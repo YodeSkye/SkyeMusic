@@ -1,0 +1,422 @@
+﻿
+Imports System.IO
+Imports SkyeMusic.My
+Public Class Options
+
+    'Declarations
+    Private UIFolderBrowser As New FolderBrowserDialog
+    Private uiFileBrowser As New OpenFileDialog
+
+    'Form Events
+    Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
+        Try
+            Select Case m.Msg
+                Case WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                    SetAccentColor()
+            End Select
+        Catch ex As Exception
+            App.WriteToLog("Options WndProc Handler Error" + Chr(13) + ex.ToString)
+        Finally
+            MyBase.WndProc(m)
+        End Try
+    End Sub
+    Private Sub OptionsLoad(sender As Object, e As EventArgs) Handles MyBase.Load
+        Text = "Options For " + My.Application.Info.Title
+        SetTheme()
+
+        'Settings
+        Select Case App.PlayerPositionShowElapsed
+            Case True : RadBtnElapsed.Checked = True
+            Case False : RadBtnRemaining.Checked = True
+        End Select
+        CoBoxPlayMode.Items.Clear()
+        CoBoxPlayMode.Items.Add("Play Once")
+        CoBoxPlayMode.Items.Add("Repeat")
+        CoBoxPlayMode.Items.Add("Play Next")
+        CoBoxPlayMode.Items.Add("Shuffle")
+        CoBoxPlayMode.SelectedIndex = App.PlayMode
+        CoBoxPlaylistDefaultAction.Items.Clear()
+        CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Play.ToString)
+        CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Queue.ToString)
+        CoBoxPlaylistDefaultAction.SelectedIndex = App.PlaylistDefaultAction
+        CoBoxPlaylistSearchAction.Items.Clear()
+        CoBoxPlaylistSearchAction.Items.Add(App.PlaylistActions.Play.ToString)
+        CoBoxPlaylistSearchAction.Items.Add(App.PlaylistActions.Queue.ToString)
+        CoBoxPlaylistSearchAction.Items.Add("Select Only")
+        CoBoxPlaylistSearchAction.SelectedIndex = App.PlaylistSearchAction
+        CoBoxTheme.Items.Clear()
+        CoBoxTheme.Items.Add(App.Themes.Accent.ToString)
+        CoBoxTheme.Items.Add(App.Themes.Light.ToString)
+        CoBoxTheme.Items.Add(App.Themes.Dark.ToString)
+        CoBoxTheme.Items.Add(App.Themes.Pink.ToString)
+        CoBoxTheme.SelectedIndex = App.Theme
+        CoBoxPlaylistTitleFormat.Items.Clear()
+        CoBoxPlaylistTitleFormat.Items.Add("Use FileName As Title")
+        CoBoxPlaylistTitleFormat.Items.Add("Song")
+        CoBoxPlaylistTitleFormat.Items.Add("Song Genre")
+        CoBoxPlaylistTitleFormat.Items.Add("Song, Artist")
+        CoBoxPlaylistTitleFormat.Items.Add("Song, Artist, Album")
+        CoBoxPlaylistTitleFormat.Items.Add("Song, Album, Artist")
+        CoBoxPlaylistTitleFormat.Items.Add("Song, Artist, Genre")
+        CoBoxPlaylistTitleFormat.Items.Add("Song, Genre, Artist")
+        CoBoxPlaylistTitleFormat.Items.Add("Song, Artist, Album, Genre")
+        CoBoxPlaylistTitleFormat.Items.Add("Song, Album, Artist, Genre")
+        CoBoxPlaylistTitleFormat.Items.Add("Song, Genre, Artist, Album")
+        CoBoxPlaylistTitleFormat.Items.Add("Artist, Song")
+        CoBoxPlaylistTitleFormat.Items.Add("Artist, Song, Album")
+        CoBoxPlaylistTitleFormat.Items.Add("Artist, Album, Song")
+        CoBoxPlaylistTitleFormat.Items.Add("Artist, Genre, Song")
+        CoBoxPlaylistTitleFormat.Items.Add("Artist, Song, Genre")
+        CoBoxPlaylistTitleFormat.Items.Add("Artist, Song, Album, Genre")
+        CoBoxPlaylistTitleFormat.Items.Add("Artist, Genre, Song, Album")
+        CoBoxPlaylistTitleFormat.Items.Add("Album, Song, Artist")
+        CoBoxPlaylistTitleFormat.Items.Add("Album, Artist, Song")
+        CoBoxPlaylistTitleFormat.Items.Add("Album, Genre, Song, Artist")
+        CoBoxPlaylistTitleFormat.Items.Add("Album, Genre, Artist, Song")
+        CoBoxPlaylistTitleFormat.Items.Add("Album, Song, Artist, Genre")
+        CoBoxPlaylistTitleFormat.Items.Add("Album, Artist, Song, Genre")
+        CoBoxPlaylistTitleFormat.Items.Add("Genre, Song")
+        CoBoxPlaylistTitleFormat.Items.Add("Genre, Song, Artist")
+        CoBoxPlaylistTitleFormat.Items.Add("Genre, Artist, Song")
+        CoBoxPlaylistTitleFormat.Items.Add("Genre, Album, Song, Artist")
+        CoBoxPlaylistTitleFormat.Items.Add("Genre, Album, Artist, Song")
+        CoBoxPlaylistTitleFormat.Items.Add("Genre, Song, Artist, Album")
+        CoBoxPlaylistTitleFormat.Items.Add("Genre, Song, Album, Artist")
+        CoBoxPlaylistTitleFormat.SelectedIndex = App.PlaylistTitleFormat
+        CkBoxPlaylistRemoveSpaces.Checked = App.PlaylistTitleRemoveSpaces
+        TxtBoxPlaylistTitleSeparator.Text = App.PlaylistTitleSeparator
+        TxtBoxPlaylistVideoIdentifier.Text = App.PlaylistVideoIdentifier
+        LBLibrarySearchFolders.Items.Clear()
+        For Each item As String In App.LibrarySearchFolders
+            LBLibrarySearchFolders.Items.Add(item)
+        Next
+        CkBoxLibrarySearchSubFolders.Checked = App.LibrarySearchSubFolders
+        CkBoxSaveWindowMetrics.Checked = App.SaveWindowMetrics
+        CkBoxSuspendOnSessionChange.Checked = App.SuspendOnSessionChange
+        TxtBoxHelperApp1Name.Text = App.HelperApp1Name
+        TxtBoxHelperApp1Path.Text = App.HelperApp1Path
+        If File.Exists(App.HelperApp1Path) Then
+            TxtBoxHelperApp1Path.ForeColor = App.CurrentTheme.TextColor
+        Else
+            TxtBoxHelperApp1Path.ForeColor = Color.Red
+        End If
+        TxtBoxHelperApp2Name.Text = App.HelperApp2Name
+        TxtBoxHelperApp2Path.Text = App.HelperApp2Path
+        If File.Exists(App.HelperApp2Path) Then
+            TxtBoxHelperApp2Path.ForeColor = App.CurrentTheme.TextColor
+        Else
+            TxtBoxHelperApp2Path.ForeColor = Color.Red
+        End If
+
+    End Sub
+    Private Sub OptionsFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        App.LibrarySearchFolders.Clear()
+        For Each item In LBLibrarySearchFolders.Items
+            App.LibrarySearchFolders.Add(item.ToString)
+        Next
+        App.SaveOptions()
+        Player.ShowPlayMode()
+    End Sub
+    Private Sub OptionsMove(sender As Object, e As EventArgs) Handles MyBase.Move
+        If Visible AndAlso WindowState = FormWindowState.Normal Then
+            If Left < 0 Then
+                Left = -App.AdjustScreenBoundsDialogWindow
+            ElseIf Right > My.Computer.Screen.WorkingArea.Width Then
+                Left = My.Computer.Screen.WorkingArea.Width - Width + App.AdjustScreenBoundsDialogWindow
+            End If
+            If Top < App.AdjustScreenBoundsDialogWindow Then
+                Top = 0
+            ElseIf Bottom > My.Computer.Screen.WorkingArea.Height Then
+                Top = My.Computer.Screen.WorkingArea.Height - Height + App.AdjustScreenBoundsDialogWindow
+            End If
+        End If
+    End Sub
+    Private Sub OptionsKeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyData = Keys.Escape Then Close()
+    End Sub
+
+    'Control Events
+    Private Sub BtnOKClick(sender As Object, e As EventArgs) Handles BtnOK.Click
+        Close()
+    End Sub
+    Private Sub BtnLibrarySearchFoldersAddClick(sender As Object, e As EventArgs) Handles BtnLibrarySearchFoldersAdd.Click
+        LibrarySearchFoldersAdd()
+    End Sub
+    Private Sub BtnHelperApp1Click(sender As Object, e As EventArgs) Handles BtnHelperApp1.Click
+        If String.IsNullOrEmpty(App.HelperApp1Path) Then
+            uiFileBrowser.InitialDirectory = String.Empty
+            uiFileBrowser.FileName = String.Empty
+        Else
+            Dim fInfo As New IO.FileInfo(App.HelperApp1Path)
+            uiFileBrowser.InitialDirectory = fInfo.DirectoryName
+            uiFileBrowser.FileName = fInfo.Name
+            fInfo = Nothing
+        End If
+        Dim r As DialogResult = uiFileBrowser.ShowDialog(Me)
+        If r = System.Windows.Forms.DialogResult.OK And Not String.IsNullOrEmpty(uiFileBrowser.FileName) Then
+            TxtBoxHelperApp1Path.Text = uiFileBrowser.FileName
+            TxtBoxHelperApp1Path.Focus()
+            Validate()
+        End If
+    End Sub
+    Private Sub BtnHelperApp2Click(sender As Object, e As EventArgs) Handles BtnHelperApp2.Click
+        If String.IsNullOrEmpty(App.HelperApp2Path) Then
+            uiFileBrowser.InitialDirectory = String.Empty
+            uiFileBrowser.FileName = String.Empty
+        Else
+            Dim fInfo As New IO.FileInfo(App.HelperApp2Path)
+            uiFileBrowser.InitialDirectory = fInfo.DirectoryName
+            uiFileBrowser.FileName = fInfo.Name
+            fInfo = Nothing
+        End If
+        Dim r As DialogResult = uiFileBrowser.ShowDialog(Me)
+        If r = System.Windows.Forms.DialogResult.OK And Not String.IsNullOrEmpty(uiFileBrowser.FileName) Then
+            TxtBoxHelperApp2Path.Text = uiFileBrowser.FileName
+            TxtBoxHelperApp2Path.Focus()
+            Validate()
+        End If
+    End Sub
+    Private Sub RadBtnElapsedClick(sender As Object, e As EventArgs) Handles RadBtnElapsed.Click
+        App.PlayerPositionShowElapsed = True
+        Player.SetTipPlayer()
+    End Sub
+    Private Sub RadBtnRemainingClick(sender As Object, e As EventArgs) Handles RadBtnRemaining.Click
+        App.PlayerPositionShowElapsed = False
+        Player.SetTipPlayer()
+    End Sub
+    Private Sub CoBoxPlayMode_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlayMode.SelectionChangeCommitted
+        App.PlayMode = CoBoxPlayMode.SelectedIndex
+        If App.PlayMode = PlayModes.Random Then Player.RandomHistoryClear()
+        Player.SetTipPlayer()
+    End Sub
+    Private Sub CoBoxPlaylistDefaultAction_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistDefaultAction.SelectionChangeCommitted
+        App.PlaylistDefaultAction = CoBoxPlaylistDefaultAction.SelectedIndex
+    End Sub
+    Private Sub CoBoxPlaylistSearchAction_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistSearchAction.SelectionChangeCommitted
+        App.PlaylistSearchAction = CoBoxPlaylistSearchAction.SelectedIndex
+    End Sub
+    Private Sub CoBoxTheme_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxTheme.SelectionChangeCommitted
+        App.Theme = CoBoxTheme.SelectedIndex
+        Debug.Print("Theme set to " + App.Theme.ToString)
+        App.CurrentTheme = App.GetCurrentThemeProperties
+        SetTheme()
+        If App.FRMLog IsNot Nothing Then
+            App.FRMLog.SetTheme()
+        End If
+        App.FRMLibrary.SetTheme()
+        Player.SetTheme()
+    End Sub
+    Private Sub CoBoxPlaylistTitleFormat_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistTitleFormat.SelectionChangeCommitted
+        App.PlaylistTitleFormat = CType(CoBoxPlaylistTitleFormat.SelectedIndex, App.PlaylistTitleFormats)
+    End Sub
+    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            e.Handled = True
+            Validate()
+        End If
+    End Sub
+    Private Sub TxtBox_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxPlaylistTitleSeparator.MouseUp, TxtBoxPlaylistVideoIdentifier.MouseUp, MyBase.MouseUp, TxtBoxHelperApp1Path.MouseUp, TxtBoxHelperApp1Name.MouseUp, TxtBoxHelperApp2Name.MouseUp, TxtBoxHelperApp2Path.MouseUp
+        If sender IsNot Me Then CMTxtBox.Display(sender, e)
+    End Sub
+    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxPlaylistTitleSeparator.PreviewKeyDown, TxtBoxPlaylistVideoIdentifier.PreviewKeyDown, MyBase.PreviewKeyDown, TxtBoxHelperApp1Path.PreviewKeyDown, TxtBoxHelperApp1Name.PreviewKeyDown, TxtBoxHelperApp2Name.PreviewKeyDown, TxtBoxHelperApp2Path.PreviewKeyDown
+        CMTxtBox.ShortcutKeys(sender, e)
+    End Sub
+    Private Sub TxtBoxPlaylistTitleSeparatorValidated(sender As Object, e As EventArgs) Handles TxtBoxPlaylistTitleSeparator.Validated
+        PlaylistTitleSeparator = TxtBoxPlaylistTitleSeparator.Text
+        TxtBoxPlaylistTitleSeparator.SelectAll()
+    End Sub
+    Private Sub TxtBoxPlaylistVideoIdentifierValidated(sender As Object, e As EventArgs) Handles TxtBoxPlaylistVideoIdentifier.Validated
+        PlaylistVideoIdentifier = TxtBoxPlaylistVideoIdentifier.Text
+        TxtBoxPlaylistVideoIdentifier.SelectAll()
+    End Sub
+    Private Sub TxtBoxHelperApp1NameValidated(sender As Object, e As EventArgs) Handles TxtBoxHelperApp1Name.Validated
+        If Not HelperApp1Name = TxtBoxHelperApp1Name.Text Then
+            HelperApp1Name = TxtBoxHelperApp1Name.Text
+            TxtBoxHelperApp1Name.SelectAll()
+            Debug.Print("TxtBoxHelperApp1NameValidated")
+        End If
+    End Sub
+    Private Sub TxtBoxHelperApp1PathValidated(sender As Object, e As EventArgs) Handles TxtBoxHelperApp1Path.Validated
+        If App.HelperApp1Path = TxtBoxHelperApp1Path.Text Then
+            TxtBoxHelperApp1Path.ForeColor = App.CurrentTheme.TextColor
+        Else
+            If String.IsNullOrEmpty(TxtBoxHelperApp1Path.Text) OrElse My.Computer.FileSystem.FileExists(TxtBoxHelperApp1Path.Text) Then
+                App.HelperApp1Path = TxtBoxHelperApp1Path.Text
+                TxtBoxHelperApp1Path.ForeColor = App.CurrentTheme.TextColor
+                TxtBoxHelperApp1Path.SelectAll()
+                Debug.Print("TxtBoxHelperApp1PathValidated")
+            Else
+                TxtBoxHelperApp1Path.ForeColor = Color.Red
+            End If
+        End If
+    End Sub
+    Private Sub TxtBoxHelperApp2NameValidated(sender As Object, e As EventArgs) Handles TxtBoxHelperApp2Name.Validated
+        If Not HelperApp2Name = TxtBoxHelperApp2Name.Text Then
+            HelperApp2Name = TxtBoxHelperApp2Name.Text
+            TxtBoxHelperApp2Name.SelectAll()
+            Debug.Print("TxtBoxHelperApp2NameValidated")
+        End If
+    End Sub
+    Private Sub TxtBoxHelperApp2PathValidated(sender As Object, e As EventArgs) Handles TxtBoxHelperApp2Path.Validated
+        If App.HelperApp2Path = TxtBoxHelperApp2Path.Text Then
+            TxtBoxHelperApp2Path.ForeColor = App.CurrentTheme.TextColor
+        Else
+            If String.IsNullOrEmpty(TxtBoxHelperApp2Path.Text) OrElse My.Computer.FileSystem.FileExists(TxtBoxHelperApp2Path.Text) Then
+                App.HelperApp2Path = TxtBoxHelperApp2Path.Text
+                TxtBoxHelperApp2Path.ForeColor = App.CurrentTheme.TextColor
+                TxtBoxHelperApp2Path.SelectAll()
+                Debug.Print("TxtBoxHelperApp2PathValidated")
+            Else
+                TxtBoxHelperApp2Path.ForeColor = Color.Red
+            End If
+        End If
+    End Sub
+    Private Sub CkBoxPlaylistRemoveSpacesClick(sender As Object, e As EventArgs) Handles CkBoxPlaylistRemoveSpaces.Click
+        App.PlaylistTitleRemoveSpaces = Not App.PlaylistTitleRemoveSpaces
+    End Sub
+    Private Sub CkBoxSearchSubFoldersClick(sender As Object, e As EventArgs) Handles CkBoxLibrarySearchSubFolders.Click
+        App.LibrarySearchSubFolders = Not App.LibrarySearchSubFolders
+    End Sub
+    Private Sub CkBoxSaveWindowMetricsClick(sender As Object, e As EventArgs) Handles CkBoxSaveWindowMetrics.Click
+        App.SaveWindowMetrics = Not App.SaveWindowMetrics
+    End Sub
+    Private Sub CkBoxSuspendOnSessionChange_Click(sender As Object, e As EventArgs) Handles CkBoxSuspendOnSessionChange.Click
+        App.SuspendOnSessionChange = Not App.SuspendOnSessionChange
+    End Sub
+    Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
+        If e.Alt Then
+        ElseIf e.Control Then
+            Select Case e.KeyCode
+            End Select
+        ElseIf e.Shift Then
+            Select Case e.KeyCode
+            End Select
+        Else
+            Select Case e.KeyCode
+                Case Keys.Enter
+                Case Keys.Escape
+                Case Keys.End
+                Case Keys.Up
+                Case Keys.Left
+                Case Keys.Right
+                Case Keys.Space
+                    'TogglePlay()
+                    'e.SuppressKeyPress = True
+                Case Keys.OemQuestion
+                Case Keys.PageUp
+                Case Keys.PageDown
+                Case Keys.Home
+                Case Keys.Delete
+                    LibrarySearchFoldersRemove()
+                Case Keys.Insert
+            End Select
+        End If
+
+    End Sub
+    Private Sub LBLibrarySearchFoldersMouseDown(sender As Object, e As MouseEventArgs) Handles LBLibrarySearchFolders.MouseDown
+        If e.Button = MouseButtons.Right Then
+            LBLibrarySearchFolders.SelectedIndex = LBLibrarySearchFolders.IndexFromPoint(e.X, e.Y)
+        End If
+    End Sub
+    Private Sub CMLibrarySearchFolders_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMLibrarySearchFolders.Opening
+        If LBLibrarySearchFolders.SelectedItems.Count = 0 Then
+            CMILibrarySearchFoldersRemove.Enabled = False
+        Else
+            CMILibrarySearchFoldersRemove.Enabled = True
+        End If
+    End Sub
+    Private Sub CMILibrarySearchFoldersAddClick(sender As Object, e As EventArgs) Handles CMILibrarySearchFoldersAdd.Click
+        LibrarySearchFoldersAdd()
+    End Sub
+    Private Sub CMILibrarySearchFoldersRemoveClick(sender As Object, e As EventArgs) Handles CMILibrarySearchFoldersRemove.Click
+        LibrarySearchFoldersRemove()
+    End Sub
+
+    'Procedures
+    Private Sub LibrarySearchFoldersAdd()
+        Dim r As DialogResult = UIFolderBrowser.ShowDialog(Me)
+        If r = DialogResult.OK And Not UIFolderBrowser.SelectedPath = String.Empty And Not LBLibrarySearchFolders.Items.Contains(UIFolderBrowser.SelectedPath) Then
+            LBLibrarySearchFolders.Items.Add(UIFolderBrowser.SelectedPath)
+        End If
+        LBLibrarySearchFolders.Focus()
+    End Sub
+    Private Sub LibrarySearchFoldersRemove()
+        If LBLibrarySearchFolders.SelectedItems.Count = 1 Then
+            LBLibrarySearchFolders.Items.RemoveAt(LBLibrarySearchFolders.SelectedIndex)
+        End If
+    End Sub
+    Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
+        Static c As Color
+        If Not AsTheme Then SuspendLayout()
+        If App.Theme = App.Themes.Accent Then
+            c = App.GetAccentColor()
+            BackColor = c
+            GrBoxTime.BackColor = c
+            RadBtnRemaining.BackColor = c
+            GrBoxPlaylistFormatting.BackColor = c
+            GrBoxLibrarySearchFolders.BackColor = c
+            CkBoxLibrarySearchSubFolders.BackColor = c
+        End If
+        If Not AsTheme Then ResumeLayout()
+        Debug.Print("Options Accent Color Set")
+    End Sub
+    Private Sub SetTheme()
+        Static forecolor As Color
+        SuspendLayout()
+        If App.Theme = App.Themes.Accent Then
+            SetAccentColor(True)
+            forecolor = App.CurrentTheme.AccentTextColor
+        Else
+            BackColor = App.CurrentTheme.BackColor
+            GrBoxTime.BackColor = App.CurrentTheme.BackColor
+            RadBtnRemaining.BackColor = App.CurrentTheme.BackColor
+            GrBoxPlaylistFormatting.BackColor = App.CurrentTheme.BackColor
+            GrBoxLibrarySearchFolders.BackColor = App.CurrentTheme.BackColor
+            CkBoxLibrarySearchSubFolders.BackColor = App.CurrentTheme.BackColor
+            forecolor = App.CurrentTheme.TextColor
+        End If
+        CoBoxPlayMode.BackColor = App.CurrentTheme.ControlBackColor
+        CoBoxPlayMode.ForeColor = App.CurrentTheme.TextColor
+        CoBoxPlaylistDefaultAction.BackColor = App.CurrentTheme.ControlBackColor
+        CoBoxPlaylistDefaultAction.ForeColor = App.CurrentTheme.TextColor
+        CoBoxPlaylistSearchAction.BackColor = App.CurrentTheme.ControlBackColor
+        CoBoxPlaylistSearchAction.ForeColor = App.CurrentTheme.TextColor
+        CoBoxTheme.BackColor = App.CurrentTheme.ControlBackColor
+        CoBoxTheme.ForeColor = App.CurrentTheme.TextColor
+        CoBoxPlaylistTitleFormat.BackColor = App.CurrentTheme.ControlBackColor
+        CoBoxPlaylistTitleFormat.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxPlaylistTitleSeparator.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxPlaylistTitleSeparator.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxPlaylistVideoIdentifier.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxPlaylistVideoIdentifier.ForeColor = App.CurrentTheme.TextColor
+        LBLibrarySearchFolders.BackColor = App.CurrentTheme.ControlBackColor
+        LBLibrarySearchFolders.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxHelperApp1Name.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxHelperApp1Name.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxHelperApp1Path.BackColor = App.CurrentTheme.ControlBackColor
+        If Not TxtBoxHelperApp1Path.ForeColor = Color.Red Then TxtBoxHelperApp1Path.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxHelperApp2Name.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxHelperApp2Name.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxHelperApp2Path.BackColor = App.CurrentTheme.ControlBackColor
+        If Not TxtBoxHelperApp2Path.ForeColor = Color.Red Then TxtBoxHelperApp2Path.ForeColor = App.CurrentTheme.TextColor
+        BtnLibrarySearchFoldersAdd.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnHelperApp1.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnHelperApp2.BackColor = App.CurrentTheme.ButtonBackColor
+        GrBoxTime.ForeColor = forecolor
+        GrBoxPlaylistFormatting.ForeColor = forecolor
+        GrBoxLibrarySearchFolders.ForeColor = forecolor
+        LblSongPlayMode.ForeColor = forecolor
+        LblDefaultPlaylistAction.ForeColor = forecolor
+        LblPlaylistSearchAction.ForeColor = forecolor
+        LblTheme.ForeColor = forecolor
+        CkBoxSaveWindowMetrics.ForeColor = forecolor
+        CkBoxSuspendOnSessionChange.ForeColor = forecolor
+        LblHelperApp1Name.ForeColor = forecolor
+        LblHelperApp1Path.ForeColor = forecolor
+        LblHelperApp2Name.ForeColor = forecolor
+        LblHelperApp2Path.ForeColor = forecolor
+        ResumeLayout()
+        Debug.Print("Options Theme Set")
+    End Sub
+
+End Class
