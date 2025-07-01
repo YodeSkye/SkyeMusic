@@ -311,7 +311,7 @@ Namespace My.Components
 		End Sub
 		Protected Overrides Sub WndProc(ByRef m As Message)
 			MyBase.WndProc(m)
-			If m.Msg = WinAPI.WM_PAINT Then
+			If m.Msg = WinAPI.WM_PAINT And m.HWnd = Handle Then
 				If LineBefore >= 0 AndAlso LineBefore < Items.Count Then
 					Dim rc As Rectangle = Items(LineBefore).GetBounds(ItemBoundsPortion.Label)
 					DrawInsertionLine(rc.Left, rc.Right, rc.Top)
