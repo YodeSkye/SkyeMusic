@@ -128,12 +128,12 @@ Public Class Log
                 RTBLog.SelectionStart = foundindex
                 RTBLog.SelectionLength = TxBxSearch.Text.Length
                 Select Case App.Theme
-                    Case App.Themes.Accent, App.Themes.Light
+                    Case App.Themes.Accent
                         RTBLog.SelectionBackColor = App.CurrentTheme.AccentTextColor
                     Case Else
                         RTBLog.SelectionBackColor = App.CurrentTheme.TextColor
                 End Select
-                RTBLog.SelectionColor = Color.Red
+                RTBLog.SelectionColor = App.CurrentTheme.BackColor
                 'Try To Find Next Occurrence
                 foundindex = searchtext.IndexOf(TxBxSearch.Text, foundindex + TxBxSearch.Text.Length, StringComparison.CurrentCultureIgnoreCase)
             Loop
