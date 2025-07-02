@@ -264,15 +264,11 @@ Public Class Player
                 TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New Point(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
             End If
         Else
-            If PlaylistItemMove Is Nothing Then
-                e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.BackColor), e.Bounds)
-                If e.ColumnIndex = 0 Then
-                    TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistBoldFont, e.Bounds.Width), PlaylistBoldFont, New Point(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
-                Else
-                    TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, LVPlaylist.Font, e.Bounds.Width), LVPlaylist.Font, New Point(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
-                End If
+            e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.BackColor), e.Bounds)
+            If e.ColumnIndex = 0 Then
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistBoldFont, e.Bounds.Width), PlaylistBoldFont, New Point(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
             Else
-                e.DrawDefault = True
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, LVPlaylist.Font, e.Bounds.Width), LVPlaylist.Font, New Point(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
             End If
         End If
     End Sub
@@ -2511,6 +2507,7 @@ Public Class Player
         End If
         LVPlaylist.BackColor = App.CurrentTheme.BackColor
         LVPlaylist.ForeColor = App.CurrentTheme.TextColor
+        LVPlaylist.InsertionLineColor = App.CurrentTheme.TextColor
         ListBoxPlaylistSearch.BackColor = App.CurrentTheme.BackColor
         ListBoxPlaylistSearch.ForeColor = App.CurrentTheme.TextColor
         LblPlaylistCount.ForeColor = App.CurrentTheme.AccentTextColor

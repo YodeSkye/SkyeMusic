@@ -288,7 +288,9 @@ Namespace My.Components
 		Inherits ListView
 
 		Private _LineBefore As Integer = -1
-		Private _LineAfter As Integer = -1
+        Private _LineAfter As Integer = -1
+		Private _InsertionLineColor As Color = Color.Teal
+
 		Public Property LineBefore As Integer
 			Get
 				Return _LineBefore
@@ -303,6 +305,15 @@ Namespace My.Components
 			End Get
 			Set(ByVal value As Integer)
 				_LineAfter = value
+			End Set
+		End Property
+		<ComponentModel.Category("Appearance"), ComponentModel.Description("Specify the color used to draw the Insertion Line")>
+		Public Property InsertionLineColor As Color
+			Get
+				Return _InsertionLineColor
+			End Get
+			Set(ByVal value As Color)
+				_InsertionLineColor = value
 			End Set
 		End Property
 
@@ -324,13 +335,16 @@ Namespace My.Components
 		End Sub
 		Private Sub DrawInsertionLine(ByVal X1 As Integer, ByVal X2 As Integer, ByVal Y As Integer)
 			Using g As Graphics = Me.CreateGraphics()
-				Dim p As New Pen(Color.Teal)
+				Dim p As New Pen(_InsertionLineColor)
 				p.Width = 3
 				g.DrawLine(p, X1, Y, X2 - 1, Y)
 				Dim leftTriangle As Point() = New Point(2) {New Point(X1, Y - 4), New Point(X1 + 7, Y), New Point(X1, Y + 4)}
-				Dim rightTriangle As Point() = New Point(2) {New Point(X2, Y - 4), New Point(X2 - 8, Y), New Point(X2, Y + 4)}
-				g.FillPolygon(Brushes.Teal, leftTriangle)
-				g.FillPolygon(Brushes.Teal, rightTriangle)
+                Dim rightTriangle As Point() = New Point(2) {New Point(X2, Y - 4), New Point(X2 - 8, Y), New Point(X2, Y + 4)}
+				Dim b As New SolidBrush(_InsertionLineColor)
+				g.FillPolygon(b, leftTriangle)
+				g.FillPolygon(b, rightTriangle)
+				b.Dispose()
+				p.Dispose()
 			End Using
 		End Sub
 
