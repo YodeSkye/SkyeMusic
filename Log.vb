@@ -56,7 +56,9 @@ Public Class Log
         End If
     End Sub
     Private Sub Log_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyData = Keys.Escape Then Me.Close()
+        If Not TxBxSearch.Focused Then
+            If e.KeyData = Keys.Escape Then Me.Close()
+        End If
     End Sub
     Private Sub Log_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick
         ToggleMaximized()
@@ -83,6 +85,14 @@ Public Class Log
     End Sub
     Private Sub TxBxSearch_DoubleClick(sender As Object, e As EventArgs) Handles TxBxSearch.DoubleClick
         ToggleMaximized()
+    End Sub
+    Private Sub TxBxSearch_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TxBxSearch.KeyPress
+        Select Case e.KeyChar
+            Case Convert.ToChar(Keys.Escape)
+                ResetRTBLogFind()
+                RTBLog.Focus()
+                e.Handled = True
+        End Select
     End Sub
     Private Sub TxBxSearch_Enter(sender As Object, e As EventArgs) Handles TxBxSearch.Enter
         If TxBxSearch.Text = LogSearchTitle Then TxBxSearch.ResetText()
@@ -186,7 +196,9 @@ Public Class Log
         RTBLog.SelectionBackColor = App.CurrentTheme.BackColor
         RTBLog.SelectionColor = App.CurrentTheme.TextColor
         RTBLog.DeselectAll()
+        RTBLog.SelectionStart = RTBLog.TextLength
+        RTBLog.SelectionLength = 0
+        RTBLog.ScrollToCaret()
     End Sub
-
 
 End Class
