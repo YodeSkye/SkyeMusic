@@ -75,6 +75,7 @@ Public Class Player
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
         PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
+        TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
         SetTheme()
         LoadPlaylist()
         ClearPlaylistTitles()

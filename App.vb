@@ -325,6 +325,7 @@ Namespace My
             Return value.ToString(format) & suffix
         End Function
         Friend Sub Initialize()
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzkzMzQwMUAzMzMwMmUzMDJlMzAzYjMzMzAzYmorMHVJSHVxLy9PM25TUGYrMURsLzhuY3BCK0k0QjZ4L3hJOTcvQ1dQcjQ9")
 #If DEBUG Then
             LogPath = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt"
             RegPath = "Software\\" + My.Application.Info.ProductName + "DEV"

@@ -46,7 +46,6 @@ Partial Class Player
         CMICopyFilePath = New ToolStripMenuItem()
         TimerPosition = New Timer(components)
         AxPlayer = New AxWMPLib.AxWindowsMediaPlayer()
-        TrackBarPosition = New TrackBar()
         BtnReverse = New Button()
         MenuPlayer = New MenuStrip()
         MIFile = New ToolStripMenuItem()
@@ -91,9 +90,9 @@ Partial Class Player
         LblDuration = New Components.LabelCSY()
         LblPosition = New Components.LabelCSY()
         CMLyrics = New Components.TextBoxContextMenu()
+        TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
         CMPlaylist.SuspendLayout()
         CType(AxPlayer, ComponentModel.ISupportInitialize).BeginInit()
-        CType(TrackBarPosition, ComponentModel.ISupportInitialize).BeginInit()
         MenuPlayer.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         CType(PicBoxVisualizer, ComponentModel.ISupportInitialize).BeginInit()
@@ -249,18 +248,6 @@ Partial Class Player
         AxPlayer.OcxState = CType(resources.GetObject("AxPlayer.OcxState"), AxHost.State)
         AxPlayer.Size = New Size(173, 214)
         AxPlayer.TabIndex = 35
-        ' 
-        ' TrackBarPosition
-        ' 
-        TrackBarPosition.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        TrackBarPosition.AutoSize = False
-        TrackBarPosition.Enabled = False
-        TrackBarPosition.Location = New Point(12, 360)
-        TrackBarPosition.Name = "TrackBarPosition"
-        TrackBarPosition.Size = New Size(386, 29)
-        TrackBarPosition.TabIndex = 20
-        TrackBarPosition.TabStop = False
-        TrackBarPosition.TickStyle = TickStyle.None
         ' 
         ' BtnReverse
         ' 
@@ -465,12 +452,12 @@ Partial Class Player
         PEXLeft.BackColor = Color.Transparent
         PEXLeft.DrawingColor = Color.DodgerBlue
         PEXLeft.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
-        PEXLeft.Location = New Point(12, 354)
+        PEXLeft.Location = New Point(12, 352)
         PEXLeft.Maximum = 100
         PEXLeft.Minimum = 0
         PEXLeft.Name = "PEXLeft"
         PEXLeft.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
-        PEXLeft.Size = New Size(386, 5)
+        PEXLeft.Size = New Size(385, 5)
         PEXLeft.Step = 1
         PEXLeft.TabIndex = 17
         PEXLeft.TabStop = False
@@ -482,12 +469,12 @@ Partial Class Player
         PEXRight.BackColor = Color.Transparent
         PEXRight.DrawingColor = Color.DodgerBlue
         PEXRight.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
-        PEXRight.Location = New Point(12, 384)
+        PEXRight.Location = New Point(12, 389)
         PEXRight.Maximum = 100
         PEXRight.Minimum = 0
         PEXRight.Name = "PEXRight"
         PEXRight.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
-        PEXRight.Size = New Size(386, 5)
+        PEXRight.Size = New Size(385, 5)
         PEXRight.Step = 1
         PEXRight.TabIndex = 18
         PEXRight.TabStop = False
@@ -509,7 +496,7 @@ Partial Class Player
         LblAlbumArtSelect.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblAlbumArtSelect.BackColor = Color.Transparent
         LblAlbumArtSelect.Image = My.Resources.Resources.ImageAlbumArtSelect
-        LblAlbumArtSelect.Location = New Point(98, 322)
+        LblAlbumArtSelect.Location = New Point(98, 321)
         LblAlbumArtSelect.Name = "LblAlbumArtSelect"
         LblAlbumArtSelect.Size = New Size(214, 32)
         LblAlbumArtSelect.TabIndex = 15
@@ -576,6 +563,7 @@ Partial Class Player
         LVPlaylist.Columns.AddRange(New ColumnHeader() {ColumnHeaderTitle, ColumnHeaderFilename})
         LVPlaylist.ContextMenuStrip = CMPlaylist
         LVPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LVPlaylist.InsertionLineColor = Color.Teal
         LVPlaylist.LineAfter = -1
         LVPlaylist.LineBefore = -1
         LVPlaylist.Location = New Point(410, 27)
@@ -672,6 +660,28 @@ Partial Class Player
         CMLyrics.Name = "CMLyrics"
         CMLyrics.Size = New Size(123, 148)
         ' 
+        ' TrackBarPosition
+        ' 
+        TrackBarPosition.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        TrackBarPosition.AutoSize = False
+        TrackBarPosition.BackColor = Color.FromArgb(CByte(45), CByte(45), CByte(45))
+        TrackBarPosition.BeforeTouchSize = New Size(385, 20)
+        TrackBarPosition.ChannelHeight = 8
+        TrackBarPosition.DecreaseButtonSize = New Size(0, 0)
+        TrackBarPosition.Enabled = False
+        TrackBarPosition.IncreaseButtonSize = New Size(0, 0)
+        TrackBarPosition.Location = New Point(13, 360)
+        TrackBarPosition.Name = "TrackBarPosition"
+        TrackBarPosition.ShowButtons = False
+        TrackBarPosition.ShowFocusRect = False
+        TrackBarPosition.Size = New Size(385, 20)
+        TrackBarPosition.SliderSize = New Size(15, 25)
+        TrackBarPosition.TabIndex = 20
+        TrackBarPosition.TabStop = False
+        TrackBarPosition.ThemeName = "Default"
+        TrackBarPosition.TimerInterval = 100
+        TrackBarPosition.Value = 0
+        ' 
         ' Player
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -686,7 +696,6 @@ Partial Class Player
         Controls.Add(LVPlaylist)
         Controls.Add(BtnPrevious)
         Controls.Add(TxtBoxPlaylistSearch)
-        Controls.Add(LblAlbumArtSelect)
         Controls.Add(BtnNext)
         Controls.Add(BtnMute)
         Controls.Add(BtnStop)
@@ -700,6 +709,7 @@ Partial Class Player
         Controls.Add(TxtBoxLyrics)
         Controls.Add(LblPlaylistCount)
         Controls.Add(TrackBarPosition)
+        Controls.Add(LblAlbumArtSelect)
         ForeColor = SystemColors.HighlightText
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
@@ -710,7 +720,6 @@ Partial Class Player
         TopMost = True
         CMPlaylist.ResumeLayout(False)
         CType(AxPlayer, ComponentModel.ISupportInitialize).EndInit()
-        CType(TrackBarPosition, ComponentModel.ISupportInitialize).EndInit()
         MenuPlayer.ResumeLayout(False)
         MenuPlayer.PerformLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).EndInit()
@@ -722,7 +731,6 @@ Partial Class Player
     Friend WithEvents BtnPlay As Button
     Friend WithEvents TimerPosition As Timer
     Friend WithEvents AxPlayer As AxWMPLib.AxWindowsMediaPlayer
-    Friend WithEvents TrackBarPosition As TrackBar
     Friend WithEvents BtnReverse As Button
     Friend WithEvents ColumnHeaderTitle As ColumnHeader
     Friend WithEvents MenuPlayer As MenuStrip
@@ -789,4 +797,5 @@ Partial Class Player
     Friend WithEvents CMLyrics As My.Components.TextBoxContextMenu
     Friend WithEvents CMIQueue As ToolStripMenuItem
     Friend WithEvents MIOpenURL As ToolStripMenuItem
+    Friend WithEvents TrackBarPosition As Syncfusion.Windows.Forms.Tools.TrackBarEx
 End Class

@@ -97,6 +97,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Syncfusion.Tools.Windows" Version="30.1.38" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 
