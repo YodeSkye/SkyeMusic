@@ -871,7 +871,8 @@ Public Class Player
     End Sub
     Private Sub TrackBarPositionMouseUp(sender As Object, e As MouseEventArgs) Handles TrackBarPosition.MouseUp
         Dim newposition As Double
-        newposition = ((e.X - 10) / (TrackBarPosition.Width - 26)) * (TrackBarPosition.Maximum - TrackBarPosition.Minimum)
+        ' newposition = ((e.X - 10) / (TrackBarPosition.Width - 26)) * (TrackBarPosition.Maximum - TrackBarPosition.Minimum)
+        newposition = ((e.X - 7) / (TrackBarPosition.Width - 18)) * (TrackBarPosition.Maximum - TrackBarPosition.Minimum)
         If newposition < 0 Then
             newposition = 0
         ElseIf newposition > TrackBarPosition.Maximum Then
@@ -2521,6 +2522,11 @@ Public Class Player
         BtnMute.BackColor = App.CurrentTheme.ButtonBackColor
         PEXLeft.DrawingColor = App.CurrentTheme.TextColor
         PEXRight.DrawingColor = App.CurrentTheme.TextColor
+        TrackBarPosition.TrackBarGradientStart = App.CurrentTheme.BackColor
+        TrackBarPosition.TrackBarGradientEnd = App.CurrentTheme.BackColor
+        TrackBarPosition.ButtonColor = App.CurrentTheme.ButtonBackColor
+        TrackBarPosition.HighlightedButtonColor = App.CurrentTheme.ButtonBackColor
+        TrackBarPosition.PushedButtonEndColor = App.CurrentTheme.TextColor
         If TxtBoxPlaylistSearch.Text = PlaylistSearchTitle Then TxtBoxPlaylistSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor 'Set the search box inactive text color
         ResumeLayout()
         Debug.Print("Player Theme Set")
