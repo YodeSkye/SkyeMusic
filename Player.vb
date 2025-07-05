@@ -2494,6 +2494,8 @@ Public Class Player
         If App.Theme = App.Themes.Accent Then
             BackColor = c
             TxtBoxLyrics.BackColor = c
+            TrackBarPosition.TrackBarGradientStart = c
+            TrackBarPosition.TrackBarGradientEnd = c
         End If
         If Not AsTheme Then ResumeLayout()
         Debug.Print("Player Accent Color Set")
@@ -2507,9 +2509,15 @@ Public Class Player
         If App.Theme = App.Themes.Accent Then
             SetAccentColor(True)
             LblPlaylistCount.ForeColor = App.CurrentTheme.AccentTextColor
+            LblDuration.ForeColor = App.CurrentTheme.AccentTextColor
+            LblPosition.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
+            TrackBarPosition.TrackBarGradientStart = App.CurrentTheme.BackColor
+            TrackBarPosition.TrackBarGradientEnd = App.CurrentTheme.BackColor
             LblPlaylistCount.ForeColor = App.CurrentTheme.TextColor
+            LblDuration.ForeColor = App.CurrentTheme.TextColor
+            LblPosition.ForeColor = App.CurrentTheme.TextColor
         End If
         LVPlaylist.BackColor = App.CurrentTheme.BackColor
         LVPlaylist.ForeColor = App.CurrentTheme.TextColor
@@ -2525,8 +2533,6 @@ Public Class Player
         BtnMute.BackColor = App.CurrentTheme.ButtonBackColor
         PEXLeft.DrawingColor = App.CurrentTheme.TextColor
         PEXRight.DrawingColor = App.CurrentTheme.TextColor
-        TrackBarPosition.TrackBarGradientStart = App.CurrentTheme.BackColor
-        TrackBarPosition.TrackBarGradientEnd = App.CurrentTheme.BackColor
         TrackBarPosition.ButtonColor = App.CurrentTheme.ButtonBackColor
         TrackBarPosition.HighlightedButtonColor = App.CurrentTheme.ButtonBackColor
         TrackBarPosition.PushedButtonEndColor = App.CurrentTheme.TextColor
