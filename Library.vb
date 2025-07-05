@@ -30,7 +30,6 @@ Public Class Library
         Dim Filename As String
         Dim HasAlbumArt As Boolean
     End Structure
-    Private ReadOnly LibrarySavePath As String = My.Computer.FileSystem.CombinePath(My.Application.Info.DirectoryPath, My.Application.Info.ProductName + "Library.xml")
     Private LibraryImageList As New ImageList
     Private AlbumArtIndex As Byte = 0
     Private PicBoxAlbumArtSmallSize As Size
@@ -1624,7 +1623,7 @@ Public Class Library
     End Sub
     Private Sub SaveLibrary()
         If LVLibrary.Items.Count = 0 Then
-            If My.Computer.FileSystem.FileExists(LibrarySavePath) Then My.Computer.FileSystem.DeleteFile(LibrarySavePath)
+            If My.Computer.FileSystem.FileExists(App.LibraryPath) Then My.Computer.FileSystem.DeleteFile(App.LibraryPath)
         Else
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim items As New Collections.Generic.List(Of LibraryItemType)
@@ -1651,7 +1650,10 @@ Public Class Library
                 newitem = Nothing
             Next
             Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of LibraryItemType)))
-            Dim file As New System.IO.StreamWriter(LibrarySavePath)
+            If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
+                My.Computer.FileSystem.CreateDirectory(System.IO.Path.GetDirectoryName(App.UserPath))
+            End If
+            Dim file As New System.IO.StreamWriter(App.LibraryPath)
             writer.Serialize(file, items)
             file.Close()
             file.Dispose()
@@ -1662,10 +1664,10 @@ Public Class Library
         End If
     End Sub
     Private Sub LoadLibrary()
-        If My.Computer.FileSystem.FileExists(LibrarySavePath) Then
+        If My.Computer.FileSystem.FileExists(App.LibraryPath) Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of LibraryItemType)))
-            Dim file As New System.IO.StreamReader(LibrarySavePath)
+            Dim file As New System.IO.StreamReader(App.LibraryPath)
             Dim items As Collections.Generic.List(Of LibraryItemType)
             items = reader.Deserialize(file)
             file.Close()

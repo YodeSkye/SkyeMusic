@@ -14,7 +14,6 @@ Public Class Player
         Dim Title As String
         Dim Filename As String
     End Structure
-    Private ReadOnly PlaylistSavePath As String = My.Computer.FileSystem.CombinePath(My.Application.Info.DirectoryPath, My.Application.Info.ProductName + "Playlist.xml") 'Playlist Save Path
     Private aDevEnum As New CoreAudio.MMDeviceEnumerator 'Audio Device Enumerator
     Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
     Private cLeftMeter, cRightMeter, visR, visB As Byte 'Meter Values and Visualizer Colors
@@ -1898,7 +1897,7 @@ Public Class Player
     End Function
     Private Sub SavePlaylist()
         If LVPlaylist.Items.Count = 0 Then
-            If My.Computer.FileSystem.FileExists(PlaylistSavePath) Then My.Computer.FileSystem.DeleteFile(PlaylistSavePath)
+            If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then My.Computer.FileSystem.DeleteFile(App.PlaylistPath)
         Else
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim items As New Collections.Generic.List(Of PlaylistItemType)
@@ -1910,7 +1909,10 @@ Public Class Player
                 newitem = Nothing
             Next
             Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of PlaylistItemType)))
-            Dim file As New System.IO.StreamWriter(PlaylistSavePath)
+            If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
+                My.Computer.FileSystem.CreateDirectory(System.IO.Path.GetDirectoryName(App.UserPath))
+            End If
+            Dim file As New System.IO.StreamWriter(App.PlaylistPath)
             writer.Serialize(file, items)
             file.Close()
             file.Dispose()
@@ -1921,10 +1923,10 @@ Public Class Player
         End If
     End Sub
     Private Sub LoadPlaylist()
-        If My.Computer.FileSystem.FileExists(PlaylistSavePath) Then
+        If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of PlaylistItemType)))
-            Dim file As New IO.FileStream(PlaylistSavePath, IO.FileMode.Open)
+            Dim file As New IO.FileStream(App.PlaylistPath, IO.FileMode.Open)
             Dim items As Collections.Generic.List(Of PlaylistItemType)
             items = reader.Deserialize(file)
             file.Close()
@@ -2504,15 +2506,16 @@ Public Class Player
         SuspendLayout()
         If App.Theme = App.Themes.Accent Then
             SetAccentColor(True)
+            LblPlaylistCount.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
+            LblPlaylistCount.ForeColor = App.CurrentTheme.TextColor
         End If
         LVPlaylist.BackColor = App.CurrentTheme.BackColor
         LVPlaylist.ForeColor = App.CurrentTheme.TextColor
         LVPlaylist.InsertionLineColor = App.CurrentTheme.TextColor
         ListBoxPlaylistSearch.BackColor = App.CurrentTheme.BackColor
         ListBoxPlaylistSearch.ForeColor = App.CurrentTheme.TextColor
-        LblPlaylistCount.ForeColor = App.CurrentTheme.AccentTextColor
         BtnPlay.BackColor = App.CurrentTheme.ButtonBackColor
         BtnStop.BackColor = App.CurrentTheme.ButtonBackColor
         BtnReverse.BackColor = App.CurrentTheme.ButtonBackColor

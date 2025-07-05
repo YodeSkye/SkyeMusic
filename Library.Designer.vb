@@ -416,6 +416,7 @@ Partial Class Library
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(984, 461)
+        ContextMenuStrip = CMLibrary
         Controls.Add(LblStatus)
         Controls.Add(LblLibraryCounts)
         Controls.Add(PicBoxAlbumArt)

@@ -108,8 +108,18 @@ Namespace My
         Private WithEvents ScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
-        Private LogPath As String = String.Empty 'LogPath is the path to the log file.
-        Private RegPath As String = String.Empty 'RegPath is the path to the registry key where application settings are stored.
+        Friend ReadOnly UserPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" 'UserPath is the base path for user-specific files.
+#If DEBUG Then
+        Private ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt" 'LogPath is the path to the log file.
+        Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName + "DEV" 'RegPath is the path to the registry key where application settings are stored.
+        Friend ReadOnly PlaylistPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
+        Friend ReadOnly LibraryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
+#Else
+        Private ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "Log.txt" 'LogPath is the path to the log file.
+        Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName 'RegPath is the path to the registry key where application settings are stored.
+        Friend ReadOnly PlaylistPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
+        Friend ReadOnly LibraryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
+#End If
 
         'Themes
         Friend CurrentTheme As ThemeProperties 'Holds the current theme settings of the application.
@@ -325,15 +335,8 @@ Namespace My
             Return value.ToString(format) & suffix
         End Function
         Friend Sub Initialize()
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzkzMzQwMUAzMzMwMmUzMDJlMzAzYjMzMzAzYmorMHVJSHVxLy9PM25TUGYrMURsLzhuY3BCK0k0QjZ4L3hJOTcvQ1dQcjQ9")
-#If DEBUG Then
-            LogPath = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt"
-            RegPath = "Software\\" + My.Application.Info.ProductName + "DEV"
-#Else
-            LogPath = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "Log.txt"
-			RegPath = "Software\\" + My.Application.Info.ProductName
-#End If
             WriteToLog(My.Application.Info.ProductName + " Started")
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzkzMzQwMUAzMzMwMmUzMDJlMzAzYjMzMzAzYmorMHVJSHVxLy9PM25TUGYrMURsLzhuY3BCK0k0QjZ4L3hJOTcvQ1dQcjQ9")
             GetOptions()
             CurrentTheme = GetCurrentThemeProperties()
 
