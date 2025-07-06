@@ -103,7 +103,6 @@ Partial Class Player
         BtnPlay.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnPlay.BackColor = Color.Transparent
         BtnPlay.Font = New Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        BtnPlay.Image = My.Resources.Resources.ImagePlay
         BtnPlay.Location = New Point(12, 399)
         BtnPlay.Name = "BtnPlay"
         BtnPlay.Size = New Size(50, 50)
@@ -253,7 +252,6 @@ Partial Class Player
         ' 
         BtnReverse.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnReverse.BackColor = Color.Transparent
-        BtnReverse.Image = My.Resources.Resources.ImageFastReverse
         BtnReverse.Location = New Point(124, 399)
         BtnReverse.Name = "BtnReverse"
         BtnReverse.Size = New Size(50, 50)
@@ -401,7 +399,6 @@ Partial Class Player
         ' 
         BtnForward.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnForward.BackColor = Color.Transparent
-        BtnForward.Image = My.Resources.Resources.ImageFastForward
         BtnForward.Location = New Point(180, 399)
         BtnForward.Name = "BtnForward"
         BtnForward.Size = New Size(50, 50)
@@ -414,7 +411,6 @@ Partial Class Player
         BtnStop.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnStop.BackColor = Color.Transparent
         BtnStop.Font = New Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        BtnStop.Image = My.Resources.Resources.ImageStop
         BtnStop.Location = New Point(68, 399)
         BtnStop.Name = "BtnStop"
         BtnStop.Size = New Size(50, 50)
@@ -426,7 +422,7 @@ Partial Class Player
         ' 
         BtnMute.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         BtnMute.BackColor = Color.Transparent
-        BtnMute.Image = My.Resources.Resources.ImageSound
+        BtnMute.Image = My.Resources.Resources.ImagePlayerSound
         BtnMute.Location = New Point(348, 399)
         BtnMute.Name = "BtnMute"
         BtnMute.Size = New Size(50, 50)
@@ -438,7 +434,6 @@ Partial Class Player
         ' 
         BtnNext.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnNext.BackColor = Color.Transparent
-        BtnNext.Image = My.Resources.Resources.ImageNext
         BtnNext.Location = New Point(292, 399)
         BtnNext.Name = "BtnNext"
         BtnNext.Size = New Size(50, 50)
@@ -540,7 +535,6 @@ Partial Class Player
         ' 
         BtnPrevious.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnPrevious.BackColor = Color.Transparent
-        BtnPrevious.Image = My.Resources.Resources.ImagePrevious
         BtnPrevious.Location = New Point(236, 399)
         BtnPrevious.Name = "BtnPrevious"
         BtnPrevious.Size = New Size(50, 50)

@@ -151,20 +151,11 @@
   <data name="ImageLog16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageLog16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ImageEditDelete16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageEditDelete16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageAlbumArtSelect" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAlbumArtSelect.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageSoundMute" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageSoundMute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageCollapse16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageCollapse16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -172,20 +163,11 @@
   <data name="ImageSkyeTag" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageSkyeTag.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImagePlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ImageOK" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageOK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageEditCut16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageEditCut16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageRefresh16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageRefresh16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -193,17 +175,11 @@
   <data name="ImageMP3Tag16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageMP3Tag16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImagePause" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ImageGetPath16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageGetPath16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageExpandAll16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageExpandAll16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageApp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageApp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -237,9 +213,6 @@
   </data>
   <data name="ImageAddAll16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAddAll16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageSound" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageSound.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageView" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageView.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -284,5 +257,56 @@
   </data>
   <data name="ImageGlobe" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageGlobe.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerSound" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerSound.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerSoundMute" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerSoundMute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentPlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentPause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentPause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentPrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentPrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhiteFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhiteFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhiteFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhiteFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhitePrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhitePrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhiteNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhiteNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhiteStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhiteStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhitePause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhitePause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhitePlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhitePlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

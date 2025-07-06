@@ -65,6 +65,13 @@ Namespace My
             Dim AccentTextColor As Color
             Dim InactiveTitleBarColor As Color
             Dim InactiveSearchTextColor As Color
+            Dim PlayerPlay As Image
+            Dim PlayerPause As Image
+            Dim PlayerStop As Image
+            Dim PlayerNext As Image
+            Dim PlayerPrevious As Image
+            Dim PlayerFastForward As Image
+            Dim PlayerFastReverse As Image
         End Structure
         Friend Enum FormatFileSizeUnits
             Auto
@@ -132,7 +139,14 @@ Namespace My
             .ButtonTextColor = Color.White,
             .AccentTextColor = Color.White,
             .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
-            .InactiveSearchTextColor = SystemColors.InactiveCaption}
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerAccentPlay,
+            .PlayerPause = Resources.ImagePlayerAccentPause,
+            .PlayerStop = Resources.ImagePlayerAccentStop,
+            .PlayerNext = Resources.ImagePlayerAccentNext,
+            .PlayerPrevious = Resources.ImagePlayerAccentPrevious,
+            .PlayerFastForward = Resources.ImagePlayerAccentFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerAccentFastReverse}
         Private ReadOnly LightTheme As New ThemeProperties With {
             .BackColor = SystemColors.Control,
             .TextColor = Color.Black,
@@ -150,7 +164,14 @@ Namespace My
             .ButtonTextColor = Color.White,
             .AccentTextColor = Color.White,
             .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
-            .InactiveSearchTextColor = SystemColors.InactiveCaption}
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
         Private ReadOnly PinkTheme As New ThemeProperties With {
             .BackColor = Color.Pink,
             .TextColor = Color.DeepPink,
@@ -159,7 +180,14 @@ Namespace My
             .ButtonTextColor = Color.White,
             .AccentTextColor = Color.White,
             .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
-            .InactiveSearchTextColor = Color.Gray}
+            .InactiveSearchTextColor = Color.Gray,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
         Private ReadOnly RedTheme As New ThemeProperties With {
             .BackColor = Color.DarkRed,
             .TextColor = Color.AntiqueWhite,
@@ -168,7 +196,14 @@ Namespace My
             .ButtonTextColor = Color.AntiqueWhite,
             .AccentTextColor = Color.White,
             .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
-            .InactiveSearchTextColor = Color.Gray}
+            .InactiveSearchTextColor = Color.Gray,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
 
         'Saved Settings
         Friend PlayerPositionShowElapsed As Boolean = True

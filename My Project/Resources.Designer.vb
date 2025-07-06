@@ -250,26 +250,6 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend ReadOnly Property ImageFastForward() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("ImageFastForward", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property ImageFastReverse() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("ImageFastReverse", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
         Friend ReadOnly Property ImageFullscreen16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageFullscreen16", resourceCulture)
@@ -360,16 +340,6 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend ReadOnly Property ImageNext() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("ImageNext", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
         Friend ReadOnly Property ImageOK() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageOK", resourceCulture)
@@ -390,16 +360,6 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend ReadOnly Property ImagePause() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("ImagePause", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
         Friend ReadOnly Property ImagePlay() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImagePlay", resourceCulture)
@@ -410,9 +370,159 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend ReadOnly Property ImagePrevious() As System.Drawing.Bitmap
+        Friend ReadOnly Property ImagePlayerAccentFastForward() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("ImagePrevious", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerAccentFastForward", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerAccentFastReverse() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerAccentFastReverse", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerAccentNext() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerAccentNext", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerAccentPause() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerAccentPause", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerAccentPlay() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerAccentPlay", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerAccentPrevious() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerAccentPrevious", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerAccentStop() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerAccentStop", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerSound() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerSound", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerSoundMute() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerSoundMute", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerWhiteFastForward() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerWhiteFastForward", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerWhiteFastReverse() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerWhiteFastReverse", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerWhiteNext() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerWhiteNext", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerWhitePause() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerWhitePause", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerWhitePlay() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerWhitePlay", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerWhitePrevious() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerWhitePrevious", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImagePlayerWhiteStop() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerWhiteStop", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -453,36 +563,6 @@ Namespace My.Resources
         Friend ReadOnly Property ImageSkyeTag() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageSkyeTag", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property ImageSound() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("ImageSound", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property ImageSoundMute() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("ImageSoundMute", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property ImageStop() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("ImageStop", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

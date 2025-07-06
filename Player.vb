@@ -296,14 +296,6 @@ Public Class Player
                 Case Keys.Escape
                 Case Keys.End
                 Case Keys.Up
-                    'LVPlaylist.BeginUpdate()
-                    'Dim r As Integer = LVPlaylist.SelectedIndices(0)
-                    'r -= 1
-                    'If r < 0 Then r = 0
-                    'LVPlaylist.SelectedIndices.Clear()
-                    'LVPlaylist.SelectedIndices.Add(r)
-                    'e.Handled = True
-                    'LVPlaylist.EndUpdate()
                 Case Keys.Down
                 Case Keys.Left
                 Case Keys.Right
@@ -890,7 +882,7 @@ Public Class Player
             Case 0 'Undefined
             Case 1 'Stopped
                 PlayState = False
-                BtnPlay.Image = Resources.ImagePlay
+                BtnPlay.Image = App.CurrentTheme.PlayerPlay
                 TrackBarPosition.Value = 0
                 PEXLeft.Value = 0
                 PEXRight.Value = 0
@@ -898,10 +890,10 @@ Public Class Player
                 AxPlayer.Visible = False
             Case 2 'Paused
                 PlayState = False
-                BtnPlay.Image = Resources.ImagePlay
+                BtnPlay.Image = App.CurrentTheme.PlayerPlay
             Case 3 'Playing
                 PlayState = True
-                BtnPlay.Image = Resources.ImagePause
+                BtnPlay.Image = App.CurrentTheme.PlayerPause
                 TrackBarPosition.Maximum = AxPlayer.currentMedia.duration * TrackBarScale
                 If Not TrackBarPosition.Enabled AndAlso Not IsURL Then TrackBarPosition.Enabled = True
                 LblDuration.Text = FormatDuration(AxPlayer.currentMedia.duration)
@@ -921,7 +913,7 @@ Public Class Player
             Case 7 'Waiting
             Case 8 'MediaEnded
                 PlayState = False
-                BtnPlay.Image = Resources.ImagePlay
+                BtnPlay.Image = App.CurrentTheme.PlayerPlay
                 TrackBarPosition.Value = 0
                 PEXLeft.Value = 0
                 PEXRight.Value = 0
@@ -2282,11 +2274,11 @@ Public Class Player
     Private Sub ToggleMute()
         If Mute Then
             AxPlayer.settings.volume = 100
-            BtnMute.Image = Resources.ImageSound
+            BtnMute.Image = Resources.ImagePlayerSound
             Mute = False
         Else
             AxPlayer.settings.volume = 0
-            BtnMute.Image = Resources.ImageSoundMute
+            BtnMute.Image = Resources.ImagePlayerSoundMute
             Mute = True
         End If
     End Sub
@@ -2537,6 +2529,16 @@ Public Class Player
         TrackBarPosition.HighlightedButtonColor = App.CurrentTheme.ButtonBackColor
         TrackBarPosition.PushedButtonEndColor = App.CurrentTheme.TextColor
         If TxtBoxPlaylistSearch.Text = PlaylistSearchTitle Then TxtBoxPlaylistSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor 'Set the search box inactive text color
+        If PlayState Then
+            BtnPlay.Image = App.CurrentTheme.PlayerPause
+        Else
+            BtnPlay.Image = App.CurrentTheme.PlayerPlay
+        End If
+        BtnStop.Image = App.CurrentTheme.PlayerStop
+        BtnNext.Image = App.CurrentTheme.PlayerNext
+        BtnPrevious.Image = App.CurrentTheme.PlayerPrevious
+        BtnForward.Image = App.CurrentTheme.PlayerFastForward
+        BtnReverse.Image = App.CurrentTheme.PlayerFastReverse
         ResumeLayout()
         Debug.Print("Player Theme Set")
     End Sub
