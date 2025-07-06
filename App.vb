@@ -54,6 +54,7 @@ Namespace My
             Light
             Dark
             Pink
+            Red
         End Enum
         Friend Structure ThemeProperties
             Dim BackColor As Color
@@ -156,6 +157,15 @@ Namespace My
             .ControlBackColor = Color.Pink,
             .ButtonBackColor = Color.HotPink,
             .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = Color.Gray}
+        Private ReadOnly RedTheme As New ThemeProperties With {
+            .BackColor = Color.DarkRed,
+            .TextColor = Color.AntiqueWhite,
+            .ControlBackColor = Color.IndianRed,
+            .ButtonBackColor = Color.FromArgb(255, 200, 20, 20),
+            .ButtonTextColor = Color.AntiqueWhite,
             .AccentTextColor = Color.White,
             .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
             .InactiveSearchTextColor = Color.Gray}
@@ -264,6 +274,7 @@ Namespace My
 
         End Function
         Friend Function GetCurrentThemeProperties() As ThemeProperties
+            Debug.Print(Color.IndianRed.R.ToString + ", " + Color.IndianRed.G.ToString + ", " + Color.IndianRed.B.ToString)
             Select Case Theme
                 Case Themes.Accent
                     Return AccentTheme
@@ -273,6 +284,8 @@ Namespace My
                     Return DarkTheme
                 Case Themes.Pink
                     Return PinkTheme
+                Case Themes.Red
+                    Return RedTheme
                 Case Else
                     Return AccentTheme
             End Select
