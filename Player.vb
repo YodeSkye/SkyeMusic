@@ -194,8 +194,8 @@ Public Class Player
     End Sub
     Private Sub Player_Move(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Move
         If Visible AndAlso Me.WindowState = FormWindowState.Normal AndAlso Not mMove Then
-            CheckMove(Me.Location)
-            App.PlayerLocation = Me.Location
+            CheckMove(Location)
+            App.PlayerLocation = Location
         End If
     End Sub
     Private Sub Player_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
