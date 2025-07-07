@@ -44,6 +44,7 @@ Partial Class Help
         RTxBxHelp.Location = New Point(12, 12)
         RTxBxHelp.Name = "RTxBxHelp"
         RTxBxHelp.ReadOnly = True
+        RTxBxHelp.ShortcutsEnabled = False
         RTxBxHelp.Size = New Size(776, 345)
         RTxBxHelp.TabIndex = 2
         RTxBxHelp.Text = ""

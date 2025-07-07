@@ -505,6 +505,7 @@ Partial Class Player
         TxtBoxPlaylistSearch.ForeColor = SystemColors.InactiveCaption
         TxtBoxPlaylistSearch.Location = New Point(412, 5)
         TxtBoxPlaylistSearch.Name = "TxtBoxPlaylistSearch"
+        TxtBoxPlaylistSearch.ShortcutsEnabled = False
         TxtBoxPlaylistSearch.Size = New Size(150, 16)
         TxtBoxPlaylistSearch.TabIndex = 22
         TxtBoxPlaylistSearch.TabStop = False

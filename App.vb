@@ -155,7 +155,14 @@ Namespace My
             .ButtonTextColor = Color.Black,
             .AccentTextColor = Color.White,
             .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
-            .InactiveSearchTextColor = SystemColors.InactiveCaption}
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerBlackPlay,
+            .PlayerPause = Resources.ImagePlayerBlackPause,
+            .PlayerStop = Resources.ImagePlayerBlackStop,
+            .PlayerNext = Resources.ImagePlayerBlackNext,
+            .PlayerPrevious = Resources.ImagePlayerBlackPrevious,
+            .PlayerFastForward = Resources.ImagePlayerBlackFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerBlackFastReverse}
         Private ReadOnly DarkTheme As New ThemeProperties With {
             .BackColor = Color.FromArgb(255, 35, 35, 35),
             .TextColor = Color.White,

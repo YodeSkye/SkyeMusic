@@ -103,6 +103,7 @@ Partial Class Log
         TxBxSearch.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxBxSearch.Location = New Point(14, 12)
         TxBxSearch.Name = "TxBxSearch"
+        TxBxSearch.ShortcutsEnabled = False
         TxBxSearch.Size = New Size(175, 18)
         TxBxSearch.TabIndex = 6
         TxBxSearch.Text = "Search Log"

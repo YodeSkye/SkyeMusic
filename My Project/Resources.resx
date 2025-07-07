@@ -309,4 +309,25 @@
   <data name="ImagePlayerWhitePrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImagePlayerWhitePrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImagePlayerBlackNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackPrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackPrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackPlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackPause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackPause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

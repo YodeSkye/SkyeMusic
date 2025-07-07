@@ -214,6 +214,7 @@ Partial Class Library
         TxbxLibrarySearch.ForeColor = SystemColors.InactiveCaption
         TxbxLibrarySearch.Location = New Point(14, 17)
         TxbxLibrarySearch.Name = "TxbxLibrarySearch"
+        TxbxLibrarySearch.ShortcutsEnabled = False
         TxbxLibrarySearch.Size = New Size(153, 18)
         TxbxLibrarySearch.TabIndex = 4
         TxbxLibrarySearch.Text = "Search Library"
