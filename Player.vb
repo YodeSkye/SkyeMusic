@@ -75,6 +75,7 @@ Public Class Player
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
         PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
         TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
+        AddHandler TrackBarPosition.MouseWheel, AddressOf TrackBarPosition_MouseWheel
         SetTheme()
         LoadPlaylist()
         ClearPlaylistTitles()
@@ -857,12 +858,11 @@ Public Class Player
         ToggleMute()
         LVPlaylist.Focus()
     End Sub
-    Private Sub TrackBarPositionScroll(sender As Object, e As EventArgs) Handles TrackBarPosition.Scroll
+    Private Sub TrackBarPosition_Scroll(sender As Object, e As EventArgs) Handles TrackBarPosition.Scroll
         AxPlayer.Ctlcontrols.pause()
     End Sub
-    Private Sub TrackBarPositionMouseUp(sender As Object, e As MouseEventArgs) Handles TrackBarPosition.MouseUp
+    Private Sub TrackBarPosition_MouseUp(sender As Object, e As MouseEventArgs) Handles TrackBarPosition.MouseUp
         Dim newposition As Double
-        ' newposition = ((e.X - 10) / (TrackBarPosition.Width - 26)) * (TrackBarPosition.Maximum - TrackBarPosition.Minimum)
         newposition = ((e.X - 7) / (TrackBarPosition.Width - 18)) * (TrackBarPosition.Maximum - TrackBarPosition.Minimum)
         If newposition < 0 Then
             newposition = 0
@@ -875,9 +875,12 @@ Public Class Player
         AxPlayer.Ctlcontrols.play()
         LVPlaylist.Focus()
     End Sub
+    Private Sub TrackBarPosition_MouseWheel(sender As Object, e As MouseEventArgs)
+        CType(e, HandledMouseEventArgs).Handled = True
+    End Sub
 
     'Handlers
-    Private Sub AxPlayerPlayStateChange(sender As Object, e As AxWMPLib._WMPOCXEvents_PlayStateChangeEvent) Handles AxPlayer.PlayStateChange
+    Private Sub AxPlayer_PlayStateChange(sender As Object, e As AxWMPLib._WMPOCXEvents_PlayStateChangeEvent) Handles AxPlayer.PlayStateChange
         Select Case e.newState
             Case 0 'Undefined
             Case 1 'Stopped
@@ -2475,6 +2478,12 @@ Public Class Player
             Debug.Print("Playlist Search Reset")
         End If
     End Sub
+    Private Sub CheckMove(ByRef location As Point)
+        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
+        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
+        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
+        If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
+    End Sub
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color
         c = App.GetAccentColor()
@@ -2549,12 +2558,6 @@ Public Class Player
             Case FormWindowState.Maximized
                 WindowState = FormWindowState.Normal
         End Select
-    End Sub
-    Private Sub CheckMove(ByRef location As Point)
-        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
-        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
-        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
-        If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
     Private Sub LyricsOff()
         If Lyrics Then
