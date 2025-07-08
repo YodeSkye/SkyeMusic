@@ -196,7 +196,7 @@ Namespace My
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
         Private ReadOnly RedTheme As New ThemeProperties With {
-            .BackColor = Color.DarkRed,
+            .BackColor = Color.FromArgb(255, 128, 13, 13),
             .TextColor = Color.AntiqueWhite,
             .ControlBackColor = Color.IndianRed,
             .ButtonBackColor = Color.FromArgb(255, 200, 20, 20),

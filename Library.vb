@@ -64,7 +64,7 @@ Public Class Library
             MyBase.WndProc(m)
         End Try
     End Sub
-    Private Sub LibraryLoad(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub Library_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'Define 12 Columns
         Dim header As ColumnHeader
         header = New ColumnHeader()
@@ -150,12 +150,12 @@ Public Class Library
         If App.SaveWindowMetrics AndAlso App.LibrarySize.Height >= 0 Then Me.Size = App.LibrarySize
 #End If
     End Sub
-    Private Sub LibraryFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+    Private Sub Library_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         e.Cancel = True
         SaveLibrary()
         Hide()
     End Sub
-    Private Sub LibraryMove(sender As Object, e As EventArgs) Handles MyBase.Move
+    Private Sub Library_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal Then
             If Left < 0 Then
                 Left = -App.AdjustScreenBoundsNormalWindow
@@ -170,12 +170,12 @@ Public Class Library
             App.LibraryLocation = Me.Location
         End If
     End Sub
-    Private Sub LibraryResize(sender As Object, e As EventArgs) Handles MyBase.Resize
+    Private Sub Library_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         If Visible AndAlso WindowState = FormWindowState.Normal Then
             App.LibrarySize = Me.Size
         End If
     End Sub
-    Private Sub LibraryKeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+    Private Sub Library_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If Not IsTextBoxLibrarySearch And e.KeyCode = Keys.Escape Then Close()
         IsTextBoxLibrarySearch = False
     End Sub
@@ -230,6 +230,49 @@ Public Class Library
             End If
         Else
             e.DrawDefault = True
+        End If
+    End Sub
+    Private Sub LVLibrary_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVLibrary.SelectedIndexChanged
+        If LVLibrary.SelectedItems.Count > 0 Then
+            SetLibraryCountText()
+            AlbumArtIndex = 0
+            ShowAlbumArt()
+            LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
+            Dim fInfo As IO.FileInfo
+            fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+            LblExtFileInfo.Text = fInfo.Extension.TrimStart(".").ToUpper
+            LblExtFileInfo.Text += " " + App.FormatFileSize(fInfo.Length, My.App.FormatFileSizeUnits.Auto, 2, False)
+            fInfo = Nothing
+            Dim tlFile As TagLib.File = Nothing
+            Try
+                tlFile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+            Catch
+            Finally
+                If tlFile IsNot Nothing Then
+                    Select Case tlFile.Properties.MediaTypes
+                        Case TagLib.MediaTypes.Audio
+                            LblExtProperties.Text = tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
+                            Select Case tlFile.Properties.AudioChannels
+                                Case 1 : LblExtProperties.Text += "Mono"
+                                Case 2 : LblExtProperties.Text += "Stereo"
+                                Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
+                            End Select
+                        Case TagLib.MediaTypes.Video Or TagLib.MediaTypes.Audio
+                            LblExtProperties.Text = tlFile.Properties.VideoWidth.ToString + "x" + tlFile.Properties.VideoHeight.ToString + ", Audio: "
+                            LblExtProperties.Text += tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
+                            Select Case tlFile.Properties.AudioChannels
+                                Case 1 : LblExtProperties.Text += "Mono"
+                                Case 2 : LblExtProperties.Text += "Stereo"
+                                Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
+                            End Select
+                    End Select
+                    LblExtType.Text = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
+                    tlFile.Dispose()
+                    tlFile = Nothing
+                End If
+            End Try
+        Else
+            ResetExtInfo()
         End If
     End Sub
     Private Sub LVLibrary_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVLibrary.ColumnClick
@@ -643,8 +686,6 @@ Public Class Library
     Private Sub GrpBoxGroupBy_DoubleClick(sender As System.Object, e As System.EventArgs) Handles GrpBoxGroupBy.DoubleClick
         ToggleMaximized()
     End Sub
-
-    'Handlers
 
     'Procedures
     Friend Overloads Sub Show(filename As String)
