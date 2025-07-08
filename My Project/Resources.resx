@@ -181,9 +181,6 @@
   <data name="ImageExpandAll16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageExpandAll16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageApp" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageApp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ImageEditPaste16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageEditPaste16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
