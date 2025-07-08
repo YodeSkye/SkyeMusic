@@ -13,10 +13,10 @@
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
-    <ApplicationIcon>My Project\IconSkyeMusic.ico</ApplicationIcon>
+    <ApplicationIcon>My Project\IconSkyeMusicRed.ico</ApplicationIcon>
     <OptionStrict>Off</OptionStrict>
     <ImportedNamespaces>SkyeMusic.My=False,System.Data=False,System.Drawing=False,System.Windows.Forms=False,Microsoft.VisualBasic=True,System=True,System.Collections=True,System.Collections.Generic=True,System.Diagnostics=True,System.Linq=True,System.Xml.Linq=True,System.Threading.Tasks=True,SkyeMusic=True</ImportedNamespaces>
-    <PackageIcon>ImageApp.png</PackageIcon>
+    <PackageIcon>ImageAppRed.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -95,6 +95,10 @@
       <PackagePath>\</PackagePath>
     </None>
     <None Update="My Project\ImageApp.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="My Project\ImageAppRed.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
