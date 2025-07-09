@@ -118,6 +118,7 @@ Namespace My
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
         Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com"
         Friend ReadOnly AttributionSyncFusion As String = "https://www.syncfusion.com/"
+        Friend ReadOnly AttributionTagLibSharp As String = "https://github.com/mono/taglib-sharp"
         Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/"
         Friend ReadOnly UserPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" 'UserPath is the base path for user-specific files.
 #If DEBUG Then

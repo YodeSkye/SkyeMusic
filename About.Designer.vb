@@ -29,6 +29,7 @@ Partial Class About
         LLblMicrosoft = New LinkLabel()
         LLblSyncFusion = New LinkLabel()
         LLblIcons8 = New LinkLabel()
+        LLblTagLibSharp = New LinkLabel()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -85,7 +86,7 @@ Partial Class About
         LLblSyncFusion.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LLblSyncFusion.Image = My.Resources.Resources.ImageAttributionSyncFusion24
         LLblSyncFusion.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSyncFusion.Location = New Point(151, 259)
+        LLblSyncFusion.Location = New Point(115, 258)
         LLblSyncFusion.Name = "LLblSyncFusion"
         LLblSyncFusion.Size = New Size(107, 23)
         LLblSyncFusion.TabIndex = 4
@@ -106,11 +107,26 @@ Partial Class About
         LLblIcons8.Text = "Icons8"
         LLblIcons8.TextAlign = ContentAlignment.TopRight
         ' 
+        ' LLblTagLibSharp
+        ' 
+        LLblTagLibSharp.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblTagLibSharp.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LLblTagLibSharp.ImageAlign = ContentAlignment.MiddleLeft
+        LLblTagLibSharp.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblTagLibSharp.Location = New Point(227, 260)
+        LLblTagLibSharp.Name = "LLblTagLibSharp"
+        LLblTagLibSharp.Size = New Size(67, 23)
+        LLblTagLibSharp.TabIndex = 6
+        LLblTagLibSharp.TabStop = True
+        LLblTagLibSharp.Text = "TagLib#"
+        LLblTagLibSharp.TextAlign = ContentAlignment.TopCenter
+        ' 
         ' About
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(384, 461)
+        Controls.Add(LLblTagLibSharp)
         Controls.Add(LLblIcons8)
         Controls.Add(LLblSyncFusion)
         Controls.Add(LLblMicrosoft)
@@ -134,4 +150,5 @@ Partial Class About
     Friend WithEvents LLblMicrosoft As LinkLabel
     Friend WithEvents LLblSyncFusion As LinkLabel
     Friend WithEvents LLblIcons8 As LinkLabel
+    Friend WithEvents LLblTagLibSharp As LinkLabel
 End Class

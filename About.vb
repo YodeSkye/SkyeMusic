@@ -99,6 +99,18 @@ Public Class About
             pInfo = Nothing
         End Try
     End Sub
+    Private Sub LLblTagLibSharp_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblTagLibSharp.MouseClick
+        Dim pInfo As New Diagnostics.ProcessStartInfo
+        pInfo.UseShellExecute = True
+        pInfo.FileName = App.AttributionTagLibSharp
+        Try
+            Diagnostics.Process.Start(pInfo)
+        Catch ex As Exception
+            WriteToLog("Cannot Open " + App.AttributionTagLibSharp + vbCr + ex.Message)
+        Finally
+            pInfo = Nothing
+        End Try
+    End Sub
     Private Sub LLblIcons8_MouseEnter(sender As Object, e As EventArgs) Handles LLblIcons8.MouseEnter
         Cursor = Cursors.Hand
     End Sub
@@ -143,6 +155,7 @@ Public Class About
             LblVersion.ForeColor = App.CurrentTheme.AccentTextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.AccentTextColor
             LLblSyncFusion.LinkColor = App.CurrentTheme.AccentTextColor
+            LLblTagLibSharp.LinkColor = App.CurrentTheme.AccentTextColor
             LLblIcons8.LinkColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
@@ -150,10 +163,12 @@ Public Class About
             LblVersion.ForeColor = App.CurrentTheme.TextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.TextColor
             LLblSyncFusion.LinkColor = App.CurrentTheme.TextColor
+            LLblTagLibSharp.LinkColor = App.CurrentTheme.TextColor
             LLblIcons8.LinkColor = App.CurrentTheme.TextColor
         End If
         LLblMicrosoft.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblSyncFusion.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
+        LLblTagLibSharp.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblIcons8.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("About Theme Set")
