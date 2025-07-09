@@ -190,6 +190,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property ImageDeleteLog32() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImageDeleteLog32", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property ImageEditCopy16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageEditCopy16", resourceCulture)
@@ -623,6 +633,16 @@ Namespace My.Resources
         Friend ReadOnly Property ImageRefresh16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageRefresh16", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImageRefreshLog32() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImageRefreshLog32", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

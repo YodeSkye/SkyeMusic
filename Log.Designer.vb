@@ -66,10 +66,10 @@ Partial Class Log
         ' BTNDeleteLog
         ' 
         BTNDeleteLog.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        BTNDeleteLog.Image = My.Resources.Resources.ImageClearRemoveDelete16
-        BTNDeleteLog.Location = New Point(12, 415)
+        BTNDeleteLog.Image = My.Resources.Resources.ImageDeleteLog32
+        BTNDeleteLog.Location = New Point(12, 399)
         BTNDeleteLog.Name = "BTNDeleteLog"
-        BTNDeleteLog.Size = New Size(32, 32)
+        BTNDeleteLog.Size = New Size(48, 48)
         BTNDeleteLog.TabIndex = 3
         TipLog.SetToolTip(BTNDeleteLog, "Delete Log")
         BTNDeleteLog.UseVisualStyleBackColor = True
@@ -77,10 +77,10 @@ Partial Class Log
         ' BTNRefreshLog
         ' 
         BTNRefreshLog.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        BTNRefreshLog.Image = My.Resources.Resources.ImageRefresh16
-        BTNRefreshLog.Location = New Point(756, 415)
+        BTNRefreshLog.Image = My.Resources.Resources.ImageRefreshLog32
+        BTNRefreshLog.Location = New Point(740, 399)
         BTNRefreshLog.Name = "BTNRefreshLog"
-        BTNRefreshLog.Size = New Size(32, 32)
+        BTNRefreshLog.Size = New Size(48, 48)
         BTNRefreshLog.TabIndex = 4
         TipLog.SetToolTip(BTNRefreshLog, "Refresh Log")
         BTNRefreshLog.UseVisualStyleBackColor = True

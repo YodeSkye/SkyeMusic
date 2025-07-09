@@ -124,8 +124,14 @@
   <data name="ImageAcceptOKGoStart" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAcceptOKGoStart.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImagePlayerBlackPause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackPause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageCopy16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageCopy16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageClearRemoveDelete16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageClearRemoveDelete16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -142,6 +148,9 @@
   <data name="ImageOpen16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageOpen16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageFullscreen16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageFullscreen16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageLibrary16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageLibrary16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -151,38 +160,92 @@
   <data name="ImageLog16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageLog16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageDeleteLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageDeleteLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageLibrary32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageLibrary32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageEditDelete16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageEditDelete16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionMicrosoft16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionMicrosoft16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageAlbumArtSelect" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAlbumArtSelect.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageSkyeTag" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageSkyeTag.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageOK" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageOK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageEditCut16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageEditCut16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageRefresh16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageRefresh16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageMP3Tag16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageMP3Tag16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImagePlayerAccentFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageGetPath16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageGetPath16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageExpandAll16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageExpandAll16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImagePlayerAccentPlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageSkyeTag" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageSkyeTag.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageView" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageView.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionSyncFusion24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionSyncFusionWhite24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageOK" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageOK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhiteFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhiteFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhiteFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhiteFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageEditCut16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageEditCut16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentPause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentPause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageRefresh16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageRefresh16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackPlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAdd16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAdd16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageEditPaste16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageEditPaste16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImagePlayerWhitePlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhitePlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageExpandAll16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageExpandAll16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageCollapse16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageCollapse16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageEditCopy16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageEditCopy16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerSound" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerSound.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageEditSelectAll16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageEditSelectAll16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -193,23 +256,47 @@
   <data name="ImageAbout16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAbout16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageAdd16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageAdd16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImagePlayerWhitePrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhitePrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageFullscreen16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageFullscreen16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImagePlayerWhiteStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhiteStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageGlobe" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageGlobe.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageLyrics" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageLyrics.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageLibrary32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageLibrary32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImageMP3Tag16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageMP3Tag16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageAddAll16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageAddAll16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImagePlayerBlackStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageView" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageView.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImagePlayerBlackPrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackPrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerBlackFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhiteNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhiteNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerSoundMute" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerSoundMute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerAccentPrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentPrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlayerWhitePause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerWhitePause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionIcons816" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionIcons816.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerAccentPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="HelpRT" xml:space="preserve">
     <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
@@ -249,91 +336,10 @@
   <data name="ImageHelp16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageHelp16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageGlobe" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageGlobe.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImageRefreshLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageRefreshLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImagePlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerAccentPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerSound" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerSound.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerSoundMute" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerSoundMute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerAccentPlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerAccentPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerAccentFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerAccentFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerAccentFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerAccentFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerAccentPause" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerAccentPause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerAccentStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerAccentStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerWhiteStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerWhiteStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerWhitePause" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerWhitePause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerWhitePlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerWhitePlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerWhiteFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerWhiteFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerWhiteFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerWhiteFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerAccentNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerAccentNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerAccentPrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerAccentPrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerWhiteNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerWhiteNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerWhitePrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerWhitePrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerBlackNext" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerBlackNext.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerBlackPrevious" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerBlackPrevious.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerBlackFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerBlackFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerBlackFastReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerBlackFastReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerBlackPlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerBlackPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerBlackPause" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerBlackPause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImagePlayerBlackStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerBlackStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageAttributionIcons816" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageAttributionIcons816.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageAttributionMicrosoft16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageAttributionMicrosoft16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageAttributionSyncFusion24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageAttributionSyncFusionWhite24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageCollapse16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageCollapse16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImageAddAll16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAddAll16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
