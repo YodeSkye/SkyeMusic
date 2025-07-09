@@ -116,7 +116,7 @@ Partial Class Log
         LblStatus.CopyOnDoubleClick = False
         LblStatus.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblStatus.ForeColor = Color.Red
-        LblStatus.Location = New Point(660, 12)
+        LblStatus.Location = New Point(657, 12)
         LblStatus.Name = "LblStatus"
         LblStatus.Size = New Size(128, 17)
         LblStatus.TabIndex = 7

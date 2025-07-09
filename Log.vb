@@ -1,8 +1,11 @@
 ﻿
+Imports System.DirectoryServices.ActiveDirectory
 Imports SkyeMusic.My
 Public Class Log
 
     'Declarations
+    Private mMove As Boolean = False
+    Private mOffset, mPosition As Point
     Private LogSearchTitle As String
 
     'Form Events
@@ -35,18 +38,33 @@ Public Class Log
         App.FRMLog.Dispose()
         App.FRMLog = Nothing
     End Sub
+    Private Sub Log_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LBLLogInfo.MouseDown
+        Dim cSender As Control
+        If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
+            mMove = True
+            cSender = CType(sender, Control)
+            If cSender Is Me Then
+                mOffset = New Point(-e.X - SystemInformation.FrameBorderSize.Width - 4, -e.Y - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+            Else
+                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+            End If
+        End If
+        cSender = Nothing
+    End Sub
+    Private Sub Log_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LBLLogInfo.MouseMove
+        If mMove Then
+            mPosition = MousePosition
+            mPosition.Offset(mOffset.X, mOffset.Y)
+            CheckMove(mPosition)
+            Location = mPosition
+        End If
+    End Sub
+    Private Sub Log_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LBLLogInfo.MouseUp
+        mMove = False
+    End Sub
     Private Sub Log_Move(sender As Object, e As EventArgs) Handles MyBase.Move
-        If Visible AndAlso WindowState = FormWindowState.Normal Then
-            If Left < 0 Then
-                Left = -App.AdjustScreenBoundsNormalWindow
-            ElseIf Right > My.Computer.Screen.WorkingArea.Width Then
-                Left = My.Computer.Screen.WorkingArea.Width - Width + App.AdjustScreenBoundsNormalWindow
-            End If
-            If Top < App.AdjustScreenBoundsNormalWindow Then
-                Top = 0
-            ElseIf Bottom > My.Computer.Screen.WorkingArea.Height Then
-                Top = My.Computer.Screen.WorkingArea.Height - Height + App.AdjustScreenBoundsNormalWindow
-            End If
+        If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
+            CheckMove(Location)
             App.LogLocation = Me.Location
         End If
     End Sub
@@ -152,6 +170,29 @@ Public Class Log
     End Sub
 
     'Procedures
+    Private Sub ToggleMaximized()
+        Select Case WindowState
+            Case FormWindowState.Normal, FormWindowState.Minimized
+                WindowState = FormWindowState.Maximized
+            Case FormWindowState.Maximized
+                WindowState = FormWindowState.Normal
+        End Select
+    End Sub
+    Private Sub ResetRTBLogFind()
+        RTBLog.SelectAll()
+        RTBLog.SelectionBackColor = App.CurrentTheme.BackColor
+        RTBLog.SelectionColor = App.CurrentTheme.TextColor
+        RTBLog.DeselectAll()
+        RTBLog.SelectionStart = RTBLog.TextLength
+        RTBLog.SelectionLength = 0
+        RTBLog.ScrollToCaret()
+    End Sub
+    Private Sub CheckMove(ByRef location As Point)
+        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
+        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
+        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
+        If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
+    End Sub
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color
         If Not AsTheme Then SuspendLayout()
@@ -182,23 +223,6 @@ Public Class Log
         If TxBxSearch.Text = LogSearchTitle Then TxBxSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
         ResumeLayout()
         Debug.Print("Log Theme Set")
-    End Sub
-    Private Sub ToggleMaximized()
-        Select Case WindowState
-            Case FormWindowState.Normal, FormWindowState.Minimized
-                WindowState = FormWindowState.Maximized
-            Case FormWindowState.Maximized
-                WindowState = FormWindowState.Normal
-        End Select
-    End Sub
-    Private Sub ResetRTBLogFind()
-        RTBLog.SelectAll()
-        RTBLog.SelectionBackColor = App.CurrentTheme.BackColor
-        RTBLog.SelectionColor = App.CurrentTheme.TextColor
-        RTBLog.DeselectAll()
-        RTBLog.SelectionStart = RTBLog.TextLength
-        RTBLog.SelectionLength = 0
-        RTBLog.ScrollToCaret()
     End Sub
 
 End Class
