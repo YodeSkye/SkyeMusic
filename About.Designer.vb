@@ -26,6 +26,9 @@ Partial Class About
         BtnOK = New Button()
         LblVersion = New Label()
         LblAbout = New Label()
+        LLblMicrosoft = New LinkLabel()
+        LLblSyncFusion = New LinkLabel()
+        LLblIcons8 = New LinkLabel()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -42,7 +45,7 @@ Partial Class About
         ' 
         LblVersion.BackColor = Color.Transparent
         LblVersion.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblVersion.Location = New Point(12, 328)
+        LblVersion.Location = New Point(12, 345)
         LblVersion.Name = "LblVersion"
         LblVersion.Size = New Size(360, 23)
         LblVersion.TabIndex = 1
@@ -51,20 +54,66 @@ Partial Class About
         ' 
         ' LblAbout
         ' 
+        LblAbout.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         LblAbout.BackColor = Color.Transparent
         LblAbout.Font = New Font("Segoe UI Semibold", 15.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblAbout.Location = New Point(12, 9)
         LblAbout.Name = "LblAbout"
-        LblAbout.Size = New Size(360, 296)
+        LblAbout.Size = New Size(360, 203)
         LblAbout.TabIndex = 2
         LblAbout.Text = "About"
         LblAbout.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LLblMicrosoft
+        ' 
+        LLblMicrosoft.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblMicrosoft.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LLblMicrosoft.Image = My.Resources.Resources.ImageAttributionMicrosoft16
+        LLblMicrosoft.ImageAlign = ContentAlignment.MiddleLeft
+        LLblMicrosoft.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblMicrosoft.Location = New Point(12, 259)
+        LLblMicrosoft.Name = "LLblMicrosoft"
+        LLblMicrosoft.Size = New Size(94, 23)
+        LLblMicrosoft.TabIndex = 3
+        LLblMicrosoft.TabStop = True
+        LLblMicrosoft.Text = "Microsoft"
+        LLblMicrosoft.TextAlign = ContentAlignment.TopRight
+        ' 
+        ' LLblSyncFusion
+        ' 
+        LLblSyncFusion.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblSyncFusion.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LLblSyncFusion.Image = My.Resources.Resources.ImageAttributionSyncFusion24
+        LLblSyncFusion.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblSyncFusion.Location = New Point(151, 259)
+        LLblSyncFusion.Name = "LLblSyncFusion"
+        LLblSyncFusion.Size = New Size(107, 23)
+        LLblSyncFusion.TabIndex = 4
+        LLblSyncFusion.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LLblIcons8
+        ' 
+        LLblIcons8.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblIcons8.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LLblIcons8.Image = My.Resources.Resources.ImageAttributionIcons816
+        LLblIcons8.ImageAlign = ContentAlignment.MiddleLeft
+        LLblIcons8.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblIcons8.Location = New Point(302, 260)
+        LLblIcons8.Name = "LLblIcons8"
+        LLblIcons8.Size = New Size(70, 23)
+        LLblIcons8.TabIndex = 5
+        LLblIcons8.TabStop = True
+        LLblIcons8.Text = "Icons8"
+        LLblIcons8.TextAlign = ContentAlignment.TopRight
         ' 
         ' About
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(384, 461)
+        Controls.Add(LLblIcons8)
+        Controls.Add(LLblSyncFusion)
+        Controls.Add(LLblMicrosoft)
         Controls.Add(LblAbout)
         Controls.Add(LblVersion)
         Controls.Add(BtnOK)
@@ -82,4 +131,7 @@ Partial Class About
     Friend WithEvents BtnOK As Button
     Friend WithEvents LblVersion As Label
     Friend WithEvents LblAbout As Label
+    Friend WithEvents LLblMicrosoft As LinkLabel
+    Friend WithEvents LLblSyncFusion As LinkLabel
+    Friend WithEvents LLblIcons8 As LinkLabel
 End Class

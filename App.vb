@@ -116,6 +116,9 @@ Namespace My
         Private WithEvents ScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
+        Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com"
+        Friend ReadOnly AttributionSyncFusion As String = "https://www.syncfusion.com/"
+        Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/"
         Friend ReadOnly UserPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" 'UserPath is the base path for user-specific files.
 #If DEBUG Then
         Private ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt" 'LogPath is the path to the log file.

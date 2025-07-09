@@ -157,9 +157,6 @@
   <data name="ImageAlbumArtSelect" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAlbumArtSelect.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageCollapse16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageCollapse16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ImageSkyeTag" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageSkyeTag.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -326,5 +323,17 @@
   </data>
   <data name="ImagePlayerBlackStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImagePlayerBlackStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionIcons816" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionIcons816.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionMicrosoft16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionMicrosoft16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionSyncFusion24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionSyncFusionWhite24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageCollapse16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageCollapse16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
