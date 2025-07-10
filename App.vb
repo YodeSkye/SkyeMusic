@@ -229,7 +229,7 @@ Namespace My
         Friend LibrarySearchSubFolders As Boolean = True
         Friend SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
         Friend SaveWindowMetrics As Boolean = False 'Flag that indicates whether to save and restore window positions and sizes.
-        Friend Theme As Themes = Themes.Accent 'The current theme of the application.
+        Friend Theme As Themes = Themes.Red 'The current theme of the application.
         Friend PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend PlayerSize As New Size(-1, -1)
         Friend LibraryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -560,8 +560,8 @@ Namespace My
                 Try : App.PlaylistSearchAction = CType([Enum].Parse(GetType(App.PlaylistActions), RegKey.GetValue("PlaylistSearchAction", App.PlaylistActions.Play.ToString).ToString), App.PlaylistActions)
                 Catch : App.PlaylistSearchAction = App.PlaylistActions.Play
                 End Try
-                Try : App.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Accent.ToString).ToString), App.Themes)
-                Catch : App.Theme = App.Themes.Accent
+                Try : App.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Red.ToString).ToString), App.Themes)
+                Catch : App.Theme = App.Themes.Red
                 End Try
                 Select Case RegKey.GetValue("SuspendOnSessionChange", "True").ToString
                     Case "False", "0" : App.SuspendOnSessionChange = False
