@@ -22,33 +22,33 @@ Partial Class Splash
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Label1 = New Label()
-        Label2 = New Label()
+        LblSkye = New Label()
+        LblMusic = New Label()
         SuspendLayout()
         ' 
-        ' Label1
+        ' LblSkye
         ' 
-        Label1.AutoSize = True
-        Label1.Font = New Font("Segoe UI", 27.75F, FontStyle.Bold Or FontStyle.Italic, GraphicsUnit.Point, CByte(0))
-        Label1.ForeColor = Color.DodgerBlue
-        Label1.Location = New Point(32, 46)
-        Label1.Name = "Label1"
-        Label1.Size = New Size(102, 50)
-        Label1.TabIndex = 0
-        Label1.Text = "Skye"
-        Label1.TextAlign = ContentAlignment.MiddleRight
+        LblSkye.AutoSize = True
+        LblSkye.Font = New Font("Segoe UI", 36F, FontStyle.Bold Or FontStyle.Italic, GraphicsUnit.Point, CByte(0))
+        LblSkye.ForeColor = Color.DodgerBlue
+        LblSkye.Location = New Point(20, 40)
+        LblSkye.Name = "LblSkye"
+        LblSkye.Size = New Size(132, 65)
+        LblSkye.TabIndex = 0
+        LblSkye.Text = "Skye"
+        LblSkye.TextAlign = ContentAlignment.MiddleRight
         ' 
-        ' Label2
+        ' LblMusic
         ' 
-        Label2.AutoSize = True
-        Label2.Font = New Font("Segoe UI Semibold", 27.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        Label2.ForeColor = SystemColors.Window
-        Label2.Location = New Point(123, 46)
-        Label2.Name = "Label2"
-        Label2.Size = New Size(121, 50)
-        Label2.TabIndex = 1
-        Label2.Text = "Music"
-        Label2.TextAlign = ContentAlignment.MiddleLeft
+        LblMusic.AutoSize = True
+        LblMusic.Font = New Font("Segoe UI Semibold", 27.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblMusic.ForeColor = SystemColors.Window
+        LblMusic.Location = New Point(134, 51)
+        LblMusic.Name = "LblMusic"
+        LblMusic.Size = New Size(121, 50)
+        LblMusic.TabIndex = 1
+        LblMusic.Text = "Music"
+        LblMusic.TextAlign = ContentAlignment.MiddleLeft
         ' 
         ' Splash
         ' 
@@ -57,8 +57,8 @@ Partial Class Splash
         BackColor = SystemColors.Desktop
         ClientSize = New Size(276, 153)
         ControlBox = False
-        Controls.Add(Label1)
-        Controls.Add(Label2)
+        Controls.Add(LblMusic)
+        Controls.Add(LblSkye)
         FormBorderStyle = FormBorderStyle.FixedToolWindow
         MaximizeBox = False
         MinimizeBox = False
@@ -71,6 +71,6 @@ Partial Class Splash
         PerformLayout()
     End Sub
 
-    Friend WithEvents Label1 As Label
-    Friend WithEvents Label2 As Label
+    Friend WithEvents LblSkye As Label
+    Friend WithEvents LblMusic As Label
 End Class
