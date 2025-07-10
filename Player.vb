@@ -2484,6 +2484,26 @@ Public Class Player
         If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
         If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
+    Private Sub ToggleMaximized()
+        Select Case WindowState
+            Case FormWindowState.Normal, FormWindowState.Minimized
+                WindowState = FormWindowState.Maximized
+            Case FormWindowState.Maximized
+                WindowState = FormWindowState.Normal
+        End Select
+    End Sub
+    Private Sub LyricsOff()
+        If Lyrics Then
+            Lyrics = False
+            MILyrics.BackColor = Color.Transparent
+        End If
+    End Sub
+    Private Sub VisualizerOff()
+        If Visualizer Then
+            Visualizer = False
+            MIVisualizer.BackColor = Color.Transparent
+        End If
+    End Sub
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color
         c = App.GetAccentColor()
@@ -2512,6 +2532,7 @@ Public Class Player
             LblPlaylistCount.ForeColor = App.CurrentTheme.AccentTextColor
             LblDuration.ForeColor = App.CurrentTheme.AccentTextColor
             LblPosition.ForeColor = App.CurrentTheme.AccentTextColor
+            TxtBoxLyrics.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
             TrackBarPosition.TrackBarGradientStart = App.CurrentTheme.BackColor
@@ -2519,6 +2540,8 @@ Public Class Player
             LblPlaylistCount.ForeColor = App.CurrentTheme.TextColor
             LblDuration.ForeColor = App.CurrentTheme.TextColor
             LblPosition.ForeColor = App.CurrentTheme.TextColor
+            TxtBoxLyrics.BackColor = App.CurrentTheme.BackColor
+            TxtBoxLyrics.ForeColor = App.CurrentTheme.TextColor
         End If
         LVPlaylist.BackColor = App.CurrentTheme.BackColor
         LVPlaylist.ForeColor = App.CurrentTheme.TextColor
@@ -2550,26 +2573,6 @@ Public Class Player
         BtnReverse.Image = App.CurrentTheme.PlayerFastReverse
         ResumeLayout()
         Debug.Print("Player Theme Set")
-    End Sub
-    Private Sub ToggleMaximized()
-        Select Case WindowState
-            Case FormWindowState.Normal, FormWindowState.Minimized
-                WindowState = FormWindowState.Maximized
-            Case FormWindowState.Maximized
-                WindowState = FormWindowState.Normal
-        End Select
-    End Sub
-    Private Sub LyricsOff()
-        If Lyrics Then
-            Lyrics = False
-            MILyrics.BackColor = Color.Transparent
-        End If
-    End Sub
-    Private Sub VisualizerOff()
-        If Visualizer Then
-            Visualizer = False
-            MIVisualizer.BackColor = Color.Transparent
-        End If
     End Sub
 
 End Class
