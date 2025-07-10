@@ -24,7 +24,7 @@ Public Class About
         SetTheme()
         Text = "About " + My.Application.Info.Title
         LblAbout.Text = My.Application.Info.Description
-        LblVersion.Text = "v" + My.Application.Info.Version.Major.ToString + "." + My.Application.Info.Version.Minor.ToString
+        LblVersion.Text = "v" + My.Application.Info.Version.Major.ToString + "." + My.Application.Info.Version.Minor.ToString + "." + My.Application.Info.Version.Build.ToString
     End Sub
     Private Sub About_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblAbout.MouseDown, LblVersion.MouseDown
         Dim cSender As Control
