@@ -30,6 +30,8 @@ Public Class Library
         Dim Filename As String
         Dim HasAlbumArt As Boolean
     End Structure
+    Private mMove As Boolean = False
+    Private mOffset, mPosition As Point
     Private LibraryImageList As New ImageList
     Private AlbumArtIndex As Byte = 0
     Private PicBoxAlbumArtSmallSize As Size
@@ -155,19 +157,34 @@ Public Class Library
         SaveLibrary()
         Hide()
     End Sub
+    Private Sub Library_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblLibraryCounts.MouseDown, LblExtTitle.MouseDown, LblExtFileInfo.MouseDown, LblExtProperties.MouseDown, LblExtType.MouseDown, GrpBoxGroupBy.MouseDown
+        Dim cSender As Control
+        If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
+            mMove = True
+            cSender = CType(sender, Control)
+            If cSender Is Me Then
+                mOffset = New Point(-e.X - SystemInformation.FrameBorderSize.Width - 4, -e.Y - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+            Else
+                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+            End If
+        End If
+        cSender = Nothing
+    End Sub
+    Private Sub Library_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblLibraryCounts.MouseMove, LblExtTitle.MouseMove, LblExtFileInfo.MouseMove, LblExtProperties.MouseMove, LblExtType.MouseMove, GrpBoxGroupBy.MouseMove
+        If mMove Then
+            mPosition = MousePosition
+            mPosition.Offset(mOffset.X, mOffset.Y)
+            CheckMove(mPosition)
+            Location = mPosition
+        End If
+    End Sub
+    Private Sub Library_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LblLibraryCounts.MouseUp, LblExtTitle.MouseUp, LblExtFileInfo.MouseUp, LblExtProperties.MouseUp, LblExtType.MouseUp, GrpBoxGroupBy.MouseUp
+        mMove = False
+    End Sub
     Private Sub Library_Move(sender As Object, e As EventArgs) Handles MyBase.Move
-        If Visible AndAlso WindowState = FormWindowState.Normal Then
-            If Left < 0 Then
-                Left = -App.AdjustScreenBoundsNormalWindow
-            ElseIf Right > My.Computer.Screen.WorkingArea.Width Then
-                Left = My.Computer.Screen.WorkingArea.Width - Width + App.AdjustScreenBoundsNormalWindow
-            End If
-            If Top < App.AdjustScreenBoundsNormalWindow Then
-                Top = 0
-            ElseIf Bottom > My.Computer.Screen.WorkingArea.Height Then
-                Top = My.Computer.Screen.WorkingArea.Height - Height + App.AdjustScreenBoundsNormalWindow
-            End If
-            App.LibraryLocation = Me.Location
+        If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
+            CheckMove(Location)
+            LibraryLocation = Location
         End If
     End Sub
     Private Sub Library_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
@@ -1929,6 +1946,20 @@ Public Class Library
         LblExtType.Text = String.Empty
         LblExtType.Refresh()
     End Sub
+    Private Sub ToggleMaximized()
+        Select Case WindowState
+            Case FormWindowState.Normal, FormWindowState.Minimized
+                WindowState = FormWindowState.Maximized
+            Case FormWindowState.Maximized
+                WindowState = FormWindowState.Normal
+        End Select
+    End Sub
+    Private Sub CheckMove(ByRef location As Point)
+        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
+        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
+        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
+        If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
+    End Sub
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color
         If Not AsTheme Then SuspendLayout()
@@ -1974,14 +2005,6 @@ Public Class Library
         GrpBoxGroupBy.ForeColor = forecolor
         ResumeLayout()
         Debug.Print("Library Theme Set")
-    End Sub
-    Private Sub ToggleMaximized()
-        Select Case WindowState
-            Case FormWindowState.Normal, FormWindowState.Minimized
-                WindowState = FormWindowState.Maximized
-            Case FormWindowState.Maximized
-                WindowState = FormWindowState.Normal
-        End Select
     End Sub
 
 End Class

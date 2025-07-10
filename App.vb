@@ -608,8 +608,8 @@ Namespace My
             Try
                 fInfo = New IO.FileInfo(LogPath)
                 If fInfo.Exists AndAlso fInfo.Length >= 1000000 Then IO.File.Move(LogPath, LogPath.Insert(LogPath.Length - 4, "Backup@" + My.Computer.Clock.LocalTime.ToString("yyyyMMdd") + "@" + My.Computer.Clock.LocalTime.ToString("HHmmss")))
-                IO.File.AppendAllText(LogPath, IIf(String.IsNullOrEmpty(logtext), String.Empty, My.Computer.Clock.LocalTime.ToString("yyyy/MM/dd") + " @ " + My.Computer.Clock.LocalTime.ToString("HH:mm:ss") + " --> " + logtext + Chr(13)).ToString)
-                'My.Debug.ShowMessage("WriteToLog", IIf(String.IsNullOrEmpty(logtext), String.Empty, logtext + IIf(showfilename, " (" + IIf(String.IsNullOrEmpty(tagPath), sNoFile, tagPath).ToString + ")", String.Empty).ToString).ToString)
+                'IO.File.AppendAllText(LogPath, IIf(String.IsNullOrEmpty(logtext), String.Empty, My.Computer.Clock.LocalTime.ToString("yyyy/MM/dd") + " @ " + My.Computer.Clock.LocalTime.ToString("HH:mm:ss") + " --> " + logtext + Chr(13)).ToString)
+                If Not String.IsNullOrEmpty(logtext) Then IO.File.AppendAllText(LogPath, My.Computer.Clock.LocalTime.ToString("yyyy/MM/dd") + " @ " + My.Computer.Clock.LocalTime.ToString("HH:mm:ss") + " --> " + logtext + Chr(13))
             Catch
             Finally : fInfo = Nothing
             End Try
