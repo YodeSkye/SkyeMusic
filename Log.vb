@@ -57,6 +57,7 @@ Public Class Log
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
+            App.LogLocation = Me.Location
         End If
     End Sub
     Private Sub Log_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LBLLogInfo.MouseUp

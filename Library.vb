@@ -176,6 +176,7 @@ Public Class Library
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
+            App.LibraryLocation = Location
         End If
     End Sub
     Private Sub Library_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LblLibraryCounts.MouseUp, LblExtTitle.MouseUp, LblExtFileInfo.MouseUp, LblExtProperties.MouseUp, LblExtType.MouseUp, GrpBoxGroupBy.MouseUp
@@ -184,7 +185,7 @@ Public Class Library
     Private Sub Library_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
-            LibraryLocation = Location
+            App.LibraryLocation = Location
         End If
     End Sub
     Private Sub Library_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
