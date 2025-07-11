@@ -34,9 +34,9 @@ Partial Class Options
         CkBoxPlaylistRemoveSpaces = New CheckBox()
         GrBoxPlaylistFormatting = New GroupBox()
         TxtBoxPlaylistVideoIdentifier = New TextBox()
-        Labelcsy2 = New Components.LabelCSY()
-        Labelcsy3 = New Components.LabelCSY()
-        Labelcsy4 = New Components.LabelCSY()
+        LblTitleFormat = New Components.LabelCSY()
+        LblTitleSeparator = New Components.LabelCSY()
+        LblVideoIdentifier = New Components.LabelCSY()
         GrBoxLibrarySearchFolders = New GroupBox()
         BtnLibrarySearchFoldersAdd = New Button()
         CkBoxLibrarySearchSubFolders = New CheckBox()
@@ -170,9 +170,9 @@ Partial Class Options
         GrBoxPlaylistFormatting.Controls.Add(TxtBoxPlaylistVideoIdentifier)
         GrBoxPlaylistFormatting.Controls.Add(CoBoxPlaylistTitleFormat)
         GrBoxPlaylistFormatting.Controls.Add(TxtBoxPlaylistTitleSeparator)
-        GrBoxPlaylistFormatting.Controls.Add(Labelcsy2)
-        GrBoxPlaylistFormatting.Controls.Add(Labelcsy3)
-        GrBoxPlaylistFormatting.Controls.Add(Labelcsy4)
+        GrBoxPlaylistFormatting.Controls.Add(LblTitleFormat)
+        GrBoxPlaylistFormatting.Controls.Add(LblTitleSeparator)
+        GrBoxPlaylistFormatting.Controls.Add(LblVideoIdentifier)
         GrBoxPlaylistFormatting.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         GrBoxPlaylistFormatting.Location = New Point(194, 12)
         GrBoxPlaylistFormatting.Name = "GrBoxPlaylistFormatting"
@@ -190,35 +190,35 @@ Partial Class Options
         TxtBoxPlaylistVideoIdentifier.Size = New Size(167, 25)
         TxtBoxPlaylistVideoIdentifier.TabIndex = 15
         ' 
-        ' Labelcsy2
+        ' LblTitleFormat
         ' 
-        Labelcsy2.AutoSize = True
-        Labelcsy2.CopyOnDoubleClick = False
-        Labelcsy2.Location = New Point(6, 23)
-        Labelcsy2.Name = "Labelcsy2"
-        Labelcsy2.Size = New Size(77, 17)
-        Labelcsy2.TabIndex = 132
-        Labelcsy2.Text = "Title Format"
+        LblTitleFormat.AutoSize = True
+        LblTitleFormat.CopyOnDoubleClick = False
+        LblTitleFormat.Location = New Point(6, 23)
+        LblTitleFormat.Name = "LblTitleFormat"
+        LblTitleFormat.Size = New Size(77, 17)
+        LblTitleFormat.TabIndex = 132
+        LblTitleFormat.Text = "Title Format"
         ' 
-        ' Labelcsy3
+        ' LblTitleSeparator
         ' 
-        Labelcsy3.AutoSize = True
-        Labelcsy3.CopyOnDoubleClick = False
-        Labelcsy3.Location = New Point(7, 88)
-        Labelcsy3.Name = "Labelcsy3"
-        Labelcsy3.Size = New Size(94, 17)
-        Labelcsy3.TabIndex = 132
-        Labelcsy3.Text = "Title Separator"
+        LblTitleSeparator.AutoSize = True
+        LblTitleSeparator.CopyOnDoubleClick = False
+        LblTitleSeparator.Location = New Point(7, 88)
+        LblTitleSeparator.Name = "LblTitleSeparator"
+        LblTitleSeparator.Size = New Size(94, 17)
+        LblTitleSeparator.TabIndex = 132
+        LblTitleSeparator.Text = "Title Separator"
         ' 
-        ' Labelcsy4
+        ' LblVideoIdentifier
         ' 
-        Labelcsy4.AutoSize = True
-        Labelcsy4.CopyOnDoubleClick = False
-        Labelcsy4.Location = New Point(6, 131)
-        Labelcsy4.Name = "Labelcsy4"
-        Labelcsy4.Size = New Size(97, 17)
-        Labelcsy4.TabIndex = 133
-        Labelcsy4.Text = "Video Identifier"
+        LblVideoIdentifier.AutoSize = True
+        LblVideoIdentifier.CopyOnDoubleClick = False
+        LblVideoIdentifier.Location = New Point(6, 131)
+        LblVideoIdentifier.Name = "LblVideoIdentifier"
+        LblVideoIdentifier.Size = New Size(97, 17)
+        LblVideoIdentifier.TabIndex = 133
+        LblVideoIdentifier.Text = "Video Identifier"
         ' 
         ' GrBoxLibrarySearchFolders
         ' 
@@ -573,9 +573,9 @@ Partial Class Options
     Friend WithEvents TxtBoxHelperApp2Name As TextBox
     Friend WithEvents CMTxtBox As My.Components.TextBoxContextMenu
     Friend WithEvents LblSongPlayMode As My.Components.LabelCSY
-    Friend WithEvents Labelcsy2 As My.Components.LabelCSY
-    Friend WithEvents Labelcsy3 As My.Components.LabelCSY
-    Friend WithEvents Labelcsy4 As My.Components.LabelCSY
+    Friend WithEvents LblTitleFormat As My.Components.LabelCSY
+    Friend WithEvents LblTitleSeparator As My.Components.LabelCSY
+    Friend WithEvents LblVideoIdentifier As My.Components.LabelCSY
     Friend WithEvents LblHelperApp1Name As My.Components.LabelCSY
     Friend WithEvents LblHelperApp1Path As My.Components.LabelCSY
     Friend WithEvents LblHelperApp2Name As My.Components.LabelCSY

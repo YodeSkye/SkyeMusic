@@ -4,6 +4,8 @@ Imports SkyeMusic.My
 Public Class Options
 
     'Declarations
+    Private mMove As Boolean = False
+    Private mOffset, mPosition As Point
     Private UIFolderBrowser As New FolderBrowserDialog
     Private uiFileBrowser As New OpenFileDialog
 
@@ -20,7 +22,7 @@ Public Class Options
             MyBase.WndProc(m)
         End Try
     End Sub
-    Private Sub OptionsLoad(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = "Options For " + My.Application.Info.Title
         SetTheme()
 
@@ -110,7 +112,7 @@ Public Class Options
         End If
 
     End Sub
-    Private Sub OptionsFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+    Private Sub Options_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.LibrarySearchFolders.Clear()
         For Each item In LBLibrarySearchFolders.Items
             App.LibrarySearchFolders.Add(item.ToString)
@@ -118,21 +120,38 @@ Public Class Options
         App.SaveOptions()
         Player.ShowPlayMode()
     End Sub
-    Private Sub OptionsMove(sender As Object, e As EventArgs) Handles MyBase.Move
-        If Visible AndAlso WindowState = FormWindowState.Normal Then
-            If Left < 0 Then
-                Left = -App.AdjustScreenBoundsDialogWindow
-            ElseIf Right > My.Computer.Screen.WorkingArea.Width Then
-                Left = My.Computer.Screen.WorkingArea.Width - Width + App.AdjustScreenBoundsDialogWindow
-            End If
-            If Top < App.AdjustScreenBoundsDialogWindow Then
-                Top = 0
-            ElseIf Bottom > My.Computer.Screen.WorkingArea.Height Then
-                Top = My.Computer.Screen.WorkingArea.Height - Height + App.AdjustScreenBoundsDialogWindow
+    Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, GrBoxLibrarySearchFolders.MouseDown, GrBoxPlaylistFormatting.MouseDown, GrBoxTime.MouseDown, LblTitleFormat.MouseDown, LblTitleSeparator.MouseDown, LblVideoIdentifier.MouseDown, LblSongPlayMode.MouseDown, LblDefaultPlaylistAction.MouseDown, LblPlaylistSearchAction.MouseDown, LblTheme.MouseDown, LblHelperApp2Path.MouseDown, LblHelperApp2Name.MouseDown, LblHelperApp1Path.MouseDown, LblHelperApp1Name.MouseDown
+        Dim cSender As Control
+        If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
+            mMove = True
+            cSender = CType(sender, Control)
+            If cSender Is Me Then
+                mOffset = New Point(-e.X - SystemInformation.FixedFrameBorderSize.Width - 7, -e.Y - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 7)
+            ElseIf cSender Is LblTitleFormat OrElse cSender Is LblTitleSeparator OrElse cSender Is LblVideoIdentifier Then
+                mOffset = New Point(-e.X - cSender.Left - GrBoxPlaylistFormatting.Left - SystemInformation.FixedFrameBorderSize.Width - 7, -e.Y - cSender.Top - GrBoxPlaylistFormatting.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 7)
+            Else
+                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 7, -e.Y - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 7)
             End If
         End If
+        cSender = Nothing
     End Sub
-    Private Sub OptionsKeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+    Private Sub Options_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, GrBoxLibrarySearchFolders.MouseMove, GrBoxPlaylistFormatting.MouseMove, GrBoxTime.MouseMove, LblTitleFormat.MouseMove, LblTitleSeparator.MouseMove, LblVideoIdentifier.MouseMove, LblSongPlayMode.MouseMove, LblDefaultPlaylistAction.MouseMove, LblPlaylistSearchAction.MouseMove, LblTheme.MouseMove, LblHelperApp2Path.MouseMove, LblHelperApp2Name.MouseMove, LblHelperApp1Path.MouseMove, LblHelperApp1Name.MouseMove
+        If mMove Then
+            mPosition = MousePosition
+            mPosition.Offset(mOffset.X, mOffset.Y)
+            CheckMove(mPosition)
+            Location = mPosition
+        End If
+    End Sub
+    Private Sub Options_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, GrBoxLibrarySearchFolders.MouseUp, GrBoxPlaylistFormatting.MouseUp, GrBoxTime.MouseUp, LblTitleFormat.MouseUp, LblTitleSeparator.MouseUp, LblVideoIdentifier.MouseUp, LblSongPlayMode.MouseUp, LblDefaultPlaylistAction.MouseUp, LblPlaylistSearchAction.MouseUp, LblTheme.MouseUp, LblHelperApp2Path.MouseUp, LblHelperApp2Name.MouseUp, LblHelperApp1Path.MouseUp, LblHelperApp1Name.MouseUp
+        mMove = False
+    End Sub
+    Private Sub Options_Move(sender As Object, e As EventArgs) Handles MyBase.Move
+        If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
+            CheckMove(Location)
+        End If
+    End Sub
+    Private Sub Options_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyData = Keys.Escape Then Close()
     End Sub
 
@@ -345,6 +364,12 @@ Public Class Options
         If LBLibrarySearchFolders.SelectedItems.Count = 1 Then
             LBLibrarySearchFolders.Items.RemoveAt(LBLibrarySearchFolders.SelectedIndex)
         End If
+    End Sub
+    Private Sub CheckMove(ByRef location As Point)
+        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
+        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
+        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
+        If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color

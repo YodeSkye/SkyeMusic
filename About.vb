@@ -1,6 +1,5 @@
 ﻿
 Imports SkyeMusic.My
-
 Public Class About
 
     'Declarations
