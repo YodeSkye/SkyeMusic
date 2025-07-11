@@ -29,11 +29,11 @@ Partial Class Splash
         ' LblSkye
         ' 
         LblSkye.AutoSize = True
-        LblSkye.Font = New Font("Segoe UI", 36F, FontStyle.Bold Or FontStyle.Italic, GraphicsUnit.Point, CByte(0))
+        LblSkye.Font = New Font("Segoe UI", 27.75F, FontStyle.Bold Or FontStyle.Italic, GraphicsUnit.Point, CByte(0))
         LblSkye.ForeColor = Color.DodgerBlue
-        LblSkye.Location = New Point(20, 40)
+        LblSkye.Location = New Point(33, 51)
         LblSkye.Name = "LblSkye"
-        LblSkye.Size = New Size(132, 65)
+        LblSkye.Size = New Size(102, 50)
         LblSkye.TabIndex = 0
         LblSkye.Text = "Skye"
         LblSkye.TextAlign = ContentAlignment.MiddleRight
@@ -43,7 +43,7 @@ Partial Class Splash
         LblMusic.AutoSize = True
         LblMusic.Font = New Font("Segoe UI Semibold", 27.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblMusic.ForeColor = SystemColors.Window
-        LblMusic.Location = New Point(134, 51)
+        LblMusic.Location = New Point(122, 51)
         LblMusic.Name = "LblMusic"
         LblMusic.Size = New Size(121, 50)
         LblMusic.TabIndex = 1
