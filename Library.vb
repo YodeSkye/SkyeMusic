@@ -126,7 +126,7 @@ Public Class Library
         LVLibrary.Columns.Add(header)
         header = New ColumnHeader()
         header.Name = "Filename"
-        header.Text = "Filename"
+        header.Text = "File Path"
         header.Width = 200
         LVLibrary.Columns.Add(header)
         header = Nothing

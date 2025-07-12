@@ -328,17 +328,17 @@ Public Class Player
                             LVPlaylist.Columns(0).Text = "Title ↑"
                     End Select
                     PlaylistFilenameSort = SortOrder.None
-                    LVPlaylist.Columns(1).Text = "Filename"
+                    LVPlaylist.Columns(1).Text = "Path"
                 Case 1
                     Select Case PlaylistFilenameSort
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             PlaylistFilenameSort = SortOrder.Descending
-                            LVPlaylist.Columns(1).Text = "Filename ↓"
+                            LVPlaylist.Columns(1).Text = "Path ↓"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             PlaylistFilenameSort = SortOrder.Ascending
-                            LVPlaylist.Columns(1).Text = "Filename ↑"
+                            LVPlaylist.Columns(1).Text = "Path ↑"
                     End Select
                     PlaylistTitleSort = SortOrder.None
                     LVPlaylist.Columns(0).Text = "Title"
@@ -2454,7 +2454,7 @@ Public Class Player
         PlaylistTitleSort = SortOrder.None
         PlaylistFilenameSort = SortOrder.None
         LVPlaylist.Columns(0).Text = "Title"
-        LVPlaylist.Columns(1).Text = "Filename"
+        LVPlaylist.Columns(1).Text = "Path"
     End Sub
     Private Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()
