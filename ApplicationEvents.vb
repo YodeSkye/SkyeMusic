@@ -29,7 +29,6 @@ Namespace My
 #If Not DEBUG Then
             My.Application.MinimumSplashScreenDisplayTime = 2000
             SplashScreen = New Splash
-            SplashScreen.BackColor = App.AccentTheme.BackColor
 #End If
         End Sub
         Protected Overrides Function OnStartup(e As ApplicationServices.StartupEventArgs) As Boolean
