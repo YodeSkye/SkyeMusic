@@ -12,7 +12,7 @@ Public Class Player
     'Declarations
     Public Structure PlaylistItemType
         Dim Title As String
-        Dim Filename As String
+        Dim Path As String
     End Structure
     Private aDevEnum As New CoreAudio.MMDeviceEnumerator 'Audio Device Enumerator
     Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
@@ -1899,7 +1899,7 @@ Public Class Player
             For Each plitem As ListViewItem In LVPlaylist.Items
                 Dim newitem As New PlaylistItemType
                 newitem.Title = plitem.SubItems(0).Text
-                newitem.Filename = plitem.SubItems(1).Text
+                newitem.Path = plitem.SubItems(1).Text
                 items.Add(newitem)
                 newitem = Nothing
             Next
@@ -1930,7 +1930,7 @@ Public Class Player
                     LVItem.UseItemStyleForSubItems = False
                     LVItem.SubItems(0).Font = PlaylistBoldFont
                     LVItem.Text = item.Title
-                    LVItem.SubItems.Add(item.Filename)
+                    LVItem.SubItems.Add(item.Path)
                     LVPlaylist.Items.Add(LVItem)
                     LVItem = Nothing
                 Next

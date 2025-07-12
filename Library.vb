@@ -27,7 +27,7 @@ Public Class Library
         Dim AV As String
         Dim Artists As String
         Dim Comments As String
-        Dim Filename As String
+        Dim FilePath As String
         Dim HasAlbumArt As Boolean
     End Structure
     Private mMove As Boolean = False
@@ -125,7 +125,7 @@ Public Class Library
         header.Width = 200
         LVLibrary.Columns.Add(header)
         header = New ColumnHeader()
-        header.Name = "Filename"
+        header.Name = "FilePath"
         header.Text = "File Path"
         header.Width = 200
         LVLibrary.Columns.Add(header)
@@ -257,13 +257,13 @@ Public Class Library
             ShowAlbumArt()
             LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             Dim fInfo As IO.FileInfo
-            fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+            fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
             LblExtFileInfo.Text = fInfo.Extension.TrimStart(".").ToUpper
             LblExtFileInfo.Text += " " + App.FormatFileSize(fInfo.Length, My.App.FormatFileSizeUnits.Auto, 2, False)
             fInfo = Nothing
             Dim tlFile As TagLib.File = Nothing
             Try
-                tlFile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+                tlFile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
             Catch
             Finally
                 If tlFile IsNot Nothing Then
@@ -403,7 +403,7 @@ Public Class Library
                             LibraryCommentsSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
                     End Select
-                Case LVLibrary.Columns("Filename").Index
+                Case LVLibrary.Columns("FilePath").Index
                     Select Case LibraryFilenameSort
                         Case SortOrder.Ascending
                             LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
@@ -451,8 +451,8 @@ Public Class Library
             CMIHelperApp2.Visible = False
         Else
             CMICopyTitle.ToolTipText = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
-            CMICopyFileName.ToolTipText = IO.Path.GetFileNameWithoutExtension(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
-            CMICopyFilePath.ToolTipText = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text
+            CMICopyFileName.ToolTipText = IO.Path.GetFileNameWithoutExtension(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+            CMICopyFilePath.ToolTipText = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text
             If File.Exists(App.HelperApp1Path) Then
                 CMIHelperApp1.Visible = True
             Else
@@ -469,7 +469,7 @@ Public Class Library
         Play()
     End Sub
     Private Sub CMIPlayWithWindows_Click(sender As Object, e As EventArgs) Handles CMIPlayWithWindows.Click
-        If LVLibrary.SelectedItems.Count > 0 Then App.PlayWithWindows(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+        If LVLibrary.SelectedItems.Count > 0 Then App.PlayWithWindows(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
     Private Sub CMIAddToPlaylistClick(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
         Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
@@ -545,22 +545,22 @@ Public Class Library
         Next
     End Sub
     Private Sub CMIHelperApp1Click(sender As Object, e As EventArgs) Handles CMIHelperApp1.Click
-        App.HelperApp1(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+        App.HelperApp1(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
     Private Sub CMIHelperApp2Click(sender As Object, e As EventArgs) Handles CMIHelperApp2.Click
-        App.HelperApp2(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+        App.HelperApp2(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
     Private Sub CMIOpenLocationClick(sender As Object, e As EventArgs) Handles CMIOpenLocation.Click
-        If LVLibrary.SelectedItems.Count > 0 Then App.OpenFileLocation(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+        If LVLibrary.SelectedItems.Count > 0 Then App.OpenFileLocation(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
     Private Sub CMICopyTitleClick(sender As Object, e As EventArgs) Handles CMICopyTitle.Click
         If LVLibrary.SelectedItems.Count > 0 Then Clipboard.SetText(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text)
     End Sub
     Private Sub CMICopyFilenameClick(sender As Object, e As EventArgs) Handles CMICopyFileName.Click
-        If LVLibrary.SelectedItems.Count > 0 Then Clipboard.SetText(IO.Path.GetFileNameWithoutExtension(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text))
+        If LVLibrary.SelectedItems.Count > 0 Then Clipboard.SetText(IO.Path.GetFileNameWithoutExtension(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text))
     End Sub
     Private Sub CMICopyFilePathClick(sender As Object, e As EventArgs) Handles CMICopyFilePath.Click
-        If LVLibrary.SelectedItems.Count > 0 Then Clipboard.SetText(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+        If LVLibrary.SelectedItems.Count > 0 Then Clipboard.SetText(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
     Private Sub PicBoxAlbumArtMouseDown(sender As Object, e As MouseEventArgs) Handles PicBoxAlbumArt.MouseDown
         If PicBoxAlbumArt.Visible AndAlso e.Button = MouseButtons.Left Then
@@ -638,7 +638,7 @@ Public Class Library
                     LibrarySearchItems.Add(item)
                 ElseIf item.SubItems(LVLibrary.Columns("Comments").Index).Text.ToLower.Contains(TxbxLibrarySearch.Text.ToLower) Then
                     LibrarySearchItems.Add(item)
-                ElseIf item.SubItems(LVLibrary.Columns("Filename").Index).Text.ToLower.Contains(TxbxLibrarySearch.Text.ToLower) Then
+                ElseIf item.SubItems(LVLibrary.Columns("FilePath").Index).Text.ToLower.Contains(TxbxLibrarySearch.Text.ToLower) Then
                     LibrarySearchItems.Add(item)
                 End If
             Next
@@ -720,10 +720,10 @@ Public Class Library
         FormatPlaylistTitle = ""
         Select Case App.PlaylistTitleFormat
             Case App.PlaylistTitleFormats.UseFilename
-                FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
             Case App.PlaylistTitleFormats.Song
                 If item.SubItems(LVLibrary.Columns("Title").Index).Text Is String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -733,7 +733,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.SongGenre
                 If item.SubItems(LVLibrary.Columns("Title").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -751,7 +751,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.SongArtist
                 If item.SubItems(LVLibrary.Columns("Artist").Index).Text Is String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -769,7 +769,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.SongArtistAlbum
                 If item.SubItems(LVLibrary.Columns("Title").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -795,7 +795,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.SongAlbumArtist
                 If item.SubItems(LVLibrary.Columns("Title").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -821,7 +821,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.SongArtistGenre
                 If item.SubItems(LVLibrary.Columns("Title").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -847,7 +847,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.SongGenreArtist
                 If item.SubItems(LVLibrary.Columns("Title").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -873,7 +873,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.SongArtistAlbumGenre
                 If item.SubItems(LVLibrary.Columns("Title").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -907,7 +907,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.SongAlbumArtistGenre
                 If item.SubItems(LVLibrary.Columns("Title").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -941,7 +941,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.SongGenreArtistAlbum
                 If item.SubItems(LVLibrary.Columns("Title").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Title").Index).Text.Replace(" ", "")
@@ -975,7 +975,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.ArtistSong
                 If item.SubItems(LVLibrary.Columns("Artist").Index).Text Is String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Artist").Index).Text.Replace(" ", "")
@@ -993,7 +993,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.ArtistSongAlbum
                 If item.SubItems(LVLibrary.Columns("Artist").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Artist").Index).Text.Replace(" ", "")
@@ -1019,7 +1019,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.ArtistAlbumSong
                 If item.SubItems(LVLibrary.Columns("Artist").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Artist").Index).Text.Replace(" ", "")
@@ -1045,7 +1045,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.ArtistGenreSong
                 If item.SubItems(LVLibrary.Columns("Artist").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Artist").Index).Text.Replace(" ", "")
@@ -1071,7 +1071,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.ArtistSongGenre
                 If item.SubItems(LVLibrary.Columns("Artist").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Artist").Index).Text.Replace(" ", "")
@@ -1097,7 +1097,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.ArtistSongAlbumGenre
                 If item.SubItems(LVLibrary.Columns("Artist").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Artist").Index).Text.Replace(" ", "")
@@ -1131,7 +1131,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.ArtistGenreSongAlbum
                 If item.SubItems(LVLibrary.Columns("Artist").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Artist").Index).Text.Replace(" ", "")
@@ -1165,7 +1165,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.AlbumSongArtist
                 If item.SubItems(LVLibrary.Columns("Album").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Album").Index).Text.Replace(" ", "")
@@ -1191,7 +1191,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.AlbumArtistSong
                 If item.SubItems(LVLibrary.Columns("Album").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Album").Index).Text.Replace(" ", "")
@@ -1217,7 +1217,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.AlbumGenreSongArtist
                 If item.SubItems(LVLibrary.Columns("Album").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Album").Index).Text.Replace(" ", "")
@@ -1251,7 +1251,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.AlbumGenreArtistSong
                 If item.SubItems(LVLibrary.Columns("Album").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Album").Index).Text.Replace(" ", "")
@@ -1285,7 +1285,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.AlbumSongArtistGenre
                 If item.SubItems(LVLibrary.Columns("Album").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Album").Index).Text.Replace(" ", "")
@@ -1319,7 +1319,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.AlbumArtistSongGenre
                 If item.SubItems(LVLibrary.Columns("Album").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Album").Index).Text.Replace(" ", "")
@@ -1353,7 +1353,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.GenreSong
                 If item.SubItems(LVLibrary.Columns("Genre").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Genre").Index).Text.Replace(" ", "")
@@ -1371,7 +1371,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.GenreSongArtist
                 If item.SubItems(LVLibrary.Columns("Genre").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Genre").Index).Text.Replace(" ", "")
@@ -1397,7 +1397,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.GenreArtistSong
                 If item.SubItems(LVLibrary.Columns("Genre").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Genre").Index).Text.Replace(" ", "")
@@ -1423,7 +1423,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.GenreAlbumSongArtist
                 If item.SubItems(LVLibrary.Columns("Genre").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Genre").Index).Text.Replace(" ", "")
@@ -1457,7 +1457,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.GenreAlbumArtistSong
                 If item.SubItems(LVLibrary.Columns("Genre").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Genre").Index).Text.Replace(" ", "")
@@ -1491,7 +1491,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.GenreSongArtistAlbum
                 If item.SubItems(LVLibrary.Columns("Genre").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Genre").Index).Text.Replace(" ", "")
@@ -1525,7 +1525,7 @@ Public Class Library
                 End If
             Case App.PlaylistTitleFormats.GenreSongAlbumArtist
                 If item.SubItems(LVLibrary.Columns("Genre").Index).Text = String.Empty Then
-                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+                    FormatPlaylistTitle = IO.Path.GetFileNameWithoutExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
                 Else
                     If App.PlaylistTitleRemoveSpaces Then
                         FormatPlaylistTitle += item.SubItems(LVLibrary.Columns("Genre").Index).Text.Replace(" ", "")
@@ -1558,7 +1558,7 @@ Public Class Library
                     End If
                 End If
         End Select
-        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(item.SubItems(LVLibrary.Columns("Filename").Index).Text)) Then
+        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)) Then
             FormatPlaylistTitle += App.PlaylistVideoIdentifier
         End If
     End Function
@@ -1650,7 +1650,7 @@ Public Class Library
                             If tlfile.Tag.Pictures.Count > 0 Then item.ImageKey = "AlbumArt"
                         End If
                         'Filename
-                        item.SubItems(LVLibrary.Columns("Filename").Index).Text = file
+                        item.SubItems(LVLibrary.Columns("FilePath").Index).Text = file
                         If App.AudioExtensionDictionary.ContainsKey(Path.GetExtension(file)) Then
                             item.SubItems(LVLibrary.Columns("AV").Index).Text = "A"
                         Else
@@ -1673,11 +1673,11 @@ Public Class Library
     End Sub
     Private Sub Play()
         If LVLibrary.SelectedItems.Count > 0 Then
-            Player.PlayFromLibrary(FormatPlaylistTitle(LVLibrary.SelectedItems(0)), LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+            Player.PlayFromLibrary(FormatPlaylistTitle(LVLibrary.SelectedItems(0)), LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
         End If
     End Sub
     Private Sub AddToPlaylist(item As ListViewItem)
-        Player.AddToPlaylistFromLibrary(FormatPlaylistTitle(item), item.SubItems(LVLibrary.Columns("Filename").Index).Text)
+        Player.AddToPlaylistFromLibrary(FormatPlaylistTitle(item), item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
         item = Nothing
     End Sub
     Private Sub SaveLibrary()
@@ -1699,7 +1699,7 @@ Public Class Library
                 newitem.AV = libraryitem.SubItems(LVLibrary.Columns("AV").Index).Text
                 newitem.Artists = libraryitem.SubItems(LVLibrary.Columns("Artists").Index).Text
                 newitem.Comments = libraryitem.SubItems(LVLibrary.Columns("Comments").Index).Text
-                newitem.Filename = libraryitem.SubItems(LVLibrary.Columns("Filename").Index).Text
+                newitem.FilePath = libraryitem.SubItems(LVLibrary.Columns("FilePath").Index).Text
                 If libraryitem.ImageKey = "AlbumArt" Then
                     newitem.HasAlbumArt = True
                 Else
@@ -1755,7 +1755,7 @@ Public Class Library
                     lvitem.SubItems(LVLibrary.Columns("AV").Index).Text = item.AV
                     lvitem.SubItems(LVLibrary.Columns("Artists").Index).Text = item.Artists
                     lvitem.SubItems(LVLibrary.Columns("Comments").Index).Text = item.Comments
-                    lvitem.SubItems(LVLibrary.Columns("Filename").Index).Text = item.Filename
+                    lvitem.SubItems(LVLibrary.Columns("FilePath").Index).Text = item.FilePath
                     If item.HasAlbumArt Then lvitem.ImageKey = "AlbumArt"
                     LVLibrary.Items.Add(lvitem)
                     lvitem = Nothing
@@ -1782,9 +1782,9 @@ Public Class Library
         If LVLibrary.SelectedItems.Count > 0 Then
             Dim tlfile As TagLib.File
             Try
-                tlfile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text)
+                tlfile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
             Catch ex As Exception
-                WriteToLog("TagLib Error while Showing Album Art, Cannot read from file: " + LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text + Chr(13) + ex.Message)
+                WriteToLog("TagLib Error while Showing Album Art, Cannot read from file: " + LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text + Chr(13) + ex.Message)
                 tlfile = Nothing
             End Try
             If tlfile Is Nothing Then
@@ -1801,7 +1801,7 @@ Public Class Library
                         PicBoxAlbumArt.Image = Image.FromStream(ms)
                         PicBoxAlbumArt.Visible = True
                     Catch ex As Exception
-                        WriteToLog("Error Loading Album Art for " + LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Filename").Index).Text + vbCr + ex.Message)
+                        WriteToLog("Error Loading Album Art for " + LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text + vbCr + ex.Message)
                         PicBoxAlbumArt.Visible = False
                         LblAlbumArtSelect.Visible = False
                     End Try
