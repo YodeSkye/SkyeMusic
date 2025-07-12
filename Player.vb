@@ -1923,24 +1923,34 @@ Public Class Player
             Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of PlaylistItemType)))
             Dim file As New IO.FileStream(App.PlaylistPath, IO.FileMode.Open)
             Dim items As Collections.Generic.List(Of PlaylistItemType)
-            items = reader.Deserialize(file)
+            Try
+                items = reader.Deserialize(file)
+                For Each item As PlaylistItemType In items
+                    Dim LVItem As New ListViewItem
+                    LVItem.UseItemStyleForSubItems = False
+                    LVItem.SubItems(0).Font = PlaylistBoldFont
+                    LVItem.Text = item.Title
+                    LVItem.SubItems.Add(item.Filename)
+                    LVPlaylist.Items.Add(LVItem)
+                    LVItem = Nothing
+                Next
+            Catch
+                items = Nothing
+            End Try
             file.Close()
             file.Dispose()
             reader = Nothing
-            For Each item As PlaylistItemType In items
-                Dim LVItem As New ListViewItem
-                LVItem.UseItemStyleForSubItems = False
-                LVItem.SubItems(0).Font = PlaylistBoldFont
-                LVItem.Text = item.Title
-                LVItem.SubItems.Add(item.Filename)
-                LVPlaylist.Items.Add(LVItem)
-                LVItem = Nothing
-            Next
-            SetPlaylistCountText()
-            items.Clear()
-            items = Nothing
-            App.WriteToLog("Playlist Loaded (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            If items Is Nothing Then
+                App.WriteToLog("Playlist Not Loaded: File not valid")
+            Else
+                items.Clear()
+                items = Nothing
+                App.WriteToLog("Playlist Loaded (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            End If
+        Else
+            App.WriteToLog("Playlist Not Loaded: File does not exist")
         End If
+        SetPlaylistCountText()
     End Sub
     Private Sub AddToPlaylistFromFile()
         Dim ofd As New OpenFileDialog

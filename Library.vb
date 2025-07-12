@@ -1728,45 +1728,55 @@ Public Class Library
             Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of LibraryItemType)))
             Dim file As New System.IO.StreamReader(App.LibraryPath)
             Dim items As Collections.Generic.List(Of LibraryItemType)
-            items = reader.Deserialize(file)
+            Try
+                items = reader.Deserialize(file)
+                For Each item As LibraryItemType In items
+                    Dim lvitem As New ListViewItem
+                    'Keep this in sync with number of columns set in Load Event
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems.Add(String.Empty)
+                    lvitem.SubItems(LVLibrary.Columns("Artist").Index).Text = item.Artist
+                    lvitem.SubItems(LVLibrary.Columns("Title").Index).Text = item.Title
+                    lvitem.SubItems(LVLibrary.Columns("Album").Index).Text = item.Album
+                    lvitem.SubItems(LVLibrary.Columns("Genre").Index).Text = item.Genre
+                    lvitem.SubItems(LVLibrary.Columns("Year").Index).Text = item.Year
+                    lvitem.SubItems(LVLibrary.Columns("Track").Index).Text = item.Track
+                    lvitem.SubItems(LVLibrary.Columns("Tracks").Index).Text = item.Tracks
+                    lvitem.SubItems(LVLibrary.Columns("Duration").Index).Text = item.Duration
+                    lvitem.SubItems(LVLibrary.Columns("AV").Index).Text = item.AV
+                    lvitem.SubItems(LVLibrary.Columns("Artists").Index).Text = item.Artists
+                    lvitem.SubItems(LVLibrary.Columns("Comments").Index).Text = item.Comments
+                    lvitem.SubItems(LVLibrary.Columns("Filename").Index).Text = item.Filename
+                    If item.HasAlbumArt Then lvitem.ImageKey = "AlbumArt"
+                    LVLibrary.Items.Add(lvitem)
+                    lvitem = Nothing
+                Next
+            Catch
+                items = Nothing
+            End Try
             file.Close()
             file.Dispose()
             reader = Nothing
-            For Each item As LibraryItemType In items
-                Dim lvitem As New ListViewItem
-                'Keep this in sync with number of columns set in Load Event
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems.Add(String.Empty)
-                lvitem.SubItems(LVLibrary.Columns("Artist").Index).Text = item.Artist
-                lvitem.SubItems(LVLibrary.Columns("Title").Index).Text = item.Title
-                lvitem.SubItems(LVLibrary.Columns("Album").Index).Text = item.Album
-                lvitem.SubItems(LVLibrary.Columns("Genre").Index).Text = item.Genre
-                lvitem.SubItems(LVLibrary.Columns("Year").Index).Text = item.Year
-                lvitem.SubItems(LVLibrary.Columns("Track").Index).Text = item.Track
-                lvitem.SubItems(LVLibrary.Columns("Tracks").Index).Text = item.Tracks
-                lvitem.SubItems(LVLibrary.Columns("Duration").Index).Text = item.Duration
-                lvitem.SubItems(LVLibrary.Columns("AV").Index).Text = item.AV
-                lvitem.SubItems(LVLibrary.Columns("Artists").Index).Text = item.Artists
-                lvitem.SubItems(LVLibrary.Columns("Comments").Index).Text = item.Comments
-                lvitem.SubItems(LVLibrary.Columns("Filename").Index).Text = item.Filename
-                If item.HasAlbumArt Then lvitem.ImageKey = "AlbumArt"
-                LVLibrary.Items.Add(lvitem)
-                lvitem = Nothing
-            Next
-            SetLibraryCountText()
-            items.Clear()
-            items = Nothing
-            App.WriteToLog("Library Loaded (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            If items Is Nothing Then
+                App.WriteToLog("Library Not Loaded: File not valid")
+            Else
+                items.Clear()
+                items = Nothing
+                App.WriteToLog("Library Loaded (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            End If
+        Else
+            App.WriteToLog("Library Not Loaded: File does not exist")
         End If
+        SetLibraryCountText()
     End Sub
     Private Sub ShowAlbumArt()
         If LVLibrary.SelectedItems.Count > 0 Then
