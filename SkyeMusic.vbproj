@@ -49,10 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="My Project\IconSkyeMusic.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Import Include="SkyeMusic.My" />
     <Import Include="System.Data" />
     <Import Include="System.Drawing" />
