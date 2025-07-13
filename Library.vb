@@ -476,9 +476,11 @@ Public Class Library
         LblStatus.Text = "Adding Selected Songs to Playlist..."
         LblStatus.Visible = True
         LblStatus.Refresh()
+        Player.LVPlaylist.Visible = False
         For Each item As ListViewItem In LVLibrary.SelectedItems
             AddToPlaylist(item)
         Next
+        Player.LVPlaylist.Visible = True
         LblStatus.Visible = False
         App.WriteToLog("Selected Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
     End Sub
@@ -487,9 +489,11 @@ Public Class Library
         LblStatus.Text = "Adding All Songs to Playlist..."
         LblStatus.Visible = True
         LblStatus.Refresh()
+        Player.LVPlaylist.Visible = False
         For Each item As ListViewItem In LVLibrary.Items
             AddToPlaylist(item)
         Next
+        Player.LVPlaylist.Visible = True
         LblStatus.Visible = False
         App.WriteToLog("Full Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
     End Sub
@@ -498,6 +502,7 @@ Public Class Library
         LblStatus.Text = "Adding Group to Playlist..."
         LblStatus.Visible = True
         LblStatus.Refresh()
+        Player.LVPlaylist.Visible = False
         'Get group name from selected list view item
         Dim groupname As String
         Select Case LibraryGroupBy
@@ -516,6 +521,7 @@ Public Class Library
         For Each item As ListViewItem In LVLibrary.Groups(groupindex).Items
             AddToPlaylist(item)
         Next
+        Player.LVPlaylist.Visible = True
         LblStatus.Visible = False
         App.WriteToLog(LibraryGroupBy.ToString + " Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
     End Sub

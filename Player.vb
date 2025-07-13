@@ -19,7 +19,7 @@ Public Class Player
     Private cLeftMeter, cRightMeter, visR, visB As Byte 'Meter Values and Visualizer Colors
     Private visV As Single 'Visualizer Volume
     Private PlayState As Boolean = False 'True if a song is currently playing
-    Private IsURL As Boolean = False 'True if the current playing item is a URL
+    Private IsStream As Boolean = False 'True if the current playing item is a URL
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
@@ -492,7 +492,9 @@ Public Class Player
         AddToPlaylistFromFile()
     End Sub
     Private Sub MIOpenURL_Click(sender As Object, e As EventArgs) Handles MIOpenURL.Click
-        PlayURLFromClipboard()
+        If Clipboard.ContainsText Then
+            PlayStream(Clipboard.GetText)
+        End If
     End Sub
     Private Sub MIExit_Click(sender As Object, e As EventArgs) Handles MIExit.Click
         Close()
@@ -597,6 +599,7 @@ Public Class Player
         End If
         If LVPlaylist.SelectedItems.Count = 0 Then
             CMIPlaylistRemove.Enabled = False
+            CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
             CMICopyTitle.ToolTipText = String.Empty
             CMICopyFileName.ToolTipText = String.Empty
             CMICopyFilePath.ToolTipText = String.Empty
@@ -604,6 +607,8 @@ Public Class Player
             CMIHelperApp2.Visible = False
         Else
             CMIPlaylistRemove.Enabled = True
+            CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
+            CMIPlaylistRemove.Text += " (" + LVPlaylist.SelectedItems.Count.ToString + ")"
             CMICopyTitle.ToolTipText = LVPlaylist.SelectedItems(0).SubItems(0).Text
             CMICopyFileName.ToolTipText = IO.Path.GetFileNameWithoutExtension(LVPlaylist.SelectedItems(0).SubItems(1).Text)
             CMICopyFilePath.ToolTipText = LVPlaylist.SelectedItems(0).SubItems(1).Text
@@ -722,7 +727,7 @@ Public Class Player
         pString_format.LineAlignment = StringAlignment.Center
         Try
             'Debug.Print(AxPlayer.URL)
-            If IsURL Then
+            If IsStream Then
                 pText = AxPlayer.URL
             Else
                 pText = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0).Text
@@ -835,13 +840,13 @@ Public Class Player
         LVPlaylist.Focus()
     End Sub
     Private Sub BtnReverseMouseDown(sender As Object, e As MouseEventArgs) Handles BtnReverse.MouseDown, BtnReverse.MouseDown
-        If Not IsURL Then
+        If Not IsStream Then
             UpdatePosition(False, 10)
             LVPlaylist.Focus()
         End If
     End Sub
     Private Sub BtnForwardMouseDown(sender As Object, e As MouseEventArgs) Handles BtnForward.MouseDown
-        If Not IsURL Then
+        If Not IsStream Then
             UpdatePosition(True, 10)
             LVPlaylist.Focus()
         End If
@@ -898,10 +903,10 @@ Public Class Player
                 PlayState = True
                 BtnPlay.Image = App.CurrentTheme.PlayerPause
                 TrackBarPosition.Maximum = AxPlayer.currentMedia.duration * TrackBarScale
-                If Not TrackBarPosition.Enabled AndAlso Not IsURL Then TrackBarPosition.Enabled = True
+                If Not TrackBarPosition.Enabled AndAlso Not IsStream Then TrackBarPosition.Enabled = True
                 LblDuration.Text = FormatDuration(AxPlayer.currentMedia.duration)
                 Try
-                    If IsURL Then
+                    If IsStream Then
                         Text = My.Application.Info.Title + " - " + AxPlayer.URL
                     Else
                         Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0).Text + " @ " + AxPlayer.URL
@@ -932,11 +937,11 @@ Public Class Player
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
         If AxPlayer.currentMedia IsNot Nothing AndAlso PlayState Then
             Try
-                If Not IsURL Then TrackBarPosition.Value = AxPlayer.Ctlcontrols.currentPosition * TrackBarScale
+                If Not IsStream Then TrackBarPosition.Value = AxPlayer.Ctlcontrols.currentPosition * TrackBarScale
                 If My.App.PlayerPositionShowElapsed Then
                     LblPosition.Text = FormatPosition(AxPlayer.Ctlcontrols.currentPosition)
                 Else
-                    If IsURL Then
+                    If IsStream Then
                         LblPosition.Text = "00:00"
                     Else
                         LblPosition.Text = FormatPosition(AxPlayer.currentMedia.duration - AxPlayer.Ctlcontrols.currentPosition)
@@ -2059,7 +2064,7 @@ Public Class Player
     End Sub
     Private Sub PlayFromPlaylist()
         If LVPlaylist.SelectedItems.Count > 0 Then
-            IsURL = False
+            IsStream = False
             LyricsOff()
             StopPlay()
             If Mute Then ToggleMute()
@@ -2084,7 +2089,7 @@ Public Class Player
         End If
     End Sub
     Friend Sub PlayFromLibrary(title As String, filename As String)
-        IsURL = False
+        IsStream = False
         LyricsOff()
         Dim lvi As ListViewItem = New ListViewItem
         lvi.UseItemStyleForSubItems = False
@@ -2106,19 +2111,6 @@ Public Class Player
         AxPlayer.URL = filename
         RandomHistoryAdd(filename)
     End Sub
-    Private Sub PlayURLFromClipboard()
-        If Clipboard.ContainsText Then
-            IsURL = True
-            Try
-                AxPlayer.URL = Clipboard.GetText
-                TrackBarPosition.Enabled = False
-                TrackBarPosition.Value = 0
-                ShowMedia()
-            Catch
-                IsURL = False
-            End Try
-        End If
-    End Sub
     Private Sub PlayQueued()
         If Queue.Count > 0 Then
             AxPlayer.URL = Queue(0)
@@ -2136,7 +2128,7 @@ Public Class Player
     End Sub
     Friend Sub PlayPrevious()
         If RandomHistory.Count > 0 Then
-            IsURL = False
+            IsStream = False
             LyricsOff()
             Select Case App.PlayMode
                 Case PlayModes.Repeat
@@ -2189,7 +2181,7 @@ Public Class Player
         End If
     End Sub
     Friend Sub PlayNext()
-        IsURL = False
+        IsStream = False
         LyricsOff()
         Select Case App.PlayMode
             Case PlayModes.Repeat
@@ -2257,6 +2249,13 @@ Public Class Player
                 End If
         End Select
     End Sub
+    Private Sub PlayStream(url As String)
+        IsStream = True
+        AxPlayer.URL = url
+        TrackBarPosition.Enabled = False
+        TrackBarPosition.Value = 0
+        ShowMedia()
+    End Sub
     Private Sub RandomHistoryAdd(filename As String)
         If App.PlayMode = App.PlayModes.Random Then
             RandomHistory.Add(filename)
@@ -2306,7 +2305,7 @@ Public Class Player
         Else
             Dim tlfile As TagLib.File
             Try
-                If IsURL Then
+                If IsStream Then
                     tlfile = Nothing
                 Else
                     tlfile = TagLib.File.Create(AxPlayer.URL)
@@ -2315,7 +2314,7 @@ Public Class Player
                 WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + AxPlayer.URL + Chr(13) + ex.Message)
                 tlfile = Nothing
             End Try
-            If Lyrics AndAlso Not IsURL Then 'Show Lyrics
+            If Lyrics AndAlso Not IsStream Then 'Show Lyrics
                 Debug.Print("Showing Lyrics...")
                 PicBoxAlbumArt.Visible = False
                 LblAlbumArtSelect.Visible = False
@@ -2379,7 +2378,7 @@ Public Class Player
                         AxPlayer.Visible = True
                     End If
                 End If
-                If Visualizer OrElse (Not AxPlayer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse IsURL Then 'Show Visualizer
+                If Visualizer OrElse (Not AxPlayer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse IsStream Then 'Show Visualizer
                     Debug.Print("Showing Visualizer...")
                     AxPlayer.Visible = False
                     PicBoxAlbumArt.Visible = False
