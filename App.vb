@@ -3,7 +3,7 @@ Imports Microsoft.Win32
 Imports SkyeMusic.Player
 
 Namespace My
-    Friend Module App
+    Public Module App
 
         'Declarations
         Friend Enum PlaylistTitleFormats 'When modifying, update Options form.
@@ -64,6 +64,16 @@ Namespace My
             MegaBytes
             GigaBytes
         End Enum
+        Public Structure Song
+            Dim Path As String 'Path to the media.
+            Dim InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
+            Dim IsStream As Boolean 'IsStream indicates whether the song is a stream.
+            Dim PlayCount As UShort 'PlayCount is the number of times the song has been played.
+            Dim DateAdded As DateTime 'DateAdded is the date and time when the song was added to the History.
+            Dim FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
+            Dim LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
+            Dim Rating As Byte 'Rating is the rating of the song, from 0 to 5.
+        End Structure
         Friend Structure ThemeProperties
             Dim BackColor As Color
             Dim TextColor As Color
@@ -101,16 +111,6 @@ Namespace My
                 Me.KeyCode = keycode
                 Me.KeyMod = keymod
             End Sub
-        End Structure
-        Friend Structure Song
-            Dim Path As String 'Path to the media.
-            Dim InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
-            Dim IsStream As Boolean 'IsStream indicates whether the song is a stream.
-            Dim PlayCount As UShort 'PlayCount is the number of times the song has been played.
-            Dim DateAdded As DateTime 'DateAdded is the date and time when the song was added to the History.
-            Dim FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
-            Dim LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
-            Dim Rating As Byte 'Rating is the rating of the song, from 0 to 5.
         End Structure
         Friend ExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
         Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
@@ -408,6 +408,24 @@ Namespace My
             End If
             Return value.ToString(format) & suffix
         End Function
+        Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)
+            'Check if in the history already
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex < 0 Then
+                'If not in the history, add it
+                Dim newsong As New Song With {
+                    .Path = songorstream,
+                    .InLibrary = False,
+                    .IsStream = stream,
+                    .PlayCount = 0,
+                    .DateAdded = DateTime.Now,
+                    .FirstPlayed = Nothing,
+                    .LastPlayed = Nothing,
+                    .Rating = 0}
+                History.Add(newsong)
+                Debug.Print("Added " + songorstream + " to history")
+            End If
+        End Sub
         Friend Sub AddToHistoryFromLibrary(songorstream As String)
             'Check if in the history already
             Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
@@ -416,9 +434,8 @@ Namespace My
                 If Not History(existingindex).InLibrary Then
                     Dim existingsong As Song = History(existingindex)
                     existingsong.InLibrary = True
-                    History.RemoveAt(existingindex)
-                    History.Insert(existingindex, existingsong)
-                    Debug.Print("Updated InLibrary flag for " + songorstream)
+                    History(existingindex) = existingsong
+                    'Debug.Print("Updated InLibrary flag for " + songorstream)
                 End If
             Else
                 'If not in the history, add it with InLibrary flag set to True
@@ -432,7 +449,7 @@ Namespace My
                     .LastPlayed = Nothing,
                     .Rating = 0}
                 History.Add(newsong)
-                Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
+                'Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
             End If
         End Sub
         Friend Sub ClearHistoryInLibraryFlag()
@@ -549,7 +566,7 @@ Namespace My
                 If My.Computer.FileSystem.FileExists(HistoryPath) Then My.Computer.FileSystem.DeleteFile(HistoryPath)
             Else
                 Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-                Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of Song)))
+                Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of App.Song)))
                 If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                     My.Computer.FileSystem.CreateDirectory(System.IO.Path.GetDirectoryName(App.UserPath))
                 End If

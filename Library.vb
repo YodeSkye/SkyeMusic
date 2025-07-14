@@ -1589,6 +1589,7 @@ Public Class Library
             LblStatus.Text = "Searching your Folders for Media Files..."
             LblStatus.Visible = True
             LblStatus.Refresh()
+            ClearHistoryInLibraryFlag()
             For Each folder As String In App.LibrarySearchFolders
                 Try
                     If App.LibrarySearchSubFolders Then
@@ -1669,6 +1670,7 @@ Public Class Library
                             item.SubItems(LVLibrary.Columns("AV").Index).Text = "V"
                         End If
                         col.Add(item)
+                        AddToHistoryFromLibrary(file)
                     End If
                 Next
                 files.Clear()

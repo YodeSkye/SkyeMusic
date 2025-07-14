@@ -1,11 +1,13 @@
 ﻿
-Imports System.IO
-Imports SkyeMusic.My
-Imports AxWMPLib
 Imports System.Drawing.Drawing2D
+Imports System.IO
+Imports System.Security.Policy
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
-Imports SkyeMusic.My.Components
+Imports AxWMPLib
 Imports Microsoft.Win32
+Imports SkyeMusic.My
+Imports SkyeMusic.My.Components
+Imports Syncfusion.Windows.Forms.Grid
 Imports TagLib.Ape
 Public Class Player
 
@@ -449,6 +451,8 @@ Public Class Player
                                 ClearPlaylistTitles()
                                 LVPlaylist.Items.Insert(itemover.Index, lvi)
                             End If
+                            App.AddToHistoryFromPlaylist(files(x))
+                            SetPlaylistCountText()
                         End If
                     End If
                 Next
@@ -493,7 +497,16 @@ Public Class Player
     End Sub
     Private Sub MIOpenURL_Click(sender As Object, e As EventArgs) Handles MIOpenURL.Click
         If Clipboard.ContainsText Then
-            PlayStream(Clipboard.GetText)
+            Dim url As String = Clipboard.GetText.Trim
+            Dim uriresult As Uri = Nothing
+            If Uri.TryCreate(url, UriKind.Absolute, uriresult) Then
+                PlayStream(url)
+                App.AddToHistoryFromPlaylist(url, True)
+            Else
+                App.WriteToLog("Cannot Play Stream, Invalid URL in Clipboard")
+            End If
+        Else
+            App.WriteToLog("Cannot Play Stream, Clipboard does not contain text")
         End If
     End Sub
     Private Sub MIExit_Click(sender As Object, e As EventArgs) Handles MIExit.Click
@@ -1980,6 +1993,7 @@ Public Class Player
                             ClearPlaylistTitles()
                             LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
                         End If
+                        App.AddToHistoryFromPlaylist(ofd.FileNames(x))
                     End If
                 End If
             Next
@@ -2124,6 +2138,7 @@ Public Class Player
             Queue.RemoveAt(0)
             SetPlaylistCountText()
             TimerPlayNext.Start()
+            App.WriteToLog("Playing " + AxPlayer.URL + " (PlayQueued)")
         End If
     End Sub
     Friend Sub PlayPrevious()
@@ -2251,10 +2266,15 @@ Public Class Player
     End Sub
     Private Sub PlayStream(url As String)
         IsStream = True
-        AxPlayer.URL = url
-        TrackBarPosition.Enabled = False
-        TrackBarPosition.Value = 0
-        ShowMedia()
+        Try
+            AxPlayer.URL = url
+            TrackBarPosition.Enabled = False
+            TrackBarPosition.Value = 0
+            ShowMedia()
+            App.WriteToLog("Playing " + url + " (PlayStream)")
+        Catch
+            App.WriteToLog("Cannot Play Stream, Invalid URL")
+        End Try
     End Sub
     Private Sub RandomHistoryAdd(filename As String)
         If App.PlayMode = App.PlayModes.Random Then
