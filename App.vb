@@ -56,6 +56,13 @@ Namespace My
             Pink
             Red
         End Enum
+        Friend Enum FormatFileSizeUnits
+            Auto
+            Bytes
+            KiloBytes
+            MegaBytes
+            GigaBytes
+        End Enum
         Friend Structure ThemeProperties
             Dim BackColor As Color
             Dim TextColor As Color
@@ -73,13 +80,6 @@ Namespace My
             Dim PlayerFastForward As Image
             Dim PlayerFastReverse As Image
         End Structure
-        Friend Enum FormatFileSizeUnits
-            Auto
-            Bytes
-            KiloBytes
-            MegaBytes
-            GigaBytes
-        End Enum
         Private Structure HotKey
             Dim WinID As Integer
             Dim Description As String
@@ -101,6 +101,16 @@ Namespace My
                 Me.KeyMod = keymod
             End Sub
         End Structure
+        Friend Structure Song
+            Dim Path As String 'Path to the media.
+            Dim InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
+            Dim IsStream As Boolean 'IsStream indicates whether the song is a stream.
+            Dim PlayCount As UShort 'PlayCount is the number of times the song has been played.
+            Dim DateAdded As DateTime 'DateAdded is the date and time when the song was added to the History.
+            Dim FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
+            Dim LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
+            Dim Rating As Byte 'Rating is the rating of the song, from 0 to 5.
+        End Structure
         Friend ExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
         Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
         Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
@@ -113,6 +123,7 @@ Namespace My
         Private HotKeyStop As New HotKey(1, "Global Stop", Keys.MediaStop, WinAPI.VK_MEDIA_STOP, 0) 'HotKeyStop is a hotkey for global stop functionality.
         Private HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
         Private HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
+        Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
         Private WithEvents ScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
@@ -394,6 +405,33 @@ Namespace My
             End If
             Return value.ToString(format) & suffix
         End Function
+        Friend Sub AddToHistoryFromLibrary(songorstream As String)
+            'Check if in the history already
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex >= 0 Then
+                'If it is in the history, update the InLibrary flag if necessary
+                If Not History(existingindex).InLibrary Then
+                    Dim existingsong As Song = History(existingindex)
+                    existingsong.InLibrary = True
+                    History.RemoveAt(existingindex)
+                    History.Insert(existingindex, existingsong)
+                    Debug.Print("Updated InLibrary flag for " + songorstream)
+                End If
+            Else
+                'If not in the history, add it with InLibrary flag set to True
+                Dim newsong As New Song With {
+                    .Path = songorstream,
+                    .InLibrary = True,
+                    .IsStream = False,
+                    .PlayCount = 0,
+                    .DateAdded = DateTime.Now,
+                    .FirstPlayed = Nothing,
+                    .LastPlayed = Nothing,
+                    .Rating = 0}
+                History.Add(newsong)
+                Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
+            End If
+        End Sub
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzkzMzQwMUAzMzMwMmUzMDJlMzAzYjMzMzAzYmorMHVJSHVxLy9PM25TUGYrMURsLzhuY3BCK0k0QjZ4L3hJOTcvQ1dQcjQ9")
