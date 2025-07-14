@@ -1946,7 +1946,7 @@ Public Class Player
             file.Dispose()
             reader = Nothing
             If items Is Nothing Then
-                App.WriteToLog("Playlist Not Loaded: File not valid")
+                App.WriteToLog("Playlist Not Loaded: File not valid (" + App.PlaylistPath + ")")
             Else
                 items.Clear()
                 items = Nothing

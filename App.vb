@@ -1,5 +1,6 @@
 ﻿
 Imports Microsoft.Win32
+Imports SkyeMusic.Player
 
 Namespace My
     Friend Module App
@@ -138,11 +139,13 @@ Namespace My
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName + "DEV" 'RegPath is the path to the registry key where application settings are stored.
         Friend ReadOnly PlaylistPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
+        Friend ReadOnly HistoryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "HistoryDEV.xml" 'HistoryPath is the path to the media history XML file.
 #Else
         Private ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "Log.txt" 'LogPath is the path to the log file.
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName 'RegPath is the path to the registry key where application settings are stored.
         Friend ReadOnly PlaylistPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
+        Friend ReadOnly HistoryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "History.xml" 'HistoryPath is the path to the media history XML file.
 #End If
 
         'Themes
@@ -432,11 +435,25 @@ Namespace My
                 Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
             End If
         End Sub
+        Friend Sub ClearHistoryInLibraryFlag()
+            If History.Count > 0 Then
+                'Clear the InLibrary flag for all songs in the history
+                For index As Integer = 0 To History.Count - 1
+                    If History(index).InLibrary Then
+                        Dim song As Song = History(index)
+                        song.InLibrary = False
+                        History(index) = song
+                    End If
+                Next
+                Debug.Print("Cleared History InLibrary Flag")
+            End If
+        End Sub
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzkzMzQwMUAzMzMwMmUzMDJlMzAzYjMzMzAzYmorMHVJSHVxLy9PM25TUGYrMURsLzhuY3BCK0k0QjZ4L3hJOTcvQ1dQcjQ9")
             GetOptions()
             CurrentTheme = GetCurrentThemeProperties()
+            LoadHistory()
 
             'Setup Dictionaries
 #Region "            Audio Types"
@@ -523,8 +540,49 @@ Namespace My
             If FRMLog IsNot Nothing AndAlso FRMLog.Visible Then FRMLog.Close()
             If FRMLibrary.Visible Then FRMLibrary.Close()
             FRMLibrary.Dispose()
+            SaveHistory()
             SaveOptions()
             My.App.WriteToLog(My.Application.Info.ProductName + " Closed")
+        End Sub
+        Private Sub SaveHistory()
+            If History.Count = 0 Then
+                If My.Computer.FileSystem.FileExists(HistoryPath) Then My.Computer.FileSystem.DeleteFile(HistoryPath)
+            Else
+                Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+                Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of Song)))
+                If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
+                    My.Computer.FileSystem.CreateDirectory(System.IO.Path.GetDirectoryName(App.UserPath))
+                End If
+                Dim file As New System.IO.StreamWriter(HistoryPath)
+                writer.Serialize(file, History)
+                file.Close()
+                file.Dispose()
+                writer = Nothing
+                App.WriteToLog("History Saved (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            End If
+        End Sub
+        Private Sub LoadHistory()
+            If My.Computer.FileSystem.FileExists(HistoryPath) Then
+                Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+                Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of Song)))
+                Dim file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
+                Try
+                    History = reader.Deserialize(file)
+                Catch
+                    History = Nothing
+                End Try
+                file.Close()
+                file.Dispose()
+                reader = Nothing
+                If History Is Nothing Then
+                    App.WriteToLog("History Not Loaded: File not valid (" + HistoryPath + ")")
+                    History = New Collections.Generic.List(Of Song) 'Initialize an empty history if the file is not valid
+                Else
+                    App.WriteToLog("History Loaded (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                End If
+            Else
+                App.WriteToLog("History Not Loaded: File does not exist")
+            End If
         End Sub
         Friend Sub SaveOptions()
             Try

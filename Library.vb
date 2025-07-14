@@ -1779,7 +1779,7 @@ Public Class Library
             file.Dispose()
             reader = Nothing
             If items Is Nothing Then
-                App.WriteToLog("Library Not Loaded: File not valid")
+                App.WriteToLog("Library Not Loaded: File not valid (" + App.LibraryPath + ")")
             Else
                 items.Clear()
                 items = Nothing
