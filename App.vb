@@ -126,6 +126,7 @@ Namespace My
         Private HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
         Private WithEvents ScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
+        Private WithEvents HistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
         Friend ReadOnly TrimEndSearch() As Char = {" ", "(", ")", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
@@ -244,6 +245,7 @@ Namespace My
         Friend LibrarySearchSubFolders As Boolean = True
         Friend SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
         Friend SaveWindowMetrics As Boolean = False 'Flag that indicates whether to save and restore window positions and sizes.
+        Friend HistoryAutoSaveInterval As UShort = 5 '1-1440 'Interval in minutes to automatically save the history.
         Friend Theme As Themes = Themes.Red 'The current theme of the application.
         Friend PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend PlayerSize As New Size(-1, -1)
@@ -257,6 +259,9 @@ Namespace My
         Friend HelperApp2Path As String = "C:\Program Files\Mp3tag\Mp3tag.exe"
 
         'Handlers
+        Private Sub HistoryAutoSaveTick(ByVal sender As Object, ByVal e As EventArgs) Handles HistoryAutoSave.Tick
+            SaveHistory()
+        End Sub
         Private Sub ScreenSaverWatcherTick(ByVal sender As Object, ByVal e As EventArgs) Handles ScreenSaverWatcher.Tick
             Static ssStatus As Boolean
             WinAPI.SystemParametersInfo(WinAPI.SPI_GETSCREENSAVERRUNNING, 0, ssStatus, 0)
@@ -465,6 +470,33 @@ Namespace My
                 Debug.Print("Cleared History InLibrary Flag")
             End If
         End Sub
+        Friend Sub PruneHistory()
+            'Find songs that are not in the library and don't exist
+            Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
+            Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
+            'Find streams that are not in the playlist
+            Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
+            Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.IsStream)
+            Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
+            For Each s As Song In streamlist
+                If s.IsStream AndAlso Player.LVPlaylist.Items.Find(s.Path, True) Is Nothing Then
+                    Debug.Print(s.Path + " found in playlist")
+                    prunelist.Remove(s)
+                End If
+            Next
+            For Each s As Song In prunelist
+                History.Remove(s)
+            Next
+            Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
+            Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
+            WriteToLog("History Pruned (" + prunelist.Count.ToString + ")")
+        End Sub
+        Friend Sub SetHistoryAutoSaveTimer()
+            HistoryAutoSave.Stop()
+            HistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
+            HistoryAutoSave.Start()
+            Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
+        End Sub
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzkzMzQwMUAzMzMwMmUzMDJlMzAzYjMzMzAzYmorMHVJSHVxLy9PM25TUGYrMURsLzhuY3BCK0k0QjZ4L3hJOTcvQ1dQcjQ9")
@@ -548,6 +580,7 @@ Namespace My
             FRMLibrary = New Library
             GenerateHotKeyList()
             RegisterHotKeys()
+            SetHistoryAutoSaveTimer()
             ScreenSaverWatcher.Interval = 1000
             ScreenSaverWatcher.Start()
             AddHandler Microsoft.Win32.SystemEvents.SessionSwitch, AddressOf SessionSwitchHandler 'SessionSwitchHandler is a handler for session switch events, sets the ScreenLocked flag, and acts accordingly.
@@ -561,7 +594,7 @@ Namespace My
             SaveOptions()
             My.App.WriteToLog(My.Application.Info.ProductName + " Closed")
         End Sub
-        Private Sub SaveHistory()
+        Friend Sub SaveHistory()
             If History.Count = 0 Then
                 If My.Computer.FileSystem.FileExists(HistoryPath) Then My.Computer.FileSystem.DeleteFile(HistoryPath)
             Else
@@ -575,6 +608,7 @@ Namespace My
                 file.Close()
                 file.Dispose()
                 writer = Nothing
+                Debug.Print("History Saved")
                 App.WriteToLog("History Saved (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             End If
         End Sub
@@ -617,6 +651,7 @@ Namespace My
                 RegKey.SetValue("Theme", App.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SuspendOnSessionChange", App.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SaveWindowMetrics", App.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("HistoryAutoSaveInterval", App.HistoryAutoSaveInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationX", App.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationY", App.PlayerLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerSizeX", App.PlayerSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -685,6 +720,12 @@ Namespace My
                     Case "True", "1" : App.SaveWindowMetrics = True
                     Case Else : App.SaveWindowMetrics = False
                 End Select
+                HistoryAutoSaveInterval = CShort(Val(RegKey.GetValue("HistoryAutoSaveInterval", 5.ToString)))
+                If HistoryAutoSaveInterval < 1 Then
+                    App.HistoryAutoSaveInterval = 1
+                ElseIf HistoryAutoSaveInterval > 1440 Then
+                    HistoryAutoSaveInterval = 1440 'Limit the interval to a maximum of 1440 minutes (24 hours)
+                End If
                 App.PlayerLocation.X = CInt(Val(RegKey.GetValue("PlayerLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
                 App.PlayerLocation.Y = CInt(Val(RegKey.GetValue("PlayerLocationY", (-1).ToString)))
                 App.PlayerSize.Width = CInt(Val(RegKey.GetValue("PlayerSizeX", (-1).ToString)))
