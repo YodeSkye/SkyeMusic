@@ -910,6 +910,7 @@ Public Class Player
             Case 0 'Undefined
             Case 1 'Stopped
                 PlayState = False
+                App.StopHistoryUpdate()
                 BtnPlay.Image = App.CurrentTheme.PlayerPlay
                 TrackBarPosition.Value = 0
                 PEXLeft.Value = 0
@@ -921,6 +922,7 @@ Public Class Player
                 BtnPlay.Image = App.CurrentTheme.PlayerPlay
             Case 3 'Playing
                 PlayState = True
+                UpdateHistory(AxPlayer.URL)
                 BtnPlay.Image = App.CurrentTheme.PlayerPause
                 TrackBarPosition.Maximum = AxPlayer.currentMedia.duration * TrackBarScale
                 If Not TrackBarPosition.Enabled AndAlso Not IsStream Then TrackBarPosition.Enabled = True

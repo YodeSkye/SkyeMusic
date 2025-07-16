@@ -77,30 +77,30 @@ Namespace My
 
             Public Overrides Function ToString() As String
                 Dim s As String = String.Empty
-                If IsStream Then s += "Stream "
+                If IsStream Then s += "Stream, "
                 s += PlayCount.ToString()
                 If PlayCount = 1 Then
                     s += " Play"
                 Else
                     s += " Plays"
                 End If
-                If Not LastPlayed = Nothing Then s += " Last Played on " + LastPlayed.ToString("MM/dd/yyyy HH:mm:ss")
-                If Rating > 0 Then s += " " + New String("★"c, Rating)
+                If Not LastPlayed = Nothing Then s += ", Last Played on " + LastPlayed.ToString()
+                If Rating > 0 Then s += ", " + New String("★"c, Rating)
                 Return s
             End Function
             Public Function ToStringFull()
                 Dim s As String = String.Empty
-                If IsStream Then s += "Stream "
+                If IsStream Then s += "Stream, "
                 s += PlayCount.ToString()
                 If PlayCount = 1 Then
                     s += " Play"
                 Else
                     s += " Plays"
                 End If
-                If Not DateAdded = Nothing Then s += " Added " + DateAdded.ToString("MM/dd/yyyy HH:mm:ss")
-                If Not FirstPlayed = Nothing Then s += " First Played " + FirstPlayed.ToString("MM/dd/yyyy HH:mm:ss")
-                If Not LastPlayed = Nothing Then s += " Last Played " + LastPlayed.ToString("MM/dd/yyyy HH:mm:ss")
-                If Rating > 0 Then s += " " + New String("★"c, Rating)
+                If Not DateAdded = Nothing Then s += ", Added " + DateAdded.ToString()
+                If Not FirstPlayed = Nothing Then s += ", First Played " + FirstPlayed.ToString()
+                If Not LastPlayed = Nothing Then s += ", Last Played " + LastPlayed.ToString()
+                If Rating > 0 Then s += ", " + New String("★"c, Rating)
                 Return s
             End Function
 
@@ -158,6 +158,7 @@ Namespace My
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
         Private WithEvents ScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
         Private WithEvents HistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
+        Private WithEvents HistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
         Friend ReadOnly TrimEndSearch() As Char = {" ", "(", ")", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
@@ -276,6 +277,7 @@ Namespace My
         Friend LibrarySearchSubFolders As Boolean = True
         Friend SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
         Friend SaveWindowMetrics As Boolean = False 'Flag that indicates whether to save and restore window positions and sizes.
+        Friend HistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to update the play count of the currently playing song.
         Friend HistoryAutoSaveInterval As UShort = 5 '1-1440 'Interval in minutes to automatically save the history.
         Friend Theme As Themes = Themes.Red 'The current theme of the application.
         Friend PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -290,7 +292,11 @@ Namespace My
         Friend HelperApp2Path As String = "C:\Program Files\Mp3tag\Mp3tag.exe"
 
         'Handlers
-        Private Sub HistoryAutoSaveTick(ByVal sender As Object, ByVal e As EventArgs) Handles HistoryAutoSave.Tick
+        Private Sub HistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles HistoryUpdate.Tick
+            HistoryUpdate.Stop()
+            UpdateHistory()
+        End Sub
+        Private Sub HistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles HistoryAutoSave.Tick
             SaveHistory()
         End Sub
         Private Sub ScreenSaverWatcherTick(ByVal sender As Object, ByVal e As EventArgs) Handles ScreenSaverWatcher.Tick
@@ -487,6 +493,31 @@ Namespace My
                 History.Add(newsong)
                 'Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
             End If
+        End Sub
+        Friend Sub UpdateHistory(songorstream As String)
+            HistoryUpdate.Stop()
+            HistoryUpdate.Interval = HistoryUpdateInterval * 1000
+            HistoryUpdate.Tag = songorstream
+            HistoryUpdate.Start()
+        End Sub
+        Private Sub UpdateHistory()
+            Dim songorstream As String = CStr(HistoryUpdate.Tag)
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex >= 0 Then
+                Dim existingsong As Song = History(existingindex)
+                existingsong.PlayCount += 1
+                If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
+                existingsong.LastPlayed = DateTime.Now
+                History(existingindex) = existingsong
+                Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
+                WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
+            Else
+                Debug.Print("Song not found in history: " + songorstream)
+            End If
+        End Sub
+        Friend Sub StopHistoryUpdate()
+            HistoryUpdate.Stop()
+            Debug.Print("History Update Stopped")
         End Sub
         Friend Sub ClearHistoryInLibraryFlag()
             If History.Count > 0 Then

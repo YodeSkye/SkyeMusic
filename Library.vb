@@ -139,6 +139,7 @@ Public Class Library
         PicBoxAlbumArtSuperSize = New Size(800, 800)
         RadBtnGroupByNone.TabStop = False
         TipLibrary.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
+        LblHistory.Text = String.Empty
         LblExtTitle.Text = String.Empty
         LblExtFileInfo.Text = String.Empty
         LblExtProperties.Text = String.Empty
@@ -255,6 +256,8 @@ Public Class Library
             SetLibraryCountText()
             AlbumArtIndex = 0
             ShowAlbumArt()
+            LblHistory.Text = App.History.Find(Function(p) p.Path = (LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)).ToStringFull
+            TipLibrary.SetToolTip(LblHistory, LblHistory.Text)
             LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             Dim fInfo As IO.FileInfo
             fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
@@ -2023,6 +2026,7 @@ Public Class Library
         RadBtnGroupByNone.ForeColor = App.CurrentTheme.ButtonTextColor
         If TxbxLibrarySearch.Text = LibrarySearchTitle Then TxbxLibrarySearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
         LblLibraryCounts.ForeColor = forecolor
+        LblHistory.ForeColor = forecolor
         LblExtFileInfo.ForeColor = forecolor
         LblExtProperties.ForeColor = forecolor
         LblExtTitle.ForeColor = forecolor

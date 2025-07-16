@@ -112,7 +112,7 @@ Public Class Options
             TxtBoxHelperApp2Path.ForeColor = Color.Red
         End If
         TxtBoxHistoryAutoSaveInterval.Text = App.HistoryAutoSaveInterval.ToString
-        BtnHistoryPrune.Text = BtnHistoryPrune.Text.TrimEnd(App.TrimEndSearch) + " (" + App.History.Count.ToString + ")"
+        SetPruneButtonText()
     End Sub
     Private Sub Options_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.LibrarySearchFolders.Clear()
@@ -158,19 +158,20 @@ Public Class Options
     End Sub
 
     'Control Events
-    Private Sub BtnOKClick(sender As Object, e As EventArgs) Handles BtnOK.Click
+    Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
     Private Sub BtnHistoryPrune_Click(sender As Object, e As EventArgs) Handles BtnHistoryPrune.Click
         App.PruneHistory()
+        SetPruneButtonText()
     End Sub
     Private Sub BtnHistorySaveNow_Click(sender As Object, e As EventArgs) Handles BtnHistorySaveNow.Click
         App.SaveHistory()
     End Sub
-    Private Sub BtnLibrarySearchFoldersAddClick(sender As Object, e As EventArgs) Handles BtnLibrarySearchFoldersAdd.Click
+    Private Sub BtnLibrarySearchFoldersAdd_Click(sender As Object, e As EventArgs) Handles BtnLibrarySearchFoldersAdd.Click
         LibrarySearchFoldersAdd()
     End Sub
-    Private Sub BtnHelperApp1Click(sender As Object, e As EventArgs) Handles BtnHelperApp1.Click
+    Private Sub BtnHelperApp1_Click(sender As Object, e As EventArgs) Handles BtnHelperApp1.Click
         If String.IsNullOrEmpty(App.HelperApp1Path) Then
             uiFileBrowser.InitialDirectory = String.Empty
             uiFileBrowser.FileName = String.Empty
@@ -187,7 +188,7 @@ Public Class Options
             Validate()
         End If
     End Sub
-    Private Sub BtnHelperApp2Click(sender As Object, e As EventArgs) Handles BtnHelperApp2.Click
+    Private Sub BtnHelperApp2_Click(sender As Object, e As EventArgs) Handles BtnHelperApp2.Click
         If String.IsNullOrEmpty(App.HelperApp2Path) Then
             uiFileBrowser.InitialDirectory = String.Empty
             uiFileBrowser.FileName = String.Empty
@@ -397,6 +398,11 @@ Public Class Options
         If LBLibrarySearchFolders.SelectedItems.Count = 1 Then
             LBLibrarySearchFolders.Items.RemoveAt(LBLibrarySearchFolders.SelectedIndex)
         End If
+    End Sub
+    Private Sub SetPruneButtonText()
+        BtnHistoryPrune.Text = BtnHistoryPrune.Text.TrimEnd(App.TrimEndSearch) + " (" + App.History.Count.ToString + ")"
+        BtnHistoryPrune.Enabled = (App.History.Count > 0)
+        BtnHistorySaveNow.Enabled = (App.History.Count > 0)
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow

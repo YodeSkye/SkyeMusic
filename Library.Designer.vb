@@ -61,6 +61,7 @@ Partial Class Library
         LblLibraryCounts = New Components.LabelCSY()
         LblStatus = New Components.LabelCSY()
         LVLibrary = New ListView()
+        LblHistory = New Components.LabelCSY()
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -255,7 +256,6 @@ Partial Class Library
         ' 
         TipLibrary.AutoPopDelay = 5000
         TipLibrary.InitialDelay = 1000
-        TipLibrary.IsBalloon = True
         TipLibrary.ReshowDelay = 1000
         ' 
         ' RadBtnGroupByGenre
@@ -330,7 +330,7 @@ Partial Class Library
         LblExtTitle.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         LblExtTitle.CopyOnDoubleClick = False
         LblExtTitle.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtTitle.Location = New Point(147, 365)
+        LblExtTitle.Location = New Point(147, 372)
         LblExtTitle.Name = "LblExtTitle"
         LblExtTitle.Size = New Size(512, 16)
         LblExtTitle.TabIndex = 19
@@ -342,7 +342,7 @@ Partial Class Library
         LblExtFileInfo.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         LblExtFileInfo.CopyOnDoubleClick = False
         LblExtFileInfo.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtFileInfo.Location = New Point(147, 382)
+        LblExtFileInfo.Location = New Point(147, 389)
         LblExtFileInfo.Name = "LblExtFileInfo"
         LblExtFileInfo.Size = New Size(512, 16)
         LblExtFileInfo.TabIndex = 20
@@ -354,7 +354,7 @@ Partial Class Library
         LblExtProperties.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         LblExtProperties.CopyOnDoubleClick = False
         LblExtProperties.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtProperties.Location = New Point(147, 399)
+        LblExtProperties.Location = New Point(147, 406)
         LblExtProperties.Name = "LblExtProperties"
         LblExtProperties.Size = New Size(512, 16)
         LblExtProperties.TabIndex = 21
@@ -366,7 +366,7 @@ Partial Class Library
         LblExtType.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         LblExtType.CopyOnDoubleClick = False
         LblExtType.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtType.Location = New Point(147, 415)
+        LblExtType.Location = New Point(147, 422)
         LblExtType.Name = "LblExtType"
         LblExtType.Size = New Size(512, 16)
         LblExtType.TabIndex = 22
@@ -412,12 +412,25 @@ Partial Class Library
         LVLibrary.UseCompatibleStateImageBehavior = False
         LVLibrary.View = View.Details
         ' 
+        ' LblHistory
+        ' 
+        LblHistory.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
+        LblHistory.CopyOnDoubleClick = False
+        LblHistory.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblHistory.Location = New Point(147, 356)
+        LblHistory.Name = "LblHistory"
+        LblHistory.Size = New Size(512, 17)
+        LblHistory.TabIndex = 25
+        LblHistory.Text = "History"
+        LblHistory.TextAlign = ContentAlignment.MiddleLeft
+        ' 
         ' Library
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(984, 461)
         ContextMenuStrip = CMLibrary
+        Controls.Add(LblHistory)
         Controls.Add(PicBoxAlbumArt)
         Controls.Add(LblStatus)
         Controls.Add(LblLibraryCounts)
@@ -481,4 +494,5 @@ Partial Class Library
     Friend WithEvents LblLibraryCounts As My.Components.LabelCSY
     Friend WithEvents LblStatus As My.Components.LabelCSY
     Friend WithEvents LVLibrary As ListView
+    Friend WithEvents LblHistory As Components.LabelCSY
 End Class
