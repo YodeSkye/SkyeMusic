@@ -65,6 +65,7 @@ Namespace My
             GigaBytes
         End Enum
         Public Structure Song
+
             Dim Path As String 'Path to the media.
             Dim InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
             Dim IsStream As Boolean 'IsStream indicates whether the song is a stream.
@@ -73,6 +74,36 @@ Namespace My
             Dim FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
             Dim LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
             Dim Rating As Byte 'Rating is the rating of the song, from 0 to 5.
+
+            Public Overrides Function ToString() As String
+                Dim s As String = String.Empty
+                If IsStream Then s += "Stream "
+                s += PlayCount.ToString()
+                If PlayCount = 1 Then
+                    s += " Play"
+                Else
+                    s += " Plays"
+                End If
+                If Not LastPlayed = Nothing Then s += " Last Played on " + LastPlayed.ToString("MM/dd/yyyy HH:mm:ss")
+                If Rating > 0 Then s += " " + New String("★"c, Rating)
+                Return s
+            End Function
+            Public Function ToStringFull()
+                Dim s As String = String.Empty
+                If IsStream Then s += "Stream "
+                s += PlayCount.ToString()
+                If PlayCount = 1 Then
+                    s += " Play"
+                Else
+                    s += " Plays"
+                End If
+                If Not DateAdded = Nothing Then s += " Added " + DateAdded.ToString("MM/dd/yyyy HH:mm:ss")
+                If Not FirstPlayed = Nothing Then s += " First Played " + FirstPlayed.ToString("MM/dd/yyyy HH:mm:ss")
+                If Not LastPlayed = Nothing Then s += " Last Played " + LastPlayed.ToString("MM/dd/yyyy HH:mm:ss")
+                If Rating > 0 Then s += " " + New String("★"c, Rating)
+                Return s
+            End Function
+
         End Structure
         Friend Structure ThemeProperties
             Dim BackColor As Color
@@ -138,15 +169,15 @@ Namespace My
 #If DEBUG Then
         Private ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt" 'LogPath is the path to the log file.
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName + "DEV" 'RegPath is the path to the registry key where application settings are stored.
-        Friend ReadOnly PlaylistPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
-        Friend ReadOnly LibraryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
-        Friend ReadOnly HistoryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "HistoryDEV.xml" 'HistoryPath is the path to the media history XML file.
+        Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
+        Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
+        Friend ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.xml" 'HistoryPath is the path to the media history XML file.
 #Else
         Private ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "Log.txt" 'LogPath is the path to the log file.
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName 'RegPath is the path to the registry key where application settings are stored.
-        Friend ReadOnly PlaylistPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
-        Friend ReadOnly LibraryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
-        Friend ReadOnly HistoryPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" + My.Application.Info.ProductName + "History.xml" 'HistoryPath is the path to the media history XML file.
+        Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
+        Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
+        Friend ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "History.xml" 'HistoryPath is the path to the media history XML file.
 #End If
 
         'Themes

@@ -112,7 +112,7 @@ Public Class Options
             TxtBoxHelperApp2Path.ForeColor = Color.Red
         End If
         TxtBoxHistoryAutoSaveInterval.Text = App.HistoryAutoSaveInterval.ToString
-        BtnHistoryPrune.Text += " (" + App.History.Count.ToString + ")"
+        BtnHistoryPrune.Text = BtnHistoryPrune.Text.TrimEnd(App.TrimEndSearch) + " (" + App.History.Count.ToString + ")"
     End Sub
     Private Sub Options_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.LibrarySearchFolders.Clear()

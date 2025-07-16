@@ -603,6 +603,8 @@ Public Class Player
         If Not MIAbout.Selected Then MIAbout.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub CMPlaylistOpening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylist.Opening
+        TipPlayer.Hide(Me)
+        TipPlayer.Show(App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(1).Text).ToString, Me, LVPlaylist.Location + LVPlaylist.PointToClient(Cursor.Position), 5000)
         CMIHelperApp1.Text = "Open with " + App.HelperApp1Name
         CMIHelperApp2.Text = "Open with " + App.HelperApp2Name
         If LVPlaylist.Items.Count = 0 Then
@@ -895,6 +897,11 @@ Public Class Player
     End Sub
     Private Sub TrackBarPosition_MouseWheel(sender As Object, e As MouseEventArgs)
         CType(e, HandledMouseEventArgs).Handled = True
+    End Sub
+    Private Sub TipPlayer_Draw(sender As Object, e As DrawToolTipEventArgs) Handles TipPlayer.Draw
+        e.DrawBackground()
+        e.DrawBorder()
+        e.DrawText()
     End Sub
 
     'Handlers
@@ -2600,6 +2607,8 @@ Public Class Player
         BtnPrevious.Image = App.CurrentTheme.PlayerPrevious
         BtnForward.Image = App.CurrentTheme.PlayerFastForward
         BtnReverse.Image = App.CurrentTheme.PlayerFastReverse
+        TipPlayer.BackColor = App.CurrentTheme.BackColor
+        TipPlayer.ForeColor = App.CurrentTheme.TextColor
         ResumeLayout()
         Debug.Print("Player Theme Set")
     End Sub

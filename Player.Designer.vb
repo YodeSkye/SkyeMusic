@@ -548,7 +548,7 @@ Partial Class Player
         TipPlayer.AutomaticDelay = 1000
         TipPlayer.AutoPopDelay = 5000
         TipPlayer.InitialDelay = 1000
-        TipPlayer.IsBalloon = True
+        TipPlayer.OwnerDraw = True
         TipPlayer.ReshowDelay = 1000
         ' 
         ' LVPlaylist

@@ -505,7 +505,7 @@ Partial Class Options
         ' TxtBoxHistoryAutoSaveInterval
         ' 
         TxtBoxHistoryAutoSaveInterval.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold)
-        TxtBoxHistoryAutoSaveInterval.Location = New Point(122, 438)
+        TxtBoxHistoryAutoSaveInterval.Location = New Point(122, 428)
         TxtBoxHistoryAutoSaveInterval.Name = "TxtBoxHistoryAutoSaveInterval"
         TxtBoxHistoryAutoSaveInterval.ShortcutsEnabled = False
         TxtBoxHistoryAutoSaveInterval.Size = New Size(43, 25)
@@ -517,7 +517,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval1.AutoSize = True
         LblHistoryAutoSaveInterval1.CopyOnDoubleClick = False
         LblHistoryAutoSaveInterval1.Font = New Font("Segoe UI", 9.75F)
-        LblHistoryAutoSaveInterval1.Location = New Point(10, 441)
+        LblHistoryAutoSaveInterval1.Location = New Point(10, 431)
         LblHistoryAutoSaveInterval1.Name = "LblHistoryAutoSaveInterval1"
         LblHistoryAutoSaveInterval1.Size = New Size(115, 17)
         LblHistoryAutoSaveInterval1.TabIndex = 143
@@ -529,7 +529,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval2.AutoSize = True
         LblHistoryAutoSaveInterval2.CopyOnDoubleClick = False
         LblHistoryAutoSaveInterval2.Font = New Font("Segoe UI", 9.75F)
-        LblHistoryAutoSaveInterval2.Location = New Point(163, 441)
+        LblHistoryAutoSaveInterval2.Location = New Point(163, 431)
         LblHistoryAutoSaveInterval2.Name = "LblHistoryAutoSaveInterval2"
         LblHistoryAutoSaveInterval2.Size = New Size(54, 17)
         LblHistoryAutoSaveInterval2.TabIndex = 144
@@ -538,21 +538,26 @@ Partial Class Options
         ' 
         ' BtnHistorySaveNow
         ' 
-        BtnHistorySaveNow.Location = New Point(215, 439)
+        BtnHistorySaveNow.Image = My.Resources.Resources.ImageSave32
+        BtnHistorySaveNow.ImageAlign = ContentAlignment.MiddleLeft
+        BtnHistorySaveNow.Location = New Point(215, 420)
         BtnHistorySaveNow.Name = "BtnHistorySaveNow"
-        BtnHistorySaveNow.Size = New Size(75, 24)
+        BtnHistorySaveNow.Size = New Size(99, 40)
         BtnHistorySaveNow.TabIndex = 13
         BtnHistorySaveNow.Text = "Save Now"
-        BtnHistorySaveNow.TextAlign = ContentAlignment.BottomCenter
+        BtnHistorySaveNow.TextAlign = ContentAlignment.MiddleRight
         BtnHistorySaveNow.UseVisualStyleBackColor = True
         ' 
         ' BtnHistoryPrune
         ' 
-        BtnHistoryPrune.Location = New Point(12, 399)
+        BtnHistoryPrune.Image = My.Resources.Resources.ImagePrune32
+        BtnHistoryPrune.ImageAlign = ContentAlignment.MiddleLeft
+        BtnHistoryPrune.Location = New Point(184, 374)
         BtnHistoryPrune.Name = "BtnHistoryPrune"
-        BtnHistoryPrune.Size = New Size(151, 24)
+        BtnHistoryPrune.Size = New Size(160, 40)
         BtnHistoryPrune.TabIndex = 11
         BtnHistoryPrune.Text = "Prune History"
+        BtnHistoryPrune.TextAlign = ContentAlignment.MiddleRight
         BtnHistoryPrune.UseVisualStyleBackColor = True
         ' 
         ' Options
