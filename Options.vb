@@ -111,6 +111,7 @@ Public Class Options
         Else
             TxtBoxHelperApp2Path.ForeColor = Color.Red
         End If
+        TxtBoxHistoryUpdateInterval.Text = App.HistoryUpdateInterval.ToString
         TxtBoxHistoryAutoSaveInterval.Text = App.HistoryAutoSaveInterval.ToString
         SetPruneButtonText()
     End Sub
@@ -238,19 +239,19 @@ Public Class Options
     Private Sub CoBoxPlaylistTitleFormat_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistTitleFormat.SelectionChangeCommitted
         App.PlaylistTitleFormat = CType(CoBoxPlaylistTitleFormat.SelectedIndex, App.PlaylistTitleFormats)
     End Sub
-    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown
+    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown, TxtBoxHistoryUpdateInterval.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.Handled = True
             Validate()
         End If
     End Sub
-    Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxHistoryAutoSaveInterval.KeyPress
-        If Not Char.IsNumber(e.KeyChar) Then e.Handled = True
+    Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxHistoryAutoSaveInterval.KeyPress, TxtBoxHistoryUpdateInterval.KeyPress
+        If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
     End Sub
-    Private Sub TxtBox_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxPlaylistTitleSeparator.MouseUp, TxtBoxPlaylistVideoIdentifier.MouseUp, TxtBoxHelperApp1Path.MouseUp, TxtBoxHelperApp1Name.MouseUp, TxtBoxHelperApp2Name.MouseUp, TxtBoxHelperApp2Path.MouseUp, TxtBoxHistoryAutoSaveInterval.MouseUp
+    Private Sub TxtBox_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxPlaylistTitleSeparator.MouseUp, TxtBoxPlaylistVideoIdentifier.MouseUp, TxtBoxHelperApp1Path.MouseUp, TxtBoxHelperApp1Name.MouseUp, TxtBoxHelperApp2Name.MouseUp, TxtBoxHelperApp2Path.MouseUp, TxtBoxHistoryAutoSaveInterval.MouseUp, TxtBoxHistoryUpdateInterval.MouseUp
         CMTxtBox.Display(sender, e)
     End Sub
-    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxPlaylistTitleSeparator.PreviewKeyDown, TxtBoxPlaylistVideoIdentifier.PreviewKeyDown, MyBase.PreviewKeyDown, TxtBoxHelperApp1Path.PreviewKeyDown, TxtBoxHelperApp1Name.PreviewKeyDown, TxtBoxHelperApp2Name.PreviewKeyDown, TxtBoxHelperApp2Path.PreviewKeyDown, TxtBoxHistoryAutoSaveInterval.PreviewKeyDown
+    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxPlaylistTitleSeparator.PreviewKeyDown, TxtBoxPlaylistVideoIdentifier.PreviewKeyDown, MyBase.PreviewKeyDown, TxtBoxHelperApp1Path.PreviewKeyDown, TxtBoxHelperApp1Name.PreviewKeyDown, TxtBoxHelperApp2Name.PreviewKeyDown, TxtBoxHelperApp2Path.PreviewKeyDown, TxtBoxHistoryAutoSaveInterval.PreviewKeyDown, TxtBoxHistoryUpdateInterval.PreviewKeyDown
         CMTxtBox.ShortcutKeys(sender, e)
     End Sub
     Private Sub TxtBoxPlaylistTitleSeparatorValidated(sender As Object, e As EventArgs) Handles TxtBoxPlaylistTitleSeparator.Validated
@@ -303,6 +304,23 @@ Public Class Options
             End If
         End If
     End Sub
+    Private Sub TxtBoxHistoryUpdateInterval_Validated(sender As Object, e As EventArgs) Handles TxtBoxHistoryUpdateInterval.Validated
+        If Not String.IsNullOrEmpty(TxtBoxHistoryUpdateInterval.Text) Then
+            Dim interval As Byte
+            Try
+                interval = CByte(Val(TxtBoxHistoryUpdateInterval.Text))
+                If interval > 60 Then
+                    interval = 60
+                End If
+            Catch
+                interval = 5
+            End Try
+            TxtBoxHistoryUpdateInterval.Text = interval.ToString
+            TxtBoxHistoryUpdateInterval.SelectAll()
+            Debug.Print("TxtBoxHistoryUpdateInterval_Validated")
+            App.HistoryUpdateInterval = interval
+        End If
+    End Sub
     Private Sub TxtBoxHistoryAutoSaveInterval_Validated(sender As Object, e As EventArgs) Handles TxtBoxHistoryAutoSaveInterval.Validated
         If Not String.IsNullOrEmpty(TxtBoxHistoryAutoSaveInterval.Text) Then
             Dim interval As UShort
@@ -316,13 +334,11 @@ Public Class Options
             Catch
                 interval = 5
             End Try
-            If Not interval = App.HistoryAutoSaveInterval Then
-                TxtBoxHistoryAutoSaveInterval.Text = interval.ToString
-                TxtBoxHistoryAutoSaveInterval.SelectAll()
-                Debug.Print("TxtBoxHistoryAutoSaveInterval_Validated")
-                App.HistoryAutoSaveInterval = interval
-                App.SetHistoryAutoSaveTimer()
-            End If
+            TxtBoxHistoryAutoSaveInterval.Text = interval.ToString
+            TxtBoxHistoryAutoSaveInterval.SelectAll()
+            Debug.Print("TxtBoxHistoryAutoSaveInterval_Validated")
+            App.HistoryAutoSaveInterval = interval
+            App.SetHistoryAutoSaveTimer()
         End If
     End Sub
     Private Sub CkBoxPlaylistRemoveSpacesClick(sender As Object, e As EventArgs) Handles CkBoxPlaylistRemoveSpaces.Click
@@ -480,14 +496,18 @@ Public Class Options
         LblHelperApp1Path.ForeColor = forecolor
         LblHelperApp2Name.ForeColor = forecolor
         LblHelperApp2Path.ForeColor = forecolor
+        LblHistoryUpdateInterval1.ForeColor = forecolor
+        LblHistoryUpdateInterval2.ForeColor = forecolor
         LblHistoryAutoSaveInterval1.ForeColor = forecolor
         LblHistoryAutoSaveInterval2.ForeColor = forecolor
-        BtnHistoryPrune.BackColor = App.CurrentTheme.ButtonBackColor
-        BtnHistoryPrune.ForeColor = App.CurrentTheme.ButtonTextColor
+        TxtBoxHistoryUpdateInterval.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxHistoryUpdateInterval.ForeColor = App.CurrentTheme.TextColor
         TxtBoxHistoryAutoSaveInterval.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxHistoryAutoSaveInterval.ForeColor = App.CurrentTheme.TextColor
         BtnHistorySaveNow.BackColor = App.CurrentTheme.ButtonBackColor
         BtnHistorySaveNow.ForeColor = App.CurrentTheme.ButtonTextColor
+        BtnHistoryPrune.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnHistoryPrune.ForeColor = App.CurrentTheme.ButtonTextColor
         ResumeLayout()
         Debug.Print("Options Theme Set")
     End Sub

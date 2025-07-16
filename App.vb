@@ -496,9 +496,15 @@ Namespace My
         End Sub
         Friend Sub UpdateHistory(songorstream As String)
             HistoryUpdate.Stop()
-            HistoryUpdate.Interval = HistoryUpdateInterval * 1000
-            HistoryUpdate.Tag = songorstream
-            HistoryUpdate.Start()
+            If HistoryUpdateInterval = 0 Then
+                HistoryUpdate.Tag = songorstream
+                UpdateHistory()
+                Return
+            Else
+                HistoryUpdate.Interval = HistoryUpdateInterval * 1000
+                HistoryUpdate.Tag = songorstream
+                HistoryUpdate.Start()
+            End If
         End Sub
         Private Sub UpdateHistory()
             Dim songorstream As String = CStr(HistoryUpdate.Tag)
@@ -713,6 +719,7 @@ Namespace My
                 RegKey.SetValue("Theme", App.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SuspendOnSessionChange", App.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SaveWindowMetrics", App.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("HistoryUpdateInterval", App.HistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HistoryAutoSaveInterval", App.HistoryAutoSaveInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationX", App.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationY", App.PlayerLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -782,6 +789,10 @@ Namespace My
                     Case "True", "1" : App.SaveWindowMetrics = True
                     Case Else : App.SaveWindowMetrics = False
                 End Select
+                HistoryUpdateInterval = CByte(Val(RegKey.GetValue("HistoryUpdateInterval", 5.ToString)))
+                If HistoryUpdateInterval > 60 Then
+                    HistoryUpdateInterval = 60 'Limit the interval to a maximum of 60 seconds
+                End If
                 HistoryAutoSaveInterval = CShort(Val(RegKey.GetValue("HistoryAutoSaveInterval", 5.ToString)))
                 If HistoryAutoSaveInterval < 1 Then
                     App.HistoryAutoSaveInterval = 1

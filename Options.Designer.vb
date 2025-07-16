@@ -70,6 +70,9 @@ Partial Class Options
         LblHistoryAutoSaveInterval2 = New Components.LabelCSY()
         BtnHistorySaveNow = New Button()
         BtnHistoryPrune = New Button()
+        TxtBoxHistoryUpdateInterval = New TextBox()
+        LblHistoryUpdateInterval2 = New Components.LabelCSY()
+        LblHistoryUpdateInterval1 = New Components.LabelCSY()
         GrBoxTime.SuspendLayout()
         GrBoxPlaylistFormatting.SuspendLayout()
         GrBoxLibrarySearchFolders.SuspendLayout()
@@ -80,7 +83,7 @@ Partial Class Options
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
-        BtnOK.Location = New Point(389, 396)
+        BtnOK.Location = New Point(389, 483)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 100
@@ -182,7 +185,7 @@ Partial Class Options
         GrBoxPlaylistFormatting.Location = New Point(194, 12)
         GrBoxPlaylistFormatting.Name = "GrBoxPlaylistFormatting"
         GrBoxPlaylistFormatting.Size = New Size(179, 178)
-        GrBoxPlaylistFormatting.TabIndex = 13
+        GrBoxPlaylistFormatting.TabIndex = 40
         GrBoxPlaylistFormatting.TabStop = False
         GrBoxPlaylistFormatting.Text = "Playlist Formatting"
         ' 
@@ -235,7 +238,7 @@ Partial Class Options
         GrBoxLibrarySearchFolders.Location = New Point(379, 12)
         GrBoxLibrarySearchFolders.Name = "GrBoxLibrarySearchFolders"
         GrBoxLibrarySearchFolders.Size = New Size(450, 171)
-        GrBoxLibrarySearchFolders.TabIndex = 20
+        GrBoxLibrarySearchFolders.TabIndex = 80
         GrBoxLibrarySearchFolders.TabStop = False
         GrBoxLibrarySearchFolders.Text = "Library Search Folders"
         ' 
@@ -505,7 +508,7 @@ Partial Class Options
         ' TxtBoxHistoryAutoSaveInterval
         ' 
         TxtBoxHistoryAutoSaveInterval.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold)
-        TxtBoxHistoryAutoSaveInterval.Location = New Point(122, 428)
+        TxtBoxHistoryAutoSaveInterval.Location = New Point(123, 468)
         TxtBoxHistoryAutoSaveInterval.Name = "TxtBoxHistoryAutoSaveInterval"
         TxtBoxHistoryAutoSaveInterval.ShortcutsEnabled = False
         TxtBoxHistoryAutoSaveInterval.Size = New Size(43, 25)
@@ -517,7 +520,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval1.AutoSize = True
         LblHistoryAutoSaveInterval1.CopyOnDoubleClick = False
         LblHistoryAutoSaveInterval1.Font = New Font("Segoe UI", 9.75F)
-        LblHistoryAutoSaveInterval1.Location = New Point(10, 431)
+        LblHistoryAutoSaveInterval1.Location = New Point(11, 471)
         LblHistoryAutoSaveInterval1.Name = "LblHistoryAutoSaveInterval1"
         LblHistoryAutoSaveInterval1.Size = New Size(115, 17)
         LblHistoryAutoSaveInterval1.TabIndex = 143
@@ -529,7 +532,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval2.AutoSize = True
         LblHistoryAutoSaveInterval2.CopyOnDoubleClick = False
         LblHistoryAutoSaveInterval2.Font = New Font("Segoe UI", 9.75F)
-        LblHistoryAutoSaveInterval2.Location = New Point(163, 431)
+        LblHistoryAutoSaveInterval2.Location = New Point(164, 471)
         LblHistoryAutoSaveInterval2.Name = "LblHistoryAutoSaveInterval2"
         LblHistoryAutoSaveInterval2.Size = New Size(54, 17)
         LblHistoryAutoSaveInterval2.TabIndex = 144
@@ -540,7 +543,7 @@ Partial Class Options
         ' 
         BtnHistorySaveNow.Image = My.Resources.Resources.ImageSave32
         BtnHistorySaveNow.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistorySaveNow.Location = New Point(215, 420)
+        BtnHistorySaveNow.Location = New Point(216, 460)
         BtnHistorySaveNow.Name = "BtnHistorySaveNow"
         BtnHistorySaveNow.Size = New Size(99, 40)
         BtnHistorySaveNow.TabIndex = 13
@@ -552,19 +555,56 @@ Partial Class Options
         ' 
         BtnHistoryPrune.Image = My.Resources.Resources.ImagePrune32
         BtnHistoryPrune.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistoryPrune.Location = New Point(184, 374)
+        BtnHistoryPrune.Location = New Point(185, 506)
         BtnHistoryPrune.Name = "BtnHistoryPrune"
         BtnHistoryPrune.Size = New Size(160, 40)
-        BtnHistoryPrune.TabIndex = 11
+        BtnHistoryPrune.TabIndex = 14
         BtnHistoryPrune.Text = "Prune History"
         BtnHistoryPrune.TextAlign = ContentAlignment.MiddleRight
         BtnHistoryPrune.UseVisualStyleBackColor = True
+        ' 
+        ' TxtBoxHistoryUpdateInterval
+        ' 
+        TxtBoxHistoryUpdateInterval.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold)
+        TxtBoxHistoryUpdateInterval.Location = New Point(226, 424)
+        TxtBoxHistoryUpdateInterval.Name = "TxtBoxHistoryUpdateInterval"
+        TxtBoxHistoryUpdateInterval.ShortcutsEnabled = False
+        TxtBoxHistoryUpdateInterval.Size = New Size(30, 25)
+        TxtBoxHistoryUpdateInterval.TabIndex = 11
+        TxtBoxHistoryUpdateInterval.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblHistoryUpdateInterval2
+        ' 
+        LblHistoryUpdateInterval2.AutoSize = True
+        LblHistoryUpdateInterval2.CopyOnDoubleClick = False
+        LblHistoryUpdateInterval2.Font = New Font("Segoe UI", 9.75F)
+        LblHistoryUpdateInterval2.Location = New Point(254, 427)
+        LblHistoryUpdateInterval2.Name = "LblHistoryUpdateInterval2"
+        LblHistoryUpdateInterval2.Size = New Size(57, 17)
+        LblHistoryUpdateInterval2.TabIndex = 147
+        LblHistoryUpdateInterval2.Text = "Seconds"
+        LblHistoryUpdateInterval2.TextAlign = ContentAlignment.MiddleRight
+        ' 
+        ' LblHistoryUpdateInterval1
+        ' 
+        LblHistoryUpdateInterval1.AutoSize = True
+        LblHistoryUpdateInterval1.CopyOnDoubleClick = False
+        LblHistoryUpdateInterval1.Font = New Font("Segoe UI", 9.75F)
+        LblHistoryUpdateInterval1.Location = New Point(11, 428)
+        LblHistoryUpdateInterval1.Name = "LblHistoryUpdateInterval1"
+        LblHistoryUpdateInterval1.Size = New Size(218, 17)
+        LblHistoryUpdateInterval1.TabIndex = 146
+        LblHistoryUpdateInterval1.Text = "Update History After Song Plays For"
+        LblHistoryUpdateInterval1.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' Options
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(842, 472)
+        ClientSize = New Size(842, 559)
+        Controls.Add(TxtBoxHistoryUpdateInterval)
+        Controls.Add(LblHistoryUpdateInterval2)
+        Controls.Add(LblHistoryUpdateInterval1)
         Controls.Add(BtnHistoryPrune)
         Controls.Add(BtnHistorySaveNow)
         Controls.Add(TxtBoxHistoryAutoSaveInterval)
@@ -660,4 +700,7 @@ Partial Class Options
     Friend WithEvents LblHistoryAutoSaveInterval2 As Components.LabelCSY
     Friend WithEvents BtnHistorySaveNow As Button
     Friend WithEvents BtnHistoryPrune As Button
+    Friend WithEvents TxtBoxHistoryUpdateInterval As TextBox
+    Friend WithEvents LblHistoryUpdateInterval2 As Components.LabelCSY
+    Friend WithEvents LblHistoryUpdateInterval1 As Components.LabelCSY
 End Class

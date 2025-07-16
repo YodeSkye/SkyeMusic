@@ -80,8 +80,8 @@ Partial Class Player
         BtnPrevious = New Button()
         TipPlayer = New ToolTip(components)
         LVPlaylist = New Components.ListViewEX()
-        ColumnHeaderTitle = New ColumnHeader()
-        ColumnHeaderFilename = New ColumnHeader()
+        Title = New ColumnHeader()
+        Filename = New ColumnHeader()
         TimerMeter = New Timer(components)
         TimerVisualizer = New Timer(components)
         PicBoxVisualizer = New PictureBox()
@@ -555,7 +555,7 @@ Partial Class Player
         ' 
         LVPlaylist.AllowDrop = True
         LVPlaylist.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
-        LVPlaylist.Columns.AddRange(New ColumnHeader() {ColumnHeaderTitle, ColumnHeaderFilename})
+        LVPlaylist.Columns.AddRange(New ColumnHeader() {Title, Filename})
         LVPlaylist.ContextMenuStrip = CMPlaylist
         LVPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LVPlaylist.InsertionLineColor = Color.Teal
@@ -569,15 +569,15 @@ Partial Class Player
         LVPlaylist.UseCompatibleStateImageBehavior = False
         LVPlaylist.View = View.Details
         ' 
-        ' ColumnHeaderTitle
+        ' Title
         ' 
-        ColumnHeaderTitle.Text = "Title"
-        ColumnHeaderTitle.Width = 300
+        Title.Text = "Title"
+        Title.Width = 300
         ' 
-        ' ColumnHeaderFilename
+        ' Filename
         ' 
-        ColumnHeaderFilename.Text = "Filename"
-        ColumnHeaderFilename.Width = 550
+        Filename.Text = "Filename"
+        Filename.Width = 550
         ' 
         ' TimerMeter
         ' 
@@ -727,7 +727,7 @@ Partial Class Player
     Friend WithEvents TimerPosition As Timer
     Friend WithEvents AxPlayer As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents BtnReverse As Button
-    Friend WithEvents ColumnHeaderTitle As ColumnHeader
+    Friend WithEvents Title As ColumnHeader
     Friend WithEvents MenuPlayer As MenuStrip
     Friend WithEvents MIAbout As ToolStripMenuItem
     Friend WithEvents MIShowHelp As ToolStripMenuItem
@@ -773,7 +773,7 @@ Partial Class Player
     Friend WithEvents LVPlaylist As My.Components.ListViewEX
     Friend WithEvents ColumnHeader1 As ColumnHeader
     Friend WithEvents ColumnHeader2 As ColumnHeader
-    Friend WithEvents ColumnHeaderFilename As ColumnHeader
+    Friend WithEvents Filename As ColumnHeader
     Friend WithEvents TimerMeter As Timer
     Friend WithEvents CMIShowCurrent As ToolStripMenuItem
     Friend WithEvents CMIViewInLibrary As ToolStripMenuItem
