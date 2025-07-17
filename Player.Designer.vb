@@ -551,6 +551,7 @@ Partial Class Player
         ' 
         ' LVPlaylist
         ' 
+        LVPlaylist.AllowColumnReorder = True
         LVPlaylist.AllowDrop = True
         LVPlaylist.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         LVPlaylist.ContextMenuStrip = CMPlaylist
