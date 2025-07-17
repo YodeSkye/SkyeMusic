@@ -8,6 +8,7 @@ Imports Microsoft.Win32
 Imports SkyeMusic.My
 Imports SkyeMusic.My.Components
 Imports Syncfusion.Windows.Forms.Grid
+Imports Syncfusion.Windows.Forms.Tools.Win32API
 Imports TagLib.Ape
 Public Class Player
 
@@ -38,7 +39,7 @@ Public Class Player
     Private Queue As New Generic.List(Of String) 'Queue of items to play
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
     Private mMove As Boolean = False
-    Private mOffset, mPosition As Point
+    Private mOffset, mPosition As System.Drawing.Point
     Friend ReadOnly Property Fullscreen As Boolean 'Property to check if the player is in fullscreen mode
         Get
             Return AxPlayer.fullScreen
@@ -73,15 +74,58 @@ Public Class Player
         End Try
     End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
         PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
         TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
-        AddHandler TrackBarPosition.MouseWheel, AddressOf TrackBarPosition_MouseWheel
+
+        'Initialize Listview
+        Dim header As ColumnHeader
+        header = New ColumnHeader()
+        header.Name = "Title"
+        header.Text = "Title"
+        header.Width = 300
+        LVPlaylist.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "Path"
+        header.Text = "Path"
+        header.Width = 550
+        LVPlaylist.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "Rating"
+        header.Text = "Rating"
+        header.Width = 60
+        header.TextAlign = HorizontalAlignment.Center
+        LVPlaylist.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "PlayCount"
+        header.Text = "Plays"
+        header.Width = 50
+        header.TextAlign = HorizontalAlignment.Center
+        LVPlaylist.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "LastPlayed"
+        header.Text = "Last Played"
+        header.Width = 180
+        LVPlaylist.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "FirstPlayed"
+        header.Text = "First Played"
+        header.Width = 180
+        LVPlaylist.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "Added"
+        header.Text = "Added"
+        header.Width = 180
+        LVPlaylist.Columns.Add(header)
+        header = Nothing
+
         SetTheme()
         LoadPlaylist()
         ClearPlaylistTitles()
         ShowPlayMode()
+
         'Initialize the media player
         AxPlayer.Visible = False
         AxPlayer.uiMode = "none"
@@ -89,6 +133,7 @@ Public Class Player
         AxPlayer.Ctlenabled = False
         AxPlayer.stretchToFit = True
         AxPlayer.settings.volume = 100
+
         'Set tooltips for buttons
         TipPlayer.SetToolTip(BtnPlay, "Play / Pause")
         TipPlayer.SetToolTip(BtnStop, "Stop Playing")
@@ -98,6 +143,7 @@ Public Class Player
         TipPlayer.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
         TipPlayer.SetToolTip(LblDuration, "Song Duration")
         SetTipPlayer()
+
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
         'If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
@@ -105,7 +151,10 @@ Public Class Player
         If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
         If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
 #End If
+
+        AddHandler TrackBarPosition.MouseWheel, AddressOf TrackBarPosition_MouseWheel
         System.Windows.Forms.Application.AddMessageFilter(New MessageFilterPlayerIgnoreFullscreenMouseClick())
+
     End Sub
     Private Sub Player_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         TopMost = False
@@ -177,9 +226,9 @@ Public Class Player
             mMove = True
             cSender = CType(sender, Control)
             If cSender Is Me Then
-                mOffset = New Point(-e.X - SystemInformation.FrameBorderSize.Width - 4, -e.Y - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+                mOffset = New POINT(-e.X - SystemInformation.FrameBorderSize.Width - 4, -e.Y - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
             Else
-                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+                mOffset = New POINT(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
             End If
         End If
         cSender = Nothing
@@ -187,7 +236,7 @@ Public Class Player
     Private Sub Player_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, PicBoxVisualizer.MouseMove, MenuPlayer.MouseMove, LblPlaylistCount.MouseMove, LblDuration.MouseMove, PEXLeft.MouseMove, PEXRight.MouseMove
         If mMove Then
             mPosition = Control.MousePosition
-            mPosition.Offset(mOffset.X, mOffset.Y)
+            mPosition.Offset(mOffset.x, mOffset.y)
             CheckMove(mPosition)
             Location = mPosition
         End If
@@ -245,7 +294,11 @@ Public Class Player
         b = e.Bounds
         Dim width As Integer = TextRenderer.MeasureText(" ", e.Font).Width
         b = Rectangle.Inflate(e.Bounds, -2, 0)
-        TextRenderer.DrawText(e.Graphics, e.Header.Text, e.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.VerticalCenter)
+        If e.Header.TextAlign = HorizontalAlignment.Center Then
+            TextRenderer.DrawText(e.Graphics, e.Header.Text, e.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter)
+        Else
+            TextRenderer.DrawText(e.Graphics, e.Header.Text, e.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.VerticalCenter)
+        End If
     End Sub
     Private Sub LVPlaylist_DrawItem(sender As Object, e As DrawListViewItemEventArgs) Handles LVPlaylist.DrawItem
         If e.Item.Selected = False Then
@@ -254,7 +307,7 @@ Public Class Player
     End Sub
     Private Sub LVPlaylist_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVPlaylist.DrawSubItem
         If e.Item.Selected = True Then
-            If e.ColumnIndex = 0 Then
+            If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
                 Static b As Rectangle
                 Static s As SizeF
                 b = e.Bounds
@@ -262,16 +315,20 @@ Public Class Player
                 If s.Width <= e.Bounds.Width Then b.Width = CInt(s.Width) + 4
                 If b.Width > LVPlaylist.Columns(e.ColumnIndex).Width Then b.Width = LVPlaylist.Columns(e.ColumnIndex).Width
                 e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.TextColor), b)
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New Point(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New POINT(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix)
+            ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
+                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
             Else
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New Point(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New POINT(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
             End If
         Else
             e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.BackColor), e.Bounds)
-            If e.ColumnIndex = 0 Then
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistBoldFont, e.Bounds.Width), PlaylistBoldFont, New Point(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+            If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistBoldFont, e.Bounds.Width), PlaylistBoldFont, New POINT(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+            ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
+                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, LVPlaylist.Font, e.Bounds, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
             Else
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, LVPlaylist.Font, e.Bounds.Width), LVPlaylist.Font, New Point(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, LVPlaylist.Font, e.Bounds.Width), LVPlaylist.Font, New POINT(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
             End If
         End If
     End Sub
@@ -434,16 +491,41 @@ Public Class Player
             If files.Count > 0 Then
                 WriteToLog("Drag&Drop Performed (" + files.Count.ToString + " " + IIf(files.Count = 1, "File", "Files").ToString + ")")
                 Dim lvi As ListViewItem
-                Dim clientpoint = LVPlaylist.PointToClient(New Point(e.X, e.Y))
+                Dim clientpoint = LVPlaylist.PointToClient(New POINT(e.X, e.Y))
                 Dim itemover = LVPlaylist.GetItemAt(clientpoint.X, clientpoint.Y)
                 For x = 0 To files.Count - 1
                     If LVPlaylist.FindItemWithText(files(x), True, 0) Is Nothing Then
                         If ExtensionDictionary.ContainsKey(Path.GetExtension(files(x))) Then
                             lvi = New ListViewItem
+                            lvi.SubItems.Add(String.Empty)
+                            lvi.SubItems.Add(String.Empty)
+                            lvi.SubItems.Add(String.Empty)
+                            lvi.SubItems.Add(String.Empty)
+                            lvi.SubItems.Add(String.Empty)
+                            lvi.SubItems.Add(String.Empty)
                             lvi.UseItemStyleForSubItems = False
-                            lvi.SubItems(0).Font = PlaylistBoldFont
-                            lvi.Text = FormatPlaylistTitle(files(x))
-                            lvi.SubItems.Add(files(x))
+                            lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = PlaylistBoldFont
+                            lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = FormatPlaylistTitle(files(x))
+                            lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = files(x)
+                            App.AddToHistoryFromPlaylist(files(x))
+
+                            'Get History Data
+                            Dim path As String = files(x)
+                            Dim s As Song = App.History.Find(Function(p) p.Path = path)
+                            If Not String.IsNullOrEmpty(s.Path) Then
+                                If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
+                                lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
+                                If Not s.LastPlayed = Nothing Then
+                                    lvi.SubItems(LVPlaylist.Columns("LastPlayed").Index).Text = s.LastPlayed.ToString()
+                                End If
+                                If Not s.FirstPlayed = Nothing Then
+                                    lvi.SubItems(LVPlaylist.Columns("FirstPlayed").Index).Text = s.FirstPlayed.ToString()
+                                End If
+                                If Not s.Added = Nothing Then
+                                    lvi.SubItems(LVPlaylist.Columns("Added").Index).Text = s.Added.ToString()
+                                End If
+                            End If
+
                             If itemover Is Nothing Then
                                 LVPlaylist.Items.Add(lvi)
                             Else
@@ -451,7 +533,6 @@ Public Class Player
                                 ClearPlaylistTitles()
                                 LVPlaylist.Items.Insert(itemover.Index, lvi)
                             End If
-                            App.AddToHistoryFromPlaylist(files(x))
                             SetPlaylistCountText()
                         End If
                     End If
@@ -475,11 +556,11 @@ Public Class Player
     Private Sub MenuPlayer_DoubleClick(sender As Object, e As EventArgs) Handles MenuPlayer.DoubleClick
         'Debug.Print(MenuPlayer.PointToClient(MousePosition).ToString)
         'Debug.Print(MIPlayMode.Bounds.ToString)
-        Dim p As Point = MenuPlayer.PointToClient(MousePosition)
+        Dim p As POINT = MenuPlayer.PointToClient(MousePosition)
         Dim rPlayMode As Rectangle = MIPlayMode.Bounds
         Dim rLyrics As Rectangle = MILyrics.Bounds
-        If Not (p.X >= rPlayMode.Left And p.Y >= rPlayMode.Top And p.X <= rPlayMode.Right And p.Y <= rPlayMode.Bottom) AndAlso
-           Not (p.X >= rLyrics.Left And p.Y >= rLyrics.Top And p.X <= rLyrics.Right And p.Y <= rLyrics.Bottom) Then
+        If Not (p.x >= rPlayMode.Left And p.y >= rPlayMode.Top And p.x <= rPlayMode.Right And p.y <= rPlayMode.Bottom) AndAlso
+           Not (p.x >= rLyrics.Left And p.y >= rLyrics.Top And p.x <= rLyrics.Right And p.y <= rLyrics.Bottom) Then
             ToggleMaximized()
         End If
     End Sub
@@ -604,7 +685,7 @@ Public Class Player
     End Sub
     Private Sub CMPlaylistOpening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylist.Opening
         TipPlayer.Hide(Me)
-        TipPlayer.Show(App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(1).Text).ToString, Me, LVPlaylist.Location + LVPlaylist.PointToClient(Cursor.Position), 5000)
+        TipPlayer.Show(App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text).ToString, Me, LVPlaylist.Location + LVPlaylist.PointToClient(Cursor.Position), 5000)
         CMIHelperApp1.Text = "Open with " + App.HelperApp1Name
         CMIHelperApp2.Text = "Open with " + App.HelperApp2Name
         If LVPlaylist.Items.Count = 0 Then
@@ -624,9 +705,9 @@ Public Class Player
             CMIPlaylistRemove.Enabled = True
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
             CMIPlaylistRemove.Text += " (" + LVPlaylist.SelectedItems.Count.ToString + ")"
-            CMICopyTitle.ToolTipText = LVPlaylist.SelectedItems(0).SubItems(0).Text
-            CMICopyFileName.ToolTipText = IO.Path.GetFileNameWithoutExtension(LVPlaylist.SelectedItems(0).SubItems(1).Text)
-            CMICopyFilePath.ToolTipText = LVPlaylist.SelectedItems(0).SubItems(1).Text
+            CMICopyTitle.ToolTipText = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text
+            CMICopyFileName.ToolTipText = IO.Path.GetFileNameWithoutExtension(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            CMICopyFilePath.ToolTipText = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text
             If IO.File.Exists(App.HelperApp1Path) Then
                 CMIHelperApp1.Visible = True
             Else
@@ -663,7 +744,7 @@ Public Class Player
         QueueFromPlaylist()
     End Sub
     Private Sub CMIPlayWithWindowsClick(sender As Object, e As EventArgs) Handles CMIPlayWithWindows.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then App.PlayWithWindows(LVPlaylist.SelectedItems(0).SubItems(1).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then App.PlayWithWindows(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
     Private Sub CMIPlaylistAddClick(sender As Object, e As EventArgs) Handles CMIPlaylistAdd.Click
         AddToPlaylistFromFile()
@@ -689,25 +770,25 @@ Public Class Player
         End Try
     End Sub
     Private Sub CMIViewInLibraryClick(sender As Object, e As EventArgs) Handles CMIViewInLibrary.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then App.FRMLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(1).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then App.FRMLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
     Private Sub CMIHelperApp1Click(sender As Object, e As EventArgs) Handles CMIHelperApp1.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then App.HelperApp1(LVPlaylist.SelectedItems(0).SubItems(1).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then App.HelperApp1(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
     Private Sub CMIHelperApp2Click(sender As Object, e As EventArgs) Handles CMIHelperApp2.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then App.HelperApp2(LVPlaylist.SelectedItems(0).SubItems(1).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then App.HelperApp2(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
     Private Sub CMIOpenLocationClick(sender As Object, e As EventArgs) Handles CMIOpenLocation.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then App.OpenFileLocation(LVPlaylist.SelectedItems(0).SubItems(1).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then App.OpenFileLocation(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
     Private Sub CMICopyTitleClick(sender As Object, e As EventArgs) Handles CMICopyTitle.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(LVPlaylist.SelectedItems(0).SubItems(0).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text)
     End Sub
     Private Sub CMICopyFileNameClick(sender As Object, e As EventArgs) Handles CMICopyFileName.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(IO.Path.GetFileNameWithoutExtension(LVPlaylist.SelectedItems(0).SubItems(1).Text))
+        If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(IO.Path.GetFileNameWithoutExtension(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text))
     End Sub
     Private Sub CMICopyFilePathClick(sender As Object, e As EventArgs) Handles CMICopyFilePath.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(LVPlaylist.SelectedItems(0).SubItems(1).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
     Private Sub PicBoxAlbumArt_DoubleClick(sender As Object, e As EventArgs) Handles PicBoxAlbumArt.DoubleClick
         ToggleMaximized()
@@ -718,7 +799,7 @@ Public Class Player
     Private Sub PicBoxVisualizer_Paint(sender As Object, e As PaintEventArgs) Handles PicBoxVisualizer.Paint
         If PlayState Then
             'Draw the background gradient
-            Dim pBrush As New LinearGradientBrush(New Point(0, 0), New Point(Me.ClientSize.Width, 0), Color.Red, Color.Blue)
+            Dim pBrush As New LinearGradientBrush(New POINT(0, 0), New POINT(Me.ClientSize.Width, 0), Color.Red, Color.Blue)
             Dim pColorBlend As New ColorBlend
             Dim pColorMiddle As New Color
             pColorMiddle = Color.FromArgb(255, visR, 0, visB)
@@ -1911,7 +1992,7 @@ Public Class Player
     Private Function RandomHistoryFull() As Boolean
         RandomHistoryFull = True
         For Each item As ListViewItem In LVPlaylist.Items
-            If Not RandomHistory.Contains(item.SubItems(1).Text) Then
+            If Not RandomHistory.Contains(item.SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                 RandomHistoryFull = False
                 Exit For
             End If
@@ -1925,8 +2006,8 @@ Public Class Player
             Dim items As New Collections.Generic.List(Of PlaylistItemType)
             For Each plitem As ListViewItem In LVPlaylist.Items
                 Dim newitem As New PlaylistItemType
-                newitem.Title = plitem.SubItems(0).Text
-                newitem.Path = plitem.SubItems(1).Text
+                newitem.Title = plitem.SubItems(LVPlaylist.Columns("Title").Index).Text
+                newitem.Path = plitem.SubItems(LVPlaylist.Columns("Path").Index).Text
                 items.Add(newitem)
                 newitem = Nothing
             Next
@@ -1953,13 +2034,34 @@ Public Class Player
             Try
                 items = reader.Deserialize(file)
                 For Each item As PlaylistItemType In items
-                    Dim LVItem As New ListViewItem
-                    LVItem.UseItemStyleForSubItems = False
-                    LVItem.SubItems(0).Font = PlaylistBoldFont
-                    LVItem.Text = item.Title
-                    LVItem.SubItems.Add(item.Path)
-                    LVPlaylist.Items.Add(LVItem)
-                    LVItem = Nothing
+                    Dim lvi As New ListViewItem
+                    lvi.SubItems.Add(String.Empty)
+                    lvi.SubItems.Add(String.Empty)
+                    lvi.SubItems.Add(String.Empty)
+                    lvi.SubItems.Add(String.Empty)
+                    lvi.SubItems.Add(String.Empty)
+                    lvi.SubItems.Add(String.Empty)
+                    lvi.UseItemStyleForSubItems = False
+                    lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = PlaylistBoldFont
+                    lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = item.Title
+                    lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = item.Path
+
+                    'Get History Data
+                    Dim s As Song = App.History.Find(Function(p) p.Path = item.Path)
+                    If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
+                    If Not String.IsNullOrEmpty(s.Path) Then lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
+                    If Not s.LastPlayed = Nothing Then
+                        lvi.SubItems(LVPlaylist.Columns("LastPlayed").Index).Text = s.LastPlayed.ToString()
+                    End If
+                    If Not s.FirstPlayed = Nothing Then
+                        lvi.SubItems(LVPlaylist.Columns("FirstPlayed").Index).Text = s.FirstPlayed.ToString()
+                    End If
+                    If Not s.Added = Nothing Then
+                        lvi.SubItems(LVPlaylist.Columns("Added").Index).Text = s.Added.ToString()
+                    End If
+
+                    LVPlaylist.Items.Add(lvi)
+                    lvi = Nothing
                 Next
             Catch
                 items = Nothing
@@ -1991,10 +2093,36 @@ Public Class Player
                 If LVPlaylist.Items.Count = 0 OrElse LVPlaylist.FindItemWithText(ofd.FileNames(x), True, 0) Is Nothing Then
                     If App.ExtensionDictionary.ContainsKey(Path.GetExtension(ofd.FileNames(x))) Then
                         lvi = New ListViewItem
+                        lvi.SubItems.Add(String.Empty)
+                        lvi.SubItems.Add(String.Empty)
+                        lvi.SubItems.Add(String.Empty)
+                        lvi.SubItems.Add(String.Empty)
+                        lvi.SubItems.Add(String.Empty)
+                        lvi.SubItems.Add(String.Empty)
                         lvi.UseItemStyleForSubItems = False
-                        lvi.SubItems(0).Font = PlaylistBoldFont
-                        lvi.Text = FormatPlaylistTitle(ofd.FileNames(x))
-                        lvi.SubItems.Add(ofd.FileNames(x))
+                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = PlaylistBoldFont
+                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = FormatPlaylistTitle(ofd.FileNames(x))
+                        lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = ofd.FileNames(x)
+
+                        App.AddToHistoryFromPlaylist(ofd.FileNames(x))
+
+                        'Get History Data
+                        Dim path As String = ofd.FileNames(x)
+                        Dim s As Song = App.History.Find(Function(p) p.Path = path)
+                        If Not String.IsNullOrEmpty(s.Path) Then
+                            If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
+                            lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
+                            If Not s.LastPlayed = Nothing Then
+                                lvi.SubItems(LVPlaylist.Columns("LastPlayed").Index).Text = s.LastPlayed.ToString()
+                            End If
+                            If Not s.FirstPlayed = Nothing Then
+                                lvi.SubItems(LVPlaylist.Columns("FirstPlayed").Index).Text = s.FirstPlayed.ToString()
+                            End If
+                            If Not s.Added = Nothing Then
+                                lvi.SubItems(LVPlaylist.Columns("Added").Index).Text = s.Added.ToString()
+                            End If
+                        End If
+
                         If LVPlaylist.SelectedItems.Count = 0 Then
                             LVPlaylist.Items.Add(lvi)
                         Else
@@ -2002,7 +2130,6 @@ Public Class Player
                             ClearPlaylistTitles()
                             LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
                         End If
-                        App.AddToHistoryFromPlaylist(ofd.FileNames(x))
                     End If
                 End If
             Next
@@ -2020,10 +2147,33 @@ Public Class Player
             If lvi IsNot Nothing Then LVPlaylist.Items.Remove(lvi)
         End If
         lvi = New ListViewItem
+        lvi.SubItems.Add(String.Empty)
+        lvi.SubItems.Add(String.Empty)
+        lvi.SubItems.Add(String.Empty)
+        lvi.SubItems.Add(String.Empty)
+        lvi.SubItems.Add(String.Empty)
+        lvi.SubItems.Add(String.Empty)
         lvi.UseItemStyleForSubItems = False
-        lvi.SubItems(0).Font = PlaylistBoldFont
-        lvi.Text = title
-        lvi.SubItems.Add(filename)
+        lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = PlaylistBoldFont
+        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = title
+        lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = filename
+
+        'Get History Data
+        Dim s As Song = App.History.Find(Function(p) p.Path = filename)
+        If Not String.IsNullOrEmpty(s.Path) Then
+            If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
+            lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
+            If Not s.LastPlayed = Nothing Then
+                lvi.SubItems(LVPlaylist.Columns("LastPlayed").Index).Text = s.LastPlayed.ToString()
+            End If
+            If Not s.FirstPlayed = Nothing Then
+                lvi.SubItems(LVPlaylist.Columns("FirstPlayed").Index).Text = s.FirstPlayed.ToString()
+            End If
+            If Not s.Added = Nothing Then
+                lvi.SubItems(LVPlaylist.Columns("Added").Index).Text = s.Added.ToString()
+            End If
+        End If
+
         ClearPlaylistTitles()
         LVPlaylist.ListViewItemSorter = Nothing
         If LVPlaylist.SelectedItems.Count = 0 Then
@@ -2034,6 +2184,32 @@ Public Class Player
         SetPlaylistCountText()
         lvi = Nothing
     End Sub
+    Friend Sub UpdateHistoryInPlaylist(path As String)
+
+        'Get Listview Entry
+        Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(path, True, 0)
+
+        'Get History Data
+        Dim s As Song = App.History.Find(Function(p) p.Path = path)
+
+        'Update with current history data
+        If Not String.IsNullOrEmpty(s.Path) Then
+            If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
+            lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
+            If Not s.LastPlayed = Nothing Then
+                lvi.SubItems(LVPlaylist.Columns("LastPlayed").Index).Text = s.LastPlayed.ToString()
+            End If
+            If Not s.FirstPlayed = Nothing Then
+                lvi.SubItems(LVPlaylist.Columns("FirstPlayed").Index).Text = s.FirstPlayed.ToString()
+            End If
+            If Not s.Added = Nothing Then
+                lvi.SubItems(LVPlaylist.Columns("Added").Index).Text = s.Added.ToString()
+            End If
+        End If
+
+        Debug.Print("Updated History in Playlist for " + path)
+
+    End Sub
     Private Sub PlaylistRemoveItems()
         If LVPlaylist.SelectedItems.Count > 0 Then
             If LVPlaylist.SelectedItems.Count = LVPlaylist.Items.Count Then
@@ -2042,7 +2218,7 @@ Public Class Player
                 LVPlaylist.Enabled = False
                 For Each item As ListViewItem In LVPlaylist.SelectedItems
                     If App.PlayMode = App.PlayModes.Random Then
-                        RandomHistory.Remove(item.SubItems(1).Text)
+                        RandomHistory.Remove(item.SubItems(LVPlaylist.Columns("Path").Index).Text)
                     End If
                     item.Remove()
                 Next
@@ -2091,22 +2267,22 @@ Public Class Player
             LyricsOff()
             StopPlay()
             If Mute Then ToggleMute()
-            App.WriteToLog("Playing " + LVPlaylist.SelectedItems(0).SubItems(1).Text + " (PlayFromPlaylist)")
-            AxPlayer.URL = LVPlaylist.SelectedItems(0).SubItems(1).Text
-            RandomHistoryAdd(LVPlaylist.SelectedItems(0).SubItems(1).Text)
+            App.WriteToLog("Playing " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayFromPlaylist)")
+            AxPlayer.URL = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text
+            RandomHistoryAdd(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
         End If
     End Sub
     Private Sub QueueFromPlaylist()
         If LVPlaylist.SelectedItems.Count > 0 Then
             Dim found As Boolean = False
             For Each s As String In Queue
-                If s = LVPlaylist.SelectedItems(0).SubItems(1).Text Then
+                If s = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text Then
                     found = True
                     Exit For
                 End If
             Next
             If Not found Then
-                Queue.Add(LVPlaylist.SelectedItems(0).SubItems(1).Text)
+                Queue.Add(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
                 SetPlaylistCountText()
             End If
         End If
@@ -2114,20 +2290,47 @@ Public Class Player
     Friend Sub PlayFromLibrary(title As String, filename As String)
         IsStream = False
         LyricsOff()
-        Dim lvi As ListViewItem = New ListViewItem
-        lvi.UseItemStyleForSubItems = False
-        lvi.SubItems(0).Font = PlaylistBoldFont
-        lvi.Text = title
-        lvi.SubItems.Add(filename)
-        LVPlaylist.ListViewItemSorter = Nothing
-        ClearPlaylistTitles()
-        If LVPlaylist.SelectedItems.Count = 0 OrElse LVPlaylist.SelectedItems(0).Index = LVPlaylist.Items.Count - 1 Then
-            LVPlaylist.Items.Add(lvi)
-        Else
-            LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index + 1, lvi)
+
+        If LVPlaylist.FindItemWithText(filename, True, 0) Is Nothing Then
+            Dim lvi As ListViewItem = New ListViewItem
+            lvi.SubItems.Add(String.Empty)
+            lvi.SubItems.Add(String.Empty)
+            lvi.SubItems.Add(String.Empty)
+            lvi.SubItems.Add(String.Empty)
+            lvi.SubItems.Add(String.Empty)
+            lvi.SubItems.Add(String.Empty)
+            lvi.UseItemStyleForSubItems = False
+            lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = PlaylistBoldFont
+            lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = title
+            lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = filename
+            LVPlaylist.ListViewItemSorter = Nothing
+
+            'Get History Data
+            Dim s As Song = App.History.Find(Function(p) p.Path = filename)
+            If Not String.IsNullOrEmpty(s.Path) Then
+                If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
+                lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
+                If Not s.LastPlayed = Nothing Then
+                    lvi.SubItems(LVPlaylist.Columns("LastPlayed").Index).Text = s.LastPlayed.ToString()
+                End If
+                If Not s.FirstPlayed = Nothing Then
+                    lvi.SubItems(LVPlaylist.Columns("FirstPlayed").Index).Text = s.FirstPlayed.ToString()
+                End If
+                If Not s.Added = Nothing Then
+                    lvi.SubItems(LVPlaylist.Columns("Added").Index).Text = s.Added.ToString()
+                End If
+            End If
+
+            ClearPlaylistTitles()
+            If LVPlaylist.SelectedItems.Count = 0 OrElse LVPlaylist.SelectedItems(0).Index = LVPlaylist.Items.Count - 1 Then
+                LVPlaylist.Items.Add(lvi)
+            Else
+                LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index + 1, lvi)
+            End If
+            SetPlaylistCountText()
+            lvi = Nothing
         End If
-        SetPlaylistCountText()
-        lvi = Nothing
+
         StopPlay()
         If Mute Then ToggleMute()
         App.WriteToLog("Playing " + filename + " (PlayFromLibrary)")
@@ -2164,15 +2367,15 @@ Public Class Player
                         Dim item As ListViewItem = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
                         Dim newindex As Integer = LVPlaylist.Items.Count - 1
                         If item Is Nothing Then
-                            App.WriteToLog("Playing " + LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(1).Text + " (PlayPreviousLinear)")
-                            AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(1).Text
+                            App.WriteToLog("Playing " + LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
+                            AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text
                         ElseIf item.Index = 0 Then
-                            App.WriteToLog("Playing " + LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(1).Text + " (PlayPreviousLinear)")
-                            AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(1).Text
+                            App.WriteToLog("Playing " + LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
+                            AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text
                         Else
                             newindex = item.Index - 1
-                            App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(1).Text + " (PlayPreviousLinear)")
-                            AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(1).Text
+                            App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
+                            AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
                         End If
                         LVPlaylist.SelectedIndices.Clear()
                         LVPlaylist.SelectedIndices.Add(newindex)
@@ -2192,8 +2395,8 @@ Public Class Player
                             item = Nothing
                         End Try
                         If item IsNot Nothing Then
-                            App.WriteToLog("Playing " + item.SubItems(1).Text + " (PlayPreviousRandom)")
-                            AxPlayer.URL = item.SubItems(1).Text
+                            App.WriteToLog("Playing " + item.SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousRandom)")
+                            AxPlayer.URL = item.SubItems(LVPlaylist.Columns("Path").Index).Text
                             LVPlaylist.SelectedIndices.Clear()
                             LVPlaylist.SelectedIndices.Add(item.Index)
                             LVPlaylist.EnsureVisible(item.Index)
@@ -2219,22 +2422,22 @@ Public Class Player
                     Else
                         Dim item As ListViewItem = Nothing
                         If LVPlaylist.SelectedItems.Count > 0 Then
-                            item = LVPlaylist.FindItemWithText(LVPlaylist.SelectedItems(0).SubItems(1).Text)
+                            item = LVPlaylist.FindItemWithText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         Else
                             item = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
                         End If
                         Dim newindex As Integer = 0
                         If item Is Nothing OrElse item.Index + 1 = LVPlaylist.Items.Count Then
-                            AxPlayer.URL = LVPlaylist.Items(0).SubItems(1).Text
+                            AxPlayer.URL = LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text
                         Else
                             newindex = item.Index + 1
-                            AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(1).Text
+                            AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
                         End If
                         LVPlaylist.SelectedIndices.Clear()
                         LVPlaylist.SelectedIndices.Add(newindex)
                         LVPlaylist.EnsureVisible(newindex)
                         item = Nothing
-                        App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(1).Text + " (PlayNextLinear)")
+                        App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextLinear)")
                         TimerPlayNext.Start()
                     End If
                 End If
@@ -2257,12 +2460,12 @@ Public Class Player
                             Else
                                 Do
                                     newindex = randomplaylistindex.Next(0, LVPlaylist.Items.Count)
-                                Loop Until newindex <> item.Index And Not RandomHistory.Contains(LVPlaylist.Items(newindex).SubItems(1).Text)
+                                Loop Until newindex <> item.Index And Not RandomHistory.Contains(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                             End If
                         End If
-                        App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(1).Text + " (PlayNextRandom)")
-                        AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(1).Text
-                        RandomHistoryAdd(LVPlaylist.Items(newindex).SubItems(1).Text)
+                        App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextRandom)")
+                        AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                        RandomHistoryAdd(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         LVPlaylist.SelectedIndices.Clear()
                         LVPlaylist.SelectedIndices.Add(newindex)
                         LVPlaylist.EnsureVisible(newindex)

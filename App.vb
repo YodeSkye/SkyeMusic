@@ -70,7 +70,7 @@ Namespace My
             Dim InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
             Dim IsStream As Boolean 'IsStream indicates whether the song is a stream.
             Dim PlayCount As UShort 'PlayCount is the number of times the song has been played.
-            Dim DateAdded As DateTime 'DateAdded is the date and time when the song was added to the History.
+            Dim Added As DateTime 'DateAdded is the date and time when the song was added to the History.
             Dim FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
             Dim LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
             Dim Rating As Byte 'Rating is the rating of the song, from 0 to 5.
@@ -97,7 +97,7 @@ Namespace My
                 Else
                     s += " Plays"
                 End If
-                If Not DateAdded = Nothing Then s += ", Added " + DateAdded.ToString()
+                If Not Added = Nothing Then s += ", Added " + Added.ToString()
                 If Not FirstPlayed = Nothing Then s += ", First Played " + FirstPlayed.ToString()
                 If Not LastPlayed = Nothing Then s += ", Last Played " + LastPlayed.ToString()
                 If Rating > 0 Then s += ", " + New String("★"c, Rating)
@@ -460,7 +460,7 @@ Namespace My
                     .InLibrary = False,
                     .IsStream = stream,
                     .PlayCount = 0,
-                    .DateAdded = DateTime.Now,
+                    .Added = DateTime.Now,
                     .FirstPlayed = Nothing,
                     .LastPlayed = Nothing,
                     .Rating = 0}
@@ -486,7 +486,7 @@ Namespace My
                     .InLibrary = True,
                     .IsStream = False,
                     .PlayCount = 0,
-                    .DateAdded = DateTime.Now,
+                    .Added = DateTime.Now,
                     .FirstPlayed = Nothing,
                     .LastPlayed = Nothing,
                     .Rating = 0}
@@ -517,6 +517,7 @@ Namespace My
                 History(existingindex) = existingsong
                 Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
                 WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
+                Player.UpdateHistoryInPlaylist(songorstream)
             Else
                 Debug.Print("Song not found in history: " + songorstream)
             End If

@@ -1965,6 +1965,8 @@ Public Class Library
         LVLibrary.Groups.Clear()
     End Sub
     Private Sub ResetExtInfo()
+        LblHistory.Text = String.Empty
+        LblHistory.Refresh()
         LblExtTitle.Text = String.Empty
         LblExtTitle.Refresh()
         LblExtFileInfo.Text = String.Empty
