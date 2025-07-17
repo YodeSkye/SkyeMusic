@@ -314,29 +314,30 @@ Public Class Player
         End If
     End Sub
     Private Sub LVPlaylist_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVPlaylist.DrawSubItem
+        Static b As Rectangle
+        Static s As SizeF
         If e.Item.Selected = True Then
             If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
-                Static b As Rectangle
-                Static s As SizeF
                 b = e.Bounds
                 s = e.Graphics.MeasureString(e.SubItem.Text, e.Item.Font, e.Bounds.Size)
                 If s.Width <= e.Bounds.Width Then b.Width = CInt(s.Width) + 4
                 If b.Width > LVPlaylist.Columns(e.ColumnIndex).Width Then b.Width = LVPlaylist.Columns(e.ColumnIndex).Width
                 e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.TextColor), b)
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New System.Drawing.Point(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, b.Width), e.Item.Font, New System.Drawing.Point(b.Left + 2, b.Top + 1), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix)
             ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
                 TextRenderer.DrawText(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
             Else
                 TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New System.Drawing.Point(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
             End If
         Else
-            e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.BackColor), e.Bounds)
+            b = e.Bounds
+            e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.BackColor), b)
             If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistBoldFont, e.Bounds.Width), PlaylistBoldFont, New System.Drawing.Point(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistBoldFont, b.Width), PlaylistBoldFont, New System.Drawing.Point(b.Left + 2, b.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
             ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
-                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, LVPlaylist.Font, e.Bounds, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
+                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, LVPlaylist.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
             Else
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, LVPlaylist.Font, e.Bounds.Width), LVPlaylist.Font, New System.Drawing.Point(e.Bounds.Left + 2, e.Bounds.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, LVPlaylist.Font, b.Width), LVPlaylist.Font, New System.Drawing.Point(b.Left + 2, b.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
             End If
         End If
     End Sub

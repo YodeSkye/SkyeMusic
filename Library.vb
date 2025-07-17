@@ -231,21 +231,22 @@ Public Class Library
         End If
     End Sub
     Private Sub LVLibrary_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVLibrary.DrawSubItem
+        Static b As Rectangle
         If e.Item.Selected = True Then
-            Dim bounds As Rectangle = e.Bounds
+            b = e.Bounds
             If e.ColumnIndex = 0 AndAlso LVLibrary.Columns(0).DisplayIndex <> 0 Then
                 Dim i As Integer
                 For i = 0 To LVLibrary.Columns.Count - 1
                     If LVLibrary.Columns(i).DisplayIndex = LVLibrary.Columns(0).DisplayIndex - 1 Then Exit For
                 Next
-                bounds = New Rectangle(e.Item.SubItems(i).Bounds.Right, e.Item.SubItems(i).Bounds.Y, LVLibrary.Columns(0).Width, e.Item.SubItems(i).Bounds.Height)
+                b = New Rectangle(e.Item.SubItems(i).Bounds.Right, e.Item.SubItems(i).Bounds.Y, LVLibrary.Columns(0).Width, e.Item.SubItems(i).Bounds.Height)
             End If
-            e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.TextColor), bounds)
+            e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.TextColor), b)
             If e.ColumnIndex = 0 AndAlso LVLibrary.Columns("Artist").Index = 0 Then
-                If Not String.IsNullOrEmpty(e.Item.ImageKey) Then e.Graphics.DrawImage(Resources.ImageAlbumArtSelect, New Rectangle(New Point(bounds.Location.X + 4, bounds.Location.Y + 2), New Size(16, 16)))
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, New Font(e.Item.Font, FontStyle.Bold), e.Bounds.Size.Width - 18), New Font(e.Item.Font, FontStyle.Bold), New Point(bounds.Left + 18, bounds.Top + 2), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix Or TextFormatFlags.EndEllipsis)
+                If Not String.IsNullOrEmpty(e.Item.ImageKey) Then e.Graphics.DrawImage(Resources.ImageAlbumArtSelect, New Rectangle(New Point(b.Location.X + 4, b.Location.Y + 2), New Size(16, 16)))
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, New Font(e.Item.Font, FontStyle.Bold), e.Bounds.Size.Width - 18), New Font(e.Item.Font, FontStyle.Bold), New Point(b.Left + 18, b.Top + 2), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix Or TextFormatFlags.EndEllipsis)
             Else
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, New Font(e.Item.Font, FontStyle.Bold), e.Bounds.Size.Width), New Font(e.Item.Font, FontStyle.Bold), New Point(bounds.Left + 2, bounds.Top + 2), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix Or TextFormatFlags.EndEllipsis)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, New Font(e.Item.Font, FontStyle.Bold), e.Bounds.Size.Width), New Font(e.Item.Font, FontStyle.Bold), New Point(b.Left + 2, b.Top + 2), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix Or TextFormatFlags.EndEllipsis)
             End If
         Else
             e.DrawDefault = True
