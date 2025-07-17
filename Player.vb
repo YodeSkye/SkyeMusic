@@ -29,8 +29,6 @@ Public Class Player
     Private Lyrics As Boolean = False 'Indicates if the lyrics are active
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
     Private TrackBarScale As Int16 = 1000 'TrackBar Scale for Position
-    Private PlaylistTitleSort As SortOrder = SortOrder.None 'Sort Order for Playlist Title
-    Private PlaylistFilenameSort As SortOrder = SortOrder.None 'Sort Order for Playlist Filename
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
     Private PlaylistSearchTitle As String 'Title for Playlist Search
     Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
@@ -40,6 +38,16 @@ Public Class Player
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
+
+    'Sort Orders
+    Private PlaylistTitleSort As SortOrder = SortOrder.None
+    Private PlaylistPathSort As SortOrder = SortOrder.None
+    Private PlaylistRatingSort As SortOrder = SortOrder.None
+    Private PlaylistPlayCountSort As SortOrder = SortOrder.None
+    Private PlaylistLastPlayedSort As SortOrder = SortOrder.None
+    Private PlaylistFirstPlayedSort As SortOrder = SortOrder.None
+    Private PlaylistAddedSort As SortOrder = SortOrder.None
+
     Friend ReadOnly Property Fullscreen As Boolean 'Property to check if the player is in fullscreen mode
         Get
             Return AxPlayer.fullScreen
@@ -101,7 +109,7 @@ Public Class Player
         header = New ColumnHeader()
         header.Name = "PlayCount"
         header.Text = "Plays"
-        header.Width = 50
+        header.Width = 60
         header.TextAlign = HorizontalAlignment.Center
         LVPlaylist.Columns.Add(header)
         header = New ColumnHeader()
@@ -236,7 +244,7 @@ Public Class Player
     Private Sub Player_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, PicBoxVisualizer.MouseMove, MenuPlayer.MouseMove, LblPlaylistCount.MouseMove, LblDuration.MouseMove, PEXLeft.MouseMove, PEXRight.MouseMove
         If mMove Then
             mPosition = Control.MousePosition
-            mPosition.Offset(mOffset.x, mOffset.y)
+            mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
         End If
@@ -378,32 +386,78 @@ Public Class Player
             ClearPlaylistTitles()
         Else
             Select Case e.Column
-                Case 0
+                Case LVPlaylist.Columns("Title").Index
+                    PlaylistTitleSort = ClearPlaylistSorts(PlaylistTitleSort)
                     Select Case PlaylistTitleSort
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             PlaylistTitleSort = SortOrder.Descending
-                            LVPlaylist.Columns(0).Text = "Title ↓"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title ↓"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             PlaylistTitleSort = SortOrder.Ascending
-                            LVPlaylist.Columns(0).Text = "Title ↑"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title ↑"
                     End Select
-                    PlaylistFilenameSort = SortOrder.None
-                    LVPlaylist.Columns(1).Text = "Path"
-                Case 1
-                    Select Case PlaylistFilenameSort
+                Case LVPlaylist.Columns("Path").Index
+                    PlaylistPathSort = ClearPlaylistSorts(PlaylistPathSort)
+                    Select Case PlaylistPathSort
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
-                            PlaylistFilenameSort = SortOrder.Descending
-                            LVPlaylist.Columns(1).Text = "Path ↓"
+                            PlaylistPathSort = SortOrder.Descending
+                            LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ↓"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
-                            PlaylistFilenameSort = SortOrder.Ascending
-                            LVPlaylist.Columns(1).Text = "Path ↑"
+                            PlaylistPathSort = SortOrder.Ascending
+                            LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ↑"
                     End Select
-                    PlaylistTitleSort = SortOrder.None
-                    LVPlaylist.Columns(0).Text = "Title"
+                Case LVPlaylist.Columns("PlayCount").Index
+                    PlaylistPlayCountSort = ClearPlaylistSorts(PlaylistPlayCountSort)
+                    Select Case PlaylistPlayCountSort
+                        Case SortOrder.Ascending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemNumberComparer(e.Column, SortOrder.Descending)
+                            PlaylistPlayCountSort = SortOrder.Descending
+                            LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays ↓"
+                        Case SortOrder.None, SortOrder.Descending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemNumberComparer(e.Column, SortOrder.Ascending)
+                            PlaylistPlayCountSort = SortOrder.Ascending
+                            LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays ↑"
+                    End Select
+                Case LVPlaylist.Columns("LastPlayed").Index
+                    PlaylistLastPlayedSort = ClearPlaylistSorts(PlaylistLastPlayedSort)
+                    Select Case PlaylistLastPlayedSort
+                        Case SortOrder.Ascending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Descending)
+                            PlaylistLastPlayedSort = SortOrder.Descending
+                            LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played ↓"
+                        Case SortOrder.None, SortOrder.Descending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
+                            PlaylistLastPlayedSort = SortOrder.Ascending
+                            LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played ↑"
+                    End Select
+                Case LVPlaylist.Columns("FirstPlayed").Index
+                    PlaylistFirstPlayedSort = ClearPlaylistSorts(PlaylistFirstPlayedSort)
+                    Select Case PlaylistFirstPlayedSort
+                        Case SortOrder.Ascending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Descending)
+                            PlaylistFirstPlayedSort = SortOrder.Descending
+                            LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played ↓"
+                        Case SortOrder.None, SortOrder.Descending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
+                            PlaylistFirstPlayedSort = SortOrder.Ascending
+                            LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played ↑"
+                    End Select
+                Case LVPlaylist.Columns("Added").Index
+                    PlaylistAddedSort = ClearPlaylistSorts(PlaylistAddedSort)
+                    Select Case PlaylistAddedSort
+                        Case SortOrder.Ascending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Descending)
+                            PlaylistAddedSort = SortOrder.Descending
+                            LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ↓"
+                        Case SortOrder.None, SortOrder.Descending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
+                            PlaylistAddedSort = SortOrder.Ascending
+                            LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ↑"
+                    End Select
             End Select
         End If
     End Sub
@@ -661,9 +715,9 @@ Public Class Player
     Private Sub MIAbout_DropDownClosed(sender As Object, e As EventArgs) Handles MIAbout.DropDownClosed
         If Not MIAbout.Selected Then MIAbout.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
-    Private Sub CMPlaylistOpening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylist.Opening
+    Private Sub CMPlaylist_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylist.Opening
         TipPlayer.Hide(Me)
-        TipPlayer.Show(App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text).ToString, Me, LVPlaylist.Location + LVPlaylist.PointToClient(Cursor.Position), 5000)
+        If LVPlaylist.SelectedItems.Count > 0 Then TipPlayer.Show(App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text).ToString, Me, Me.PointToClient(CMPlaylist.Location), 5000)
         CMIHelperApp1.Text = "Open with " + App.HelperApp1Name
         CMIHelperApp2.Text = "Open with " + App.HelperApp2Name
         If LVPlaylist.Items.Count = 0 Then
@@ -673,19 +727,31 @@ Public Class Player
         End If
         If LVPlaylist.SelectedItems.Count = 0 Then
             CMIPlaylistRemove.Enabled = False
+            CMIShowCurrent.Enabled = False
+            CMIViewInLibrary.Enabled = False
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
             CMICopyTitle.ToolTipText = String.Empty
             CMICopyFileName.ToolTipText = String.Empty
             CMICopyFilePath.ToolTipText = String.Empty
+            CMICopyTitle.Enabled = False
+            CMICopyFileName.Enabled = False
+            CMICopyFilePath.Enabled = False
             CMIHelperApp1.Visible = False
             CMIHelperApp2.Visible = False
+            CMIOpenLocation.Visible = False
+            TSSeparatorExternalTools.Visible = False
         Else
             CMIPlaylistRemove.Enabled = True
+            CMIShowCurrent.Enabled = True
+            CMIViewInLibrary.Enabled = True
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
             CMIPlaylistRemove.Text += " (" + LVPlaylist.SelectedItems.Count.ToString + ")"
             CMICopyTitle.ToolTipText = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text
             CMICopyFileName.ToolTipText = IO.Path.GetFileNameWithoutExtension(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
             CMICopyFilePath.ToolTipText = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text
+            CMICopyTitle.Enabled = True
+            CMICopyFileName.Enabled = True
+            CMICopyFilePath.Enabled = True
             If IO.File.Exists(App.HelperApp1Path) Then
                 CMIHelperApp1.Visible = True
             Else
@@ -696,10 +762,13 @@ Public Class Player
             Else
                 CMIHelperApp2.Visible = False
             End If
+            CMIOpenLocation.Visible = True
+            TSSeparatorExternalTools.Visible = True
         End If
         If LVPlaylist.SelectedItems.Count > 0 Then
             CMIPlay.Enabled = True
             CMIQueue.Enabled = True
+            CMIPlayWithWindows.Enabled = True
             Select Case App.PlaylistDefaultAction
                 Case App.PlaylistActions.Play
                     CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Bold)
@@ -713,9 +782,10 @@ Public Class Player
             CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Regular)
             CMIPlay.Enabled = False
             CMIQueue.Enabled = False
+            CMIPlayWithWindows.Enabled = False
         End If
     End Sub
-    Private Sub CMIPlayClick(sender As Object, e As EventArgs) Handles CMIPlay.Click
+    Private Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
         PlayFromPlaylist()
     End Sub
     Private Sub CMIQueue_Click(sender As Object, e As EventArgs) Handles CMIQueue.Click
@@ -2004,6 +2074,10 @@ Public Class Player
             End If
         Next
     End Function
+    Private Function ClearPlaylistSorts(currentsort As SortOrder) As SortOrder
+        ClearPlaylistTitles()
+        Return currentsort
+    End Function
     Private Sub SavePlaylist()
         If LVPlaylist.Items.Count = 0 Then
             If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then My.Computer.FileSystem.DeleteFile(App.PlaylistPath)
@@ -2578,9 +2652,19 @@ Public Class Player
     End Sub
     Private Sub ClearPlaylistTitles()
         PlaylistTitleSort = SortOrder.None
-        PlaylistFilenameSort = SortOrder.None
-        LVPlaylist.Columns(0).Text = "Title"
-        LVPlaylist.Columns(1).Text = "Path"
+        PlaylistPathSort = SortOrder.None
+        PlaylistRatingSort = SortOrder.None
+        PlaylistPlayCountSort = SortOrder.None
+        PlaylistLastPlayedSort = SortOrder.None
+        PlaylistFirstPlayedSort = SortOrder.None
+        PlaylistAddedSort = SortOrder.None
+        LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title"
+        LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path"
+        LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating"
+        LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays"
+        LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played"
+        LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played"
+        LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added"
     End Sub
     Private Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()

@@ -1009,14 +1009,69 @@ Namespace My
             col = column
             sort = sortorder
         End Sub
-        Public Function Compare(x As Object,
-                 y As Object) As Integer Implements System.Collections.IComparer.Compare
-            Dim returnVal As Integer = -1
+        Public Function Compare(x As Object, y As Object) As Integer Implements System.Collections.IComparer.Compare
+            Dim returnVal As Integer
             returnVal = String.Compare(CType(x, ListViewItem).SubItems(col).Text, CType(y, ListViewItem).SubItems(col).Text)
-            If sort = SortOrder.Descending Then
-                returnVal *= -1
-            End If
+            If sort = SortOrder.Descending Then returnVal *= -1
             Return returnVal
+        End Function
+    End Class
+    Friend Class ListViewItemNumberComparer
+        Implements IComparer
+        Private col As Integer
+        Private sort As SortOrder
+        Public Sub New(column As Integer, sortorder As SortOrder)
+            col = column
+            sort = sortorder
+        End Sub
+        Public Function Compare(x As Object, y As Object) As Integer Implements System.Collections.IComparer.Compare
+            Dim returnval As Integer
+            Dim valx As Integer
+            Dim valy As Integer
+            If Integer.TryParse(CType(x, ListViewItem).SubItems(col).Text, valx) AndAlso Integer.TryParse(CType(y, ListViewItem).SubItems(col).Text, valy) Then
+                returnval = valx.CompareTo(valy)
+                If sort = SortOrder.Descending Then
+                    Return -returnval
+                Else
+                    Return returnval
+                End If
+            Else
+                returnval = String.Compare(CType(x, ListViewItem).SubItems(col).Text, CType(y, ListViewItem).SubItems(col).Text)
+                If sort = SortOrder.Descending Then
+                    Return -returnval
+                Else
+                    Return returnval
+                End If
+            End If
+        End Function
+    End Class
+    Friend Class ListViewItemDateComparer
+        Implements IComparer
+        Private col As Integer
+        Private sort As SortOrder
+        Public Sub New(column As Integer, sortorder As SortOrder)
+            col = column
+            sort = sortorder
+        End Sub
+        Public Function Compare(x As Object, y As Object) As Integer Implements System.Collections.IComparer.Compare
+            Dim returnval As Integer
+            Dim datex As DateTime
+            Dim datey As DateTime
+            If DateTime.TryParse(CType(x, ListViewItem).SubItems(col).Text, datex) AndAlso DateTime.TryParse(CType(y, ListViewItem).SubItems(col).Text, datey) Then
+                returnval = datex.CompareTo(datey)
+                If sort = SortOrder.Descending Then
+                    Return -returnval
+                Else
+                    Return returnval
+                End If
+            Else
+                returnval = String.Compare(CType(x, ListViewItem).SubItems(col).Text, CType(y, ListViewItem).SubItems(col).Text)
+                If sort = SortOrder.Descending Then
+                    Return -returnval
+                Else
+                    Return returnval
+                End If
+            End If
         End Function
     End Class
     Public Class MessageFilterPlayerIgnoreFullscreenMouseClick
