@@ -61,7 +61,7 @@ Partial Class AddStream
         ' LblStreamTitle
         ' 
         LblStreamTitle.AutoSize = True
-        LblStreamTitle.Location = New Point(12, 9)
+        LblStreamTitle.Location = New Point(12, 8)
         LblStreamTitle.Name = "LblStreamTitle"
         LblStreamTitle.Size = New Size(70, 15)
         LblStreamTitle.TabIndex = 9
@@ -81,11 +81,11 @@ Partial Class AddStream
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(487, 192)
-        Controls.Add(LblStreamPath)
-        Controls.Add(LblStreamTitle)
         Controls.Add(TxtBoxStreamPath)
         Controls.Add(TxtBoxStreamTitle)
         Controls.Add(BtnOK)
+        Controls.Add(LblStreamPath)
+        Controls.Add(LblStreamTitle)
         FormBorderStyle = FormBorderStyle.FixedDialog
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         MaximizeBox = False

@@ -624,10 +624,15 @@ Public Class Player
     End Sub
     Private Sub MIOpenURL_Click(sender As Object, e As EventArgs) Handles MIOpenURL.Click
         Dim frmAddStream As New AddStream
-        If Clipboard.ContainsText Then frmAddStream.NewStream.Path = Clipboard.GetText
+        Dim uriresult As Uri = Nothing
+        If Clipboard.ContainsText Then
+            frmAddStream.NewStream.Path = Clipboard.GetText
+            If Not Uri.TryCreate(frmAddStream.NewStream.Path, UriKind.Absolute, uriresult) Then
+                frmAddStream.NewStream.Path = String.Empty
+            End If
+        End If
         frmAddStream.ShowDialog(Me)
         If frmAddStream.DialogResult = DialogResult.OK Then
-            Dim uriresult As Uri = Nothing
             If Uri.TryCreate(frmAddStream.NewStream.Path, UriKind.Absolute, uriresult) Then
                 'Add to History
                 App.AddToHistoryFromPlaylist(frmAddStream.NewStream.Path, True)
