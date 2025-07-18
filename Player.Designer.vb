@@ -120,79 +120,81 @@ Partial Class Player
         ' 
         CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMPlaylist.Name = "CMPlaylist"
-        CMPlaylist.Size = New Size(177, 358)
+        CMPlaylist.Size = New Size(181, 380)
         ' 
         ' CMIPlay
         ' 
         CMIPlay.Font = New Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMIPlay.Image = My.Resources.Resources.ImagePlay
         CMIPlay.Name = "CMIPlay"
-        CMIPlay.Size = New Size(176, 22)
+        CMIPlay.Size = New Size(180, 22)
         CMIPlay.Text = "Play"
         ' 
         ' CMIQueue
         ' 
         CMIQueue.Image = My.Resources.Resources.ImagePlay
         CMIQueue.Name = "CMIQueue"
-        CMIQueue.Size = New Size(176, 22)
+        CMIQueue.Size = New Size(180, 22)
         CMIQueue.Text = "Queue"
         ' 
         ' CMIPlayWithWindows
         ' 
         CMIPlayWithWindows.Image = My.Resources.Resources.ImageWindows16
         CMIPlayWithWindows.Name = "CMIPlayWithWindows"
-        CMIPlayWithWindows.Size = New Size(176, 22)
+        CMIPlayWithWindows.Size = New Size(180, 22)
         CMIPlayWithWindows.Text = "Play In Windows"
         ' 
         ' ToolStripSeparator3
         ' 
         ToolStripSeparator3.Name = "ToolStripSeparator3"
-        ToolStripSeparator3.Size = New Size(173, 6)
+        ToolStripSeparator3.Size = New Size(177, 6)
         ' 
         ' CMIPlaylistAdd
         ' 
         CMIPlaylistAdd.Image = My.Resources.Resources.ImageAdd16
         CMIPlaylistAdd.Name = "CMIPlaylistAdd"
-        CMIPlaylistAdd.Size = New Size(176, 22)
+        CMIPlaylistAdd.Size = New Size(180, 22)
         CMIPlaylistAdd.Text = "Add"
         ' 
         ' CMIPlaylistRemove
         ' 
         CMIPlaylistRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMIPlaylistRemove.Name = "CMIPlaylistRemove"
-        CMIPlaylistRemove.Size = New Size(176, 22)
+        CMIPlaylistRemove.Size = New Size(180, 22)
         CMIPlaylistRemove.Text = "Remove"
         ' 
         ' CMIClearPlaylist
         ' 
         CMIClearPlaylist.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMIClearPlaylist.Name = "CMIClearPlaylist"
-        CMIClearPlaylist.Size = New Size(176, 22)
+        CMIClearPlaylist.Size = New Size(180, 22)
         CMIClearPlaylist.Text = "Clear Playlist"
         ' 
         ' ToolStripSeparator1
         ' 
         ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New Size(173, 6)
+        ToolStripSeparator1.Size = New Size(177, 6)
         ' 
         ' CMIShowCurrent
         ' 
         CMIShowCurrent.Image = My.Resources.Resources.ImageAcceptOKGoStart
         CMIShowCurrent.Name = "CMIShowCurrent"
-        CMIShowCurrent.Size = New Size(176, 22)
+        CMIShowCurrent.Size = New Size(180, 22)
         CMIShowCurrent.Text = "Show Current Song"
         ' 
         ' CMIRating
         ' 
         CMIRating.DropDown = CMRatings
+        CMIRating.Image = My.Resources.Resources.ImageRating16
         CMIRating.Name = "CMIRating"
-        CMIRating.Size = New Size(176, 22)
+        CMIRating.Size = New Size(180, 22)
         CMIRating.Text = "Rating"
         ' 
         ' CMRatings
         ' 
         CMRatings.Items.AddRange(New ToolStripItem() {CMIRating5Stars, CMIRating4Stars, CMIRating3Stars, CMIRating2Stars, CMIRating1Star})
         CMRatings.Name = "CMRatings"
+        CMRatings.OwnerItem = CMIRating
         CMRatings.ShowImageMargin = False
         CMRatings.Size = New Size(156, 136)
         ' 
@@ -230,57 +232,57 @@ Partial Class Player
         ' 
         CMIViewInLibrary.Image = My.Resources.Resources.ImageLibrary16
         CMIViewInLibrary.Name = "CMIViewInLibrary"
-        CMIViewInLibrary.Size = New Size(176, 22)
+        CMIViewInLibrary.Size = New Size(180, 22)
         CMIViewInLibrary.Text = "View In Library"
         ' 
         ' ToolStripSeparator6
         ' 
         ToolStripSeparator6.Name = "ToolStripSeparator6"
-        ToolStripSeparator6.Size = New Size(173, 6)
+        ToolStripSeparator6.Size = New Size(177, 6)
         ' 
         ' CMIHelperApp1
         ' 
         CMIHelperApp1.Image = My.Resources.Resources.ImageSkyeTag
         CMIHelperApp1.Name = "CMIHelperApp1"
-        CMIHelperApp1.Size = New Size(176, 22)
+        CMIHelperApp1.Size = New Size(180, 22)
         ' 
         ' CMIHelperApp2
         ' 
         CMIHelperApp2.Image = My.Resources.Resources.ImageMP3Tag16
         CMIHelperApp2.Name = "CMIHelperApp2"
-        CMIHelperApp2.Size = New Size(176, 22)
+        CMIHelperApp2.Size = New Size(180, 22)
         ' 
         ' CMIOpenLocation
         ' 
         CMIOpenLocation.Image = My.Resources.Resources.ImageOpen16
         CMIOpenLocation.Name = "CMIOpenLocation"
-        CMIOpenLocation.Size = New Size(176, 22)
+        CMIOpenLocation.Size = New Size(180, 22)
         CMIOpenLocation.Text = "Open File Location"
         ' 
         ' TSSeparatorExternalTools
         ' 
         TSSeparatorExternalTools.Name = "TSSeparatorExternalTools"
-        TSSeparatorExternalTools.Size = New Size(173, 6)
+        TSSeparatorExternalTools.Size = New Size(177, 6)
         ' 
         ' CMICopyTitle
         ' 
         CMICopyTitle.Image = My.Resources.Resources.ImageCopy16
         CMICopyTitle.Name = "CMICopyTitle"
-        CMICopyTitle.Size = New Size(176, 22)
+        CMICopyTitle.Size = New Size(180, 22)
         CMICopyTitle.Text = "Copy Title"
         ' 
         ' CMICopyFileName
         ' 
         CMICopyFileName.Image = My.Resources.Resources.ImageCopy16
         CMICopyFileName.Name = "CMICopyFileName"
-        CMICopyFileName.Size = New Size(176, 22)
+        CMICopyFileName.Size = New Size(180, 22)
         CMICopyFileName.Text = "Copy File Name"
         ' 
         ' CMICopyFilePath
         ' 
         CMICopyFilePath.Image = My.Resources.Resources.ImageCopy16
         CMICopyFilePath.Name = "CMICopyFilePath"
-        CMICopyFilePath.Size = New Size(176, 22)
+        CMICopyFilePath.Size = New Size(180, 22)
         CMICopyFilePath.Text = "Copy File Path"
         ' 
         ' TimerPosition

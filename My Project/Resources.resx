@@ -330,8 +330,14 @@
   <data name="ImagePlayerAccentPlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImagePlayerAccentPlay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImagePlayerBlackFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePlayerBlackFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageDeleteLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageDeleteLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImagePrune32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImagePrune32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageSettings16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageSettings16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -339,13 +345,10 @@
   <data name="ImageLog16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageLog16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImagePlayerBlackFastForward" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePlayerBlackFastForward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ImageAttributionSyncFusion24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAttributionSyncFusionWhite24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImagePrune32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImagePrune32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImageRating16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageRating16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
