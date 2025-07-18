@@ -78,6 +78,7 @@ Namespace My
             Public Overrides Function ToString() As String
                 Dim s As String = String.Empty
                 If IsStream Then s += "Stream, "
+                If Rating > 0 Then s += New String("★"c, Rating) + ", "
                 s += PlayCount.ToString()
                 If PlayCount = 1 Then
                     s += " Play"
@@ -85,12 +86,12 @@ Namespace My
                     s += " Plays"
                 End If
                 If Not LastPlayed = Nothing Then s += ", Last Played on " + LastPlayed.ToString()
-                If Rating > 0 Then s += ", " + New String("★"c, Rating)
                 Return s
             End Function
             Public Function ToStringFull()
                 Dim s As String = String.Empty
                 If IsStream Then s += "Stream, "
+                If Rating > 0 Then s += New String("★"c, Rating) + ", "
                 s += PlayCount.ToString()
                 If PlayCount = 1 Then
                     s += " Play"
@@ -100,7 +101,6 @@ Namespace My
                 If Not Added = Nothing Then s += ", Added " + Added.ToString()
                 If Not FirstPlayed = Nothing Then s += ", First Played " + FirstPlayed.ToString()
                 If Not LastPlayed = Nothing Then s += ", Last Played " + LastPlayed.ToString()
-                If Rating > 0 Then s += ", " + New String("★"c, Rating)
                 Return s
             End Function
 
@@ -156,9 +156,10 @@ Namespace My
         Private HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
         Private HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
-        Private WithEvents ScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
-        Private WithEvents HistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
-        Private WithEvents HistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
+        Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
+        Private WithEvents timerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
+        Private WithEvents timerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
+        Private WithEvents timerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
         Friend ReadOnly TrimEndSearch() As Char = {" ", "(", ")", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
@@ -292,14 +293,17 @@ Namespace My
         Friend HelperApp2Path As String = "C:\Program Files\Mp3tag\Mp3tag.exe"
 
         'Handlers
-        Private Sub HistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles HistoryUpdate.Tick
-            HistoryUpdate.Stop()
+        Private Sub timerHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryUpdate.Tick
+            timerHistoryUpdate.Stop()
             UpdateHistory()
         End Sub
-        Private Sub HistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles HistoryAutoSave.Tick
-            SaveHistory()
+        Private Sub timerHistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryAutoSave.Tick
+            If HistoryChanged Then
+                HistoryChanged = False
+                SaveHistory()
+            End If
         End Sub
-        Private Sub ScreenSaverWatcherTick(ByVal sender As Object, ByVal e As EventArgs) Handles ScreenSaverWatcher.Tick
+        Private Sub timerScreenSaverWatcher_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerScreenSaverWatcher.Tick
             Static ssStatus As Boolean
             WinAPI.SystemParametersInfo(WinAPI.SPI_GETSCREENSAVERRUNNING, 0, ssStatus, 0)
             Select Case ssStatus
@@ -465,6 +469,7 @@ Namespace My
                     .LastPlayed = Nothing,
                     .Rating = 0}
                 History.Add(newsong)
+                HistoryChanged = True
                 Debug.Print("Added " + songorstream + " to history")
             End If
         End Sub
@@ -493,21 +498,22 @@ Namespace My
                 History.Add(newsong)
                 'Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
             End If
+            HistoryChanged = True
         End Sub
         Friend Sub UpdateHistory(songorstream As String)
-            HistoryUpdate.Stop()
+            timerHistoryUpdate.Stop()
             If HistoryUpdateInterval = 0 Then
-                HistoryUpdate.Tag = songorstream
+                timerHistoryUpdate.Tag = songorstream
                 UpdateHistory()
                 Return
             Else
-                HistoryUpdate.Interval = HistoryUpdateInterval * 1000
-                HistoryUpdate.Tag = songorstream
-                HistoryUpdate.Start()
+                timerHistoryUpdate.Interval = HistoryUpdateInterval * 1000
+                timerHistoryUpdate.Tag = songorstream
+                timerHistoryUpdate.Start()
             End If
         End Sub
         Private Sub UpdateHistory()
-            Dim songorstream As String = CStr(HistoryUpdate.Tag)
+            Dim songorstream As String = CStr(timerHistoryUpdate.Tag)
             Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
             If existingindex >= 0 Then
                 Dim existingsong As Song = History(existingindex)
@@ -515,6 +521,7 @@ Namespace My
                 If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
                 existingsong.LastPlayed = DateTime.Now
                 History(existingindex) = existingsong
+                HistoryChanged = True
                 Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
                 WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
                 Player.UpdateHistoryInPlaylist(songorstream)
@@ -522,9 +529,15 @@ Namespace My
                 Debug.Print("Song not found in history: " + songorstream)
             End If
         End Sub
+        Friend Sub SetHistoryAutoSaveTimer()
+            timerHistoryAutoSave.Stop()
+            timerHistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
+            timerHistoryAutoSave.Start()
+            Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
+        End Sub
         Friend Sub StopHistoryUpdate()
-            HistoryUpdate.Stop()
-            Debug.Print("History Update Stopped")
+            timerHistoryUpdate.Stop()
+            Debug.Print("History Update Timer Stopped")
         End Sub
         Friend Sub ClearHistoryInLibraryFlag()
             If History.Count > 0 Then
@@ -559,12 +572,6 @@ Namespace My
             Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
             Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
             WriteToLog("History Pruned (" + prunelist.Count.ToString + ")")
-        End Sub
-        Friend Sub SetHistoryAutoSaveTimer()
-            HistoryAutoSave.Stop()
-            HistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
-            HistoryAutoSave.Start()
-            Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
         End Sub
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
@@ -650,8 +657,8 @@ Namespace My
             GenerateHotKeyList()
             RegisterHotKeys()
             SetHistoryAutoSaveTimer()
-            ScreenSaverWatcher.Interval = 1000
-            ScreenSaverWatcher.Start()
+            timerScreenSaverWatcher.Interval = 1000
+            timerScreenSaverWatcher.Start()
             AddHandler Microsoft.Win32.SystemEvents.SessionSwitch, AddressOf SessionSwitchHandler 'SessionSwitchHandler is a handler for session switch events, sets the ScreenLocked flag, and acts accordingly.
         End Sub
         Friend Sub Finalize()

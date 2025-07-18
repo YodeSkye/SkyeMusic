@@ -1,6 +1,7 @@
 ﻿
 Imports System.Drawing.Drawing2D
 Imports System.IO
+Imports System.Reflection.Metadata.Ecma335
 Imports System.Security.Policy
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports AxWMPLib
@@ -22,7 +23,7 @@ Public Class Player
     Private cLeftMeter, cRightMeter, visR, visB As Byte 'Meter Values and Visualizer Colors
     Private visV As Single 'Visualizer Volume
     Private PlayState As Boolean = False 'True if a song is currently playing
-    Private IsStream As Boolean = False 'True if the current playing item is a URL
+    Private IsStream As Boolean = False 'True if the current playing item is a stream
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
@@ -103,7 +104,7 @@ Public Class Player
         header = New ColumnHeader()
         header.Name = "Rating"
         header.Text = "Rating"
-        header.Width = 60
+        header.Width = 70
         header.TextAlign = HorizontalAlignment.Center
         LVPlaylist.Columns.Add(header)
         header = New ColumnHeader()
@@ -410,6 +411,18 @@ Public Class Player
                             LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             PlaylistPathSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ↑"
+                    End Select
+                Case LVPlaylist.Columns("Rating").Index
+                    PlaylistRatingSort = ClearPlaylistSorts(PlaylistRatingSort)
+                    Select Case PlaylistRatingSort
+                        Case SortOrder.Ascending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            PlaylistRatingSort = SortOrder.Descending
+                            LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating ↓"
+                        Case SortOrder.None, SortOrder.Descending
+                            LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            PlaylistRatingSort = SortOrder.Ascending
+                            LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating ↑"
                     End Select
                 Case LVPlaylist.Columns("PlayCount").Index
                     PlaylistPlayCountSort = ClearPlaylistSorts(PlaylistPlayCountSort)
@@ -723,12 +736,14 @@ Public Class Player
         CMIHelperApp2.Text = "Open with " + App.HelperApp2Name
         If LVPlaylist.Items.Count = 0 Then
             CMIClearPlaylist.Enabled = False
+            CMIShowCurrent.Enabled = False
         Else
             CMIClearPlaylist.Enabled = True
+            CMIShowCurrent.Enabled = True
         End If
         If LVPlaylist.SelectedItems.Count = 0 Then
             CMIPlaylistRemove.Enabled = False
-            CMIShowCurrent.Enabled = False
+            CMIRating.Enabled = False
             CMIViewInLibrary.Enabled = False
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
             CMICopyTitle.ToolTipText = String.Empty
@@ -743,7 +758,7 @@ Public Class Player
             TSSeparatorExternalTools.Visible = False
         Else
             CMIPlaylistRemove.Enabled = True
-            CMIShowCurrent.Enabled = True
+            CMIRating.Enabled = True
             CMIViewInLibrary.Enabled = True
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
             CMIPlaylistRemove.Text += " (" + LVPlaylist.SelectedItems.Count.ToString + ")"
@@ -817,6 +832,56 @@ Public Class Player
         Finally
             item = Nothing
         End Try
+    End Sub
+    Private Sub CMIRating5Stars_Click(sender As Object, e As EventArgs) Handles CMIRating5Stars.Click
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            Dim hindex As Integer = App.History.FindIndex(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            Dim hsong As App.Song = App.History(hindex)
+            hsong.Rating = 5
+            App.History(hindex) = hsong
+            UpdateHistoryInPlaylist(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            hsong = Nothing
+        End If
+    End Sub
+    Private Sub CMIRating4Stars_Click(sender As Object, e As EventArgs) Handles CMIRating4Stars.Click
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            Dim hindex As Integer = App.History.FindIndex(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            Dim hsong As App.Song = App.History(hindex)
+            hsong.Rating = 4
+            App.History(hindex) = hsong
+            UpdateHistoryInPlaylist(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            hsong = Nothing
+        End If
+    End Sub
+    Private Sub CMIRating3Stars_Click(sender As Object, e As EventArgs) Handles CMIRating3Stars.Click
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            Dim hindex As Integer = App.History.FindIndex(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            Dim hsong As App.Song = App.History(hindex)
+            hsong.Rating = 3
+            App.History(hindex) = hsong
+            UpdateHistoryInPlaylist(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            hsong = Nothing
+        End If
+    End Sub
+    Private Sub CMIRating2Stars_Click(sender As Object, e As EventArgs) Handles CMIRating2Stars.Click
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            Dim hindex As Integer = App.History.FindIndex(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            Dim hsong As App.Song = App.History(hindex)
+            hsong.Rating = 2
+            App.History(hindex) = hsong
+            UpdateHistoryInPlaylist(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            hsong = Nothing
+        End If
+    End Sub
+    Private Sub CMIRating1Star_Click(sender As Object, e As EventArgs) Handles CMIRating1Star.Click
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            Dim hindex As Integer = App.History.FindIndex(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            Dim hsong As App.Song = App.History(hindex)
+            hsong.Rating = 1
+            App.History(hindex) = hsong
+            UpdateHistoryInPlaylist(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            hsong = Nothing
+        End If
     End Sub
     Private Sub CMIViewInLibraryClick(sender As Object, e As EventArgs) Handles CMIViewInLibrary.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.FRMLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
@@ -2699,11 +2764,11 @@ Public Class Player
             Debug.Print("Playlist Search Reset")
         End If
     End Sub
-    Private Sub CheckMove(ByRef location As Point)
-        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
-        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
-        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
-        If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
+    Private Sub CheckMove(ByRef location As POINT)
+        If location.x + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.x = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
+        If location.y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
+        If location.x < My.Computer.Screen.WorkingArea.Left Then location.x = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
+        If location.y < App.AdjustScreenBoundsNormalWindow Then location.y = My.Computer.Screen.WorkingArea.Top
     End Sub
     Private Sub ToggleMaximized()
         Select Case WindowState
