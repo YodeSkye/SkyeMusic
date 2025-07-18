@@ -1,7 +1,7 @@
 ﻿Public Class AddStream
 
     'Declarations
-    Friend Property NewStream As Player.PlaylistItemType
+    Friend NewStream As Player.PlaylistItemType
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -9,18 +9,8 @@
             If m.Msg = My.WinAPI.WM_SYSCOMMAND AndAlso CInt(m.WParam) = My.WinAPI.SC_CLOSE Then
                 DialogResult = DialogResult.Cancel
             End If
-            'Select Case m.Msg
-            '    Case My.WinAPI.WM_SYSCOMMAND
-            '        Select Case CInt(m.WParam)
-            '            Case My.WinAPI.SC_CLOSE
-            'DialogResult = DialogResult.Cancel
-            'Case Else
-            '    MyBase.WndProc(m)
-            'End Select
-            'Case Else
-            '    MyBase.WndProc(m)
-            'End Select
-        Catch ex As Exception : My.App.WriteToLog("MainForm WndProc Handler Error" + Chr(13) + ex.ToString)
+        Catch ex As Exception
+            My.App.WriteToLog("AddStream WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
@@ -31,6 +21,8 @@
 
     'Control Events
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
+        NewStream.Title = TxtBoxStreamTitle.Text
+        NewStream.Path = TxtBoxStreamPath.Text
         DialogResult = DialogResult.OK
         Me.Close()
     End Sub

@@ -553,25 +553,33 @@ Namespace My
             End If
         End Sub
         Friend Sub PruneHistory()
+
             'Find songs that are not in the library and don't exist
             Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
             Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
+
             'Find streams that are not in the playlist
             Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
             Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.IsStream)
             Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
             For Each s As Song In streamlist
-                If s.IsStream AndAlso Player.LVPlaylist.Items.Find(s.Path, True) Is Nothing Then
+                If s.IsStream AndAlso Player.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
                     Debug.Print(s.Path + " found in playlist")
                     prunelist.Remove(s)
                 End If
             Next
+
+            'Find files that don't exist anymore
+
+            'Prune History
             For Each s As Song In prunelist
                 History.Remove(s)
             Next
             Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
             Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
             WriteToLog("History Pruned (" + prunelist.Count.ToString + ")")
+            streamlist = Nothing
+            prunelist = Nothing
         End Sub
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")

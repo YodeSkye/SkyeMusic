@@ -24,57 +24,82 @@ Partial Class AddStream
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(AddStream))
         BtnOK = New Button()
-        TxtBoxStreamName = New TextBox()
+        TxtBoxStreamTitle = New TextBox()
         TxtBoxStreamPath = New TextBox()
+        LblStreamTitle = New Label()
+        LblStreamPath = New Label()
         SuspendLayout()
         ' 
         ' BtnOK
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
-        BtnOK.Location = New Point(211, 90)
+        BtnOK.Location = New Point(211, 116)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 8
         BtnOK.UseVisualStyleBackColor = True
         ' 
-        ' TxtBoxStreamName
+        ' TxtBoxStreamTitle
         ' 
-        TxtBoxStreamName.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        TxtBoxStreamName.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TxtBoxStreamName.Location = New Point(12, 12)
-        TxtBoxStreamName.Name = "TxtBoxStreamName"
-        TxtBoxStreamName.Size = New Size(463, 29)
-        TxtBoxStreamName.TabIndex = 4
+        TxtBoxStreamTitle.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        TxtBoxStreamTitle.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TxtBoxStreamTitle.Location = New Point(12, 22)
+        TxtBoxStreamTitle.Name = "TxtBoxStreamTitle"
+        TxtBoxStreamTitle.Size = New Size(463, 29)
+        TxtBoxStreamTitle.TabIndex = 4
         ' 
         ' TxtBoxStreamPath
         ' 
         TxtBoxStreamPath.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         TxtBoxStreamPath.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TxtBoxStreamPath.Location = New Point(12, 47)
+        TxtBoxStreamPath.Location = New Point(12, 72)
         TxtBoxStreamPath.Name = "TxtBoxStreamPath"
         TxtBoxStreamPath.Size = New Size(463, 29)
         TxtBoxStreamPath.TabIndex = 5
+        ' 
+        ' LblStreamTitle
+        ' 
+        LblStreamTitle.AutoSize = True
+        LblStreamTitle.Location = New Point(12, 9)
+        LblStreamTitle.Name = "LblStreamTitle"
+        LblStreamTitle.Size = New Size(70, 15)
+        LblStreamTitle.TabIndex = 9
+        LblStreamTitle.Text = "Stream Title"
+        ' 
+        ' LblStreamPath
+        ' 
+        LblStreamPath.AutoSize = True
+        LblStreamPath.Location = New Point(12, 58)
+        LblStreamPath.Name = "LblStreamPath"
+        LblStreamPath.Size = New Size(71, 15)
+        LblStreamPath.TabIndex = 10
+        LblStreamPath.Text = "Stream Path"
         ' 
         ' AddStream
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(487, 166)
+        ClientSize = New Size(487, 192)
+        Controls.Add(LblStreamPath)
+        Controls.Add(LblStreamTitle)
         Controls.Add(TxtBoxStreamPath)
-        Controls.Add(TxtBoxStreamName)
+        Controls.Add(TxtBoxStreamTitle)
         Controls.Add(BtnOK)
         FormBorderStyle = FormBorderStyle.FixedDialog
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         MaximizeBox = False
         MinimizeBox = False
         Name = "AddStream"
+        StartPosition = FormStartPosition.CenterParent
         Text = "Add Stream"
         ResumeLayout(False)
         PerformLayout()
     End Sub
 
     Friend WithEvents BtnOK As Button
-    Friend WithEvents TxtBoxStreamName As TextBox
+    Friend WithEvents TxtBoxStreamTitle As TextBox
     Friend WithEvents TxtBoxStreamPath As TextBox
+    Friend WithEvents LblStreamTitle As Label
+    Friend WithEvents LblStreamPath As Label
 End Class

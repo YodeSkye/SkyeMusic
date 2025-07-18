@@ -623,17 +623,27 @@ Public Class Player
         AddToPlaylistFromFile()
     End Sub
     Private Sub MIOpenURL_Click(sender As Object, e As EventArgs) Handles MIOpenURL.Click
-        If Clipboard.ContainsText Then
-            Dim url As String = Clipboard.GetText.Trim
+        Dim frmAddStream As New AddStream
+        If Clipboard.ContainsText Then frmAddStream.NewStream.Path = Clipboard.GetText
+        frmAddStream.ShowDialog(Me)
+        If frmAddStream.DialogResult = DialogResult.OK Then
             Dim uriresult As Uri = Nothing
-            If Uri.TryCreate(url, UriKind.Absolute, uriresult) Then
-                PlayStream(url)
-                App.AddToHistoryFromPlaylist(url, True)
+            If Uri.TryCreate(frmAddStream.NewStream.Path, UriKind.Absolute, uriresult) Then
+                'Add to History
+                App.AddToHistoryFromPlaylist(frmAddStream.NewStream.Path, True)
+                'Add to Playlist
+                AddToPlaylistFromLibrary(frmAddStream.NewStream.Title, frmAddStream.NewStream.Path)
+                LVPlaylist.SelectedIndices.Clear()
+                LVPlaylist.SelectedIndices.Add(LVPlaylist.FindItemWithText(frmAddStream.NewStream.Title).Index)
+                'Play Stream
+                PlayStream(frmAddStream.NewStream.Path)
+                Debug.Print("New Stream Added (" + frmAddStream.NewStream.Path + ")")
             Else
-                App.WriteToLog("Cannot Play Stream, Invalid URL in Clipboard")
+                Debug.Print("Invalid Stream")
+                WriteToLog("Invalid Stream, New Stream Not Added")
             End If
         Else
-            App.WriteToLog("Cannot Play Stream, Clipboard does not contain text")
+            Debug.Print("Add Stream Cancelled")
         End If
     End Sub
     Private Sub MIExit_Click(sender As Object, e As EventArgs) Handles MIExit.Click
@@ -936,12 +946,7 @@ Public Class Player
         pString_format.Alignment = StringAlignment.Center
         pString_format.LineAlignment = StringAlignment.Center
         Try
-            'Debug.Print(AxPlayer.URL)
-            If IsStream Then
-                pText = AxPlayer.URL
-            Else
-                pText = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0).Text
-            End If
+            pText = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0).Text
         Catch
             pText = String.Empty
         End Try
