@@ -583,6 +583,7 @@ Namespace My
         End Sub
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu proper case function.
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzkzMzQwMUAzMzMwMmUzMDJlMzAzYjMzMzAzYmorMHVJSHVxLy9PM25TUGYrMURsLzhuY3BCK0k0QjZ4L3hJOTcvQ1dQcjQ9")
             GetOptions()
             CurrentTheme = GetCurrentThemeProperties()

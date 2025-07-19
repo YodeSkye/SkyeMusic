@@ -28,6 +28,7 @@ Partial Class AddStream
         TxtBoxStreamPath = New TextBox()
         LblStreamTitle = New Label()
         LblStreamPath = New Label()
+        CMAddStream = New Components.TextBoxContextMenu()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -46,6 +47,7 @@ Partial Class AddStream
         TxtBoxStreamTitle.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxStreamTitle.Location = New Point(12, 22)
         TxtBoxStreamTitle.Name = "TxtBoxStreamTitle"
+        TxtBoxStreamTitle.ShortcutsEnabled = False
         TxtBoxStreamTitle.Size = New Size(463, 29)
         TxtBoxStreamTitle.TabIndex = 4
         ' 
@@ -55,6 +57,7 @@ Partial Class AddStream
         TxtBoxStreamPath.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxStreamPath.Location = New Point(12, 72)
         TxtBoxStreamPath.Name = "TxtBoxStreamPath"
+        TxtBoxStreamPath.ShortcutsEnabled = False
         TxtBoxStreamPath.Size = New Size(463, 29)
         TxtBoxStreamPath.TabIndex = 5
         ' 
@@ -75,6 +78,12 @@ Partial Class AddStream
         LblStreamPath.Size = New Size(71, 15)
         LblStreamPath.TabIndex = 10
         LblStreamPath.Text = "Stream Path"
+        ' 
+        ' CMAddStream
+        ' 
+        CMAddStream.Name = "CMAddStream"
+        CMAddStream.ShowExtendedTools = True
+        CMAddStream.Size = New Size(181, 198)
         ' 
         ' AddStream
         ' 
@@ -102,4 +111,5 @@ Partial Class AddStream
     Friend WithEvents TxtBoxStreamPath As TextBox
     Friend WithEvents LblStreamTitle As Label
     Friend WithEvents LblStreamPath As Label
+    Friend WithEvents CMAddStream As Components.TextBoxContextMenu
 End Class

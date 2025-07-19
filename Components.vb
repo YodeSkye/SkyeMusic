@@ -1,5 +1,7 @@
 ﻿
 Imports System.Runtime.InteropServices
+Imports System.Text
+Imports Syncfusion.Windows.Forms.Tools
 
 Namespace My.Components
 
@@ -288,7 +290,7 @@ Namespace My.Components
 		Inherits ListView
 
 		Private _LineBefore As Integer = -1
-        Private _LineAfter As Integer = -1
+		Private _LineAfter As Integer = -1
 		Private _InsertionLineColor As Color = Color.Teal
 
 		Public Property LineBefore As Integer
@@ -339,7 +341,7 @@ Namespace My.Components
 				p.Width = 3
 				g.DrawLine(p, X1, Y, X2 - 1, Y)
 				Dim leftTriangle As Point() = New Point(2) {New Point(X1, Y - 4), New Point(X1 + 7, Y), New Point(X1, Y + 4)}
-                Dim rightTriangle As Point() = New Point(2) {New Point(X2, Y - 4), New Point(X2 - 8, Y), New Point(X2, Y + 4)}
+				Dim rightTriangle As Point() = New Point(2) {New Point(X2, Y - 4), New Point(X2 - 8, Y), New Point(X2, Y + 4)}
 				Dim b As New SolidBrush(_InsertionLineColor)
 				g.FillPolygon(b, leftTriangle)
 				g.FillPolygon(b, rightTriangle)
@@ -383,8 +385,11 @@ Namespace My.Components
 	''' </summary>
 	Friend Class TextBoxContextMenu
 		Inherits System.Windows.Forms.ContextMenuStrip
+
 		'Declarations
+		Public Property ShowExtendedTools As Boolean = False
 		Private txbx As TextBox
+
 		'Control Events
 		Public Sub New()
 			MyBase.New
@@ -395,13 +400,16 @@ Namespace My.Components
 			Me.Items.Add("Paste", Nothing, AddressOf PasteClick)
 			Me.Items.Add("Delete", Nothing, AddressOf DeleteClick)
 			Me.Items.Add("-")
+			Me.Items.Add("Proper Case", Nothing, AddressOf ProperCaseClick)
+			Me.Items.Add("-")
 			Me.Items.Add("Select All", Nothing, AddressOf SelectAllClick)
-			Me.Items(0).Image = My.Resources.ImageEditUndo16
-			Me.Items(2).Image = My.Resources.ImageEditCut16
-			Me.Items(3).Image = My.Resources.ImageEditCopy16
-			Me.Items(4).Image = My.Resources.ImageEditPaste16
-			Me.Items(5).Image = My.Resources.ImageEditDelete16
-			Me.Items(7).Image = My.Resources.ImageEditSelectAll16
+			Me.Items(0).Image = Resources.ImageEditUndo16
+			Me.Items(2).Image = Resources.ImageEditCut16
+			Me.Items(3).Image = Resources.ImageEditCopy16
+			Me.Items(4).Image = Resources.ImageEditPaste16
+			Me.Items(5).Image = Resources.ImageEditDelete16
+			Me.Items(7).Image = Resources.ImageEditSelectAll16
+			Me.Items(9).Image = Resources.ImageEditSelectAll16
 		End Sub
 		Friend Sub Display(ByRef sender As TextBox, ByVal e As MouseEventArgs)
 			If e.Button = MouseButtons.Right Then
@@ -411,7 +419,15 @@ Namespace My.Components
 				Me.Items(3).Enabled = txbx.SelectedText.Length > 0
 				Me.Items(4).Enabled = Clipboard.ContainsText And Not txbx.ReadOnly
 				Me.Items(5).Enabled = txbx.SelectedText.Length > 0 And Not txbx.ReadOnly
-				Me.Items(7).Enabled = txbx.Text.Length > 0 And txbx.SelectedText.Length < txbx.Text.Length
+				Me.Items(7).Enabled = txbx.Text.Length > 0
+				If ShowExtendedTools Then
+					Me.Items(6).Visible = True
+					Me.Items(7).Visible = True
+				Else
+					Me.Items(6).Visible = False
+					Me.Items(7).Visible = False
+				End If
+				Me.Items(9).Enabled = txbx.Text.Length > 0 And txbx.SelectedText.Length < txbx.Text.Length
 				If txbx.SelectedText.Length > 0 Then txbx.Focus()
 				MyBase.Show(txbx, e.Location)
 			End If
@@ -450,10 +466,15 @@ Namespace My.Components
 			Delete()
 			txbx = Nothing
 		End Sub
+		Private Sub ProperCaseClick(ByVal sender As Object, ByVal e As EventArgs)
+			ProperCase()
+			txbx = Nothing
+		End Sub
 		Private Sub SelectAllClick(ByVal sender As Object, ByVal e As EventArgs)
 			SelectAll()
 			txbx = Nothing
 		End Sub
+
 		'Procedures
 		Private Sub Undo()
 			txbx.Undo()
@@ -478,6 +499,11 @@ Namespace My.Components
 				txbx.SelectionLength = 0
 				pos = Nothing
 			End If
+			If txbx.FindForm IsNot Nothing Then txbx.FindForm.Validate()
+		End Sub
+		Private Sub ProperCase()
+			txbx.Focus()
+			txbx.Text = StrConv(txbx.Text, VbStrConv.ProperCase)
 			If txbx.FindForm IsNot Nothing Then txbx.FindForm.Validate()
 		End Sub
 		Private Sub SelectAll()
