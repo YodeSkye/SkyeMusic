@@ -381,7 +381,6 @@ Namespace My
 
         End Function
         Friend Function GetCurrentThemeProperties() As ThemeProperties
-            Debug.Print(Color.IndianRed.R.ToString + ", " + Color.IndianRed.G.ToString + ", " + Color.IndianRed.B.ToString)
             Select Case Theme
                 Case Themes.Accent
                     Return AccentTheme
