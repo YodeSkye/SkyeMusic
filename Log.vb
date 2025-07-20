@@ -91,7 +91,7 @@ Public Class Log
         RTBCMLog.Display(sender, e)
     End Sub
     Private Sub LBLLogInfo_DoubleClick(sender As Object, e As EventArgs) Handles LBLLogInfo.DoubleClick
-        ToggleMaximized()
+        App.OpenFileLocation(App.LogPath)
     End Sub
     Private Sub BTNOK_Click(sender As Object, e As EventArgs) Handles BTNOK.Click
         Close()
