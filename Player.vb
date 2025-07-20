@@ -11,6 +11,7 @@ Imports SkyeMusic.My.Components
 Imports Syncfusion.Windows.Forms.Grid
 Imports Syncfusion.Windows.Forms.Tools.Win32API
 Imports TagLib.Ape
+Imports TagLib.IFD.Entries
 Public Class Player
 
     'Declarations
@@ -23,7 +24,7 @@ Public Class Player
     Private cLeftMeter, cRightMeter, visR, visB As Byte 'Meter Values and Visualizer Colors
     Private visV As Single 'Visualizer Volume
     Private PlayState As Boolean = False 'True if a song is currently playing
-    Private IsStream As Boolean = False 'True if the current playing item is a stream
+    Private Stream As Boolean = False 'True if the current playing item is a stream
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
@@ -623,7 +624,7 @@ Public Class Player
         AddToPlaylistFromFile()
     End Sub
     Private Sub MIOpenURL_Click(sender As Object, e As EventArgs) Handles MIOpenURL.Click
-        Dim frmAddStream As New AddStream
+        Dim frmAddStream As New PlayerAddStream
         Dim uriresult As Uri = Nothing
         If Clipboard.ContainsText Then
             frmAddStream.NewStream.Path = Clipboard.GetText
@@ -1060,13 +1061,13 @@ Public Class Player
         LVPlaylist.Focus()
     End Sub
     Private Sub BtnReverseMouseDown(sender As Object, e As MouseEventArgs) Handles BtnReverse.MouseDown, BtnReverse.MouseDown
-        If Not IsStream Then
+        If Not Stream Then
             UpdatePosition(False, 10)
             LVPlaylist.Focus()
         End If
     End Sub
     Private Sub BtnForwardMouseDown(sender As Object, e As MouseEventArgs) Handles BtnForward.MouseDown
-        If Not IsStream Then
+        If Not Stream Then
             UpdatePosition(True, 10)
             LVPlaylist.Focus()
         End If
@@ -1130,10 +1131,10 @@ Public Class Player
                 UpdateHistory(AxPlayer.URL)
                 BtnPlay.Image = App.CurrentTheme.PlayerPause
                 TrackBarPosition.Maximum = AxPlayer.currentMedia.duration * TrackBarScale
-                If Not TrackBarPosition.Enabled AndAlso Not IsStream Then TrackBarPosition.Enabled = True
+                If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
                 LblDuration.Text = FormatDuration(AxPlayer.currentMedia.duration)
                 Try
-                    If IsStream Then
+                    If Stream Then
                         Text = My.Application.Info.Title + " - " + AxPlayer.URL
                     Else
                         Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0).Text + " @ " + AxPlayer.URL
@@ -1164,11 +1165,11 @@ Public Class Player
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
         If AxPlayer.currentMedia IsNot Nothing AndAlso PlayState Then
             Try
-                If Not IsStream Then TrackBarPosition.Value = AxPlayer.Ctlcontrols.currentPosition * TrackBarScale
+                If Not Stream Then TrackBarPosition.Value = AxPlayer.Ctlcontrols.currentPosition * TrackBarScale
                 If My.App.PlayerPositionShowElapsed Then
                     LblPosition.Text = FormatPosition(AxPlayer.Ctlcontrols.currentPosition)
                 Else
-                    If IsStream Then
+                    If Stream Then
                         LblPosition.Text = "00:00"
                     Else
                         LblPosition.Text = FormatPosition(AxPlayer.currentMedia.duration - AxPlayer.Ctlcontrols.currentPosition)
@@ -1238,6 +1239,13 @@ Public Class Player
             End If
         End If
     End Sub
+    Private Function IsStream(path As String) As Boolean
+        If App.History.FindIndex(Function(p) p.Path = path And p.IsStream = True) >= 0 Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
     Private Function FormatDuration(duration As Double) As String
         Dim dur As TimeSpan = TimeSpan.FromSeconds(duration)
         Dim durstr As String = ""
@@ -2327,12 +2335,16 @@ Public Class Player
     End Sub
     Private Sub PlayFromPlaylist()
         If LVPlaylist.SelectedItems.Count > 0 Then
-            IsStream = False
             LyricsOff()
             StopPlay()
             If Mute Then ToggleMute()
-            App.WriteToLog("Playing " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayFromPlaylist)")
-            AxPlayer.URL = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text
+            If IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                PlayStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            Else
+                Stream = False
+                AxPlayer.URL = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text
+                App.WriteToLog("Playing " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayFromPlaylist)")
+            End If
             RandomHistoryAdd(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
         End If
     End Sub
@@ -2352,7 +2364,6 @@ Public Class Player
         End If
     End Sub
     Friend Sub PlayFromLibrary(title As String, filename As String)
-        IsStream = False
         LyricsOff()
         Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(filename, True, 0)
         If existingitem Is Nothing Then
@@ -2371,6 +2382,12 @@ Public Class Player
             SetPlaylistCountText()
             lvi = Nothing
         Else
+            If Not existingitem.SubItems(LVPlaylist.Columns("Title").Index).Text = title Then
+                Dim i As Integer = existingitem.Index
+                existingitem.SubItems(LVPlaylist.Columns("Title").Index).Text = title
+                LVPlaylist.Items.RemoveAt(i)
+                LVPlaylist.Items.Insert(i, existingitem)
+            End If
             LVPlaylist.EnsureVisible(existingitem.Index)
             LVPlaylist.SelectedIndices.Clear()
             LVPlaylist.SelectedIndices.Add(existingitem.Index)
@@ -2378,13 +2395,20 @@ Public Class Player
         End If
         StopPlay()
         If Mute Then ToggleMute()
-        App.WriteToLog("Playing " + filename + " (PlayFromLibrary)")
+        Stream = False
         AxPlayer.URL = filename
+        App.WriteToLog("Playing " + filename + " (PlayFromLibrary)")
         RandomHistoryAdd(filename)
     End Sub
     Private Sub PlayQueued()
         If Queue.Count > 0 Then
-            AxPlayer.URL = Queue(0)
+            If IsStream(Queue(0)) Then
+                PlayStream(Queue(0))
+            Else
+                Stream = False
+                AxPlayer.URL = Queue(0)
+                App.WriteToLog("Playing " + AxPlayer.URL + " (PlayQueued)")
+            End If
             Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
             If item IsNot Nothing Then
                 LVPlaylist.SelectedIndices.Clear()
@@ -2395,12 +2419,11 @@ Public Class Player
             Queue.RemoveAt(0)
             SetPlaylistCountText()
             TimerPlayNext.Start()
-            App.WriteToLog("Playing " + AxPlayer.URL + " (PlayQueued)")
         End If
     End Sub
     Friend Sub PlayPrevious()
         If RandomHistory.Count > 0 Then
-            IsStream = False
+            Stream = False
             LyricsOff()
             Select Case App.PlayMode
                 Case PlayModes.Repeat
@@ -2412,15 +2435,29 @@ Public Class Player
                         Dim item As ListViewItem = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
                         Dim newindex As Integer = LVPlaylist.Items.Count - 1
                         If item Is Nothing Then
+                            If IsStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                                PlayStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text)
+                            Else
+                                AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text
+                                App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
+                            End If
                             App.WriteToLog("Playing " + LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
-                            AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text
                         ElseIf item.Index = 0 Then
+                            If IsStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                                PlayStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text)
+                            Else
+                                AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text
+                                App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
+                            End If
                             App.WriteToLog("Playing " + LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
-                            AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text
                         Else
                             newindex = item.Index - 1
-                            App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
-                            AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                            If IsStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                                PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
+                            Else
+                                AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                                App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
+                            End If
                         End If
                         LVPlaylist.SelectedIndices.Clear()
                         LVPlaylist.SelectedIndices.Add(newindex)
@@ -2440,8 +2477,12 @@ Public Class Player
                             item = Nothing
                         End Try
                         If item IsNot Nothing Then
-                            App.WriteToLog("Playing " + item.SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousRandom)")
-                            AxPlayer.URL = item.SubItems(LVPlaylist.Columns("Path").Index).Text
+                            If IsStream(item.SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                                PlayStream(item.SubItems(LVPlaylist.Columns("Path").Index).Text)
+                            Else
+                                AxPlayer.URL = item.SubItems(LVPlaylist.Columns("Path").Index).Text
+                                App.WriteToLog("Playing " + item.SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousRandom)")
+                            End If
                             LVPlaylist.SelectedIndices.Clear()
                             LVPlaylist.SelectedIndices.Add(item.Index)
                             LVPlaylist.EnsureVisible(item.Index)
@@ -2453,7 +2494,7 @@ Public Class Player
         End If
     End Sub
     Friend Sub PlayNext()
-        IsStream = False
+        Stream = False
         LyricsOff()
         Select Case App.PlayMode
             Case PlayModes.Repeat
@@ -2473,16 +2514,25 @@ Public Class Player
                         End If
                         Dim newindex As Integer = 0
                         If item Is Nothing OrElse item.Index + 1 = LVPlaylist.Items.Count Then
-                            AxPlayer.URL = LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text
+                            If IsStream(LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                                PlayStream(LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+                            Else
+                                AxPlayer.URL = LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text
+                                App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextLinear)")
+                            End If
                         Else
                             newindex = item.Index + 1
-                            AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                            If IsStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                                PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
+                            Else
+                                AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                                App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextLinear)")
+                            End If
                         End If
                         LVPlaylist.SelectedIndices.Clear()
                         LVPlaylist.SelectedIndices.Add(newindex)
                         LVPlaylist.EnsureVisible(newindex)
                         item = Nothing
-                        App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextLinear)")
                         TimerPlayNext.Start()
                     End If
                 End If
@@ -2508,8 +2558,12 @@ Public Class Player
                                 Loop Until newindex <> item.Index And Not RandomHistory.Contains(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                             End If
                         End If
-                        App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextRandom)")
-                        AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                        If IsStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                            PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
+                        Else
+                            AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                            App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextRandom)")
+                        End If
                         RandomHistoryAdd(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         LVPlaylist.SelectedIndices.Clear()
                         LVPlaylist.SelectedIndices.Add(newindex)
@@ -2522,12 +2576,11 @@ Public Class Player
         End Select
     End Sub
     Private Sub PlayStream(url As String)
-        IsStream = True
+        Stream = True
         Try
             AxPlayer.URL = url
             TrackBarPosition.Enabled = False
             TrackBarPosition.Value = 0
-            ShowMedia()
             App.WriteToLog("Playing " + url + " (PlayStream)")
         Catch
             App.WriteToLog("Cannot Play Stream, Invalid URL")
@@ -2582,7 +2635,7 @@ Public Class Player
         Else
             Dim tlfile As TagLib.File
             Try
-                If IsStream Then
+                If Stream Then
                     tlfile = Nothing
                 Else
                     tlfile = TagLib.File.Create(AxPlayer.URL)
@@ -2591,7 +2644,7 @@ Public Class Player
                 WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + AxPlayer.URL + Chr(13) + ex.Message)
                 tlfile = Nothing
             End Try
-            If Lyrics AndAlso Not IsStream Then 'Show Lyrics
+            If Lyrics AndAlso Not Stream Then 'Show Lyrics
                 Debug.Print("Showing Lyrics...")
                 PicBoxAlbumArt.Visible = False
                 LblAlbumArtSelect.Visible = False
@@ -2655,7 +2708,7 @@ Public Class Player
                         AxPlayer.Visible = True
                     End If
                 End If
-                If Visualizer OrElse (Not AxPlayer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse IsStream Then 'Show Visualizer
+                If Visualizer OrElse (Not AxPlayer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse Stream Then 'Show Visualizer
                     Debug.Print("Showing Visualizer...")
                     AxPlayer.Visible = False
                     PicBoxAlbumArt.Visible = False

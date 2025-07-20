@@ -1,7 +1,7 @@
 ﻿
 Imports SkyeMusic.My
 
-Public Class AddStream
+Public Class PlayerAddStream
 
     'Declarations
     Private mMove As Boolean = False
