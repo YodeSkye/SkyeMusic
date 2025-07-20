@@ -553,12 +553,13 @@ Namespace My
         End Sub
         Friend Sub PruneHistory()
 
-            'Find songs that are not in the library and don't exist
             Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
+
+            'Find songs that are not in the library and don't exist
             Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
+            Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
 
             'Find streams that are not in the playlist
-            Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
             Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.IsStream)
             Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
             For Each s As Song In streamlist
@@ -567,8 +568,6 @@ Namespace My
                     prunelist.Remove(s)
                 End If
             Next
-
-            'Find files that don't exist anymore
 
             'Prune History
             For Each s As Song In prunelist

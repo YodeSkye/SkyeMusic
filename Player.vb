@@ -566,7 +566,9 @@ Public Class Player
                 Dim clientpoint = LVPlaylist.PointToClient(New System.Drawing.Point(e.X, e.Y))
                 Dim itemover = LVPlaylist.GetItemAt(clientpoint.X, clientpoint.Y)
                 For x = 0 To files.Count - 1
-                    If LVPlaylist.FindItemWithText(files(x), True, 0) Is Nothing Then
+                    lvi = LVPlaylist.FindItemWithText(files(x), True, 0)
+                    If lvi Is Nothing Then
+                        'add new playlist entry
                         If ExtensionDictionary.ContainsKey(Path.GetExtension(files(x))) Then
                             lvi = CreateListviewItem()
                             lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = FormatPlaylistTitle(files(x))
@@ -581,6 +583,21 @@ Public Class Player
                                 LVPlaylist.Items.Insert(itemover.Index, lvi)
                             End If
                             SetPlaylistCountText()
+                        End If
+                    Else
+                        'update playlist entry
+                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = FormatPlaylistTitle(files(x))
+                        LVPlaylist.Items.RemoveAt(lvi.Index)
+                        If itemover Is Nothing Then
+                            LVPlaylist.Items.Add(lvi)
+                        Else
+                            LVPlaylist.ListViewItemSorter = Nothing
+                            ClearPlaylistTitles()
+                            If itemover.Index >= 0 Then
+                                LVPlaylist.Items.Insert(itemover.Index, lvi)
+                            Else
+                                LVPlaylist.Items.Add(lvi)
+                            End If
                         End If
                     End If
                 Next
@@ -951,11 +968,17 @@ Public Class Player
         Dim pText As String
         pString_format.Alignment = StringAlignment.Center
         pString_format.LineAlignment = StringAlignment.Center
-        Try
-            pText = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0).Text
-        Catch
-            pText = String.Empty
-        End Try
+        'Try
+        Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
+        If lvi Is Nothing Then
+            pText = AxPlayer.URL
+        Else
+            pText = lvi.Text
+            lvi = Nothing
+        End If
+        'Catch
+        '    pText = String.Empty
+        'End Try
         pFont = New Font(Me.Font.FontFamily, pSize, FontStyle.Bold)
         If Not String.IsNullOrEmpty(pText) Then
             Do
@@ -2233,7 +2256,9 @@ Public Class Player
         If result = DialogResult.OK AndAlso ofd.FileNames.Length > 0 Then
             Dim lvi As ListViewItem
             For x = 0 To ofd.FileNames.Length - 1
-                If LVPlaylist.Items.Count = 0 OrElse LVPlaylist.FindItemWithText(ofd.FileNames(x), True, 0) Is Nothing Then
+                lvi = LVPlaylist.FindItemWithText(ofd.FileNames(x), True, 0)
+                If LVPlaylist.Items.Count = 0 OrElse lvi Is Nothing Then
+                    'Create New Playlist Entry
                     If App.ExtensionDictionary.ContainsKey(Path.GetExtension(ofd.FileNames(x))) Then
                         lvi = CreateListviewItem()
                         lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = FormatPlaylistTitle(ofd.FileNames(x))
@@ -2247,6 +2272,17 @@ Public Class Player
                             ClearPlaylistTitles()
                             LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
                         End If
+                    End If
+                Else
+                    'Update Playlist Entry
+                    lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = FormatPlaylistTitle(ofd.FileNames(x))
+                    LVPlaylist.Items.RemoveAt(lvi.Index)
+                    If LVPlaylist.SelectedItems.Count = 0 Then
+                        LVPlaylist.Items.Add(lvi)
+                    Else
+                        LVPlaylist.ListViewItemSorter = Nothing
+                        ClearPlaylistTitles()
+                        LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
                     End If
                 End If
             Next
@@ -2279,8 +2315,10 @@ Public Class Player
     End Sub
     Friend Sub UpdateHistoryInPlaylist(path As String)
         Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(path, True, 0)
-        GetHistory(lvi, path)
-        Debug.Print("Updated History in Playlist for " + path)
+        If lvi IsNot Nothing Then
+            GetHistory(lvi, path)
+            Debug.Print("Updated History in Playlist for " + path)
+        End If
     End Sub
     Private Sub PlaylistRemoveItems()
         If LVPlaylist.SelectedItems.Count > 0 Then
