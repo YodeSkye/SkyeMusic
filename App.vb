@@ -3,6 +3,7 @@ Imports Microsoft.Win32
 Imports SkyeMusic.Player
 
 Namespace My
+
     Public Module App
 
         'Declarations
@@ -1015,6 +1016,7 @@ Namespace My
         End Sub
 
     End Module
+
     Friend Class ListViewItemStringComparer
         Implements IComparer
         Private col As Integer
@@ -1088,6 +1090,7 @@ Namespace My
             End If
         End Function
     End Class
+
     Public Class MessageFilterPlayerIgnoreFullscreenMouseClick
 
         Implements IMessageFilter
