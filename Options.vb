@@ -122,22 +122,24 @@ Public Class Options
         App.SaveOptions()
         Player.ShowPlayMode()
     End Sub
-    Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, GrBoxLibrarySearchFolders.MouseDown, GrBoxPlaylistFormatting.MouseDown, GrBoxTime.MouseDown, LblTitleFormat.MouseDown, LblTitleSeparator.MouseDown, LblVideoIdentifier.MouseDown, LblSongPlayMode.MouseDown, LblDefaultPlaylistAction.MouseDown, LblPlaylistSearchAction.MouseDown, LblTheme.MouseDown, LblHelperApp2Path.MouseDown, LblHelperApp2Name.MouseDown, LblHelperApp1Path.MouseDown, LblHelperApp1Name.MouseDown
+    Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, GrBoxTime.MouseDown, LblTitleFormat.MouseDown, LblTitleSeparator.MouseDown, LblVideoIdentifier.MouseDown, LblSongPlayMode.MouseDown, LblDefaultPlaylistAction.MouseDown, LblPlaylistSearchAction.MouseDown, LblTheme.MouseDown, LblHelperApp2Path.MouseDown, LblHelperApp2Name.MouseDown, LblHelperApp1Path.MouseDown, LblHelperApp1Name.MouseDown, TCOptions.MouseDown, TPApp.MouseDown, TPPlayer.MouseDown, TPPlaylist.MouseDown, TPLibrary.MouseDown, LblHistoryAutoSaveInterval1.MouseDown, LblHistoryAutoSaveInterval2.MouseDown, LblLibrarySearchFolders.MouseDown, LblHistoryUpdateInterval1.MouseDown, LblHistoryUpdateInterval2.MouseDown, LblPlaylistFormatting.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
             cSender = CType(sender, Control)
             If cSender Is Me Then
                 mOffset = New Point(-e.X - SystemInformation.FixedFrameBorderSize.Width - 7, -e.Y - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 7)
-            ElseIf cSender Is LblTitleFormat OrElse cSender Is LblTitleSeparator OrElse cSender Is LblVideoIdentifier Then
-                mOffset = New Point(-e.X - cSender.Left - GrBoxPlaylistFormatting.Left - SystemInformation.FixedFrameBorderSize.Width - 7, -e.Y - cSender.Top - GrBoxPlaylistFormatting.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 7)
-            Else
+            ElseIf cSender Is TCOptions Then
                 mOffset = New Point(-e.X - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 7, -e.Y - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 7)
+            ElseIf cSender Is TPApp OrElse cSender Is TPLibrary OrElse cSender Is TPPlayer OrElse cSender Is TPPlaylist Then
+                mOffset = New Point(-e.X - TCOptions.Left - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 9, -e.Y - TCOptions.Top - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 9)
+            Else
+                mOffset = New Point(-e.X - TCOptions.Left - TPApp.Left - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 9, -e.Y - TCOptions.Top - TPApp.Top - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 9)
             End If
         End If
         cSender = Nothing
     End Sub
-    Private Sub Options_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, GrBoxLibrarySearchFolders.MouseMove, GrBoxPlaylistFormatting.MouseMove, GrBoxTime.MouseMove, LblTitleFormat.MouseMove, LblTitleSeparator.MouseMove, LblVideoIdentifier.MouseMove, LblSongPlayMode.MouseMove, LblDefaultPlaylistAction.MouseMove, LblPlaylistSearchAction.MouseMove, LblTheme.MouseMove, LblHelperApp2Path.MouseMove, LblHelperApp2Name.MouseMove, LblHelperApp1Path.MouseMove, LblHelperApp1Name.MouseMove
+    Private Sub Options_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, GrBoxTime.MouseMove, LblTitleFormat.MouseMove, LblTitleSeparator.MouseMove, LblVideoIdentifier.MouseMove, LblSongPlayMode.MouseMove, LblDefaultPlaylistAction.MouseMove, LblPlaylistSearchAction.MouseMove, LblTheme.MouseMove, LblHelperApp2Path.MouseMove, LblHelperApp2Name.MouseMove, LblHelperApp1Path.MouseMove, LblHelperApp1Name.MouseMove, TCOptions.MouseMove, TPApp.MouseMove, TPPlayer.MouseMove, TPPlaylist.MouseMove, TPLibrary.MouseMove, LblHistoryAutoSaveInterval1.MouseMove, LblHistoryAutoSaveInterval2.MouseMove, LblLibrarySearchFolders.MouseMove, LblHistoryUpdateInterval1.MouseMove, LblHistoryUpdateInterval2.MouseMove, LblPlaylistFormatting.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -145,7 +147,7 @@ Public Class Options
             Location = mPosition
         End If
     End Sub
-    Private Sub Options_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, GrBoxLibrarySearchFolders.MouseUp, GrBoxPlaylistFormatting.MouseUp, GrBoxTime.MouseUp, LblTitleFormat.MouseUp, LblTitleSeparator.MouseUp, LblVideoIdentifier.MouseUp, LblSongPlayMode.MouseUp, LblDefaultPlaylistAction.MouseUp, LblPlaylistSearchAction.MouseUp, LblTheme.MouseUp, LblHelperApp2Path.MouseUp, LblHelperApp2Name.MouseUp, LblHelperApp1Path.MouseUp, LblHelperApp1Name.MouseUp
+    Private Sub Options_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, GrBoxTime.MouseUp, LblTitleFormat.MouseUp, LblTitleSeparator.MouseUp, LblVideoIdentifier.MouseUp, LblSongPlayMode.MouseUp, LblDefaultPlaylistAction.MouseUp, LblPlaylistSearchAction.MouseUp, LblTheme.MouseUp, LblHelperApp2Path.MouseUp, LblHelperApp2Name.MouseUp, LblHelperApp1Path.MouseUp, LblHelperApp1Name.MouseUp, TCOptions.MouseUp, TPApp.MouseUp, TPPlayer.MouseUp, TPPlaylist.MouseUp, TPLibrary.MouseUp, LblHistoryAutoSaveInterval1.MouseUp, LblHistoryAutoSaveInterval2.MouseUp, LblLibrarySearchFolders.MouseUp, LblHistoryUpdateInterval1.MouseUp, LblHistoryUpdateInterval2.MouseUp, LblPlaylistFormatting.MouseUp
         mMove = False
     End Sub
     Private Sub Options_Move(sender As Object, e As EventArgs) Handles MyBase.Move
@@ -317,7 +319,7 @@ Public Class Options
             TxtBoxHistoryUpdateInterval.Text = interval.ToString
             TxtBoxHistoryUpdateInterval.SelectAll()
             Debug.Print("TxtBoxHistoryUpdateInterval_Validated")
-            App.HistoryUpdateInterval = interval
+            HistoryUpdateInterval = interval
         End If
     End Sub
     Private Sub TxtBoxHistoryAutoSaveInterval_Validated(sender As Object, e As EventArgs) Handles TxtBoxHistoryAutoSaveInterval.Validated
@@ -433,9 +435,8 @@ Public Class Options
             BackColor = c
             GrBoxTime.BackColor = c
             RadBtnRemaining.BackColor = c
-            GrBoxPlaylistFormatting.BackColor = c
-            GrBoxLibrarySearchFolders.BackColor = c
             CkBoxLibrarySearchSubFolders.BackColor = c
+            TCOptions.TabPanelBackColor = c
         End If
         If Not AsTheme Then ResumeLayout()
         Debug.Print("Options Accent Color Set")
@@ -450,11 +451,14 @@ Public Class Options
             BackColor = App.CurrentTheme.BackColor
             GrBoxTime.BackColor = App.CurrentTheme.BackColor
             RadBtnRemaining.BackColor = App.CurrentTheme.BackColor
-            GrBoxPlaylistFormatting.BackColor = App.CurrentTheme.BackColor
-            GrBoxLibrarySearchFolders.BackColor = App.CurrentTheme.BackColor
             CkBoxLibrarySearchSubFolders.BackColor = App.CurrentTheme.BackColor
+            TCOptions.TabPanelBackColor = App.CurrentTheme.BackColor
             forecolor = App.CurrentTheme.TextColor
         End If
+        TCOptions.ActiveTabColor = App.CurrentTheme.ButtonBackColor
+        TCOptions.ActiveTabForeColor = App.CurrentTheme.ButtonTextColor
+        TCOptions.InactiveTabColor = App.CurrentTheme.ControlBackColor
+        TCOptions.InActiveTabForeColor = forecolor
         CoBoxPlayMode.BackColor = App.CurrentTheme.ControlBackColor
         CoBoxPlayMode.ForeColor = App.CurrentTheme.TextColor
         CoBoxPlaylistDefaultAction.BackColor = App.CurrentTheme.ControlBackColor
@@ -483,14 +487,19 @@ Public Class Options
         BtnHelperApp1.BackColor = App.CurrentTheme.ButtonBackColor
         BtnHelperApp2.BackColor = App.CurrentTheme.ButtonBackColor
         GrBoxTime.ForeColor = forecolor
-        GrBoxPlaylistFormatting.ForeColor = forecolor
-        GrBoxLibrarySearchFolders.ForeColor = forecolor
         LblSongPlayMode.ForeColor = forecolor
         LblDefaultPlaylistAction.ForeColor = forecolor
         LblPlaylistSearchAction.ForeColor = forecolor
         LblTheme.ForeColor = forecolor
+        LblLibrarySearchFolders.ForeColor = forecolor
+        LblPlaylistFormatting.ForeColor = forecolor
+        LblTitleFormat.ForeColor = forecolor
+        LblTitleSeparator.ForeColor = forecolor
+        LblVideoIdentifier.ForeColor = forecolor
         CkBoxSaveWindowMetrics.ForeColor = forecolor
         CkBoxSuspendOnSessionChange.ForeColor = forecolor
+        CkBoxLibrarySearchSubFolders.ForeColor = forecolor
+        CkBoxPlaylistRemoveSpaces.ForeColor = forecolor
         LblHelperApp1Name.ForeColor = forecolor
         LblHelperApp1Path.ForeColor = forecolor
         LblHelperApp2Name.ForeColor = forecolor
