@@ -33,6 +33,7 @@ Partial Class Player
         CMIPlaylistAdd = New ToolStripMenuItem()
         CMIPlaylistRemove = New ToolStripMenuItem()
         CMIClearPlaylist = New ToolStripMenuItem()
+        CMIEditTitle = New ToolStripMenuItem()
         ToolStripSeparator1 = New ToolStripSeparator()
         CMIShowCurrent = New ToolStripMenuItem()
         CMIRating = New ToolStripMenuItem()
@@ -118,9 +119,9 @@ Partial Class Player
         ' 
         ' CMPlaylist
         ' 
-        CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
+        CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMPlaylist.Name = "CMPlaylist"
-        CMPlaylist.Size = New Size(177, 358)
+        CMPlaylist.Size = New Size(177, 380)
         ' 
         ' CMIPlay
         ' 
@@ -169,6 +170,13 @@ Partial Class Player
         CMIClearPlaylist.Name = "CMIClearPlaylist"
         CMIClearPlaylist.Size = New Size(176, 22)
         CMIClearPlaylist.Text = "Clear Playlist"
+        ' 
+        ' CMIEditTitle
+        ' 
+        CMIEditTitle.Image = My.Resources.Resources.ImageEdit16
+        CMIEditTitle.Name = "CMIEditTitle"
+        CMIEditTitle.Size = New Size(176, 22)
+        CMIEditTitle.Text = "Edit Title"
         ' 
         ' ToolStripSeparator1
         ' 
@@ -334,26 +342,26 @@ Partial Class Player
         ' 
         MIOpen.Image = My.Resources.Resources.ImageOpen16
         MIOpen.Name = "MIOpen"
-        MIOpen.Size = New Size(180, 22)
+        MIOpen.Size = New Size(127, 22)
         MIOpen.Text = "Open"
         ' 
         ' MIOpenURL
         ' 
         MIOpenURL.Image = My.Resources.Resources.ImageGlobe
         MIOpenURL.Name = "MIOpenURL"
-        MIOpenURL.Size = New Size(180, 22)
+        MIOpenURL.Size = New Size(127, 22)
         MIOpenURL.Text = "Open URL"
         ' 
         ' ToolStripSeparator4
         ' 
         ToolStripSeparator4.Name = "ToolStripSeparator4"
-        ToolStripSeparator4.Size = New Size(177, 6)
+        ToolStripSeparator4.Size = New Size(124, 6)
         ' 
         ' MIExit
         ' 
         MIExit.Image = My.Resources.Resources.ImageExit
         MIExit.Name = "MIExit"
-        MIExit.Size = New Size(180, 22)
+        MIExit.Size = New Size(127, 22)
         MIExit.Text = "Exit"
         ' 
         ' MIView
@@ -695,7 +703,8 @@ Partial Class Player
         ' CMLyrics
         ' 
         CMLyrics.Name = "CMLyrics"
-        CMLyrics.Size = New Size(123, 148)
+        CMLyrics.ShowExtendedTools = False
+        CMLyrics.Size = New Size(138, 176)
         ' 
         ' TrackBarPosition
         ' 
@@ -841,4 +850,5 @@ Partial Class Player
     Friend WithEvents CMIRating3Stars As ToolStripMenuItem
     Friend WithEvents CMIRating2Stars As ToolStripMenuItem
     Friend WithEvents CMIRating1Star As ToolStripMenuItem
+    Friend WithEvents CMIEditTitle As ToolStripMenuItem
 End Class

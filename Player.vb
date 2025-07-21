@@ -776,6 +776,7 @@ Public Class Player
         End If
         If LVPlaylist.SelectedItems.Count = 0 Then
             CMIPlaylistRemove.Enabled = False
+            CMIEditTitle.Enabled = False
             CMIRating.Enabled = False
             CMIViewInLibrary.Enabled = False
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
@@ -791,6 +792,7 @@ Public Class Player
             TSSeparatorExternalTools.Visible = False
         Else
             CMIPlaylistRemove.Enabled = True
+            CMIEditTitle.Enabled = True
             CMIRating.Enabled = True
             CMIViewInLibrary.Enabled = True
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
@@ -851,6 +853,22 @@ Public Class Player
     End Sub
     Private Sub CMIClearPlaylistClick(sender As Object, e As EventArgs) Handles CMIClearPlaylist.Click
         LVPlaylist.Items.Clear()
+    End Sub
+    Private Sub CMIEditTitle_Click(sender As Object, e As EventArgs) Handles CMIEditTitle.Click
+        Dim frmEditTitle As New PlayerEditTitle
+        Dim uriresult As Uri = Nothing
+        frmEditTitle.NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text
+        frmEditTitle.ShowDialog(Me)
+        If frmEditTitle.DialogResult = DialogResult.OK Then
+            If frmEditTitle.NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text Then
+                Debug.Print("Edit Title Cancelled, New Title Same As Old Title")
+            Else
+                LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text = frmEditTitle.NewTitle
+                Debug.Print("Title of " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " Updated to " + frmEditTitle.NewTitle)
+            End If
+        Else
+                Debug.Print("Edit Title Cancelled")
+        End If
     End Sub
     Private Sub CMIShowCurrentClick(sender As Object, e As EventArgs) Handles CMIShowCurrent.Click
         Dim item As ListViewItem
