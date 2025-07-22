@@ -685,7 +685,7 @@ Namespace My
                 Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
                 Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of App.Song)))
                 If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
-                    My.Computer.FileSystem.CreateDirectory(System.IO.Path.GetDirectoryName(App.UserPath))
+                    My.Computer.FileSystem.CreateDirectory(App.UserPath)
                 End If
                 Dim file As New System.IO.StreamWriter(HistoryPath)
                 writer.Serialize(file, History)

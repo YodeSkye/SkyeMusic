@@ -566,7 +566,11 @@ Public Class Player
                 Dim clientpoint = LVPlaylist.PointToClient(New System.Drawing.Point(e.X, e.Y))
                 Dim itemover = LVPlaylist.GetItemAt(clientpoint.X, clientpoint.Y)
                 For x = 0 To files.Count - 1
-                    lvi = LVPlaylist.FindItemWithText(files(x), True, 0)
+                    If LVPlaylist.Items.Count = 0 Then
+                        lvi = Nothing
+                    Else
+                        lvi = LVPlaylist.FindItemWithText(files(x), True, 0)
+                    End If
                     If lvi Is Nothing Then
                         'add new playlist entry
                         If ExtensionDictionary.ContainsKey(Path.GetExtension(files(x))) Then
@@ -2218,7 +2222,7 @@ Public Class Player
             Next
             Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of PlaylistItemType)))
             If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
-                My.Computer.FileSystem.CreateDirectory(System.IO.Path.GetDirectoryName(App.UserPath))
+                My.Computer.FileSystem.CreateDirectory(App.UserPath)
             End If
             Dim file As New System.IO.StreamWriter(App.PlaylistPath)
             writer.Serialize(file, items)
@@ -2274,7 +2278,7 @@ Public Class Player
         If result = DialogResult.OK AndAlso ofd.FileNames.Length > 0 Then
             Dim lvi As ListViewItem
             For x = 0 To ofd.FileNames.Length - 1
-                lvi = LVPlaylist.FindItemWithText(ofd.FileNames(x), True, 0)
+                If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(ofd.FileNames(x), True, 0)
                 If LVPlaylist.Items.Count = 0 OrElse lvi Is Nothing Then
                     'Create New Playlist Entry
                     If App.ExtensionDictionary.ContainsKey(Path.GetExtension(ofd.FileNames(x))) Then

@@ -1,6 +1,5 @@
 ﻿
 Imports System.IO
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement.Button
 Imports SkyeMusic.My
 Public Class Library
 
@@ -1728,7 +1727,7 @@ Public Class Library
             Next
             Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of LibraryItemType)))
             If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
-                My.Computer.FileSystem.CreateDirectory(System.IO.Path.GetDirectoryName(App.UserPath))
+                My.Computer.FileSystem.CreateDirectory(App.UserPath)
             End If
             Dim file As New System.IO.StreamWriter(App.LibraryPath)
             writer.Serialize(file, items)
