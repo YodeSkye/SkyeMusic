@@ -2276,7 +2276,7 @@ Public Class Player
         ofd.Multiselect = True
         Dim result As DialogResult = ofd.ShowDialog(Me)
         If result = DialogResult.OK AndAlso ofd.FileNames.Length > 0 Then
-            Dim lvi As ListViewItem
+            Dim lvi As ListViewItem = Nothing
             For x = 0 To ofd.FileNames.Length - 1
                 If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(ofd.FileNames(x), True, 0)
                 If LVPlaylist.Items.Count = 0 OrElse lvi Is Nothing Then

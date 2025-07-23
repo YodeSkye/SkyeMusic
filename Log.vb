@@ -1,5 +1,4 @@
 ﻿
-Imports System.DirectoryServices.ActiveDirectory
 Imports SkyeMusic.My
 Public Class Log
 
@@ -7,6 +6,8 @@ Public Class Log
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
     Private LogSearchTitle As String
+    Private DeleteLogConfirm As Boolean = False
+    Private WithEvents timerDeleteLog As New Timer
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -24,6 +25,7 @@ Public Class Log
     Private Sub Log_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = My.Application.Info.Title + " Log"
         LogSearchTitle = TxBxSearch.Text
+        timerDeleteLog.Interval = 5000
         SetTheme()
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
@@ -100,7 +102,10 @@ Public Class Log
         App.ShowLog(True)
     End Sub
     Private Sub BTNDeleteLog_Click(sender As Object, e As EventArgs) Handles BTNDeleteLog.Click
-        App.DeleteLog()
+        If DeleteLogConfirm Then
+            App.DeleteLog()
+        End If
+        SetDeleteLogConfirm()
     End Sub
     Private Sub TxBxSearch_DoubleClick(sender As Object, e As EventArgs) Handles TxBxSearch.DoubleClick
         ToggleMaximized()
@@ -170,6 +175,11 @@ Public Class Log
         End If
     End Sub
 
+    'Handlers
+    Private Sub timerDeleteLog_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerDeleteLog.Tick
+        SetDeleteLogConfirm()
+    End Sub
+
     'Procedures
     Private Sub ToggleMaximized()
         Select Case WindowState
@@ -187,6 +197,21 @@ Public Class Log
         RTBLog.SelectionStart = RTBLog.TextLength
         RTBLog.SelectionLength = 0
         RTBLog.ScrollToCaret()
+    End Sub
+    Private Sub SetDeleteLogConfirm(Optional forcereset As Boolean = False)
+        If DeleteLogConfirm Or forcereset Then
+            timerDeleteLog.Stop()
+            DeleteLogConfirm = False
+            Me.BTNDeleteLog.BackColor = App.CurrentTheme.ButtonBackColor
+            TipLog.Hide(Me)
+            TipLog.IsBalloon = False
+        Else
+            DeleteLogConfirm = True
+            Me.BTNDeleteLog.BackColor = Color.Red
+            TipLog.IsBalloon = True
+            TipLog.Show("Are You Sure?", Me, BTNDeleteLog.Location)
+            timerDeleteLog.Start()
+        End If
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
