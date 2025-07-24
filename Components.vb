@@ -191,7 +191,7 @@ Namespace My.Components
 			AddHandler Me.Resize, New System.EventHandler(AddressOf Me.ProgressEXResize)
 			AddHandler Me.Paint, New System.Windows.Forms.PaintEventHandler(AddressOf Me.ProgressEXPaint)
 			'Designer Stuff
-			maxValue = Me.Width
+			maxValue = 100 'Me.Width
 			minValue = 0
 			stepValue = 1
 			percentageDrawMode = percentageDrawModes.Center
@@ -291,8 +291,8 @@ Namespace My.Components
 		Inherits ListView
 
 		Private _LineBefore As Integer = -1
-		Private _LineAfter As Integer = -1
-		Private _InsertionLineColor As Color
+        Private _LineAfter As Integer = -1
+		Private _InsertionLineColor As Color = Color.Teal
 
 		<DefaultValue(-1)>
 		Public Property LineBefore As Integer

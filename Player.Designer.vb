@@ -507,7 +507,6 @@ Partial Class Player
         PEXLeft.DrawingColor = Color.DodgerBlue
         PEXLeft.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
         PEXLeft.Location = New Point(12, 352)
-        PEXLeft.Maximum = 96
         PEXLeft.Name = "PEXLeft"
         PEXLeft.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
         PEXLeft.Size = New Size(385, 5)
@@ -522,7 +521,6 @@ Partial Class Player
         PEXRight.DrawingColor = Color.DodgerBlue
         PEXRight.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
         PEXRight.Location = New Point(12, 389)
-        PEXRight.Maximum = 96
         PEXRight.Name = "PEXRight"
         PEXRight.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
         PEXRight.Size = New Size(385, 5)
