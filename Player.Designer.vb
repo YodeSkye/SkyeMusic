@@ -300,7 +300,6 @@ Partial Class Player
         ' 
         ' AxPlayer
         ' 
-        AxPlayer.Anchor = AnchorStyles.None
         AxPlayer.Enabled = True
         AxPlayer.Location = New Point(1, 27)
         AxPlayer.Name = "AxPlayer"
@@ -508,15 +507,13 @@ Partial Class Player
         PEXLeft.DrawingColor = Color.DodgerBlue
         PEXLeft.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
         PEXLeft.Location = New Point(12, 352)
-        PEXLeft.Maximum = 100
-        PEXLeft.Minimum = 0
+        PEXLeft.Maximum = 96
         PEXLeft.Name = "PEXLeft"
         PEXLeft.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
         PEXLeft.Size = New Size(385, 5)
         PEXLeft.Step = 1
         PEXLeft.TabIndex = 17
         PEXLeft.TabStop = False
-        PEXLeft.Value = 0
         ' 
         ' PEXRight
         ' 
@@ -525,15 +522,13 @@ Partial Class Player
         PEXRight.DrawingColor = Color.DodgerBlue
         PEXRight.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
         PEXRight.Location = New Point(12, 389)
-        PEXRight.Maximum = 100
-        PEXRight.Minimum = 0
+        PEXRight.Maximum = 96
         PEXRight.Name = "PEXRight"
         PEXRight.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
         PEXRight.Size = New Size(385, 5)
         PEXRight.Step = 1
         PEXRight.TabIndex = 18
         PEXRight.TabStop = False
-        PEXRight.Value = 0
         ' 
         ' PicBoxAlbumArt
         ' 
@@ -576,7 +571,6 @@ Partial Class Player
         ListBoxPlaylistSearch.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         ListBoxPlaylistSearch.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         ListBoxPlaylistSearch.FormattingEnabled = True
-        ListBoxPlaylistSearch.ItemHeight = 21
         ListBoxPlaylistSearch.Location = New Point(410, 25)
         ListBoxPlaylistSearch.Name = "ListBoxPlaylistSearch"
         ListBoxPlaylistSearch.Size = New Size(574, 88)
@@ -619,8 +613,6 @@ Partial Class Player
         LVPlaylist.ContextMenuStrip = CMPlaylist
         LVPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LVPlaylist.InsertionLineColor = Color.Teal
-        LVPlaylist.LineAfter = -1
-        LVPlaylist.LineBefore = -1
         LVPlaylist.Location = New Point(410, 27)
         LVPlaylist.Name = "LVPlaylist"
         LVPlaylist.OwnerDraw = True
@@ -668,7 +660,6 @@ Partial Class Player
         ' LblPlaylistCount
         ' 
         LblPlaylistCount.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        LblPlaylistCount.CopyOnDoubleClick = False
         LblPlaylistCount.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblPlaylistCount.Location = New Point(410, 436)
         LblPlaylistCount.Name = "LblPlaylistCount"
@@ -680,7 +671,6 @@ Partial Class Player
         ' 
         LblDuration.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         LblDuration.BackColor = Color.Transparent
-        LblDuration.CopyOnDoubleClick = False
         LblDuration.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblDuration.Location = New Point(318, 327)
         LblDuration.Name = "LblDuration"
@@ -692,7 +682,6 @@ Partial Class Player
         ' 
         LblPosition.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         LblPosition.BackColor = Color.Transparent
-        LblPosition.CopyOnDoubleClick = False
         LblPosition.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblPosition.Location = New Point(12, 327)
         LblPosition.Name = "LblPosition"
@@ -703,7 +692,6 @@ Partial Class Player
         ' CMLyrics
         ' 
         CMLyrics.Name = "CMLyrics"
-        CMLyrics.ShowExtendedTools = False
         CMLyrics.Size = New Size(138, 176)
         ' 
         ' TrackBarPosition

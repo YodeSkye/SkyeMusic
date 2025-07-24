@@ -1,4 +1,5 @@
 ﻿
+Imports System.ComponentModel
 Imports System.Runtime.InteropServices
 Imports System.Text
 Imports Syncfusion.Windows.Forms.Tools
@@ -40,7 +41,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or Sets a value determine how to display Percentage value
 		''' </summary>
-		<System.ComponentModel.Category("Behavior"), System.ComponentModel.Description("Specify how to display the Percentage value")>
+		<System.ComponentModel.Category("Behavior"), System.ComponentModel.Description("Specify how to display the Percentage value"), DefaultValue(percentageDrawModes.Movable)>
 		Public Property PercentageMode As percentageDrawModes
 			Get
 				Return percentageDrawMode
@@ -53,7 +54,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or Sets a value to determine use of a color gradient
 		''' </summary>
-		<System.ComponentModel.Category("Appearance"), System.ComponentModel.Description("Specify how to display the Drawing Color")>
+		<System.ComponentModel.Category("Appearance"), System.ComponentModel.Description("Specify how to display the Drawing Color"), DefaultValue(colorDrawModes.Gradient)>
 		Public Property DrawingColorMode As colorDrawModes
 			Get
 				Return colorDrawMode
@@ -66,7 +67,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or Sets the color used to draw the Progress activities
 		''' </summary>
-		<System.ComponentModel.Category("Appearance"), System.ComponentModel.Description("Specify the color used to draw the progress activities")>
+		<System.ComponentModel.Category("Appearance"), System.ComponentModel.Description("Specify the color used to draw the progress activities"), DefaultValue(GetType(Color), "Red")>
 		Public Property DrawingColor As Color
 			Get
 				Return m_drawingColor
@@ -84,7 +85,7 @@ Namespace My.Components
 		''' <summary>
 		'''  Gets or sets the maximum value of the range of the control. 
 		''' </summary>
-		<System.ComponentModel.Category("Layout"), System.ComponentModel.Description("Specify the maximum value the progress can increased to")>
+		<System.ComponentModel.Category("Layout"), System.ComponentModel.Description("Specify the maximum value the progress can increased to"), DefaultValue(100)>
 		Public Property Maximum As Integer
 			Get
 				Return maxValue
@@ -97,7 +98,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or sets the minimum value of the range of the control.
 		''' </summary>
-		<System.ComponentModel.Category("Layout")>
+		<System.ComponentModel.Category("Layout"), System.ComponentModel.Description("Specify the minimum value the progress can decreased to"), DefaultValue(0)>
 		Public Property Minimum As Integer
 			Get
 				Return minValue
@@ -111,7 +112,7 @@ Namespace My.Components
 		'''  Gets or sets the amount by which a call to the System.Windows.Forms.ProgressBar.
 		'''  StepForword method increases the current position of the progress bar.
 		''' </summary>
-		<System.ComponentModel.Category("Layout")>
+		<System.ComponentModel.Category("Layout"), System.ComponentModel.Description("Specify the amount by which a call to the System.Windows.Forms.ProgressBar.StepForword method increases the current position of the progress bar"), DefaultValue(5)>
 		Public Property [Step] As Integer
 			Get
 				Return stepValue
@@ -127,7 +128,7 @@ Namespace My.Components
 		''' <exception cref="System.ArgumentException">The value specified is greater than the value of
 		''' the System.Windows.Forms.ProgressBar.Maximum property.  -or- The value specified is less
 		''' than the value of the System.Windows.Forms.ProgressBar.Minimum property</exception>
-		<System.ComponentModel.Category("Layout")>
+		<System.ComponentModel.Category("Layout"), System.ComponentModel.Description("Specify the current position of the progress bar"), DefaultValue(0)>
 		Public Property Value As Integer
 			Get
 				Return CInt(Math.Truncate(_value))
@@ -291,8 +292,9 @@ Namespace My.Components
 
 		Private _LineBefore As Integer = -1
 		Private _LineAfter As Integer = -1
-		Private _InsertionLineColor As Color = Color.Teal
+		Private _InsertionLineColor As Color
 
+		<DefaultValue(-1)>
 		Public Property LineBefore As Integer
 			Get
 				Return _LineBefore
@@ -301,6 +303,7 @@ Namespace My.Components
 				_LineBefore = value
 			End Set
 		End Property
+		<DefaultValue(-1)>
 		Public Property LineAfter As Integer
 			Get
 				Return _LineAfter
@@ -309,7 +312,7 @@ Namespace My.Components
 				_LineAfter = value
 			End Set
 		End Property
-		<ComponentModel.Category("Appearance"), ComponentModel.Description("Specify the color used to draw the Insertion Line")>
+		<ComponentModel.Category("Appearance"), ComponentModel.Description("Specify the color used to draw the Insertion Line"), DefaultValue(GetType(Color), "Color.Teal")>
 		Public Property InsertionLineColor As Color
 			Get
 				Return _InsertionLineColor
@@ -358,6 +361,7 @@ Namespace My.Components
 	Public Class LabelCSY
 
 		Inherits System.Windows.Forms.Label
+		<DefaultValue(False)>
 		Public Property CopyOnDoubleClick As Boolean
 		Protected Overrides Sub DefWndProc(ByRef m As Message)
 			Select Case m.Msg
@@ -387,7 +391,8 @@ Namespace My.Components
 		Inherits System.Windows.Forms.ContextMenuStrip
 
 		'Declarations
-		Public Property ShowExtendedTools As Boolean = False
+		<DefaultValue(False)>
+		Public Property ShowExtendedTools As Boolean
 		Private txbx As TextBox
 
 		'Control Events
