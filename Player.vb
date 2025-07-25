@@ -3,6 +3,7 @@ Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports AxWMPLib
 Imports SkyeMusic.My
+
 Public Class Player
 
     'Declarations
@@ -1237,7 +1238,7 @@ Public Class Player
         Return lvi
     End Function
     Private Sub GetHistory(ByRef lvi As ListViewItem, path As String)
-        Dim s As Song = App.History.Find(Function(p) p.Path = path)
+        Dim s As App.Song = App.History.Find(Function(p) p.Path = path)
         If Not String.IsNullOrEmpty(s.Path) Then
             If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
             lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
@@ -2375,20 +2376,32 @@ Public Class Player
             OnStop()
         End If
     End Sub
-    Private Sub PlayFromPlaylist()
-        If LVPlaylist.SelectedItems.Count > 0 Then
-            LyricsOff()
-            StopPlay()
-            If Mute Then ToggleMute()
-            If IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
-                PlayStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
-            Else
-                Stream = False
-                PlayFile(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayFromPlaylist")
-                'AxPlayer.URL = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text
-                'App.WriteToLog("Playing " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayFromPlaylist)")
-            End If
-            'RandomHistoryAdd(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+    Private Sub PlayStream(url As String)
+        If Not String.IsNullOrEmpty(url) Then
+            Stream = True
+            Try
+                AxPlayer.URL = url
+                TrackBarPosition.Enabled = False
+                TrackBarPosition.Value = 0
+                '''OnPlay()
+                App.WriteToLog("Playing " + url + " (PlayStream)")
+                RandomHistoryAdd(url)
+            Catch
+                App.WriteToLog("Cannot Play Stream, Invalid URL: " + url)
+            End Try
+        End If
+    End Sub
+    Private Sub PlayFile(path As String, source As String)
+        If Not String.IsNullOrEmpty(path) Then
+            Stream = False
+            Try
+                AxPlayer.URL = path
+                '''OnPlay()
+                App.WriteToLog("Playing " + path + " (" + source + ")")
+                RandomHistoryAdd(path)
+            Catch
+                App.WriteToLog("Cannot Play File, Invalid Path: " + path + " (" + source + ")")
+            End Try
         End If
     End Sub
     Private Sub QueueFromPlaylist()
@@ -2404,6 +2417,22 @@ Public Class Player
                 Queue.Add(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
                 SetPlaylistCountText()
             End If
+        End If
+    End Sub
+    Private Sub PlayFromPlaylist()
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            LyricsOff()
+            StopPlay()
+            If Mute Then ToggleMute()
+            If IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                PlayStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            Else
+                Stream = False
+                PlayFile(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayFromPlaylist")
+                'AxPlayer.URL = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text
+                'App.WriteToLog("Playing " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayFromPlaylist)")
+            End If
+            'RandomHistoryAdd(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
         End If
     End Sub
     Friend Sub PlayFromLibrary(title As String, filename As String)
@@ -2443,29 +2472,6 @@ Public Class Player
         'AxPlayer.URL = filename
         'App.WriteToLog("Playing " + filename + " (PlayFromLibrary)")
         'RandomHistoryAdd(filename)
-    End Sub
-    Private Sub PlayQueued()
-        If Queue.Count > 0 Then
-            StopPlay()
-            If IsStream(Queue(0)) Then
-                PlayStream(Queue(0))
-            Else
-                PlayFile(Queue(0), "PlayQueued")
-                'Stream = False
-                'AxPlayer.URL = Queue(0)
-                'App.WriteToLog("Playing " + AxPlayer.URL + " (PlayQueued)")
-            End If
-            Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
-            If item IsNot Nothing Then
-                LVPlaylist.SelectedIndices.Clear()
-                LVPlaylist.SelectedIndices.Add(item.Index)
-                LVPlaylist.EnsureVisible(item.Index)
-                item = Nothing
-            End If
-            Queue.RemoveAt(0)
-            SetPlaylistCountText()
-            'TimerPlayNext.Start()
-        End If
     End Sub
     Friend Sub PlayPrevious()
         Stream = False
@@ -2631,32 +2637,27 @@ Public Class Player
                 End If
         End Select
     End Sub
-    Private Sub PlayStream(url As String)
-        If Not String.IsNullOrEmpty(url) Then
-            Stream = True
-            Try
-                AxPlayer.URL = url
-                TrackBarPosition.Enabled = False
-                TrackBarPosition.Value = 0
-                '''OnPlay()
-                App.WriteToLog("Playing " + url + " (PlayStream)")
-                RandomHistoryAdd(url)
-            Catch
-                App.WriteToLog("Cannot Play Stream, Invalid URL: " + url)
-            End Try
-        End If
-    End Sub
-    Private Sub PlayFile(path As String, source As String)
-        If Not String.IsNullOrEmpty(path) Then
-            Stream = False
-            Try
-                AxPlayer.URL = path
-                '''OnPlay()
-                App.WriteToLog("Playing " + path + " (" + source + ")")
-                RandomHistoryAdd(path)
-            Catch
-                App.WriteToLog("Cannot Play File, Invalid Path: " + path + " (" + source + ")")
-            End Try
+    Private Sub PlayQueued()
+        If Queue.Count > 0 Then
+            StopPlay()
+            If IsStream(Queue(0)) Then
+                PlayStream(Queue(0))
+            Else
+                PlayFile(Queue(0), "PlayQueued")
+                'Stream = False
+                'AxPlayer.URL = Queue(0)
+                'App.WriteToLog("Playing " + AxPlayer.URL + " (PlayQueued)")
+            End If
+            Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
+            If item IsNot Nothing Then
+                LVPlaylist.SelectedIndices.Clear()
+                LVPlaylist.SelectedIndices.Add(item.Index)
+                LVPlaylist.EnsureVisible(item.Index)
+                item = Nothing
+            End If
+            Queue.RemoveAt(0)
+            SetPlaylistCountText()
+            'TimerPlayNext.Start()
         End If
     End Sub
     Private Sub OnPlay()
