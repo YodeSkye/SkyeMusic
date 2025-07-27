@@ -60,7 +60,6 @@ Partial Class PlayerEditTitle
         ' CMEditTitle
         ' 
         CMEditTitle.Name = "CMEditTitle"
-        CMEditTitle.ShowExtendedTools = False
         CMEditTitle.Size = New Size(138, 176)
         ' 
         ' PlayerEditTitle
@@ -71,6 +70,7 @@ Partial Class PlayerEditTitle
         Controls.Add(TxtBoxTitle)
         Controls.Add(BtnOK)
         Controls.Add(LblTitle)
+        FormBorderStyle = FormBorderStyle.FixedDialog
         Name = "PlayerEditTitle"
         StartPosition = FormStartPosition.CenterParent
         Text = "PlayerEditTitle"
