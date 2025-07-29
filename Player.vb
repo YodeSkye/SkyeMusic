@@ -2657,7 +2657,7 @@ Public Class Player
             End If
             Queue.RemoveAt(0)
             SetPlaylistCountText()
-            'TimerPlayNext.Start()
+            TimerPlayNext.Start()
         End If
     End Sub
     Private Sub OnPlay()
