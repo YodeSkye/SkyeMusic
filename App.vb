@@ -160,6 +160,7 @@ Namespace My
         Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
         Private WithEvents timerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
         Private WithEvents timerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
+        Private WithEvents timerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
         Private WithEvents timerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
@@ -297,6 +298,10 @@ Namespace My
         Private Sub timerHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryUpdate.Tick
             timerHistoryUpdate.Stop()
             UpdateHistory()
+        End Sub
+        Private Sub timerRandomHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerRandomHistoryUpdate.Tick
+            timerRandomHistoryUpdate.Stop()
+            UpdateRandomHistory()
         End Sub
         Private Sub timerHistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryAutoSave.Tick
             If HistoryChanged Then
@@ -529,15 +534,32 @@ Namespace My
                 Debug.Print("Song not found in history: " + songorstream)
             End If
         End Sub
+        Friend Sub UpdateRandomHistory(songorstream As String)
+            timerRandomHistoryUpdate.Stop()
+            If HistoryUpdateInterval = 0 Then
+                timerRandomHistoryUpdate.Tag = songorstream
+                UpdateRandomHistory()
+                Return
+            Else
+                timerRandomHistoryUpdate.Interval = HistoryUpdateInterval * 1000
+                timerRandomHistoryUpdate.Tag = songorstream
+                timerRandomHistoryUpdate.Start()
+            End If
+        End Sub
+        Private Sub UpdateRandomHistory()
+            Dim songorstream As String = CStr(timerRandomHistoryUpdate.Tag)
+            Player.AddToRandomHistory(songorstream)
+        End Sub
         Friend Sub SetHistoryAutoSaveTimer()
             timerHistoryAutoSave.Stop()
             timerHistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
             timerHistoryAutoSave.Start()
             Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
         End Sub
-        Friend Sub StopHistoryUpdate()
+        Friend Sub StopHistoryUpdates()
             timerHistoryUpdate.Stop()
-            Debug.Print("History Update Timer Stopped")
+            timerRandomHistoryUpdate.Stop()
+            Debug.Print("History Update Timers Stopped")
         End Sub
         Friend Sub ClearHistoryInLibraryFlag()
             If History.Count > 0 Then

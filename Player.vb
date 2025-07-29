@@ -2316,7 +2316,12 @@ Public Class Player
         lvi = Nothing
     End Sub
     Friend Sub UpdateHistoryInPlaylist(path As String)
-        Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(path, True, 0)
+        Dim lvi As ListViewItem
+        Try
+            lvi = LVPlaylist.FindItemWithText(path, True, 0)
+        Catch
+            lvi = Nothing
+        End Try
         If lvi IsNot Nothing Then
             GetHistory(lvi, path)
             Debug.Print("Updated History in Playlist for " + path)
@@ -2522,10 +2527,19 @@ Public Class Player
                 End If
             Case PlayModes.Random
                 If RandomHistory.Count > 0 Then
-                    If LVPlaylist.Items.Count = 0 Then
-                        'AxPlayer.Ctlcontrols.stop()
-                    Else
-                        If RandomHistoryIndex > 0 Then RandomHistoryIndex -= 1
+                    If LVPlaylist.Items.Count > 0 Then
+                        If RandomHistoryIndex > 0 Then
+                            RandomHistoryIndex -= 1
+                        Else
+                            RandomHistoryIndex = RandomHistory.Count - 1
+                        End If
+                        If RandomHistory.Item(RandomHistoryIndex) = AxPlayer.URL Then
+                            'Already Playing Previous Random
+                            RandomHistoryIndex -= 1
+                            If RandomHistoryIndex < 0 Then
+                                RandomHistoryIndex = RandomHistory.Count - 1
+                            End If
+                        End If
                         Dim item As ListViewItem
                         Try
                             item = LVPlaylist.FindItemWithText(RandomHistory.Item(RandomHistoryIndex), True, 0)
@@ -2537,14 +2551,11 @@ Public Class Player
                                 PlayStream(item.SubItems(LVPlaylist.Columns("Path").Index).Text)
                             Else
                                 PlayFile(item.SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousRandom")
-                                'AxPlayer.URL = item.SubItems(LVPlaylist.Columns("Path").Index).Text
-                                'App.WriteToLog("Playing " + item.SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousRandom)")
                             End If
                             LVPlaylist.SelectedIndices.Clear()
                             LVPlaylist.SelectedIndices.Add(item.Index)
                             LVPlaylist.EnsureVisible(item.Index)
                             item = Nothing
-                            'TimerPlayNext.Start()
                         End If
                     End If
                 End If
@@ -2684,7 +2695,7 @@ Public Class Player
     End Sub
     Private Sub OnStop()
         PlayState = False
-        App.StopHistoryUpdate()
+        App.StopHistoryUpdates()
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
         TrackBarPosition.Value = 0
         PEXLeft.Value = 0
@@ -2692,15 +2703,20 @@ Public Class Player
         ResetLblPositionText()
         AxPlayer.Visible = False
     End Sub
-    Private Sub RandomHistoryAdd(path As String)
+    Private Sub RandomHistoryAdd(songorstream As String)
         If App.PlayMode = App.PlayModes.Random Then
-            If RandomHistory.FindIndex(Function(p) p = path) < 0 Then
-                RandomHistory.Add(path)
-                RandomHistoryIndex = RandomHistory.Count - 1
-                'Debug.Print("Added " + path + " to Random History")
+            If RandomHistory.FindIndex(Function(p) p = songorstream) < 0 Then
+                App.UpdateRandomHistory(songorstream)
             Else
-                'Debug.Print("Not Adding " + path + " to Random History, Already Exists")
+                Debug.Print("Not Adding " + songorstream + " to Random History, Already Exists")
             End If
+        End If
+    End Sub
+    Friend Sub AddToRandomHistory(songorstream As String)
+        If App.PlayMode = App.PlayModes.Random Then
+            RandomHistory.Add(songorstream)
+            RandomHistoryIndex = RandomHistory.Count
+            Debug.Print("Added " + songorstream + " to Random History")
         End If
     End Sub
     Friend Sub RandomHistoryClear()
