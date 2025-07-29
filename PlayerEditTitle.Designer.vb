@@ -73,7 +73,7 @@ Partial Class PlayerEditTitle
         FormBorderStyle = FormBorderStyle.FixedDialog
         Name = "PlayerEditTitle"
         StartPosition = FormStartPosition.CenterParent
-        Text = "PlayerEditTitle"
+        Text = "Edit Title"
         ResumeLayout(False)
         PerformLayout()
     End Sub

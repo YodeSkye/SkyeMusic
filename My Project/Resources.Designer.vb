@@ -63,13 +63,15 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
-        '''\pard\sa200\sl240\slmult1\qc\cf1\ul\b\f0\fs28\lang9 Keyboard Shortcuts\cf2\par
-        '''\cf1\ulnone\i\fs24 &lt;Spacebar&gt; \b0\i0 Toggle Play/Pause\cf0\par
-        '''\cf1\b\i &lt;Ctrl&gt;+&lt;Spacebar&gt; \b0\i0 Stop\cf0\par
-        '''\cf1\b\i &lt;M&gt; \b0\i0 Toggle Mute\cf0\par
-        '''\cf1\b\i &lt;Left Arrow&gt; \b0\i0 Fast Reverse\cf0\par
-        '''\cf1\b\i &lt;Right Arrow&gt; \b0\i0 Fast Forward\cf0\par
-        '''\cf1\b\i &lt;B&gt; \b0\i0 Previous Son [rest of string was truncated]&quot;;.
+        '''\pard\sa200\sl240\slmult1\qc\ul\b\f0\fs28\lang9 Keyboard Shortcuts\par
+        '''\ulnone\i\fs24 &lt;Spacebar&gt; \b0\i0 Toggle Play/Pause\par
+        '''\b\i &lt;Ctrl&gt;+&lt;Spacebar&gt; \b0\i0 Stop\par
+        '''\b\i &lt;M&gt; \b0\i0 Toggle Mute\par
+        '''\b\i &lt;Left Arrow&gt; \b0\i0 Fast Reverse\par
+        '''\b\i &lt;Right Arrow&gt; \b0\i0 Fast Forward\par
+        '''\b\i &lt;B&gt; \b0\i0 Previous Song\par
+        '''\b\i &lt;N&gt; \b0\i0 Next Song\par
+        '''\b\i &lt;L&gt; \b0\i [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property HelpRT() As String
             Get

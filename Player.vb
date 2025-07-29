@@ -342,10 +342,10 @@ Public Class Player
         If e.Alt Then
         ElseIf e.Control Then
             Select Case e.KeyCode
-                Case Keys.A
-                    For Each item As ListViewItem In LVPlaylist.Items
-                        item.Selected = True
-                    Next
+                'Case Keys.A
+                '    For Each item As ListViewItem In LVPlaylist.Items
+                '        item.Selected = True
+                '    Next
             End Select
         ElseIf e.Shift Then
             Select Case e.KeyCode
