@@ -56,6 +56,9 @@ Partial Class Options
         CoBoxTheme = New ComboBox()
         LblTheme = New Components.LabelCSY()
         TipOptions = New ToolTip(components)
+        TxtBoxHistoryUpdateInterval = New TextBox()
+        LblHistoryUpdateInterval2 = New Components.LabelCSY()
+        LblHistoryUpdateInterval1 = New Components.LabelCSY()
         TxtBoxHistoryAutoSaveInterval = New TextBox()
         LblHistoryAutoSaveInterval1 = New Components.LabelCSY()
         LblHistoryAutoSaveInterval2 = New Components.LabelCSY()
@@ -71,9 +74,6 @@ Partial Class Options
         LblHelperApp2Name = New Components.LabelCSY()
         LblHelperApp1Path = New Components.LabelCSY()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
-        TxtBoxHistoryUpdateInterval = New TextBox()
-        LblHistoryUpdateInterval2 = New Components.LabelCSY()
-        LblHistoryUpdateInterval1 = New Components.LabelCSY()
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         LblPlaylistFormatting = New Label()
         TPLibrary = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
@@ -110,6 +110,7 @@ Partial Class Options
         RadBtnElapsed.TabIndex = 1
         RadBtnElapsed.TabStop = True
         RadBtnElapsed.Text = "Show Elapsed Time"
+        TipOptions.SetToolTip(RadBtnElapsed, "Show time that has passed since the song started playing.")
         RadBtnElapsed.UseVisualStyleBackColor = True
         ' 
         ' RadBtnRemaining
@@ -122,6 +123,7 @@ Partial Class Options
         RadBtnRemaining.Size = New Size(184, 25)
         RadBtnRemaining.TabIndex = 2
         RadBtnRemaining.Text = "Show Remaining Time"
+        TipOptions.SetToolTip(RadBtnRemaining, "Show time left before the song is finished playing.")
         RadBtnRemaining.UseVisualStyleBackColor = False
         ' 
         ' GrBoxTime
@@ -136,6 +138,7 @@ Partial Class Options
         GrBoxTime.TabIndex = 0
         GrBoxTime.TabStop = False
         GrBoxTime.Text = "Song Position Display"
+        TipOptions.SetToolTip(GrBoxTime, "Choose the way to view the play time of the song." & vbCrLf & "This may also be achieved by clicking the Play Time in the Player.")
         ' 
         ' CoBoxPlayMode
         ' 
@@ -147,6 +150,7 @@ Partial Class Options
         CoBoxPlayMode.Name = "CoBoxPlayMode"
         CoBoxPlayMode.Size = New Size(168, 29)
         CoBoxPlayMode.TabIndex = 3
+        TipOptions.SetToolTip(CoBoxPlayMode, "Song Play Mode" & vbCrLf & "  Play Once = Play the song then stop." & vbCrLf & "  Repeat = Play the same song over & over." & vbCrLf & "  Play Next = Play the next or previous song in the Playlist." & vbCrLf & "  Shuffle = Play a random song next.")
         ' 
         ' CoBoxPlaylistTitleFormat
         ' 
@@ -192,7 +196,6 @@ Partial Class Options
         ' LblTitleFormat
         ' 
         LblTitleFormat.AutoSize = True
-        LblTitleFormat.CopyOnDoubleClick = False
         LblTitleFormat.Location = New Point(19, 38)
         LblTitleFormat.Name = "LblTitleFormat"
         LblTitleFormat.Size = New Size(93, 21)
@@ -202,7 +205,6 @@ Partial Class Options
         ' LblTitleSeparator
         ' 
         LblTitleSeparator.AutoSize = True
-        LblTitleSeparator.CopyOnDoubleClick = False
         LblTitleSeparator.Location = New Point(19, 117)
         LblTitleSeparator.Name = "LblTitleSeparator"
         LblTitleSeparator.Size = New Size(111, 21)
@@ -212,7 +214,6 @@ Partial Class Options
         ' LblVideoIdentifier
         ' 
         LblVideoIdentifier.AutoSize = True
-        LblVideoIdentifier.CopyOnDoubleClick = False
         LblVideoIdentifier.Location = New Point(18, 173)
         LblVideoIdentifier.Name = "LblVideoIdentifier"
         LblVideoIdentifier.Size = New Size(116, 21)
@@ -248,7 +249,6 @@ Partial Class Options
         LBLibrarySearchFolders.ContextMenuStrip = CMLibrarySearchFolders
         LBLibrarySearchFolders.Font = New Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LBLibrarySearchFolders.FormattingEnabled = True
-        LBLibrarySearchFolders.ItemHeight = 25
         LBLibrarySearchFolders.Location = New Point(137, 39)
         LBLibrarySearchFolders.Name = "LBLibrarySearchFolders"
         LBLibrarySearchFolders.Size = New Size(541, 104)
@@ -322,24 +322,22 @@ Partial Class Options
         ' CMTxtBox
         ' 
         CMTxtBox.Name = "CMTxtBox"
-        CMTxtBox.ShowExtendedTools = False
         CMTxtBox.Size = New Size(138, 176)
         ' 
         ' LblSongPlayMode
         ' 
         LblSongPlayMode.AutoSize = True
-        LblSongPlayMode.CopyOnDoubleClick = False
         LblSongPlayMode.Font = New Font("Segoe UI", 12F)
         LblSongPlayMode.Location = New Point(14, 137)
         LblSongPlayMode.Name = "LblSongPlayMode"
         LblSongPlayMode.Size = New Size(123, 21)
         LblSongPlayMode.TabIndex = 131
         LblSongPlayMode.Text = "Song Play Mode"
+        TipOptions.SetToolTip(LblSongPlayMode, resources.GetString("LblSongPlayMode.ToolTip"))
         ' 
         ' LblHelperApp1Name
         ' 
         LblHelperApp1Name.AutoSize = True
-        LblHelperApp1Name.CopyOnDoubleClick = False
         LblHelperApp1Name.Font = New Font("Segoe UI", 12F)
         LblHelperApp1Name.Location = New Point(353, 10)
         LblHelperApp1Name.Name = "LblHelperApp1Name"
@@ -372,7 +370,6 @@ Partial Class Options
         ' LblDefaultPlaylistAction
         ' 
         LblDefaultPlaylistAction.AutoSize = True
-        LblDefaultPlaylistAction.CopyOnDoubleClick = False
         LblDefaultPlaylistAction.Font = New Font("Segoe UI", 12F)
         LblDefaultPlaylistAction.Location = New Point(10, 260)
         LblDefaultPlaylistAction.Name = "LblDefaultPlaylistAction"
@@ -383,7 +380,6 @@ Partial Class Options
         ' LblPlaylistSearchAction
         ' 
         LblPlaylistSearchAction.AutoSize = True
-        LblPlaylistSearchAction.CopyOnDoubleClick = False
         LblPlaylistSearchAction.Font = New Font("Segoe UI", 12F)
         LblPlaylistSearchAction.Location = New Point(10, 349)
         LblPlaylistSearchAction.Name = "LblPlaylistSearchAction"
@@ -405,13 +401,47 @@ Partial Class Options
         ' LblTheme
         ' 
         LblTheme.AutoSize = True
-        LblTheme.CopyOnDoubleClick = False
         LblTheme.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblTheme.Location = New Point(13, 12)
         LblTheme.Name = "LblTheme"
         LblTheme.Size = New Size(57, 21)
         LblTheme.TabIndex = 141
         LblTheme.Text = "Theme"
+        ' 
+        ' TxtBoxHistoryUpdateInterval
+        ' 
+        TxtBoxHistoryUpdateInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TxtBoxHistoryUpdateInterval.Location = New Point(269, 229)
+        TxtBoxHistoryUpdateInterval.Name = "TxtBoxHistoryUpdateInterval"
+        TxtBoxHistoryUpdateInterval.ShortcutsEnabled = False
+        TxtBoxHistoryUpdateInterval.Size = New Size(44, 29)
+        TxtBoxHistoryUpdateInterval.TabIndex = 148
+        TxtBoxHistoryUpdateInterval.TextAlign = HorizontalAlignment.Center
+        TipOptions.SetToolTip(TxtBoxHistoryUpdateInterval, "Update Song History & Shuffle Play History after 1-60 seconds, or 0 for immediate update.")
+        ' 
+        ' LblHistoryUpdateInterval2
+        ' 
+        LblHistoryUpdateInterval2.AutoSize = True
+        LblHistoryUpdateInterval2.Font = New Font("Segoe UI", 12F)
+        LblHistoryUpdateInterval2.Location = New Point(311, 232)
+        LblHistoryUpdateInterval2.Name = "LblHistoryUpdateInterval2"
+        LblHistoryUpdateInterval2.Size = New Size(68, 21)
+        LblHistoryUpdateInterval2.TabIndex = 150
+        LblHistoryUpdateInterval2.Text = "Seconds"
+        LblHistoryUpdateInterval2.TextAlign = ContentAlignment.MiddleRight
+        TipOptions.SetToolTip(LblHistoryUpdateInterval2, "Update Song History & Shuffle Play History after 1-60 seconds, or 0 for immediate update.")
+        ' 
+        ' LblHistoryUpdateInterval1
+        ' 
+        LblHistoryUpdateInterval1.AutoSize = True
+        LblHistoryUpdateInterval1.Font = New Font("Segoe UI", 12F)
+        LblHistoryUpdateInterval1.Location = New Point(14, 233)
+        LblHistoryUpdateInterval1.Name = "LblHistoryUpdateInterval1"
+        LblHistoryUpdateInterval1.Size = New Size(259, 21)
+        LblHistoryUpdateInterval1.TabIndex = 149
+        LblHistoryUpdateInterval1.Text = "Update History After Song Plays For"
+        LblHistoryUpdateInterval1.TextAlign = ContentAlignment.MiddleRight
+        TipOptions.SetToolTip(LblHistoryUpdateInterval1, "Update Song History & Shuffle Play History after 1-60 seconds, or 0 for immediate update.")
         ' 
         ' TxtBoxHistoryAutoSaveInterval
         ' 
@@ -426,7 +456,6 @@ Partial Class Options
         ' LblHistoryAutoSaveInterval1
         ' 
         LblHistoryAutoSaveInterval1.AutoSize = True
-        LblHistoryAutoSaveInterval1.CopyOnDoubleClick = False
         LblHistoryAutoSaveInterval1.Font = New Font("Segoe UI", 12F)
         LblHistoryAutoSaveInterval1.Location = New Point(13, 304)
         LblHistoryAutoSaveInterval1.Name = "LblHistoryAutoSaveInterval1"
@@ -438,7 +467,6 @@ Partial Class Options
         ' LblHistoryAutoSaveInterval2
         ' 
         LblHistoryAutoSaveInterval2.AutoSize = True
-        LblHistoryAutoSaveInterval2.CopyOnDoubleClick = False
         LblHistoryAutoSaveInterval2.Font = New Font("Segoe UI", 12F)
         LblHistoryAutoSaveInterval2.Location = New Point(206, 304)
         LblHistoryAutoSaveInterval2.Name = "LblHistoryAutoSaveInterval2"
@@ -559,7 +587,6 @@ Partial Class Options
         ' LblHelperApp2Path
         ' 
         LblHelperApp2Path.AutoSize = True
-        LblHelperApp2Path.CopyOnDoubleClick = False
         LblHelperApp2Path.Font = New Font("Segoe UI", 12F)
         LblHelperApp2Path.Location = New Point(353, 179)
         LblHelperApp2Path.Name = "LblHelperApp2Path"
@@ -570,7 +597,6 @@ Partial Class Options
         ' LblHelperApp2Name
         ' 
         LblHelperApp2Name.AutoSize = True
-        LblHelperApp2Name.CopyOnDoubleClick = False
         LblHelperApp2Name.Font = New Font("Segoe UI", 12F)
         LblHelperApp2Name.Location = New Point(353, 129)
         LblHelperApp2Name.Name = "LblHelperApp2Name"
@@ -581,7 +607,6 @@ Partial Class Options
         ' LblHelperApp1Path
         ' 
         LblHelperApp1Path.AutoSize = True
-        LblHelperApp1Path.CopyOnDoubleClick = False
         LblHelperApp1Path.Font = New Font("Segoe UI", 12F)
         LblHelperApp1Path.Location = New Point(353, 60)
         LblHelperApp1Path.Name = "LblHelperApp1Path"
@@ -607,40 +632,6 @@ Partial Class Options
         TPPlayer.TabIndex = 2
         TPPlayer.Text = " Player "
         TPPlayer.ThemesEnabled = False
-        ' 
-        ' TxtBoxHistoryUpdateInterval
-        ' 
-        TxtBoxHistoryUpdateInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TxtBoxHistoryUpdateInterval.Location = New Point(269, 229)
-        TxtBoxHistoryUpdateInterval.Name = "TxtBoxHistoryUpdateInterval"
-        TxtBoxHistoryUpdateInterval.ShortcutsEnabled = False
-        TxtBoxHistoryUpdateInterval.Size = New Size(44, 29)
-        TxtBoxHistoryUpdateInterval.TabIndex = 148
-        TxtBoxHistoryUpdateInterval.TextAlign = HorizontalAlignment.Center
-        ' 
-        ' LblHistoryUpdateInterval2
-        ' 
-        LblHistoryUpdateInterval2.AutoSize = True
-        LblHistoryUpdateInterval2.CopyOnDoubleClick = False
-        LblHistoryUpdateInterval2.Font = New Font("Segoe UI", 12F)
-        LblHistoryUpdateInterval2.Location = New Point(311, 232)
-        LblHistoryUpdateInterval2.Name = "LblHistoryUpdateInterval2"
-        LblHistoryUpdateInterval2.Size = New Size(68, 21)
-        LblHistoryUpdateInterval2.TabIndex = 150
-        LblHistoryUpdateInterval2.Text = "Seconds"
-        LblHistoryUpdateInterval2.TextAlign = ContentAlignment.MiddleRight
-        ' 
-        ' LblHistoryUpdateInterval1
-        ' 
-        LblHistoryUpdateInterval1.AutoSize = True
-        LblHistoryUpdateInterval1.CopyOnDoubleClick = False
-        LblHistoryUpdateInterval1.Font = New Font("Segoe UI", 12F)
-        LblHistoryUpdateInterval1.Location = New Point(14, 233)
-        LblHistoryUpdateInterval1.Name = "LblHistoryUpdateInterval1"
-        LblHistoryUpdateInterval1.Size = New Size(259, 21)
-        LblHistoryUpdateInterval1.TabIndex = 149
-        LblHistoryUpdateInterval1.Text = "Update History After Song Plays For"
-        LblHistoryUpdateInterval1.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' TPPlaylist
         ' 
