@@ -126,13 +126,10 @@
   <metadata name="CMTxtBox.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>193, 17</value>
   </metadata>
-  <data name="LblSongPlayMode.ToolTip" xml:space="preserve">
-    <value>Song Play Mode
-  Play Once = Play the song then stop.
-  Repeat = Play the same song over &amp; over.
-  Play Next = Play the next or previous song in the Playlist.
-  Shuffle = Play a random song next.
-</value>
+  <data name="BtnHistoryPrune.ToolTip" xml:space="preserve">
+    <value>Prune the song history.
+This will remove any song history entries that aren't in the library, cannot be found in storage, or are a stream not found in the playlist.
+The total number of song history entries is given in parentheses.</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

@@ -57,25 +57,25 @@ Partial Class Options
         LblTheme = New Components.LabelCSY()
         TipOptions = New ToolTip(components)
         TxtBoxHistoryUpdateInterval = New TextBox()
-        LblHistoryUpdateInterval2 = New Components.LabelCSY()
-        LblHistoryUpdateInterval1 = New Components.LabelCSY()
+        LblPlaylistFormatting = New Label()
         TxtBoxHistoryAutoSaveInterval = New TextBox()
-        LblHistoryAutoSaveInterval1 = New Components.LabelCSY()
-        LblHistoryAutoSaveInterval2 = New Components.LabelCSY()
         BtnHistorySaveNow = New Button()
         BtnHistoryPrune = New Button()
-        TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
-        TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         TxtBoxHelperApp2Path = New TextBox()
         TxtBoxHelperApp2Name = New TextBox()
         TxtBoxHelperApp1Path = New TextBox()
         TxtBoxHelperApp1Name = New TextBox()
+        LblHistoryUpdateInterval2 = New Components.LabelCSY()
+        LblHistoryUpdateInterval1 = New Components.LabelCSY()
+        LblHistoryAutoSaveInterval1 = New Components.LabelCSY()
+        LblHistoryAutoSaveInterval2 = New Components.LabelCSY()
+        TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
+        TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         LblHelperApp2Path = New Components.LabelCSY()
         LblHelperApp2Name = New Components.LabelCSY()
         LblHelperApp1Path = New Components.LabelCSY()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
-        LblPlaylistFormatting = New Label()
         TPLibrary = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         LblLibrarySearchFolders = New Label()
         GrBoxTime.SuspendLayout()
@@ -162,6 +162,7 @@ Partial Class Options
         CoBoxPlaylistTitleFormat.Name = "CoBoxPlaylistTitleFormat"
         CoBoxPlaylistTitleFormat.Size = New Size(230, 29)
         CoBoxPlaylistTitleFormat.TabIndex = 10
+        TipOptions.SetToolTip(CoBoxPlaylistTitleFormat, "Choose how to generally format the song title in the Playlist")
         ' 
         ' TxtBoxPlaylistTitleSeparator
         ' 
@@ -171,6 +172,7 @@ Partial Class Options
         TxtBoxPlaylistTitleSeparator.ShortcutsEnabled = False
         TxtBoxPlaylistTitleSeparator.Size = New Size(137, 29)
         TxtBoxPlaylistTitleSeparator.TabIndex = 18
+        TipOptions.SetToolTip(TxtBoxPlaylistTitleSeparator, "Enter a separator to separate different song title elements.")
         ' 
         ' CkBoxPlaylistRemoveSpaces
         ' 
@@ -182,6 +184,7 @@ Partial Class Options
         CkBoxPlaylistRemoveSpaces.Size = New Size(135, 25)
         CkBoxPlaylistRemoveSpaces.TabIndex = 14
         CkBoxPlaylistRemoveSpaces.Text = "Remove Spaces"
+        TipOptions.SetToolTip(CkBoxPlaylistRemoveSpaces, "Select to remove spaces from each element of the song title.")
         CkBoxPlaylistRemoveSpaces.UseVisualStyleBackColor = True
         ' 
         ' TxtBoxPlaylistVideoIdentifier
@@ -192,6 +195,7 @@ Partial Class Options
         TxtBoxPlaylistVideoIdentifier.ShortcutsEnabled = False
         TxtBoxPlaylistVideoIdentifier.Size = New Size(137, 29)
         TxtBoxPlaylistVideoIdentifier.TabIndex = 22
+        TipOptions.SetToolTip(TxtBoxPlaylistVideoIdentifier, "Enter how to identify videos in the Playlist." & vbCrLf & "The identifier will be added to the end of the title.")
         ' 
         ' LblTitleFormat
         ' 
@@ -227,7 +231,7 @@ Partial Class Options
         BtnLibrarySearchFoldersAdd.Name = "BtnLibrarySearchFoldersAdd"
         BtnLibrarySearchFoldersAdd.Size = New Size(32, 32)
         BtnLibrarySearchFoldersAdd.TabIndex = 82
-        TipOptions.SetToolTip(BtnLibrarySearchFoldersAdd, "Add Folder")
+        TipOptions.SetToolTip(BtnLibrarySearchFoldersAdd, "Add folder to list.")
         BtnLibrarySearchFoldersAdd.UseVisualStyleBackColor = True
         ' 
         ' CkBoxLibrarySearchSubFolders
@@ -241,6 +245,7 @@ Partial Class Options
         CkBoxLibrarySearchSubFolders.Size = New Size(161, 25)
         CkBoxLibrarySearchSubFolders.TabIndex = 81
         CkBoxLibrarySearchSubFolders.Text = "Search Sub-Folders"
+        TipOptions.SetToolTip(CkBoxLibrarySearchSubFolders, "Check this to search all sub-folders of the  folders in your list. Un-Check it to only search the folders listed.")
         CkBoxLibrarySearchSubFolders.UseVisualStyleBackColor = False
         ' 
         ' LBLibrarySearchFolders
@@ -254,6 +259,7 @@ Partial Class Options
         LBLibrarySearchFolders.Size = New Size(541, 104)
         LBLibrarySearchFolders.Sorted = True
         LBLibrarySearchFolders.TabIndex = 80
+        TipOptions.SetToolTip(LBLibrarySearchFolders, "Add your music folders here, the Library uses this list to find your music." & vbCrLf & "Right-Click for options.")
         ' 
         ' CMLibrarySearchFolders
         ' 
@@ -285,6 +291,7 @@ Partial Class Options
         CkBoxSaveWindowMetrics.Size = New Size(176, 25)
         CkBoxSaveWindowMetrics.TabIndex = 20
         CkBoxSaveWindowMetrics.Text = "Save Window Metrics"
+        TipOptions.SetToolTip(CkBoxSaveWindowMetrics, "Auto save window sizes and locations.")
         CkBoxSaveWindowMetrics.UseVisualStyleBackColor = True
         ' 
         ' CkBoxSuspendOnSessionChange
@@ -297,6 +304,7 @@ Partial Class Options
         CkBoxSuspendOnSessionChange.Size = New Size(234, 25)
         CkBoxSuspendOnSessionChange.TabIndex = 22
         CkBoxSuspendOnSessionChange.Text = "Minimize App On Screen Lock"
+        TipOptions.SetToolTip(CkBoxSuspendOnSessionChange, "Stop play and Minimize the window if the screen is locked or screensaver is activated." & vbCrLf)
         CkBoxSuspendOnSessionChange.UseVisualStyleBackColor = True
         ' 
         ' BtnHelperApp1
@@ -306,7 +314,7 @@ Partial Class Options
         BtnHelperApp1.Name = "BtnHelperApp1"
         BtnHelperApp1.Size = New Size(32, 32)
         BtnHelperApp1.TabIndex = 64
-        TipOptions.SetToolTip(BtnHelperApp1, "Select Helper App")
+        TipOptions.SetToolTip(BtnHelperApp1, "Select a Helper App.")
         BtnHelperApp1.UseVisualStyleBackColor = True
         ' 
         ' BtnHelperApp2
@@ -316,7 +324,7 @@ Partial Class Options
         BtnHelperApp2.Name = "BtnHelperApp2"
         BtnHelperApp2.Size = New Size(32, 32)
         BtnHelperApp2.TabIndex = 70
-        TipOptions.SetToolTip(BtnHelperApp2, "Select Helper App")
+        TipOptions.SetToolTip(BtnHelperApp2, "Select a Helper App.")
         BtnHelperApp2.UseVisualStyleBackColor = True
         ' 
         ' CMTxtBox
@@ -333,7 +341,6 @@ Partial Class Options
         LblSongPlayMode.Size = New Size(123, 21)
         LblSongPlayMode.TabIndex = 131
         LblSongPlayMode.Text = "Song Play Mode"
-        TipOptions.SetToolTip(LblSongPlayMode, resources.GetString("LblSongPlayMode.ToolTip"))
         ' 
         ' LblHelperApp1Name
         ' 
@@ -355,6 +362,7 @@ Partial Class Options
         CoBoxPlaylistDefaultAction.Name = "CoBoxPlaylistDefaultAction"
         CoBoxPlaylistDefaultAction.Size = New Size(178, 29)
         CoBoxPlaylistDefaultAction.TabIndex = 250
+        TipOptions.SetToolTip(CoBoxPlaylistDefaultAction, "Choose what happens when you double-click a song in the playlist.")
         ' 
         ' CoBoxPlaylistSearchAction
         ' 
@@ -366,6 +374,7 @@ Partial Class Options
         CoBoxPlaylistSearchAction.Name = "CoBoxPlaylistSearchAction"
         CoBoxPlaylistSearchAction.Size = New Size(178, 29)
         CoBoxPlaylistSearchAction.TabIndex = 255
+        TipOptions.SetToolTip(CoBoxPlaylistSearchAction, "Choose what happens when you select an item in the search box.")
         ' 
         ' LblDefaultPlaylistAction
         ' 
@@ -397,6 +406,7 @@ Partial Class Options
         CoBoxTheme.Name = "CoBoxTheme"
         CoBoxTheme.Size = New Size(196, 33)
         CoBoxTheme.TabIndex = 10
+        TipOptions.SetToolTip(CoBoxTheme, "Choose a color theme." & vbCrLf & "Accent Theme will color the app based on the Windows accent color.")
         ' 
         ' LblTheme
         ' 
@@ -419,6 +429,95 @@ Partial Class Options
         TxtBoxHistoryUpdateInterval.TextAlign = HorizontalAlignment.Center
         TipOptions.SetToolTip(TxtBoxHistoryUpdateInterval, "Update Song History & Shuffle Play History after 1-60 seconds, or 0 for immediate update.")
         ' 
+        ' LblPlaylistFormatting
+        ' 
+        LblPlaylistFormatting.AutoSize = True
+        LblPlaylistFormatting.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
+        LblPlaylistFormatting.Location = New Point(10, 10)
+        LblPlaylistFormatting.Name = "LblPlaylistFormatting"
+        LblPlaylistFormatting.Size = New Size(140, 21)
+        LblPlaylistFormatting.TabIndex = 140
+        LblPlaylistFormatting.Text = "Playlist Formatting"
+        TipOptions.SetToolTip(LblPlaylistFormatting, "Choose the formatting options for listing songs in the Playlist.")
+        ' 
+        ' TxtBoxHistoryAutoSaveInterval
+        ' 
+        TxtBoxHistoryAutoSaveInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TxtBoxHistoryAutoSaveInterval.Location = New Point(148, 301)
+        TxtBoxHistoryAutoSaveInterval.Name = "TxtBoxHistoryAutoSaveInterval"
+        TxtBoxHistoryAutoSaveInterval.ShortcutsEnabled = False
+        TxtBoxHistoryAutoSaveInterval.Size = New Size(61, 29)
+        TxtBoxHistoryAutoSaveInterval.TabIndex = 42
+        TxtBoxHistoryAutoSaveInterval.TextAlign = HorizontalAlignment.Center
+        TipOptions.SetToolTip(TxtBoxHistoryAutoSaveInterval, "Auto save the song history every 1-1440 minutes.")
+        ' 
+        ' BtnHistorySaveNow
+        ' 
+        BtnHistorySaveNow.Image = My.Resources.Resources.ImageSave32
+        BtnHistorySaveNow.ImageAlign = ContentAlignment.MiddleLeft
+        BtnHistorySaveNow.Location = New Point(267, 293)
+        BtnHistorySaveNow.Name = "BtnHistorySaveNow"
+        BtnHistorySaveNow.Size = New Size(120, 40)
+        BtnHistorySaveNow.TabIndex = 44
+        BtnHistorySaveNow.Text = "Save Now"
+        BtnHistorySaveNow.TextAlign = ContentAlignment.MiddleRight
+        TipOptions.SetToolTip(BtnHistorySaveNow, "Save the song history now.")
+        BtnHistorySaveNow.UseVisualStyleBackColor = True
+        ' 
+        ' BtnHistoryPrune
+        ' 
+        BtnHistoryPrune.Image = My.Resources.Resources.ImagePrune32
+        BtnHistoryPrune.ImageAlign = ContentAlignment.MiddleLeft
+        BtnHistoryPrune.Location = New Point(587, 293)
+        BtnHistoryPrune.Name = "BtnHistoryPrune"
+        BtnHistoryPrune.Size = New Size(218, 40)
+        BtnHistoryPrune.TabIndex = 90
+        BtnHistoryPrune.Text = "Prune History"
+        BtnHistoryPrune.TextAlign = ContentAlignment.MiddleRight
+        TipOptions.SetToolTip(BtnHistoryPrune, resources.GetString("BtnHistoryPrune.ToolTip"))
+        BtnHistoryPrune.UseVisualStyleBackColor = True
+        ' 
+        ' TxtBoxHelperApp2Path
+        ' 
+        TxtBoxHelperApp2Path.Font = New Font("Segoe UI", 12F)
+        TxtBoxHelperApp2Path.Location = New Point(353, 200)
+        TxtBoxHelperApp2Path.Name = "TxtBoxHelperApp2Path"
+        TxtBoxHelperApp2Path.ShortcutsEnabled = False
+        TxtBoxHelperApp2Path.Size = New Size(420, 29)
+        TxtBoxHelperApp2Path.TabIndex = 68
+        TipOptions.SetToolTip(TxtBoxHelperApp2Path, "Enter or Select the path to your Helper App.")
+        ' 
+        ' TxtBoxHelperApp2Name
+        ' 
+        TxtBoxHelperApp2Name.Font = New Font("Segoe UI", 12F)
+        TxtBoxHelperApp2Name.Location = New Point(353, 150)
+        TxtBoxHelperApp2Name.Name = "TxtBoxHelperApp2Name"
+        TxtBoxHelperApp2Name.ShortcutsEnabled = False
+        TxtBoxHelperApp2Name.Size = New Size(202, 29)
+        TxtBoxHelperApp2Name.TabIndex = 66
+        TipOptions.SetToolTip(TxtBoxHelperApp2Name, "Enter a name for your Helper App.")
+        ' 
+        ' TxtBoxHelperApp1Path
+        ' 
+        TxtBoxHelperApp1Path.Font = New Font("Segoe UI", 12F)
+        TxtBoxHelperApp1Path.ForeColor = Color.White
+        TxtBoxHelperApp1Path.Location = New Point(353, 82)
+        TxtBoxHelperApp1Path.Name = "TxtBoxHelperApp1Path"
+        TxtBoxHelperApp1Path.ShortcutsEnabled = False
+        TxtBoxHelperApp1Path.Size = New Size(420, 29)
+        TxtBoxHelperApp1Path.TabIndex = 62
+        TipOptions.SetToolTip(TxtBoxHelperApp1Path, "Enter or Select the path to your Helper App.")
+        ' 
+        ' TxtBoxHelperApp1Name
+        ' 
+        TxtBoxHelperApp1Name.Font = New Font("Segoe UI", 12F)
+        TxtBoxHelperApp1Name.Location = New Point(353, 31)
+        TxtBoxHelperApp1Name.Name = "TxtBoxHelperApp1Name"
+        TxtBoxHelperApp1Name.ShortcutsEnabled = False
+        TxtBoxHelperApp1Name.Size = New Size(202, 29)
+        TxtBoxHelperApp1Name.TabIndex = 60
+        TipOptions.SetToolTip(TxtBoxHelperApp1Name, "Enter a name for your Helper App.")
+        ' 
         ' LblHistoryUpdateInterval2
         ' 
         LblHistoryUpdateInterval2.AutoSize = True
@@ -429,7 +528,6 @@ Partial Class Options
         LblHistoryUpdateInterval2.TabIndex = 150
         LblHistoryUpdateInterval2.Text = "Seconds"
         LblHistoryUpdateInterval2.TextAlign = ContentAlignment.MiddleRight
-        TipOptions.SetToolTip(LblHistoryUpdateInterval2, "Update Song History & Shuffle Play History after 1-60 seconds, or 0 for immediate update.")
         ' 
         ' LblHistoryUpdateInterval1
         ' 
@@ -441,17 +539,6 @@ Partial Class Options
         LblHistoryUpdateInterval1.TabIndex = 149
         LblHistoryUpdateInterval1.Text = "Update History After Song Plays For"
         LblHistoryUpdateInterval1.TextAlign = ContentAlignment.MiddleRight
-        TipOptions.SetToolTip(LblHistoryUpdateInterval1, "Update Song History & Shuffle Play History after 1-60 seconds, or 0 for immediate update.")
-        ' 
-        ' TxtBoxHistoryAutoSaveInterval
-        ' 
-        TxtBoxHistoryAutoSaveInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TxtBoxHistoryAutoSaveInterval.Location = New Point(148, 301)
-        TxtBoxHistoryAutoSaveInterval.Name = "TxtBoxHistoryAutoSaveInterval"
-        TxtBoxHistoryAutoSaveInterval.ShortcutsEnabled = False
-        TxtBoxHistoryAutoSaveInterval.Size = New Size(61, 29)
-        TxtBoxHistoryAutoSaveInterval.TabIndex = 42
-        TxtBoxHistoryAutoSaveInterval.TextAlign = HorizontalAlignment.Center
         ' 
         ' LblHistoryAutoSaveInterval1
         ' 
@@ -474,30 +561,6 @@ Partial Class Options
         LblHistoryAutoSaveInterval2.TabIndex = 144
         LblHistoryAutoSaveInterval2.Text = "Minutes"
         LblHistoryAutoSaveInterval2.TextAlign = ContentAlignment.MiddleRight
-        ' 
-        ' BtnHistorySaveNow
-        ' 
-        BtnHistorySaveNow.Image = My.Resources.Resources.ImageSave32
-        BtnHistorySaveNow.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistorySaveNow.Location = New Point(267, 293)
-        BtnHistorySaveNow.Name = "BtnHistorySaveNow"
-        BtnHistorySaveNow.Size = New Size(120, 40)
-        BtnHistorySaveNow.TabIndex = 44
-        BtnHistorySaveNow.Text = "Save Now"
-        BtnHistorySaveNow.TextAlign = ContentAlignment.MiddleRight
-        BtnHistorySaveNow.UseVisualStyleBackColor = True
-        ' 
-        ' BtnHistoryPrune
-        ' 
-        BtnHistoryPrune.Image = My.Resources.Resources.ImagePrune32
-        BtnHistoryPrune.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistoryPrune.Location = New Point(587, 293)
-        BtnHistoryPrune.Name = "BtnHistoryPrune"
-        BtnHistoryPrune.Size = New Size(218, 40)
-        BtnHistoryPrune.TabIndex = 90
-        BtnHistoryPrune.Text = "Prune History"
-        BtnHistoryPrune.TextAlign = ContentAlignment.MiddleRight
-        BtnHistoryPrune.UseVisualStyleBackColor = True
         ' 
         ' TCOptions
         ' 
@@ -546,43 +609,6 @@ Partial Class Options
         TPApp.TabIndex = 1
         TPApp.Text = " App "
         TPApp.ThemesEnabled = False
-        ' 
-        ' TxtBoxHelperApp2Path
-        ' 
-        TxtBoxHelperApp2Path.Font = New Font("Segoe UI", 12F)
-        TxtBoxHelperApp2Path.Location = New Point(353, 200)
-        TxtBoxHelperApp2Path.Name = "TxtBoxHelperApp2Path"
-        TxtBoxHelperApp2Path.ShortcutsEnabled = False
-        TxtBoxHelperApp2Path.Size = New Size(420, 29)
-        TxtBoxHelperApp2Path.TabIndex = 68
-        ' 
-        ' TxtBoxHelperApp2Name
-        ' 
-        TxtBoxHelperApp2Name.Font = New Font("Segoe UI", 12F)
-        TxtBoxHelperApp2Name.Location = New Point(353, 150)
-        TxtBoxHelperApp2Name.Name = "TxtBoxHelperApp2Name"
-        TxtBoxHelperApp2Name.ShortcutsEnabled = False
-        TxtBoxHelperApp2Name.Size = New Size(202, 29)
-        TxtBoxHelperApp2Name.TabIndex = 66
-        ' 
-        ' TxtBoxHelperApp1Path
-        ' 
-        TxtBoxHelperApp1Path.Font = New Font("Segoe UI", 12F)
-        TxtBoxHelperApp1Path.ForeColor = Color.White
-        TxtBoxHelperApp1Path.Location = New Point(353, 82)
-        TxtBoxHelperApp1Path.Name = "TxtBoxHelperApp1Path"
-        TxtBoxHelperApp1Path.ShortcutsEnabled = False
-        TxtBoxHelperApp1Path.Size = New Size(420, 29)
-        TxtBoxHelperApp1Path.TabIndex = 62
-        ' 
-        ' TxtBoxHelperApp1Name
-        ' 
-        TxtBoxHelperApp1Name.Font = New Font("Segoe UI", 12F)
-        TxtBoxHelperApp1Name.Location = New Point(353, 31)
-        TxtBoxHelperApp1Name.Name = "TxtBoxHelperApp1Name"
-        TxtBoxHelperApp1Name.ShortcutsEnabled = False
-        TxtBoxHelperApp1Name.Size = New Size(202, 29)
-        TxtBoxHelperApp1Name.TabIndex = 60
         ' 
         ' LblHelperApp2Path
         ' 
@@ -657,16 +683,6 @@ Partial Class Options
         TPPlaylist.TabIndex = 3
         TPPlaylist.Text = " Playlist "
         TPPlaylist.ThemesEnabled = False
-        ' 
-        ' LblPlaylistFormatting
-        ' 
-        LblPlaylistFormatting.AutoSize = True
-        LblPlaylistFormatting.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
-        LblPlaylistFormatting.Location = New Point(10, 10)
-        LblPlaylistFormatting.Name = "LblPlaylistFormatting"
-        LblPlaylistFormatting.Size = New Size(140, 21)
-        LblPlaylistFormatting.TabIndex = 140
-        LblPlaylistFormatting.Text = "Playlist Formatting"
         ' 
         ' TPLibrary
         ' 
