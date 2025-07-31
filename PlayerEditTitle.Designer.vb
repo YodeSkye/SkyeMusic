@@ -32,7 +32,7 @@ Partial Class PlayerEditTitle
         ' 
         TxtBoxTitle.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         TxtBoxTitle.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TxtBoxTitle.Location = New Point(12, 23)
+        TxtBoxTitle.Location = New Point(12, 28)
         TxtBoxTitle.Name = "TxtBoxTitle"
         TxtBoxTitle.ShortcutsEnabled = False
         TxtBoxTitle.Size = New Size(463, 29)
@@ -42,7 +42,7 @@ Partial Class PlayerEditTitle
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = Resources.Resources.ImageOK
-        BtnOK.Location = New Point(211, 66)
+        BtnOK.Location = New Point(211, 71)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 12
@@ -51,9 +51,10 @@ Partial Class PlayerEditTitle
         ' LblTitle
         ' 
         LblTitle.AutoSize = True
+        LblTitle.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblTitle.Location = New Point(12, 9)
         LblTitle.Name = "LblTitle"
-        LblTitle.Size = New Size(30, 15)
+        LblTitle.Size = New Size(38, 20)
         LblTitle.TabIndex = 13
         LblTitle.Text = "Title"
         ' 
@@ -66,7 +67,7 @@ Partial Class PlayerEditTitle
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(487, 142)
+        ClientSize = New Size(487, 147)
         Controls.Add(TxtBoxTitle)
         Controls.Add(BtnOK)
         Controls.Add(LblTitle)

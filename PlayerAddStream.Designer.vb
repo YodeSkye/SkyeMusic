@@ -35,7 +35,7 @@ Partial Class PlayerAddStream
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
-        BtnOK.Location = New Point(211, 116)
+        BtnOK.Location = New Point(211, 121)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 8
@@ -45,7 +45,7 @@ Partial Class PlayerAddStream
         ' 
         TxtBoxStreamTitle.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         TxtBoxStreamTitle.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TxtBoxStreamTitle.Location = New Point(12, 22)
+        TxtBoxStreamTitle.Location = New Point(12, 28)
         TxtBoxStreamTitle.Name = "TxtBoxStreamTitle"
         TxtBoxStreamTitle.ShortcutsEnabled = False
         TxtBoxStreamTitle.Size = New Size(463, 29)
@@ -55,7 +55,7 @@ Partial Class PlayerAddStream
         ' 
         TxtBoxStreamPath.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         TxtBoxStreamPath.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TxtBoxStreamPath.Location = New Point(12, 72)
+        TxtBoxStreamPath.Location = New Point(12, 78)
         TxtBoxStreamPath.Name = "TxtBoxStreamPath"
         TxtBoxStreamPath.ShortcutsEnabled = False
         TxtBoxStreamPath.Size = New Size(463, 29)
@@ -64,18 +64,20 @@ Partial Class PlayerAddStream
         ' LblStreamTitle
         ' 
         LblStreamTitle.AutoSize = True
-        LblStreamTitle.Location = New Point(12, 8)
+        LblStreamTitle.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LblStreamTitle.Location = New Point(12, 9)
         LblStreamTitle.Name = "LblStreamTitle"
-        LblStreamTitle.Size = New Size(70, 15)
+        LblStreamTitle.Size = New Size(89, 20)
         LblStreamTitle.TabIndex = 9
         LblStreamTitle.Text = "Stream Title"
         ' 
         ' LblStreamPath
         ' 
         LblStreamPath.AutoSize = True
-        LblStreamPath.Location = New Point(12, 58)
+        LblStreamPath.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LblStreamPath.Location = New Point(12, 59)
         LblStreamPath.Name = "LblStreamPath"
-        LblStreamPath.Size = New Size(71, 15)
+        LblStreamPath.Size = New Size(88, 20)
         LblStreamPath.TabIndex = 10
         LblStreamPath.Text = "Stream Path"
         ' 
@@ -83,13 +85,13 @@ Partial Class PlayerAddStream
         ' 
         CMAddStream.Name = "CMAddStream"
         CMAddStream.ShowExtendedTools = True
-        CMAddStream.Size = New Size(181, 198)
+        CMAddStream.Size = New Size(138, 176)
         ' 
-        ' AddStream
+        ' PlayerAddStream
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(487, 192)
+        ClientSize = New Size(487, 197)
         Controls.Add(TxtBoxStreamPath)
         Controls.Add(TxtBoxStreamTitle)
         Controls.Add(BtnOK)
@@ -99,7 +101,7 @@ Partial Class PlayerAddStream
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         MaximizeBox = False
         MinimizeBox = False
-        Name = "AddStream"
+        Name = "PlayerAddStream"
         StartPosition = FormStartPosition.CenterParent
         Text = "Add Stream"
         ResumeLayout(False)
