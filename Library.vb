@@ -1,6 +1,7 @@
 ﻿
 Imports System.IO
 Imports SkyeMusic.My
+
 Public Class Library
 
     'Declarations
@@ -9,6 +10,7 @@ Public Class Library
         Genre
         Album
         Artist
+        Year
     End Enum
     Private Structure LibraryGroup
         Dim Name As String
@@ -505,12 +507,15 @@ Public Class Library
         App.WriteToLog("Full Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
     End Sub
     Private Sub CMIAddGroupToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddGroupToPlaylist.Click
+
+        'Initialize
         Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
         LblStatus.Text = "Adding Group to Playlist..."
         LblStatus.Visible = True
         LblStatus.Refresh()
         Player.LVPlaylist.Visible = False
         Player.LVPlaylist.SuspendLayout()
+
         'Get group name from selected list view item
         Dim groupname As String
         Select Case LibraryGroupBy
@@ -520,21 +525,29 @@ Public Class Library
                 groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Artist").Index).Text
             Case LibraryGroupMode.Genre
                 groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Genre").Index).Text
+            Case LibraryGroupMode.Year
+                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Year").Index).Text
             Case Else
                 groupname = String.Empty
         End Select
+
         'Get group index
         Dim groupindex As Int16 = GetLibraryGroupIndex(groupname)
+
         'Add to Playlist
         For Each item As ListViewItem In LVLibrary.Groups(groupindex).Items
             AddToPlaylist(item)
         Next
+
+        'Finalize
         Player.LVPlaylist.ResumeLayout()
         Player.LVPlaylist.Visible = True
         LblStatus.Visible = False
         App.WriteToLog(LibraryGroupBy.ToString + " Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+
     End Sub
     Private Sub CMICollapseGroup_Click(sender As Object, e As EventArgs) Handles CMICollapseGroup.Click
+
         'Get group name from selected list view item
         Dim groupname As String
         Select Case LibraryGroupBy
@@ -544,15 +557,20 @@ Public Class Library
                 groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Artist").Index).Text
             Case LibraryGroupMode.Genre
                 groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Genre").Index).Text
+            Case LibraryGroupMode.Year
+                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Year").Index).Text
             Case Else
                 groupname = String.Empty
         End Select
+
         'Get group index
         Dim groupindex As Int16 = GetLibraryGroupIndex(groupname)
+
         'Collapse group
         If Not groupindex = -1 Then
             LVLibrary.Groups(groupindex).CollapsedState = ListViewGroupCollapsedState.Collapsed
         End If
+
     End Sub
     Private Sub CMIExpandAllGroups_Click(sender As Object, e As EventArgs) Handles CMIExpandAllGroups.Click
         For Each g As ListViewGroup In LVLibrary.Groups
@@ -707,6 +725,14 @@ Public Class Library
         End If
         LVLibrary.Focus()
         RadBtnGroupByGenre.TabStop = False
+    End Sub
+    Private Sub RadBtnGroupByYear_CheckedChanged(sender As Object, e As EventArgs) Handles RadBtnGroupByYear.CheckedChanged
+        If RadBtnGroupByYear.Checked Then
+            LibraryGroupBy = LibraryGroupMode.Year
+            SetGroups()
+        End If
+        LVLibrary.Focus()
+        RadBtnGroupByYear.TabStop = False
     End Sub
     Private Sub RadBtnGroupByNone_CheckedChanged(sender As Object, e As EventArgs) Handles RadBtnGroupByNone.CheckedChanged
         If RadBtnGroupByNone.Checked Then
@@ -1883,6 +1909,8 @@ Public Class Library
         LVLibrary.Columns(11).Text = LVLibrary.Columns(11).Text.TrimEnd(" ↑↓".ToCharArray)
     End Sub
     Private Sub SetGroups()
+
+        'Initialize
         Debug.Print("SetGroups")
         Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
         LVLibrary.Visible = False
@@ -1891,6 +1919,7 @@ Public Class Library
         LVLibrary.SelectedItems.Clear()
         ShowAlbumArt()
         ResetExtInfo()
+
         'Create list of groups
         For Each item As ListViewItem In LVLibrary.Items
             Dim pGroup As String
@@ -1902,6 +1931,8 @@ Public Class Library
                     pGroup = item.SubItems(LVLibrary.Columns("Artist").Index).Text
                 Case LibraryGroupMode.Genre
                     pGroup = item.SubItems(LVLibrary.Columns("Genre").Index).Text
+                Case LibraryGroupMode.Year
+                    pGroup = item.SubItems(LVLibrary.Columns("Year").Index).Text
                 Case Else
                     pGroup = String.Empty
             End Select
@@ -1912,6 +1943,7 @@ Public Class Library
                 LibraryGroups.Add(aGroup)
             End If
         Next
+
         'Create listview groups
         For Each group As LibraryGroup In LibraryGroups
             Dim groupname As String
@@ -1923,6 +1955,8 @@ Public Class Library
                         groupname = "Unknown Artist"
                     Case LibraryGroupMode.Genre
                         groupname = "No Genre"
+                    Case LibraryGroupMode.Year
+                        groupname = "Unknown Year"
                     Case Else
                         groupname = "Default"
                 End Select
@@ -1931,6 +1965,7 @@ Public Class Library
             End If
             LVLibrary.Groups.Add(group.Index.ToString, groupname)
         Next
+        '
         'Assign each listview item to a group
         For Each item As ListViewItem In LVLibrary.Items
             Dim aGroup As String
@@ -1941,17 +1976,23 @@ Public Class Library
                     aGroup = item.SubItems(LVLibrary.Columns("Artist").Index).Text
                 Case LibraryGroupMode.Genre
                     aGroup = item.SubItems(LVLibrary.Columns("Genre").Index).Text
+                Case LibraryGroupMode.Year
+                    aGroup = item.SubItems(LVLibrary.Columns("Year").Index).Text
                 Case Else
                     aGroup = String.Empty
             End Select
             item.Group = LVLibrary.Groups(GetLibraryGroupIndex(aGroup))
         Next
+
         'Display totals for each group
         For Each group As ListViewGroup In LVLibrary.Groups
             group.Header += " (" + group.Items.Count.ToString + ")"
         Next
+
+        'Finalize
         LVLibrary.Visible = True
         App.WriteToLog("Songs Grouped By " + LibraryGroupBy.ToString + " (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+
     End Sub
     Private Function GetLibraryGroupIndex(groupname As String) As Int16
         For Each group As LibraryGroup In LibraryGroups
@@ -2024,6 +2065,8 @@ Public Class Library
         RadBtnGroupByArtist.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGroupByGenre.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGroupByGenre.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnGroupByYear.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnGroupByYear.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGroupByNone.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGroupByNone.ForeColor = App.CurrentTheme.ButtonTextColor
         If TxbxLibrarySearch.Text = LibrarySearchTitle Then TxbxLibrarySearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
