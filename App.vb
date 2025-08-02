@@ -89,7 +89,7 @@ Namespace My
                 If Not LastPlayed = Nothing Then s += ", Last Played on " + LastPlayed.ToString()
                 Return s
             End Function
-            Public Function ToStringFull()
+            Public Function ToStringFull() As String
                 Dim s As String = String.Empty
                 If IsStream Then s += "Stream, "
                 If Rating > 0 Then s += New String("★"c, Rating) + ", "
@@ -164,7 +164,7 @@ Namespace My
         Private WithEvents timerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
-        Friend ReadOnly TrimEndSearch() As Char = {" ", "(", ")", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
+        Friend ReadOnly TrimEndSearch() As Char = {CChar(" "), CChar("("), CChar(")"), CChar("0"), CChar("1"), CChar("2"), CChar("3"), CChar("4"), CChar("5"), CChar("6"), CChar("7"), CChar("8"), CChar("9")} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
         Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
         Friend ReadOnly AttributionSyncFusion As String = "https://www.syncfusion.com/" 'AttributionSyncFusion is the URL for Syncfusion, which provides UI controls and libraries used in the application.
         Friend ReadOnly AttributionTagLibSharp As String = "https://github.com/mono/taglib-sharp" 'AttributionTagLibSharp is the URL for TagLib# library, which is used for reading and writing metadata in media files.

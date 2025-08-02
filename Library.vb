@@ -263,7 +263,7 @@ Public Class Library
             LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             Dim fInfo As IO.FileInfo
             fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
-            LblExtFileInfo.Text = fInfo.Extension.TrimStart(".").ToUpper
+            LblExtFileInfo.Text = fInfo.Extension.TrimStart(CChar(".")).ToUpper
             LblExtFileInfo.Text += " " + App.FormatFileSize(fInfo.Length, My.App.FormatFileSizeUnits.Auto, 2, False)
             fInfo = Nothing
             Dim tlFile As TagLib.File = Nothing
