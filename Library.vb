@@ -614,7 +614,7 @@ Public Class Library
         End If
     End Sub
     Private Sub LblAlbumArtSelectClick(sender As Object, e As EventArgs) Handles LblAlbumArtSelect.Click
-        AlbumArtIndex += 1
+        AlbumArtIndex += CType(1, Byte)
         ShowAlbumArt()
     End Sub
     Private Sub LblLibraryCounts_DoubleClick(sender As Object, e As EventArgs) Handles LblLibraryCounts.DoubleClick
@@ -1772,7 +1772,7 @@ Public Class Library
             Dim file As New System.IO.StreamReader(App.LibraryPath)
             Dim items As Collections.Generic.List(Of LibraryItemType)
             Try
-                items = reader.Deserialize(file)
+                items = DirectCast(reader.Deserialize(file), Collections.Generic.List(Of LibraryItemType))
                 For Each item As LibraryItemType In items
                     Dim lvitem As New ListViewItem
                     'Keep this in sync with number of columns set in Load Event
@@ -1939,7 +1939,7 @@ Public Class Library
             If GetLibraryGroupIndex(pGroup) = -1 Then
                 aGroup = New LibraryGroup
                 aGroup.Name = pGroup
-                aGroup.Index = LibraryGroups.Count
+                aGroup.Index = CShort(LibraryGroups.Count)
                 LibraryGroups.Add(aGroup)
             End If
         Next

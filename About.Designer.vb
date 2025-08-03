@@ -24,12 +24,12 @@ Partial Class About
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(About))
         BtnOK = New Button()
-        LblVersion = New Label()
         LblAbout = New Label()
         LLblMicrosoft = New LinkLabel()
         LLblSyncFusion = New LinkLabel()
         LLblIcons8 = New LinkLabel()
         LLblTagLibSharp = New LinkLabel()
+        LblVersion = New Components.LabelCSY()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -41,17 +41,6 @@ Partial Class About
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 0
         BtnOK.UseVisualStyleBackColor = True
-        ' 
-        ' LblVersion
-        ' 
-        LblVersion.BackColor = Color.Transparent
-        LblVersion.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblVersion.Location = New Point(12, 345)
-        LblVersion.Name = "LblVersion"
-        LblVersion.Size = New Size(360, 23)
-        LblVersion.TabIndex = 1
-        LblVersion.Text = "Version"
-        LblVersion.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' LblAbout
         ' 
@@ -121,17 +110,27 @@ Partial Class About
         LLblTagLibSharp.Text = "TagLib#"
         LLblTagLibSharp.TextAlign = ContentAlignment.TopCenter
         ' 
+        ' LblVersion
+        ' 
+        LblVersion.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblVersion.Location = New Point(12, 347)
+        LblVersion.Name = "LblVersion"
+        LblVersion.Size = New Size(360, 23)
+        LblVersion.TabIndex = 7
+        LblVersion.Text = "Labelcsy1"
+        LblVersion.TextAlign = ContentAlignment.MiddleCenter
+        ' 
         ' About
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(384, 461)
+        Controls.Add(LblVersion)
         Controls.Add(LLblTagLibSharp)
         Controls.Add(LLblIcons8)
         Controls.Add(LLblSyncFusion)
         Controls.Add(LLblMicrosoft)
         Controls.Add(LblAbout)
-        Controls.Add(LblVersion)
         Controls.Add(BtnOK)
         FormBorderStyle = FormBorderStyle.Fixed3D
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -145,10 +144,10 @@ Partial Class About
     End Sub
 
     Friend WithEvents BtnOK As Button
-    Friend WithEvents LblVersion As Label
     Friend WithEvents LblAbout As Label
     Friend WithEvents LLblMicrosoft As LinkLabel
     Friend WithEvents LLblSyncFusion As LinkLabel
     Friend WithEvents LLblIcons8 As LinkLabel
     Friend WithEvents LLblTagLibSharp As LinkLabel
+    Friend WithEvents LblVersion As Components.LabelCSY
 End Class

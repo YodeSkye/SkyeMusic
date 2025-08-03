@@ -56,7 +56,7 @@ Public Class Player
                     Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
                     App.PerformHotKeyAction(m.WParam.ToInt32)
                 Case WinAPI.WM_ACTIVATE
-                    Select Case m.WParam
+                    Select Case m.WParam.ToInt32
                         Case 0
                             IsFocused = False
                             SetInactiveColor()
@@ -67,7 +67,7 @@ Public Class Player
                 Case WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
                     SetAccentColor()
                 Case WinAPI.WM_SIZE
-                    If (m.WParam = 0 Or m.WParam = 2) AndAlso Lyrics Then ShowMedia()
+                    If (m.WParam.ToInt32 = 0 Or m.WParam.ToInt32 = 2) AndAlso Lyrics Then ShowMedia()
             End Select
         Catch ex As Exception
             App.WriteToLog("Player WndProc Handler Error" + Chr(13) + ex.ToString)
@@ -713,12 +713,12 @@ Public Class Player
         End If
     End Sub
     Private Sub MIPlayMode_Click(sender As Object, e As EventArgs) Handles MIPlayMode.Click
-        Dim newIndex As Byte = App.PlayMode + 1
+        Dim newIndex As Byte = CType(App.PlayMode + 1, Byte)
         'Debug.Print(newIndex.ToString)
         If newIndex = [Enum].GetNames(GetType(App.PlayModes)).Length Then
             newIndex = 0
         End If
-        App.PlayMode = newIndex
+        App.PlayMode = CType(newIndex, App.PlayModes)
         ShowPlayMode()
     End Sub
     Private Sub MIPlayMode_MouseEnter(sender As Object, e As EventArgs) Handles MIPlayMode.MouseEnter
@@ -996,7 +996,7 @@ Public Class Player
         pFont = New Font(Me.Font.FontFamily, pSize, FontStyle.Bold)
         If Not String.IsNullOrEmpty(pText) Then
             Do
-                pSize -= 1
+                pSize -= CByte(1)
                 pFont = New Font(Me.Font.FontFamily, pSize, FontStyle.Bold)
                 If pSize = 8 Then Exit Do 'Minimum Font Size
             Loop Until e.Graphics.MeasureString(pText, pFont).Width < PicBoxVisualizer.Width
@@ -1013,7 +1013,7 @@ Public Class Player
         pFont.Dispose()
     End Sub
     Private Sub LblAlbumArtSelectClick(sender As Object, e As EventArgs) Handles LblAlbumArtSelect.Click
-        AlbumArtIndex += 1
+        AlbumArtIndex += CByte(1)
         ShowMedia()
     End Sub
     Private Sub LblPosition_MouseUp(sender As Object, e As MouseEventArgs) Handles LblPosition.MouseUp
@@ -1070,10 +1070,10 @@ Public Class Player
         End If
     End Sub
     Private Sub TxtBoxLyrics_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxLyrics.MouseUp
-        CMLyrics.Display(sender, e)
+        CMLyrics.Display(CType(sender, TextBox), e)
     End Sub
     Private Sub TxtBoxLyrics_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxLyrics.PreviewKeyDown
-        CMLyrics.ShortcutKeys(sender, e)
+        CMLyrics.ShortcutKeys(CType(sender, TextBox), e)
     End Sub
     Private Sub ListBoxPlaylistSearchSelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBoxPlaylistSearch.SelectedIndexChanged
         If ListBoxPlaylistSearch.SelectedItems.Count = 1 Then
@@ -2221,7 +2221,7 @@ Public Class Player
             Dim file As New IO.FileStream(App.PlaylistPath, IO.FileMode.Open)
             Dim items As Collections.Generic.List(Of PlaylistItemType)
             Try
-                items = reader.Deserialize(file)
+                items = DirectCast(reader.Deserialize(file), Collections.Generic.List(Of PlaylistItemType))
                 For Each item As PlaylistItemType In items
                     Dim lvi As ListViewItem
                     lvi = CreateListviewItem()
@@ -2874,14 +2874,14 @@ Public Class Player
                     'Height > Width, Set Height then Get Width, then Set Centers
                     AxPlayer.Width = VideoGetWidth(PanelMedia.Height)
                     AxPlayer.Height = PanelMedia.Height
-                    AxPlayer.Left = PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2)
-                    AxPlayer.Top = PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2)
+                    AxPlayer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2))
+                    AxPlayer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2))
                 Else
                     'Width > Height, Set Width then Get Height, then Set Centers
                     AxPlayer.Width = PanelMedia.Width
                     AxPlayer.Height = VideoGetHeight(PanelMedia.Width)
-                    AxPlayer.Left = PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2)
-                    AxPlayer.Top = PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2)
+                    AxPlayer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2))
+                    AxPlayer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2))
                 End If
             End If
         Catch

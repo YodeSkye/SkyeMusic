@@ -369,7 +369,7 @@ Namespace My.Components
 					If CopyOnDoubleClick Then
 						MyBase.DefWndProc(m)
 					Else
-						m.Result = 0
+						m.Result = IntPtr.Zero
 					End If
 				Case Else
 					MyBase.DefWndProc(m)

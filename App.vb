@@ -368,7 +368,7 @@ Namespace My
             Dim regkey As RegistryKey
             Dim regvalue As Integer
             regkey = Registry.CurrentUser.OpenSubKey("Software\Microsoft\Windows\DWM")
-            regvalue = regkey.GetValue("AccentColor")
+            regvalue = CInt(regkey.GetValue("AccentColor"))
             If regvalue = Nothing Then
                 c = App.CurrentTheme.BackColor
             Else
@@ -522,7 +522,7 @@ Namespace My
             Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
             If existingindex >= 0 Then
                 Dim existingsong As Song = History(existingindex)
-                existingsong.PlayCount += 1
+                existingsong.PlayCount += CUShort(1)
                 If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
                 existingsong.LastPlayed = DateTime.Now
                 History(existingindex) = existingsong
@@ -724,7 +724,7 @@ Namespace My
                 Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of Song)))
                 Dim file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
                 Try
-                    History = reader.Deserialize(file)
+                    History = DirectCast(reader.Deserialize(file), Collections.Generic.List(Of Song))
                 Catch
                     History = Nothing
                 End Try
@@ -831,7 +831,7 @@ Namespace My
                 If HistoryUpdateInterval > 60 Then
                     HistoryUpdateInterval = 60 'Limit the interval to a maximum of 60 seconds
                 End If
-                HistoryAutoSaveInterval = CShort(Val(RegKey.GetValue("HistoryAutoSaveInterval", 5.ToString)))
+                HistoryAutoSaveInterval = CUShort(Val(RegKey.GetValue("HistoryAutoSaveInterval", 5.ToString)))
                 If HistoryAutoSaveInterval < 1 Then
                     App.HistoryAutoSaveInterval = 1
                 ElseIf HistoryAutoSaveInterval > 1440 Then
