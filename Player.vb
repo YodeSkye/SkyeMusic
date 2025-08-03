@@ -1179,7 +1179,7 @@ Public Class Player
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
         If AxPlayer.currentMedia IsNot Nothing AndAlso PlayState Then
             Try
-                If Not Stream Then TrackBarPosition.Value = AxPlayer.Ctlcontrols.currentPosition * TrackBarScale
+                If Not Stream Then TrackBarPosition.Value = CInt(AxPlayer.Ctlcontrols.currentPosition * TrackBarScale)
                 If My.App.PlayerPositionShowElapsed Then
                     LblPosition.Text = FormatPosition(AxPlayer.Ctlcontrols.currentPosition)
                 Else
@@ -2675,7 +2675,7 @@ Public Class Player
         PlayState = True
         UpdateHistory(AxPlayer.URL)
         BtnPlay.Image = App.CurrentTheme.PlayerPause
-        TrackBarPosition.Maximum = AxPlayer.currentMedia.duration * TrackBarScale
+        TrackBarPosition.Maximum = CInt(AxPlayer.currentMedia.duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
         LblDuration.Text = FormatDuration(AxPlayer.currentMedia.duration)
         Try

@@ -316,15 +316,15 @@ Namespace My
                 Case True
                     If Not ScreenSaverActive Then
                         ScreenSaverActive = True
-                        Debug.Print("ScreenSaver Activated @ " & Now.ToString)
+                        Debug.Print("ScreenSaver Activated @ " + Now.ToString)
                         WriteToLog("ScreenSaver Activated @ " + Now.ToString)
                         SessionSuspended()
                     End If
                 Case False
                     If ScreenSaverActive Then
                         ScreenSaverActive = False
-                        Debug.Print("ScreenSaver Deactivated @ " & Now)
-                        WriteToLog("ScreenSaver Deactivated @ " + Now)
+                        Debug.Print("ScreenSaver Deactivated @ " + Now.ToString)
+                        WriteToLog("ScreenSaver Deactivated @ " + Now.ToString)
                     End If
             End Select
         End Sub

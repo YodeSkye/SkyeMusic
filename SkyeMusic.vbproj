@@ -14,7 +14,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
     <ApplicationIcon>My Project\IconSkyeMusicRed.ico</ApplicationIcon>
-    <OptionStrict>Off</OptionStrict>
+    <OptionStrict>On</OptionStrict>
     <ImportedNamespaces>SkyeMusic.My=False,System.Data=False,System.Drawing=False,System.Windows.Forms=False,Microsoft.VisualBasic=True,System=True,System.Collections=True,System.Collections.Generic=True,System.Diagnostics=True,System.Linq=True,System.Xml.Linq=True,System.Threading.Tasks=True,SkyeMusic=True</ImportedNamespaces>
     <PackageIcon>ImageAppRed.png</PackageIcon>
   </PropertyGroup>

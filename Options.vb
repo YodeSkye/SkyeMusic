@@ -216,15 +216,15 @@ Public Class Options
         Player.SetTipPlayer()
     End Sub
     Private Sub CoBoxPlayMode_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlayMode.SelectionChangeCommitted
-        App.PlayMode = CoBoxPlayMode.SelectedIndex
+        App.PlayMode = CType(CoBoxPlayMode.SelectedIndex, App.PlayModes)
         If App.PlayMode = PlayModes.Random Then Player.RandomHistoryClear()
         Player.SetTipPlayer()
     End Sub
     Private Sub CoBoxPlaylistDefaultAction_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistDefaultAction.SelectionChangeCommitted
-        App.PlaylistDefaultAction = CoBoxPlaylistDefaultAction.SelectedIndex
+        App.PlaylistDefaultAction = CType(CoBoxPlaylistDefaultAction.SelectedIndex, App.PlaylistActions)
     End Sub
     Private Sub CoBoxPlaylistSearchAction_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistSearchAction.SelectionChangeCommitted
-        App.PlaylistSearchAction = CoBoxPlaylistSearchAction.SelectedIndex
+        App.PlaylistSearchAction = CType(CoBoxPlaylistSearchAction.SelectedIndex, App.PlaylistActions)
     End Sub
     Private Sub CoBoxTheme_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxTheme.SelectionChangeCommitted
         App.Theme = CType(CoBoxTheme.SelectedIndex, App.Themes)
