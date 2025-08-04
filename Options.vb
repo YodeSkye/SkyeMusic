@@ -161,6 +161,19 @@ Public Class Options
     End Sub
 
     'Control Events
+    Private Sub TCOptions_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TCOptions.SelectedIndexChanged
+        Debug.Print(TCOptions.SelectedTab.Name)
+        Select Case TCOptions.SelectedTab.Name
+            Case "TPApp"
+                CoBoxTheme.Focus()
+            Case "TPPlayer"
+                GrBoxTime.Focus()
+            Case "TPPlaylist"
+                CoBoxPlaylistTitleFormat.Focus()
+            Case "TPLibrary"
+                LBLibrarySearchFolders.Focus()
+        End Select
+    End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub

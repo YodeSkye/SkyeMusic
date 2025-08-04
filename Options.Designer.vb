@@ -575,6 +575,7 @@ Partial Class Options
         TCOptions.Name = "TCOptions"
         TCOptions.Size = New Size(818, 457)
         TCOptions.TabIndex = 148
+        TCOptions.TabStop = False
         TCOptions.TabStyle = GetType(Syncfusion.Windows.Forms.Tools.TabRendererWhidbey)
         TCOptions.ThemeName = "TabRendererWhidbey"
         ' 
