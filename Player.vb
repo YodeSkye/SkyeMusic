@@ -1029,9 +1029,6 @@ Public Class Player
     Private Sub LblPlaylistCount_DoubleClick(sender As Object, e As EventArgs) Handles LblPlaylistCount.DoubleClick
         ToggleMaximized()
     End Sub
-    Private Sub TxtBoxPlaylistSearch_DoubleClick(sender As Object, e As EventArgs) Handles TxtBoxPlaylistSearch.DoubleClick
-        ToggleMaximized()
-    End Sub
     Private Sub TxtBoxPlaylistSearch_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TxtBoxPlaylistSearch.KeyPress
         Select Case e.KeyChar
             Case Convert.ToChar(Keys.Escape)

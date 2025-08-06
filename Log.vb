@@ -107,9 +107,6 @@ Public Class Log
         End If
         SetDeleteLogConfirm()
     End Sub
-    Private Sub TxBxSearch_DoubleClick(sender As Object, e As EventArgs) Handles TxBxSearch.DoubleClick
-        ToggleMaximized()
-    End Sub
     Private Sub TxBxSearch_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TxBxSearch.KeyPress
         Select Case e.KeyChar
             Case Convert.ToChar(Keys.Escape)
