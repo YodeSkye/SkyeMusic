@@ -99,9 +99,9 @@ Namespace My
                 Else
                     s += " Plays"
                 End If
-                If Not Added = Nothing Then s += ", Added " + Added.ToString()
-                If Not FirstPlayed = Nothing Then s += ", First Played " + FirstPlayed.ToString()
                 If Not LastPlayed = Nothing Then s += ", Last Played " + LastPlayed.ToString()
+                If Not FirstPlayed = Nothing Then s += ", First Played " + FirstPlayed.ToString()
+                If Not Added = Nothing Then s += ", Added " + Added.ToString()
                 Return s
             End Function
 

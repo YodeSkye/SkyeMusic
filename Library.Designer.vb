@@ -51,6 +51,7 @@ Partial Class Library
         TipLibrary = New ToolTip(components)
         RadBtnGroupByGenre = New RadioButton()
         GrpBoxGroupBy = New GroupBox()
+        RadBtnGroupByYear = New RadioButton()
         RadBtnGroupByArtist = New RadioButton()
         RadBtnGroupByAlbum = New RadioButton()
         RadBtnGroupByNone = New RadioButton()
@@ -62,7 +63,6 @@ Partial Class Library
         LblStatus = New Components.LabelCSY()
         LVLibrary = New ListView()
         LblHistory = New Components.LabelCSY()
-        RadBtnGroupByYear = New RadioButton()
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -273,7 +273,7 @@ Partial Class Library
         ' 
         ' GrpBoxGroupBy
         ' 
-        GrpBoxGroupBy.Anchor = AnchorStyles.Bottom
+        GrpBoxGroupBy.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         GrpBoxGroupBy.Controls.Add(RadBtnGroupByYear)
         GrpBoxGroupBy.Controls.Add(RadBtnGroupByArtist)
         GrpBoxGroupBy.Controls.Add(RadBtnGroupByAlbum)
@@ -285,6 +285,19 @@ Partial Class Library
         GrpBoxGroupBy.TabIndex = 18
         GrpBoxGroupBy.TabStop = False
         GrpBoxGroupBy.Text = "Group By"
+        ' 
+        ' RadBtnGroupByYear
+        ' 
+        RadBtnGroupByYear.Appearance = Appearance.Button
+        RadBtnGroupByYear.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
+        RadBtnGroupByYear.ForeColor = SystemColors.ControlText
+        RadBtnGroupByYear.Location = New Point(183, 22)
+        RadBtnGroupByYear.Name = "RadBtnGroupByYear"
+        RadBtnGroupByYear.Size = New Size(53, 25)
+        RadBtnGroupByYear.TabIndex = 23
+        RadBtnGroupByYear.Text = "Year"
+        RadBtnGroupByYear.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnGroupByYear.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByArtist
         ' 
@@ -328,7 +341,7 @@ Partial Class Library
         ' 
         ' LblExtTitle
         ' 
-        LblExtTitle.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
+        LblExtTitle.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtTitle.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblExtTitle.Location = New Point(147, 372)
         LblExtTitle.Name = "LblExtTitle"
@@ -339,7 +352,7 @@ Partial Class Library
         ' 
         ' LblExtFileInfo
         ' 
-        LblExtFileInfo.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
+        LblExtFileInfo.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtFileInfo.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblExtFileInfo.Location = New Point(147, 389)
         LblExtFileInfo.Name = "LblExtFileInfo"
@@ -350,7 +363,7 @@ Partial Class Library
         ' 
         ' LblExtProperties
         ' 
-        LblExtProperties.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
+        LblExtProperties.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtProperties.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblExtProperties.Location = New Point(147, 406)
         LblExtProperties.Name = "LblExtProperties"
@@ -361,7 +374,7 @@ Partial Class Library
         ' 
         ' LblExtType
         ' 
-        LblExtType.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
+        LblExtType.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtType.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblExtType.Location = New Point(147, 422)
         LblExtType.Name = "LblExtType"
@@ -409,7 +422,7 @@ Partial Class Library
         ' 
         ' LblHistory
         ' 
-        LblHistory.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
+        LblHistory.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblHistory.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblHistory.Location = New Point(147, 356)
         LblHistory.Name = "LblHistory"
@@ -417,19 +430,6 @@ Partial Class Library
         LblHistory.TabIndex = 25
         LblHistory.Text = "History"
         LblHistory.TextAlign = ContentAlignment.MiddleLeft
-        ' 
-        ' RadBtnGroupByYear
-        ' 
-        RadBtnGroupByYear.Appearance = Appearance.Button
-        RadBtnGroupByYear.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
-        RadBtnGroupByYear.ForeColor = SystemColors.ControlText
-        RadBtnGroupByYear.Location = New Point(183, 22)
-        RadBtnGroupByYear.Name = "RadBtnGroupByYear"
-        RadBtnGroupByYear.Size = New Size(53, 25)
-        RadBtnGroupByYear.TabIndex = 23
-        RadBtnGroupByYear.Text = "Year"
-        RadBtnGroupByYear.TextAlign = ContentAlignment.MiddleCenter
-        RadBtnGroupByYear.UseVisualStyleBackColor = True
         ' 
         ' Library
         ' 

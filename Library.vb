@@ -258,42 +258,7 @@ Public Class Library
             SetLibraryCountText()
             AlbumArtIndex = 0
             ShowAlbumArt()
-            LblHistory.Text = App.History.Find(Function(p) p.Path = (LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)).ToStringFull
-            TipLibrary.SetToolTip(LblHistory, LblHistory.Text)
-            LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
-            Dim fInfo As IO.FileInfo
-            fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
-            LblExtFileInfo.Text = fInfo.Extension.TrimStart(CChar(".")).ToUpper
-            LblExtFileInfo.Text += " " + App.FormatFileSize(fInfo.Length, My.App.FormatFileSizeUnits.Auto, 2, False)
-            fInfo = Nothing
-            Dim tlFile As TagLib.File = Nothing
-            Try
-                tlFile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
-            Catch
-            Finally
-                If tlFile IsNot Nothing Then
-                    Select Case tlFile.Properties.MediaTypes
-                        Case TagLib.MediaTypes.Audio
-                            LblExtProperties.Text = tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
-                            Select Case tlFile.Properties.AudioChannels
-                                Case 1 : LblExtProperties.Text += "Mono"
-                                Case 2 : LblExtProperties.Text += "Stereo"
-                                Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
-                            End Select
-                        Case TagLib.MediaTypes.Video Or TagLib.MediaTypes.Audio
-                            LblExtProperties.Text = tlFile.Properties.VideoWidth.ToString + "x" + tlFile.Properties.VideoHeight.ToString + ", Audio: "
-                            LblExtProperties.Text += tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
-                            Select Case tlFile.Properties.AudioChannels
-                                Case 1 : LblExtProperties.Text += "Mono"
-                                Case 2 : LblExtProperties.Text += "Stereo"
-                                Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
-                            End Select
-                    End Select
-                    LblExtType.Text = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
-                    tlFile.Dispose()
-                    tlFile = Nothing
-                End If
-            End Try
+            SetExtInfo()
         Else
             ResetExtInfo()
         End If
@@ -620,8 +585,11 @@ Public Class Library
     Private Sub LblLibraryCounts_DoubleClick(sender As Object, e As EventArgs) Handles LblLibraryCounts.DoubleClick
         ToggleMaximized()
     End Sub
-    Private Sub LblExt_DoubleClick(sender As Object, e As EventArgs) Handles LblExtTitle.DoubleClick, LblExtFileInfo.DoubleClick, LblExtProperties.DoubleClick, LblExtType.DoubleClick
+    Private Sub LblExtInfo_DoubleClick(sender As Object, e As EventArgs) Handles LblExtTitle.DoubleClick, LblExtFileInfo.DoubleClick, LblExtProperties.DoubleClick, LblExtType.DoubleClick, LblHistory.DoubleClick
         ToggleMaximized()
+    End Sub
+    Private Sub LblExtInfo_Resize(sender As Object, e As EventArgs) Handles LblExtTitle.Resize, LblExtFileInfo.Resize, LblExtProperties.Resize, LblExtType.Resize, LblHistory.Resize
+        SetExtInfo()
     End Sub
     Private Sub TxbxLibrarySearch_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TxbxLibrarySearch.KeyPress
         If e.KeyChar = Convert.ToChar(Keys.Escape) Then e.Handled = True
@@ -2004,6 +1972,57 @@ Public Class Library
         'Debug.Print("ClearGroups")
         LibraryGroups.Clear()
         LVLibrary.Groups.Clear()
+    End Sub
+    Private Sub SetExtInfo()
+        If LVLibrary.SelectedItems.Count > 0 Then
+            Dim h As String = App.History.Find(Function(p) p.Path = (LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)).ToStringFull
+            LblHistory.Text = GenerateEllipsis(LblHistory.CreateGraphics(), h, LblHistory.Font, LblHistory.Size.Width)
+            If LblHistory.Text = h Then
+                TipLibrary.SetToolTip(LblHistory, Nothing)
+            Else
+                TipLibrary.SetToolTip(LblHistory, h)
+            End If
+            LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
+            Dim fInfo As IO.FileInfo
+            fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+            LblExtFileInfo.Text = fInfo.Extension.TrimStart(CChar(".")).ToUpper
+            LblExtFileInfo.Text += " " + App.FormatFileSize(fInfo.Length, My.App.FormatFileSizeUnits.Auto, 2, False)
+            fInfo = Nothing
+            Dim tlFile As TagLib.File = Nothing
+            Try
+                tlFile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+            Catch
+            Finally
+                If tlFile IsNot Nothing Then
+                    Select Case tlFile.Properties.MediaTypes
+                        Case TagLib.MediaTypes.Audio
+                            LblExtProperties.Text = tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
+                            Select Case tlFile.Properties.AudioChannels
+                                Case 1 : LblExtProperties.Text += "Mono"
+                                Case 2 : LblExtProperties.Text += "Stereo"
+                                Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
+                            End Select
+                        Case TagLib.MediaTypes.Video Or TagLib.MediaTypes.Audio
+                            LblExtProperties.Text = tlFile.Properties.VideoWidth.ToString + "x" + tlFile.Properties.VideoHeight.ToString + ", Audio: "
+                            LblExtProperties.Text += tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
+                            Select Case tlFile.Properties.AudioChannels
+                                Case 1 : LblExtProperties.Text += "Mono"
+                                Case 2 : LblExtProperties.Text += "Stereo"
+                                Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
+                            End Select
+                    End Select
+                    h = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
+                    LblExtType.Text = GenerateEllipsis(LblExtType.CreateGraphics(), h, LblExtType.Font, LblExtType.Size.Width)
+                    If LblExtType.Text = h Then
+                        TipLibrary.SetToolTip(LblExtType, Nothing)
+                    Else
+                        TipLibrary.SetToolTip(LblExtType, h)
+                    End If
+                    tlFile.Dispose()
+                    tlFile = Nothing
+                End If
+            End Try
+        End If
     End Sub
     Private Sub ResetExtInfo()
         LblHistory.Text = String.Empty
