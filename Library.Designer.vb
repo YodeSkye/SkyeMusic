@@ -343,9 +343,9 @@ Partial Class Library
         ' 
         LblExtTitle.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtTitle.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtTitle.Location = New Point(147, 372)
+        LblExtTitle.Location = New Point(147, 371)
         LblExtTitle.Name = "LblExtTitle"
-        LblExtTitle.Size = New Size(454, 16)
+        LblExtTitle.Size = New Size(454, 18)
         LblExtTitle.TabIndex = 19
         LblExtTitle.Text = "Title"
         LblExtTitle.TextAlign = ContentAlignment.MiddleLeft
@@ -356,18 +356,18 @@ Partial Class Library
         LblExtFileInfo.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblExtFileInfo.Location = New Point(147, 389)
         LblExtFileInfo.Name = "LblExtFileInfo"
-        LblExtFileInfo.Size = New Size(454, 16)
+        LblExtFileInfo.Size = New Size(454, 18)
         LblExtFileInfo.TabIndex = 20
-        LblExtFileInfo.Text = "LblExtFileInfo"
+        LblExtFileInfo.Text = "File Info"
         LblExtFileInfo.TextAlign = ContentAlignment.MiddleLeft
         ' 
         ' LblExtProperties
         ' 
         LblExtProperties.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtProperties.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtProperties.Location = New Point(147, 406)
+        LblExtProperties.Location = New Point(147, 407)
         LblExtProperties.Name = "LblExtProperties"
-        LblExtProperties.Size = New Size(454, 16)
+        LblExtProperties.Size = New Size(454, 18)
         LblExtProperties.TabIndex = 21
         LblExtProperties.Text = "Properties"
         LblExtProperties.TextAlign = ContentAlignment.MiddleLeft
@@ -376,9 +376,9 @@ Partial Class Library
         ' 
         LblExtType.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtType.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtType.Location = New Point(147, 422)
+        LblExtType.Location = New Point(147, 425)
         LblExtType.Name = "LblExtType"
-        LblExtType.Size = New Size(454, 16)
+        LblExtType.Size = New Size(454, 18)
         LblExtType.TabIndex = 22
         LblExtType.Text = "Type"
         LblExtType.TextAlign = ContentAlignment.MiddleLeft
@@ -424,9 +424,9 @@ Partial Class Library
         ' 
         LblHistory.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblHistory.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblHistory.Location = New Point(147, 356)
+        LblHistory.Location = New Point(147, 353)
         LblHistory.Name = "LblHistory"
-        LblHistory.Size = New Size(454, 17)
+        LblHistory.Size = New Size(454, 18)
         LblHistory.TabIndex = 25
         LblHistory.Text = "History"
         LblHistory.TextAlign = ContentAlignment.MiddleLeft
@@ -437,7 +437,6 @@ Partial Class Library
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(984, 461)
         ContextMenuStrip = CMLibrary
-        Controls.Add(LblHistory)
         Controls.Add(PicBoxAlbumArt)
         Controls.Add(LblStatus)
         Controls.Add(LblLibraryCounts)
@@ -452,6 +451,7 @@ Partial Class Library
         Controls.Add(LblExtFileInfo)
         Controls.Add(LblExtTitle)
         Controls.Add(LVLibrary)
+        Controls.Add(LblHistory)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
         MinimumSize = New Size(1000, 500)
