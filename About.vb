@@ -62,6 +62,12 @@ Public Class About
     Private Sub BtnOKClick(sender As Object, e As EventArgs) Handles BtnOK.Click
         Me.Close()
     End Sub
+    Private Sub LblVersion_DoubleClick(sender As Object, e As EventArgs) Handles LblVersion.DoubleClick
+        Dim classname As String = Space(256)
+        My.WinAPI.GetClassName(Player.Handle, classname, 255)
+        My.Computer.Clipboard.SetText(classname.TrimEnd(Chr(0), CChar(" "))) 'Remove null terminator & trailing spaces from class name
+        Debug.Print(classname.TrimEnd(Chr(0), CChar(" ")))
+    End Sub
     Private Sub LLblMicrosoft_MouseEnter(sender As Object, e As EventArgs) Handles LLblMicrosoft.MouseEnter
         Cursor = Cursors.Hand
     End Sub
