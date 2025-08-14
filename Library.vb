@@ -390,7 +390,12 @@ Public Class Library
         End If
     End Sub
     Private Sub LVLibrary_DoubleClick(sender As Object, e As EventArgs) Handles LVLibrary.DoubleClick
-        Play()
+        Select Case App.PlaylistDefaultAction
+            Case App.PlaylistActions.Play
+                Play()
+            Case App.PlaylistActions.Queue
+                Queue()
+        End Select
     End Sub
     Private Sub CMLibraryOpening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMLibrary.Opening
         CMIHelperApp1.Text = "Open with " + App.HelperApp1Name
@@ -419,10 +424,22 @@ Public Class Library
             CMICopyFilePath.ToolTipText = String.Empty
             CMIHelperApp1.Visible = False
             CMIHelperApp2.Visible = False
+            CMIPlay.Enabled = False
+            CMIQueue.Enabled = False
+            CMIPlayWithWindows.Enabled = False
         Else
             CMICopyTitle.ToolTipText = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             CMICopyFileName.ToolTipText = IO.Path.GetFileNameWithoutExtension(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
             CMICopyFilePath.ToolTipText = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text
+            CMIPlayWithWindows.Enabled = True
+            Select Case App.PlaylistDefaultAction
+                Case App.PlaylistActions.Play
+                    CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Bold)
+                    CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Regular)
+                Case App.PlaylistActions.Queue
+                    CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Regular)
+                    CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Bold)
+            End Select
             If File.Exists(App.HelperApp1Path) Then
                 CMIHelperApp1.Visible = True
             Else
@@ -437,6 +454,9 @@ Public Class Library
     End Sub
     Private Sub CMIPlayClick(sender As Object, e As EventArgs) Handles CMIPlay.Click
         Play()
+    End Sub
+    Private Sub CMIQueue_Click(sender As Object, e As EventArgs) Handles CMIQueue.Click
+        Queue()
     End Sub
     Private Sub CMIPlayWithWindows_Click(sender As Object, e As EventArgs) Handles CMIPlayWithWindows.Click
         If LVLibrary.SelectedItems.Count > 0 Then App.PlayWithWindows(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
@@ -1685,6 +1705,11 @@ Public Class Library
     Private Sub Play()
         If LVLibrary.SelectedItems.Count > 0 Then
             Player.PlayFromLibrary(FormatPlaylistTitle(LVLibrary.SelectedItems(0)), LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+        End If
+    End Sub
+    Private Sub Queue()
+        If LVLibrary.SelectedItems.Count > 0 Then
+            Player.QueueFromLibrary(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
         End If
     End Sub
     Private Sub AddToPlaylist(item As ListViewItem)

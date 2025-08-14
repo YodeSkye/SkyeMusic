@@ -2470,10 +2470,6 @@ Public Class Player
         StopPlay()
         If Mute Then ToggleMute()
         PlayFile(filename, "PlayFromLibrary")
-        'Stream = False
-        'AxPlayer.URL = filename
-        'App.WriteToLog("Playing " + filename + " (PlayFromLibrary)")
-        'RandomHistoryAdd(filename)
     End Sub
     Friend Sub PlayPrevious()
         Stream = False
@@ -2699,6 +2695,19 @@ Public Class Player
         PEXRight.Value = 0
         ResetLblPositionText()
         AxPlayer.Visible = False
+    End Sub
+    Friend Sub QueueFromLibrary(path As String)
+        Dim found As Boolean = False
+        For Each s As String In Queue
+            If s = path Then
+                found = True
+                Exit For
+            End If
+        Next
+        If Not found Then
+            Queue.Add(path)
+            SetPlaylistCountText()
+        End If
     End Sub
     Private Sub RandomHistoryAdd(songorstream As String)
         If App.PlayMode = App.PlayModes.Random Then

@@ -63,6 +63,7 @@ Partial Class Library
         LblStatus = New Components.LabelCSY()
         LVLibrary = New ListView()
         LblHistory = New Components.LabelCSY()
+        CMIQueue = New ToolStripMenuItem()
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -70,13 +71,13 @@ Partial Class Library
         ' 
         ' CMLibrary
         ' 
-        CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
+        CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMLibrary.Name = "CMLibrary"
-        CMLibrary.Size = New Size(189, 314)
+        CMLibrary.Size = New Size(189, 358)
         ' 
         ' CMIPlay
         ' 
-        CMIPlay.Font = New Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        CMIPlay.Font = New Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMIPlay.Image = My.Resources.Resources.ImagePlay
         CMIPlay.Name = "CMIPlay"
         CMIPlay.Size = New Size(188, 22)
@@ -431,6 +432,13 @@ Partial Class Library
         LblHistory.Text = "History"
         LblHistory.TextAlign = ContentAlignment.MiddleLeft
         ' 
+        ' CMIQueue
+        ' 
+        CMIQueue.Image = My.Resources.Resources.ImagePlay
+        CMIQueue.Name = "CMIQueue"
+        CMIQueue.Size = New Size(188, 22)
+        CMIQueue.Text = "Queue"
+        ' 
         ' Library
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -503,4 +511,5 @@ Partial Class Library
     Friend WithEvents LVLibrary As ListView
     Friend WithEvents LblHistory As Components.LabelCSY
     Friend WithEvents RadBtnGroupByYear As RadioButton
+    Friend WithEvents CMIQueue As ToolStripMenuItem
 End Class
