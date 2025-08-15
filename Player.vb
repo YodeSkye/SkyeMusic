@@ -260,6 +260,7 @@ Public Class Player
     Private Sub Player_Deactivate(sender As Object, e As EventArgs) Handles MyBase.Deactivate
         Debug.Print("Player Lost Focus")
         ResetTxtBoxPlaylistSearch()
+        LVPlaylist.Select()
     End Sub
     Private Sub Player_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         SavePlaylist()
