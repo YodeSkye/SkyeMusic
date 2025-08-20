@@ -280,6 +280,7 @@ Namespace My
         Friend LibrarySearchSubFolders As Boolean = True
         Friend SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
         Friend SaveWindowMetrics As Boolean = False 'Flag that indicates whether to save and restore window positions and sizes.
+        Friend RandomHistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to add the currently playing song to the shuffle play history.
         Friend HistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to update the play count of the currently playing song.
         Friend HistoryAutoSaveInterval As UShort = 5 '1-1440 'Interval in minutes to automatically save the history.
         Friend Theme As Themes = Themes.Red 'The current theme of the application.
@@ -536,12 +537,12 @@ Namespace My
         End Sub
         Friend Sub UpdateRandomHistory(songorstream As String)
             timerRandomHistoryUpdate.Stop()
-            If HistoryUpdateInterval = 0 Then
+            If RandomHistoryUpdateInterval = 0 Then
                 timerRandomHistoryUpdate.Tag = songorstream
                 UpdateRandomHistory()
                 Return
             Else
-                timerRandomHistoryUpdate.Interval = HistoryUpdateInterval * 1000
+                timerRandomHistoryUpdate.Interval = RandomHistoryUpdateInterval * 1000
                 timerRandomHistoryUpdate.Tag = songorstream
                 timerRandomHistoryUpdate.Start()
             End If
@@ -757,6 +758,7 @@ Namespace My
                 RegKey.SetValue("Theme", App.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SuspendOnSessionChange", App.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SaveWindowMetrics", App.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("RandomHistoryUpdateInterval", App.RandomHistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HistoryUpdateInterval", App.HistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HistoryAutoSaveInterval", App.HistoryAutoSaveInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationX", App.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -827,6 +829,10 @@ Namespace My
                     Case "True", "1" : App.SaveWindowMetrics = True
                     Case Else : App.SaveWindowMetrics = False
                 End Select
+                RandomHistoryUpdateInterval = CByte(Val(RegKey.GetValue("RandomHistoryUpdateInterval", 5.ToString)))
+                If RandomHistoryUpdateInterval > 60 Then
+                    RandomHistoryUpdateInterval = 60 'Limit the interval to a maximum of 60 seconds
+                End If
                 HistoryUpdateInterval = CByte(Val(RegKey.GetValue("HistoryUpdateInterval", 5.ToString)))
                 If HistoryUpdateInterval > 60 Then
                     HistoryUpdateInterval = 60 'Limit the interval to a maximum of 60 seconds

@@ -65,6 +65,7 @@ Partial Class Options
         TxtBoxHelperApp2Name = New TextBox()
         TxtBoxHelperApp1Path = New TextBox()
         TxtBoxHelperApp1Name = New TextBox()
+        TxtBoxRandomHistoryUpdateInterval = New TextBox()
         LblHistoryUpdateInterval2 = New Components.LabelCSY()
         LblHistoryUpdateInterval1 = New Components.LabelCSY()
         LblHistoryAutoSaveInterval1 = New Components.LabelCSY()
@@ -75,6 +76,8 @@ Partial Class Options
         LblHelperApp2Name = New Components.LabelCSY()
         LblHelperApp1Path = New Components.LabelCSY()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        LblRandomHistoryUpdateInterval1 = New Components.LabelCSY()
+        LblRandomHistoryUpdateInterval2 = New Components.LabelCSY()
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         TPLibrary = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         LblLibrarySearchFolders = New Label()
@@ -427,7 +430,7 @@ Partial Class Options
         TxtBoxHistoryUpdateInterval.Size = New Size(44, 29)
         TxtBoxHistoryUpdateInterval.TabIndex = 148
         TxtBoxHistoryUpdateInterval.TextAlign = HorizontalAlignment.Center
-        TipOptions.SetToolTip(TxtBoxHistoryUpdateInterval, "Update Song History & Shuffle Play History after 1-60 seconds, or 0 for immediate update.")
+        TipOptions.SetToolTip(TxtBoxHistoryUpdateInterval, "Update Song History after 1-60 seconds, or 0 for immediate update.")
         ' 
         ' LblPlaylistFormatting
         ' 
@@ -517,6 +520,17 @@ Partial Class Options
         TxtBoxHelperApp1Name.Size = New Size(202, 29)
         TxtBoxHelperApp1Name.TabIndex = 60
         TipOptions.SetToolTip(TxtBoxHelperApp1Name, "Enter a name for your Helper App.")
+        ' 
+        ' TxtBoxRandomHistoryUpdateInterval
+        ' 
+        TxtBoxRandomHistoryUpdateInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TxtBoxRandomHistoryUpdateInterval.Location = New Point(355, 293)
+        TxtBoxRandomHistoryUpdateInterval.Name = "TxtBoxRandomHistoryUpdateInterval"
+        TxtBoxRandomHistoryUpdateInterval.ShortcutsEnabled = False
+        TxtBoxRandomHistoryUpdateInterval.Size = New Size(44, 29)
+        TxtBoxRandomHistoryUpdateInterval.TabIndex = 151
+        TxtBoxRandomHistoryUpdateInterval.TextAlign = HorizontalAlignment.Center
+        TipOptions.SetToolTip(TxtBoxRandomHistoryUpdateInterval, resources.GetString("TxtBoxRandomHistoryUpdateInterval.ToolTip"))
         ' 
         ' LblHistoryUpdateInterval2
         ' 
@@ -644,12 +658,15 @@ Partial Class Options
         ' TPPlayer
         ' 
         TPPlayer.BorderStyle = BorderStyle.Fixed3D
+        TPPlayer.Controls.Add(TxtBoxRandomHistoryUpdateInterval)
         TPPlayer.Controls.Add(TxtBoxHistoryUpdateInterval)
         TPPlayer.Controls.Add(LblHistoryUpdateInterval2)
         TPPlayer.Controls.Add(GrBoxTime)
         TPPlayer.Controls.Add(CoBoxPlayMode)
         TPPlayer.Controls.Add(LblHistoryUpdateInterval1)
         TPPlayer.Controls.Add(LblSongPlayMode)
+        TPPlayer.Controls.Add(LblRandomHistoryUpdateInterval1)
+        TPPlayer.Controls.Add(LblRandomHistoryUpdateInterval2)
         TPPlayer.Image = Nothing
         TPPlayer.ImageSize = New Size(16, 16)
         TPPlayer.Location = New Point(1, 42)
@@ -659,6 +676,28 @@ Partial Class Options
         TPPlayer.TabIndex = 2
         TPPlayer.Text = " Player "
         TPPlayer.ThemesEnabled = False
+        ' 
+        ' LblRandomHistoryUpdateInterval1
+        ' 
+        LblRandomHistoryUpdateInterval1.AutoSize = True
+        LblRandomHistoryUpdateInterval1.Font = New Font("Segoe UI", 12F)
+        LblRandomHistoryUpdateInterval1.Location = New Point(14, 296)
+        LblRandomHistoryUpdateInterval1.Name = "LblRandomHistoryUpdateInterval1"
+        LblRandomHistoryUpdateInterval1.Size = New Size(345, 21)
+        LblRandomHistoryUpdateInterval1.TabIndex = 152
+        LblRandomHistoryUpdateInterval1.Text = "Update Shuffle Play History After Song Plays For"
+        LblRandomHistoryUpdateInterval1.TextAlign = ContentAlignment.MiddleRight
+        ' 
+        ' LblRandomHistoryUpdateInterval2
+        ' 
+        LblRandomHistoryUpdateInterval2.AutoSize = True
+        LblRandomHistoryUpdateInterval2.Font = New Font("Segoe UI", 12F)
+        LblRandomHistoryUpdateInterval2.Location = New Point(397, 296)
+        LblRandomHistoryUpdateInterval2.Name = "LblRandomHistoryUpdateInterval2"
+        LblRandomHistoryUpdateInterval2.Size = New Size(68, 21)
+        LblRandomHistoryUpdateInterval2.TabIndex = 153
+        LblRandomHistoryUpdateInterval2.Text = "Seconds"
+        LblRandomHistoryUpdateInterval2.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' TPPlaylist
         ' 
@@ -797,4 +836,7 @@ Partial Class Options
     Friend WithEvents LblHelperApp2Path As Components.LabelCSY
     Friend WithEvents LblHelperApp2Name As Components.LabelCSY
     Friend WithEvents LblHelperApp1Path As Components.LabelCSY
+    Friend WithEvents TxtBoxRandomHistoryUpdateInterval As TextBox
+    Friend WithEvents LblRandomHistoryUpdateInterval2 As Components.LabelCSY
+    Friend WithEvents LblRandomHistoryUpdateInterval1 As Components.LabelCSY
 End Class
