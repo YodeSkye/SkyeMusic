@@ -26,6 +26,7 @@ Partial Class Library
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Library))
         CMLibrary = New ContextMenuStrip(components)
         CMIPlay = New ToolStripMenuItem()
+        CMIQueue = New ToolStripMenuItem()
         CMIPlayWithWindows = New ToolStripMenuItem()
         ToolStripSeparator3 = New ToolStripSeparator()
         CMIAddToPlaylist = New ToolStripMenuItem()
@@ -63,7 +64,6 @@ Partial Class Library
         LblStatus = New Components.LabelCSY()
         LVLibrary = New ListView()
         LblHistory = New Components.LabelCSY()
-        CMIQueue = New ToolStripMenuItem()
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -73,7 +73,7 @@ Partial Class Library
         ' 
         CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMLibrary.Name = "CMLibrary"
-        CMLibrary.Size = New Size(189, 358)
+        CMLibrary.Size = New Size(189, 336)
         ' 
         ' CMIPlay
         ' 
@@ -82,6 +82,13 @@ Partial Class Library
         CMIPlay.Name = "CMIPlay"
         CMIPlay.Size = New Size(188, 22)
         CMIPlay.Text = "Play"
+        ' 
+        ' CMIQueue
+        ' 
+        CMIQueue.Image = My.Resources.Resources.ImagePlay
+        CMIQueue.Name = "CMIQueue"
+        CMIQueue.Size = New Size(188, 22)
+        CMIQueue.Text = "Queue"
         ' 
         ' CMIPlayWithWindows
         ' 
@@ -431,13 +438,6 @@ Partial Class Library
         LblHistory.TabIndex = 25
         LblHistory.Text = "History"
         LblHistory.TextAlign = ContentAlignment.MiddleLeft
-        ' 
-        ' CMIQueue
-        ' 
-        CMIQueue.Image = My.Resources.Resources.ImagePlay
-        CMIQueue.Name = "CMIQueue"
-        CMIQueue.Size = New Size(188, 22)
-        CMIQueue.Text = "Queue"
         ' 
         ' Library
         ' 

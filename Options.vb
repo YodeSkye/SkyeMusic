@@ -114,7 +114,8 @@ Public Class Options
         TxtBoxRandomHistoryUpdateInterval.Text = App.RandomHistoryUpdateInterval.ToString
         TxtBoxHistoryUpdateInterval.Text = App.HistoryUpdateInterval.ToString
         TxtBoxHistoryAutoSaveInterval.Text = App.HistoryAutoSaveInterval.ToString
-        SetPruneButtonText()
+        SetPrunePlaylistButtonText()
+        SetPruneHistoryButtonText()
     End Sub
     Private Sub Options_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.LibrarySearchFolders.Clear()
@@ -178,9 +179,13 @@ Public Class Options
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
+    Private Sub BtnPrunePlaylist_Click(sender As Object, e As EventArgs) Handles BtnPrunePlaylist.Click
+        Player.PrunePlaylist()
+        SetPrunePlaylistButtonText()
+    End Sub
     Private Sub BtnHistoryPrune_Click(sender As Object, e As EventArgs) Handles BtnHistoryPrune.Click
         App.PruneHistory()
-        SetPruneButtonText()
+        SetPruneHistoryButtonText()
     End Sub
     Private Sub BtnHistorySaveNow_Click(sender As Object, e As EventArgs) Handles BtnHistorySaveNow.Click
         App.SaveHistory()
@@ -448,7 +453,11 @@ Public Class Options
             LBLibrarySearchFolders.Items.RemoveAt(LBLibrarySearchFolders.SelectedIndex)
         End If
     End Sub
-    Private Sub SetPruneButtonText()
+    Private Sub SetPrunePlaylistButtonText()
+        BtnPrunePlaylist.Text = BtnPrunePlaylist.Text.TrimEnd(App.TrimEndSearch) + " (" + Player.LVPlaylist.Items.Count.ToString + ")"
+        BtnPrunePlaylist.Enabled = (Player.LVPlaylist.Items.Count > 0)
+    End Sub
+    Private Sub SetPruneHistoryButtonText()
         BtnHistoryPrune.Text = BtnHistoryPrune.Text.TrimEnd(App.TrimEndSearch) + " (" + App.History.Count.ToString + ")"
         BtnHistoryPrune.Enabled = (App.History.Count > 0)
         BtnHistorySaveNow.Enabled = (App.History.Count > 0)
@@ -548,6 +557,8 @@ Public Class Options
         TxtBoxHistoryUpdateInterval.ForeColor = App.CurrentTheme.TextColor
         TxtBoxHistoryAutoSaveInterval.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxHistoryAutoSaveInterval.ForeColor = App.CurrentTheme.TextColor
+        BtnPrunePlaylist.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnPrunePlaylist.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnHistorySaveNow.BackColor = App.CurrentTheme.ButtonBackColor
         BtnHistorySaveNow.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnHistoryPrune.BackColor = App.CurrentTheme.ButtonBackColor

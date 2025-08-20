@@ -88,7 +88,6 @@ Partial Class Log
         ' LBLLogInfo
         ' 
         LBLLogInfo.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        LBLLogInfo.CopyOnDoubleClick = False
         LBLLogInfo.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LBLLogInfo.Location = New Point(12, 352)
         LBLLogInfo.Name = "LBLLogInfo"
@@ -113,7 +112,6 @@ Partial Class Log
         LblStatus.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         LblStatus.AutoSize = True
         LblStatus.BackColor = Color.Transparent
-        LblStatus.CopyOnDoubleClick = False
         LblStatus.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblStatus.ForeColor = Color.Red
         LblStatus.Location = New Point(657, 12)

@@ -22,6 +22,7 @@ Partial Class PlayerEditTitle
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(PlayerEditTitle))
         TxtBoxTitle = New TextBox()
         BtnOK = New Button()
         LblTitle = New Label()
@@ -41,7 +42,7 @@ Partial Class PlayerEditTitle
         ' BtnOK
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
-        BtnOK.Image = Resources.Resources.ImageOK
+        BtnOK.Image = My.Resources.Resources.ImageOK
         BtnOK.Location = New Point(211, 71)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -72,6 +73,7 @@ Partial Class PlayerEditTitle
         Controls.Add(BtnOK)
         Controls.Add(LblTitle)
         FormBorderStyle = FormBorderStyle.FixedDialog
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "PlayerEditTitle"
         StartPosition = FormStartPosition.CenterParent
         Text = "Edit Title"

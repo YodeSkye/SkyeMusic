@@ -2399,6 +2399,10 @@ Public Class Player
             Stream = False
             Try
                 AxPlayer.URL = path
+                If Not My.Computer.FileSystem.FileExists(path) Then
+                    LblPosition.Text = String.Empty
+                    LblDuration.Text = String.Empty
+                End If
                 '''OnPlay()
                 App.WriteToLog("Playing " + path + " (" + source + ")")
                 RandomHistoryAdd(path)
@@ -2960,6 +2964,32 @@ Public Class Player
             PlaylistSearchItems.Clear()
             Debug.Print("Playlist Search Reset")
         End If
+    End Sub
+    Friend Sub PrunePlaylist()
+
+        Debug.Print("Pruning Playlist..." + LVPlaylist.Items.Count.ToString + " total playlist items...")
+
+        'Find files that don't exist
+        Dim prunelist As New Collections.Generic.List(Of String)
+        For index As Integer = 0 To LVPlaylist.Items.Count - 1
+            If Not IsStream(LVPlaylist.Items(index).SubItems(1).Text) AndAlso Not My.Computer.FileSystem.FileExists(LVPlaylist.Items(index).SubItems(1).Text) Then
+                prunelist.Add(LVPlaylist.Items(index).SubItems(1).Text)
+            End If
+        Next
+
+        Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found...")
+
+        'Prune History
+        For Each s As String In prunelist
+            Debug.Print(s)
+            LVPlaylist.Items.RemoveAt(LVPlaylist.FindItemWithText(s, True, 0).Index)
+        Next
+        Debug.Print("Playlist Pruned (" + prunelist.Count.ToString + ")")
+        Debug.Print("Pruning Playlist Complete..." + LVPlaylist.Items.Count.ToString + " total playlist items.")
+        WriteToLog("Playlist Pruned (" + prunelist.Count.ToString + ")")
+
+        prunelist = Nothing
+
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow

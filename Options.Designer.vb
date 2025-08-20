@@ -66,6 +66,7 @@ Partial Class Options
         TxtBoxHelperApp1Path = New TextBox()
         TxtBoxHelperApp1Name = New TextBox()
         TxtBoxRandomHistoryUpdateInterval = New TextBox()
+        BtnPrunePlaylist = New Button()
         LblHistoryUpdateInterval2 = New Components.LabelCSY()
         LblHistoryUpdateInterval1 = New Components.LabelCSY()
         LblHistoryAutoSaveInterval1 = New Components.LabelCSY()
@@ -532,6 +533,19 @@ Partial Class Options
         TxtBoxRandomHistoryUpdateInterval.TextAlign = HorizontalAlignment.Center
         TipOptions.SetToolTip(TxtBoxRandomHistoryUpdateInterval, resources.GetString("TxtBoxRandomHistoryUpdateInterval.ToolTip"))
         ' 
+        ' BtnPrunePlaylist
+        ' 
+        BtnPrunePlaylist.Image = My.Resources.Resources.ImagePrune32
+        BtnPrunePlaylist.ImageAlign = ContentAlignment.MiddleLeft
+        BtnPrunePlaylist.Location = New Point(583, 360)
+        BtnPrunePlaylist.Name = "BtnPrunePlaylist"
+        BtnPrunePlaylist.Size = New Size(218, 40)
+        BtnPrunePlaylist.TabIndex = 256
+        BtnPrunePlaylist.Text = "Prune Playlist"
+        BtnPrunePlaylist.TextAlign = ContentAlignment.MiddleRight
+        TipOptions.SetToolTip(BtnPrunePlaylist, resources.GetString("BtnPrunePlaylist.ToolTip"))
+        BtnPrunePlaylist.UseVisualStyleBackColor = True
+        ' 
         ' LblHistoryUpdateInterval2
         ' 
         LblHistoryUpdateInterval2.AutoSize = True
@@ -702,6 +716,7 @@ Partial Class Options
         ' TPPlaylist
         ' 
         TPPlaylist.BorderStyle = BorderStyle.Fixed3D
+        TPPlaylist.Controls.Add(BtnPrunePlaylist)
         TPPlaylist.Controls.Add(LblPlaylistFormatting)
         TPPlaylist.Controls.Add(TxtBoxPlaylistVideoIdentifier)
         TPPlaylist.Controls.Add(CoBoxPlaylistTitleFormat)
@@ -839,4 +854,5 @@ Partial Class Options
     Friend WithEvents TxtBoxRandomHistoryUpdateInterval As TextBox
     Friend WithEvents LblRandomHistoryUpdateInterval2 As Components.LabelCSY
     Friend WithEvents LblRandomHistoryUpdateInterval1 As Components.LabelCSY
+    Friend WithEvents BtnPrunePlaylist As Button
 End Class
