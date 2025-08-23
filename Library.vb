@@ -13,23 +13,23 @@ Public Class Library
         Year
     End Enum
     Private Structure LibraryGroup
-        Dim Name As String
-        Dim Index As Int16
+        Public Name As String
+        Public Index As Int16
     End Structure
     Public Structure LibraryItemType
-        Dim Artist As String
-        Dim Title As String
-        Dim Album As String
-        Dim Genre As String
-        Dim Year As String
-        Dim Track As String
-        Dim Tracks As String
-        Dim Duration As String
-        Dim AV As String
-        Dim Artists As String
-        Dim Comments As String
-        Dim FilePath As String
-        Dim HasAlbumArt As Boolean
+        Public Artist As String
+        Public Title As String
+        Public Album As String
+        Public Genre As String
+        Public Year As String
+        Public Track As String
+        Public Tracks As String
+        Public Duration As String
+        Public AV As String
+        Public Artists As String
+        Public Comments As String
+        Public FilePath As String
+        Public HasAlbumArt As Boolean
     End Structure
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point

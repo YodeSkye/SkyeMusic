@@ -67,14 +67,14 @@ Namespace My
         End Enum
         Public Structure Song
 
-            Dim Path As String 'Path to the media.
-            Dim InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
-            Dim IsStream As Boolean 'IsStream indicates whether the song is a stream.
-            Dim PlayCount As UShort 'PlayCount is the number of times the song has been played.
-            Dim Added As DateTime 'DateAdded is the date and time when the song was added to the History.
-            Dim FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
-            Dim LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
-            Dim Rating As Byte 'Rating is the rating of the song, from 0 to 5.
+            Public Path As String 'Path to the media.
+            Public InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
+            Public IsStream As Boolean 'IsStream indicates whether the song is a stream.
+            Public PlayCount As UShort 'PlayCount is the number of times the song has been played.
+            Public Added As DateTime 'DateAdded is the date and time when the song was added to the History.
+            Public FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
+            Public LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
+            Public Rating As Byte 'Rating is the rating of the song, from 0 to 5.
 
             Public Overrides Function ToString() As String
                 Dim s As String = String.Empty
@@ -107,28 +107,28 @@ Namespace My
 
         End Structure
         Friend Structure ThemeProperties
-            Dim BackColor As Color
-            Dim TextColor As Color
-            Dim ControlBackColor As Color
-            Dim ButtonBackColor As Color
-            Dim ButtonTextColor As Color
-            Dim AccentTextColor As Color
-            Dim InactiveTitleBarColor As Color
-            Dim InactiveSearchTextColor As Color
-            Dim PlayerPlay As Image
-            Dim PlayerPause As Image
-            Dim PlayerStop As Image
-            Dim PlayerNext As Image
-            Dim PlayerPrevious As Image
-            Dim PlayerFastForward As Image
-            Dim PlayerFastReverse As Image
+            Public BackColor As Color
+            Public TextColor As Color
+            Public ControlBackColor As Color
+            Public ButtonBackColor As Color
+            Public ButtonTextColor As Color
+            Public AccentTextColor As Color
+            Public InactiveTitleBarColor As Color
+            Public InactiveSearchTextColor As Color
+            Public PlayerPlay As Image
+            Public PlayerPause As Image
+            Public PlayerStop As Image
+            Public PlayerNext As Image
+            Public PlayerPrevious As Image
+            Public PlayerFastForward As Image
+            Public PlayerFastReverse As Image
         End Structure
         Private Structure HotKey
-            Dim WinID As Integer
-            Dim Description As String
-            Dim Key As Keys
-            Dim KeyCode As Byte
-            Dim KeyMod As Byte
+            Public WinID As Integer
+            Public Description As String
+            Public Key As Keys
+            Public KeyCode As Byte
+            Public KeyMod As Byte
             ReadOnly Property KeyText As String
                 Get
                     Dim kc As New System.Windows.Forms.KeysConverter

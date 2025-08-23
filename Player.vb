@@ -8,8 +8,8 @@ Public Class Player
 
     'Declarations
     Public Structure PlaylistItemType
-        Dim Title As String
-        Dim Path As String
+        Public Title As String
+        Public Path As String
     End Structure
     Private aDevEnum As New CoreAudio.MMDeviceEnumerator 'Audio Device Enumerator
     Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
