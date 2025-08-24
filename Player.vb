@@ -11,6 +11,7 @@ Public Class Player
         Public Title As String
         Public Path As String
     End Structure
+    Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Private aDevEnum As New CoreAudio.MMDeviceEnumerator 'Audio Device Enumerator
     Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
     Private cLeftMeter, cRightMeter, visR, visB As Byte 'Meter Values and Visualizer Colors
@@ -28,7 +29,6 @@ Public Class Player
     Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
     Private RandomHistory As New Generic.List(Of String) 'History of played items for random play
     Private RandomHistoryIndex As Integer = 0 'Index for the random history
-    Private Queue As New Generic.List(Of String) 'Queue of items to play
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
@@ -837,7 +837,12 @@ Public Class Player
         PlayFromPlaylist()
     End Sub
     Private Sub CMIQueue_Click(sender As Object, e As EventArgs) Handles CMIQueue.Click
+        CMPlaylist.Close()
         QueueFromPlaylist()
+    End Sub
+    Private Sub CMIViewQueue_Click(sender As Object, e As EventArgs) Handles CMIViewQueue.Click
+        Dim frm As New PlayerQueue
+        frm.ShowDialog()
     End Sub
     Private Sub CMIPlayWithWindowsClick(sender As Object, e As EventArgs) Handles CMIPlayWithWindows.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.PlayWithWindows(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
@@ -2715,12 +2720,14 @@ Public Class Player
         End If
     End Sub
     Private Sub RandomHistoryAdd(songorstream As String)
-        If App.PlayMode = App.PlayModes.Random Then
+        If App.PlayMode = App.PlayModes.Random AndAlso LVPlaylist.FindItemWithText(songorstream, True, 0) IsNot Nothing Then
             If RandomHistory.FindIndex(Function(p) p = songorstream) < 0 Then
                 App.UpdateRandomHistory(songorstream)
             Else
                 Debug.Print("Not Adding " + songorstream + " to Random History, Already Exists")
             End If
+        Else
+            Debug.Print("Not Adding " + songorstream + " to Random History, Song Not Found In Playlist or Not In Random PlayMode")
         End If
     End Sub
     Friend Sub AddToRandomHistory(songorstream As String)
