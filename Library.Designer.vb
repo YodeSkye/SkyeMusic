@@ -71,125 +71,125 @@ Partial Class Library
         ' 
         ' CMLibrary
         ' 
+        CMLibrary.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMLibrary.Name = "CMLibrary"
-        CMLibrary.Size = New Size(189, 336)
+        CMLibrary.Size = New Size(229, 392)
         ' 
         ' CMIPlay
         ' 
-        CMIPlay.Font = New Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMIPlay.Image = My.Resources.Resources.ImagePlay
         CMIPlay.Name = "CMIPlay"
-        CMIPlay.Size = New Size(188, 22)
+        CMIPlay.Size = New Size(228, 26)
         CMIPlay.Text = "Play"
         ' 
         ' CMIQueue
         ' 
         CMIQueue.Image = My.Resources.Resources.ImagePlay
         CMIQueue.Name = "CMIQueue"
-        CMIQueue.Size = New Size(188, 22)
+        CMIQueue.Size = New Size(228, 26)
         CMIQueue.Text = "Queue"
         ' 
         ' CMIPlayWithWindows
         ' 
         CMIPlayWithWindows.Image = My.Resources.Resources.ImageWindows16
         CMIPlayWithWindows.Name = "CMIPlayWithWindows"
-        CMIPlayWithWindows.Size = New Size(188, 22)
+        CMIPlayWithWindows.Size = New Size(228, 26)
         CMIPlayWithWindows.Text = "Play In Windows"
         ' 
         ' ToolStripSeparator3
         ' 
         ToolStripSeparator3.Name = "ToolStripSeparator3"
-        ToolStripSeparator3.Size = New Size(185, 6)
+        ToolStripSeparator3.Size = New Size(225, 6)
         ' 
         ' CMIAddToPlaylist
         ' 
         CMIAddToPlaylist.Image = My.Resources.Resources.ImageAdd16
         CMIAddToPlaylist.Name = "CMIAddToPlaylist"
-        CMIAddToPlaylist.Size = New Size(188, 22)
+        CMIAddToPlaylist.Size = New Size(228, 26)
         CMIAddToPlaylist.Text = "Add To Playlist"
         ' 
         ' CMIAddAllToPlaylist
         ' 
         CMIAddAllToPlaylist.Image = My.Resources.Resources.ImageAddAll16
         CMIAddAllToPlaylist.Name = "CMIAddAllToPlaylist"
-        CMIAddAllToPlaylist.Size = New Size(188, 22)
+        CMIAddAllToPlaylist.Size = New Size(228, 26)
         CMIAddAllToPlaylist.Text = "Add ALL To Playlist"
         ' 
         ' ToolStripSeparator1
         ' 
         ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New Size(185, 6)
+        ToolStripSeparator1.Size = New Size(225, 6)
         ' 
         ' CMIAddGroupToPlaylist
         ' 
         CMIAddGroupToPlaylist.Image = My.Resources.Resources.ImageAdd16
         CMIAddGroupToPlaylist.Name = "CMIAddGroupToPlaylist"
-        CMIAddGroupToPlaylist.Size = New Size(188, 22)
+        CMIAddGroupToPlaylist.Size = New Size(228, 26)
         CMIAddGroupToPlaylist.Text = "Add Group To Playlist"
         ' 
         ' CMICollapseGroup
         ' 
         CMICollapseGroup.Image = My.Resources.Resources.ImageCollapse16
         CMICollapseGroup.Name = "CMICollapseGroup"
-        CMICollapseGroup.Size = New Size(188, 22)
+        CMICollapseGroup.Size = New Size(228, 26)
         CMICollapseGroup.Text = "Collapse Group"
         ' 
         ' CMIExpandAllGroups
         ' 
         CMIExpandAllGroups.Image = My.Resources.Resources.ImageExpandAll16
         CMIExpandAllGroups.Name = "CMIExpandAllGroups"
-        CMIExpandAllGroups.Size = New Size(188, 22)
+        CMIExpandAllGroups.Size = New Size(228, 26)
         CMIExpandAllGroups.Text = "Expand All"
         ' 
         ' CMISeparatorGroupBy
         ' 
         CMISeparatorGroupBy.Name = "CMISeparatorGroupBy"
-        CMISeparatorGroupBy.Size = New Size(185, 6)
+        CMISeparatorGroupBy.Size = New Size(225, 6)
         ' 
         ' CMIHelperApp1
         ' 
         CMIHelperApp1.Image = My.Resources.Resources.ImageSkyeTag
         CMIHelperApp1.Name = "CMIHelperApp1"
-        CMIHelperApp1.Size = New Size(188, 22)
+        CMIHelperApp1.Size = New Size(228, 26)
         ' 
         ' CMIHelperApp2
         ' 
         CMIHelperApp2.Image = My.Resources.Resources.ImageMP3Tag16
         CMIHelperApp2.Name = "CMIHelperApp2"
-        CMIHelperApp2.Size = New Size(188, 22)
+        CMIHelperApp2.Size = New Size(228, 26)
         ' 
         ' CMIOpenLocation
         ' 
         CMIOpenLocation.Image = My.Resources.Resources.ImageOpen16
         CMIOpenLocation.Name = "CMIOpenLocation"
-        CMIOpenLocation.Size = New Size(188, 22)
+        CMIOpenLocation.Size = New Size(228, 26)
         CMIOpenLocation.Text = "Open File Location"
         ' 
         ' ToolStripSeparator2
         ' 
         ToolStripSeparator2.Name = "ToolStripSeparator2"
-        ToolStripSeparator2.Size = New Size(185, 6)
+        ToolStripSeparator2.Size = New Size(225, 6)
         ' 
         ' CMICopyTitle
         ' 
         CMICopyTitle.Image = My.Resources.Resources.ImageCopy16
         CMICopyTitle.Name = "CMICopyTitle"
-        CMICopyTitle.Size = New Size(188, 22)
+        CMICopyTitle.Size = New Size(228, 26)
         CMICopyTitle.Text = "Copy Title"
         ' 
         ' CMICopyFileName
         ' 
         CMICopyFileName.Image = My.Resources.Resources.ImageCopy16
         CMICopyFileName.Name = "CMICopyFileName"
-        CMICopyFileName.Size = New Size(188, 22)
+        CMICopyFileName.Size = New Size(228, 26)
         CMICopyFileName.Text = "Copy File Name"
         ' 
         ' CMICopyFilePath
         ' 
         CMICopyFilePath.Image = My.Resources.Resources.ImageCopy16
         CMICopyFilePath.Name = "CMICopyFilePath"
-        CMICopyFilePath.Size = New Size(188, 22)
+        CMICopyFilePath.Size = New Size(228, 26)
         CMICopyFilePath.Text = "Copy File Path"
         ' 
         ' BtnSearchFolders
@@ -264,6 +264,7 @@ Partial Class Library
         ' 
         TipLibrary.AutoPopDelay = 5000
         TipLibrary.InitialDelay = 1000
+        TipLibrary.OwnerDraw = True
         TipLibrary.ReshowDelay = 1000
         ' 
         ' RadBtnGroupByGenre

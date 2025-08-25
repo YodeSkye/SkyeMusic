@@ -51,7 +51,7 @@ Partial Class Log
         ' 
         RTBCMLog.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         RTBCMLog.Name = "RTBCMLog"
-        RTBCMLog.Size = New Size(181, 170)
+        RTBCMLog.Size = New Size(129, 148)
         ' 
         ' BTNOK
         ' 
@@ -101,7 +101,7 @@ Partial Class Log
         ' 
         TxBxSearch.BorderStyle = BorderStyle.None
         TxBxSearch.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TxBxSearch.Location = New Point(14, 12)
+        TxBxSearch.Location = New Point(15, 12)
         TxBxSearch.Name = "TxBxSearch"
         TxBxSearch.ShortcutsEnabled = False
         TxBxSearch.Size = New Size(175, 18)

@@ -565,11 +565,12 @@ Partial Class Player
         TxtBoxPlaylistSearch.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TxtBoxPlaylistSearch.BackColor = Color.Black
         TxtBoxPlaylistSearch.BorderStyle = BorderStyle.None
+        TxtBoxPlaylistSearch.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxPlaylistSearch.ForeColor = SystemColors.InactiveCaption
-        TxtBoxPlaylistSearch.Location = New Point(412, 5)
+        TxtBoxPlaylistSearch.Location = New Point(414, 5)
         TxtBoxPlaylistSearch.Name = "TxtBoxPlaylistSearch"
         TxtBoxPlaylistSearch.ShortcutsEnabled = False
-        TxtBoxPlaylistSearch.Size = New Size(150, 16)
+        TxtBoxPlaylistSearch.Size = New Size(150, 18)
         TxtBoxPlaylistSearch.TabIndex = 22
         TxtBoxPlaylistSearch.TabStop = False
         TxtBoxPlaylistSearch.Text = "Search Playlist"
@@ -701,7 +702,7 @@ Partial Class Player
         ' 
         CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMLyrics.Name = "CMLyrics"
-        CMLyrics.Size = New Size(181, 198)
+        CMLyrics.Size = New Size(149, 176)
         ' 
         ' TrackBarPosition
         ' 

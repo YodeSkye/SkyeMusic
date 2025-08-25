@@ -267,22 +267,23 @@ Partial Class Options
         ' 
         ' CMLibrarySearchFolders
         ' 
+        CMLibrarySearchFolders.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMLibrarySearchFolders.Items.AddRange(New ToolStripItem() {CMILibrarySearchFoldersAdd, CMILibrarySearchFoldersRemove})
         CMLibrarySearchFolders.Name = "CMLibrarySearchFolders"
-        CMLibrarySearchFolders.Size = New Size(154, 48)
+        CMLibrarySearchFolders.Size = New Size(165, 48)
         ' 
         ' CMILibrarySearchFoldersAdd
         ' 
         CMILibrarySearchFoldersAdd.Image = My.Resources.Resources.ImageAdd16
         CMILibrarySearchFoldersAdd.Name = "CMILibrarySearchFoldersAdd"
-        CMILibrarySearchFoldersAdd.Size = New Size(153, 22)
+        CMILibrarySearchFoldersAdd.Size = New Size(164, 22)
         CMILibrarySearchFoldersAdd.Text = "Add Folder"
         ' 
         ' CMILibrarySearchFoldersRemove
         ' 
         CMILibrarySearchFoldersRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMILibrarySearchFoldersRemove.Name = "CMILibrarySearchFoldersRemove"
-        CMILibrarySearchFoldersRemove.Size = New Size(153, 22)
+        CMILibrarySearchFoldersRemove.Size = New Size(164, 22)
         CMILibrarySearchFoldersRemove.Text = "Remove Folder"
         ' 
         ' CkBoxSaveWindowMetrics
@@ -333,8 +334,9 @@ Partial Class Options
         ' 
         ' CMTxtBox
         ' 
+        CMTxtBox.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMTxtBox.Name = "CMTxtBox"
-        CMTxtBox.Size = New Size(138, 176)
+        CMTxtBox.Size = New Size(149, 176)
         ' 
         ' LblSongPlayMode
         ' 
@@ -421,6 +423,10 @@ Partial Class Options
         LblTheme.Size = New Size(57, 21)
         LblTheme.TabIndex = 141
         LblTheme.Text = "Theme"
+        ' 
+        ' TipOptions
+        ' 
+        TipOptions.OwnerDraw = True
         ' 
         ' TxtBoxHistoryUpdateInterval
         ' 
@@ -543,7 +549,7 @@ Partial Class Options
         BtnPrunePlaylist.TabIndex = 256
         BtnPrunePlaylist.Text = "Prune Playlist"
         BtnPrunePlaylist.TextAlign = ContentAlignment.MiddleRight
-        TipOptions.SetToolTip(BtnPrunePlaylist, resources.GetString("BtnPrunePlaylist.ToolTip"))
+        TipOptions.SetToolTip(BtnPrunePlaylist, "Prune the Playlist." & vbCrLf & "This will remove any playlist entries that cannot be found in storage, while preserving streams." & vbCrLf & "The total number of playlist entries is given in parentheses.")
         BtnPrunePlaylist.UseVisualStyleBackColor = True
         ' 
         ' LblHistoryUpdateInterval2
