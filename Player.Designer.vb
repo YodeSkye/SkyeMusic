@@ -63,6 +63,7 @@ Partial Class Player
         MIExit = New ToolStripMenuItem()
         MIView = New ToolStripMenuItem()
         MIFullscreen = New ToolStripMenuItem()
+        MIViewQueue = New ToolStripMenuItem()
         ToolStripSeparator5 = New ToolStripSeparator()
         MIOptions = New ToolStripMenuItem()
         MIVisualizer = New ToolStripMenuItem()
@@ -97,7 +98,6 @@ Partial Class Player
         LblPosition = New Components.LabelCSY()
         CMLyrics = New Components.TextBoxContextMenu()
         TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
-        MIViewQueue = New ToolStripMenuItem()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         CType(AxPlayer, ComponentModel.ISupportInitialize).BeginInit()
@@ -120,75 +120,75 @@ Partial Class Player
         ' 
         ' CMPlaylist
         ' 
+        CMPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMPlaylist.Name = "CMPlaylist"
-        CMPlaylist.Size = New Size(177, 380)
+        CMPlaylist.Size = New Size(217, 444)
         ' 
         ' CMIPlay
         ' 
-        CMIPlay.Font = New Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMIPlay.Image = My.Resources.Resources.ImagePlay
         CMIPlay.Name = "CMIPlay"
-        CMIPlay.Size = New Size(176, 22)
+        CMIPlay.Size = New Size(216, 26)
         CMIPlay.Text = "Play"
         ' 
         ' CMIQueue
         ' 
         CMIQueue.Image = My.Resources.Resources.ImagePlay
         CMIQueue.Name = "CMIQueue"
-        CMIQueue.Size = New Size(176, 22)
+        CMIQueue.Size = New Size(216, 26)
         CMIQueue.Text = "Queue"
         ' 
         ' CMIPlayWithWindows
         ' 
         CMIPlayWithWindows.Image = My.Resources.Resources.ImageWindows16
         CMIPlayWithWindows.Name = "CMIPlayWithWindows"
-        CMIPlayWithWindows.Size = New Size(176, 22)
+        CMIPlayWithWindows.Size = New Size(216, 26)
         CMIPlayWithWindows.Text = "Play In Windows"
         ' 
         ' ToolStripSeparator3
         ' 
         ToolStripSeparator3.Name = "ToolStripSeparator3"
-        ToolStripSeparator3.Size = New Size(173, 6)
+        ToolStripSeparator3.Size = New Size(213, 6)
         ' 
         ' CMIPlaylistAdd
         ' 
         CMIPlaylistAdd.Image = My.Resources.Resources.ImageAdd16
         CMIPlaylistAdd.Name = "CMIPlaylistAdd"
-        CMIPlaylistAdd.Size = New Size(176, 22)
+        CMIPlaylistAdd.Size = New Size(216, 26)
         CMIPlaylistAdd.Text = "Add"
         ' 
         ' CMIPlaylistRemove
         ' 
         CMIPlaylistRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMIPlaylistRemove.Name = "CMIPlaylistRemove"
-        CMIPlaylistRemove.Size = New Size(176, 22)
+        CMIPlaylistRemove.Size = New Size(216, 26)
         CMIPlaylistRemove.Text = "Remove"
         ' 
         ' CMIClearPlaylist
         ' 
         CMIClearPlaylist.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMIClearPlaylist.Name = "CMIClearPlaylist"
-        CMIClearPlaylist.Size = New Size(176, 22)
+        CMIClearPlaylist.Size = New Size(216, 26)
         CMIClearPlaylist.Text = "Clear Playlist"
         ' 
         ' CMIEditTitle
         ' 
         CMIEditTitle.Image = My.Resources.Resources.ImageEdit16
         CMIEditTitle.Name = "CMIEditTitle"
-        CMIEditTitle.Size = New Size(176, 22)
+        CMIEditTitle.Size = New Size(216, 26)
         CMIEditTitle.Text = "Edit Title"
         ' 
         ' ToolStripSeparator1
         ' 
         ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New Size(173, 6)
+        ToolStripSeparator1.Size = New Size(213, 6)
         ' 
         ' CMIShowCurrent
         ' 
         CMIShowCurrent.Image = My.Resources.Resources.ImageAcceptOKGoStart
         CMIShowCurrent.Name = "CMIShowCurrent"
-        CMIShowCurrent.Size = New Size(176, 22)
+        CMIShowCurrent.Size = New Size(216, 26)
         CMIShowCurrent.Text = "Show Current Song"
         ' 
         ' CMIRating
@@ -196,101 +196,103 @@ Partial Class Player
         CMIRating.DropDown = CMRatings
         CMIRating.Image = My.Resources.Resources.ImageRating16
         CMIRating.Name = "CMIRating"
-        CMIRating.Size = New Size(176, 22)
+        CMIRating.Size = New Size(216, 26)
         CMIRating.Text = "Rating"
         ' 
         ' CMRatings
         ' 
+        CMRatings.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMRatings.Items.AddRange(New ToolStripItem() {CMIRating5Stars, CMIRating4Stars, CMIRating3Stars, CMIRating2Stars, CMIRating1Star})
         CMRatings.Name = "CMRatings"
+        CMRatings.OwnerItem = CMIRating
         CMRatings.ShowImageMargin = False
-        CMRatings.Size = New Size(100, 114)
+        CMRatings.Size = New Size(121, 134)
         ' 
         ' CMIRating5Stars
         ' 
         CMIRating5Stars.Name = "CMIRating5Stars"
-        CMIRating5Stars.Size = New Size(99, 22)
+        CMIRating5Stars.Size = New Size(120, 26)
         CMIRating5Stars.Text = "★★★★★"
         ' 
         ' CMIRating4Stars
         ' 
         CMIRating4Stars.Name = "CMIRating4Stars"
-        CMIRating4Stars.Size = New Size(99, 22)
+        CMIRating4Stars.Size = New Size(120, 26)
         CMIRating4Stars.Text = "★★★★"
         ' 
         ' CMIRating3Stars
         ' 
         CMIRating3Stars.Name = "CMIRating3Stars"
-        CMIRating3Stars.Size = New Size(99, 22)
+        CMIRating3Stars.Size = New Size(120, 26)
         CMIRating3Stars.Text = "★★★"
         ' 
         ' CMIRating2Stars
         ' 
         CMIRating2Stars.Name = "CMIRating2Stars"
-        CMIRating2Stars.Size = New Size(99, 22)
+        CMIRating2Stars.Size = New Size(120, 26)
         CMIRating2Stars.Text = "★★"
         ' 
         ' CMIRating1Star
         ' 
         CMIRating1Star.Name = "CMIRating1Star"
-        CMIRating1Star.Size = New Size(99, 22)
+        CMIRating1Star.Size = New Size(120, 26)
         CMIRating1Star.Text = "★"
         ' 
         ' CMIViewInLibrary
         ' 
         CMIViewInLibrary.Image = My.Resources.Resources.ImageLibrary16
         CMIViewInLibrary.Name = "CMIViewInLibrary"
-        CMIViewInLibrary.Size = New Size(176, 22)
+        CMIViewInLibrary.Size = New Size(216, 26)
         CMIViewInLibrary.Text = "View In Library"
         ' 
         ' ToolStripSeparator6
         ' 
         ToolStripSeparator6.Name = "ToolStripSeparator6"
-        ToolStripSeparator6.Size = New Size(173, 6)
+        ToolStripSeparator6.Size = New Size(213, 6)
         ' 
         ' CMIHelperApp1
         ' 
         CMIHelperApp1.Image = My.Resources.Resources.ImageSkyeTag
         CMIHelperApp1.Name = "CMIHelperApp1"
-        CMIHelperApp1.Size = New Size(176, 22)
+        CMIHelperApp1.Size = New Size(216, 26)
         ' 
         ' CMIHelperApp2
         ' 
         CMIHelperApp2.Image = My.Resources.Resources.ImageMP3Tag16
         CMIHelperApp2.Name = "CMIHelperApp2"
-        CMIHelperApp2.Size = New Size(176, 22)
+        CMIHelperApp2.Size = New Size(216, 26)
         ' 
         ' CMIOpenLocation
         ' 
         CMIOpenLocation.Image = My.Resources.Resources.ImageOpen16
         CMIOpenLocation.Name = "CMIOpenLocation"
-        CMIOpenLocation.Size = New Size(176, 22)
+        CMIOpenLocation.Size = New Size(216, 26)
         CMIOpenLocation.Text = "Open File Location"
         ' 
         ' TSSeparatorExternalTools
         ' 
         TSSeparatorExternalTools.Name = "TSSeparatorExternalTools"
-        TSSeparatorExternalTools.Size = New Size(173, 6)
+        TSSeparatorExternalTools.Size = New Size(213, 6)
         ' 
         ' CMICopyTitle
         ' 
         CMICopyTitle.Image = My.Resources.Resources.ImageCopy16
         CMICopyTitle.Name = "CMICopyTitle"
-        CMICopyTitle.Size = New Size(176, 22)
+        CMICopyTitle.Size = New Size(216, 26)
         CMICopyTitle.Text = "Copy Title"
         ' 
         ' CMICopyFileName
         ' 
         CMICopyFileName.Image = My.Resources.Resources.ImageCopy16
         CMICopyFileName.Name = "CMICopyFileName"
-        CMICopyFileName.Size = New Size(176, 22)
+        CMICopyFileName.Size = New Size(216, 26)
         CMICopyFileName.Text = "Copy File Name"
         ' 
         ' CMICopyFilePath
         ' 
         CMICopyFilePath.Image = My.Resources.Resources.ImageCopy16
         CMICopyFilePath.Name = "CMICopyFilePath"
-        CMICopyFilePath.Size = New Size(176, 22)
+        CMICopyFilePath.Size = New Size(216, 26)
         CMICopyFilePath.Text = "Copy File Path"
         ' 
         ' TimerPosition
@@ -321,10 +323,11 @@ Partial Class Player
         ' MenuPlayer
         ' 
         MenuPlayer.BackColor = Color.Black
+        MenuPlayer.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         MenuPlayer.Items.AddRange(New ToolStripItem() {MIFile, MIView, MIVisualizer, MILyrics, MIPlayMode, MILibrary, MIAbout})
         MenuPlayer.Location = New Point(0, 0)
         MenuPlayer.Name = "MenuPlayer"
-        MenuPlayer.Size = New Size(984, 24)
+        MenuPlayer.Size = New Size(984, 25)
         MenuPlayer.TabIndex = 12
         MenuPlayer.Text = "MenuStrip1"
         ' 
@@ -334,33 +337,33 @@ Partial Class Player
         MIFile.ForeColor = SystemColors.HighlightText
         MIFile.Image = My.Resources.Resources.ImageOpen16
         MIFile.Name = "MIFile"
-        MIFile.Size = New Size(53, 20)
+        MIFile.Size = New Size(55, 21)
         MIFile.Text = "File"
         ' 
         ' MIOpen
         ' 
         MIOpen.Image = My.Resources.Resources.ImageOpen16
         MIOpen.Name = "MIOpen"
-        MIOpen.Size = New Size(127, 22)
+        MIOpen.Size = New Size(135, 22)
         MIOpen.Text = "Open"
         ' 
         ' MIOpenURL
         ' 
         MIOpenURL.Image = My.Resources.Resources.ImageGlobe
         MIOpenURL.Name = "MIOpenURL"
-        MIOpenURL.Size = New Size(127, 22)
+        MIOpenURL.Size = New Size(135, 22)
         MIOpenURL.Text = "Open URL"
         ' 
         ' ToolStripSeparator4
         ' 
         ToolStripSeparator4.Name = "ToolStripSeparator4"
-        ToolStripSeparator4.Size = New Size(124, 6)
+        ToolStripSeparator4.Size = New Size(132, 6)
         ' 
         ' MIExit
         ' 
         MIExit.Image = My.Resources.Resources.ImageExit
         MIExit.Name = "MIExit"
-        MIExit.Size = New Size(127, 22)
+        MIExit.Size = New Size(135, 22)
         MIExit.Text = "Exit"
         ' 
         ' MIView
@@ -369,47 +372,54 @@ Partial Class Player
         MIView.ForeColor = SystemColors.HighlightText
         MIView.Image = My.Resources.Resources.ImageView
         MIView.Name = "MIView"
-        MIView.Size = New Size(60, 20)
+        MIView.Size = New Size(63, 21)
         MIView.Text = "View"
         ' 
         ' MIFullscreen
         ' 
         MIFullscreen.Image = My.Resources.Resources.ImageFullscreen16
         MIFullscreen.Name = "MIFullscreen"
-        MIFullscreen.Size = New Size(180, 22)
+        MIFullscreen.Size = New Size(138, 22)
         MIFullscreen.Text = "Full Screen"
+        ' 
+        ' MIViewQueue
+        ' 
+        MIViewQueue.Image = My.Resources.Resources.ImagePlay
+        MIViewQueue.Name = "MIViewQueue"
+        MIViewQueue.Size = New Size(138, 22)
+        MIViewQueue.Text = "Queue"
         ' 
         ' ToolStripSeparator5
         ' 
         ToolStripSeparator5.Name = "ToolStripSeparator5"
-        ToolStripSeparator5.Size = New Size(177, 6)
+        ToolStripSeparator5.Size = New Size(135, 6)
         ' 
         ' MIOptions
         ' 
         MIOptions.Image = My.Resources.Resources.ImageSettings16
         MIOptions.Name = "MIOptions"
-        MIOptions.Size = New Size(180, 22)
+        MIOptions.Size = New Size(138, 22)
         MIOptions.Text = "Options"
         ' 
         ' MIVisualizer
         ' 
         MIVisualizer.Image = My.Resources.Resources.ImageVisualizer16
         MIVisualizer.Name = "MIVisualizer"
-        MIVisualizer.Size = New Size(28, 20)
+        MIVisualizer.Size = New Size(28, 21)
         ' 
         ' MILyrics
         ' 
         MILyrics.BackColor = Color.Transparent
         MILyrics.Image = My.Resources.Resources.ImageLyrics
         MILyrics.Name = "MILyrics"
-        MILyrics.Size = New Size(28, 20)
+        MILyrics.Size = New Size(28, 21)
         MILyrics.Visible = False
         ' 
         ' MIPlayMode
         ' 
         MIPlayMode.ForeColor = SystemColors.HighlightText
         MIPlayMode.Name = "MIPlayMode"
-        MIPlayMode.Size = New Size(75, 20)
+        MIPlayMode.Size = New Size(82, 21)
         MIPlayMode.Text = "Play Mode"
         ' 
         ' MILibrary
@@ -417,7 +427,7 @@ Partial Class Player
         MILibrary.ForeColor = SystemColors.HighlightText
         MILibrary.Image = My.Resources.Resources.ImageLibrary16
         MILibrary.Name = "MILibrary"
-        MILibrary.Size = New Size(71, 20)
+        MILibrary.Size = New Size(76, 21)
         MILibrary.Text = "Library"
         ' 
         ' MIAbout
@@ -426,28 +436,28 @@ Partial Class Player
         MIAbout.ForeColor = SystemColors.HighlightText
         MIAbout.Image = My.Resources.Resources.ImageAbout16
         MIAbout.Name = "MIAbout"
-        MIAbout.Size = New Size(68, 20)
+        MIAbout.Size = New Size(71, 21)
         MIAbout.Text = "About"
         ' 
         ' MIShowHelp
         ' 
         MIShowHelp.Image = My.Resources.Resources.ImageHelp16
         MIShowHelp.Name = "MIShowHelp"
-        MIShowHelp.Size = New Size(107, 22)
+        MIShowHelp.Size = New Size(111, 22)
         MIShowHelp.Text = "Help"
         ' 
         ' MIShowLog
         ' 
         MIShowLog.Image = My.Resources.Resources.ImageLog16
         MIShowLog.Name = "MIShowLog"
-        MIShowLog.Size = New Size(107, 22)
+        MIShowLog.Size = New Size(111, 22)
         MIShowLog.Text = "Log"
         ' 
         ' MIShowAbout
         ' 
         MIShowAbout.Image = My.Resources.Resources.ImageAbout16
         MIShowAbout.Name = "MIShowAbout"
-        MIShowAbout.Size = New Size(107, 22)
+        MIShowAbout.Size = New Size(111, 22)
         MIShowAbout.Text = "About"
         ' 
         ' TimerPlayNext
@@ -689,8 +699,9 @@ Partial Class Player
         ' 
         ' CMLyrics
         ' 
+        CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMLyrics.Name = "CMLyrics"
-        CMLyrics.Size = New Size(138, 176)
+        CMLyrics.Size = New Size(181, 198)
         ' 
         ' TrackBarPosition
         ' 
@@ -713,13 +724,6 @@ Partial Class Player
         TrackBarPosition.ThemeName = "Default"
         TrackBarPosition.TimerInterval = 100
         TrackBarPosition.Value = 0
-        ' 
-        ' MIViewQueue
-        ' 
-        MIViewQueue.Image = My.Resources.Resources.ImagePlay
-        MIViewQueue.Name = "MIViewQueue"
-        MIViewQueue.Size = New Size(180, 22)
-        MIViewQueue.Text = "Queue"
         ' 
         ' Player
         ' 

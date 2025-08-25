@@ -22,17 +22,22 @@ Partial Class PlayerQueue
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(PlayerQueue))
         LVQueue = New ListView()
         ColumnHeader1 = New ColumnHeader()
         ColumnHeader2 = New ColumnHeader()
+        CMQueue = New ContextMenuStrip(components)
+        CMIRemove = New ToolStripMenuItem()
         BtnOK = New Button()
+        CMQueue.SuspendLayout()
         SuspendLayout()
         ' 
         ' LVQueue
         ' 
         LVQueue.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LVQueue.Columns.AddRange(New ColumnHeader() {ColumnHeader1, ColumnHeader2})
+        LVQueue.ContextMenuStrip = CMQueue
         LVQueue.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LVQueue.FullRowSelect = True
         LVQueue.HeaderStyle = ColumnHeaderStyle.Nonclickable
@@ -53,6 +58,20 @@ Partial Class PlayerQueue
         ' 
         ColumnHeader2.Text = "Path"
         ColumnHeader2.Width = 600
+        ' 
+        ' CMQueue
+        ' 
+        CMQueue.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        CMQueue.Items.AddRange(New ToolStripItem() {CMIRemove})
+        CMQueue.Name = "CMQueue"
+        CMQueue.Size = New Size(181, 52)
+        ' 
+        ' CMIRemove
+        ' 
+        CMIRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
+        CMIRemove.Name = "CMIRemove"
+        CMIRemove.Size = New Size(180, 26)
+        CMIRemove.Text = "Remove"
         ' 
         ' BtnOK
         ' 
@@ -76,6 +95,7 @@ Partial Class PlayerQueue
         Name = "PlayerQueue"
         StartPosition = FormStartPosition.CenterParent
         Text = "Queue"
+        CMQueue.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
 
@@ -83,4 +103,6 @@ Partial Class PlayerQueue
     Friend WithEvents BtnOK As Button
     Friend WithEvents ColumnHeader1 As ColumnHeader
     Friend WithEvents ColumnHeader2 As ColumnHeader
+    Friend WithEvents CMQueue As ContextMenuStrip
+    Friend WithEvents CMIRemove As ToolStripMenuItem
 End Class

@@ -49,8 +49,9 @@ Partial Class Log
         ' 
         ' RTBCMLog
         ' 
+        RTBCMLog.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         RTBCMLog.Name = "RTBCMLog"
-        RTBCMLog.Size = New Size(123, 148)
+        RTBCMLog.Size = New Size(181, 170)
         ' 
         ' BTNOK
         ' 

@@ -89,6 +89,18 @@ Public Class PlayerQueue
     Private Sub LVQueue_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVQueue.DrawSubItem
         e.DrawDefault = True
     End Sub
+    Private Sub CMQueue_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMQueue.Opening
+        If LVQueue.SelectedItems.Count = 0 Then
+            CMIRemove.Text = CMIRemove.Text.TrimEnd(App.TrimEndSearch)
+            CMIRemove.Enabled = False
+        Else
+            CMIRemove.Text = CMIRemove.Text.TrimEnd(App.TrimEndSearch) + " (" + LVQueue.SelectedItems.Count.ToString + ")"
+            CMIRemove.Enabled = True
+        End If
+    End Sub
+    Private Sub CMIRemove_Click(sender As Object, e As EventArgs) Handles CMIRemove.Click
+
+    End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
@@ -102,11 +114,11 @@ Public Class PlayerQueue
     End Sub
     Private Sub SetAccentColor()
         Static c As Color
-        c = App.GetAccentColor()
         If App.Theme = App.Themes.Accent Then
+            c = App.GetAccentColor()
             BackColor = c
+            Debug.Print("Player Accent Color Set")
         End If
-        Debug.Print("Player Accent Color Set")
     End Sub
     Private Sub SetTheme()
         If App.Theme = App.Themes.Accent Then

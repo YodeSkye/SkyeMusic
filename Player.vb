@@ -3,6 +3,7 @@ Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports AxWMPLib
 Imports SkyeMusic.My
+Imports Syncfusion.Windows.Forms
 
 Public Class Player
 
@@ -30,6 +31,7 @@ Public Class Player
     Private RandomHistory As New Generic.List(Of String) 'History of played items for shuffle play mode
     Private RandomHistoryIndex As Integer = 0 'Index for the shuffle history
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
+    Private TipPlayerFont As Font 'Font for custom drawing of TipPlayer
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
 
@@ -80,6 +82,7 @@ Public Class Player
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
         PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
+        TipPlayerFont = New Font(LVPlaylist.Font.FontFamily, 12, FontStyle.Regular) 'Font for custom drawing of TipPlayer
         TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
 
         'Initialize Listview
@@ -771,7 +774,9 @@ Public Class Player
     End Sub
     Private Sub CMPlaylist_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylist.Opening
         TipPlayer.Hide(Me)
-        If LVPlaylist.SelectedItems.Count > 0 Then TipPlayer.Show(App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text).ToString, Me, Me.PointToClient(CMPlaylist.Location), 5000)
+        Static pt As Point
+        pt = PointToClient(CMPlaylist.Location)
+        If LVPlaylist.SelectedItems.Count > 0 Then TipPlayer.Show(App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text).ToString, Me, New Point(pt.X + 8, pt.Y - 6), 5000)
         CMIHelperApp1.Text = "Open with " + App.HelperApp1Name
         CMIHelperApp2.Text = "Open with " + App.HelperApp2Name
         If LVPlaylist.Items.Count = 0 Then
@@ -842,6 +847,9 @@ Public Class Player
             CMIQueue.Enabled = False
             CMIPlayWithWindows.Enabled = False
         End If
+    End Sub
+    Private Sub CMPlaylist_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles CMPlaylist.Closing
+        TipPlayer.Hide(Me)
     End Sub
     Private Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
         PlayFromPlaylist()
@@ -1150,10 +1158,34 @@ Public Class Player
     Private Sub TrackBarPosition_MouseWheel(sender As Object, e As MouseEventArgs)
         CType(e, HandledMouseEventArgs).Handled = True
     End Sub
+    Private Sub TipPlayer_Popup(sender As Object, e As PopupEventArgs) Handles TipPlayer.Popup
+        Static s As SizeF
+        s = TextRenderer.MeasureText(TipPlayer.GetToolTip(e.AssociatedControl), TipPlayerFont)
+        s.Width += 14
+        s.Height += 16
+        e.ToolTipSize = s.ToSize
+    End Sub
     Private Sub TipPlayer_Draw(sender As Object, e As DrawToolTipEventArgs) Handles TipPlayer.Draw
-        e.DrawBackground()
-        e.DrawBorder()
-        e.DrawText()
+
+        'Declarations
+        Dim g As Graphics = e.Graphics
+
+        'Draw background
+        Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
+        g.FillRectangle(brbg, e.Bounds)
+
+        'Draw border
+        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipPlayerFont.Size / 4)) 'Scale border thickness with font
+            g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
+        End Using
+
+        'Draw text
+        TextRenderer.DrawText(g, e.ToolTipText, TipPlayerFont, New Point(7, 7), App.CurrentTheme.TextColor)
+
+        'Finalize
+        brbg.Dispose()
+        g.Dispose()
+
     End Sub
 
     'Handlers
@@ -2201,7 +2233,7 @@ Public Class Player
             If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then My.Computer.FileSystem.DeleteFile(App.PlaylistPath)
         Else
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-            Dim items As New Collections.Generic.List(Of PlaylistItemType)
+            Dim items As New System.Collections.Generic.List(Of PlaylistItemType)
             For Each plitem As ListViewItem In LVPlaylist.Items
                 Dim newitem As New PlaylistItemType
                 newitem.Title = plitem.SubItems(LVPlaylist.Columns("Title").Index).Text
@@ -2209,7 +2241,7 @@ Public Class Player
                 items.Add(newitem)
                 newitem = Nothing
             Next
-            Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of PlaylistItemType)))
+            Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of PlaylistItemType)))
             If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                 My.Computer.FileSystem.CreateDirectory(App.UserPath)
             End If
@@ -2226,11 +2258,11 @@ Public Class Player
     Private Sub LoadPlaylist()
         If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-            Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of PlaylistItemType)))
+            Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of PlaylistItemType)))
             Dim file As New IO.FileStream(App.PlaylistPath, IO.FileMode.Open)
-            Dim items As Collections.Generic.List(Of PlaylistItemType)
+            Dim items As System.Collections.Generic.List(Of PlaylistItemType)
             Try
-                items = DirectCast(reader.Deserialize(file), Collections.Generic.List(Of PlaylistItemType))
+                items = DirectCast(reader.Deserialize(file), System.Collections.Generic.List(Of PlaylistItemType))
                 For Each item As PlaylistItemType In items
                     Dim lvi As ListViewItem
                     lvi = CreateListviewItem()
@@ -2983,7 +3015,7 @@ Public Class Player
         Debug.Print("Pruning Playlist..." + LVPlaylist.Items.Count.ToString + " total playlist items...")
 
         'Find files that don't exist
-        Dim prunelist As New Collections.Generic.List(Of String)
+        Dim prunelist As New System.Collections.Generic.List(Of String)
         For index As Integer = 0 To LVPlaylist.Items.Count - 1
             If Not IsStream(LVPlaylist.Items(index).SubItems(1).Text) AndAlso Not My.Computer.FileSystem.FileExists(LVPlaylist.Items(index).SubItems(1).Text) Then
                 prunelist.Add(LVPlaylist.Items(index).SubItems(1).Text)
