@@ -27,8 +27,8 @@ Public Class Player
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
     Private PlaylistSearchTitle As String 'Title for Playlist Search
     Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
-    Private RandomHistory As New Generic.List(Of String) 'History of played items for random play
-    Private RandomHistoryIndex As Integer = 0 'Index for the random history
+    Private RandomHistory As New Generic.List(Of String) 'History of played items for shuffle play mode
+    Private RandomHistoryIndex As Integer = 0 'Index for the shuffle history
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
@@ -681,12 +681,22 @@ Public Class Player
         Else
             MIFullscreen.Enabled = False
         End If
+        MIViewQueue.Text = MIViewQueue.Text.TrimEnd(App.TrimEndSearch) + " (" + Queue.Count.ToString + ")"
+        If Queue.Count = 0 Then
+            MIViewQueue.Enabled = False
+        Else
+            MIViewQueue.Enabled = True
+        End If
     End Sub
     Private Sub MIView_DropDownClosed(sender As Object, e As EventArgs) Handles MIView.DropDownClosed
         If Not MIView.Selected Then MIView.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub MIFullscreenClick(sender As Object, e As EventArgs) Handles MIFullscreen.Click
         If AxPlayer.Visible And Not Fullscreen Then AxPlayer.fullScreen = True
+    End Sub
+    Private Sub MIViewQueue_Click(sender As Object, e As EventArgs) Handles MIViewQueue.Click
+        Dim frm As New PlayerQueue
+        frm.ShowDialog()
     End Sub
     Private Sub MIOptionsClick(sender As Object, e As EventArgs) Handles MIOptions.Click
         ShowOptions()
@@ -839,10 +849,6 @@ Public Class Player
     Private Sub CMIQueue_Click(sender As Object, e As EventArgs) Handles CMIQueue.Click
         CMPlaylist.Close()
         QueueFromPlaylist()
-    End Sub
-    Private Sub CMIViewQueue_Click(sender As Object, e As EventArgs) Handles CMIViewQueue.Click
-        Dim frm As New PlayerQueue
-        frm.ShowDialog()
     End Sub
     Private Sub CMIPlayWithWindowsClick(sender As Object, e As EventArgs) Handles CMIPlayWithWindows.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.PlayWithWindows(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)

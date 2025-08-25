@@ -97,15 +97,13 @@ Partial Class Player
         LblPosition = New Components.LabelCSY()
         CMLyrics = New Components.TextBoxContextMenu()
         TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
-        CMQueue = New ContextMenuStrip(components)
-        CMIViewQueue = New ToolStripMenuItem()
+        MIViewQueue = New ToolStripMenuItem()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         CType(AxPlayer, ComponentModel.ISupportInitialize).BeginInit()
         MenuPlayer.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         CType(PicBoxVisualizer, ComponentModel.ISupportInitialize).BeginInit()
-        CMQueue.SuspendLayout()
         SuspendLayout()
         ' 
         ' BtnPlay
@@ -124,74 +122,73 @@ Partial Class Player
         ' 
         CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMPlaylist.Name = "CMPlaylist"
-        CMPlaylist.Size = New Size(181, 402)
+        CMPlaylist.Size = New Size(177, 380)
         ' 
         ' CMIPlay
         ' 
         CMIPlay.Font = New Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMIPlay.Image = My.Resources.Resources.ImagePlay
         CMIPlay.Name = "CMIPlay"
-        CMIPlay.Size = New Size(180, 22)
+        CMIPlay.Size = New Size(176, 22)
         CMIPlay.Text = "Play"
         ' 
         ' CMIQueue
         ' 
-        CMIQueue.DropDown = CMQueue
         CMIQueue.Image = My.Resources.Resources.ImagePlay
         CMIQueue.Name = "CMIQueue"
-        CMIQueue.Size = New Size(180, 22)
+        CMIQueue.Size = New Size(176, 22)
         CMIQueue.Text = "Queue"
         ' 
         ' CMIPlayWithWindows
         ' 
         CMIPlayWithWindows.Image = My.Resources.Resources.ImageWindows16
         CMIPlayWithWindows.Name = "CMIPlayWithWindows"
-        CMIPlayWithWindows.Size = New Size(180, 22)
+        CMIPlayWithWindows.Size = New Size(176, 22)
         CMIPlayWithWindows.Text = "Play In Windows"
         ' 
         ' ToolStripSeparator3
         ' 
         ToolStripSeparator3.Name = "ToolStripSeparator3"
-        ToolStripSeparator3.Size = New Size(177, 6)
+        ToolStripSeparator3.Size = New Size(173, 6)
         ' 
         ' CMIPlaylistAdd
         ' 
         CMIPlaylistAdd.Image = My.Resources.Resources.ImageAdd16
         CMIPlaylistAdd.Name = "CMIPlaylistAdd"
-        CMIPlaylistAdd.Size = New Size(180, 22)
+        CMIPlaylistAdd.Size = New Size(176, 22)
         CMIPlaylistAdd.Text = "Add"
         ' 
         ' CMIPlaylistRemove
         ' 
         CMIPlaylistRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMIPlaylistRemove.Name = "CMIPlaylistRemove"
-        CMIPlaylistRemove.Size = New Size(180, 22)
+        CMIPlaylistRemove.Size = New Size(176, 22)
         CMIPlaylistRemove.Text = "Remove"
         ' 
         ' CMIClearPlaylist
         ' 
         CMIClearPlaylist.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMIClearPlaylist.Name = "CMIClearPlaylist"
-        CMIClearPlaylist.Size = New Size(180, 22)
+        CMIClearPlaylist.Size = New Size(176, 22)
         CMIClearPlaylist.Text = "Clear Playlist"
         ' 
         ' CMIEditTitle
         ' 
         CMIEditTitle.Image = My.Resources.Resources.ImageEdit16
         CMIEditTitle.Name = "CMIEditTitle"
-        CMIEditTitle.Size = New Size(180, 22)
+        CMIEditTitle.Size = New Size(176, 22)
         CMIEditTitle.Text = "Edit Title"
         ' 
         ' ToolStripSeparator1
         ' 
         ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New Size(177, 6)
+        ToolStripSeparator1.Size = New Size(173, 6)
         ' 
         ' CMIShowCurrent
         ' 
         CMIShowCurrent.Image = My.Resources.Resources.ImageAcceptOKGoStart
         CMIShowCurrent.Name = "CMIShowCurrent"
-        CMIShowCurrent.Size = New Size(180, 22)
+        CMIShowCurrent.Size = New Size(176, 22)
         CMIShowCurrent.Text = "Show Current Song"
         ' 
         ' CMIRating
@@ -199,14 +196,13 @@ Partial Class Player
         CMIRating.DropDown = CMRatings
         CMIRating.Image = My.Resources.Resources.ImageRating16
         CMIRating.Name = "CMIRating"
-        CMIRating.Size = New Size(180, 22)
+        CMIRating.Size = New Size(176, 22)
         CMIRating.Text = "Rating"
         ' 
         ' CMRatings
         ' 
         CMRatings.Items.AddRange(New ToolStripItem() {CMIRating5Stars, CMIRating4Stars, CMIRating3Stars, CMIRating2Stars, CMIRating1Star})
         CMRatings.Name = "CMRatings"
-        CMRatings.OwnerItem = CMIRating
         CMRatings.ShowImageMargin = False
         CMRatings.Size = New Size(100, 114)
         ' 
@@ -244,57 +240,57 @@ Partial Class Player
         ' 
         CMIViewInLibrary.Image = My.Resources.Resources.ImageLibrary16
         CMIViewInLibrary.Name = "CMIViewInLibrary"
-        CMIViewInLibrary.Size = New Size(180, 22)
+        CMIViewInLibrary.Size = New Size(176, 22)
         CMIViewInLibrary.Text = "View In Library"
         ' 
         ' ToolStripSeparator6
         ' 
         ToolStripSeparator6.Name = "ToolStripSeparator6"
-        ToolStripSeparator6.Size = New Size(177, 6)
+        ToolStripSeparator6.Size = New Size(173, 6)
         ' 
         ' CMIHelperApp1
         ' 
         CMIHelperApp1.Image = My.Resources.Resources.ImageSkyeTag
         CMIHelperApp1.Name = "CMIHelperApp1"
-        CMIHelperApp1.Size = New Size(180, 22)
+        CMIHelperApp1.Size = New Size(176, 22)
         ' 
         ' CMIHelperApp2
         ' 
         CMIHelperApp2.Image = My.Resources.Resources.ImageMP3Tag16
         CMIHelperApp2.Name = "CMIHelperApp2"
-        CMIHelperApp2.Size = New Size(180, 22)
+        CMIHelperApp2.Size = New Size(176, 22)
         ' 
         ' CMIOpenLocation
         ' 
         CMIOpenLocation.Image = My.Resources.Resources.ImageOpen16
         CMIOpenLocation.Name = "CMIOpenLocation"
-        CMIOpenLocation.Size = New Size(180, 22)
+        CMIOpenLocation.Size = New Size(176, 22)
         CMIOpenLocation.Text = "Open File Location"
         ' 
         ' TSSeparatorExternalTools
         ' 
         TSSeparatorExternalTools.Name = "TSSeparatorExternalTools"
-        TSSeparatorExternalTools.Size = New Size(177, 6)
+        TSSeparatorExternalTools.Size = New Size(173, 6)
         ' 
         ' CMICopyTitle
         ' 
         CMICopyTitle.Image = My.Resources.Resources.ImageCopy16
         CMICopyTitle.Name = "CMICopyTitle"
-        CMICopyTitle.Size = New Size(180, 22)
+        CMICopyTitle.Size = New Size(176, 22)
         CMICopyTitle.Text = "Copy Title"
         ' 
         ' CMICopyFileName
         ' 
         CMICopyFileName.Image = My.Resources.Resources.ImageCopy16
         CMICopyFileName.Name = "CMICopyFileName"
-        CMICopyFileName.Size = New Size(180, 22)
+        CMICopyFileName.Size = New Size(176, 22)
         CMICopyFileName.Text = "Copy File Name"
         ' 
         ' CMICopyFilePath
         ' 
         CMICopyFilePath.Image = My.Resources.Resources.ImageCopy16
         CMICopyFilePath.Name = "CMICopyFilePath"
-        CMICopyFilePath.Size = New Size(180, 22)
+        CMICopyFilePath.Size = New Size(176, 22)
         CMICopyFilePath.Text = "Copy File Path"
         ' 
         ' TimerPosition
@@ -369,7 +365,7 @@ Partial Class Player
         ' 
         ' MIView
         ' 
-        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, ToolStripSeparator5, MIOptions})
+        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIViewQueue, ToolStripSeparator5, MIOptions})
         MIView.ForeColor = SystemColors.HighlightText
         MIView.Image = My.Resources.Resources.ImageView
         MIView.Name = "MIView"
@@ -380,19 +376,19 @@ Partial Class Player
         ' 
         MIFullscreen.Image = My.Resources.Resources.ImageFullscreen16
         MIFullscreen.Name = "MIFullscreen"
-        MIFullscreen.Size = New Size(131, 22)
+        MIFullscreen.Size = New Size(180, 22)
         MIFullscreen.Text = "Full Screen"
         ' 
         ' ToolStripSeparator5
         ' 
         ToolStripSeparator5.Name = "ToolStripSeparator5"
-        ToolStripSeparator5.Size = New Size(128, 6)
+        ToolStripSeparator5.Size = New Size(177, 6)
         ' 
         ' MIOptions
         ' 
         MIOptions.Image = My.Resources.Resources.ImageSettings16
         MIOptions.Name = "MIOptions"
-        MIOptions.Size = New Size(131, 22)
+        MIOptions.Size = New Size(180, 22)
         MIOptions.Text = "Options"
         ' 
         ' MIVisualizer
@@ -718,19 +714,12 @@ Partial Class Player
         TrackBarPosition.TimerInterval = 100
         TrackBarPosition.Value = 0
         ' 
-        ' CMQueue
+        ' MIViewQueue
         ' 
-        CMQueue.Items.AddRange(New ToolStripItem() {CMIViewQueue})
-        CMQueue.Name = "CMQueue"
-        CMQueue.OwnerItem = CMIQueue
-        CMQueue.Size = New Size(138, 26)
-        ' 
-        ' CMIViewQueue
-        ' 
-        CMIViewQueue.Image = My.Resources.Resources.ImageView
-        CMIViewQueue.Name = "CMIViewQueue"
-        CMIViewQueue.Size = New Size(137, 22)
-        CMIViewQueue.Text = "View Queue"
+        MIViewQueue.Image = My.Resources.Resources.ImagePlay
+        MIViewQueue.Name = "MIViewQueue"
+        MIViewQueue.Size = New Size(180, 22)
+        MIViewQueue.Text = "Queue"
         ' 
         ' Player
         ' 
@@ -775,7 +764,6 @@ Partial Class Player
         MenuPlayer.PerformLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).EndInit()
         CType(PicBoxVisualizer, ComponentModel.ISupportInitialize).EndInit()
-        CMQueue.ResumeLayout(False)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -856,6 +844,5 @@ Partial Class Player
     Friend WithEvents CMIRating2Stars As ToolStripMenuItem
     Friend WithEvents CMIRating1Star As ToolStripMenuItem
     Friend WithEvents CMIEditTitle As ToolStripMenuItem
-    Friend WithEvents CMQueue As ContextMenuStrip
-    Friend WithEvents CMIViewQueue As ToolStripMenuItem
+    Friend WithEvents MIViewQueue As ToolStripMenuItem
 End Class
