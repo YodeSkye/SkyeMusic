@@ -30,6 +30,8 @@ Partial Class PlayerQueue
         CMQueue = New ContextMenuStrip(components)
         CMIRemove = New ToolStripMenuItem()
         BtnOK = New Button()
+        TipQueue = New ToolTip(components)
+        BtnPrune = New Button()
         CMQueue.SuspendLayout()
         SuspendLayout()
         ' 
@@ -64,13 +66,14 @@ Partial Class PlayerQueue
         CMQueue.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMQueue.Items.AddRange(New ToolStripItem() {CMIRemove})
         CMQueue.Name = "CMQueue"
-        CMQueue.Size = New Size(181, 52)
+        CMQueue.Size = New Size(126, 26)
         ' 
         ' CMIRemove
         ' 
+        CMIRemove.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMIRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMIRemove.Name = "CMIRemove"
-        CMIRemove.Size = New Size(180, 26)
+        CMIRemove.Size = New Size(125, 22)
         CMIRemove.Text = "Remove"
         ' 
         ' BtnOK
@@ -81,13 +84,30 @@ Partial Class PlayerQueue
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 9
+        TipQueue.SetToolTip(BtnOK, "Close Window")
         BtnOK.UseVisualStyleBackColor = True
+        ' 
+        ' TipQueue
+        ' 
+        TipQueue.OwnerDraw = True
+        ' 
+        ' BtnPrune
+        ' 
+        BtnPrune.Anchor = AnchorStyles.Bottom
+        BtnPrune.Image = My.Resources.Resources.ImagePrune32
+        BtnPrune.Location = New Point(724, 201)
+        BtnPrune.Name = "BtnPrune"
+        BtnPrune.Size = New Size(48, 48)
+        BtnPrune.TabIndex = 10
+        TipQueue.SetToolTip(BtnPrune, "Prune Queue by removing any item not found in the Playlist")
+        BtnPrune.UseVisualStyleBackColor = True
         ' 
         ' PlayerQueue
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(784, 261)
+        Controls.Add(BtnPrune)
         Controls.Add(BtnOK)
         Controls.Add(LVQueue)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -105,4 +125,6 @@ Partial Class PlayerQueue
     Friend WithEvents ColumnHeader2 As ColumnHeader
     Friend WithEvents CMQueue As ContextMenuStrip
     Friend WithEvents CMIRemove As ToolStripMenuItem
+    Friend WithEvents TipQueue As ToolTip
+    Friend WithEvents BtnPrune As Button
 End Class

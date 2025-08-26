@@ -2978,7 +2978,7 @@ Public Class Player
         LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played"
         LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added"
     End Sub
-    Private Sub SetPlaylistCountText()
+    Friend Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()
         LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString
         If LVPlaylist.Items.Count = 1 Then
