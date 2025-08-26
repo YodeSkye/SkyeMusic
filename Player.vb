@@ -31,7 +31,6 @@ Public Class Player
     Private RandomHistory As New Generic.List(Of String) 'History of played items for shuffle play mode
     Private RandomHistoryIndex As Integer = 0 'Index for the shuffle history
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
-    Private TipPlayerFont As Font 'Font for custom drawing of TipPlayer
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
 
@@ -82,7 +81,6 @@ Public Class Player
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
         PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
-        TipPlayerFont = New Font(LVPlaylist.Font.FontFamily, 12, FontStyle.Regular) 'Font for custom drawing of TipPlayer
         TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
 
         'Initialize Listview
@@ -1160,7 +1158,7 @@ Public Class Player
     End Sub
     Private Sub TipPlayer_Popup(sender As Object, e As PopupEventArgs) Handles TipPlayer.Popup
         Static s As SizeF
-        s = TextRenderer.MeasureText(TipPlayer.GetToolTip(e.AssociatedControl), TipPlayerFont)
+        s = TextRenderer.MeasureText(TipPlayer.GetToolTip(e.AssociatedControl), App.TipFont)
         s.Width += 14
         s.Height += 16
         e.ToolTipSize = s.ToSize
@@ -1175,12 +1173,12 @@ Public Class Player
         g.FillRectangle(brbg, e.Bounds)
 
         'Draw border
-        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipPlayerFont.Size / 4)) 'Scale border thickness with font
+        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
             g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
         End Using
 
         'Draw text
-        TextRenderer.DrawText(g, e.ToolTipText, TipPlayerFont, New Point(7, 7), App.CurrentTheme.TextColor)
+        TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
 
         'Finalize
         brbg.Dispose()

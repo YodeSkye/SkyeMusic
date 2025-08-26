@@ -53,7 +53,6 @@ Public Class Library
     Private LibraryGroupBy As LibraryGroupMode = LibraryGroupMode.None
     Private LibraryGroups As New Collections.Generic.List(Of LibraryGroup)
     Private IsTextBoxLibrarySearch As Boolean = False
-    Private TipLibraryFont As Font 'Font for custom drawing of TipLibrary
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -140,7 +139,6 @@ Public Class Library
         PicBoxAlbumArtLargeSize = New Size(400, 400)
         PicBoxAlbumArtSuperSize = New Size(800, 800)
         RadBtnGroupByNone.TabStop = False
-        TipLibraryFont = New Font(LVLibrary.Font.FontFamily, 12, FontStyle.Regular) 'Font for custom drawing of TipLibrary
         TipLibrary.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
         LblHistory.Text = String.Empty
         LblExtTitle.Text = String.Empty
@@ -737,7 +735,7 @@ Public Class Library
     End Sub
     Private Sub TipLibrary_Popup(sender As Object, e As PopupEventArgs) Handles TipLibrary.Popup
         Static s As SizeF
-        s = TextRenderer.MeasureText(TipLibrary.GetToolTip(e.AssociatedControl), TipLibraryFont)
+        s = TextRenderer.MeasureText(TipLibrary.GetToolTip(e.AssociatedControl), App.TipFont)
         s.Width += 14
         s.Height += 16
         e.ToolTipSize = s.ToSize
@@ -752,12 +750,12 @@ Public Class Library
         g.FillRectangle(brbg, e.Bounds)
 
         'Draw border
-        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipLibraryFont.Size / 4)) 'Scale border thickness with font
+        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
             g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
         End Using
 
         'Draw text
-        TextRenderer.DrawText(g, e.ToolTipText, TipLibraryFont, New Point(7, 7), App.CurrentTheme.TextColor)
+        TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
 
         'Finalize
         brbg.Dispose()

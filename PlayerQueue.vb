@@ -2,13 +2,11 @@
 Public Class PlayerQueue
 
     'Declarations
-    Private TipQueueFont As Font 'Font for custom drawing of TipQueue
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
 
     'Form Events
     Private Sub PlayerQueue_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        TipQueueFont = New Font(LVQueue.Font.FontFamily, 12, FontStyle.Regular) 'Font for custom drawing of TipQueue
         SetTheme()
         For Each s As String In Player.Queue
             Dim playlistlvi As ListViewItem = Player.LVPlaylist.FindItemWithText(s, True, 0)
@@ -124,7 +122,7 @@ Public Class PlayerQueue
     End Sub
     Private Sub TipQueue_Popup(sender As Object, e As PopupEventArgs) Handles TipQueue.Popup
         Static s As SizeF
-        s = TextRenderer.MeasureText(TipQueue.GetToolTip(e.AssociatedControl), TipQueueFont)
+        s = TextRenderer.MeasureText(TipQueue.GetToolTip(e.AssociatedControl), App.TipFont)
         s.Width += 14
         s.Height += 16
         e.ToolTipSize = s.ToSize
@@ -139,12 +137,12 @@ Public Class PlayerQueue
         g.FillRectangle(brbg, e.Bounds)
 
         'Draw border
-        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipQueueFont.Size / 4)) 'Scale border thickness with font
+        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
             g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
         End Using
 
         'Draw text
-        TextRenderer.DrawText(g, e.ToolTipText, TipQueueFont, New Point(7, 7), App.CurrentTheme.TextColor)
+        TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
 
         'Finalize
         brbg.Dispose()

@@ -1,6 +1,5 @@
 ﻿
 Imports System.IO
-Imports System.Runtime.InteropServices
 Imports SkyeMusic.My
 
 Public Class Options
@@ -10,7 +9,6 @@ Public Class Options
     Private mOffset, mPosition As Point
     Private UIFolderBrowser As New FolderBrowserDialog
     Private uiFileBrowser As New OpenFileDialog
-    Private TipOptionsFont As Font 'Font for custom drawing of TipOptions
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -27,7 +25,6 @@ Public Class Options
     End Sub
     Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = "Options For " + My.Application.Info.Title
-        TipOptionsFont = New Font(Font.FontFamily, 12, FontStyle.Regular) 'Font for custom drawing of TipOptions
         SetTheme()
 
         'Settings
@@ -444,7 +441,7 @@ Public Class Options
     End Sub
     Private Sub TipOptions_Popup(sender As Object, e As PopupEventArgs) Handles TipOptions.Popup
         Static s As SizeF
-        s = TextRenderer.MeasureText(TipOptions.GetToolTip(e.AssociatedControl), TipOptionsFont)
+        s = TextRenderer.MeasureText(TipOptions.GetToolTip(e.AssociatedControl), App.TipFont)
         s.Width += 14
         s.Height += 16
         e.ToolTipSize = s.ToSize
@@ -459,12 +456,12 @@ Public Class Options
         g.FillRectangle(brbg, e.Bounds)
 
         'Draw border
-        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipOptionsFont.Size / 4)) 'Scale border thickness with font
+        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
             g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
         End Using
 
         'Draw text
-        TextRenderer.DrawText(g, e.ToolTipText, TipOptionsFont, New Point(7, 7), App.CurrentTheme.TextColor)
+        TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
 
         'Finalize
         brbg.Dispose()
@@ -598,9 +595,5 @@ Public Class Options
         ResumeLayout()
         Debug.Print("Options Theme Set")
     End Sub
-
-    <DllImport("user32.dll", SetLastError:=True)>
-    Private Shared Function FindWindowEx(parentHandle As IntPtr, childAfter As IntPtr, className As String, windowTitle As String) As IntPtr
-    End Function
 
 End Class
