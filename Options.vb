@@ -1,5 +1,6 @@
 ﻿
 Imports System.IO
+Imports System.Runtime.InteropServices
 Imports SkyeMusic.My
 
 Public Class Options
@@ -597,5 +598,9 @@ Public Class Options
         ResumeLayout()
         Debug.Print("Options Theme Set")
     End Sub
+
+    <DllImport("user32.dll", SetLastError:=True)>
+    Private Shared Function FindWindowEx(parentHandle As IntPtr, childAfter As IntPtr, className As String, windowTitle As String) As IntPtr
+    End Function
 
 End Class

@@ -1,6 +1,8 @@
 ﻿
 Imports Microsoft.Win32
 Imports SkyeMusic.Player
+Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
 
 Namespace My
 
