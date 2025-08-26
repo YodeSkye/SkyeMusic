@@ -106,7 +106,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Syncfusion.Tools.Windows" Version="30.2.6" />
+    <PackageReference Include="Syncfusion.Tools.Windows" Version="30.2.7" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.8" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
