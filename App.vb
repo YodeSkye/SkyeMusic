@@ -1051,8 +1051,10 @@ Namespace My
 
     Friend Class ListViewItemStringComparer
         Implements IComparer
+
         Private col As Integer
         Private sort As SortOrder
+
         Public Sub New(column As Integer, sortorder As SortOrder)
             col = column
             sort = sortorder
@@ -1063,11 +1065,14 @@ Namespace My
             If sort = SortOrder.Descending Then returnVal *= -1
             Return returnVal
         End Function
+
     End Class
     Friend Class ListViewItemNumberComparer
         Implements IComparer
+
         Private col As Integer
         Private sort As SortOrder
+
         Public Sub New(column As Integer, sortorder As SortOrder)
             col = column
             sort = sortorder
@@ -1092,11 +1097,14 @@ Namespace My
                 End If
             End If
         End Function
+
     End Class
     Friend Class ListViewItemDateComparer
         Implements IComparer
+
         Private col As Integer
         Private sort As SortOrder
+
         Public Sub New(column As Integer, sortorder As SortOrder)
             col = column
             sort = sortorder
@@ -1121,6 +1129,15 @@ Namespace My
                 End If
             End If
         End Function
+
+    End Class
+    Friend Class ListViewGroupComparer
+        Implements IComparer
+
+        Public Function Compare(objA As Object, objB As Object) As Integer Implements System.Collections.IComparer.Compare
+            Return CType(objA, ListViewGroup).Header.CompareTo(CType(objB, ListViewGroup).Header)
+        End Function
+
     End Class
 
     Public Class MessageFilterPlayerIgnoreFullscreenMouseClick

@@ -429,11 +429,25 @@ Public Class Library
             CMIPlay.Enabled = False
             CMIQueue.Enabled = False
             CMIPlayWithWindows.Enabled = False
+            CMIAddGroupToPlaylist.Enabled = False
+            CMICollapseGroup.Enabled = False
+            CMIAddToPlaylist.Enabled = False
+            CMIOpenLocation.Enabled = False
+            CMICopyTitle.Enabled = False
+            CMICopyFileName.Enabled = False
+            CMICopyFilePath.Enabled = False
         Else
             CMICopyTitle.ToolTipText = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             CMICopyFileName.ToolTipText = IO.Path.GetFileNameWithoutExtension(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
             CMICopyFilePath.ToolTipText = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text
             CMIPlayWithWindows.Enabled = True
+            CMIAddGroupToPlaylist.Enabled = True
+            CMICollapseGroup.Enabled = True
+            CMIAddToPlaylist.Enabled = True
+            CMIOpenLocation.Enabled = True
+            CMICopyTitle.Enabled = True
+            CMICopyFileName.Enabled = True
+            CMICopyFilePath.Enabled = True
             Select Case App.PlaylistDefaultAction
                 Case App.PlaylistActions.Play
                     CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Bold)
@@ -464,19 +478,21 @@ Public Class Library
         If LVLibrary.SelectedItems.Count > 0 Then App.PlayWithWindows(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
     Private Sub CMIAddToPlaylistClick(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
-        Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-        LblStatus.Text = "Adding Selected Songs to Playlist..."
-        LblStatus.Visible = True
-        LblStatus.Refresh()
-        Player.LVPlaylist.Visible = False
-        Player.LVPlaylist.SuspendLayout()
-        For Each item As ListViewItem In LVLibrary.SelectedItems
-            AddToPlaylist(item)
-        Next
-        Player.LVPlaylist.ResumeLayout()
-        Player.LVPlaylist.Visible = True
-        LblStatus.Visible = False
-        App.WriteToLog("Selected Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        If LVLibrary.SelectedItems.Count > 0 Then
+            Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+            LblStatus.Text = "Adding Selected Songs to Playlist..."
+            LblStatus.Visible = True
+            LblStatus.Refresh()
+            Player.LVPlaylist.Visible = False
+            Player.LVPlaylist.SuspendLayout()
+            For Each item As ListViewItem In LVLibrary.SelectedItems
+                AddToPlaylist(item)
+            Next
+            Player.LVPlaylist.ResumeLayout()
+            Player.LVPlaylist.Visible = True
+            LblStatus.Visible = False
+            App.WriteToLog("Selected Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        End If
     End Sub
     Private Sub CMIAddAllToPlaylistClick(sender As Object, e As EventArgs) Handles CMIAddAllToPlaylist.Click
         Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
@@ -494,84 +510,88 @@ Public Class Library
         App.WriteToLog("Full Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
     End Sub
     Private Sub CMIAddGroupToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddGroupToPlaylist.Click
+        If LVLibrary.SelectedItems.Count > 0 Then
 
-        'Initialize
-        Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-        LblStatus.Text = "Adding Group to Playlist..."
-        LblStatus.Visible = True
-        LblStatus.Refresh()
-        Player.LVPlaylist.Visible = False
-        Player.LVPlaylist.SuspendLayout()
+            'Initialize
+            Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+            LblStatus.Text = "Adding Group to Playlist..."
+            LblStatus.Visible = True
+            LblStatus.Refresh()
+            Player.LVPlaylist.Visible = False
+            Player.LVPlaylist.SuspendLayout()
 
-        'Get group name from selected list view item
-        Dim groupname As String
-        Select Case LibraryGroupBy
-            Case LibraryGroupMode.Album
-                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Album").Index).Text
-            Case LibraryGroupMode.Artist
-                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Artist").Index).Text
-            Case LibraryGroupMode.Genre
-                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Genre").Index).Text
-            Case LibraryGroupMode.Year
-                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Year").Index).Text
-            Case LibraryGroupMode.Type
-                Dim ext As String = Computer.FileSystem.GetFileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
-                If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
-                    groupname = ext.TrimStart(CChar("."))
-                Else
-                    groupname = App.ExtensionDictionary.Item(ext)
-                End If
-            Case Else
-                groupname = String.Empty
-        End Select
+            'Get group name from selected list view item
+            Dim groupname As String
+            Select Case LibraryGroupBy
+                Case LibraryGroupMode.Album
+                    groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Album").Index).Text
+                Case LibraryGroupMode.Artist
+                    groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Artist").Index).Text
+                Case LibraryGroupMode.Genre
+                    groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Genre").Index).Text
+                Case LibraryGroupMode.Year
+                    groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Year").Index).Text
+                Case LibraryGroupMode.Type
+                    Dim ext As String = Computer.FileSystem.GetFileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
+                    If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
+                        groupname = ext.TrimStart(CChar("."))
+                    Else
+                        groupname = App.ExtensionDictionary.Item(ext)
+                    End If
+                Case Else
+                    groupname = String.Empty
+            End Select
 
-        'Get group index
-        Dim groupindex As Int16 = GetLibraryGroupIndex(groupname)
+            'Get group index
+            Dim groupindex As Int16 = GetLibraryGroupIndex(groupname)
 
-        'Add to Playlist
-        For Each item As ListViewItem In LVLibrary.Groups(groupindex).Items
-            AddToPlaylist(item)
-        Next
+            'Add to Playlist
+            For Each item As ListViewItem In LVLibrary.Groups(groupindex).Items
+                AddToPlaylist(item)
+            Next
 
-        'Finalize
-        Player.LVPlaylist.ResumeLayout()
-        Player.LVPlaylist.Visible = True
-        LblStatus.Visible = False
-        App.WriteToLog(LibraryGroupBy.ToString + " Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            'Finalize
+            Player.LVPlaylist.ResumeLayout()
+            Player.LVPlaylist.Visible = True
+            LblStatus.Visible = False
+            App.WriteToLog(LibraryGroupBy.ToString + " Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
+        End If
     End Sub
     Private Sub CMICollapseGroup_Click(sender As Object, e As EventArgs) Handles CMICollapseGroup.Click
+        If LVLibrary.SelectedItems.Count > 0 Then
 
-        'Get group name from selected list view item
-        Dim groupname As String
-        Select Case LibraryGroupBy
-            Case LibraryGroupMode.Album
-                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Album").Index).Text
-            Case LibraryGroupMode.Artist
-                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Artist").Index).Text
-            Case LibraryGroupMode.Genre
-                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Genre").Index).Text
-            Case LibraryGroupMode.Year
-                groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Year").Index).Text
-            Case LibraryGroupMode.Type
-                Dim ext As String = Computer.FileSystem.GetFileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
-                If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
-                    groupname = ext.TrimStart(CChar("."))
-                Else
-                    groupname = App.ExtensionDictionary.Item(ext)
-                End If
-            Case Else
-                groupname = String.Empty
-        End Select
+            'Get group name from selected list view item
+            Dim groupname As String
+            Select Case LibraryGroupBy
+                Case LibraryGroupMode.Album
+                    groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Album").Index).Text
+                Case LibraryGroupMode.Artist
+                    groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Artist").Index).Text
+                Case LibraryGroupMode.Genre
+                    groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Genre").Index).Text
+                Case LibraryGroupMode.Year
+                    groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Year").Index).Text
+                Case LibraryGroupMode.Type
+                    Dim ext As String = Computer.FileSystem.GetFileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
+                    If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
+                        groupname = ext.TrimStart(CChar("."))
+                    Else
+                        groupname = App.ExtensionDictionary.Item(ext)
+                    End If
+                Case Else
+                    groupname = String.Empty
+            End Select
 
-        'Get group index
-        Dim groupindex As Int16 = GetLibraryGroupIndex(groupname)
+            'Get group index
+            Dim groupindex As Int16 = GetLibraryGroupIndex(groupname)
 
-        'Collapse group
-        If Not groupindex = -1 Then
-            LVLibrary.Groups(groupindex).CollapsedState = ListViewGroupCollapsedState.Collapsed
+            'Collapse group
+            If Not groupindex = -1 Then
+                LVLibrary.Groups(groupindex).CollapsedState = ListViewGroupCollapsedState.Collapsed
+            End If
+
         End If
-
     End Sub
     Private Sub CMIExpandAllGroups_Click(sender As Object, e As EventArgs) Handles CMIExpandAllGroups.Click
         For Each g As ListViewGroup In LVLibrary.Groups
@@ -579,10 +599,10 @@ Public Class Library
         Next
     End Sub
     Private Sub CMIHelperApp1Click(sender As Object, e As EventArgs) Handles CMIHelperApp1.Click
-        App.HelperApp1(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+        If LVLibrary.SelectedItems.Count > 0 Then App.HelperApp1(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
     Private Sub CMIHelperApp2Click(sender As Object, e As EventArgs) Handles CMIHelperApp2.Click
-        App.HelperApp2(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+        If LVLibrary.SelectedItems.Count > 0 Then App.HelperApp2(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
     Private Sub CMIOpenLocationClick(sender As Object, e As EventArgs) Handles CMIOpenLocation.Click
         If LVLibrary.SelectedItems.Count > 0 Then App.OpenFileLocation(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
@@ -1996,6 +2016,21 @@ Public Class Library
                 LibraryGroups.Add(aGroup)
             End If
         Next
+
+        'Sort listview groups if necessary
+        If LibraryGroupBy = LibraryGroupMode.Type Then
+
+            'LibraryGroups.Sort(New Comparison(Of LibraryGroup.Name))
+
+            'Dim groups(LVLibrary.Groups.Count - 1) As ListViewGroup
+            'LVLibrary.Groups.CopyTo(groups, 0)
+            'Debug.Print(groups(0).Name)
+            'Array.Sort(groups, New ListViewGroupComparer)
+            'LVLibrary.BeginUpdate()
+            'LVLibrary.Groups.Clear()
+            'LVLibrary.Groups.AddRange(groups)
+            'LVLibrary.EndUpdate()
+        End If
 
         'Create listview groups
         For Each group As LibraryGroup In LibraryGroups
