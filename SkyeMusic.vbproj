@@ -24,6 +24,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
+	<NoWarn>MSB3305</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="CoreAudio.dll" />
