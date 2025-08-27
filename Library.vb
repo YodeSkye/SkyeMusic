@@ -2015,22 +2015,18 @@ Public Class Library
                 aGroup.Index = CShort(LibraryGroups.Count)
                 LibraryGroups.Add(aGroup)
             End If
+
+            'Sort groups, if necessary
+            If LibraryGroupBy = LibraryGroupMode.Type Then
+                LibraryGroups.Sort(Function(x, y) x.Name.CompareTo(y.Name))
+                For i As Int16 = 0 To CShort(LibraryGroups.Count - 1)
+                    Dim p As LibraryGroup = LibraryGroups(i)
+                    p.Index = i
+                    LibraryGroups(i) = p
+                Next
+            End If
+
         Next
-
-        'Sort listview groups if necessary
-        If LibraryGroupBy = LibraryGroupMode.Type Then
-
-            'LibraryGroups.Sort(New Comparison(Of LibraryGroup.Name))
-
-            'Dim groups(LVLibrary.Groups.Count - 1) As ListViewGroup
-            'LVLibrary.Groups.CopyTo(groups, 0)
-            'Debug.Print(groups(0).Name)
-            'Array.Sort(groups, New ListViewGroupComparer)
-            'LVLibrary.BeginUpdate()
-            'LVLibrary.Groups.Clear()
-            'LVLibrary.Groups.AddRange(groups)
-            'LVLibrary.EndUpdate()
-        End If
 
         'Create listview groups
         For Each group As LibraryGroup In LibraryGroups
