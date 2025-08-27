@@ -1,5 +1,6 @@
 ﻿
 Imports System.IO
+Imports AxWMPLib
 Imports SkyeMusic.My
 
 Public Class Library
@@ -11,6 +12,7 @@ Public Class Library
         Album
         Artist
         Year
+        Type
     End Enum
     Private Structure LibraryGroup
         Public Name As String
@@ -512,6 +514,13 @@ Public Class Library
                 groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Genre").Index).Text
             Case LibraryGroupMode.Year
                 groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Year").Index).Text
+            Case LibraryGroupMode.Type
+                Dim ext As String = Computer.FileSystem.GetFileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
+                If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
+                    groupname = ext.TrimStart(CChar("."))
+                Else
+                    groupname = App.ExtensionDictionary.Item(ext)
+                End If
             Case Else
                 groupname = String.Empty
         End Select
@@ -544,6 +553,13 @@ Public Class Library
                 groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Genre").Index).Text
             Case LibraryGroupMode.Year
                 groupname = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Year").Index).Text
+            Case LibraryGroupMode.Type
+                Dim ext As String = Computer.FileSystem.GetFileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
+                If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
+                    groupname = ext.TrimStart(CChar("."))
+                Else
+                    groupname = App.ExtensionDictionary.Item(ext)
+                End If
             Case Else
                 groupname = String.Empty
         End Select
@@ -721,6 +737,14 @@ Public Class Library
         End If
         LVLibrary.Focus()
         RadBtnGroupByYear.TabStop = False
+    End Sub
+    Private Sub RadBtnGroupByType_CheckedChanged(sender As Object, e As EventArgs) Handles RadBtnGroupByType.CheckedChanged
+        If RadBtnGroupByType.Checked Then
+            LibraryGroupBy = LibraryGroupMode.Type
+            SetGroups()
+        End If
+        LVLibrary.Focus()
+        RadBtnGroupByType.TabStop = False
     End Sub
     Private Sub RadBtnGroupByNone_CheckedChanged(sender As Object, e As EventArgs) Handles RadBtnGroupByNone.CheckedChanged
         If RadBtnGroupByNone.Checked Then
@@ -1955,6 +1979,13 @@ Public Class Library
                     pGroup = item.SubItems(LVLibrary.Columns("Genre").Index).Text
                 Case LibraryGroupMode.Year
                     pGroup = item.SubItems(LVLibrary.Columns("Year").Index).Text
+                Case LibraryGroupMode.Type
+                    Dim ext As String = Computer.FileSystem.GetFileInfo(item.SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
+                    If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
+                        pGroup = ext.TrimStart(CChar("."))
+                    Else
+                        pGroup = App.ExtensionDictionary.Item(ext)
+                    End If
                 Case Else
                     pGroup = String.Empty
             End Select
@@ -1979,6 +2010,8 @@ Public Class Library
                         groupname = "No Genre"
                     Case LibraryGroupMode.Year
                         groupname = "Unknown Year"
+                    Case LibraryGroupMode.Type
+                        groupname = "Unknown Type"
                     Case Else
                         groupname = "Default"
                 End Select
@@ -1987,7 +2020,7 @@ Public Class Library
             End If
             LVLibrary.Groups.Add(group.Index.ToString, groupname)
         Next
-        '
+
         'Assign each listview item to a group
         For Each item As ListViewItem In LVLibrary.Items
             Dim aGroup As String
@@ -2000,6 +2033,13 @@ Public Class Library
                     aGroup = item.SubItems(LVLibrary.Columns("Genre").Index).Text
                 Case LibraryGroupMode.Year
                     aGroup = item.SubItems(LVLibrary.Columns("Year").Index).Text
+                Case LibraryGroupMode.Type
+                    Dim ext As String = Computer.FileSystem.GetFileInfo(item.SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
+                    If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
+                        aGroup = ext.TrimStart(CChar("."))
+                    Else
+                        aGroup = App.ExtensionDictionary.Item(ext)
+                    End If
                 Case Else
                     aGroup = String.Empty
             End Select
@@ -2140,6 +2180,8 @@ Public Class Library
         RadBtnGroupByGenre.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGroupByYear.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGroupByYear.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnGroupByType.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnGroupByType.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGroupByNone.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGroupByNone.ForeColor = App.CurrentTheme.ButtonTextColor
         If TxbxLibrarySearch.Text = LibrarySearchTitle Then TxbxLibrarySearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor

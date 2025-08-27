@@ -64,6 +64,7 @@ Partial Class Library
         LblStatus = New Components.LabelCSY()
         LVLibrary = New ListView()
         LblHistory = New Components.LabelCSY()
+        RadBtnGroupByType = New RadioButton()
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -283,6 +284,7 @@ Partial Class Library
         ' GrpBoxGroupBy
         ' 
         GrpBoxGroupBy.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
+        GrpBoxGroupBy.Controls.Add(RadBtnGroupByType)
         GrpBoxGroupBy.Controls.Add(RadBtnGroupByYear)
         GrpBoxGroupBy.Controls.Add(RadBtnGroupByArtist)
         GrpBoxGroupBy.Controls.Add(RadBtnGroupByAlbum)
@@ -339,7 +341,7 @@ Partial Class Library
         RadBtnGroupByNone.Appearance = Appearance.Button
         RadBtnGroupByNone.Checked = True
         RadBtnGroupByNone.ForeColor = SystemColors.ControlText
-        RadBtnGroupByNone.Location = New Point(36, 53)
+        RadBtnGroupByNone.Location = New Point(65, 53)
         RadBtnGroupByNone.Name = "RadBtnGroupByNone"
         RadBtnGroupByNone.Size = New Size(171, 25)
         RadBtnGroupByNone.TabIndex = 22
@@ -440,6 +442,19 @@ Partial Class Library
         LblHistory.Text = "History"
         LblHistory.TextAlign = ContentAlignment.MiddleLeft
         ' 
+        ' RadBtnGroupByType
+        ' 
+        RadBtnGroupByType.Appearance = Appearance.Button
+        RadBtnGroupByType.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
+        RadBtnGroupByType.ForeColor = SystemColors.ControlText
+        RadBtnGroupByType.Location = New Point(6, 53)
+        RadBtnGroupByType.Name = "RadBtnGroupByType"
+        RadBtnGroupByType.Size = New Size(53, 25)
+        RadBtnGroupByType.TabIndex = 24
+        RadBtnGroupByType.Text = "Type"
+        RadBtnGroupByType.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnGroupByType.UseVisualStyleBackColor = True
+        ' 
         ' Library
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -513,4 +528,5 @@ Partial Class Library
     Friend WithEvents LblHistory As Components.LabelCSY
     Friend WithEvents RadBtnGroupByYear As RadioButton
     Friend WithEvents CMIQueue As ToolStripMenuItem
+    Friend WithEvents RadBtnGroupByType As RadioButton
 End Class
