@@ -52,10 +52,10 @@ Partial Class PlayerEditTitle
         ' LblTitle
         ' 
         LblTitle.AutoSize = True
-        LblTitle.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LblTitle.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblTitle.Location = New Point(12, 9)
         LblTitle.Name = "LblTitle"
-        LblTitle.Size = New Size(38, 20)
+        LblTitle.Size = New Size(39, 21)
         LblTitle.TabIndex = 13
         LblTitle.Text = "Title"
         ' 

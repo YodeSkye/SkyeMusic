@@ -162,7 +162,7 @@ Partial Class Options
         CoBoxPlaylistTitleFormat.FlatStyle = FlatStyle.Flat
         CoBoxPlaylistTitleFormat.Font = New Font("Segoe UI", 12F)
         CoBoxPlaylistTitleFormat.FormattingEnabled = True
-        CoBoxPlaylistTitleFormat.Location = New Point(19, 58)
+        CoBoxPlaylistTitleFormat.Location = New Point(19, 59)
         CoBoxPlaylistTitleFormat.Name = "CoBoxPlaylistTitleFormat"
         CoBoxPlaylistTitleFormat.Size = New Size(230, 29)
         CoBoxPlaylistTitleFormat.TabIndex = 10
@@ -233,7 +233,7 @@ Partial Class Options
         BtnLibrarySearchFoldersAdd.Image = My.Resources.Resources.ImageAdd16
         BtnLibrarySearchFoldersAdd.Location = New Point(643, 147)
         BtnLibrarySearchFoldersAdd.Name = "BtnLibrarySearchFoldersAdd"
-        BtnLibrarySearchFoldersAdd.Size = New Size(32, 32)
+        BtnLibrarySearchFoldersAdd.Size = New Size(32, 31)
         BtnLibrarySearchFoldersAdd.TabIndex = 82
         TipOptions.SetToolTip(BtnLibrarySearchFoldersAdd, "Add folder to list.")
         BtnLibrarySearchFoldersAdd.UseVisualStyleBackColor = True
@@ -256,11 +256,11 @@ Partial Class Options
         ' 
         LBLibrarySearchFolders.BackColor = SystemColors.Window
         LBLibrarySearchFolders.ContextMenuStrip = CMLibrarySearchFolders
-        LBLibrarySearchFolders.Font = New Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LBLibrarySearchFolders.Font = New Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LBLibrarySearchFolders.FormattingEnabled = True
         LBLibrarySearchFolders.Location = New Point(137, 39)
         LBLibrarySearchFolders.Name = "LBLibrarySearchFolders"
-        LBLibrarySearchFolders.Size = New Size(541, 104)
+        LBLibrarySearchFolders.Size = New Size(541, 88)
         LBLibrarySearchFolders.Sorted = True
         LBLibrarySearchFolders.TabIndex = 80
         TipOptions.SetToolTip(LBLibrarySearchFolders, "Add your music folders here, the Library uses this list to find your music." & vbCrLf & "Right-Click for options.")
@@ -291,7 +291,7 @@ Partial Class Options
         CkBoxSaveWindowMetrics.AutoSize = True
         CkBoxSaveWindowMetrics.FlatStyle = FlatStyle.Flat
         CkBoxSaveWindowMetrics.Font = New Font("Segoe UI", 12F)
-        CkBoxSaveWindowMetrics.Location = New Point(13, 182)
+        CkBoxSaveWindowMetrics.Location = New Point(13, 181)
         CkBoxSaveWindowMetrics.Name = "CkBoxSaveWindowMetrics"
         CkBoxSaveWindowMetrics.Size = New Size(176, 25)
         CkBoxSaveWindowMetrics.TabIndex = 20
@@ -317,7 +317,7 @@ Partial Class Options
         BtnHelperApp1.Image = My.Resources.Resources.ImageGetPath16
         BtnHelperApp1.Location = New Point(773, 81)
         BtnHelperApp1.Name = "BtnHelperApp1"
-        BtnHelperApp1.Size = New Size(32, 32)
+        BtnHelperApp1.Size = New Size(32, 31)
         BtnHelperApp1.TabIndex = 64
         TipOptions.SetToolTip(BtnHelperApp1, "Select a Helper App.")
         BtnHelperApp1.UseVisualStyleBackColor = True
@@ -327,7 +327,7 @@ Partial Class Options
         BtnHelperApp2.Image = My.Resources.Resources.ImageGetPath16
         BtnHelperApp2.Location = New Point(773, 199)
         BtnHelperApp2.Name = "BtnHelperApp2"
-        BtnHelperApp2.Size = New Size(32, 32)
+        BtnHelperApp2.Size = New Size(32, 31)
         BtnHelperApp2.TabIndex = 70
         TipOptions.SetToolTip(BtnHelperApp2, "Select a Helper App.")
         BtnHelperApp2.UseVisualStyleBackColor = True
@@ -342,7 +342,7 @@ Partial Class Options
         ' 
         LblSongPlayMode.AutoSize = True
         LblSongPlayMode.Font = New Font("Segoe UI", 12F)
-        LblSongPlayMode.Location = New Point(14, 137)
+        LblSongPlayMode.Location = New Point(14, 136)
         LblSongPlayMode.Name = "LblSongPlayMode"
         LblSongPlayMode.Size = New Size(123, 21)
         LblSongPlayMode.TabIndex = 131
@@ -408,7 +408,7 @@ Partial Class Options
         CoBoxTheme.FlatStyle = FlatStyle.Flat
         CoBoxTheme.Font = New Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         CoBoxTheme.FormattingEnabled = True
-        CoBoxTheme.Location = New Point(13, 32)
+        CoBoxTheme.Location = New Point(13, 31)
         CoBoxTheme.Name = "CoBoxTheme"
         CoBoxTheme.Size = New Size(196, 33)
         CoBoxTheme.TabIndex = 10

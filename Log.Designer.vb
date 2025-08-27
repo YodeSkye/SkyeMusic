@@ -38,7 +38,7 @@ Partial Class Log
         ' RTBLog
         ' 
         RTBLog.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        RTBLog.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        RTBLog.Font = New Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         RTBLog.Location = New Point(12, 32)
         RTBLog.Name = "RTBLog"
         RTBLog.ShortcutsEnabled = False

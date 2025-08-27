@@ -112,7 +112,7 @@ Partial Class About
         ' 
         ' LblVersion
         ' 
-        LblVersion.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblVersion.Font = New Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblVersion.Location = New Point(12, 347)
         LblVersion.Name = "LblVersion"
         LblVersion.Size = New Size(360, 23)

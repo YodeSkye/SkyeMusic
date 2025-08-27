@@ -61,7 +61,7 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
+        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
         '''\pard\sa200\sl240\slmult1\qc\ul\b\f0\fs28\lang9 Keyboard Shortcuts\par
         '''\ulnone\i\fs24 &lt;Spacebar&gt; \b0\i0 Toggle Play/Pause\par
@@ -71,7 +71,7 @@ Namespace My.Resources
         '''\b\i &lt;Right Arrow&gt; \b0\i0 Fast Forward\par
         '''\b\i &lt;B&gt; \b0\i0 Previous Song\par
         '''\b\i &lt;N&gt; \b0\i0 Next Song\par
-        '''\b\i &lt;L&gt; \b0\i [rest of string was truncated]&quot;;.
+        '''\b\i &lt;L&gt; \b0\ [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property HelpRT() As String
             Get

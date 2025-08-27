@@ -298,21 +298,7 @@ Namespace My
         Friend HelperApp2Name As String = "MP3Tag"
         Friend HelperApp2Path As String = "C:\Program Files\Mp3tag\Mp3tag.exe"
 
-        'Handlers
-        Private Sub timerHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryUpdate.Tick
-            timerHistoryUpdate.Stop()
-            UpdateHistory()
-        End Sub
-        Private Sub timerRandomHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerRandomHistoryUpdate.Tick
-            timerRandomHistoryUpdate.Stop()
-            UpdateRandomHistory()
-        End Sub
-        Private Sub timerHistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryAutoSave.Tick
-            If HistoryChanged Then
-                HistoryChanged = False
-                SaveHistory()
-            End If
-        End Sub
+        'App Handlers
         Private Sub timerScreenSaverWatcher_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerScreenSaverWatcher.Tick
             Static ssStatus As Boolean
             WinAPI.SystemParametersInfo(WinAPI.SPI_GETSCREENSAVERRUNNING, 0, ssStatus, 0)
@@ -346,266 +332,7 @@ Namespace My
             End Select
         End Sub
 
-        'Procedures
-        Friend Function GenerateLogTime(starttime As TimeSpan, stoptime As TimeSpan, Optional fractionalseconds As Boolean = True) As String
-            Dim time As TimeSpan
-            If starttime > stoptime Then
-                time = stoptime + (New TimeSpan(24, 0, 0) - starttime)
-            Else
-                time = stoptime - starttime
-            End If
-            If fractionalseconds Then
-                Return New Date(time.Ticks).ToString("HH:mm:ss.ffff")
-            Else
-                Return New Date(time.Ticks).ToString("HH:mm:ss")
-            End If
-        End Function
-        Friend Function GetRandom(ByVal Min As Integer, ByVal Max As Integer) As Integer
-            ' by making Generator static, we preserve the same instance '
-            ' (i.e., do not create new instances with the same seed over and over) '
-            ' between calls '
-            Static Generator As System.Random = New System.Random()
-            Return Generator.Next(Min, Max)
-        End Function
-        Friend Function GetAccentColor() As Color
-            Dim c As Color
-            Dim regkey As RegistryKey
-            Dim regvalue As Integer
-            regkey = Registry.CurrentUser.OpenSubKey("Software\Microsoft\Windows\DWM")
-            regvalue = CInt(regkey.GetValue("AccentColor"))
-            If regvalue = Nothing Then
-                c = App.CurrentTheme.BackColor
-            Else
-                c = Color.FromArgb(255, WinAPI.GetRValue(regvalue), WinAPI.GetGValue(regvalue), WinAPI.GetBValue(regvalue))
-            End If
-            regkey.Close()
-            regkey.Dispose()
-            GetAccentColor = c
-
-            '
-            'API Method
-            'Dim params As WinAPI.DWMCOLORIZATIONPARAMS
-            'WinAPI.DwmGetColorizationParameters(params)
-            'c = Color.FromArgb(255, App.GetRValue(params.ColorizationColor), App.GetGValue(params.ColorizationColor), App.GetBValue(params.ColorizationColor))
-            '
-
-        End Function
-        Friend Function GetCurrentThemeProperties() As ThemeProperties
-            Select Case Theme
-                Case Themes.Accent
-                    Return AccentTheme
-                Case Themes.Light
-                    Return LightTheme
-                Case Themes.Dark
-                    Return DarkTheme
-                Case Themes.Pink
-                    Return PinkTheme
-                Case Themes.Red
-                    Return RedTheme
-                Case Else
-                    Return AccentTheme
-            End Select
-        End Function
-        Friend Function GenerateEllipsis(ByRef g As Graphics, s As String, f As System.Drawing.Font, width As Integer) As String
-            Dim ellipsistext As String = s
-            If width >= 0 Then
-                Do While g.MeasureString(ellipsistext, f).Width > width
-                    ellipsistext = ellipsistext.Substring(0, ellipsistext.Length - 1)
-                Loop
-            End If
-            If ellipsistext = s Then
-                Return s
-            Else
-                If ellipsistext.Length <= 2 Then
-                    Return "..."
-                Else
-                    Return ellipsistext.Substring(0, ellipsistext.Length - 2) + "..."
-                End If
-            End If
-        End Function
-        Friend Function FormatFileSize(filesizeinbytes As Long, unit As FormatFileSizeUnits, Optional decimalDigits As Integer = 2, Optional omitThousandSeparators As Boolean = False) As String 'Converts a number of bytes into Kbytes, Megabytes, or Gigabytes
-            'Simple Error Checking
-            If filesizeinbytes <= 0 Then Return "0 B"
-            'Auto-Select Best Units Of Measure
-            If unit = FormatFileSizeUnits.Auto Then
-                Select Case filesizeinbytes
-                    Case Is < 1023
-                        unit = FormatFileSizeUnits.Bytes
-                        decimalDigits = 0
-                    Case Is < 1024 * 1023 : unit = FormatFileSizeUnits.KiloBytes
-                    Case Is < 1048576 * 1023 : unit = FormatFileSizeUnits.MegaBytes
-                    Case Else : unit = FormatFileSizeUnits.GigaBytes
-                End Select
-            End If
-            'Evaluate The Decimal Value
-            Dim value As Decimal
-            Dim suffix As String = ""
-            Select Case unit
-                Case FormatFileSizeUnits.Bytes
-                    value = CDec(filesizeinbytes)
-                    suffix = " B"
-                Case FormatFileSizeUnits.KiloBytes
-                    value = CDec(filesizeinbytes / 1024)
-                    suffix = " KB"
-                Case FormatFileSizeUnits.MegaBytes
-                    value = CDec(filesizeinbytes / 1048576)
-                    suffix = " MB"
-                Case FormatFileSizeUnits.GigaBytes
-                    value = CDec(filesizeinbytes / 1073741824)
-                    suffix = " GB"
-            End Select
-            'Get The String Representation
-            Dim format As String
-            If omitThousandSeparators Then
-                format = "F" & decimalDigits.ToString
-            Else
-                format = "N" & decimalDigits.ToString
-            End If
-            Return value.ToString(format) & suffix
-        End Function
-        Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)
-            'Check if in the history already
-            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
-            If existingindex < 0 Then
-                'If not in the history, add it
-                Dim newsong As New Song With {
-                    .Path = songorstream,
-                    .InLibrary = False,
-                    .IsStream = stream,
-                    .PlayCount = 0,
-                    .Added = DateTime.Now,
-                    .FirstPlayed = Nothing,
-                    .LastPlayed = Nothing,
-                    .Rating = 0}
-                History.Add(newsong)
-                HistoryChanged = True
-                Debug.Print("Added " + songorstream + " to history")
-            End If
-        End Sub
-        Friend Sub AddToHistoryFromLibrary(songorstream As String)
-            'Check if in the history already
-            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
-            If existingindex >= 0 Then
-                'If it is in the history, update the InLibrary flag if necessary
-                If Not History(existingindex).InLibrary Then
-                    Dim existingsong As Song = History(existingindex)
-                    existingsong.InLibrary = True
-                    History(existingindex) = existingsong
-                    'Debug.Print("Updated InLibrary flag for " + songorstream)
-                End If
-            Else
-                'If not in the history, add it with InLibrary flag set to True
-                Dim newsong As New Song With {
-                    .Path = songorstream,
-                    .InLibrary = True,
-                    .IsStream = False,
-                    .PlayCount = 0,
-                    .Added = DateTime.Now,
-                    .FirstPlayed = Nothing,
-                    .LastPlayed = Nothing,
-                    .Rating = 0}
-                History.Add(newsong)
-                'Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
-            End If
-            HistoryChanged = True
-        End Sub
-        Friend Sub UpdateHistory(songorstream As String)
-            timerHistoryUpdate.Stop()
-            If HistoryUpdateInterval = 0 Then
-                timerHistoryUpdate.Tag = songorstream
-                UpdateHistory()
-                Return
-            Else
-                timerHistoryUpdate.Interval = HistoryUpdateInterval * 1000
-                timerHistoryUpdate.Tag = songorstream
-                timerHistoryUpdate.Start()
-            End If
-        End Sub
-        Private Sub UpdateHistory()
-            Dim songorstream As String = CStr(timerHistoryUpdate.Tag)
-            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
-            If existingindex >= 0 Then
-                Dim existingsong As Song = History(existingindex)
-                existingsong.PlayCount += CUShort(1)
-                If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
-                existingsong.LastPlayed = DateTime.Now
-                History(existingindex) = existingsong
-                HistoryChanged = True
-                Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
-                WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
-                Player.UpdateHistoryInPlaylist(songorstream)
-            Else
-                Debug.Print("Song not found in history: " + songorstream)
-            End If
-        End Sub
-        Friend Sub UpdateRandomHistory(songorstream As String)
-            timerRandomHistoryUpdate.Stop()
-            If RandomHistoryUpdateInterval = 0 Then
-                timerRandomHistoryUpdate.Tag = songorstream
-                UpdateRandomHistory()
-                Return
-            Else
-                timerRandomHistoryUpdate.Interval = RandomHistoryUpdateInterval * 1000
-                timerRandomHistoryUpdate.Tag = songorstream
-                timerRandomHistoryUpdate.Start()
-            End If
-        End Sub
-        Private Sub UpdateRandomHistory()
-            Dim songorstream As String = CStr(timerRandomHistoryUpdate.Tag)
-            Player.AddToRandomHistory(songorstream)
-        End Sub
-        Friend Sub SetHistoryAutoSaveTimer()
-            timerHistoryAutoSave.Stop()
-            timerHistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
-            timerHistoryAutoSave.Start()
-            Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
-        End Sub
-        Friend Sub StopHistoryUpdates()
-            timerHistoryUpdate.Stop()
-            timerRandomHistoryUpdate.Stop()
-            Debug.Print("History Update Timers Stopped")
-        End Sub
-        Friend Sub ClearHistoryInLibraryFlag()
-            If History.Count > 0 Then
-                'Clear the InLibrary flag for all songs in the history
-                For index As Integer = 0 To History.Count - 1
-                    If History(index).InLibrary Then
-                        Dim song As Song = History(index)
-                        song.InLibrary = False
-                        History(index) = song
-                    End If
-                Next
-                Debug.Print("Cleared History InLibrary Flag")
-            End If
-        End Sub
-        Friend Sub PruneHistory()
-
-            Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
-
-            'Find songs that are not in the library and don't exist
-            Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
-            Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
-
-            'Find streams that are not in the playlist
-            Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.IsStream)
-            Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
-            For Each s As Song In streamlist
-                If s.IsStream AndAlso Player.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
-                    Debug.Print(s.Path + " found in playlist")
-                    prunelist.Remove(s)
-                End If
-            Next
-
-            'Prune History
-            For Each s As Song In prunelist
-                History.Remove(s)
-            Next
-            Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
-            Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
-            WriteToLog("History Pruned (" + prunelist.Count.ToString + ")")
-            streamlist = Nothing
-            prunelist = Nothing
-        End Sub
+        'App Procedures
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
@@ -879,6 +606,48 @@ Namespace My
                 WriteToLog("Error Loading Options" + vbCr + ex.Message)
             End Try
         End Sub
+        Private Sub GenerateHotKeyList()
+            HotKeys.Clear()
+            HotKeys.Add(HotKeyPlay)
+            HotKeys.Add(HotKeyStop)
+            HotKeys.Add(HotKeyNext)
+            HotKeys.Add(HotKeyPrevious)
+        End Sub
+        Private Sub RegisterHotKeys()
+            Dim status As Boolean
+            For Each key As HotKey In HotKeys
+                If Not key.Key = Keys.None Then
+                    status = My.WinAPI.RegisterHotKey(Player.Handle, key.WinID, key.KeyMod, key.KeyCode)
+                    Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
+                    WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
+                End If
+            Next
+        End Sub
+        Private Sub UnRegisterHotKeys()
+            Dim status As Boolean
+            For Each key As HotKey In HotKeys
+                If Not key.Key = Keys.None Then
+                    status = My.WinAPI.UnregisterHotKey(Player.Handle, key.WinID)
+                    Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
+                    WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
+                End If
+            Next
+        End Sub
+        Friend Sub PerformHotKeyAction(hotkey As Integer)
+            Select Case hotkey
+                Case HotKeyPlay.WinID
+                    Player.TogglePlay()
+                Case HotKeyStop.WinID
+                    Player.StopPlay()
+                Case HotKeyNext.WinID
+                    Player.PlayNext()
+                Case HotKeyPrevious.WinID
+                    Player.PlayPrevious()
+            End Select
+        End Sub
+        Private Sub SessionSuspended() 'SessionSuspended is called when the screensaver is activated or the screen is locked.
+            If ScreenLocked OrElse ScreenSaverActive Then Player.Suspend()
+        End Sub
         Friend Sub WriteToLog(logtext As String)
             Static fInfo As IO.FileInfo
             Try
@@ -1004,48 +773,285 @@ Namespace My
                 End If
             End If
         End Sub
-        Private Sub GenerateHotKeyList()
-            HotKeys.Clear()
-            HotKeys.Add(HotKeyPlay)
-            HotKeys.Add(HotKeyStop)
-            HotKeys.Add(HotKeyNext)
-            HotKeys.Add(HotKeyPrevious)
+
+        'History Handlers
+        Private Sub timerHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryUpdate.Tick
+            timerHistoryUpdate.Stop()
+            UpdateHistory()
         End Sub
-        Private Sub RegisterHotKeys()
-            Dim status As Boolean
-            For Each key As HotKey In HotKeys
-                If Not key.Key = Keys.None Then
-                    status = My.WinAPI.RegisterHotKey(Player.Handle, key.WinID, key.KeyMod, key.KeyCode)
-                    Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
-                    WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
+        Private Sub timerRandomHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerRandomHistoryUpdate.Tick
+            timerRandomHistoryUpdate.Stop()
+            UpdateRandomHistory()
+        End Sub
+        Private Sub timerHistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryAutoSave.Tick
+            If HistoryChanged Then
+                HistoryChanged = False
+                SaveHistory()
+            End If
+        End Sub
+
+        'History Procedures
+        Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)
+            'Check if in the history already
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex < 0 Then
+                'If not in the history, add it
+                Dim newsong As New Song With {
+                    .Path = songorstream,
+                    .InLibrary = False,
+                    .IsStream = stream,
+                    .PlayCount = 0,
+                    .Added = DateTime.Now,
+                    .FirstPlayed = Nothing,
+                    .LastPlayed = Nothing,
+                    .Rating = 0}
+                History.Add(newsong)
+                HistoryChanged = True
+                Debug.Print("Added " + songorstream + " to history")
+            End If
+        End Sub
+        Friend Sub AddToHistoryFromLibrary(songorstream As String)
+            'Check if in the history already
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex >= 0 Then
+                'If it is in the history, update the InLibrary flag if necessary
+                If Not History(existingindex).InLibrary Then
+                    Dim existingsong As Song = History(existingindex)
+                    existingsong.InLibrary = True
+                    History(existingindex) = existingsong
+                    'Debug.Print("Updated InLibrary flag for " + songorstream)
+                End If
+            Else
+                'If not in the history, add it with InLibrary flag set to True
+                Dim newsong As New Song With {
+                    .Path = songorstream,
+                    .InLibrary = True,
+                    .IsStream = False,
+                    .PlayCount = 0,
+                    .Added = DateTime.Now,
+                    .FirstPlayed = Nothing,
+                    .LastPlayed = Nothing,
+                    .Rating = 0}
+                History.Add(newsong)
+                'Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
+            End If
+            HistoryChanged = True
+        End Sub
+        Friend Sub ClearHistoryInLibraryFlag()
+            If History.Count > 0 Then
+                'Clear the InLibrary flag for all songs in the history
+                For index As Integer = 0 To History.Count - 1
+                    If History(index).InLibrary Then
+                        Dim song As Song = History(index)
+                        song.InLibrary = False
+                        History(index) = song
+                    End If
+                Next
+                Debug.Print("Cleared History InLibrary Flag")
+            End If
+        End Sub
+        Friend Sub PruneHistory()
+
+            Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
+
+            'Find songs that are not in the library and don't exist
+            Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
+            Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
+
+            'Find streams that are not in the playlist
+            Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.IsStream)
+            Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
+            For Each s As Song In streamlist
+                If s.IsStream AndAlso Player.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
+                    Debug.Print(s.Path + " found in playlist")
+                    prunelist.Remove(s)
                 End If
             Next
-        End Sub
-        Private Sub UnRegisterHotKeys()
-            Dim status As Boolean
-            For Each key As HotKey In HotKeys
-                If Not key.Key = Keys.None Then
-                    status = My.WinAPI.UnregisterHotKey(Player.Handle, key.WinID)
-                    Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
-                    WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
-                End If
+
+            'Prune History
+            For Each s As Song In prunelist
+                History.Remove(s)
             Next
+            Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
+            Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
+            WriteToLog("History Pruned (" + prunelist.Count.ToString + ")")
+            streamlist = Nothing
+            prunelist = Nothing
         End Sub
-        Friend Sub PerformHotKeyAction(hotkey As Integer)
-            Select Case hotkey
-                Case HotKeyPlay.WinID
-                    Player.TogglePlay()
-                Case HotKeyStop.WinID
-                    Player.StopPlay()
-                Case HotKeyNext.WinID
-                    Player.PlayNext()
-                Case HotKeyPrevious.WinID
-                    Player.PlayPrevious()
+        Friend Sub UpdateHistory(songorstream As String)
+            timerHistoryUpdate.Stop()
+            If HistoryUpdateInterval = 0 Then
+                timerHistoryUpdate.Tag = songorstream
+                UpdateHistory()
+                Return
+            Else
+                timerHistoryUpdate.Interval = HistoryUpdateInterval * 1000
+                timerHistoryUpdate.Tag = songorstream
+                timerHistoryUpdate.Start()
+            End If
+        End Sub
+        Private Sub UpdateHistory()
+            Dim songorstream As String = CStr(timerHistoryUpdate.Tag)
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex >= 0 Then
+                Dim existingsong As Song = History(existingindex)
+                existingsong.PlayCount += CUShort(1)
+                If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
+                existingsong.LastPlayed = DateTime.Now
+                History(existingindex) = existingsong
+                HistoryChanged = True
+                Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
+                WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
+                Player.UpdateHistoryInPlaylist(songorstream)
+            Else
+                Debug.Print("Song not found in history: " + songorstream)
+            End If
+        End Sub
+        Friend Sub UpdateRandomHistory(songorstream As String)
+            timerRandomHistoryUpdate.Stop()
+            If RandomHistoryUpdateInterval = 0 Then
+                timerRandomHistoryUpdate.Tag = songorstream
+                UpdateRandomHistory()
+                Return
+            Else
+                timerRandomHistoryUpdate.Interval = RandomHistoryUpdateInterval * 1000
+                timerRandomHistoryUpdate.Tag = songorstream
+                timerRandomHistoryUpdate.Start()
+            End If
+        End Sub
+        Private Sub UpdateRandomHistory()
+            Dim songorstream As String = CStr(timerRandomHistoryUpdate.Tag)
+            Player.AddToRandomHistory(songorstream)
+        End Sub
+        Friend Sub StopHistoryUpdates()
+            timerHistoryUpdate.Stop()
+            timerRandomHistoryUpdate.Stop()
+            Debug.Print("History Update Timers Stopped")
+        End Sub
+        Friend Sub SetHistoryAutoSaveTimer()
+            timerHistoryAutoSave.Stop()
+            timerHistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
+            timerHistoryAutoSave.Start()
+            Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
+        End Sub
+
+        'Functions
+        Friend Function GenerateLogTime(starttime As TimeSpan, stoptime As TimeSpan, Optional fractionalseconds As Boolean = True) As String
+            Dim time As TimeSpan
+            If starttime > stoptime Then
+                time = stoptime + (New TimeSpan(24, 0, 0) - starttime)
+            Else
+                time = stoptime - starttime
+            End If
+            If fractionalseconds Then
+                Return New Date(time.Ticks).ToString("HH:mm:ss.ffff")
+            Else
+                Return New Date(time.Ticks).ToString("HH:mm:ss")
+            End If
+        End Function
+        Friend Function FormatFileSize(filesizeinbytes As Long, unit As FormatFileSizeUnits, Optional decimalDigits As Integer = 2, Optional omitThousandSeparators As Boolean = False) As String 'Converts a number of bytes into Kbytes, Megabytes, or Gigabytes
+            'Simple Error Checking
+            If filesizeinbytes <= 0 Then Return "0 B"
+            'Auto-Select Best Units Of Measure
+            If unit = FormatFileSizeUnits.Auto Then
+                Select Case filesizeinbytes
+                    Case Is < 1023
+                        unit = FormatFileSizeUnits.Bytes
+                        decimalDigits = 0
+                    Case Is < 1024 * 1023 : unit = FormatFileSizeUnits.KiloBytes
+                    Case Is < 1048576 * 1023 : unit = FormatFileSizeUnits.MegaBytes
+                    Case Else : unit = FormatFileSizeUnits.GigaBytes
+                End Select
+            End If
+            'Evaluate The Decimal Value
+            Dim value As Decimal
+            Dim suffix As String = ""
+            Select Case unit
+                Case FormatFileSizeUnits.Bytes
+                    value = CDec(filesizeinbytes)
+                    suffix = " B"
+                Case FormatFileSizeUnits.KiloBytes
+                    value = CDec(filesizeinbytes / 1024)
+                    suffix = " KB"
+                Case FormatFileSizeUnits.MegaBytes
+                    value = CDec(filesizeinbytes / 1048576)
+                    suffix = " MB"
+                Case FormatFileSizeUnits.GigaBytes
+                    value = CDec(filesizeinbytes / 1073741824)
+                    suffix = " GB"
             End Select
-        End Sub
-        Private Sub SessionSuspended() 'SessionSuspended is called when the screensaver is activated or the screen is locked.
-            If ScreenLocked OrElse ScreenSaverActive Then Player.Suspend()
-        End Sub
+            'Get The String Representation
+            Dim format As String
+            If omitThousandSeparators Then
+                format = "F" & decimalDigits.ToString
+            Else
+                format = "N" & decimalDigits.ToString
+            End If
+            Return value.ToString(format) & suffix
+        End Function
+        Friend Function GetRandom(ByVal Min As Integer, ByVal Max As Integer) As Integer
+            ' by making Generator static, we preserve the same instance '
+            ' (i.e., do not create new instances with the same seed over and over) '
+            ' between calls '
+            Static Generator As System.Random = New System.Random()
+            Return Generator.Next(Min, Max)
+        End Function
+        Friend Function GenerateEllipsis(ByRef g As Graphics, s As String, f As System.Drawing.Font, width As Integer) As String
+            Dim ellipsistext As String = s
+            If width >= 0 Then
+                Do While g.MeasureString(ellipsistext, f).Width > width
+                    ellipsistext = ellipsistext.Substring(0, ellipsistext.Length - 1)
+                Loop
+            End If
+            If ellipsistext = s Then
+                Return s
+            Else
+                If ellipsistext.Length <= 2 Then
+                    Return "..."
+                Else
+                    Return ellipsistext.Substring(0, ellipsistext.Length - 2) + "..."
+                End If
+            End If
+        End Function
+        Friend Function GetAccentColor() As Color
+            Dim c As Color
+            Dim regkey As RegistryKey
+            Dim regvalue As Integer
+            regkey = Registry.CurrentUser.OpenSubKey("Software\Microsoft\Windows\DWM")
+            regvalue = CInt(regkey.GetValue("AccentColor"))
+            If regvalue = Nothing Then
+                c = App.CurrentTheme.BackColor
+            Else
+                c = Color.FromArgb(255, WinAPI.GetRValue(regvalue), WinAPI.GetGValue(regvalue), WinAPI.GetBValue(regvalue))
+            End If
+            regkey.Close()
+            regkey.Dispose()
+            GetAccentColor = c
+
+            '
+            'API Method
+            'Dim params As WinAPI.DWMCOLORIZATIONPARAMS
+            'WinAPI.DwmGetColorizationParameters(params)
+            'c = Color.FromArgb(255, App.GetRValue(params.ColorizationColor), App.GetGValue(params.ColorizationColor), App.GetBValue(params.ColorizationColor))
+            '
+
+        End Function
+        Friend Function GetCurrentThemeProperties() As ThemeProperties
+            Select Case Theme
+                Case Themes.Accent
+                    Return AccentTheme
+                Case Themes.Light
+                    Return LightTheme
+                Case Themes.Dark
+                    Return DarkTheme
+                Case Themes.Pink
+                    Return PinkTheme
+                Case Themes.Red
+                    Return RedTheme
+                Case Else
+                    Return AccentTheme
+            End Select
+        End Function
 
     End Module
 
@@ -1128,14 +1134,6 @@ Namespace My
                     Return returnval
                 End If
             End If
-        End Function
-
-    End Class
-    Friend Class ListViewGroupComparer
-        Implements IComparer
-
-        Public Function Compare(objA As Object, objB As Object) As Integer Implements System.Collections.IComparer.Compare
-            Return CType(objA, ListViewGroup).Header.CompareTo(CType(objB, ListViewGroup).Header)
         End Function
 
     End Class
