@@ -65,7 +65,7 @@ Partial Class PlayerAddStream
         ' 
         LblStreamTitle.AutoSize = True
         LblStreamTitle.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        LblStreamTitle.Location = New Point(12, 9)
+        LblStreamTitle.Location = New Point(12, 8)
         LblStreamTitle.Name = "LblStreamTitle"
         LblStreamTitle.Size = New Size(92, 21)
         LblStreamTitle.TabIndex = 9
@@ -75,7 +75,7 @@ Partial Class PlayerAddStream
         ' 
         LblStreamPath.AutoSize = True
         LblStreamPath.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        LblStreamPath.Location = New Point(12, 59)
+        LblStreamPath.Location = New Point(12, 58)
         LblStreamPath.Name = "LblStreamPath"
         LblStreamPath.Size = New Size(93, 21)
         LblStreamPath.TabIndex = 10
