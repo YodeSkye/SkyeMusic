@@ -112,13 +112,16 @@ Public Class PlayerQueue
         Close()
     End Sub
     Private Sub BtnPrune_Click(sender As Object, e As EventArgs) Handles BtnPrune.Click
+        Dim count As Integer = 0
         For Each item As ListViewItem In LVQueue.Items
             If Player.LVPlaylist.FindItemWithText(item.SubItems(1).Text, True, 0) Is Nothing Then
+                count += 1
                 Player.Queue.Remove(item.SubItems(1).Text)
                 LVQueue.Items.Remove(item)
             End If
         Next
         Player.SetPlaylistCountText()
+        App.WriteToLog("Queue Pruned (" + count.ToString + ")")
     End Sub
     Private Sub TipQueue_Popup(sender As Object, e As PopupEventArgs) Handles TipQueue.Popup
         Static s As SizeF

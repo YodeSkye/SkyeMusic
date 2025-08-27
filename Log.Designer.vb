@@ -123,6 +123,10 @@ Partial Class Log
         LblStatus.TextAlign = ContentAlignment.MiddleRight
         LblStatus.Visible = False
         ' 
+        ' TipLog
+        ' 
+        TipLog.OwnerDraw = True
+        ' 
         ' Log
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
