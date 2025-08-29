@@ -100,6 +100,7 @@ Public Class Log
         Close()
     End Sub
     Private Sub BTNRefreshLog_Click(sender As Object, e As EventArgs) Handles BTNRefreshLog.Click
+        SetDeleteLogConfirm(True)
         App.ShowLog(True)
     End Sub
     Private Sub BTNDeleteLog_Click(sender As Object, e As EventArgs) Handles BTNDeleteLog.Click
@@ -231,11 +232,9 @@ Public Class Log
             DeleteLogConfirm = False
             Me.BTNDeleteLog.BackColor = App.CurrentTheme.ButtonBackColor
             TipLog.Hide(Me)
-            TipLog.IsBalloon = False
         Else
             DeleteLogConfirm = True
             Me.BTNDeleteLog.BackColor = Color.Red
-            TipLog.IsBalloon = True
             TipLog.Show("Are You Sure?", Me, BTNDeleteLog.Location)
             timerDeleteLog.Start()
         End If
