@@ -2,6 +2,7 @@
 Imports System.Runtime.InteropServices
 
 Namespace My
+
     Public Module WinAPI
 
         'Declarations
@@ -150,6 +151,7 @@ Namespace My
         Friend Declare Auto Function GetLastInputInfo Lib "user32.dll" (ByRef plii As LASTINPUTINFO) As Boolean
 
         'Procedures
+
         ''' <summary>
         ''' To Remove A Borderless Window From Windows TaskSwitcher
         ''' </summary>

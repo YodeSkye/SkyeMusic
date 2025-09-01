@@ -1,8 +1,5 @@
 ﻿
 Imports System.ComponentModel
-Imports System.Runtime.InteropServices
-Imports System.Text
-Imports Syncfusion.Windows.Forms.Tools
 
 Namespace My.Components
 
@@ -12,6 +9,7 @@ Namespace My.Components
 	<System.ComponentModel.DefaultProperty("PercentageMode")>
 	Friend Class ProgressEX
 		Inherits System.Windows.Forms.UserControl
+
 		''' <summary>
 		''' Specifies how the percentage value should be drawn
 		''' </summary>
@@ -287,11 +285,10 @@ Namespace My.Components
 	''' Extended Listview control with Insertion Line for drag/drop operations.
 	''' </summary>
 	Friend Class ListViewEX
-
 		Inherits ListView
 
 		Private _LineBefore As Integer = -1
-        Private _LineAfter As Integer = -1
+		Private _LineAfter As Integer = -1
 		Private _InsertionLineColor As Color = Color.Teal
 
 		<DefaultValue(-1)>
@@ -359,8 +356,8 @@ Namespace My.Components
 	''' Changes basic .NET label to OPTIONALLY copy on double-click
 	''' </summary>
 	Public Class LabelCSY
-
 		Inherits System.Windows.Forms.Label
+
 		<DefaultValue(False)>
 		Public Property CopyOnDoubleClick As Boolean
 		Protected Overrides Sub DefWndProc(ByRef m As Message)
@@ -527,7 +524,6 @@ Namespace My.Components
 	''' 5.	Set ShortcutsEnabled property to False.
 	''' </summary>
 	Friend Class RichTextBoxContextMenu
-
 		Inherits System.Windows.Forms.ContextMenuStrip
 
 		'Declarations
