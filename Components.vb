@@ -52,7 +52,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or Sets a value to determine use of a color gradient
 		''' </summary>
-		<System.ComponentModel.Category("Appearance"), System.ComponentModel.Description("Specify how to display the Drawing Color"), DefaultValue(colorDrawModes.Gradient)>
+		<Category("Appearance"), Description("Specify how to display the Drawing Color"), DefaultValue(colorDrawModes.Gradient)>
 		Public Property DrawingColorMode As colorDrawModes
 			Get
 				Return colorDrawMode
@@ -65,7 +65,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or Sets the color used to draw the Progress activities
 		''' </summary>
-		<System.ComponentModel.Category("Appearance"), System.ComponentModel.Description("Specify the color used to draw the progress activities"), DefaultValue(GetType(Color), "Red")>
+		<Category("Appearance"), Description("Specify the color used to draw the progress activities"), DefaultValue(GetType(Color), "Red")>
 		Public Property DrawingColor As Color
 			Get
 				Return m_drawingColor
@@ -83,7 +83,7 @@ Namespace My.Components
 		''' <summary>
 		'''  Gets or sets the maximum value of the range of the control. 
 		''' </summary>
-		<System.ComponentModel.Category("Layout"), System.ComponentModel.Description("Specify the maximum value the progress can increased to"), DefaultValue(100)>
+		<Category("Layout"), Description("Specify the maximum value the progress can increased to"), DefaultValue(100)>
 		Public Property Maximum As Integer
 			Get
 				Return maxValue
@@ -96,7 +96,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or sets the minimum value of the range of the control.
 		''' </summary>
-		<System.ComponentModel.Category("Layout"), System.ComponentModel.Description("Specify the minimum value the progress can decreased to"), DefaultValue(0)>
+		<Category("Layout"), Description("Specify the minimum value the progress can decreased to"), DefaultValue(0)>
 		Public Property Minimum As Integer
 			Get
 				Return minValue
@@ -110,7 +110,7 @@ Namespace My.Components
 		'''  Gets or sets the amount by which a call to the System.Windows.Forms.ProgressBar.
 		'''  StepForword method increases the current position of the progress bar.
 		''' </summary>
-		<System.ComponentModel.Category("Layout"), System.ComponentModel.Description("Specify the amount by which a call to the System.Windows.Forms.ProgressBar.StepForword method increases the current position of the progress bar"), DefaultValue(5)>
+		<Category("Layout"), Description("Specify the amount by which a call to the System.Windows.Forms.ProgressBar.StepForword method increases the current position of the progress bar"), DefaultValue(5)>
 		Public Property [Step] As Integer
 			Get
 				Return stepValue
@@ -126,7 +126,7 @@ Namespace My.Components
 		''' <exception cref="System.ArgumentException">The value specified is greater than the value of
 		''' the System.Windows.Forms.ProgressBar.Maximum property.  -or- The value specified is less
 		''' than the value of the System.Windows.Forms.ProgressBar.Minimum property</exception>
-		<System.ComponentModel.Category("Layout"), System.ComponentModel.Description("Specify the current position of the progress bar"), DefaultValue(0)>
+		<Category("Layout"), Description("Specify the current position of the progress bar"), DefaultValue(0)>
 		Public Property Value As Integer
 			Get
 				Return CInt(Math.Truncate(_value))
@@ -153,7 +153,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or Sets the color used to draw the Precentage value
 		''' </summary>
-		<System.ComponentModel.Category("Appearance"), System.ComponentModel.Description("Specify the font used to draw the Percentage value")>
+		<Category("Appearance"), Description("Specify the font used to draw the Percentage value")>
 		Public Overrides Property Font As Font
 			Get
 				Return writingFont
@@ -167,7 +167,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or Sets the color used to draw the Precentage value
 		''' </summary>
-		<System.ComponentModel.Category("Appearance"), System.ComponentModel.Description("Specify the color used to draw the Percentage value")>
+		<Category("Appearance"), Description("Specify the color used to draw the Percentage value")>
 		Public Overrides Property ForeColor As Color
 			Get
 				Return writingBrush.Color
