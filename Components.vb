@@ -6,7 +6,7 @@ Namespace My.Components
 	''' <summary>
 	''' Extended Windows progress bar control.
 	''' </summary>
-	<System.ComponentModel.DefaultProperty("PercentageMode")>
+	<DefaultProperty("PercentageMode")>
 	Friend Class ProgressEX
 		Inherits System.Windows.Forms.UserControl
 
@@ -39,7 +39,7 @@ Namespace My.Components
 		''' <summary>
 		''' Gets or Sets a value determine how to display Percentage value
 		''' </summary>
-		<System.ComponentModel.Category("Behavior"), System.ComponentModel.Description("Specify how to display the Percentage value"), DefaultValue(percentageDrawModes.Movable)>
+		<Category("Behavior"), Description("Specify how to display the Percentage value"), DefaultValue(percentageDrawModes.Movable)>
 		Public Property PercentageMode As percentageDrawModes
 			Get
 				Return percentageDrawMode
@@ -309,7 +309,7 @@ Namespace My.Components
 				_LineAfter = value
 			End Set
 		End Property
-		<ComponentModel.Category("Appearance"), ComponentModel.Description("Specify the color used to draw the Insertion Line"), DefaultValue(GetType(Color), "Color.Teal")>
+		<Category("Appearance"), Description("Specify the color used to draw the Insertion Line"), DefaultValue(GetType(Color), "Color.Teal")>
 		Public Property InsertionLineColor As Color
 			Get
 				Return _InsertionLineColor
