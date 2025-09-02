@@ -8,6 +8,11 @@ Imports Syncfusion.Windows.Forms
 Public Class Player
 
     'Declarations
+    Private Enum PlayStates
+        Playing
+        Paused
+        Stopped
+    End Enum
     Public Structure PlaylistItemType
         Public Title As String
         Public Path As String
@@ -17,7 +22,7 @@ Public Class Player
     Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
     Private cLeftMeter, cRightMeter, visR, visB As Byte 'Meter Values and Visualizer Colors
     Private visV As Single 'Visualizer Volume
-    Private PlayState As Boolean = False 'True if a song is currently playing
+    Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private Stream As Boolean = False 'True if the current playing item is a stream
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
@@ -677,7 +682,7 @@ Public Class Player
         If Not MIView.DropDown.Visible Then MIView.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub MIViewDropDownOpening(sender As Object, e As EventArgs) Handles MIView.DropDownOpening
-        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(AxPlayer.URL)) And PlayState Then
+        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(AxPlayer.URL)) And Not PlayState = PlayStates.Stopped Then
             MIFullscreen.Enabled = True
         Else
             MIFullscreen.Enabled = False
@@ -976,7 +981,7 @@ Public Class Player
         ToggleMaximized()
     End Sub
     Private Sub PicBoxVisualizer_Paint(sender As Object, e As PaintEventArgs) Handles PicBoxVisualizer.Paint
-        If PlayState Then
+        If PlayState = PlayStates.Playing Then
             'Draw the background gradient
             Dim pBrush As New LinearGradientBrush(New Point(0, 0), New Point(Me.ClientSize.Width, 0), Color.Red, Color.Blue)
             Dim pColorBlend As New ColorBlend
@@ -1201,7 +1206,7 @@ Public Class Player
             Case 6 'Buffering
             Case 7 'Waiting
             Case 8 'MediaEnded
-                PlayState = False
+                PlayState = PlayStates.Stopped
                 BtnPlay.Image = App.CurrentTheme.PlayerPlay
                 TrackBarPosition.Value = 0
                 PEXLeft.Value = 0
@@ -1216,7 +1221,7 @@ Public Class Player
         End Select
     End Sub
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
-        If AxPlayer.currentMedia IsNot Nothing AndAlso PlayState Then
+        If AxPlayer.currentMedia IsNot Nothing AndAlso PlayState = PlayStates.Playing Then
             Try
                 If Not Stream Then TrackBarPosition.Value = CInt(AxPlayer.Ctlcontrols.currentPosition * TrackBarScale)
                 If My.App.PlayerPositionShowElapsed Then
@@ -1235,7 +1240,7 @@ Public Class Player
         End If
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
-        If AxPlayer.currentMedia IsNot Nothing And PlayState Then
+        If AxPlayer.currentMedia IsNot Nothing And PlayState = PlayStates.Playing Then
             Try : cLeftMeter = CByte(aDev.AudioMeterInformation.PeakValues(0) * 100)
             Catch : cLeftMeter = 0
             End Try
@@ -2404,7 +2409,7 @@ Public Class Player
                 PlayFromPlaylist()
             End If
         Else
-            If PlayState Then
+            If PlayState = PlayStates.Playing Then
                 AxPlayer.Ctlcontrols.pause()
                 '''OnPause()
             Else
@@ -2711,7 +2716,7 @@ Public Class Player
         End If
     End Sub
     Private Sub OnPlay()
-        PlayState = True
+        PlayState = PlayStates.Playing
         UpdateHistory(AxPlayer.URL)
         BtnPlay.Image = App.CurrentTheme.PlayerPause
         TrackBarPosition.Maximum = CInt(AxPlayer.currentMedia.duration * TrackBarScale)
@@ -2729,11 +2734,11 @@ Public Class Player
         ShowMedia()
     End Sub
     Private Sub OnPause()
-        PlayState = False
+        PlayState = PlayStates.Paused
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
     End Sub
     Private Sub OnStop()
-        PlayState = False
+        PlayState = PlayStates.Stopped
         App.StopHistoryUpdates()
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
         TrackBarPosition.Value = 0
@@ -2777,7 +2782,7 @@ Public Class Player
         RandomHistory.Clear()
     End Sub
     Private Sub UpdatePosition(ByVal forward As Boolean, Optional ByVal seconds As Byte = 20)
-        If AxPlayer.currentMedia IsNot Nothing And PlayState Then
+        If AxPlayer.currentMedia IsNot Nothing And PlayState = PlayStates.Playing Then
             If forward Then
                 If AxPlayer.Ctlcontrols.currentPosition + seconds > AxPlayer.currentMedia.duration Then
                     AxPlayer.Ctlcontrols.currentPosition = AxPlayer.currentMedia.duration
@@ -3117,7 +3122,7 @@ Public Class Player
         TrackBarPosition.HighlightedButtonColor = App.CurrentTheme.ButtonBackColor
         TrackBarPosition.PushedButtonEndColor = App.CurrentTheme.TextColor
         If TxtBoxPlaylistSearch.Text = PlaylistSearchTitle Then TxtBoxPlaylistSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor 'Set the search box inactive text color
-        If PlayState Then
+        If PlayState = PlayStates.Playing Then
             BtnPlay.Image = App.CurrentTheme.PlayerPause
         Else
             BtnPlay.Image = App.CurrentTheme.PlayerPlay
