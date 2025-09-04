@@ -213,7 +213,7 @@ Namespace My
             .BackColor = Color.FromArgb(255, 35, 35, 35),
             .TextColor = Color.DeepPink,
             .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
-            .ButtonBackColor = Color.HotPink,
+            .ButtonBackColor = Color.DeepPink,
             .ButtonTextColor = Color.White,
             .AccentTextColor = Color.White,
             .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),

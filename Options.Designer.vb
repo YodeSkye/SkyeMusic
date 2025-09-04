@@ -309,7 +309,7 @@ Partial Class Options
         CkBoxSuspendOnSessionChange.Size = New Size(234, 25)
         CkBoxSuspendOnSessionChange.TabIndex = 22
         CkBoxSuspendOnSessionChange.Text = "Minimize App On Screen Lock"
-        TipOptions.SetToolTip(CkBoxSuspendOnSessionChange, "Stop play and Minimize the window if the screen is locked or screensaver is activated." & vbCrLf)
+        TipOptions.SetToolTip(CkBoxSuspendOnSessionChange, "Stop play and Minimize the window if the screen is locked or screensaver is activated.")
         CkBoxSuspendOnSessionChange.UseVisualStyleBackColor = True
         ' 
         ' BtnHelperApp1
