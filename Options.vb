@@ -48,8 +48,8 @@ Public Class Options
         CoBoxPlaylistSearchAction.Items.Add("Select Only")
         CoBoxPlaylistSearchAction.SelectedIndex = App.PlaylistSearchAction
         CoBoxTheme.Items.Clear()
-        CoBoxTheme.Items.Add(App.Themes.BlueAccent.ToString)
-        CoBoxTheme.Items.Add(App.Themes.PinkAccent.ToString)
+        CoBoxTheme.Items.Add("Blue Accent")
+        CoBoxTheme.Items.Add("Pink Accent")
         CoBoxTheme.Items.Add(App.Themes.Light.ToString)
         CoBoxTheme.Items.Add(App.Themes.Dark.ToString)
         CoBoxTheme.Items.Add(App.Themes.Pink.ToString)
