@@ -128,15 +128,14 @@ Public Class Log
         If TxBxSearch.Text Is String.Empty Or RTBLog.Focused Then
             ResetRTBLogFind()
         ElseIf TxBxSearch.Text.Length <= 4 Then
-            Select Case App.Theme
-                Case App.Themes.Accent
-                    TxBxSearch.ForeColor = App.CurrentTheme.AccentTextColor
-                Case Else
-                    TxBxSearch.ForeColor = App.CurrentTheme.TextColor
-            End Select
+            If App.CurrentTheme.IsAccent Then
+                TxBxSearch.ForeColor = App.CurrentTheme.AccentTextColor
+            Else
+                TxBxSearch.ForeColor = App.CurrentTheme.TextColor
+            End If
             ResetRTBLogFind()
-        ElseIf Not TxBxSearch.Text = LogSearchTitle AndAlso TxBxSearch.Text.Length > 4 AndAlso IsHandleCreated Then
-            Debug.Print("Searching Log...")
+            ElseIf Not TxBxSearch.Text = LogSearchTitle AndAlso TxBxSearch.Text.Length > 4 AndAlso IsHandleCreated Then
+                Debug.Print("Searching Log...")
             LblStatus.Visible = True
             LblStatus.Refresh()
             Dim foundindex As Integer
@@ -147,25 +146,23 @@ Public Class Log
             If foundindex < 0 Then
                 TxBxSearch.ForeColor = Color.Red
             Else
-                Select Case App.Theme
-                    Case App.Themes.Accent
-                        TxBxSearch.ForeColor = App.CurrentTheme.AccentTextColor
-                    Case Else
-                        TxBxSearch.ForeColor = App.CurrentTheme.TextColor
-                End Select
+                If App.CurrentTheme.IsAccent Then
+                    TxBxSearch.ForeColor = App.CurrentTheme.AccentTextColor
+                Else
+                    TxBxSearch.ForeColor = App.CurrentTheme.TextColor
+                End If
                 RTBLog.Select(foundindex, 0)
-                RTBLog.ScrollToCaret()
-            End If
-            Do Until foundindex < 0
+                    RTBLog.ScrollToCaret()
+                End If
+                Do Until foundindex < 0
                 'Highlight Current Match
                 RTBLog.SelectionStart = foundindex
                 RTBLog.SelectionLength = TxBxSearch.Text.Length
-                Select Case App.Theme
-                    Case App.Themes.Accent
-                        RTBLog.SelectionBackColor = App.CurrentTheme.AccentTextColor
-                    Case Else
-                        RTBLog.SelectionBackColor = App.CurrentTheme.TextColor
-                End Select
+                If App.CurrentTheme.IsAccent Then
+                    RTBLog.SelectionBackColor = App.CurrentTheme.AccentTextColor
+                Else
+                    RTBLog.SelectionBackColor = App.CurrentTheme.TextColor
+                End If
                 RTBLog.SelectionColor = App.CurrentTheme.BackColor
                 'Try To Find Next Occurrence
                 foundindex = searchtext.IndexOf(TxBxSearch.Text, foundindex + TxBxSearch.Text.Length, StringComparison.CurrentCultureIgnoreCase)
@@ -248,7 +245,7 @@ Public Class Log
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color
         If Not AsTheme Then SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
             TxBxSearch.BackColor = c
@@ -258,7 +255,7 @@ Public Class Log
     End Sub
     Friend Sub SetTheme()
         SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             SetAccentColor(True)
             LBLLogInfo.ForeColor = App.CurrentTheme.AccentTextColor
         Else

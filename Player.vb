@@ -1036,15 +1036,14 @@ Public Class Player
                 If pSize = 8 Then Exit Do 'Minimum Font Size
             Loop Until e.Graphics.MeasureString(pText, pFont).Width < PicBoxVisualizer.Width
             Dim pBrush As SolidBrush
-            Select Case App.Theme
-                Case App.Themes.Accent
-                    pBrush = New SolidBrush(App.CurrentTheme.AccentTextColor)
-                Case Else
-                    pBrush = New SolidBrush(App.CurrentTheme.TextColor)
-            End Select
+            If App.CurrentTheme.IsAccent Then
+                pBrush = New SolidBrush(App.CurrentTheme.AccentTextColor)
+            Else
+                pBrush = New SolidBrush(App.CurrentTheme.TextColor)
+            End If
             e.Graphics.DrawString(pText, pFont, pBrush, PicBoxVisualizer.ClientSize.Width \ 2, PicBoxVisualizer.ClientSize.Height \ 2, pString_format)
-        End If
-        pString_format.Dispose()
+            End If
+            pString_format.Dispose()
         pFont.Dispose()
     End Sub
     Private Sub LblAlbumArtSelectClick(sender As Object, e As EventArgs) Handles LblAlbumArtSelect.Click
@@ -3085,7 +3084,7 @@ Public Class Player
             MenuPlayer.BackColor = c
             TxtBoxPlaylistSearch.BackColor = c
         End If
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             BackColor = c
             TxtBoxLyrics.BackColor = c
             TrackBarPosition.TrackBarGradientStart = c
@@ -3100,7 +3099,7 @@ Public Class Player
     End Sub
     Friend Sub SetTheme()
         SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             SetAccentColor(True)
             LblPlaylistCount.ForeColor = App.CurrentTheme.AccentTextColor
             LblDuration.ForeColor = App.CurrentTheme.AccentTextColor

@@ -48,7 +48,8 @@ Public Class Options
         CoBoxPlaylistSearchAction.Items.Add("Select Only")
         CoBoxPlaylistSearchAction.SelectedIndex = App.PlaylistSearchAction
         CoBoxTheme.Items.Clear()
-        CoBoxTheme.Items.Add(App.Themes.Accent.ToString)
+        CoBoxTheme.Items.Add(App.Themes.BlueAccent.ToString)
+        CoBoxTheme.Items.Add(App.Themes.PinkAccent.ToString)
         CoBoxTheme.Items.Add(App.Themes.Light.ToString)
         CoBoxTheme.Items.Add(App.Themes.Dark.ToString)
         CoBoxTheme.Items.Add(App.Themes.Pink.ToString)
@@ -500,7 +501,7 @@ Public Class Options
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color
         If Not AsTheme Then SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
             GrBoxTime.BackColor = c
@@ -514,7 +515,7 @@ Public Class Options
     Private Sub SetTheme()
         Static forecolor As Color
         SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             SetAccentColor(True)
             forecolor = App.CurrentTheme.AccentTextColor
         Else

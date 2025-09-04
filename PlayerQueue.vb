@@ -162,14 +162,14 @@ Public Class PlayerQueue
     End Sub
     Private Sub SetAccentColor()
         Static c As Color
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
             Debug.Print("Player Accent Color Set")
         End If
     End Sub
     Private Sub SetTheme()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             SetAccentColor()
         Else
             BackColor = App.CurrentTheme.BackColor

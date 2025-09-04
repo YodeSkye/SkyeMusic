@@ -90,13 +90,13 @@ Public Class PlayerAddStream
     Private Sub SetAccentColor()
         Static c As Color
         c = App.GetAccentColor()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             BackColor = c
         End If
         Debug.Print("Player Accent Color Set")
     End Sub
     Private Sub SetTheme()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             SetAccentColor()
         Else
             BackColor = App.CurrentTheme.BackColor

@@ -661,12 +661,11 @@ Public Class Library
     Private Sub TxbxLibrarySearchEnter(sender As Object, e As EventArgs) Handles TxbxLibrarySearch.Enter
         If TxbxLibrarySearch.Text = LibrarySearchTitle Then
             TxbxLibrarySearch.ResetText()
-            Select Case App.Theme
-                Case App.Themes.Accent
-                    TxbxLibrarySearch.ForeColor = App.CurrentTheme.AccentTextColor
-                Case Else
-                    TxbxLibrarySearch.ForeColor = App.CurrentTheme.TextColor
-            End Select
+            If App.CurrentTheme.IsAccent Then
+                TxbxLibrarySearch.ForeColor = App.CurrentTheme.AccentTextColor
+            Else
+                TxbxLibrarySearch.ForeColor = App.CurrentTheme.TextColor
+            End If
         End If
     End Sub
     Private Sub TxbxLibrarySearchLeave(sender As Object, e As EventArgs) Handles TxbxLibrarySearch.Leave
@@ -2178,7 +2177,7 @@ Public Class Library
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color
         If Not AsTheme Then SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
             TxbxLibrarySearch.BackColor = c
@@ -2189,7 +2188,7 @@ Public Class Library
     Friend Sub SetTheme()
         Static forecolor As Color
         SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             SetAccentColor(True)
             forecolor = App.CurrentTheme.AccentTextColor
         Else

@@ -54,7 +54,8 @@ Namespace My
             SelectOnly
         End Enum
         Friend Enum Themes
-            Accent
+            BlueAccent
+            PinkAccent
             Light
             Dark
             Pink
@@ -109,6 +110,7 @@ Namespace My
 
         End Structure
         Friend Structure ThemeProperties
+            Public IsAccent As Boolean
             Public BackColor As Color
             Public TextColor As Color
             Public ControlBackColor As Color
@@ -189,7 +191,8 @@ Namespace My
 
         'Themes
         Friend CurrentTheme As ThemeProperties 'Holds the current theme settings of the application.
-        Private ReadOnly AccentTheme As New ThemeProperties With { 'Used by Splash Screen
+        Private ReadOnly BlueAccentTheme As New ThemeProperties With { 'Used by Splash Screen
+            .IsAccent = True,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
             .TextColor = Color.DodgerBlue,
             .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
@@ -205,7 +208,25 @@ Namespace My
             .PlayerPrevious = Resources.ImagePlayerAccentPrevious,
             .PlayerFastForward = Resources.ImagePlayerAccentFastForward,
             .PlayerFastReverse = Resources.ImagePlayerAccentFastReverse}
+        Private ReadOnly PinkAccentTheme As New ThemeProperties With { 'Used by Splash Screen
+            .IsAccent = True,
+            .BackColor = Color.FromArgb(255, 35, 35, 35),
+            .TextColor = Color.DeepPink,
+            .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
+            .ButtonBackColor = Color.HotPink,
+            .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
         Private ReadOnly LightTheme As New ThemeProperties With {
+            .IsAccent = False,
             .BackColor = SystemColors.Control,
             .TextColor = Color.Black,
             .ControlBackColor = SystemColors.Window,
@@ -222,6 +243,7 @@ Namespace My
             .PlayerFastForward = Resources.ImagePlayerBlackFastForward,
             .PlayerFastReverse = Resources.ImagePlayerBlackFastReverse}
         Private ReadOnly DarkTheme As New ThemeProperties With {
+            .IsAccent = False,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
             .TextColor = Color.White,
             .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
@@ -238,6 +260,7 @@ Namespace My
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
         Private ReadOnly PinkTheme As New ThemeProperties With {
+            .IsAccent = False,
             .BackColor = Color.Pink,
             .TextColor = Color.DeepPink,
             .ControlBackColor = Color.Pink,
@@ -254,6 +277,7 @@ Namespace My
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
         Friend ReadOnly RedTheme As New ThemeProperties With {
+            .IsAccent = False,
             .BackColor = Color.FromArgb(255, 128, 13, 13),
             .TextColor = Color.AntiqueWhite,
             .ControlBackColor = Color.IndianRed,
@@ -1037,8 +1061,10 @@ Namespace My
         End Function
         Friend Function GetCurrentThemeProperties() As ThemeProperties
             Select Case Theme
-                Case Themes.Accent
-                    Return AccentTheme
+                Case Themes.BlueAccent
+                    Return BlueAccentTheme
+                Case Themes.PinkAccent
+                    Return PinkAccentTheme
                 Case Themes.Light
                     Return LightTheme
                 Case Themes.Dark
@@ -1048,7 +1074,7 @@ Namespace My
                 Case Themes.Red
                     Return RedTheme
                 Case Else
-                    Return AccentTheme
+                    Return RedTheme
             End Select
         End Function
 

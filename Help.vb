@@ -72,7 +72,7 @@ Public Class Help
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color
         If Not AsTheme Then SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
             RTxBxHelp.BackColor = c
@@ -82,19 +82,18 @@ Public Class Help
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             SetAccentColor(True)
         Else
             BackColor = App.CurrentTheme.BackColor
             RTxBxHelp.BackColor = App.CurrentTheme.BackColor
         End If
         RTxBxHelp.SelectAll()
-        Select Case App.Theme
-            Case App.Themes.Accent
-                RTxBxHelp.SelectionColor = App.CurrentTheme.AccentTextColor
-            Case Else
-                RTxBxHelp.SelectionColor = App.CurrentTheme.TextColor
-        End Select
+        If App.CurrentTheme.IsAccent Then
+            RTxBxHelp.SelectionColor = App.CurrentTheme.AccentTextColor
+        Else
+            RTxBxHelp.SelectionColor = App.CurrentTheme.TextColor
+        End If
         RTxBxHelp.DeselectAll()
         ResumeLayout()
         Debug.Print("Help Theme Set")

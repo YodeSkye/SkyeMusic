@@ -145,7 +145,7 @@ Public Class About
     Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
         Static c As Color
         If Not AsTheme Then SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
         End If
@@ -154,7 +154,7 @@ Public Class About
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
-        If App.Theme = App.Themes.Accent Then
+        If App.CurrentTheme.IsAccent Then
             SetAccentColor(True)
             LblAbout.ForeColor = App.CurrentTheme.AccentTextColor
             LblVersion.ForeColor = App.CurrentTheme.AccentTextColor
