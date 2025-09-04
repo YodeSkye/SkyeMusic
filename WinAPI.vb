@@ -24,6 +24,7 @@ Namespace My
         Friend Const WM_RBUTTONUP As Integer = &H205
         Friend Const WM_RBUTTONDOWN As Integer = &H204
         Friend Const WM_SIZE As Integer = &H5
+        Friend Const WM_GET_CUSTOM_DATA As UInteger = &H8001
         Friend Declare Auto Function GetClassName Lib "user32.dll" (ByVal hwnd As IntPtr, ByVal lpClassName As String, ByVal nMaxCount As Integer) As Integer
         'Friend Declare Auto Function SendMessage Lib "user32.dll" (ByVal hWnd As IntPtr, ByVal Msg As UInteger, ByVal wParam As IntPtr, ByVal lParam As IntPtr) As Integer
         Friend Declare Auto Function SendMessage Lib "user32.dll" (ByVal hWnd As IntPtr, ByVal Msg As UInteger, ByVal wParam As IntPtr, ByVal lParam As IntPtr) As IntPtr

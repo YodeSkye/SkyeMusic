@@ -74,11 +74,23 @@ Public Class Player
                     SetAccentColor()
                 Case WinAPI.WM_SIZE
                     If (m.WParam.ToInt32 = 0 Or m.WParam.ToInt32 = 2) AndAlso Lyrics Then ShowMedia()
+                Case WinAPI.WM_GET_CUSTOM_DATA
+                    App.WriteToLog(WinAPI.WM_GET_CUSTOM_DATA.ToString)
+                    Select Case PlayState
+                        Case PlayStates.Playing
+                            m.Result = New IntPtr(2)
+                        Case PlayStates.Paused
+                            m.Result = New IntPtr(1)
+                        Case PlayStates.Stopped
+                            m.Result = New IntPtr(0)
+                        Case Else
+                            m.Result = New IntPtr(9999)
+                    End Select
             End Select
         Catch ex As Exception
             App.WriteToLog("Player WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
-            MyBase.WndProc(m)
+            If m.Msg <> WinAPI.WM_GET_CUSTOM_DATA Then MyBase.WndProc(m)
         End Try
     End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
