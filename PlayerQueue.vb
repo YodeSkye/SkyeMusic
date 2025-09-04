@@ -6,6 +6,18 @@ Public Class PlayerQueue
     Private mOffset, mPosition As Point
 
     'Form Events
+    Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
+        Try
+            Select Case m.Msg
+                Case WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                    SetAccentColor()
+            End Select
+        Catch ex As Exception
+            My.App.WriteToLog("Queue WndProc Handler Error" + Chr(13) + ex.ToString)
+        Finally
+            MyBase.WndProc(m)
+        End Try
+    End Sub
     Private Sub PlayerQueue_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetTheme()
         For Each s As String In Player.Queue

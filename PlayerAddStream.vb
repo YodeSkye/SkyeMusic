@@ -11,9 +11,12 @@ Public Class PlayerAddStream
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
-            If m.Msg = My.WinAPI.WM_SYSCOMMAND AndAlso CInt(m.WParam) = My.WinAPI.SC_CLOSE Then
-                DialogResult = DialogResult.Cancel
-            End If
+            Select Case m.Msg
+                Case My.WinAPI.WM_SYSCOMMAND
+                    If CInt(m.WParam) = My.WinAPI.SC_CLOSE Then DialogResult = DialogResult.Cancel
+                Case WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                    SetAccentColor()
+            End Select
         Catch ex As Exception
             My.App.WriteToLog("AddStream WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
@@ -98,11 +101,13 @@ Public Class PlayerAddStream
     Private Sub SetTheme()
         If App.CurrentTheme.IsAccent Then
             SetAccentColor()
+            LblStreamTitle.ForeColor = App.CurrentTheme.AccentTextColor
+            LblStreamPath.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
+            LblStreamTitle.ForeColor = App.CurrentTheme.TextColor
+            LblStreamPath.ForeColor = App.CurrentTheme.TextColor
         End If
-        LblStreamTitle.ForeColor = App.CurrentTheme.TextColor
-        LblStreamPath.ForeColor = App.CurrentTheme.TextColor
         TxtBoxStreamTitle.BackColor = App.CurrentTheme.BackColor
         TxtBoxStreamTitle.ForeColor = App.CurrentTheme.TextColor
         TxtBoxStreamPath.BackColor = App.CurrentTheme.BackColor

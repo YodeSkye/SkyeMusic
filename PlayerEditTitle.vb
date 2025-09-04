@@ -11,9 +11,12 @@ Public Class PlayerEditTitle
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
-            If m.Msg = My.WinAPI.WM_SYSCOMMAND AndAlso CInt(m.WParam) = My.WinAPI.SC_CLOSE Then
-                DialogResult = DialogResult.Cancel
-            End If
+            Select Case m.Msg
+                Case My.WinAPI.WM_SYSCOMMAND
+                    If CInt(m.WParam) = My.WinAPI.SC_CLOSE Then DialogResult = DialogResult.Cancel
+                Case WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                    SetAccentColor()
+            End Select
         Catch ex As Exception
             My.App.WriteToLog("EditTitle WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
@@ -92,10 +95,11 @@ Public Class PlayerEditTitle
     Private Sub SetTheme()
         If App.CurrentTheme.IsAccent Then
             SetAccentColor()
+            LblTitle.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
+            LblTitle.ForeColor = App.CurrentTheme.TextColor
         End If
-        LblTitle.ForeColor = App.CurrentTheme.TextColor
         TxtBoxTitle.BackColor = App.CurrentTheme.BackColor
         TxtBoxTitle.ForeColor = App.CurrentTheme.TextColor
     End Sub
