@@ -70,6 +70,7 @@ Public Class Library
         End Try
     End Sub
     Private Sub Library_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
         'Define 12 Columns
         Dim header As ColumnHeader
         header = New ColumnHeader()
@@ -133,6 +134,7 @@ Public Class Library
         header.Width = 200
         LVLibrary.Columns.Add(header)
         header = Nothing
+
         LibrarySearchTitle = TxbxLibrarySearch.Text
         SetTheme()
         LibraryImageList.Images.Add("AlbumArt", Resources.ImageAlbumArtSelect)
@@ -141,13 +143,15 @@ Public Class Library
         PicBoxAlbumArtLargeSize = New Size(400, 400)
         PicBoxAlbumArtSuperSize = New Size(800, 800)
         RadBtnGroupByNone.TabStop = False
-        TipLibrary.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
         LblHistory.Text = String.Empty
         LblExtTitle.Text = String.Empty
         LblExtFileInfo.Text = String.Empty
         LblExtProperties.Text = String.Empty
         LblExtType.Text = String.Empty
+        TipLibrary.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
+        CustomDrawCMToolTip(CMLibrary)
         LoadLibrary()
+
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.LibraryLocation.Y >= 0 Then Me.Location = App.LibraryLocation
         'If App.SaveWindowMetrics AndAlso App.LibrarySize.Height >= 0 Then Me.Size = App.LibrarySize
@@ -155,6 +159,7 @@ Public Class Library
         If App.SaveWindowMetrics AndAlso App.LibraryLocation.Y >= 0 Then Me.Location = App.LibraryLocation
         If App.SaveWindowMetrics AndAlso App.LibrarySize.Height >= 0 Then Me.Size = App.LibrarySize
 #End If
+
     End Sub
     Private Sub Library_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         e.Cancel = True
@@ -2224,6 +2229,49 @@ Public Class Library
         GrpBoxGroupBy.ForeColor = forecolor
         ResumeLayout()
         Debug.Print("Library Theme Set")
+    End Sub
+    Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
+
+        'Initialize
+        Dim MyField As Reflection.PropertyInfo = MyToolStrip.GetType().GetProperty("ToolTip", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
+        Dim MyToolTip As ToolTip = CType(MyField.GetValue(MyToolStrip), ToolTip)
+
+        'Configure ToolTip
+        MyToolTip.OwnerDraw = True
+
+        'Draw
+        AddHandler MyToolTip.Popup,
+            Sub(sender, e)
+                Dim s As SizeF
+                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), App.TipFont)
+                s.Width += 14
+                s.Height += 16
+                e.ToolTipSize = s.ToSize
+            End Sub
+        AddHandler MyToolTip.Draw,
+            Sub(sender, e)
+
+                'Declarations
+                Dim g As Graphics = e.Graphics
+
+                'Draw background
+                Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
+                g.FillRectangle(brbg, e.Bounds)
+
+                'Draw border
+                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
+                    g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
+                End Using
+
+                'Draw text
+                TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
+
+                'Finalize
+                brbg.Dispose()
+                g.Dispose()
+
+            End Sub
+
     End Sub
 
 End Class

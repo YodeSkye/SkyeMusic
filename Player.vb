@@ -163,6 +163,7 @@ Public Class Player
         TipPlayer.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
         TipPlayer.SetToolTip(LblDuration, "Song Duration")
         SetTipPlayer()
+        CustomDrawCMToolTip(CMPlaylist)
 
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
@@ -3147,6 +3148,49 @@ Public Class Player
         TipPlayer.ForeColor = App.CurrentTheme.TextColor
         ResumeLayout()
         Debug.Print("Player Theme Set")
+    End Sub
+    Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
+
+        'Initialize
+        Dim MyField As Reflection.PropertyInfo = MyToolStrip.GetType().GetProperty("ToolTip", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
+        Dim MyToolTip As ToolTip = CType(MyField.GetValue(MyToolStrip), ToolTip)
+
+        'Configure ToolTip
+        MyToolTip.OwnerDraw = True
+
+        'Draw
+        AddHandler MyToolTip.Popup,
+            Sub(sender, e)
+                Dim s As SizeF
+                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), App.TipFont)
+                s.Width += 14
+                s.Height += 16
+                e.ToolTipSize = s.ToSize
+            End Sub
+        AddHandler MyToolTip.Draw,
+            Sub(sender, e)
+
+                'Declarations
+                Dim g As Graphics = e.Graphics
+
+                'Draw background
+                Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
+                g.FillRectangle(brbg, e.Bounds)
+
+                'Draw border
+                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
+                    g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
+                End Using
+
+                'Draw text
+                TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
+
+                'Finalize
+                brbg.Dispose()
+                g.Dispose()
+
+            End Sub
+
     End Sub
 
 End Class
