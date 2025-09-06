@@ -2993,7 +2993,7 @@ Public Class Player
         LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played"
         LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added"
     End Sub
-    Friend Sub SetPlaylistCountText()
+    Private Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()
         LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString
         If LVPlaylist.Items.Count = 1 Then
@@ -3049,7 +3049,29 @@ Public Class Player
         WriteToLog("Playlist Pruned (" + prunelist.Count.ToString + ")")
 
         prunelist = Nothing
+        SetPlaylistCountText()
 
+    End Sub
+    Friend Sub PruneQueue()
+        Dim count As Integer = 0
+        Dim removelist As New System.Collections.Generic.List(Of String)
+        For Each item As String In Queue
+            If LVPlaylist.FindItemWithText(item, True, 0) Is Nothing Then
+                count += 1
+                removelist.Add(item)
+            End If
+        Next
+        For Each item As String In removelist
+            Queue.Remove(item)
+        Next
+        removelist = Nothing
+        SetPlaylistCountText()
+        App.WriteToLog("Queue Pruned (" + count.ToString + ")")
+    End Sub
+    Friend Sub RemoveFromQueue(path As String)
+        Queue.Remove(path)
+        Debug.Print(path + " Removed From Queue")
+        SetPlaylistCountText()
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow

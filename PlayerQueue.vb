@@ -20,19 +20,7 @@ Public Class PlayerQueue
     End Sub
     Private Sub PlayerQueue_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetTheme()
-        For Each s As String In Player.Queue
-            Dim playlistlvi As ListViewItem = Player.LVPlaylist.FindItemWithText(s, True, 0)
-            Dim lvi As New ListViewItem
-            If playlistlvi Is Nothing Then
-                lvi.SubItems(0).Text = "Not Found In Playlist"
-                lvi.SubItems.Add(s)
-            Else
-                lvi.SubItems(0).Text = playlistlvi.SubItems(0).Text
-                lvi.SubItems.Add(s)
-            End If
-            LVQueue.Items.Add(lvi)
-        Next
-        LVQueue.Columns(1).Width = -2
+        Populate()
     End Sub
     Private Sub PlayerQueue_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
         Dim cSender As Control
@@ -113,27 +101,17 @@ Public Class PlayerQueue
     Private Sub CMIRemove_Click(sender As Object, e As EventArgs) Handles CMIRemove.Click
         If LVQueue.SelectedItems.Count > 0 Then
             For Each item As ListViewItem In LVQueue.SelectedItems
-                Player.Queue.Remove(item.SubItems(1).Text)
-                LVQueue.Items.Remove(item)
-                Debug.Print(item.Text + " Removed")
+                Player.RemoveFromQueue(item.SubItems(1).Text)
             Next
-            Player.SetPlaylistCountText()
+            Populate()
         End If
     End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
     Private Sub BtnPrune_Click(sender As Object, e As EventArgs) Handles BtnPrune.Click
-        Dim count As Integer = 0
-        For Each item As ListViewItem In LVQueue.Items
-            If Player.LVPlaylist.FindItemWithText(item.SubItems(1).Text, True, 0) Is Nothing Then
-                count += 1
-                Player.Queue.Remove(item.SubItems(1).Text)
-                LVQueue.Items.Remove(item)
-            End If
-        Next
-        Player.SetPlaylistCountText()
-        App.WriteToLog("Queue Pruned (" + count.ToString + ")")
+        Player.PruneQueue()
+        Populate()
     End Sub
     Private Sub TipQueue_Popup(sender As Object, e As PopupEventArgs) Handles TipQueue.Popup
         Static s As SizeF
@@ -166,6 +144,22 @@ Public Class PlayerQueue
     End Sub
 
     'Procedures
+    Private Sub Populate()
+        LVQueue.Items.Clear()
+        For Each s As String In Player.Queue
+            Dim playlistlvi As ListViewItem = Player.LVPlaylist.FindItemWithText(s, True, 0)
+            Dim lvi As New ListViewItem
+            If playlistlvi Is Nothing Then
+                lvi.SubItems(0).Text = "Not Found In Playlist"
+                lvi.SubItems.Add(s)
+            Else
+                lvi.SubItems(0).Text = playlistlvi.SubItems(0).Text
+                lvi.SubItems.Add(s)
+            End If
+            LVQueue.Items.Add(lvi)
+        Next
+        LVQueue.Columns(1).Width = -2
+    End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
