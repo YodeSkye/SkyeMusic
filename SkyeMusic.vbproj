@@ -116,7 +116,6 @@
   <ItemGroup>
     <Reference Include="CoreAudio">
       <HintPath>CoreAudio.dll</HintPath>
-      <Private>True</Private>
     </Reference>
   </ItemGroup>
 
