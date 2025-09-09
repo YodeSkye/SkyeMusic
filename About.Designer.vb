@@ -29,7 +29,7 @@ Partial Class About
         LLblSyncFusion = New LinkLabel()
         LLblIcons8 = New LinkLabel()
         LLblTagLibSharp = New LinkLabel()
-        LblVersion = New Components.LabelCSY()
+        LblVersion = New Components.Label
         SuspendLayout()
         ' 
         ' BtnOK
@@ -149,5 +149,5 @@ Partial Class About
     Friend WithEvents LLblSyncFusion As LinkLabel
     Friend WithEvents LLblIcons8 As LinkLabel
     Friend WithEvents LLblTagLibSharp As LinkLabel
-    Friend WithEvents LblVersion As Components.LabelCSY
+    Friend WithEvents LblVersion As Components.Label
 End Class

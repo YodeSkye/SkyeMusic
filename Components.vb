@@ -6,10 +6,13 @@ Namespace My.Components
 	''' <summary>
 	''' Extended Windows progress bar control.
 	''' </summary>
+	<ToolboxItem(True)>
+	<DesignerCategory("Code")>
 	<DefaultProperty("PercentageMode")>
-	Friend Class ProgressEX
+	Public Class ProgressEX
 		Inherits System.Windows.Forms.UserControl
 
+		'Declarations
 		''' <summary>
 		''' Specifies how the percentage value should be drawn
 		''' </summary>
@@ -36,17 +39,19 @@ Namespace My.Components
 		Private writingBrush As SolidBrush 'Percent writing brush
 		Private writingFont As Font 'Font to write Percent with
 		Private _Drawer As Drawing2D.LinearGradientBrush
+
+		'Properties
 		''' <summary>
 		''' Gets or Sets a value determine how to display Percentage value
 		''' </summary>
-		<Category("Behavior"), Description("Specify how to display the Percentage value"), DefaultValue(percentageDrawModes.Movable)>
+		<Category("Behavior"), Description("Specify how to display the Percentage value"), DefaultValue(percentageDrawModes.Center)>
 		Public Property PercentageMode As percentageDrawModes
 			Get
 				Return percentageDrawMode
 			End Get
 			Set
 				percentageDrawMode = Value
-				Me.Refresh()
+				'Me.Refresh()
 			End Set
 		End Property
 		''' <summary>
@@ -76,8 +81,9 @@ Namespace My.Components
 				gradientBlender.Colors(0) = ControlPaint.Dark(Value)
 				gradientBlender.Colors(1) = ControlPaint.Light(Value)
 				gradientBlender.Colors(2) = ControlPaint.Dark(Value)
+				_Brush?.Dispose()
 				_Brush = New SolidBrush(Value)
-				Me.Refresh()
+				Me.Invalidate(False)
 			End Set
 		End Property
 		''' <summary>
@@ -178,31 +184,38 @@ Namespace My.Components
 			End Set
 		End Property
 
+		'Events
 		''' <summary>
 		''' Initialize new instance of the ProgressEx control
 		''' </summary>
 		Public Sub New()
+
 			'Initialize
-			Me.BackColor = System.Drawing.SystemColors.Control
+			MyBase.New()
 			Me.Name = "ProgressEx"
-			Me.Size = New System.Drawing.Size(96, 24)
-			AddHandler Me.Resize, New System.EventHandler(AddressOf Me.ProgressEXResize)
-			AddHandler Me.Paint, New System.Windows.Forms.PaintEventHandler(AddressOf Me.ProgressEXPaint)
-			'Designer Stuff
-			maxValue = 100 'Me.Width
-			minValue = 0
-			stepValue = 1
-			percentageDrawMode = percentageDrawModes.Center
-			'ProgressEx Stuff
-			gradientBlender = New Drawing2D.ColorBlend(3) 'Color Mixer contain 3 colors for (top, center, bottom)
-			gradientBlender.Positions = New Single() {0F, 0.5F, 1.0F} 'Position of mixing pints is (top, middle, bottom)
-			DrawingColor = Color.Blue
-			writingBrush = New SolidBrush(Color.Black)
-			writingFont = New Font("Arial", 10, FontStyle.Bold)
-			_Drawer = New Drawing2D.LinearGradientBrush(Me.ClientRectangle, Color.Black, Color.White, Drawing2D.LinearGradientMode.Vertical)
-			Me.SetStyle(ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint Or ControlStyles.DoubleBuffer, True) 'Cancel Reflection while drawing
+			Me.DoubleBuffered = True
+			Me.SetStyle(ControlStyles.AllPaintingInWmPaint Or ControlStyles.UserPaint Or ControlStyles.DoubleBuffer, True) 'Cancel Reflection while drawing
 			Me.SetStyle(ControlStyles.SupportsTransparentBackColor, True) 'Allow Transparent backcolor
 			Me.BackColor = Color.Transparent
+			Me.MinimumSize = New Size(50, 5)
+			Me.MaximumSize = New Size(Integer.MaxValue, 40)
+			Me.Size = New System.Drawing.Size(96, 24)
+
+			'Designer Stuff
+			maxValue = 100
+			minValue = 0
+			stepValue = 5
+			percentageDrawMode = percentageDrawModes.Center
+			colorDrawMode = colorDrawModes.Gradient
+
+			'ProgressEx Stuff
+			m_drawingColor = Color.Red
+			gradientBlender = New Drawing2D.ColorBlend() With {
+				.Positions = {0.0F, 0.5F, 1.0F},
+				.Colors = {ControlPaint.Dark(m_drawingColor), ControlPaint.Light(m_drawingColor), ControlPaint.Dark(m_drawingColor)}}
+			writingFont = New Font("Arial", 10, FontStyle.Bold)
+			writingBrush = New SolidBrush(Color.Black)
+
 		End Sub
 		''' <summary> 
 		''' Clean up any resources being used.
@@ -211,46 +224,43 @@ Namespace My.Components
 			_Brush.Dispose()
 			writingBrush.Dispose() 'Release Percentage writer brush
 			writingFont.Dispose() 'Release Percentage font
+			_Drawer.Dispose()
 			MyBase.Dispose(disposing)
 		End Sub
-		Private Sub ProgressEXPaint(sender As Object, e As System.Windows.Forms.PaintEventArgs)
-			'Why draw outside the control !! ?
-			If _value <> 0 And _value <= maxValue Then
-				percentageValue = (_value / maxValue) * 100 'Calculate the Percentage according to the logical value reached
-				drawingWidth = CInt(Math.Truncate(Me.Width * _value)) \ (maxValue - minValue) 'Calculate the right side of drawing edge
-				Select Case Me.DrawingColorMode 'Now we ready to draw, so do the actual drawing
+		Protected Overrides Sub OnPaint(e As PaintEventArgs)
+			MyBase.OnPaint(e)
+			If LicenseManager.UsageMode = LicenseUsageMode.Runtime AndAlso _value > 0 Then
+				percentageValue = (_value - minValue) / (maxValue - minValue) * 100
+				Dim w = CInt((Me.Width - 1) * (_value - minValue) / (maxValue - minValue))
+				Select Case colorDrawMode
 					Case colorDrawModes.Gradient
-						_Drawer.InterpolationColors = gradientBlender 'Tie our color mixer with the just created brush
-						e.Graphics.FillRectangle(_Drawer, 0, 0, drawingWidth, Me.Height)
-					Case colorDrawModes.Smooth : e.Graphics.FillRectangle(_Brush, 0, 0, drawingWidth, Me.Height)
+						_Drawer.InterpolationColors = gradientBlender
+						e.Graphics.FillRectangle(_Drawer, 0, 0, w, Me.Height)
+					Case Else
+						e.Graphics.FillRectangle(_Brush, 0, 0, w, Me.Height)
 				End Select
-				'Prepare for Percentage writing only when required
+
 				If percentageDrawMode <> percentageDrawModes.None Then
-					Dim st As String = CInt(Math.Truncate(percentageValue)).ToString() & "%"
-					Dim s As SizeF = e.Graphics.MeasureString(st, writingFont) 'Calculate Percentage rectangle size
-					If percentageDrawMode = percentageDrawModes.Movable Then
-						e.Graphics.DrawString(st, writingFont, writingBrush, drawingWidth, (e.ClipRectangle.Height \ 2 - s.Height / 2))
-					ElseIf percentageDrawMode = percentageDrawModes.Center Then
-						e.Graphics.DrawString(st, writingFont, writingBrush, New PointF((e.ClipRectangle.Width \ 2 - s.Width / 2), (e.ClipRectangle.Height \ 2 - s.Height / 2)))
-					End If
+					Dim txt = CInt(Math.Truncate(percentageValue)).ToString() & "%"
+					Dim sz = e.Graphics.MeasureString(txt, writingFont)
+					Debug.Print(percentageDrawMode.ToString)
+					Dim x = If(percentageDrawMode = percentageDrawModes.Movable, w, (Me.Width - sz.Width) / 2)
+					Dim y = (Me.Height - sz.Height) / 2
+					e.Graphics.DrawString(txt, writingFont, writingBrush, x, y)
 				End If
 			End If
 		End Sub
-		Private Sub ProgressEXResize(sender As Object, e As System.EventArgs)
-			If Me.Height > 40 Then
-				Me.Height = 40
+		Protected Overrides Sub OnResize(e As EventArgs)
+			MyBase.OnResize(e)
+			If LicenseManager.UsageMode = LicenseUsageMode.Runtime Then
+				_Drawer?.Dispose()
+				_Drawer = New Drawing2D.LinearGradientBrush(New Rectangle(Point.Empty, Me.ClientSize), Color.Black, Color.White, Drawing2D.LinearGradientMode.Vertical)
+				If gradientBlender IsNot Nothing Then _Drawer.InterpolationColors = gradientBlender
+				Me.Invalidate()
 			End If
-			'Prevent a Progress shorter than its own percentag
-			'used to be set to 15
-			If Me.Height < 5 Then
-				Me.Height = 5
-			End If
-			'Prevent a Progress smaller than its own percentage
-			If Me.Width < 50 Then
-				Me.Width = 50
-			End If
-			Me.Refresh()
 		End Sub
+
+		'Procedures
 		''' <summary>
 		''' Increment the progress one step
 		''' </summary>
@@ -279,18 +289,23 @@ Namespace My.Components
 				Me.Refresh()
 			End If
 		End Sub
+
 	End Class
 
 	''' <summary>
 	''' Extended Listview control with Insertion Line for drag/drop operations.
 	''' </summary>
-	Friend Class ListViewEX
+	<ToolboxItem(True)>
+	<DesignerCategory("Code")>
+	Public Class ListViewEX
 		Inherits ListView
 
+		'Declarations
 		Private _LineBefore As Integer = -1
 		Private _LineAfter As Integer = -1
 		Private _InsertionLineColor As Color = Color.Teal
 
+		'Properties
 		<DefaultValue(-1)>
 		Public Property LineBefore As Integer
 			Get
@@ -316,37 +331,41 @@ Namespace My.Components
 			End Get
 			Set(ByVal value As Color)
 				_InsertionLineColor = value
+				Me.Invalidate()
 			End Set
 		End Property
 
+		'Events
 		Public Sub New()
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, True)
 		End Sub
 		Protected Overrides Sub WndProc(ByRef m As Message)
 			MyBase.WndProc(m)
-			If m.Msg = WinAPI.WM_PAINT And m.HWnd = Handle Then
-				If LineBefore >= 0 AndAlso LineBefore < Items.Count Then
-					Dim rc As Rectangle = Items(LineBefore).GetBounds(ItemBoundsPortion.Label)
-					DrawInsertionLine(rc.Left, rc.Right, rc.Top)
-				End If
-				If LineAfter >= 0 AndAlso LineBefore < Items.Count Then
-					Dim rc As Rectangle = Items(LineAfter).GetBounds(ItemBoundsPortion.Label)
-					DrawInsertionLine(rc.Left, rc.Right, rc.Bottom)
-				End If
+
+			If m.Msg = WinAPI.WM_PAINT AndAlso Me.IsHandleCreated AndAlso Not DesignMode Then
+				Using g As Graphics = Graphics.FromHwnd(Me.Handle)
+					If LineBefore >= 0 AndAlso LineBefore < Items.Count Then
+						Dim rc As Rectangle = Items(LineBefore).GetBounds(ItemBoundsPortion.Label)
+						DrawInsertionLine(g, rc.Left, rc.Right, rc.Top)
+					End If
+					If LineAfter >= 0 AndAlso LineAfter < Items.Count Then
+						Dim rc As Rectangle = Items(LineAfter).GetBounds(ItemBoundsPortion.Label)
+						DrawInsertionLine(g, rc.Left, rc.Right, rc.Bottom)
+					End If
+				End Using
 			End If
 		End Sub
-		Private Sub DrawInsertionLine(ByVal X1 As Integer, ByVal X2 As Integer, ByVal Y As Integer)
-			Using g As Graphics = Me.CreateGraphics()
-				Dim p As New Pen(_InsertionLineColor)
-				p.Width = 3
+
+		'Procedures
+		Private Sub DrawInsertionLine(g As Graphics, X1 As Integer, X2 As Integer, Y As Integer)
+			Using p As New Pen(_InsertionLineColor) With {.Width = 3}
 				g.DrawLine(p, X1, Y, X2 - 1, Y)
-				Dim leftTriangle As Point() = New Point(2) {New Point(X1, Y - 4), New Point(X1 + 7, Y), New Point(X1, Y + 4)}
-				Dim rightTriangle As Point() = New Point(2) {New Point(X2, Y - 4), New Point(X2 - 8, Y), New Point(X2, Y + 4)}
-				Dim b As New SolidBrush(_InsertionLineColor)
-				g.FillPolygon(b, leftTriangle)
-				g.FillPolygon(b, rightTriangle)
-				b.Dispose()
-				p.Dispose()
+				Dim leftTriangle As Point() = {New Point(X1, Y - 4), New Point(X1 + 7, Y), New Point(X1, Y + 4)}
+				Dim rightTriangle As Point() = {New Point(X2, Y - 4), New Point(X2 - 8, Y), New Point(X2, Y + 4)}
+				Using b As New SolidBrush(_InsertionLineColor)
+					g.FillPolygon(b, leftTriangle)
+					g.FillPolygon(b, rightTriangle)
+				End Using
 			End Using
 		End Sub
 
@@ -355,22 +374,30 @@ Namespace My.Components
 	''' <summary>
 	''' Changes basic .NET label to OPTIONALLY copy on double-click
 	''' </summary>
-	Public Class LabelCSY
+	<ToolboxItem(True)>
+	<DesignerCategory("Code")>
+	Public Class Label
 		Inherits System.Windows.Forms.Label
 
+		'Properties
 		<DefaultValue(False)>
 		Public Property CopyOnDoubleClick As Boolean
+
+		'Events
 		Protected Overrides Sub DefWndProc(ByRef m As Message)
-			Select Case m.Msg
-				Case WinAPI.WM_LBUTTONDBLCLK
-					If CopyOnDoubleClick Then
+			If LicenseManager.UsageMode = LicenseUsageMode.Runtime Then
+				Select Case m.Msg
+					Case WinAPI.WM_LBUTTONDBLCLK
+						'Suppress default double-click behavior unless explicitly allowed
+						If CopyOnDoubleClick Then
+							MyBase.DefWndProc(m)
+						Else
+							m.Result = IntPtr.Zero
+						End If
+					Case Else
 						MyBase.DefWndProc(m)
-					Else
-						m.Result = IntPtr.Zero
-					End If
-				Case Else
-					MyBase.DefWndProc(m)
-			End Select
+				End Select
+			End If
 		End Sub
 
 	End Class

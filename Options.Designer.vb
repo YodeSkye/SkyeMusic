@@ -33,9 +33,9 @@ Partial Class Options
         TxtBoxPlaylistTitleSeparator = New TextBox()
         CkBoxPlaylistRemoveSpaces = New CheckBox()
         TxtBoxPlaylistVideoIdentifier = New TextBox()
-        LblTitleFormat = New Components.LabelCSY()
-        LblTitleSeparator = New Components.LabelCSY()
-        LblVideoIdentifier = New Components.LabelCSY()
+        LblTitleFormat = New Components.Label
+        LblTitleSeparator = New Components.Label
+        LblVideoIdentifier = New Components.Label
         BtnLibrarySearchFoldersAdd = New Button()
         CkBoxLibrarySearchSubFolders = New CheckBox()
         LBLibrarySearchFolders = New ListBox()
@@ -47,14 +47,14 @@ Partial Class Options
         BtnHelperApp1 = New Button()
         BtnHelperApp2 = New Button()
         CMTxtBox = New Components.TextBoxContextMenu()
-        LblSongPlayMode = New Components.LabelCSY()
-        LblHelperApp1Name = New Components.LabelCSY()
+        LblSongPlayMode = New Components.Label
+        LblHelperApp1Name = New Components.Label
         CoBoxPlaylistDefaultAction = New ComboBox()
         CoBoxPlaylistSearchAction = New ComboBox()
-        LblDefaultPlaylistAction = New Components.LabelCSY()
-        LblPlaylistSearchAction = New Components.LabelCSY()
+        LblDefaultPlaylistAction = New Components.Label
+        LblPlaylistSearchAction = New Components.Label
         CoBoxTheme = New ComboBox()
-        LblTheme = New Components.LabelCSY()
+        LblTheme = New Components.Label
         TipOptions = New ToolTip(components)
         TxtBoxHistoryUpdateInterval = New TextBox()
         LblPlaylistFormatting = New Label()
@@ -67,18 +67,18 @@ Partial Class Options
         TxtBoxHelperApp1Name = New TextBox()
         TxtBoxRandomHistoryUpdateInterval = New TextBox()
         BtnPrunePlaylist = New Button()
-        LblHistoryUpdateInterval2 = New Components.LabelCSY()
-        LblHistoryUpdateInterval1 = New Components.LabelCSY()
-        LblHistoryAutoSaveInterval1 = New Components.LabelCSY()
-        LblHistoryAutoSaveInterval2 = New Components.LabelCSY()
+        LblHistoryUpdateInterval2 = New Components.Label
+        LblHistoryUpdateInterval1 = New Components.Label
+        LblHistoryAutoSaveInterval1 = New Components.Label
+        LblHistoryAutoSaveInterval2 = New Components.Label
         TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
-        LblHelperApp2Path = New Components.LabelCSY()
-        LblHelperApp2Name = New Components.LabelCSY()
-        LblHelperApp1Path = New Components.LabelCSY()
+        LblHelperApp2Path = New Components.Label
+        LblHelperApp2Name = New Components.Label
+        LblHelperApp1Path = New Components.Label
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
-        LblRandomHistoryUpdateInterval1 = New Components.LabelCSY()
-        LblRandomHistoryUpdateInterval2 = New Components.LabelCSY()
+        LblRandomHistoryUpdateInterval1 = New Components.Label
+        LblRandomHistoryUpdateInterval2 = New Components.Label
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         TPLibrary = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         LblLibrarySearchFolders = New Label()
@@ -823,21 +823,21 @@ Partial Class Options
     Friend WithEvents BtnHelperApp1 As Button
     Friend WithEvents BtnHelperApp2 As Button
     Friend WithEvents CMTxtBox As My.Components.TextBoxContextMenu
-    Friend WithEvents LblSongPlayMode As My.Components.LabelCSY
-    Friend WithEvents LblTitleFormat As My.Components.LabelCSY
-    Friend WithEvents LblTitleSeparator As My.Components.LabelCSY
-    Friend WithEvents LblVideoIdentifier As My.Components.LabelCSY
-    Friend WithEvents LblHelperApp1Name As My.Components.LabelCSY
+    Friend WithEvents LblSongPlayMode As My.Components.Label
+    Friend WithEvents LblTitleFormat As My.Components.Label
+    Friend WithEvents LblTitleSeparator As My.Components.Label
+    Friend WithEvents LblVideoIdentifier As My.Components.Label
+    Friend WithEvents LblHelperApp1Name As My.Components.Label
     Friend WithEvents CoBoxPlaylistDefaultAction As ComboBox
     Friend WithEvents CoBoxPlaylistSearchAction As ComboBox
-    Friend WithEvents LblDefaultPlaylistAction As My.Components.LabelCSY
-    Friend WithEvents LblPlaylistSearchAction As My.Components.LabelCSY
+    Friend WithEvents LblDefaultPlaylistAction As My.Components.Label
+    Friend WithEvents LblPlaylistSearchAction As My.Components.Label
     Friend WithEvents CoBoxTheme As ComboBox
-    Friend WithEvents LblTheme As Components.LabelCSY
+    Friend WithEvents LblTheme As Components.Label
     Friend WithEvents TipOptions As ToolTip
     Friend WithEvents TxtBoxHistoryAutoSaveInterval As TextBox
-    Friend WithEvents LblHistoryAutoSaveInterval1 As Components.LabelCSY
-    Friend WithEvents LblHistoryAutoSaveInterval2 As Components.LabelCSY
+    Friend WithEvents LblHistoryAutoSaveInterval1 As Components.Label
+    Friend WithEvents LblHistoryAutoSaveInterval2 As Components.Label
     Friend WithEvents BtnHistorySaveNow As Button
     Friend WithEvents BtnHistoryPrune As Button
     Friend WithEvents TCOptions As Syncfusion.Windows.Forms.Tools.TabControlAdv
@@ -846,19 +846,19 @@ Partial Class Options
     Friend WithEvents TPPlaylist As Syncfusion.Windows.Forms.Tools.TabPageAdv
     Friend WithEvents TPLibrary As Syncfusion.Windows.Forms.Tools.TabPageAdv
     Friend WithEvents TxtBoxHistoryUpdateInterval As TextBox
-    Friend WithEvents LblHistoryUpdateInterval2 As Components.LabelCSY
-    Friend WithEvents LblHistoryUpdateInterval1 As Components.LabelCSY
+    Friend WithEvents LblHistoryUpdateInterval2 As Components.Label
+    Friend WithEvents LblHistoryUpdateInterval1 As Components.Label
     Friend WithEvents LblLibrarySearchFolders As Label
     Friend WithEvents LblPlaylistFormatting As Label
     Friend WithEvents TxtBoxHelperApp2Path As TextBox
     Friend WithEvents TxtBoxHelperApp2Name As TextBox
     Friend WithEvents TxtBoxHelperApp1Path As TextBox
     Friend WithEvents TxtBoxHelperApp1Name As TextBox
-    Friend WithEvents LblHelperApp2Path As Components.LabelCSY
-    Friend WithEvents LblHelperApp2Name As Components.LabelCSY
-    Friend WithEvents LblHelperApp1Path As Components.LabelCSY
+    Friend WithEvents LblHelperApp2Path As Components.Label
+    Friend WithEvents LblHelperApp2Name As Components.Label
+    Friend WithEvents LblHelperApp1Path As Components.Label
     Friend WithEvents TxtBoxRandomHistoryUpdateInterval As TextBox
-    Friend WithEvents LblRandomHistoryUpdateInterval2 As Components.LabelCSY
-    Friend WithEvents LblRandomHistoryUpdateInterval1 As Components.LabelCSY
+    Friend WithEvents LblRandomHistoryUpdateInterval2 As Components.Label
+    Friend WithEvents LblRandomHistoryUpdateInterval1 As Components.Label
     Friend WithEvents BtnPrunePlaylist As Button
 End Class

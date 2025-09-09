@@ -57,14 +57,14 @@ Partial Class Library
         RadBtnGroupByArtist = New RadioButton()
         RadBtnGroupByAlbum = New RadioButton()
         RadBtnGroupByNone = New RadioButton()
-        LblExtTitle = New Components.LabelCSY()
-        LblExtFileInfo = New Components.LabelCSY()
-        LblExtProperties = New Components.LabelCSY()
-        LblExtType = New Components.LabelCSY()
-        LblLibraryCounts = New Components.LabelCSY()
-        LblStatus = New Components.LabelCSY()
+        LblExtTitle = New Components.Label
+        LblExtFileInfo = New Components.Label
+        LblExtProperties = New Components.Label
+        LblExtType = New Components.Label
+        LblLibraryCounts = New Components.Label
+        LblStatus = New Components.Label
         LVLibrary = New ListView()
-        LblHistory = New Components.LabelCSY()
+        LblHistory = New Components.Label
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -519,14 +519,14 @@ Partial Class Library
     Friend WithEvents CMICollapseGroup As ToolStripMenuItem
     Friend WithEvents CMIExpandAllGroups As ToolStripMenuItem
     Friend WithEvents CMISeparatorGroupBy As ToolStripSeparator
-    Friend WithEvents LblExtTitle As My.Components.LabelCSY
-    Friend WithEvents LblExtFileInfo As My.Components.LabelCSY
-    Friend WithEvents LblExtProperties As My.Components.LabelCSY
-    Friend WithEvents LblExtType As My.Components.LabelCSY
-    Friend WithEvents LblLibraryCounts As My.Components.LabelCSY
-    Friend WithEvents LblStatus As My.Components.LabelCSY
+    Friend WithEvents LblExtTitle As My.Components.Label
+    Friend WithEvents LblExtFileInfo As My.Components.Label
+    Friend WithEvents LblExtProperties As My.Components.Label
+    Friend WithEvents LblExtType As My.Components.Label
+    Friend WithEvents LblLibraryCounts As My.Components.Label
+    Friend WithEvents LblStatus As My.Components.Label
     Friend WithEvents LVLibrary As ListView
-    Friend WithEvents LblHistory As Components.LabelCSY
+    Friend WithEvents LblHistory As Components.Label
     Friend WithEvents RadBtnGroupByYear As RadioButton
     Friend WithEvents CMIQueue As ToolStripMenuItem
     Friend WithEvents RadBtnGroupByType As RadioButton

@@ -29,9 +29,9 @@ Partial Class Log
         BTNOK = New Button()
         BTNDeleteLog = New Button()
         BTNRefreshLog = New Button()
-        LBLLogInfo = New Components.LabelCSY()
+        LBLLogInfo = New Components.Label
         TxBxSearch = New TextBox()
-        LblStatus = New Components.LabelCSY()
+        LblStatus = New Components.Label
         TipLog = New ToolTip(components)
         SuspendLayout()
         ' 
@@ -153,8 +153,8 @@ Partial Class Log
     Friend WithEvents BTNDeleteLog As Button
     Friend WithEvents BTNRefreshLog As Button
     Friend WithEvents RTBCMLog As My.Components.RichTextBoxContextMenu
-    Friend WithEvents LBLLogInfo As My.Components.LabelCSY
+    Friend WithEvents LBLLogInfo As My.Components.Label
     Friend WithEvents TxBxSearch As TextBox
-    Friend WithEvents LblStatus As My.Components.LabelCSY
+    Friend WithEvents LblStatus As My.Components.Label
     Friend WithEvents TipLog As ToolTip
 End Class

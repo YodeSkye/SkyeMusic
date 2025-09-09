@@ -93,9 +93,9 @@ Partial Class Player
         TimerVisualizer = New Timer(components)
         PicBoxVisualizer = New PictureBox()
         TxtBoxLyrics = New TextBox()
-        LblPlaylistCount = New Components.LabelCSY()
-        LblDuration = New Components.LabelCSY()
-        LblPosition = New Components.LabelCSY()
+        LblPlaylistCount = New Components.Label
+        LblDuration = New Components.Label
+        LblPosition = New Components.Label
         CMLyrics = New Components.TextBoxContextMenu()
         TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
         CMPlaylist.SuspendLayout()
@@ -832,11 +832,11 @@ Partial Class Player
     Friend WithEvents MIPlayMode As ToolStripMenuItem
     Friend WithEvents MILyrics As ToolStripMenuItem
     Friend WithEvents TxtBoxLyrics As TextBox
-    Friend WithEvents Labelcsy1 As My.Components.LabelCSY
-    Friend WithEvents LblPlaylistCount As My.Components.LabelCSY
+    Friend WithEvents Labelcsy1 As My.Components.Label
+    Friend WithEvents LblPlaylistCount As My.Components.Label
     Friend WithEvents MIVisualizer As ToolStripMenuItem
-    Friend WithEvents LblDuration As My.Components.LabelCSY
-    Friend WithEvents LblPosition As My.Components.LabelCSY
+    Friend WithEvents LblDuration As My.Components.Label
+    Friend WithEvents LblPosition As My.Components.Label
     Friend WithEvents CMLyrics As My.Components.TextBoxContextMenu
     Friend WithEvents CMIQueue As ToolStripMenuItem
     Friend WithEvents MIOpenURL As ToolStripMenuItem
