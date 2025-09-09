@@ -32,6 +32,7 @@ Partial Class PlayerEditTitle
         ' TxtBoxTitle
         ' 
         TxtBoxTitle.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        TxtBoxTitle.ContextMenuStrip = CMEditTitle
         TxtBoxTitle.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxTitle.Location = New Point(12, 28)
         TxtBoxTitle.Name = "TxtBoxTitle"

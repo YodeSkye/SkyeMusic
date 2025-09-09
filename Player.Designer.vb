@@ -93,9 +93,9 @@ Partial Class Player
         TimerVisualizer = New Timer(components)
         PicBoxVisualizer = New PictureBox()
         TxtBoxLyrics = New TextBox()
-        LblPlaylistCount = New Components.Label
-        LblDuration = New Components.Label
-        LblPosition = New Components.Label
+        LblPlaylistCount = New Components.Label()
+        LblDuration = New Components.Label()
+        LblPosition = New Components.Label()
         CMLyrics = New Components.TextBoxContextMenu()
         TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
         CMPlaylist.SuspendLayout()
@@ -517,6 +517,8 @@ Partial Class Player
         PEXLeft.DrawingColor = Color.DodgerBlue
         PEXLeft.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
         PEXLeft.Location = New Point(12, 352)
+        PEXLeft.MaximumSize = New Size(Integer.MaxValue, 40)
+        PEXLeft.MinimumSize = New Size(50, 5)
         PEXLeft.Name = "PEXLeft"
         PEXLeft.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
         PEXLeft.Size = New Size(385, 5)
@@ -531,6 +533,8 @@ Partial Class Player
         PEXRight.DrawingColor = Color.DodgerBlue
         PEXRight.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
         PEXRight.Location = New Point(12, 389)
+        PEXRight.MaximumSize = New Size(Integer.MaxValue, 40)
+        PEXRight.MinimumSize = New Size(50, 5)
         PEXRight.Name = "PEXRight"
         PEXRight.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
         PEXRight.Size = New Size(385, 5)
@@ -653,6 +657,7 @@ Partial Class Player
         ' 
         TxtBoxLyrics.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         TxtBoxLyrics.BorderStyle = BorderStyle.None
+        TxtBoxLyrics.ContextMenuStrip = CMLyrics
         TxtBoxLyrics.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         TxtBoxLyrics.ForeColor = Color.White
         TxtBoxLyrics.Location = New Point(1, 27)
@@ -702,7 +707,7 @@ Partial Class Player
         ' 
         CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMLyrics.Name = "CMLyrics"
-        CMLyrics.Size = New Size(149, 176)
+        CMLyrics.Size = New Size(181, 198)
         ' 
         ' TrackBarPosition
         ' 

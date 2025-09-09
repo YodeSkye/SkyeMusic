@@ -44,6 +44,7 @@ Partial Class PlayerAddStream
         ' TxtBoxStreamTitle
         ' 
         TxtBoxStreamTitle.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        TxtBoxStreamTitle.ContextMenuStrip = CMAddStream
         TxtBoxStreamTitle.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxStreamTitle.Location = New Point(12, 28)
         TxtBoxStreamTitle.Name = "TxtBoxStreamTitle"
@@ -54,6 +55,7 @@ Partial Class PlayerAddStream
         ' TxtBoxStreamPath
         ' 
         TxtBoxStreamPath.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        TxtBoxStreamPath.ContextMenuStrip = CMAddStream
         TxtBoxStreamPath.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxStreamPath.Location = New Point(12, 78)
         TxtBoxStreamPath.Name = "TxtBoxStreamPath"

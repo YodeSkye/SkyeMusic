@@ -29,18 +29,20 @@ Partial Class Log
         BTNOK = New Button()
         BTNDeleteLog = New Button()
         BTNRefreshLog = New Button()
-        LBLLogInfo = New Components.Label
+        LBLLogInfo = New Components.Label()
         TxBxSearch = New TextBox()
-        LblStatus = New Components.Label
+        LblStatus = New Components.Label()
         TipLog = New ToolTip(components)
         SuspendLayout()
         ' 
         ' RTBLog
         ' 
         RTBLog.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        RTBLog.ContextMenuStrip = RTBCMLog
         RTBLog.Font = New Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         RTBLog.Location = New Point(12, 32)
         RTBLog.Name = "RTBLog"
+        RTBLog.ReadOnly = True
         RTBLog.ShortcutsEnabled = False
         RTBLog.Size = New Size(776, 317)
         RTBLog.TabIndex = 0

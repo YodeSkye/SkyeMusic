@@ -270,9 +270,9 @@ Public Class Options
     Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxHistoryAutoSaveInterval.KeyPress, TxtBoxHistoryUpdateInterval.KeyPress, TxtBoxRandomHistoryUpdateInterval.KeyPress
         If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
     End Sub
-    Private Sub TxtBox_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxPlaylistTitleSeparator.MouseUp, TxtBoxPlaylistVideoIdentifier.MouseUp, TxtBoxHelperApp1Path.MouseUp, TxtBoxHelperApp1Name.MouseUp, TxtBoxHelperApp2Name.MouseUp, TxtBoxHelperApp2Path.MouseUp, TxtBoxHistoryAutoSaveInterval.MouseUp, TxtBoxHistoryUpdateInterval.MouseUp, TxtBoxRandomHistoryUpdateInterval.MouseUp
-        CMTxtBox.Display(CType(sender, TextBox), e)
-    End Sub
+    'Private Sub TxtBox_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxPlaylistTitleSeparator.MouseUp, TxtBoxPlaylistVideoIdentifier.MouseUp, TxtBoxHelperApp1Path.MouseUp, TxtBoxHelperApp1Name.MouseUp, TxtBoxHelperApp2Name.MouseUp, TxtBoxHelperApp2Path.MouseUp, TxtBoxHistoryAutoSaveInterval.MouseUp, TxtBoxHistoryUpdateInterval.MouseUp, TxtBoxRandomHistoryUpdateInterval.MouseUp
+    '    'CMTxtBox.Display(CType(sender, TextBox), e)
+    'End Sub
     Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxPlaylistTitleSeparator.PreviewKeyDown, TxtBoxPlaylistVideoIdentifier.PreviewKeyDown, MyBase.PreviewKeyDown, TxtBoxHelperApp1Path.PreviewKeyDown, TxtBoxHelperApp1Name.PreviewKeyDown, TxtBoxHelperApp2Name.PreviewKeyDown, TxtBoxHelperApp2Path.PreviewKeyDown, TxtBoxHistoryAutoSaveInterval.PreviewKeyDown, TxtBoxHistoryUpdateInterval.PreviewKeyDown, TxtBoxRandomHistoryUpdateInterval.PreviewKeyDown
         CMTxtBox.ShortcutKeys(CType(sender, TextBox), e)
     End Sub

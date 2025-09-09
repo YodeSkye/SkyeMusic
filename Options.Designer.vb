@@ -31,11 +31,12 @@ Partial Class Options
         CoBoxPlayMode = New ComboBox()
         CoBoxPlaylistTitleFormat = New ComboBox()
         TxtBoxPlaylistTitleSeparator = New TextBox()
+        CMTxtBox = New Components.TextBoxContextMenu()
         CkBoxPlaylistRemoveSpaces = New CheckBox()
         TxtBoxPlaylistVideoIdentifier = New TextBox()
-        LblTitleFormat = New Components.Label
-        LblTitleSeparator = New Components.Label
-        LblVideoIdentifier = New Components.Label
+        LblTitleFormat = New Components.Label()
+        LblTitleSeparator = New Components.Label()
+        LblVideoIdentifier = New Components.Label()
         BtnLibrarySearchFoldersAdd = New Button()
         CkBoxLibrarySearchSubFolders = New CheckBox()
         LBLibrarySearchFolders = New ListBox()
@@ -46,15 +47,14 @@ Partial Class Options
         CkBoxSuspendOnSessionChange = New CheckBox()
         BtnHelperApp1 = New Button()
         BtnHelperApp2 = New Button()
-        CMTxtBox = New Components.TextBoxContextMenu()
-        LblSongPlayMode = New Components.Label
-        LblHelperApp1Name = New Components.Label
+        LblSongPlayMode = New Components.Label()
+        LblHelperApp1Name = New Components.Label()
         CoBoxPlaylistDefaultAction = New ComboBox()
         CoBoxPlaylistSearchAction = New ComboBox()
-        LblDefaultPlaylistAction = New Components.Label
-        LblPlaylistSearchAction = New Components.Label
+        LblDefaultPlaylistAction = New Components.Label()
+        LblPlaylistSearchAction = New Components.Label()
         CoBoxTheme = New ComboBox()
-        LblTheme = New Components.Label
+        LblTheme = New Components.Label()
         TipOptions = New ToolTip(components)
         TxtBoxHistoryUpdateInterval = New TextBox()
         LblPlaylistFormatting = New Label()
@@ -67,18 +67,18 @@ Partial Class Options
         TxtBoxHelperApp1Name = New TextBox()
         TxtBoxRandomHistoryUpdateInterval = New TextBox()
         BtnPrunePlaylist = New Button()
-        LblHistoryUpdateInterval2 = New Components.Label
-        LblHistoryUpdateInterval1 = New Components.Label
-        LblHistoryAutoSaveInterval1 = New Components.Label
-        LblHistoryAutoSaveInterval2 = New Components.Label
+        LblHistoryUpdateInterval2 = New Components.Label()
+        LblHistoryUpdateInterval1 = New Components.Label()
+        LblHistoryAutoSaveInterval1 = New Components.Label()
+        LblHistoryAutoSaveInterval2 = New Components.Label()
         TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
-        LblHelperApp2Path = New Components.Label
-        LblHelperApp2Name = New Components.Label
-        LblHelperApp1Path = New Components.Label
+        LblHelperApp2Path = New Components.Label()
+        LblHelperApp2Name = New Components.Label()
+        LblHelperApp1Path = New Components.Label()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
-        LblRandomHistoryUpdateInterval1 = New Components.Label
-        LblRandomHistoryUpdateInterval2 = New Components.Label
+        LblRandomHistoryUpdateInterval1 = New Components.Label()
+        LblRandomHistoryUpdateInterval2 = New Components.Label()
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         TPLibrary = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         LblLibrarySearchFolders = New Label()
@@ -170,6 +170,7 @@ Partial Class Options
         ' 
         ' TxtBoxPlaylistTitleSeparator
         ' 
+        TxtBoxPlaylistTitleSeparator.ContextMenuStrip = CMTxtBox
         TxtBoxPlaylistTitleSeparator.Font = New Font("Segoe UI", 12F)
         TxtBoxPlaylistTitleSeparator.Location = New Point(18, 138)
         TxtBoxPlaylistTitleSeparator.Name = "TxtBoxPlaylistTitleSeparator"
@@ -177,6 +178,12 @@ Partial Class Options
         TxtBoxPlaylistTitleSeparator.Size = New Size(137, 29)
         TxtBoxPlaylistTitleSeparator.TabIndex = 18
         TipOptions.SetToolTip(TxtBoxPlaylistTitleSeparator, "Enter a separator to separate different song title elements.")
+        ' 
+        ' CMTxtBox
+        ' 
+        CMTxtBox.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        CMTxtBox.Name = "CMTxtBox"
+        CMTxtBox.Size = New Size(181, 198)
         ' 
         ' CkBoxPlaylistRemoveSpaces
         ' 
@@ -193,6 +200,7 @@ Partial Class Options
         ' 
         ' TxtBoxPlaylistVideoIdentifier
         ' 
+        TxtBoxPlaylistVideoIdentifier.ContextMenuStrip = CMTxtBox
         TxtBoxPlaylistVideoIdentifier.Font = New Font("Segoe UI", 12F)
         TxtBoxPlaylistVideoIdentifier.Location = New Point(18, 192)
         TxtBoxPlaylistVideoIdentifier.Name = "TxtBoxPlaylistVideoIdentifier"
@@ -332,12 +340,6 @@ Partial Class Options
         TipOptions.SetToolTip(BtnHelperApp2, "Select a Helper App.")
         BtnHelperApp2.UseVisualStyleBackColor = True
         ' 
-        ' CMTxtBox
-        ' 
-        CMTxtBox.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        CMTxtBox.Name = "CMTxtBox"
-        CMTxtBox.Size = New Size(149, 176)
-        ' 
         ' LblSongPlayMode
         ' 
         LblSongPlayMode.AutoSize = True
@@ -430,6 +432,7 @@ Partial Class Options
         ' 
         ' TxtBoxHistoryUpdateInterval
         ' 
+        TxtBoxHistoryUpdateInterval.ContextMenuStrip = CMTxtBox
         TxtBoxHistoryUpdateInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxHistoryUpdateInterval.Location = New Point(269, 229)
         TxtBoxHistoryUpdateInterval.Name = "TxtBoxHistoryUpdateInterval"
@@ -452,6 +455,7 @@ Partial Class Options
         ' 
         ' TxtBoxHistoryAutoSaveInterval
         ' 
+        TxtBoxHistoryAutoSaveInterval.ContextMenuStrip = CMTxtBox
         TxtBoxHistoryAutoSaveInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxHistoryAutoSaveInterval.Location = New Point(148, 301)
         TxtBoxHistoryAutoSaveInterval.Name = "TxtBoxHistoryAutoSaveInterval"
@@ -489,6 +493,7 @@ Partial Class Options
         ' 
         ' TxtBoxHelperApp2Path
         ' 
+        TxtBoxHelperApp2Path.ContextMenuStrip = CMTxtBox
         TxtBoxHelperApp2Path.Font = New Font("Segoe UI", 12F)
         TxtBoxHelperApp2Path.Location = New Point(353, 200)
         TxtBoxHelperApp2Path.Name = "TxtBoxHelperApp2Path"
@@ -499,6 +504,7 @@ Partial Class Options
         ' 
         ' TxtBoxHelperApp2Name
         ' 
+        TxtBoxHelperApp2Name.ContextMenuStrip = CMTxtBox
         TxtBoxHelperApp2Name.Font = New Font("Segoe UI", 12F)
         TxtBoxHelperApp2Name.Location = New Point(353, 150)
         TxtBoxHelperApp2Name.Name = "TxtBoxHelperApp2Name"
@@ -509,6 +515,7 @@ Partial Class Options
         ' 
         ' TxtBoxHelperApp1Path
         ' 
+        TxtBoxHelperApp1Path.ContextMenuStrip = CMTxtBox
         TxtBoxHelperApp1Path.Font = New Font("Segoe UI", 12F)
         TxtBoxHelperApp1Path.ForeColor = Color.White
         TxtBoxHelperApp1Path.Location = New Point(353, 82)
@@ -520,6 +527,7 @@ Partial Class Options
         ' 
         ' TxtBoxHelperApp1Name
         ' 
+        TxtBoxHelperApp1Name.ContextMenuStrip = CMTxtBox
         TxtBoxHelperApp1Name.Font = New Font("Segoe UI", 12F)
         TxtBoxHelperApp1Name.Location = New Point(353, 31)
         TxtBoxHelperApp1Name.Name = "TxtBoxHelperApp1Name"
@@ -530,6 +538,7 @@ Partial Class Options
         ' 
         ' TxtBoxRandomHistoryUpdateInterval
         ' 
+        TxtBoxRandomHistoryUpdateInterval.ContextMenuStrip = CMTxtBox
         TxtBoxRandomHistoryUpdateInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxRandomHistoryUpdateInterval.Location = New Point(355, 293)
         TxtBoxRandomHistoryUpdateInterval.Name = "TxtBoxRandomHistoryUpdateInterval"

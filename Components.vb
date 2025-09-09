@@ -411,134 +411,129 @@ Namespace My.Components
 	''' 4.	Disable all built in contextmenus. !Does Not Work by assigning to ContextMenu Property of TextBox!
 	''' 5.	Set ShortcutsEnabled property to False.
 	''' </summary>
-	Friend Class TextBoxContextMenu
+	<ToolboxItem(True)>
+	<DesignerCategory("Code")>
+	Public Class TextBoxContextMenu
 		Inherits System.Windows.Forms.ContextMenuStrip
 
 		'Declarations
+		Private WithEvents miUndo As ToolStripMenuItem
+		Private WithEvents miCut As ToolStripMenuItem
+		Private WithEvents miCopy As ToolStripMenuItem
+		Private WithEvents miPaste As ToolStripMenuItem
+        Private WithEvents miDelete As ToolStripMenuItem
+		Private miSeparatorProperCase As New ToolStripSeparator
+		Private WithEvents miProperCase As ToolStripMenuItem
+		Private WithEvents miSelectAll As ToolStripMenuItem
+
+		'Properties
 		<DefaultValue(False)>
 		Public Property ShowExtendedTools As Boolean
-		Private txbx As TextBox
 
-		'Control Events
+		'Events
 		Public Sub New()
 			MyBase.New
-			Me.Items.Add("Undo", Nothing, AddressOf UndoClick)
-			Me.Items.Add("-")
-			Me.Items.Add("Cut", Nothing, AddressOf CutClick)
-			Me.Items.Add("Copy", Nothing, AddressOf CopyClick)
-			Me.Items.Add("Paste", Nothing, AddressOf PasteClick)
-			Me.Items.Add("Delete", Nothing, AddressOf DeleteClick)
-			Me.Items.Add("-")
-			Me.Items.Add("Proper Case", Nothing, AddressOf ProperCaseClick)
-			Me.Items.Add("-")
-			Me.Items.Add("Select All", Nothing, AddressOf SelectAllClick)
-			Me.Items(0).Image = Resources.ImageEditUndo16
-			Me.Items(2).Image = Resources.ImageEditCut16
-			Me.Items(3).Image = Resources.ImageEditCopy16
-			Me.Items(4).Image = Resources.ImageEditPaste16
-			Me.Items(5).Image = Resources.ImageEditDelete16
-			Me.Items(7).Image = Resources.ImageEditSelectAll16
-			Me.Items(9).Image = Resources.ImageEditSelectAll16
+			miUndo = New ToolStripMenuItem("Undo", Resources.ImageEditUndo16, AddressOf UndoClick)
+			Me.Items.Add(miUndo)
+			Me.Items.Add(New ToolStripSeparator())
+			miCut = New ToolStripMenuItem("Cut", Resources.ImageEditCut16, AddressOf CutClick)
+			Me.Items.Add(miCut)
+			miCopy = New ToolStripMenuItem("Copy", Resources.ImageEditCopy16, AddressOf CopyClick)
+			Me.Items.Add(miCopy)
+			miPaste = New ToolStripMenuItem("Paste", Resources.ImageEditPaste16, AddressOf PasteClick)
+			Me.Items.Add(miPaste)
+			miDelete = New ToolStripMenuItem("Delete", Resources.ImageEditDelete16, AddressOf DeleteClick)
+			Me.Items.Add(miDelete)
+			Me.Items.Add(miSeparatorProperCase)
+			miProperCase = New ToolStripMenuItem("Proper Case", Resources.ImageEditProperCase16, AddressOf ProperCaseClick)
+			Me.Items.Add(miProperCase)
+			Me.Items.Add(New ToolStripSeparator())
+			miSelectAll = New ToolStripMenuItem("Select All", Resources.ImageEditSelectAll16, AddressOf SelectAllClick)
+			Me.Items.Add(miSelectAll)
 		End Sub
-		Friend Sub Display(ByRef sender As TextBox, ByVal e As MouseEventArgs)
-			If e.Button = MouseButtons.Right Then
-				txbx = sender
-				Me.Items(0).Enabled = txbx.CanUndo
-				Me.Items(2).Enabled = txbx.SelectedText.Length > 0 And Not txbx.ReadOnly
-				Me.Items(3).Enabled = txbx.SelectedText.Length > 0
-				Me.Items(4).Enabled = Clipboard.ContainsText And Not txbx.ReadOnly
-				Me.Items(5).Enabled = txbx.SelectedText.Length > 0 And Not txbx.ReadOnly
-				Me.Items(7).Enabled = txbx.Text.Length > 0
-				If ShowExtendedTools Then
-					Me.Items(6).Visible = True
-					Me.Items(7).Visible = True
-				Else
-					Me.Items(6).Visible = False
-					Me.Items(7).Visible = False
-				End If
-				Me.Items(9).Enabled = txbx.Text.Length > 0 And txbx.SelectedText.Length < txbx.Text.Length
-				If txbx.SelectedText.Length > 0 Then txbx.Focus()
-				MyBase.Show(txbx, e.Location)
-			End If
+		Protected Overrides Sub OnOpening(e As CancelEventArgs)
+			MyBase.OnOpening(e)
+
+			Dim txbx As TextBox = TryCast(SourceControl, TextBox)
+			If txbx Is Nothing Then Return
+			miUndo.Enabled = txbx.CanUndo AndAlso Not txbx.ReadOnly
+			miCut.Enabled = txbx.SelectedText.Length > 0 AndAlso Not txbx.ReadOnly
+			miCopy.Enabled = txbx.SelectedText.Length > 0
+			miPaste.Enabled = Clipboard.ContainsText() AndAlso Not txbx.ReadOnly
+			miDelete.Enabled = txbx.SelectedText.Length > 0 AndAlso Not txbx.ReadOnly
+			miSeparatorProperCase.Visible = ShowExtendedTools
+			miProperCase.Visible = ShowExtendedTools
+			miSelectAll.Enabled = txbx.Text.Length > 0 AndAlso txbx.SelectedText.Length < txbx.Text.Length
+
+			If txbx.SelectedText.Length > 0 Then txbx.Focus()
+
 		End Sub
-		Friend Sub ShortcutKeys(ByRef sender As TextBox, e As PreviewKeyDownEventArgs)
-			txbx = sender
+		Public Sub ShortcutKeys(ByRef sender As TextBox, e As PreviewKeyDownEventArgs)
 			If e.Control Then
 				Select Case e.KeyCode
-					Case Keys.A : SelectAll()
-					Case Keys.C : Copy()
-					Case Keys.D : Delete()
-					Case Keys.V : Paste()
-					Case Keys.X : Cut()
-					Case Keys.Z : Undo()
+					Case Keys.A : SelectAll(sender)
+					Case Keys.C : Copy(sender)
+					Case Keys.D : Delete(sender)
+					Case Keys.V : Paste(sender)
+					Case Keys.X : Cut(sender)
+					Case Keys.Z : Undo(sender)
 				End Select
 			End If
-			txbx = Nothing
 		End Sub
 		Private Sub UndoClick(ByVal sender As Object, ByVal e As EventArgs)
-			Undo()
-			txbx = Nothing
+			Undo(TryCast(SourceControl, TextBox))
 		End Sub
 		Private Sub CutClick(ByVal sender As Object, ByVal e As EventArgs)
-			Cut()
-			txbx = Nothing
+			Cut(TryCast(SourceControl, TextBox))
 		End Sub
 		Private Sub CopyClick(ByVal sender As Object, ByVal e As EventArgs)
-			Copy()
-			txbx = Nothing
+			Copy(TryCast(SourceControl, TextBox))
 		End Sub
 		Private Sub PasteClick(ByVal sender As Object, ByVal e As EventArgs)
-			Paste()
-			txbx = Nothing
+			Paste(TryCast(SourceControl, TextBox))
 		End Sub
 		Private Sub DeleteClick(ByVal sender As Object, ByVal e As EventArgs)
-			Delete()
-			txbx = Nothing
+			Delete(TryCast(SourceControl, TextBox))
 		End Sub
 		Private Sub ProperCaseClick(ByVal sender As Object, ByVal e As EventArgs)
-			ProperCase()
-			txbx = Nothing
+			ProperCase(TryCast(SourceControl, TextBox))
 		End Sub
 		Private Sub SelectAllClick(ByVal sender As Object, ByVal e As EventArgs)
-			SelectAll()
-			txbx = Nothing
+			SelectAll(TryCast(SourceControl, TextBox))
 		End Sub
 
 		'Procedures
-		Private Sub Undo()
+		Private Sub Undo(txbx As TextBox)
 			txbx.Undo()
 			If txbx.FindForm IsNot Nothing Then txbx.FindForm.Validate()
 		End Sub
-		Private Sub Cut()
+		Private Sub Cut(txbx As TextBox)
 			txbx.Cut()
 			If txbx.FindForm IsNot Nothing Then txbx.FindForm.Validate()
 		End Sub
-		Private Sub Copy()
+		Private Sub Copy(txbx As TextBox)
 			txbx.Copy()
 		End Sub
-		Private Sub Paste()
+		Private Sub Paste(txbx As TextBox)
 			txbx.Paste()
 			If txbx.FindForm IsNot Nothing Then txbx.FindForm.Validate()
 		End Sub
-		Private Sub Delete()
+		Private Sub Delete(txbx As TextBox)
 			If Not txbx.ReadOnly Then
-				Dim pos As Integer = txbx.SelectionStart
-				txbx.Text = txbx.Text.Substring(0, pos) + txbx.Text.Substring(pos + txbx.SelectionLength)
-				txbx.SelectionStart = pos
-				txbx.SelectionLength = 0
-				pos = Nothing
+				txbx.SelectedText = String.Empty
+				txbx.FindForm()?.Validate()
 			End If
-			If txbx.FindForm IsNot Nothing Then txbx.FindForm.Validate()
 		End Sub
-		Private Sub ProperCase()
+		Private Sub ProperCase(txbx As TextBox)
 			txbx.Focus()
 			txbx.Text = StrConv(txbx.Text, VbStrConv.ProperCase)
 			If txbx.FindForm IsNot Nothing Then txbx.FindForm.Validate()
 		End Sub
-		Private Sub SelectAll()
+		Private Sub SelectAll(txbx As TextBox)
 			txbx.SelectAll()
 			txbx.Focus()
 		End Sub
+
 	End Class
 
 	''' <summary>
@@ -550,109 +545,116 @@ Namespace My.Components
 	''' 4.	Disable all built in contextmenus. !Does Not Work by assigning to ContextMenu Property of RichTextBox!
 	''' 5.	Set ShortcutsEnabled property to False.
 	''' </summary>
-	Friend Class RichTextBoxContextMenu
+	<ToolboxItem(True)>
+	<DesignerCategory("Code")>
+	Public Class RichTextBoxContextMenu
 		Inherits System.Windows.Forms.ContextMenuStrip
 
 		'Declarations
-		Private rtb As RichTextBox
+		Private WithEvents miUndo As ToolStripMenuItem
+		Private WithEvents miCut As ToolStripMenuItem
+		Private WithEvents miCopy As ToolStripMenuItem
+		Private WithEvents miPaste As ToolStripMenuItem
+		Private WithEvents miDelete As ToolStripMenuItem
+		Private WithEvents miSelectAll As ToolStripMenuItem
 
-		'Control Events
+		'Events
 		Public Sub New()
 			MyBase.New
-			Me.Items.Add("Undo", Nothing, AddressOf UndoClick)
-			Me.Items.Add("-")
-			Me.Items.Add("Cut", Nothing, AddressOf CutClick)
-			Me.Items.Add("Copy", Nothing, AddressOf CopyClick)
-			Me.Items.Add("Paste", Nothing, AddressOf PasteClick)
-			Me.Items.Add("Delete", Nothing, AddressOf DeleteClick)
-			Me.Items.Add("-")
-			Me.Items.Add("Select All", Nothing, AddressOf SelectAllClick)
-			Me.Items(0).Image = My.Resources.ImageEditUndo16
-			Me.Items(2).Image = My.Resources.ImageEditCut16
-			Me.Items(3).Image = My.Resources.ImageEditCopy16
-			Me.Items(4).Image = My.Resources.ImageEditPaste16
-			Me.Items(5).Image = My.Resources.ImageEditDelete16
-			Me.Items(7).Image = My.Resources.ImageEditSelectAll16
+			miUndo = New ToolStripMenuItem("Undo", Resources.ImageEditUndo16, AddressOf UndoClick)
+			Me.Items.Add(miUndo)
+			Me.Items.Add(New ToolStripSeparator())
+			miCut = New ToolStripMenuItem("Cut", Resources.ImageEditCut16, AddressOf CutClick)
+			Me.Items.Add(miCut)
+			miCopy = New ToolStripMenuItem("Copy", Resources.ImageEditCopy16, AddressOf CopyClick)
+			Me.Items.Add(miCopy)
+			miPaste = New ToolStripMenuItem("Paste", Resources.ImageEditPaste16, AddressOf PasteClick)
+			Me.Items.Add(miPaste)
+			miDelete = New ToolStripMenuItem("Delete", Resources.ImageEditDelete16, AddressOf DeleteClick)
+			Me.Items.Add(miDelete)
+			Me.Items.Add(New ToolStripSeparator())
+			miSelectAll = New ToolStripMenuItem("Select All", Resources.ImageEditSelectAll16, AddressOf SelectAllClick)
+			Me.Items.Add(miSelectAll)
 		End Sub
-		Friend Sub Display(ByRef sender As RichTextBox, ByVal e As MouseEventArgs)
-			If e.Button = MouseButtons.Right Then
-				rtb = sender
-				Me.Items(0).Enabled = rtb.CanUndo And Not rtb.ReadOnly
-				Me.Items(2).Enabled = rtb.SelectedText.Length > 0 And Not rtb.ReadOnly
-				Me.Items(3).Enabled = rtb.SelectedText.Length > 0
-				Me.Items(4).Enabled = Clipboard.ContainsText And Not rtb.ReadOnly
-				Me.Items(5).Enabled = rtb.SelectedText.Length > 0 And Not rtb.ReadOnly
-				Me.Items(7).Enabled = rtb.Text.Length > 0 And rtb.SelectedText.Length < rtb.Text.Length
-				If rtb.SelectedText.Length > 0 Then rtb.Focus()
-				MyBase.Show(rtb, e.Location)
-			End If
+		Protected Overrides Sub OnOpening(e As CancelEventArgs)
+			MyBase.OnOpening(e)
+			Dim rtb As RichTextBox = TryCast(SourceControl, RichTextBox)
+			If rtb Is Nothing Then Return
+			miUndo.Enabled = rtb.CanUndo AndAlso Not rtb.ReadOnly
+			miCut.Enabled = rtb.SelectedText.Length > 0 AndAlso Not rtb.ReadOnly
+			miCopy.Enabled = rtb.SelectedText.Length > 0
+			miPaste.Enabled = Clipboard.ContainsText() AndAlso Not rtb.ReadOnly
+			miDelete.Enabled = rtb.SelectedText.Length > 0 AndAlso Not rtb.ReadOnly
+			miSelectAll.Enabled = rtb.Text.Length > 0 AndAlso rtb.SelectedText.Length < rtb.Text.Length
+			If rtb.SelectedText.Length > 0 Then rtb.Focus()
 		End Sub
-		Friend Sub ShortcutKeys(ByRef sender As RichTextBox, e As PreviewKeyDownEventArgs)
-			rtb = sender
+		'Public Sub Display(ByRef sender As RichTextBox, ByVal e As MouseEventArgs)
+		'	If e.Button = MouseButtons.Right Then
+		'		rtb = sender
+		'		Me.Items(0).Enabled = rtb.CanUndo And Not rtb.ReadOnly
+		'		Me.Items(2).Enabled = rtb.SelectedText.Length > 0 And Not rtb.ReadOnly
+		'		Me.Items(3).Enabled = rtb.SelectedText.Length > 0
+		'		Me.Items(4).Enabled = Clipboard.ContainsText And Not rtb.ReadOnly
+		'		Me.Items(5).Enabled = rtb.SelectedText.Length > 0 And Not rtb.ReadOnly
+		'		Me.Items(7).Enabled = rtb.Text.Length > 0 And rtb.SelectedText.Length < rtb.Text.Length
+		'		If rtb.SelectedText.Length > 0 Then rtb.Focus()
+		'		MyBase.Show(rtb, e.Location)
+		'	End If
+		'End Sub
+		Public Sub ShortcutKeys(ByRef sender As RichTextBox, e As PreviewKeyDownEventArgs)
 			If e.Control Then
 				Select Case e.KeyCode
-					Case Keys.A : SelectAll()
-					Case Keys.C : Copy()
-					Case Keys.D : Delete()
-					Case Keys.V : Paste()
-					Case Keys.X : Cut()
-					Case Keys.Z : Undo()
+					Case Keys.A : SelectAll(sender)
+					Case Keys.C : Copy(sender)
+					Case Keys.D : Delete(sender)
+					Case Keys.V : Paste(sender)
+					Case Keys.X : Cut(sender)
+					Case Keys.Z : Undo(sender)
 				End Select
 			End If
-			rtb = Nothing
 		End Sub
 		Private Sub UndoClick(ByVal sender As Object, ByVal e As EventArgs)
-			Undo()
-			rtb = Nothing
+			Undo(TryCast(SourceControl, RichTextBox))
 		End Sub
 		Private Sub CutClick(ByVal sender As Object, ByVal e As EventArgs)
-			Cut()
-			rtb = Nothing
+			Cut(TryCast(SourceControl, RichTextBox))
 		End Sub
 		Private Sub CopyClick(ByVal sender As Object, ByVal e As EventArgs)
-			Copy()
-			rtb = Nothing
+			Copy(TryCast(SourceControl, RichTextBox))
 		End Sub
 		Private Sub PasteClick(ByVal sender As Object, ByVal e As EventArgs)
-			Paste()
-			rtb = Nothing
+			Paste(TryCast(SourceControl, RichTextBox))
 		End Sub
 		Private Sub DeleteClick(ByVal sender As Object, ByVal e As EventArgs)
-			Delete()
-			rtb = Nothing
+			Delete(TryCast(SourceControl, RichTextBox))
 		End Sub
 		Private Sub SelectAllClick(ByVal sender As Object, ByVal e As EventArgs)
-			SelectAll()
-			rtb = Nothing
+			SelectAll(TryCast(SourceControl, RichTextBox))
 		End Sub
 
 		'Procedures
-		Private Sub Undo()
+		Private Sub Undo(rtb As RichTextBox)
 			rtb.Undo()
 			If rtb.FindForm IsNot Nothing Then rtb.FindForm.Validate()
 		End Sub
-		Private Sub Cut()
+		Private Sub Cut(rtb As RichTextBox)
 			rtb.Cut()
 			If rtb.FindForm IsNot Nothing Then rtb.FindForm.Validate()
 		End Sub
-		Private Sub Copy()
+		Private Sub Copy(rtb As RichTextBox)
 			rtb.Copy()
 		End Sub
-		Private Sub Paste()
+		Private Sub Paste(rtb As RichTextBox)
 			rtb.Paste()
 			If rtb.FindForm IsNot Nothing Then rtb.FindForm.Validate()
 		End Sub
-		Private Sub Delete()
+		Private Sub Delete(rtb As RichTextBox)
 			If Not rtb.ReadOnly Then
-				Dim pos As Integer = rtb.SelectionStart
-				rtb.Text = rtb.Text.Substring(0, pos) + rtb.Text.Substring(pos + rtb.SelectionLength)
-				rtb.SelectionStart = pos
-				rtb.SelectionLength = 0
-				pos = Nothing
+				rtb.SelectedText = String.Empty
+				rtb.FindForm()?.Validate()
 			End If
-			If rtb.FindForm IsNot Nothing Then rtb.FindForm.Validate()
 		End Sub
-		Private Sub SelectAll()
+		Private Sub SelectAll(rtb As RichTextBox)
 			rtb.SelectAll()
 			rtb.Focus()
 		End Sub

@@ -70,9 +70,6 @@ Public Class PlayerEditTitle
             Me.Close()
         End If
     End Sub
-    Private Sub TxtBox_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxTitle.MouseUp
-        CMEditTitle.Display(DirectCast(sender, TextBox), e)
-    End Sub
     Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxTitle.PreviewKeyDown
         CMEditTitle.ShortcutKeys(DirectCast(sender, TextBox), e)
     End Sub

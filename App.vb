@@ -724,7 +724,7 @@ Namespace My
             Else
                 FRMLog.BTNDeleteLog.Visible = False
             End If
-            FRMLog.RTBLog.ReadOnly = True
+            'FRMLog.RTBLog.ReadOnly = True
             FRMLog.BTNOK.Select()
         End Sub
         Friend Sub DeleteLog()

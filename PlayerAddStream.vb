@@ -76,9 +76,6 @@ Public Class PlayerAddStream
             Me.Close()
         End If
     End Sub
-    Private Sub TxtBox_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxStreamTitle.MouseUp, TxtBoxStreamPath.MouseUp
-        CMAddStream.Display(DirectCast(sender, TextBox), e)
-    End Sub
     Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxStreamTitle.PreviewKeyDown, TxtBoxStreamPath.PreviewKeyDown
         CMAddStream.ShortcutKeys(DirectCast(sender, TextBox), e)
     End Sub

@@ -1101,9 +1101,6 @@ Public Class Player
             End If
         End If
     End Sub
-    Private Sub TxtBoxLyrics_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxLyrics.MouseUp
-        CMLyrics.Display(CType(sender, TextBox), e)
-    End Sub
     Private Sub TxtBoxLyrics_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxLyrics.PreviewKeyDown
         CMLyrics.ShortcutKeys(CType(sender, TextBox), e)
     End Sub

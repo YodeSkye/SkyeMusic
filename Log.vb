@@ -90,9 +90,6 @@ Public Class Log
     Private Sub RTBLog_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles RTBLog.PreviewKeyDown
         RTBCMLog.ShortcutKeys(CType(sender, RichTextBox), e)
     End Sub
-    Private Sub RTBLog_MouseUp(sender As Object, e As MouseEventArgs) Handles RTBLog.MouseUp
-        RTBCMLog.Display(CType(sender, RichTextBox), e)
-    End Sub
     Private Sub LBLLogInfo_DoubleClick(sender As Object, e As EventArgs) Handles LBLLogInfo.DoubleClick
         App.OpenFileLocation(App.LogPath)
     End Sub
