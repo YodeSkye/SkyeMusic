@@ -10,7 +10,7 @@ Public Class About
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
-                Case WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
                     SetAccentColor()
             End Select
         Catch ex As Exception
@@ -64,7 +64,7 @@ Public Class About
     End Sub
     Private Sub LblVersion_DoubleClick(sender As Object, e As EventArgs) Handles LblVersion.DoubleClick
         Dim classname As String = Space(256)
-        My.WinAPI.GetClassName(Player.Handle, classname, 255)
+        Skye.WinAPI.GetClassName(Player.Handle, classname, 255)
         My.Computer.Clipboard.SetText(classname.TrimEnd(Chr(0), CChar(" "))) 'Remove null terminator & trailing spaces from class name
         Debug.Print(classname.TrimEnd(Chr(0), CChar(" ")))
     End Sub
