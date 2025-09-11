@@ -588,19 +588,6 @@ Namespace My.Components
 			miSelectAll.Enabled = rtb.Text.Length > 0 AndAlso rtb.SelectedText.Length < rtb.Text.Length
 			If rtb.SelectedText.Length > 0 Then rtb.Focus()
 		End Sub
-		'Public Sub Display(ByRef sender As RichTextBox, ByVal e As MouseEventArgs)
-		'	If e.Button = MouseButtons.Right Then
-		'		rtb = sender
-		'		Me.Items(0).Enabled = rtb.CanUndo And Not rtb.ReadOnly
-		'		Me.Items(2).Enabled = rtb.SelectedText.Length > 0 And Not rtb.ReadOnly
-		'		Me.Items(3).Enabled = rtb.SelectedText.Length > 0
-		'		Me.Items(4).Enabled = Clipboard.ContainsText And Not rtb.ReadOnly
-		'		Me.Items(5).Enabled = rtb.SelectedText.Length > 0 And Not rtb.ReadOnly
-		'		Me.Items(7).Enabled = rtb.Text.Length > 0 And rtb.SelectedText.Length < rtb.Text.Length
-		'		If rtb.SelectedText.Length > 0 Then rtb.Focus()
-		'		MyBase.Show(rtb, e.Location)
-		'	End If
-		'End Sub
 		Public Sub ShortcutKeys(ByRef sender As RichTextBox, e As PreviewKeyDownEventArgs)
 			If e.Control Then
 				Select Case e.KeyCode
