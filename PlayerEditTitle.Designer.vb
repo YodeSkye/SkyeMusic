@@ -26,7 +26,7 @@ Partial Class PlayerEditTitle
         TxtBoxTitle = New TextBox()
         BtnOK = New Button()
         LblTitle = New Label()
-        CMEditTitle = New Components.TextBoxContextMenu()
+        CMEditTitle = New Skye.UI.TextBoxContextMenu()
         SuspendLayout()
         ' 
         ' TxtBoxTitle
@@ -85,5 +85,5 @@ Partial Class PlayerEditTitle
     Friend WithEvents TxtBoxTitle As TextBox
     Friend WithEvents BtnOK As Button
     Friend WithEvents LblTitle As Label
-    Friend WithEvents CMEditTitle As Components.TextBoxContextMenu
+    Friend WithEvents CMEditTitle As Skye.UI.TextBoxContextMenu
 End Class

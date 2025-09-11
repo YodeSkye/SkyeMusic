@@ -79,8 +79,8 @@ Partial Class Player
         BtnStop = New Button()
         BtnMute = New Button()
         BtnNext = New Button()
-        PEXLeft = New Components.ProgressEX()
-        PEXRight = New Components.ProgressEX()
+        PEXLeft = New Skye.UI.ProgressEX()
+        PEXRight = New Skye.UI.ProgressEX()
         PicBoxAlbumArt = New PictureBox()
         LblAlbumArtSelect = New Label()
         TxtBoxPlaylistSearch = New TextBox()
@@ -88,15 +88,15 @@ Partial Class Player
         PanelMedia = New Panel()
         BtnPrevious = New Button()
         TipPlayer = New ToolTip(components)
-        LVPlaylist = New Components.ListViewEX()
+        LVPlaylist = New Skye.UI.ListViewEX()
         TimerMeter = New Timer(components)
         TimerVisualizer = New Timer(components)
         PicBoxVisualizer = New PictureBox()
         TxtBoxLyrics = New TextBox()
-        LblPlaylistCount = New Components.Label()
-        LblDuration = New Components.Label()
-        LblPosition = New Components.Label()
-        CMLyrics = New Components.TextBoxContextMenu()
+        LblPlaylistCount = New Skye.UI.Label()
+        LblDuration = New Skye.UI.Label()
+        LblPosition = New Skye.UI.Label()
+        CMLyrics = New Skye.UI.TextBoxContextMenu()
         TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
@@ -515,12 +515,12 @@ Partial Class Player
         PEXLeft.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         PEXLeft.BackColor = Color.Transparent
         PEXLeft.DrawingColor = Color.DodgerBlue
-        PEXLeft.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
+        PEXLeft.DrawingColorMode = Skye.UI.ProgressEX.colorDrawModes.Smooth
         PEXLeft.Location = New Point(12, 352)
         PEXLeft.MaximumSize = New Size(Integer.MaxValue, 40)
         PEXLeft.MinimumSize = New Size(50, 5)
         PEXLeft.Name = "PEXLeft"
-        PEXLeft.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
+        PEXLeft.PercentageMode = Skye.UI.ProgressEX.percentageDrawModes.None
         PEXLeft.Size = New Size(385, 5)
         PEXLeft.Step = 1
         PEXLeft.TabIndex = 17
@@ -531,12 +531,12 @@ Partial Class Player
         PEXRight.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         PEXRight.BackColor = Color.Transparent
         PEXRight.DrawingColor = Color.DodgerBlue
-        PEXRight.DrawingColorMode = My.Components.ProgressEX.colorDrawModes.Smooth
+        PEXRight.DrawingColorMode = Skye.UI.ProgressEX.colorDrawModes.Smooth
         PEXRight.Location = New Point(12, 389)
         PEXRight.MaximumSize = New Size(Integer.MaxValue, 40)
         PEXRight.MinimumSize = New Size(50, 5)
         PEXRight.Name = "PEXRight"
-        PEXRight.PercentageMode = My.Components.ProgressEX.percentageDrawModes.None
+        PEXRight.PercentageMode = Skye.UI.ProgressEX.percentageDrawModes.None
         PEXRight.Size = New Size(385, 5)
         PEXRight.Step = 1
         PEXRight.TabIndex = 18
@@ -799,8 +799,8 @@ Partial Class Player
     Friend WithEvents BtnStop As Button
     Friend WithEvents BtnMute As Button
     Friend WithEvents BtnNext As Button
-    Friend WithEvents PEXLeft As My.Components.ProgressEX
-    Friend WithEvents PEXRight As My.Components.ProgressEX
+    Friend WithEvents PEXLeft As Skye.UI.ProgressEX
+    Friend WithEvents PEXRight As Skye.UI.ProgressEX
     Friend WithEvents PicBoxAlbumArt As PictureBox
     Friend WithEvents LblAlbumArtSelect As Label
     Friend WithEvents TxtBoxPlaylistSearch As TextBox
@@ -824,7 +824,7 @@ Partial Class Player
     Friend WithEvents ToolStripSeparator3 As ToolStripSeparator
     Friend WithEvents ToolStripSeparator4 As ToolStripSeparator
     Friend WithEvents ToolStripSeparator5 As ToolStripSeparator
-    Friend WithEvents LVPlaylist As My.Components.ListViewEX
+    Friend WithEvents LVPlaylist As Skye.UI.ListViewEX
     Friend WithEvents ColumnHeader1 As ColumnHeader
     Friend WithEvents ColumnHeader2 As ColumnHeader
     Friend WithEvents TimerMeter As Timer
@@ -837,12 +837,12 @@ Partial Class Player
     Friend WithEvents MIPlayMode As ToolStripMenuItem
     Friend WithEvents MILyrics As ToolStripMenuItem
     Friend WithEvents TxtBoxLyrics As TextBox
-    Friend WithEvents Labelcsy1 As My.Components.Label
-    Friend WithEvents LblPlaylistCount As My.Components.Label
+    Friend WithEvents Labelcsy1 As Skye.UI.Label
+    Friend WithEvents LblPlaylistCount As Skye.UI.Label
     Friend WithEvents MIVisualizer As ToolStripMenuItem
-    Friend WithEvents LblDuration As My.Components.Label
-    Friend WithEvents LblPosition As My.Components.Label
-    Friend WithEvents CMLyrics As My.Components.TextBoxContextMenu
+    Friend WithEvents LblDuration As Skye.UI.Label
+    Friend WithEvents LblPosition As Skye.UI.Label
+    Friend WithEvents CMLyrics As Skye.UI.TextBoxContextMenu
     Friend WithEvents CMIQueue As ToolStripMenuItem
     Friend WithEvents MIOpenURL As ToolStripMenuItem
     Friend WithEvents TrackBarPosition As Syncfusion.Windows.Forms.Tools.TrackBarEx

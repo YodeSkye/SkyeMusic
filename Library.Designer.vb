@@ -57,14 +57,14 @@ Partial Class Library
         RadBtnGroupByArtist = New RadioButton()
         RadBtnGroupByAlbum = New RadioButton()
         RadBtnGroupByNone = New RadioButton()
-        LblExtTitle = New Components.Label
-        LblExtFileInfo = New Components.Label
-        LblExtProperties = New Components.Label
-        LblExtType = New Components.Label
-        LblLibraryCounts = New Components.Label
-        LblStatus = New Components.Label
+        LblExtTitle = New Skye.UI.Label
+        LblExtFileInfo = New Skye.UI.Label
+        LblExtProperties = New Skye.UI.Label
+        LblExtType = New Skye.UI.Label
+        LblLibraryCounts = New Skye.UI.Label
+        LblStatus = New Skye.UI.Label
         LVLibrary = New ListView()
-        LblHistory = New Components.Label
+        LblHistory = New Skye.UI.Label
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -519,14 +519,14 @@ Partial Class Library
     Friend WithEvents CMICollapseGroup As ToolStripMenuItem
     Friend WithEvents CMIExpandAllGroups As ToolStripMenuItem
     Friend WithEvents CMISeparatorGroupBy As ToolStripSeparator
-    Friend WithEvents LblExtTitle As My.Components.Label
-    Friend WithEvents LblExtFileInfo As My.Components.Label
-    Friend WithEvents LblExtProperties As My.Components.Label
-    Friend WithEvents LblExtType As My.Components.Label
-    Friend WithEvents LblLibraryCounts As My.Components.Label
-    Friend WithEvents LblStatus As My.Components.Label
+    Friend WithEvents LblExtTitle As Skye.UI.Label
+    Friend WithEvents LblExtFileInfo As Skye.UI.Label
+    Friend WithEvents LblExtProperties As Skye.UI.Label
+    Friend WithEvents LblExtType As Skye.UI.Label
+    Friend WithEvents LblLibraryCounts As Skye.UI.Label
+    Friend WithEvents LblStatus As Skye.UI.Label
     Friend WithEvents LVLibrary As ListView
-    Friend WithEvents LblHistory As Components.Label
+    Friend WithEvents LblHistory As Skye.UI.Label
     Friend WithEvents RadBtnGroupByYear As RadioButton
     Friend WithEvents CMIQueue As ToolStripMenuItem
     Friend WithEvents RadBtnGroupByType As RadioButton

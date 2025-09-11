@@ -29,7 +29,7 @@ Partial Class About
         LLblSyncFusion = New LinkLabel()
         LLblIcons8 = New LinkLabel()
         LLblTagLibSharp = New LinkLabel()
-        LblVersion = New Components.Label
+        LblVersion = New Skye.UI.Label
         SuspendLayout()
         ' 
         ' BtnOK
@@ -149,5 +149,5 @@ Partial Class About
     Friend WithEvents LLblSyncFusion As LinkLabel
     Friend WithEvents LLblIcons8 As LinkLabel
     Friend WithEvents LLblTagLibSharp As LinkLabel
-    Friend WithEvents LblVersion As Components.Label
+    Friend WithEvents LblVersion As Skye.UI.Label
 End Class

@@ -25,13 +25,13 @@ Partial Class Log
         components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Log))
         RTBLog = New RichTextBox()
-        RTBCMLog = New Components.RichTextBoxContextMenu()
+        RTBCMLog = New Skye.UI.RichTextBoxContextMenu()
         BTNOK = New Button()
         BTNDeleteLog = New Button()
         BTNRefreshLog = New Button()
-        LBLLogInfo = New Components.Label()
+        LBLLogInfo = New Skye.UI.Label()
         TxBxSearch = New TextBox()
-        LblStatus = New Components.Label()
+        LblStatus = New Skye.UI.Label()
         TipLog = New ToolTip(components)
         SuspendLayout()
         ' 
@@ -154,9 +154,9 @@ Partial Class Log
     Friend WithEvents BTNOK As Button
     Friend WithEvents BTNDeleteLog As Button
     Friend WithEvents BTNRefreshLog As Button
-    Friend WithEvents RTBCMLog As My.Components.RichTextBoxContextMenu
-    Friend WithEvents LBLLogInfo As My.Components.Label
+    Friend WithEvents RTBCMLog As Skye.UI.RichTextBoxContextMenu
+    Friend WithEvents LBLLogInfo As Skye.UI.Label
     Friend WithEvents TxBxSearch As TextBox
-    Friend WithEvents LblStatus As My.Components.Label
+    Friend WithEvents LblStatus As Skye.UI.Label
     Friend WithEvents TipLog As ToolTip
 End Class

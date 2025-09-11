@@ -28,7 +28,7 @@ Partial Class PlayerAddStream
         TxtBoxStreamPath = New TextBox()
         LblStreamTitle = New Label()
         LblStreamPath = New Label()
-        CMAddStream = New Components.TextBoxContextMenu()
+        CMAddStream = New Skye.UI.TextBoxContextMenu()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -115,5 +115,5 @@ Partial Class PlayerAddStream
     Friend WithEvents TxtBoxStreamPath As TextBox
     Friend WithEvents LblStreamTitle As Label
     Friend WithEvents LblStreamPath As Label
-    Friend WithEvents CMAddStream As Components.TextBoxContextMenu
+    Friend WithEvents CMAddStream As Skye.UI.TextBoxContextMenu
 End Class
