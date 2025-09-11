@@ -156,10 +156,10 @@ Namespace My
         Friend AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
         Friend AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
         Private HotKeys As New Collections.Generic.List(Of HotKey) 'HotKeys is a list of hotkeys used in the application for global media control.
-        Private HotKeyPlay As New HotKey(0, "Global Play/Pause", Keys.MediaPlayPause, WinAPI.VK_MEDIA_PLAY_PAUSE, 0) 'HotKeyPlay is a hotkey for global play/pause functionality.
-        Private HotKeyStop As New HotKey(1, "Global Stop", Keys.MediaStop, WinAPI.VK_MEDIA_STOP, 0) 'HotKeyStop is a hotkey for global stop functionality.
-        Private HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
-        Private HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
+        Private HotKeyPlay As New HotKey(0, "Global Play/Pause", Keys.MediaPlayPause, Skye.WinAPI.VK_MEDIA_PLAY_PAUSE, 0) 'HotKeyPlay is a hotkey for global play/pause functionality.
+        Private HotKeyStop As New HotKey(1, "Global Stop", Keys.MediaStop, Skye.WinAPI.VK_MEDIA_STOP, 0) 'HotKeyStop is a hotkey for global stop functionality.
+        Private HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
+        Private HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
         Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
         Private WithEvents timerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
@@ -325,7 +325,7 @@ Namespace My
         'App Handlers
         Private Sub timerScreenSaverWatcher_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerScreenSaverWatcher.Tick
             Static ssStatus As Boolean
-            WinAPI.SystemParametersInfo(WinAPI.SPI_GETSCREENSAVERRUNNING, 0, ssStatus, 0)
+            Skye.WinAPI.SystemParametersInfo(Skye.WinAPI.SPI_GETSCREENSAVERRUNNING, 0, ssStatus, 0)
             Select Case ssStatus
                 Case True
                     If Not ScreenSaverActive Then
@@ -360,7 +360,7 @@ Namespace My
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzkzMzQwMUAzMzMwMmUzMDJlMzAzYjMzMzAzYmorMHVJSHVxLy9PM25TUGYrMURsLzhuY3BCK0k0QjZ4L3hJOTcvQ1dQcjQ9")
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JFaF5cXGtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXZfcXRdRGVfVkxzWUNWYEg=")
             GetOptions()
             CurrentTheme = GetCurrentThemeProperties()
             LoadHistory()
@@ -640,7 +640,7 @@ Namespace My
             Dim status As Boolean
             For Each key As HotKey In HotKeys
                 If Not key.Key = Keys.None Then
-                    status = My.WinAPI.RegisterHotKey(Player.Handle, key.WinID, key.KeyMod, key.KeyCode)
+                    status = Skye.WinAPI.RegisterHotKey(Player.Handle, key.WinID, key.KeyMod, key.KeyCode)
                     Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
                     WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
                 End If
@@ -650,7 +650,7 @@ Namespace My
             Dim status As Boolean
             For Each key As HotKey In HotKeys
                 If Not key.Key = Keys.None Then
-                    status = My.WinAPI.UnregisterHotKey(Player.Handle, key.WinID)
+                    status = Skye.WinAPI.UnregisterHotKey(Player.Handle, key.WinID)
                     Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
                     WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
                 End If
@@ -1045,7 +1045,7 @@ Namespace My
             If regvalue = Nothing Then
                 c = App.CurrentTheme.BackColor
             Else
-                c = Color.FromArgb(255, WinAPI.GetRValue(regvalue), WinAPI.GetGValue(regvalue), WinAPI.GetBValue(regvalue))
+                c = Color.FromArgb(255, Skye.WinAPI.GetRValue(regvalue), Skye.WinAPI.GetGValue(regvalue), Skye.WinAPI.GetBValue(regvalue))
             End If
             regkey.Close()
             regkey.Dispose()
@@ -1167,7 +1167,7 @@ Namespace My
 
         Implements IMessageFilter
         Public Function PreFilterMessage(ByRef m As Message) As Boolean Implements IMessageFilter.PreFilterMessage
-            If Player.Fullscreen AndAlso (m.Msg = WinAPI.WM_LBUTTONDOWN OrElse m.Msg = WinAPI.WM_LBUTTONUP OrElse m.Msg = WinAPI.WM_LBUTTONDBLCLK OrElse m.Msg = WinAPI.WM_RBUTTONDOWN OrElse m.Msg = WinAPI.WM_RBUTTONUP) Then
+            If Player.Fullscreen AndAlso (m.Msg = Skye.WinAPI.WM_LBUTTONDOWN OrElse m.Msg = Skye.WinAPI.WM_LBUTTONUP OrElse m.Msg = Skye.WinAPI.WM_LBUTTONDBLCLK OrElse m.Msg = Skye.WinAPI.WM_RBUTTONDOWN OrElse m.Msg = Skye.WinAPI.WM_RBUTTONUP) Then
                 Return True
             Else
                 Return False

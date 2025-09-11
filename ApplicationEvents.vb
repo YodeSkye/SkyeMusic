@@ -1,5 +1,4 @@
 ﻿Imports Microsoft.VisualBasic.ApplicationServices
-Imports SkyeMusic.My.Components
 
 Namespace My
 

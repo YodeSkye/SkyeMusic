@@ -58,10 +58,10 @@ Public Class Player
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
-                Case WinAPI.WM_HOTKEY
+                Case Skye.WinAPI.WM_HOTKEY
                     Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
                     App.PerformHotKeyAction(m.WParam.ToInt32)
-                Case WinAPI.WM_ACTIVATE
+                Case Skye.WinAPI.WM_ACTIVATE
                     Select Case m.WParam.ToInt32
                         Case 0
                             IsFocused = False
@@ -70,12 +70,12 @@ Public Class Player
                             IsFocused = True
                             SetAccentColor()
                     End Select
-                Case WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
                     SetAccentColor()
-                Case WinAPI.WM_SIZE
+                Case Skye.WinAPI.WM_SIZE
                     If (m.WParam.ToInt32 = 0 Or m.WParam.ToInt32 = 2) AndAlso Lyrics Then ShowMedia()
-                Case WinAPI.WM_GET_CUSTOM_DATA
-                    App.WriteToLog(WinAPI.WM_GET_CUSTOM_DATA.ToString)
+                Case Skye.WinAPI.WM_GET_CUSTOM_DATA
+                    App.WriteToLog(Skye.WinAPI.WM_GET_CUSTOM_DATA.ToString)
                     Select Case PlayState
                         Case PlayStates.Playing
                             m.Result = New IntPtr(2)
@@ -90,7 +90,7 @@ Public Class Player
         Catch ex As Exception
             App.WriteToLog("Player WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
-            If m.Msg <> WinAPI.WM_GET_CUSTOM_DATA Then MyBase.WndProc(m)
+            If m.Msg <> Skye.WinAPI.WM_GET_CUSTOM_DATA Then MyBase.WndProc(m)
         End Try
     End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -727,7 +727,7 @@ Public Class Player
         Else
             Visualizer = True
             LyricsOff()
-            MIVisualizer.BackColor = WinAPI.GetSystemColor(COLOR_HIGHLIGHT)
+            MIVisualizer.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
             ShowMedia()
         End If
     End Sub
@@ -738,7 +738,7 @@ Public Class Player
         Else
             Lyrics = True
             VisualizerOff()
-            MILyrics.BackColor = WinAPI.GetSystemColor(COLOR_HIGHLIGHT)
+            MILyrics.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
             ShowMedia()
         End If
     End Sub

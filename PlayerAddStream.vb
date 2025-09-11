@@ -12,9 +12,9 @@ Public Class PlayerAddStream
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
-                Case My.WinAPI.WM_SYSCOMMAND
-                    If CInt(m.WParam) = My.WinAPI.SC_CLOSE Then DialogResult = DialogResult.Cancel
-                Case WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                Case Skye.WinAPI.WM_SYSCOMMAND
+                    If CInt(m.WParam) = Skye.WinAPI.SC_CLOSE Then DialogResult = DialogResult.Cancel
+                Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
                     SetAccentColor()
             End Select
         Catch ex As Exception

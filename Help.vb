@@ -10,7 +10,7 @@ Public Class Help
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
-                Case WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
                     SetAccentColor()
             End Select
         Catch ex As Exception
