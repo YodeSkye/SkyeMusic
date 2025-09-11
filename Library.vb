@@ -488,13 +488,15 @@ Public Class Library
             LblStatus.Text = "Adding Selected Songs to Playlist..."
             LblStatus.Visible = True
             LblStatus.Refresh()
-            Player.LVPlaylist.Visible = False
-            Player.LVPlaylist.SuspendLayout()
+            'Player.LVPlaylist.Visible = False
+            'Player.LVPlaylist.SuspendLayout()
+            Player.LVPlaylist.BeginUpdate()
             For Each item As ListViewItem In LVLibrary.SelectedItems
                 AddToPlaylist(item)
             Next
-            Player.LVPlaylist.ResumeLayout()
-            Player.LVPlaylist.Visible = True
+            Player.LVPlaylist.EndUpdate()
+            'Player.LVPlaylist.ResumeLayout()
+            'Player.LVPlaylist.Visible = True
             LblStatus.Visible = False
             App.WriteToLog("Selected Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
@@ -504,13 +506,15 @@ Public Class Library
         LblStatus.Text = "Adding All Songs to Playlist..."
         LblStatus.Visible = True
         LblStatus.Refresh()
-        Player.LVPlaylist.Visible = False
-        Player.LVPlaylist.SuspendLayout()
+        'Player.LVPlaylist.Visible = False
+        'Player.LVPlaylist.SuspendLayout()
+        Player.LVPlaylist.BeginUpdate()
         For Each item As ListViewItem In LVLibrary.Items
             AddToPlaylist(item)
         Next
-        Player.LVPlaylist.ResumeLayout()
-        Player.LVPlaylist.Visible = True
+        Player.LVPlaylist.EndUpdate()
+        'Player.LVPlaylist.ResumeLayout()
+        'Player.LVPlaylist.Visible = True
         LblStatus.Visible = False
         App.WriteToLog("Full Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
     End Sub
@@ -522,8 +526,9 @@ Public Class Library
             LblStatus.Text = "Adding Group to Playlist..."
             LblStatus.Visible = True
             LblStatus.Refresh()
-            Player.LVPlaylist.Visible = False
-            Player.LVPlaylist.SuspendLayout()
+            'Player.LVPlaylist.Visible = False
+            'Player.LVPlaylist.SuspendLayout()
+            Player.LVPlaylist.BeginUpdate()
 
             'Get group name from selected list view item
             Dim groupname As String
@@ -556,8 +561,9 @@ Public Class Library
             Next
 
             'Finalize
-            Player.LVPlaylist.ResumeLayout()
-            Player.LVPlaylist.Visible = True
+            Player.LVPlaylist.EndUpdate()
+            'Player.LVPlaylist.ResumeLayout()
+            'Player.LVPlaylist.Visible = True
             LblStatus.Visible = False
             App.WriteToLog(LibraryGroupBy.ToString + " Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
