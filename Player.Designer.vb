@@ -93,10 +93,10 @@ Partial Class Player
         TimerVisualizer = New Timer(components)
         PicBoxVisualizer = New PictureBox()
         TxtBoxLyrics = New TextBox()
+        CMLyrics = New Skye.UI.TextBoxContextMenu()
         LblPlaylistCount = New Skye.UI.Label()
         LblDuration = New Skye.UI.Label()
         LblPosition = New Skye.UI.Label()
-        CMLyrics = New Skye.UI.TextBoxContextMenu()
         TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
@@ -671,6 +671,12 @@ Partial Class Player
         TxtBoxLyrics.TextAlign = HorizontalAlignment.Center
         TxtBoxLyrics.Visible = False
         ' 
+        ' CMLyrics
+        ' 
+        CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        CMLyrics.Name = "CMLyrics"
+        CMLyrics.Size = New Size(149, 176)
+        ' 
         ' LblPlaylistCount
         ' 
         LblPlaylistCount.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
@@ -702,12 +708,6 @@ Partial Class Player
         LblPosition.Size = New Size(80, 25)
         LblPosition.TabIndex = 14
         LblPosition.TextAlign = ContentAlignment.TopCenter
-        ' 
-        ' CMLyrics
-        ' 
-        CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        CMLyrics.Name = "CMLyrics"
-        CMLyrics.Size = New Size(181, 198)
         ' 
         ' TrackBarPosition
         ' 
