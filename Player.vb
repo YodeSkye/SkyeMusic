@@ -2672,13 +2672,13 @@ Public Class Player
                         Dim newindex As Integer = 0
                         If RandomHistoryFull() Then RandomHistory.Clear()
                         If item Is Nothing Then
-                            newindex = randomplaylistindex.Next(0, LVPlaylist.Items.Count)
+                            newindex = App.GetRandom(0, LVPlaylist.Items.Count - 1)
                         Else
                             If LVPlaylist.Items.Count = 1 Then
                                 newindex = 0
                             Else
                                 Do
-                                    newindex = randomplaylistindex.Next(0, LVPlaylist.Items.Count)
+                                    newindex = App.GetRandom(0, LVPlaylist.Items.Count - 1) 'randomplaylistindex.Next(0, LVPlaylist.Items.Count)
                                 Loop Until newindex <> item.Index And Not RandomHistory.Contains(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                             End If
                         End If

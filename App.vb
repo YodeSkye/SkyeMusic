@@ -1012,12 +1012,13 @@ Namespace My
             End If
             Return value.ToString(format) & suffix
         End Function
-        Friend Function GetRandom(ByVal Min As Integer, ByVal Max As Integer) As Integer
+        Friend Function GetRandom(ByVal min As Integer, ByVal max As Integer) As Integer
             ' by making Generator static, we preserve the same instance '
             ' (i.e., do not create new instances with the same seed over and over) '
             ' between calls '
             Static Generator As System.Random = New System.Random()
-            Return Generator.Next(Min, Max)
+            If max <> Integer.MaxValue Then max += 1
+            Return Generator.Next(min, max)
         End Function
         Friend Function GenerateEllipsis(ByRef g As Graphics, s As String, f As System.Drawing.Font, width As Integer) As String
             Dim ellipsistext As String = s
