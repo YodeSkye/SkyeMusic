@@ -75,7 +75,6 @@ Public Class Player
                 Case Skye.WinAPI.WM_SIZE
                     If (m.WParam.ToInt32 = 0 Or m.WParam.ToInt32 = 2) AndAlso Lyrics Then ShowMedia()
                 Case Skye.WinAPI.WM_GET_CUSTOM_DATA
-                    App.WriteToLog(Skye.WinAPI.WM_GET_CUSTOM_DATA.ToString)
                     Select Case PlayState
                         Case PlayStates.Playing
                             m.Result = New IntPtr(2)
