@@ -116,7 +116,7 @@
 
   <ItemGroup>
     <Reference Include="CoreAudio">
-      <HintPath>CoreAudio.dll</HintPath>
+      <HintPath>..\CoreAudio.dll</HintPath>
     </Reference>
   </ItemGroup>
 
