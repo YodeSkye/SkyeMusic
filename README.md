@@ -26,7 +26,7 @@ To ensure full functionality of **Skye Music**, install the following NuGet pack
 
 ### 1. Syncfusion.Tools.Windows
 
-Provides advanced WinForms UI components like Ribbon, Docking Manager, and TreeView. It 's free for individual developers and small businesses. To get a license, visit their website at [Syncfusion Community License](https://www.syncfusion.com/products/communitylicense).
+Provides advanced WinForms UI components like Ribbon, Docking Manager, and TreeView. It 's free for individual developers and small businesses. To get a license, visit their website [Syncfusion Community License](https://www.syncfusion.com/products/communitylicense).
 
 ```powershell
 Install-Package Syncfusion.Tools.Windows
