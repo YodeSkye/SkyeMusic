@@ -787,35 +787,6 @@ Public Class Library
     Private Sub GrpBoxGroupBy_DoubleClick(sender As System.Object, e As System.EventArgs) Handles GrpBoxGroupBy.DoubleClick
         ToggleMaximized()
     End Sub
-    Private Sub TipLibrary_Popup(sender As Object, e As PopupEventArgs) Handles TipLibrary.Popup
-        Static s As SizeF
-        s = TextRenderer.MeasureText(TipLibrary.GetToolTip(e.AssociatedControl), App.TipFont)
-        s.Width += 14
-        s.Height += 16
-        e.ToolTipSize = s.ToSize
-    End Sub
-    Private Sub TipLibrary_Draw(sender As Object, e As DrawToolTipEventArgs) Handles TipLibrary.Draw
-
-        'Declarations
-        Dim g As Graphics = e.Graphics
-
-        'Draw background
-        Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
-        g.FillRectangle(brbg, e.Bounds)
-
-        'Draw border
-        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
-            g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
-        End Using
-
-        'Draw text
-        TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
-
-        'Finalize
-        brbg.Dispose()
-        g.Dispose()
-
-    End Sub
 
     'Procedures
     Friend Overloads Sub Show(filename As String)
@@ -2225,6 +2196,9 @@ Public Class Library
         RadBtnGroupByType.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGroupByNone.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGroupByNone.ForeColor = App.CurrentTheme.ButtonTextColor
+        TipLibrary.BackColor = App.CurrentTheme.BackColor
+        TipLibrary.ForeColor = App.CurrentTheme.TextColor
+        TipLibrary.BorderColor = App.CurrentTheme.ButtonBackColor
         If TxbxLibrarySearch.Text = LibrarySearchTitle Then TxbxLibrarySearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
         LblLibraryCounts.ForeColor = forecolor
         LblHistory.ForeColor = forecolor

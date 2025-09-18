@@ -1169,35 +1169,6 @@ Public Class Player
     Private Sub TrackBarPosition_MouseWheel(sender As Object, e As MouseEventArgs)
         CType(e, HandledMouseEventArgs).Handled = True
     End Sub
-    Private Sub TipPlayer_Popup(sender As Object, e As PopupEventArgs) Handles TipPlayer.Popup
-        Static s As SizeF
-        s = TextRenderer.MeasureText(TipPlayer.GetToolTip(e.AssociatedControl), App.TipFont)
-        s.Width += 14
-        s.Height += 16
-        e.ToolTipSize = s.ToSize
-    End Sub
-    Private Sub TipPlayer_Draw(sender As Object, e As DrawToolTipEventArgs) Handles TipPlayer.Draw
-
-        'Declarations
-        Dim g As Graphics = e.Graphics
-
-        'Draw background
-        Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
-        g.FillRectangle(brbg, e.Bounds)
-
-        'Draw border
-        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
-            g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
-        End Using
-
-        'Draw text
-        TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
-
-        'Finalize
-        brbg.Dispose()
-        g.Dispose()
-
-    End Sub
 
     'Handlers
     Private Sub AxPlayer_PlayStateChange(sender As Object, e As AxWMPLib._WMPOCXEvents_PlayStateChangeEvent) Handles AxPlayer.PlayStateChange
@@ -3164,6 +3135,7 @@ Public Class Player
         BtnReverse.Image = App.CurrentTheme.PlayerFastReverse
         TipPlayer.BackColor = App.CurrentTheme.BackColor
         TipPlayer.ForeColor = App.CurrentTheme.TextColor
+        TipPlayer.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("Player Theme Set")
     End Sub
@@ -3180,7 +3152,7 @@ Public Class Player
         AddHandler MyToolTip.Popup,
             Sub(sender, e)
                 Dim s As SizeF
-                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), App.TipFont)
+                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), TipPlayer.Font)
                 s.Width += 14
                 s.Height += 16
                 e.ToolTipSize = s.ToSize
@@ -3201,7 +3173,7 @@ Public Class Player
                 End Using
 
                 'Draw text
-                TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
+                TextRenderer.DrawText(g, e.ToolTipText, TipPlayer.Font, New Point(7, 7), App.CurrentTheme.TextColor)
 
                 'Finalize
                 brbg.Dispose()

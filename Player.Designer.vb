@@ -87,7 +87,7 @@ Partial Class Player
         ListBoxPlaylistSearch = New ListBox()
         PanelMedia = New Panel()
         BtnPrevious = New Button()
-        TipPlayer = New ToolTip(components)
+        TipPlayer = New Skye.UI.ToolTip()
         LVPlaylist = New Skye.UI.ListViewEX()
         TimerMeter = New Timer(components)
         TimerVisualizer = New Timer(components)
@@ -116,6 +116,7 @@ Partial Class Player
         BtnPlay.Size = New Size(50, 50)
         BtnPlay.TabIndex = 1
         BtnPlay.TabStop = False
+        TipPlayer.SetToolTipIcon(BtnPlay, Nothing)
         BtnPlay.UseVisualStyleBackColor = False
         ' 
         ' CMPlaylist
@@ -124,6 +125,7 @@ Partial Class Player
         CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMPlaylist.Name = "CMPlaylist"
         CMPlaylist.Size = New Size(217, 444)
+        TipPlayer.SetToolTipIcon(CMPlaylist, Nothing)
         ' 
         ' CMIPlay
         ' 
@@ -207,6 +209,7 @@ Partial Class Player
         CMRatings.OwnerItem = CMIRating
         CMRatings.ShowImageMargin = False
         CMRatings.Size = New Size(121, 134)
+        TipPlayer.SetToolTipIcon(CMRatings, Nothing)
         ' 
         ' CMIRating5Stars
         ' 
@@ -308,6 +311,7 @@ Partial Class Player
         AxPlayer.OcxState = CType(resources.GetObject("AxPlayer.OcxState"), AxHost.State)
         AxPlayer.Size = New Size(173, 214)
         AxPlayer.TabIndex = 35
+        TipPlayer.SetToolTipIcon(AxPlayer, Nothing)
         ' 
         ' BtnReverse
         ' 
@@ -318,6 +322,7 @@ Partial Class Player
         BtnReverse.Size = New Size(50, 50)
         BtnReverse.TabIndex = 6
         BtnReverse.TabStop = False
+        TipPlayer.SetToolTipIcon(BtnReverse, Nothing)
         BtnReverse.UseVisualStyleBackColor = False
         ' 
         ' MenuPlayer
@@ -330,6 +335,7 @@ Partial Class Player
         MenuPlayer.Size = New Size(984, 25)
         MenuPlayer.TabIndex = 12
         MenuPlayer.Text = "MenuStrip1"
+        TipPlayer.SetToolTipIcon(MenuPlayer, Nothing)
         ' 
         ' MIFile
         ' 
@@ -473,6 +479,7 @@ Partial Class Player
         BtnForward.Size = New Size(50, 50)
         BtnForward.TabIndex = 7
         BtnForward.TabStop = False
+        TipPlayer.SetToolTipIcon(BtnForward, Nothing)
         BtnForward.UseVisualStyleBackColor = False
         ' 
         ' BtnStop
@@ -485,6 +492,7 @@ Partial Class Player
         BtnStop.Size = New Size(50, 50)
         BtnStop.TabIndex = 4
         BtnStop.TabStop = False
+        TipPlayer.SetToolTipIcon(BtnStop, Nothing)
         BtnStop.UseVisualStyleBackColor = False
         ' 
         ' BtnMute
@@ -497,6 +505,7 @@ Partial Class Player
         BtnMute.Size = New Size(50, 50)
         BtnMute.TabIndex = 11
         BtnMute.TabStop = False
+        TipPlayer.SetToolTipIcon(BtnMute, Nothing)
         BtnMute.UseVisualStyleBackColor = False
         ' 
         ' BtnNext
@@ -508,6 +517,7 @@ Partial Class Player
         BtnNext.Size = New Size(50, 50)
         BtnNext.TabIndex = 9
         BtnNext.TabStop = False
+        TipPlayer.SetToolTipIcon(BtnNext, Nothing)
         BtnNext.UseVisualStyleBackColor = False
         ' 
         ' PEXLeft
@@ -525,6 +535,7 @@ Partial Class Player
         PEXLeft.Step = 1
         PEXLeft.TabIndex = 17
         PEXLeft.TabStop = False
+        TipPlayer.SetToolTipIcon(PEXLeft, Nothing)
         ' 
         ' PEXRight
         ' 
@@ -541,6 +552,7 @@ Partial Class Player
         PEXRight.Step = 1
         PEXRight.TabIndex = 18
         PEXRight.TabStop = False
+        TipPlayer.SetToolTipIcon(PEXRight, Nothing)
         ' 
         ' PicBoxAlbumArt
         ' 
@@ -551,6 +563,7 @@ Partial Class Player
         PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.Zoom
         PicBoxAlbumArt.TabIndex = 20
         PicBoxAlbumArt.TabStop = False
+        TipPlayer.SetToolTipIcon(PicBoxAlbumArt, Nothing)
         PicBoxAlbumArt.Visible = False
         ' 
         ' LblAlbumArtSelect
@@ -562,6 +575,7 @@ Partial Class Player
         LblAlbumArtSelect.Name = "LblAlbumArtSelect"
         LblAlbumArtSelect.Size = New Size(214, 32)
         LblAlbumArtSelect.TabIndex = 15
+        TipPlayer.SetToolTipIcon(LblAlbumArtSelect, Nothing)
         LblAlbumArtSelect.Visible = False
         ' 
         ' TxtBoxPlaylistSearch
@@ -578,6 +592,7 @@ Partial Class Player
         TxtBoxPlaylistSearch.TabIndex = 22
         TxtBoxPlaylistSearch.TabStop = False
         TxtBoxPlaylistSearch.Text = "Search Playlist"
+        TipPlayer.SetToolTipIcon(TxtBoxPlaylistSearch, Nothing)
         ' 
         ' ListBoxPlaylistSearch
         ' 
@@ -588,6 +603,7 @@ Partial Class Player
         ListBoxPlaylistSearch.Name = "ListBoxPlaylistSearch"
         ListBoxPlaylistSearch.Size = New Size(574, 88)
         ListBoxPlaylistSearch.TabIndex = 25
+        TipPlayer.SetToolTipIcon(ListBoxPlaylistSearch, Nothing)
         ListBoxPlaylistSearch.Visible = False
         ' 
         ' PanelMedia
@@ -597,6 +613,7 @@ Partial Class Player
         PanelMedia.Name = "PanelMedia"
         PanelMedia.Size = New Size(407, 294)
         PanelMedia.TabIndex = 30
+        TipPlayer.SetToolTipIcon(PanelMedia, Nothing)
         PanelMedia.Visible = False
         ' 
         ' BtnPrevious
@@ -608,15 +625,16 @@ Partial Class Player
         BtnPrevious.Size = New Size(50, 50)
         BtnPrevious.TabIndex = 8
         BtnPrevious.TabStop = False
+        TipPlayer.SetToolTipIcon(BtnPrevious, Nothing)
         BtnPrevious.UseVisualStyleBackColor = False
         ' 
         ' TipPlayer
         ' 
-        TipPlayer.AutomaticDelay = 1000
-        TipPlayer.AutoPopDelay = 5000
-        TipPlayer.InitialDelay = 1000
+        TipPlayer.BackColor = SystemColors.Control
+        TipPlayer.BorderColor = SystemColors.Window
+        TipPlayer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipPlayer.ForeColor = SystemColors.WindowText
         TipPlayer.OwnerDraw = True
-        TipPlayer.ReshowDelay = 1000
         ' 
         ' LVPlaylist
         ' 
@@ -631,6 +649,7 @@ Partial Class Player
         LVPlaylist.OwnerDraw = True
         LVPlaylist.Size = New Size(574, 409)
         LVPlaylist.TabIndex = 0
+        TipPlayer.SetToolTipIcon(LVPlaylist, Nothing)
         LVPlaylist.UseCompatibleStateImageBehavior = False
         LVPlaylist.View = View.Details
         ' 
@@ -651,6 +670,7 @@ Partial Class Player
         PicBoxVisualizer.Size = New Size(407, 294)
         PicBoxVisualizer.TabIndex = 31
         PicBoxVisualizer.TabStop = False
+        TipPlayer.SetToolTipIcon(PicBoxVisualizer, Nothing)
         PicBoxVisualizer.Visible = False
         ' 
         ' TxtBoxLyrics
@@ -669,6 +689,7 @@ Partial Class Player
         TxtBoxLyrics.Size = New Size(407, 294)
         TxtBoxLyrics.TabIndex = 36
         TxtBoxLyrics.TextAlign = HorizontalAlignment.Center
+        TipPlayer.SetToolTipIcon(TxtBoxLyrics, Nothing)
         TxtBoxLyrics.Visible = False
         ' 
         ' CMLyrics
@@ -676,6 +697,7 @@ Partial Class Player
         CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMLyrics.Name = "CMLyrics"
         CMLyrics.Size = New Size(149, 176)
+        TipPlayer.SetToolTipIcon(CMLyrics, Nothing)
         ' 
         ' LblPlaylistCount
         ' 
@@ -686,6 +708,7 @@ Partial Class Player
         LblPlaylistCount.Size = New Size(572, 22)
         LblPlaylistCount.TabIndex = 37
         LblPlaylistCount.TextAlign = ContentAlignment.TopCenter
+        TipPlayer.SetToolTipIcon(LblPlaylistCount, Nothing)
         ' 
         ' LblDuration
         ' 
@@ -697,6 +720,7 @@ Partial Class Player
         LblDuration.Size = New Size(80, 25)
         LblDuration.TabIndex = 15
         LblDuration.TextAlign = ContentAlignment.TopCenter
+        TipPlayer.SetToolTipIcon(LblDuration, Nothing)
         ' 
         ' LblPosition
         ' 
@@ -708,6 +732,7 @@ Partial Class Player
         LblPosition.Size = New Size(80, 25)
         LblPosition.TabIndex = 14
         LblPosition.TextAlign = ContentAlignment.TopCenter
+        TipPlayer.SetToolTipIcon(LblPosition, Nothing)
         ' 
         ' TrackBarPosition
         ' 
@@ -729,6 +754,7 @@ Partial Class Player
         TrackBarPosition.TabStop = False
         TrackBarPosition.ThemeName = "Default"
         TrackBarPosition.TimerInterval = 100
+        TipPlayer.SetToolTipIcon(TrackBarPosition, Nothing)
         TrackBarPosition.Value = 0
         ' 
         ' Player
@@ -766,6 +792,7 @@ Partial Class Player
         Name = "Player"
         StartPosition = FormStartPosition.CenterScreen
         Text = "Player"
+        TipPlayer.SetToolTipIcon(Me, Nothing)
         TopMost = True
         CMPlaylist.ResumeLayout(False)
         CMRatings.ResumeLayout(False)
@@ -812,7 +839,7 @@ Partial Class Player
     Friend WithEvents CMIHelperApp1 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents MIExit As ToolStripMenuItem
-    Friend WithEvents TipPlayer As ToolTip
+    Friend WithEvents TipPlayer As Skye.UI.ToolTip
     Friend WithEvents CMIOpenLocation As ToolStripMenuItem
     Friend WithEvents CMIHelperApp2 As ToolStripMenuItem
     Friend WithEvents TSSeparatorExternalTools As ToolStripSeparator

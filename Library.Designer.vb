@@ -49,7 +49,7 @@ Partial Class Library
         LBXLibrarySearch = New ListBox()
         PicBoxAlbumArt = New PictureBox()
         LblAlbumArtSelect = New Label()
-        TipLibrary = New ToolTip(components)
+        TipLibrary = New Skye.UI.ToolTip()
         RadBtnGroupByGenre = New RadioButton()
         GrpBoxGroupBy = New GroupBox()
         RadBtnGroupByType = New RadioButton()
@@ -57,14 +57,14 @@ Partial Class Library
         RadBtnGroupByArtist = New RadioButton()
         RadBtnGroupByAlbum = New RadioButton()
         RadBtnGroupByNone = New RadioButton()
-        LblExtTitle = New Skye.UI.Label
-        LblExtFileInfo = New Skye.UI.Label
-        LblExtProperties = New Skye.UI.Label
-        LblExtType = New Skye.UI.Label
-        LblLibraryCounts = New Skye.UI.Label
-        LblStatus = New Skye.UI.Label
+        LblExtTitle = New Skye.UI.Label()
+        LblExtFileInfo = New Skye.UI.Label()
+        LblExtProperties = New Skye.UI.Label()
+        LblExtType = New Skye.UI.Label()
+        LblLibraryCounts = New Skye.UI.Label()
+        LblStatus = New Skye.UI.Label()
         LVLibrary = New ListView()
-        LblHistory = New Skye.UI.Label
+        LblHistory = New Skye.UI.Label()
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -76,6 +76,7 @@ Partial Class Library
         CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMLibrary.Name = "CMLibrary"
         CMLibrary.Size = New Size(229, 392)
+        TipLibrary.SetToolTipIcon(CMLibrary, Nothing)
         ' 
         ' CMIPlay
         ' 
@@ -205,6 +206,7 @@ Partial Class Library
         BtnSearchFolders.TabStop = False
         BtnSearchFolders.Text = "Search Folders"
         BtnSearchFolders.TextAlign = ContentAlignment.MiddleRight
+        TipLibrary.SetToolTipIcon(BtnSearchFolders, Nothing)
         BtnSearchFolders.UseVisualStyleBackColor = True
         ' 
         ' BtnOK
@@ -216,6 +218,7 @@ Partial Class Library
         BtnOK.Size = New Size(64, 73)
         BtnOK.TabIndex = 3
         BtnOK.TabStop = False
+        TipLibrary.SetToolTipIcon(BtnOK, Nothing)
         BtnOK.UseVisualStyleBackColor = True
         ' 
         ' TxbxLibrarySearch
@@ -229,6 +232,7 @@ Partial Class Library
         TxbxLibrarySearch.Size = New Size(153, 18)
         TxbxLibrarySearch.TabIndex = 4
         TxbxLibrarySearch.Text = "Search Library"
+        TipLibrary.SetToolTipIcon(TxbxLibrarySearch, Nothing)
         ' 
         ' LBXLibrarySearch
         ' 
@@ -238,6 +242,7 @@ Partial Class Library
         LBXLibrarySearch.Name = "LBXLibrarySearch"
         LBXLibrarySearch.Size = New Size(491, 88)
         LBXLibrarySearch.TabIndex = 5
+        TipLibrary.SetToolTipIcon(LBXLibrarySearch, Nothing)
         LBXLibrarySearch.Visible = False
         ' 
         ' PicBoxAlbumArt
@@ -249,6 +254,7 @@ Partial Class Library
         PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.Zoom
         PicBoxAlbumArt.TabIndex = 7
         PicBoxAlbumArt.TabStop = False
+        TipLibrary.SetToolTipIcon(PicBoxAlbumArt, Nothing)
         PicBoxAlbumArt.Visible = False
         ' 
         ' LblAlbumArtSelect
@@ -259,14 +265,16 @@ Partial Class Library
         LblAlbumArtSelect.Name = "LblAlbumArtSelect"
         LblAlbumArtSelect.Size = New Size(32, 36)
         LblAlbumArtSelect.TabIndex = 16
+        TipLibrary.SetToolTipIcon(LblAlbumArtSelect, Nothing)
         LblAlbumArtSelect.Visible = False
         ' 
         ' TipLibrary
         ' 
-        TipLibrary.AutoPopDelay = 5000
-        TipLibrary.InitialDelay = 1000
+        TipLibrary.BackColor = SystemColors.Control
+        TipLibrary.BorderColor = SystemColors.Window
+        TipLibrary.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipLibrary.ForeColor = SystemColors.WindowText
         TipLibrary.OwnerDraw = True
-        TipLibrary.ReshowDelay = 1000
         ' 
         ' RadBtnGroupByGenre
         ' 
@@ -279,6 +287,7 @@ Partial Class Library
         RadBtnGroupByGenre.TabIndex = 21
         RadBtnGroupByGenre.Text = "Genre"
         RadBtnGroupByGenre.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrary.SetToolTipIcon(RadBtnGroupByGenre, Nothing)
         RadBtnGroupByGenre.UseVisualStyleBackColor = True
         ' 
         ' GrpBoxGroupBy
@@ -296,6 +305,7 @@ Partial Class Library
         GrpBoxGroupBy.TabIndex = 18
         GrpBoxGroupBy.TabStop = False
         GrpBoxGroupBy.Text = "Group By"
+        TipLibrary.SetToolTipIcon(GrpBoxGroupBy, Nothing)
         ' 
         ' RadBtnGroupByType
         ' 
@@ -308,6 +318,7 @@ Partial Class Library
         RadBtnGroupByType.TabIndex = 24
         RadBtnGroupByType.Text = "Type"
         RadBtnGroupByType.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrary.SetToolTipIcon(RadBtnGroupByType, Nothing)
         RadBtnGroupByType.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByYear
@@ -321,6 +332,7 @@ Partial Class Library
         RadBtnGroupByYear.TabIndex = 23
         RadBtnGroupByYear.Text = "Year"
         RadBtnGroupByYear.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrary.SetToolTipIcon(RadBtnGroupByYear, Nothing)
         RadBtnGroupByYear.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByArtist
@@ -334,6 +346,7 @@ Partial Class Library
         RadBtnGroupByArtist.TabIndex = 20
         RadBtnGroupByArtist.Text = "Artist"
         RadBtnGroupByArtist.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrary.SetToolTipIcon(RadBtnGroupByArtist, Nothing)
         RadBtnGroupByArtist.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByAlbum
@@ -347,6 +360,7 @@ Partial Class Library
         RadBtnGroupByAlbum.TabIndex = 19
         RadBtnGroupByAlbum.Text = "Album"
         RadBtnGroupByAlbum.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrary.SetToolTipIcon(RadBtnGroupByAlbum, Nothing)
         RadBtnGroupByAlbum.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByNone
@@ -361,6 +375,7 @@ Partial Class Library
         RadBtnGroupByNone.TabStop = True
         RadBtnGroupByNone.Text = "No Grouping"
         RadBtnGroupByNone.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrary.SetToolTipIcon(RadBtnGroupByNone, Nothing)
         RadBtnGroupByNone.UseVisualStyleBackColor = True
         ' 
         ' LblExtTitle
@@ -373,6 +388,7 @@ Partial Class Library
         LblExtTitle.TabIndex = 19
         LblExtTitle.Text = "Title"
         LblExtTitle.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrary.SetToolTipIcon(LblExtTitle, Nothing)
         ' 
         ' LblExtFileInfo
         ' 
@@ -384,6 +400,7 @@ Partial Class Library
         LblExtFileInfo.TabIndex = 20
         LblExtFileInfo.Text = "File Info"
         LblExtFileInfo.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrary.SetToolTipIcon(LblExtFileInfo, Nothing)
         ' 
         ' LblExtProperties
         ' 
@@ -395,6 +412,7 @@ Partial Class Library
         LblExtProperties.TabIndex = 21
         LblExtProperties.Text = "Properties"
         LblExtProperties.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrary.SetToolTipIcon(LblExtProperties, Nothing)
         ' 
         ' LblExtType
         ' 
@@ -406,6 +424,7 @@ Partial Class Library
         LblExtType.TabIndex = 22
         LblExtType.Text = "Type"
         LblExtType.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrary.SetToolTipIcon(LblExtType, Nothing)
         ' 
         ' LblLibraryCounts
         ' 
@@ -416,6 +435,7 @@ Partial Class Library
         LblLibraryCounts.Size = New Size(423, 28)
         LblLibraryCounts.TabIndex = 23
         LblLibraryCounts.TextAlign = ContentAlignment.MiddleRight
+        TipLibrary.SetToolTipIcon(LblLibraryCounts, Nothing)
         ' 
         ' LblStatus
         ' 
@@ -428,6 +448,7 @@ Partial Class Library
         LblStatus.TabIndex = 24
         LblStatus.Text = "Status"
         LblStatus.TextAlign = ContentAlignment.MiddleRight
+        TipLibrary.SetToolTipIcon(LblStatus, Nothing)
         LblStatus.Visible = False
         ' 
         ' LVLibrary
@@ -441,6 +462,7 @@ Partial Class Library
         LVLibrary.OwnerDraw = True
         LVLibrary.Size = New Size(960, 339)
         LVLibrary.TabIndex = 0
+        TipLibrary.SetToolTipIcon(LVLibrary, Nothing)
         LVLibrary.UseCompatibleStateImageBehavior = False
         LVLibrary.View = View.Details
         ' 
@@ -454,6 +476,7 @@ Partial Class Library
         LblHistory.TabIndex = 25
         LblHistory.Text = "History"
         LblHistory.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrary.SetToolTipIcon(LblHistory, Nothing)
         ' 
         ' Library
         ' 
@@ -483,6 +506,7 @@ Partial Class Library
         Name = "Library"
         StartPosition = FormStartPosition.CenterScreen
         Text = "Library"
+        TipLibrary.SetToolTipIcon(Me, Nothing)
         CMLibrary.ResumeLayout(False)
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).EndInit()
         GrpBoxGroupBy.ResumeLayout(False)
@@ -500,7 +524,7 @@ Partial Class Library
     Friend WithEvents CMIAddToPlaylist As ToolStripMenuItem
     Friend WithEvents CMIAddAllToPlaylist As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
-    Friend WithEvents TipLibrary As ToolTip
+    Friend WithEvents TipLibrary As Skye.UI.ToolTip
     Friend WithEvents CMIOpenLocation As ToolStripMenuItem
     Friend WithEvents CMIHelperApp2 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator

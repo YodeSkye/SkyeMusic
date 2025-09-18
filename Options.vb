@@ -270,9 +270,6 @@ Public Class Options
     Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxHistoryAutoSaveInterval.KeyPress, TxtBoxHistoryUpdateInterval.KeyPress, TxtBoxRandomHistoryUpdateInterval.KeyPress
         If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
     End Sub
-    'Private Sub TxtBox_MouseUp(sender As Object, e As MouseEventArgs) Handles TxtBoxPlaylistTitleSeparator.MouseUp, TxtBoxPlaylistVideoIdentifier.MouseUp, TxtBoxHelperApp1Path.MouseUp, TxtBoxHelperApp1Name.MouseUp, TxtBoxHelperApp2Name.MouseUp, TxtBoxHelperApp2Path.MouseUp, TxtBoxHistoryAutoSaveInterval.MouseUp, TxtBoxHistoryUpdateInterval.MouseUp, TxtBoxRandomHistoryUpdateInterval.MouseUp
-    '    'CMTxtBox.Display(CType(sender, TextBox), e)
-    'End Sub
     Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxPlaylistTitleSeparator.PreviewKeyDown, TxtBoxPlaylistVideoIdentifier.PreviewKeyDown, MyBase.PreviewKeyDown, TxtBoxHelperApp1Path.PreviewKeyDown, TxtBoxHelperApp1Name.PreviewKeyDown, TxtBoxHelperApp2Name.PreviewKeyDown, TxtBoxHelperApp2Path.PreviewKeyDown, TxtBoxHistoryAutoSaveInterval.PreviewKeyDown, TxtBoxHistoryUpdateInterval.PreviewKeyDown, TxtBoxRandomHistoryUpdateInterval.PreviewKeyDown
         CMTxtBox.ShortcutKeys(CType(sender, TextBox), e)
     End Sub
@@ -440,35 +437,6 @@ Public Class Options
     Private Sub CMILibrarySearchFoldersRemoveClick(sender As Object, e As EventArgs) Handles CMILibrarySearchFoldersRemove.Click
         LibrarySearchFoldersRemove()
     End Sub
-    Private Sub TipOptions_Popup(sender As Object, e As PopupEventArgs) Handles TipOptions.Popup
-        Static s As SizeF
-        s = TextRenderer.MeasureText(TipOptions.GetToolTip(e.AssociatedControl), App.TipFont)
-        s.Width += 14
-        s.Height += 16
-        e.ToolTipSize = s.ToSize
-    End Sub
-    Private Sub TipOptions_Draw(sender As Object, e As DrawToolTipEventArgs) Handles TipOptions.Draw
-
-        'Declarations
-        Dim g As Graphics = e.Graphics
-
-        'Draw background
-        Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
-        g.FillRectangle(brbg, e.Bounds)
-
-        'Draw border
-        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
-            g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
-        End Using
-
-        'Draw text
-        TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
-
-        'Finalize
-        brbg.Dispose()
-        g.Dispose()
-
-    End Sub
 
     'Procedures
     Private Sub LibrarySearchFoldersAdd()
@@ -593,6 +561,9 @@ Public Class Options
         BtnHistorySaveNow.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnHistoryPrune.BackColor = App.CurrentTheme.ButtonBackColor
         BtnHistoryPrune.ForeColor = App.CurrentTheme.ButtonTextColor
+        TipOptions.BackColor = App.CurrentTheme.BackColor
+        TipOptions.ForeColor = App.CurrentTheme.TextColor
+        TipOptions.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("Options Theme Set")
     End Sub
