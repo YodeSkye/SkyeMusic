@@ -470,7 +470,7 @@ Namespace My
                 file.Dispose()
                 writer = Nothing
                 Debug.Print("History Saved")
-                App.WriteToLog("History Saved (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                App.WriteToLog("History Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             End If
         End Sub
         Private Sub LoadHistory()
@@ -490,7 +490,7 @@ Namespace My
                     App.WriteToLog("History Not Loaded: File not valid (" + HistoryPath + ")")
                     History = New Collections.Generic.List(Of Song) 'Initialize an empty history if the file is not valid
                 Else
-                    App.WriteToLog("History Loaded (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                    App.WriteToLog("History Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
                 End If
             Else
                 App.WriteToLog("History Not Loaded: File does not exist")
@@ -540,7 +540,7 @@ Namespace My
                 RegSubKey.Dispose()
                 RegKey.Close()
                 RegKey.Dispose()
-                App.WriteToLog("Options Saved (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                App.WriteToLog("Options Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             Catch ex As Exception
                 WriteToLog("Error Saving Options" + vbCr + ex.Message)
             End Try
@@ -624,7 +624,7 @@ Namespace My
                 RegSubKey.Dispose()
                 RegKey.Close()
                 RegKey.Dispose()
-                App.WriteToLog("Options Loaded (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                App.WriteToLog("Options Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             Catch ex As Exception
                 WriteToLog("Error Loading Options" + vbCr + ex.Message)
             End Try
@@ -959,67 +959,6 @@ Namespace My
         End Sub
 
         'Functions
-        Friend Function GenerateLogTime(starttime As TimeSpan, stoptime As TimeSpan, Optional fractionalseconds As Boolean = True) As String
-            Dim time As TimeSpan
-            If starttime > stoptime Then
-                time = stoptime + (New TimeSpan(24, 0, 0) - starttime)
-            Else
-                time = stoptime - starttime
-            End If
-            If fractionalseconds Then
-                Return New Date(time.Ticks).ToString("HH:mm:ss.ffff")
-            Else
-                Return New Date(time.Ticks).ToString("HH:mm:ss")
-            End If
-        End Function
-        Friend Function FormatFileSize(filesizeinbytes As Long, unit As FormatFileSizeUnits, Optional decimalDigits As Integer = 2, Optional omitThousandSeparators As Boolean = False) As String 'Converts a number of bytes into Kbytes, Megabytes, or Gigabytes
-            'Simple Error Checking
-            If filesizeinbytes <= 0 Then Return "0 B"
-            'Auto-Select Best Units Of Measure
-            If unit = FormatFileSizeUnits.Auto Then
-                Select Case filesizeinbytes
-                    Case Is < 1023
-                        unit = FormatFileSizeUnits.Bytes
-                        decimalDigits = 0
-                    Case Is < 1024 * 1023 : unit = FormatFileSizeUnits.KiloBytes
-                    Case Is < 1048576 * 1023 : unit = FormatFileSizeUnits.MegaBytes
-                    Case Else : unit = FormatFileSizeUnits.GigaBytes
-                End Select
-            End If
-            'Evaluate The Decimal Value
-            Dim value As Decimal
-            Dim suffix As String = ""
-            Select Case unit
-                Case FormatFileSizeUnits.Bytes
-                    value = CDec(filesizeinbytes)
-                    suffix = " B"
-                Case FormatFileSizeUnits.KiloBytes
-                    value = CDec(filesizeinbytes / 1024)
-                    suffix = " KB"
-                Case FormatFileSizeUnits.MegaBytes
-                    value = CDec(filesizeinbytes / 1048576)
-                    suffix = " MB"
-                Case FormatFileSizeUnits.GigaBytes
-                    value = CDec(filesizeinbytes / 1073741824)
-                    suffix = " GB"
-            End Select
-            'Get The String Representation
-            Dim format As String
-            If omitThousandSeparators Then
-                format = "F" & decimalDigits.ToString
-            Else
-                format = "N" & decimalDigits.ToString
-            End If
-            Return value.ToString(format) & suffix
-        End Function
-        Friend Function GetRandom(ByVal min As Integer, ByVal max As Integer) As Integer
-            ' by making Generator static, we preserve the same instance '
-            ' (i.e., do not create new instances with the same seed over and over) '
-            ' between calls '
-            Static Generator As System.Random = New System.Random()
-            If max <> Integer.MaxValue Then max += 1
-            Return Generator.Next(min, max)
-        End Function
         Friend Function GenerateEllipsis(ByRef g As Graphics, s As String, f As System.Drawing.Font, width As Integer) As String
             Dim ellipsistext As String = s
             If width >= 0 Then

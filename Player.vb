@@ -2263,7 +2263,7 @@ Public Class Player
             writer = Nothing
             items.Clear()
             items = Nothing
-            App.WriteToLog("Playlist Saved (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            App.WriteToLog("Playlist Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
     End Sub
     Private Sub LoadPlaylist()
@@ -2294,7 +2294,7 @@ Public Class Player
             Else
                 items.Clear()
                 items = Nothing
-                App.WriteToLog("Playlist Loaded (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                App.WriteToLog("Playlist Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             End If
         Else
             App.WriteToLog("Playlist Not Loaded: File does not exist")
@@ -2672,13 +2672,13 @@ Public Class Player
                         Dim newindex As Integer = 0
                         If RandomHistoryFull() Then RandomHistory.Clear()
                         If item Is Nothing Then
-                            newindex = App.GetRandom(0, LVPlaylist.Items.Count - 1)
+                            newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
                         Else
                             If LVPlaylist.Items.Count = 1 Then
                                 newindex = 0
                             Else
                                 Do
-                                    newindex = App.GetRandom(0, LVPlaylist.Items.Count - 1) 'randomplaylistindex.Next(0, LVPlaylist.Items.Count)
+                                    newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1) 'randomplaylistindex.Next(0, LVPlaylist.Items.Count)
                                 Loop Until newindex <> item.Index And Not RandomHistory.Contains(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                             End If
                         End If

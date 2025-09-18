@@ -498,7 +498,7 @@ Public Class Library
             'Player.LVPlaylist.ResumeLayout()
             'Player.LVPlaylist.Visible = True
             LblStatus.Visible = False
-            App.WriteToLog("Selected Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            App.WriteToLog("Selected Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
     End Sub
     Private Sub CMIAddAllToPlaylistClick(sender As Object, e As EventArgs) Handles CMIAddAllToPlaylist.Click
@@ -516,7 +516,7 @@ Public Class Library
         'Player.LVPlaylist.ResumeLayout()
         'Player.LVPlaylist.Visible = True
         LblStatus.Visible = False
-        App.WriteToLog("Full Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        App.WriteToLog("Full Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
     End Sub
     Private Sub CMIAddGroupToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddGroupToPlaylist.Click
         If LVLibrary.SelectedItems.Count > 0 Then
@@ -565,7 +565,7 @@ Public Class Library
             'Player.LVPlaylist.ResumeLayout()
             'Player.LVPlaylist.Visible = True
             LblStatus.Visible = False
-            App.WriteToLog(LibraryGroupBy.ToString + " Library Added to Playlist (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            App.WriteToLog(LibraryGroupBy.ToString + " Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
         End If
     End Sub
@@ -1782,7 +1782,7 @@ Public Class Library
             LblStatus.Visible = False
             LVLibrary.Visible = True
             SetLibraryCountText()
-            App.WriteToLog("Folders Searched (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            App.WriteToLog("Folders Searched (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
     End Sub
     Private Sub Play()
@@ -1838,7 +1838,7 @@ Public Class Library
             writer = Nothing
             items.Clear()
             items = Nothing
-            App.WriteToLog("Library Saved (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            App.WriteToLog("Library Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
     End Sub
     Private Sub LoadLibrary()
@@ -1890,7 +1890,7 @@ Public Class Library
             Else
                 items.Clear()
                 items = Nothing
-                App.WriteToLog("Library Loaded (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                App.WriteToLog("Library Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             End If
         Else
             App.WriteToLog("Library Not Loaded: File does not exist")
@@ -2094,7 +2094,7 @@ Public Class Library
 
         'Finalize
         LVLibrary.Visible = True
-        App.WriteToLog("Songs Grouped By " + LibraryGroupBy.ToString + " (" + App.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        App.WriteToLog("Songs Grouped By " + LibraryGroupBy.ToString + " (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
     End Sub
     Private Function GetLibraryGroupIndex(groupname As String) As Int16
@@ -2121,7 +2121,7 @@ Public Class Library
             Dim fInfo As IO.FileInfo
             fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
             LblExtFileInfo.Text = fInfo.Extension.TrimStart(CChar(".")).ToUpper
-            LblExtFileInfo.Text += " " + App.FormatFileSize(fInfo.Length, My.App.FormatFileSizeUnits.Auto, 2, False)
+            LblExtFileInfo.Text += " " + Skye.Common.FormatFileSize(fInfo.Length, Skye.Common.FormatFileSizeUnits.Auto, 2, False)
             fInfo = Nothing
             Dim tlFile As TagLib.File = Nothing
             Try
