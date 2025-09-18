@@ -113,35 +113,35 @@ Public Class PlayerQueue
         Player.PruneQueue()
         Populate()
     End Sub
-    Private Sub TipQueue_Popup(sender As Object, e As PopupEventArgs) Handles TipQueue.Popup
-        Static s As SizeF
-        s = TextRenderer.MeasureText(TipQueue.GetToolTip(e.AssociatedControl), App.TipFont)
-        s.Width += 14
-        s.Height += 16
-        e.ToolTipSize = s.ToSize
-    End Sub
-    Private Sub TipQueue_Draw(sender As Object, e As DrawToolTipEventArgs) Handles TipQueue.Draw
+    'Private Sub TipQueue_Popup(sender As Object, e As PopupEventArgs) Handles TipQueue.Popup
+    '    Static s As SizeF
+    '    s = TextRenderer.MeasureText(TipQueue.GetToolTip(e.AssociatedControl), App.TipFont)
+    '    s.Width += 14
+    '    s.Height += 16
+    '    e.ToolTipSize = s.ToSize
+    'End Sub
+    'Private Sub TipQueue_Draw(sender As Object, e As DrawToolTipEventArgs) Handles TipQueue.Draw
 
-        'Declarations
-        Dim g As Graphics = e.Graphics
+    '    'Declarations
+    '    Dim g As Graphics = e.Graphics
 
-        'Draw background
-        Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
-        g.FillRectangle(brbg, e.Bounds)
+    '    'Draw background
+    '    Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
+    '    g.FillRectangle(brbg, e.Bounds)
 
-        'Draw border
-        Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
-            g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
-        End Using
+    '    'Draw border
+    '    Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
+    '        g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
+    '    End Using
 
-        'Draw text
-        TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
+    '    'Draw text
+    '    TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
 
-        'Finalize
-        brbg.Dispose()
-        g.Dispose()
+    '    'Finalize
+    '    brbg.Dispose()
+    '    g.Dispose()
 
-    End Sub
+    'End Sub
 
     'Procedures
     Private Sub Populate()
@@ -182,6 +182,9 @@ Public Class PlayerQueue
         End If
         LVQueue.BackColor = App.CurrentTheme.BackColor
         LVQueue.ForeColor = App.CurrentTheme.TextColor
+        TipQueue.BackColor = App.CurrentTheme.BackColor
+        TipQueue.ForeColor = App.CurrentTheme.TextColor
+        TipQueue.BorderColor = App.CurrentTheme.ButtonBackColor
     End Sub
 
 End Class

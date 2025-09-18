@@ -30,7 +30,7 @@ Partial Class PlayerQueue
         CMQueue = New ContextMenuStrip(components)
         CMIRemove = New ToolStripMenuItem()
         BtnOK = New Button()
-        TipQueue = New ToolTip(components)
+        TipQueue = New Skye.UI.ToolTip()
         BtnPrune = New Button()
         CMQueue.SuspendLayout()
         SuspendLayout()
@@ -48,6 +48,7 @@ Partial Class PlayerQueue
         LVQueue.OwnerDraw = True
         LVQueue.Size = New Size(760, 158)
         LVQueue.TabIndex = 0
+        TipQueue.SetToolTipIcon(LVQueue, Nothing)
         LVQueue.UseCompatibleStateImageBehavior = False
         LVQueue.View = View.Details
         ' 
@@ -63,10 +64,11 @@ Partial Class PlayerQueue
         ' 
         ' CMQueue
         ' 
-        CMQueue.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        CMQueue.Font = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMQueue.Items.AddRange(New ToolStripItem() {CMIRemove})
         CMQueue.Name = "CMQueue"
         CMQueue.Size = New Size(126, 26)
+        TipQueue.SetToolTipIcon(CMQueue, Nothing)
         ' 
         ' CMIRemove
         ' 
@@ -85,10 +87,15 @@ Partial Class PlayerQueue
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 9
         TipQueue.SetToolTip(BtnOK, "Close Window")
+        TipQueue.SetToolTipIcon(BtnOK, Nothing)
         BtnOK.UseVisualStyleBackColor = True
         ' 
         ' TipQueue
         ' 
+        TipQueue.BackColor = SystemColors.Control
+        TipQueue.BorderColor = SystemColors.Window
+        TipQueue.Font = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipQueue.ForeColor = SystemColors.WindowText
         TipQueue.OwnerDraw = True
         ' 
         ' BtnPrune
@@ -100,11 +107,12 @@ Partial Class PlayerQueue
         BtnPrune.Size = New Size(48, 48)
         BtnPrune.TabIndex = 10
         TipQueue.SetToolTip(BtnPrune, "Prune Queue by removing any item not found in the Playlist")
+        TipQueue.SetToolTipIcon(BtnPrune, My.Resources.Resources.ImagePrune32)
         BtnPrune.UseVisualStyleBackColor = True
         ' 
         ' PlayerQueue
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
+        AutoScaleDimensions = New SizeF(7.0F, 15.0F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(784, 261)
         Controls.Add(BtnPrune)
@@ -115,6 +123,7 @@ Partial Class PlayerQueue
         Name = "PlayerQueue"
         StartPosition = FormStartPosition.CenterParent
         Text = "Queue"
+        TipQueue.SetToolTipIcon(Me, Nothing)
         CMQueue.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
@@ -125,6 +134,6 @@ Partial Class PlayerQueue
     Friend WithEvents ColumnHeader2 As ColumnHeader
     Friend WithEvents CMQueue As ContextMenuStrip
     Friend WithEvents CMIRemove As ToolStripMenuItem
-    Friend WithEvents TipQueue As ToolTip
+    Friend WithEvents TipQueue As Skye.UI.ToolTip
     Friend WithEvents BtnPrune As Button
 End Class

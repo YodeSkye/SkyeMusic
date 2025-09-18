@@ -22,7 +22,6 @@ Partial Class Log
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Log))
         RTBLog = New RichTextBox()
         RTBCMLog = New Skye.UI.RichTextBoxContextMenu()
@@ -32,7 +31,7 @@ Partial Class Log
         LBLLogInfo = New Skye.UI.Label()
         TxBxSearch = New TextBox()
         LblStatus = New Skye.UI.Label()
-        TipLog = New ToolTip(components)
+        TipLog = New Skye.UI.ToolTip()
         SuspendLayout()
         ' 
         ' RTBLog
@@ -47,6 +46,7 @@ Partial Class Log
         RTBLog.Size = New Size(776, 317)
         RTBLog.TabIndex = 0
         RTBLog.Text = ""
+        TipLog.SetToolTipIcon(RTBLog, Nothing)
         RTBLog.WordWrap = False
         ' 
         ' RTBCMLog
@@ -54,6 +54,7 @@ Partial Class Log
         RTBCMLog.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         RTBCMLog.Name = "RTBCMLog"
         RTBCMLog.Size = New Size(129, 148)
+        TipLog.SetToolTipIcon(RTBCMLog, Nothing)
         ' 
         ' BTNOK
         ' 
@@ -64,6 +65,7 @@ Partial Class Log
         BTNOK.Size = New Size(64, 64)
         BTNOK.TabIndex = 2
         TipLog.SetToolTip(BTNOK, "Close Window")
+        TipLog.SetToolTipIcon(BTNOK, Nothing)
         BTNOK.UseVisualStyleBackColor = True
         ' 
         ' BTNDeleteLog
@@ -75,6 +77,7 @@ Partial Class Log
         BTNDeleteLog.Size = New Size(48, 48)
         BTNDeleteLog.TabIndex = 3
         TipLog.SetToolTip(BTNDeleteLog, "Delete Log")
+        TipLog.SetToolTipIcon(BTNDeleteLog, Nothing)
         BTNDeleteLog.UseVisualStyleBackColor = True
         ' 
         ' BTNRefreshLog
@@ -86,6 +89,7 @@ Partial Class Log
         BTNRefreshLog.Size = New Size(48, 48)
         BTNRefreshLog.TabIndex = 4
         TipLog.SetToolTip(BTNRefreshLog, "Refresh Log")
+        TipLog.SetToolTipIcon(BTNRefreshLog, Nothing)
         BTNRefreshLog.UseVisualStyleBackColor = True
         ' 
         ' LBLLogInfo
@@ -98,6 +102,7 @@ Partial Class Log
         LBLLogInfo.TabIndex = 5
         LBLLogInfo.Text = "Log Info"
         LBLLogInfo.TextAlign = ContentAlignment.BottomCenter
+        TipLog.SetToolTipIcon(LBLLogInfo, Nothing)
         ' 
         ' TxBxSearch
         ' 
@@ -109,6 +114,7 @@ Partial Class Log
         TxBxSearch.Size = New Size(175, 18)
         TxBxSearch.TabIndex = 6
         TxBxSearch.Text = "Search Log"
+        TipLog.SetToolTipIcon(TxBxSearch, Nothing)
         ' 
         ' LblStatus
         ' 
@@ -123,10 +129,15 @@ Partial Class Log
         LblStatus.TabIndex = 7
         LblStatus.Text = "Searching The Log..."
         LblStatus.TextAlign = ContentAlignment.MiddleRight
+        TipLog.SetToolTipIcon(LblStatus, Nothing)
         LblStatus.Visible = False
         ' 
         ' TipLog
         ' 
+        TipLog.BackColor = SystemColors.Control
+        TipLog.BorderColor = SystemColors.Window
+        TipLog.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipLog.ForeColor = SystemColors.WindowText
         TipLog.OwnerDraw = True
         ' 
         ' Log
@@ -146,6 +157,7 @@ Partial Class Log
         MinimumSize = New Size(400, 300)
         Name = "Log"
         StartPosition = FormStartPosition.CenterScreen
+        TipLog.SetToolTipIcon(Me, Nothing)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -158,5 +170,5 @@ Partial Class Log
     Friend WithEvents LBLLogInfo As Skye.UI.Label
     Friend WithEvents TxBxSearch As TextBox
     Friend WithEvents LblStatus As Skye.UI.Label
-    Friend WithEvents TipLog As ToolTip
+    Friend WithEvents TipLog As Skye.UI.ToolTip
 End Class
