@@ -48,7 +48,7 @@ Partial Class PlayerQueue
         LVQueue.OwnerDraw = True
         LVQueue.Size = New Size(760, 158)
         LVQueue.TabIndex = 0
-        TipQueue.SetToolTipIcon(LVQueue, Nothing)
+        TipQueue.SetToolTipImage(LVQueue, Nothing)
         LVQueue.UseCompatibleStateImageBehavior = False
         LVQueue.View = View.Details
         ' 
@@ -68,7 +68,7 @@ Partial Class PlayerQueue
         CMQueue.Items.AddRange(New ToolStripItem() {CMIRemove})
         CMQueue.Name = "CMQueue"
         CMQueue.Size = New Size(126, 26)
-        TipQueue.SetToolTipIcon(CMQueue, Nothing)
+        TipQueue.SetToolTipImage(CMQueue, Nothing)
         ' 
         ' CMIRemove
         ' 
@@ -87,7 +87,7 @@ Partial Class PlayerQueue
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 9
         TipQueue.SetToolTip(BtnOK, "Close Window")
-        TipQueue.SetToolTipIcon(BtnOK, Nothing)
+        TipQueue.SetToolTipImage(BtnOK, Nothing)
         BtnOK.UseVisualStyleBackColor = True
         ' 
         ' TipQueue
@@ -107,7 +107,7 @@ Partial Class PlayerQueue
         BtnPrune.Size = New Size(48, 48)
         BtnPrune.TabIndex = 10
         TipQueue.SetToolTip(BtnPrune, "Prune Queue by removing any item not found in the Playlist")
-        TipQueue.SetToolTipIcon(BtnPrune, My.Resources.Resources.ImagePrune32)
+        TipQueue.SetToolTipImage(BtnPrune, My.Resources.Resources.ImagePrune32)
         BtnPrune.UseVisualStyleBackColor = True
         ' 
         ' PlayerQueue
@@ -123,7 +123,7 @@ Partial Class PlayerQueue
         Name = "PlayerQueue"
         StartPosition = FormStartPosition.CenterParent
         Text = "Queue"
-        TipQueue.SetToolTipIcon(Me, Nothing)
+        TipQueue.SetToolTipImage(Me, Nothing)
         CMQueue.ResumeLayout(False)
         ResumeLayout(False)
     End Sub

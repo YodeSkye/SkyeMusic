@@ -47,7 +47,7 @@ Partial Class Log
         RTBLog.Size = New Size(776, 317)
         RTBLog.TabIndex = 0
         RTBLog.Text = ""
-        TipLog.SetToolTipIcon(RTBLog, Nothing)
+        TipLog.SetToolTipImage(RTBLog, Nothing)
         RTBLog.WordWrap = False
         ' 
         ' RTBCMLog
@@ -55,7 +55,7 @@ Partial Class Log
         RTBCMLog.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         RTBCMLog.Name = "RTBCMLog"
         RTBCMLog.Size = New Size(129, 148)
-        TipLog.SetToolTipIcon(RTBCMLog, Nothing)
+        TipLog.SetToolTipImage(RTBCMLog, Nothing)
         ' 
         ' BTNOK
         ' 
@@ -66,7 +66,7 @@ Partial Class Log
         BTNOK.Size = New Size(64, 64)
         BTNOK.TabIndex = 2
         TipLog.SetToolTip(BTNOK, "Close Window")
-        TipLog.SetToolTipIcon(BTNOK, Nothing)
+        TipLog.SetToolTipImage(BTNOK, Nothing)
         BTNOK.UseVisualStyleBackColor = True
         ' 
         ' BTNDeleteLog
@@ -78,7 +78,7 @@ Partial Class Log
         BTNDeleteLog.Size = New Size(48, 48)
         BTNDeleteLog.TabIndex = 3
         TipLog.SetToolTip(BTNDeleteLog, "Delete Log")
-        TipLog.SetToolTipIcon(BTNDeleteLog, Nothing)
+        TipLog.SetToolTipImage(BTNDeleteLog, Nothing)
         BTNDeleteLog.UseVisualStyleBackColor = True
         ' 
         ' BTNRefreshLog
@@ -90,7 +90,7 @@ Partial Class Log
         BTNRefreshLog.Size = New Size(48, 48)
         BTNRefreshLog.TabIndex = 4
         TipLog.SetToolTip(BTNRefreshLog, "Refresh Log")
-        TipLog.SetToolTipIcon(BTNRefreshLog, Nothing)
+        TipLog.SetToolTipImage(BTNRefreshLog, Nothing)
         BTNRefreshLog.UseVisualStyleBackColor = True
         ' 
         ' LBLLogInfo
@@ -103,7 +103,7 @@ Partial Class Log
         LBLLogInfo.TabIndex = 5
         LBLLogInfo.Text = "Log Info"
         LBLLogInfo.TextAlign = ContentAlignment.BottomCenter
-        TipLog.SetToolTipIcon(LBLLogInfo, Nothing)
+        TipLog.SetToolTipImage(LBLLogInfo, Nothing)
         ' 
         ' TxBxSearch
         ' 
@@ -115,7 +115,7 @@ Partial Class Log
         TxBxSearch.Size = New Size(175, 18)
         TxBxSearch.TabIndex = 6
         TxBxSearch.Text = "Search Log"
-        TipLog.SetToolTipIcon(TxBxSearch, Nothing)
+        TipLog.SetToolTipImage(TxBxSearch, Nothing)
         ' 
         ' LblStatus
         ' 
@@ -130,7 +130,7 @@ Partial Class Log
         LblStatus.TabIndex = 7
         LblStatus.Text = "Searching The Log..."
         LblStatus.TextAlign = ContentAlignment.MiddleRight
-        TipLog.SetToolTipIcon(LblStatus, Nothing)
+        TipLog.SetToolTipImage(LblStatus, Nothing)
         LblStatus.Visible = False
         ' 
         ' TipLog
@@ -158,7 +158,7 @@ Partial Class Log
         MinimumSize = New Size(400, 300)
         Name = "Log"
         StartPosition = FormStartPosition.CenterScreen
-        TipLog.SetToolTipIcon(Me, Nothing)
+        TipLog.SetToolTipImage(Me, Nothing)
         ResumeLayout(False)
         PerformLayout()
     End Sub
