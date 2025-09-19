@@ -1,5 +1,5 @@
 ﻿
-<Assembly: Reflection.AssemblyVersionAttribute("0.7.0.0")>
+<Assembly: Reflection.AssemblyVersionAttribute("0.7.0")>
 
 <Assembly: Reflection.AssemblyProductAttribute("SkyeMusic")>
 <Assembly: Reflection.AssemblyTitleAttribute("Skye Music")>
