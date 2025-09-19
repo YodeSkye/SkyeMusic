@@ -87,10 +87,8 @@ Partial Class Player
         ListBoxPlaylistSearch = New ListBox()
         PanelMedia = New Panel()
         BtnPrevious = New Button()
-        TipPlayer = New Skye.UI.ToolTip()
+        TipPlayer = New Skye.UI.ToolTip(components)
         LVPlaylist = New Skye.UI.ListViewEX()
-        TimerMeter = New Timer(components)
-        TimerVisualizer = New Timer(components)
         PicBoxVisualizer = New PictureBox()
         TxtBoxLyrics = New TextBox()
         CMLyrics = New Skye.UI.TextBoxContextMenu()
@@ -98,6 +96,8 @@ Partial Class Player
         LblDuration = New Skye.UI.Label()
         LblPosition = New Skye.UI.Label()
         TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
+        TimerMeter = New Timer(components)
+        TimerVisualizer = New Timer(components)
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         CType(AxPlayer, ComponentModel.ISupportInitialize).BeginInit()
@@ -653,15 +653,6 @@ Partial Class Player
         LVPlaylist.UseCompatibleStateImageBehavior = False
         LVPlaylist.View = View.Details
         ' 
-        ' TimerMeter
-        ' 
-        TimerMeter.Enabled = True
-        TimerMeter.Interval = 75
-        ' 
-        ' TimerVisualizer
-        ' 
-        TimerVisualizer.Interval = 75
-        ' 
         ' PicBoxVisualizer
         ' 
         PicBoxVisualizer.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
@@ -756,6 +747,15 @@ Partial Class Player
         TrackBarPosition.TimerInterval = 100
         TipPlayer.SetToolTipIcon(TrackBarPosition, Nothing)
         TrackBarPosition.Value = 0
+        ' 
+        ' TimerMeter
+        ' 
+        TimerMeter.Enabled = True
+        TimerMeter.Interval = 75
+        ' 
+        ' TimerVisualizer
+        ' 
+        TimerVisualizer.Interval = 75
         ' 
         ' Player
         ' 

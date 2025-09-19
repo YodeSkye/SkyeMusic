@@ -55,7 +55,7 @@ Partial Class Options
         LblPlaylistSearchAction = New Skye.UI.Label()
         CoBoxTheme = New ComboBox()
         LblTheme = New Skye.UI.Label()
-        TipOptions = New Skye.UI.ToolTip()
+        TipOptions = New Skye.UI.ToolTip(components)
         TxtBoxHistoryUpdateInterval = New TextBox()
         LblPlaylistFormatting = New Label()
         TxtBoxHistoryAutoSaveInterval = New TextBox()

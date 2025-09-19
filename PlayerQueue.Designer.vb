@@ -30,7 +30,7 @@ Partial Class PlayerQueue
         CMQueue = New ContextMenuStrip(components)
         CMIRemove = New ToolStripMenuItem()
         BtnOK = New Button()
-        TipQueue = New Skye.UI.ToolTip()
+        TipQueue = New Skye.UI.ToolTip(components)
         BtnPrune = New Button()
         CMQueue.SuspendLayout()
         SuspendLayout()
@@ -64,7 +64,7 @@ Partial Class PlayerQueue
         ' 
         ' CMQueue
         ' 
-        CMQueue.Font = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        CMQueue.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMQueue.Items.AddRange(New ToolStripItem() {CMIRemove})
         CMQueue.Name = "CMQueue"
         CMQueue.Size = New Size(126, 26)
@@ -94,7 +94,7 @@ Partial Class PlayerQueue
         ' 
         TipQueue.BackColor = SystemColors.Control
         TipQueue.BorderColor = SystemColors.Window
-        TipQueue.Font = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipQueue.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipQueue.ForeColor = SystemColors.WindowText
         TipQueue.OwnerDraw = True
         ' 
@@ -112,7 +112,7 @@ Partial Class PlayerQueue
         ' 
         ' PlayerQueue
         ' 
-        AutoScaleDimensions = New SizeF(7.0F, 15.0F)
+        AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(784, 261)
         Controls.Add(BtnPrune)

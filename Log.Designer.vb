@@ -22,6 +22,7 @@ Partial Class Log
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Log))
         RTBLog = New RichTextBox()
         RTBCMLog = New Skye.UI.RichTextBoxContextMenu()
@@ -31,7 +32,7 @@ Partial Class Log
         LBLLogInfo = New Skye.UI.Label()
         TxBxSearch = New TextBox()
         LblStatus = New Skye.UI.Label()
-        TipLog = New Skye.UI.ToolTip()
+        TipLog = New Skye.UI.ToolTip(components)
         SuspendLayout()
         ' 
         ' RTBLog

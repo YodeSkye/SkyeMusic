@@ -49,7 +49,7 @@ Partial Class Library
         LBXLibrarySearch = New ListBox()
         PicBoxAlbumArt = New PictureBox()
         LblAlbumArtSelect = New Label()
-        TipLibrary = New Skye.UI.ToolTip()
+        TipLibrary = New Skye.UI.ToolTip(components)
         RadBtnGroupByGenre = New RadioButton()
         GrpBoxGroupBy = New GroupBox()
         RadBtnGroupByType = New RadioButton()
