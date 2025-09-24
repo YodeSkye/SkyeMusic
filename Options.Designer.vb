@@ -837,7 +837,7 @@ Partial Class Options
         TipOptionsEX.FadeOutRate = 25
         TipOptionsEX.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipOptionsEX.HideDelay = 1000
-        TipOptionsEX.ShadowAlpha = 100
+        TipOptionsEX.ShadowAlpha = 200
         TipOptionsEX.ShowDelay = 1000
         ' 
         ' Options

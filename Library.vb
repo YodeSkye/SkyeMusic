@@ -148,7 +148,7 @@ Public Class Library
         LblExtFileInfo.Text = String.Empty
         LblExtProperties.Text = String.Empty
         LblExtType.Text = String.Empty
-        TipLibrary.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
+        TipLibrary.SetText(LblAlbumArtSelect, "Show Next Album Art")
         CustomDrawCMToolTip(CMLibrary)
         LoadLibrary()
 
@@ -2083,9 +2083,9 @@ Public Class Library
             Dim h As String = App.History.Find(Function(p) p.Path = (LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)).ToStringFull
             LblHistory.Text = GenerateEllipsis(LblHistory.CreateGraphics(), h, LblHistory.Font, LblHistory.Size.Width)
             If LblHistory.Text = h Then
-                TipLibrary.SetToolTip(LblHistory, Nothing)
+                TipLibrary.SetText(LblHistory, Nothing)
             Else
-                TipLibrary.SetToolTip(LblHistory, h)
+                TipLibrary.SetText(LblHistory, h)
             End If
             LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             Dim fInfo As IO.FileInfo
@@ -2119,9 +2119,9 @@ Public Class Library
                     h = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
                     LblExtType.Text = GenerateEllipsis(LblExtType.CreateGraphics(), h, LblExtType.Font, LblExtType.Size.Width)
                     If LblExtType.Text = h Then
-                        TipLibrary.SetToolTip(LblExtType, Nothing)
+                        TipLibrary.SetText(LblExtType, Nothing)
                     Else
-                        TipLibrary.SetToolTip(LblExtType, h)
+                        TipLibrary.SetText(LblExtType, h)
                     End If
                     tlFile.Dispose()
                     tlFile = Nothing
