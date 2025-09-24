@@ -196,11 +196,13 @@ Public Class Log
             timerDeleteLog.Stop()
             DeleteLogConfirm = False
             Me.BTNDeleteLog.BackColor = App.CurrentTheme.ButtonBackColor
-            TipLog.Hide(Me)
+            TipLog.HideDelay = 500
+            TipLog.HideTooltip()
         Else
             DeleteLogConfirm = True
             Me.BTNDeleteLog.BackColor = Color.Red
-            TipLog.Show("Are You Sure?", Me, BTNDeleteLog.Location)
+            TipLog.HideDelay = 5000
+            TipLog.ShowTooltipAtCursor("Are You Sure?")
             timerDeleteLog.Start()
         End If
     End Sub

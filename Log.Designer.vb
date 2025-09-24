@@ -32,7 +32,7 @@ Partial Class Log
         LBLLogInfo = New Skye.UI.Label()
         TxBxSearch = New TextBox()
         LblStatus = New Skye.UI.Label()
-        TipLog = New Skye.UI.ToolTip(components)
+        TipLog = New Skye.UI.ToolTipEX(components)
         SuspendLayout()
         ' 
         ' RTBLog
@@ -40,6 +40,7 @@ Partial Class Log
         RTBLog.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         RTBLog.ContextMenuStrip = RTBCMLog
         RTBLog.Font = New Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        TipLog.SetImage(RTBLog, Nothing)
         RTBLog.Location = New Point(12, 32)
         RTBLog.Name = "RTBLog"
         RTBLog.ReadOnly = True
@@ -47,75 +48,74 @@ Partial Class Log
         RTBLog.Size = New Size(776, 317)
         RTBLog.TabIndex = 0
         RTBLog.Text = ""
-        TipLog.SetToolTipImage(RTBLog, Nothing)
         RTBLog.WordWrap = False
         ' 
         ' RTBCMLog
         ' 
         RTBCMLog.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipLog.SetImage(RTBCMLog, Nothing)
         RTBCMLog.Name = "RTBCMLog"
         RTBCMLog.Size = New Size(129, 148)
-        TipLog.SetToolTipImage(RTBCMLog, Nothing)
         ' 
         ' BTNOK
         ' 
         BTNOK.Anchor = AnchorStyles.Bottom
+        TipLog.SetImage(BTNOK, Nothing)
         BTNOK.Image = My.Resources.Resources.ImageOK
         BTNOK.Location = New Point(368, 383)
         BTNOK.Name = "BTNOK"
         BTNOK.Size = New Size(64, 64)
         BTNOK.TabIndex = 2
-        TipLog.SetToolTip(BTNOK, "Close Window")
-        TipLog.SetToolTipImage(BTNOK, Nothing)
+        TipLog.SetText(BTNOK, "Close Window")
         BTNOK.UseVisualStyleBackColor = True
         ' 
         ' BTNDeleteLog
         ' 
         BTNDeleteLog.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
+        TipLog.SetImage(BTNDeleteLog, Nothing)
         BTNDeleteLog.Image = My.Resources.Resources.ImageDeleteLog32
         BTNDeleteLog.Location = New Point(12, 399)
         BTNDeleteLog.Name = "BTNDeleteLog"
         BTNDeleteLog.Size = New Size(48, 48)
         BTNDeleteLog.TabIndex = 3
-        TipLog.SetToolTip(BTNDeleteLog, "Delete Log")
-        TipLog.SetToolTipImage(BTNDeleteLog, Nothing)
+        TipLog.SetText(BTNDeleteLog, "Delete Log")
         BTNDeleteLog.UseVisualStyleBackColor = True
         ' 
         ' BTNRefreshLog
         ' 
         BTNRefreshLog.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
+        TipLog.SetImage(BTNRefreshLog, Nothing)
         BTNRefreshLog.Image = My.Resources.Resources.ImageRefreshLog32
         BTNRefreshLog.Location = New Point(740, 399)
         BTNRefreshLog.Name = "BTNRefreshLog"
         BTNRefreshLog.Size = New Size(48, 48)
         BTNRefreshLog.TabIndex = 4
-        TipLog.SetToolTip(BTNRefreshLog, "Refresh Log")
-        TipLog.SetToolTipImage(BTNRefreshLog, Nothing)
+        TipLog.SetText(BTNRefreshLog, "Refresh Log")
         BTNRefreshLog.UseVisualStyleBackColor = True
         ' 
         ' LBLLogInfo
         ' 
         LBLLogInfo.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LBLLogInfo.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        TipLog.SetImage(LBLLogInfo, Nothing)
         LBLLogInfo.Location = New Point(12, 352)
         LBLLogInfo.Name = "LBLLogInfo"
         LBLLogInfo.Size = New Size(776, 23)
         LBLLogInfo.TabIndex = 5
         LBLLogInfo.Text = "Log Info"
         LBLLogInfo.TextAlign = ContentAlignment.BottomCenter
-        TipLog.SetToolTipImage(LBLLogInfo, Nothing)
         ' 
         ' TxBxSearch
         ' 
         TxBxSearch.BorderStyle = BorderStyle.None
         TxBxSearch.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipLog.SetImage(TxBxSearch, Nothing)
         TxBxSearch.Location = New Point(15, 12)
         TxBxSearch.Name = "TxBxSearch"
         TxBxSearch.ShortcutsEnabled = False
         TxBxSearch.Size = New Size(175, 18)
         TxBxSearch.TabIndex = 6
         TxBxSearch.Text = "Search Log"
-        TipLog.SetToolTipImage(TxBxSearch, Nothing)
         ' 
         ' LblStatus
         ' 
@@ -124,22 +124,21 @@ Partial Class Log
         LblStatus.BackColor = Color.Transparent
         LblStatus.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblStatus.ForeColor = Color.Red
+        TipLog.SetImage(LblStatus, Nothing)
         LblStatus.Location = New Point(657, 12)
         LblStatus.Name = "LblStatus"
         LblStatus.Size = New Size(128, 17)
         LblStatus.TabIndex = 7
         LblStatus.Text = "Searching The Log..."
         LblStatus.TextAlign = ContentAlignment.MiddleRight
-        TipLog.SetToolTipImage(LblStatus, Nothing)
         LblStatus.Visible = False
         ' 
         ' TipLog
         ' 
-        TipLog.BackColor = SystemColors.Control
-        TipLog.BorderColor = SystemColors.Window
         TipLog.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipLog.ForeColor = SystemColors.WindowText
-        TipLog.OwnerDraw = True
+        TipLog.HideDelay = 1000
+        TipLog.ShadowAlpha = 100
+        TipLog.ShowDelay = 1000
         ' 
         ' Log
         ' 
@@ -154,11 +153,11 @@ Partial Class Log
         Controls.Add(BTNOK)
         Controls.Add(RTBLog)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
+        TipLog.SetImage(Me, Nothing)
         KeyPreview = True
         MinimumSize = New Size(400, 300)
         Name = "Log"
         StartPosition = FormStartPosition.CenterScreen
-        TipLog.SetToolTipImage(Me, Nothing)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -171,5 +170,5 @@ Partial Class Log
     Friend WithEvents LBLLogInfo As Skye.UI.Label
     Friend WithEvents TxBxSearch As TextBox
     Friend WithEvents LblStatus As Skye.UI.Label
-    Friend WithEvents TipLog As Skye.UI.ToolTip
+    Friend WithEvents TipLog As Skye.UI.ToolTipEX
 End Class

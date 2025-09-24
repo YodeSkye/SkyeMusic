@@ -561,9 +561,9 @@ Public Class Options
         BtnHistorySaveNow.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnHistoryPrune.BackColor = App.CurrentTheme.ButtonBackColor
         BtnHistoryPrune.ForeColor = App.CurrentTheme.ButtonTextColor
-        TipOptions.BackColor = App.CurrentTheme.BackColor
-        TipOptions.ForeColor = App.CurrentTheme.TextColor
-        TipOptions.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipOptionsEX.BackColor = App.CurrentTheme.BackColor
+        TipOptionsEX.ForeColor = App.CurrentTheme.TextColor
+        TipOptionsEX.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("Options Theme Set")
     End Sub

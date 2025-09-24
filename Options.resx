@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="TipOptions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>300, 17</value>
+  <metadata name="TipOptionsEX.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>413, 17</value>
   </metadata>
   <metadata name="CMTxtBox.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>193, 17</value>
@@ -126,13 +126,12 @@
   <metadata name="CMLibrarySearchFolders.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>11, 17</value>
   </metadata>
-  <data name="BtnHistoryPrune.ToolTip" xml:space="preserve">
+  <data name="BtnHistoryPrune.Text" xml:space="preserve">
     <value>Prune the song history.
-This will remove any song history entries that aren't in the library, cannot be found in storage,
-or are a stream not found in the playlist.
+This will remove any song history entries that aren't in the library, cannot be found in storage, or are a stream that cannot be found in the playlist.
 The total number of song history entries is given in parentheses.</value>
   </data>
-  <data name="TxtBoxRandomHistoryUpdateInterval.ToolTip" xml:space="preserve">
+  <data name="TxtBoxRandomHistoryUpdateInterval.Text" xml:space="preserve">
     <value>Update Shuffle Play History after 1-60 seconds, or 0 for immediate update.
 Shuffle Play History is a list of songs played while in Shuffle Play Mode and is used when clicking the previous song button.</value>
   </data>

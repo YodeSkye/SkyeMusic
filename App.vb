@@ -227,7 +227,7 @@ Namespace My
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
         Private ReadOnly LightTheme As New ThemeProperties With {
             .IsAccent = False,
-            .BackColor = Color.FromArgb(255, 240, 240, 240), 'SystemColors.Control
+            .BackColor = Color.FromArgb(255, 241, 240, 240), 'SystemColors.Control = 240,240,240, set to avoid transparency issues in ToolTipEX
             .TextColor = Color.Black,
             .ControlBackColor = SystemColors.Window,
             .ButtonBackColor = SystemColors.Window,

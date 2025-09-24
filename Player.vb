@@ -154,13 +154,13 @@ Public Class Player
         AxPlayer.settings.volume = 100
 
         'Set tooltips for buttons
-        TipPlayer.SetToolTip(BtnPlay, "Play / Pause")
-        TipPlayer.SetToolTip(BtnStop, "Stop Playing")
-        TipPlayer.SetToolTip(BtnReverse, "Skip Backward")
-        TipPlayer.SetToolTip(BtnForward, "Skip Forward")
-        TipPlayer.SetToolTip(BtnMute, "Mute")
-        TipPlayer.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
-        TipPlayer.SetToolTip(LblDuration, "Song Duration")
+        TipPlayerEX.SetText(BtnPlay, "Play / Pause")
+        TipPlayerEX.SetText(BtnStop, "Stop Playing")
+        TipPlayerEX.SetText(BtnReverse, "Skip Backward")
+        TipPlayerEX.SetText(BtnForward, "Skip Forward")
+        TipPlayerEX.SetText(BtnMute, "Mute")
+        TipPlayerEX.SetText(LblAlbumArtSelect, "Show Next Album Art")
+        TipPlayerEX.SetText(LblDuration, "Song Duration")
         SetTipPlayer()
         CustomDrawCMToolTip(CMPlaylist)
 
@@ -788,10 +788,7 @@ Public Class Player
         If Not MIAbout.Selected Then MIAbout.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub CMPlaylist_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylist.Opening
-        TipPlayer.Hide(Me)
-        Static pt As Point
-        pt = PointToClient(CMPlaylist.Location)
-        If LVPlaylist.SelectedItems.Count > 0 Then TipPlayer.Show(App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text).ToString, Me, New Point(pt.X + 8, pt.Y - 6), 5000)
+        If LVPlaylist.SelectedItems.Count > 0 Then TipPlaylist.ShowTooltipAt(New Point(CMPlaylist.Location.X, CMPlaylist.Location.Y - 36), App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text).ToString)
         CMIHelperApp1.Text = "Open with " + App.HelperApp1Name
         CMIHelperApp2.Text = "Open with " + App.HelperApp2Name
         If LVPlaylist.Items.Count = 0 Then
@@ -864,7 +861,7 @@ Public Class Player
         End If
     End Sub
     Private Sub CMPlaylist_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles CMPlaylist.Closing
-        TipPlayer.Hide(Me)
+        TipPlaylist.HideTooltip()
     End Sub
     Private Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
         PlayFromPlaylist()
@@ -2928,20 +2925,20 @@ Public Class Player
     Friend Sub SetTipPlayer()
         Select Case App.PlayMode
             Case App.PlayModes.None, PlayModes.Repeat
-                TipPlayer.SetToolTip(BtnPrevious, String.Empty)
-                TipPlayer.SetToolTip(BtnNext, String.Empty)
+                TipPlayerEX.SetText(BtnPrevious, String.Empty)
+                TipPlayerEX.SetText(BtnNext, String.Empty)
             Case App.PlayModes.Linear
-                TipPlayer.SetToolTip(BtnPrevious, "Previous Song In Playlist")
-                TipPlayer.SetToolTip(BtnNext, "Next Song In Playlist")
+                TipPlayerEX.SetText(BtnPrevious, "Previous Song In Playlist")
+                TipPlayerEX.SetText(BtnNext, "Next Song In Playlist")
             Case App.PlayModes.Random
-                TipPlayer.SetToolTip(BtnPrevious, "Previous Song Played")
-                TipPlayer.SetToolTip(BtnNext, "Next Random Song")
+                TipPlayerEX.SetText(BtnPrevious, "Previous Song Played")
+                TipPlayerEX.SetText(BtnNext, "Next Random Song")
         End Select
         Select Case App.PlayerPositionShowElapsed
             Case True
-                TipPlayer.SetToolTip(LblPosition, "Elapsed Time")
+                TipPlayerEX.SetText(LblPosition, "Elapsed Time")
             Case False
-                TipPlayer.SetToolTip(LblPosition, "Time Remaining")
+                TipPlayerEX.SetText(LblPosition, "Time Remaining")
         End Select
     End Sub
     Private Sub ClearPlaylistTitles()
@@ -3133,9 +3130,12 @@ Public Class Player
         BtnPrevious.Image = App.CurrentTheme.PlayerPrevious
         BtnForward.Image = App.CurrentTheme.PlayerFastForward
         BtnReverse.Image = App.CurrentTheme.PlayerFastReverse
-        TipPlayer.BackColor = App.CurrentTheme.BackColor
-        TipPlayer.ForeColor = App.CurrentTheme.TextColor
-        TipPlayer.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipPlayerEX.BackColor = App.CurrentTheme.BackColor
+        TipPlayerEX.ForeColor = App.CurrentTheme.TextColor
+        TipPlayerEX.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipPlaylist.BackColor = App.CurrentTheme.BackColor
+        TipPlaylist.ForeColor = App.CurrentTheme.TextColor
+        TipPlaylist.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("Player Theme Set")
     End Sub
@@ -3152,7 +3152,7 @@ Public Class Player
         AddHandler MyToolTip.Popup,
             Sub(sender, e)
                 Dim s As SizeF
-                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), TipPlayer.Font)
+                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), TipPlayerEX.Font)
                 s.Width += 14
                 s.Height += 16
                 e.ToolTipSize = s.ToSize
@@ -3168,12 +3168,12 @@ Public Class Player
                 g.FillRectangle(brbg, e.Bounds)
 
                 'Draw border
-                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipPlayer.Font.Size / 4)) 'Scale border thickness with font
+                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipPlayerEX.Font.Size / 4)) 'Scale border thickness with font
                     g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
                 End Using
 
                 'Draw text
-                TextRenderer.DrawText(g, e.ToolTipText, TipPlayer.Font, New Point(7, 7), App.CurrentTheme.TextColor)
+                TextRenderer.DrawText(g, e.ToolTipText, TipPlayerEX.Font, New Point(7, 7), App.CurrentTheme.TextColor)
 
                 'Finalize
                 brbg.Dispose()
