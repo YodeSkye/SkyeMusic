@@ -1652,15 +1652,13 @@ Public Class Library
             Dim tlfile As TagLib.File
             Dim item As New ListViewItem()
             Dim col As New Collections.Generic.List(Of ListViewItem)
-            LVLibrary.Items.Clear()
-            ShowAlbumArt()
-            ResetExtInfo()
-            LVLibrary.Refresh()
-            LVLibrary.Visible = False
             LblStatus.Text = "Searching your Folders for Media Files..."
             LblStatus.Visible = True
             LblStatus.Refresh()
+            ResetExtInfo()
             ClearHistoryInLibraryFlag()
+            LVLibrary.BeginUpdate()
+            LVLibrary.Items.Clear()
             For Each folder As String In App.LibrarySearchFolders
                 Try
                     If App.LibrarySearchSubFolders Then
@@ -1750,8 +1748,9 @@ Public Class Library
             col.Clear()
             item = Nothing
             tlfile = Nothing
+            LVLibrary.EndUpdate()
             LblStatus.Visible = False
-            LVLibrary.Visible = True
+            ShowAlbumArt()
             SetLibraryCountText()
             App.WriteToLog("Folders Searched (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
