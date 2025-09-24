@@ -1,5 +1,6 @@
 ﻿
 Imports Microsoft.Win32
+Imports Skye
 Imports SkyeMusic.Player
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
@@ -226,7 +227,7 @@ Namespace My
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
         Private ReadOnly LightTheme As New ThemeProperties With {
             .IsAccent = False,
-            .BackColor = SystemColors.Control,
+            .BackColor = Color.FromArgb(255, 240, 241, 241), 'SystemColors.Control
             .TextColor = Color.Black,
             .ControlBackColor = SystemColors.Window,
             .ButtonBackColor = SystemColors.Window,
