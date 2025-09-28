@@ -104,6 +104,8 @@ Partial Class PlayerQueue
         ' 
         ' TipQueue
         ' 
+        TipQueue.FadeInRate = 25
+        TipQueue.FadeOutRate = 25
         TipQueue.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipQueue.HideDelay = 1000
         TipQueue.ShadowAlpha = 200

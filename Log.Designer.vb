@@ -135,6 +135,8 @@ Partial Class Log
         ' 
         ' TipLog
         ' 
+        TipLog.FadeInRate = 25
+        TipLog.FadeOutRate = 25
         TipLog.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipLog.HideDelay = 1000
         TipLog.ShadowAlpha = 200

@@ -214,9 +214,9 @@ Partial Class Library
         BtnOK.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         TipLibrary.SetImage(BtnOK, Nothing)
         BtnOK.Image = My.Resources.Resources.ImageOK
-        BtnOK.Location = New Point(883, 436)
+        BtnOK.Location = New Point(874, 444)
         BtnOK.Name = "BtnOK"
-        BtnOK.Size = New Size(64, 73)
+        BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 3
         BtnOK.TabStop = False
         BtnOK.UseVisualStyleBackColor = True

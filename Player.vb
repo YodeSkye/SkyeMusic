@@ -3063,10 +3063,10 @@ Public Class Player
             MIVisualizer.BackColor = Color.Transparent
         End If
     End Sub
-    Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
+    Private Sub SetAccentColor()
         Static c As Color
         c = App.GetAccentColor()
-        If Not AsTheme Then SuspendLayout()
+        SuspendLayout()
         If IsFocused Then
             MenuPlayer.BackColor = c
             TxtBoxPlaylistSearch.BackColor = c
@@ -3077,8 +3077,16 @@ Public Class Player
             TrackBarPosition.TrackBarGradientStart = c
             TrackBarPosition.TrackBarGradientEnd = c
         End If
-        If Not AsTheme Then ResumeLayout()
+        ResumeLayout()
         Debug.Print("Player Accent Color Set")
+        Invoke(Sub()
+                   '— repaint everything
+                   Me.Invalidate(True)
+                   Me.Update()
+                   '— tell Windows to recalc non-client area
+                   Skye.WinAPI.SetWindowPos(Me.Handle, IntPtr.Zero, 0, 0, 0, 0, Skye.WinAPI.SWP_NOMOVE Or Skye.WinAPI.SWP_NOSIZE Or Skye.WinAPI.SWP_NOZORDER Or Skye.WinAPI.SWP_FRAMECHANGED)
+                   Debug.Print("Player Repainted")
+               End Sub)
     End Sub
     Private Sub SetInactiveColor()
         MenuPlayer.BackColor = App.CurrentTheme.InactiveTitleBarColor
@@ -3087,7 +3095,6 @@ Public Class Player
     Friend Sub SetTheme()
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
-            SetAccentColor(True)
             LblPlaylistCount.ForeColor = App.CurrentTheme.AccentTextColor
             LblDuration.ForeColor = App.CurrentTheme.AccentTextColor
             LblPosition.ForeColor = App.CurrentTheme.AccentTextColor
