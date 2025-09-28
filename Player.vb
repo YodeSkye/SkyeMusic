@@ -36,6 +36,7 @@ Public Class Player
     Private RandomHistory As New Generic.List(Of String) 'History of played items for shuffle play mode
     Private RandomHistoryIndex As Integer = 0 'Index for the shuffle history
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
+    Private CurrentAccentColor As Color 'Current Windows Accent Color
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
 
@@ -65,10 +66,12 @@ Public Class Player
                     Select Case m.WParam.ToInt32
                         Case 0
                             IsFocused = False
-                            SetInactiveColor()
+                            Debug.Print("Player Lost Focus")
+                            SetInactiveTitleBarColor()
                         Case 1, 2
                             IsFocused = True
-                            SetAccentColor()
+                            Debug.Print("Player Got Focus")
+                            SetActiveTitleBarColor()
                     End Select
                 Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
                     SetAccentColor()
@@ -140,6 +143,7 @@ Public Class Player
         LVPlaylist.Columns.Add(header)
         header = Nothing
 
+        SetAccentColor()
         SetTheme()
         LoadPlaylist()
         ClearPlaylistTitles()
@@ -276,7 +280,6 @@ Public Class Player
         End If
     End Sub
     Private Sub Player_Deactivate(sender As Object, e As EventArgs) Handles MyBase.Deactivate
-        Debug.Print("Player Lost Focus")
         ResetTxtBoxPlaylistSearch()
         LVPlaylist.Select()
     End Sub
@@ -1039,8 +1042,8 @@ Public Class Player
                 pBrush = New SolidBrush(App.CurrentTheme.TextColor)
             End If
             e.Graphics.DrawString(pText, pFont, pBrush, PicBoxVisualizer.ClientSize.Width \ 2, PicBoxVisualizer.ClientSize.Height \ 2, pString_format)
-            End If
-            pString_format.Dispose()
+        End If
+        pString_format.Dispose()
         pFont.Dispose()
     End Sub
     Private Sub LblAlbumArtSelectClick(sender As Object, e As EventArgs) Handles LblAlbumArtSelect.Click
@@ -3064,33 +3067,36 @@ Public Class Player
         End If
     End Sub
     Private Sub SetAccentColor()
-        Static c As Color
-        c = App.GetAccentColor()
-        SuspendLayout()
-        If IsFocused Then
-            MenuPlayer.BackColor = c
-            TxtBoxPlaylistSearch.BackColor = c
+        Dim accent As Color = App.GetAccentColor()
+        If CurrentAccentColor <> accent Then
+            CurrentAccentColor = accent
+            SuspendLayout()
+            SetActiveTitleBarColor()
+            If App.CurrentTheme.IsAccent Then
+                BackColor = CurrentAccentColor
+                TxtBoxLyrics.BackColor = CurrentAccentColor
+                TrackBarPosition.TrackBarGradientStart = CurrentAccentColor
+                TrackBarPosition.TrackBarGradientEnd = CurrentAccentColor
+            End If
+            ResumeLayout()
+            Debug.Print("Player Accent Color Set")
+            Skye.WinAPI.RedrawWindow(Me.Handle, IntPtr.Zero, IntPtr.Zero, Skye.WinAPI.RDW_INVALIDATE Or Skye.WinAPI.RDW_ERASE Or Skye.WinAPI.RDW_FRAME Or Skye.WinAPI.RDW_ALLCHILDREN Or Skye.WinAPI.RDW_UPDATENOW)
+            Debug.Print("Player Repainted")
         End If
-        If App.CurrentTheme.IsAccent Then
-            BackColor = c
-            TxtBoxLyrics.BackColor = c
-            TrackBarPosition.TrackBarGradientStart = c
-            TrackBarPosition.TrackBarGradientEnd = c
-        End If
-        ResumeLayout()
-        Debug.Print("Player Accent Color Set")
-        Invoke(Sub()
-                   '— repaint everything
-                   Me.Invalidate(True)
-                   Me.Update()
-                   '— tell Windows to recalc non-client area
-                   Skye.WinAPI.SetWindowPos(Me.Handle, IntPtr.Zero, 0, 0, 0, 0, Skye.WinAPI.SWP_NOMOVE Or Skye.WinAPI.SWP_NOSIZE Or Skye.WinAPI.SWP_NOZORDER Or Skye.WinAPI.SWP_FRAMECHANGED)
-                   Debug.Print("Player Repainted")
-               End Sub)
     End Sub
-    Private Sub SetInactiveColor()
-        MenuPlayer.BackColor = App.CurrentTheme.InactiveTitleBarColor
-        TxtBoxPlaylistSearch.BackColor = App.CurrentTheme.InactiveTitleBarColor
+    Private Sub SetActiveTitleBarColor()
+        If IsFocused And CurrentAccentColor <> Nothing Then
+            MenuPlayer.BackColor = CurrentAccentColor
+            TxtBoxPlaylistSearch.BackColor = CurrentAccentColor
+            Debug.Print("Player Active Title Bar Color Set: " + CurrentAccentColor.ToString)
+        End If
+    End Sub
+    Private Sub SetInactiveTitleBarColor()
+        If Not IsFocused Then
+            MenuPlayer.BackColor = App.CurrentTheme.InactiveTitleBarColor
+            TxtBoxPlaylistSearch.BackColor = App.CurrentTheme.InactiveTitleBarColor
+            Debug.Print("Player InActive Title Bar Color Set")
+        End If
     End Sub
     Friend Sub SetTheme()
         SuspendLayout()
