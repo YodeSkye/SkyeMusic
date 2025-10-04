@@ -17,8 +17,8 @@
     <OptionStrict>On</OptionStrict>
     <ImportedNamespaces>SkyeMusic.My=False,System.Data=False,System.Drawing=False,System.Windows.Forms=False,Microsoft.VisualBasic=True,System=True,System.Collections=True,System.Collections.Generic=True,System.Diagnostics=True,System.Linq=True,System.Xml.Linq=True,System.Threading.Tasks=True,SkyeMusic=True</ImportedNamespaces>
     <PackageIcon>ImageAppRed.png</PackageIcon>
-    <AssemblyVersion>0.7.0</AssemblyVersion>
-    <FileVersion>0.7.0</FileVersion>
+    <AssemblyVersion>0.7.1</AssemblyVersion>
+    <FileVersion>0.7.1</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -110,8 +110,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkyeLibrary" Version="1.2.8" />
-    <PackageReference Include="Syncfusion.Tools.Windows" Version="31.1.21" />
+    <PackageReference Include="SkyeLibrary" Version="1.2.9" />
+    <PackageReference Include="Syncfusion.Tools.Windows" Version="31.1.22" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.9" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
