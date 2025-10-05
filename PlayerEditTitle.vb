@@ -24,6 +24,7 @@ Public Class PlayerEditTitle
         End Try
     End Sub
     Private Sub AddStream_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        SetAccentColor()
         SetTheme()
         TxtBoxTitle.Text = NewTitle
     End Sub
@@ -91,7 +92,6 @@ Public Class PlayerEditTitle
     End Sub
     Private Sub SetTheme()
         If App.CurrentTheme.IsAccent Then
-            SetAccentColor()
             LblTitle.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor

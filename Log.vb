@@ -6,6 +6,7 @@ Public Class Log
     'Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private CurrentAccentColor As Color 'Current Windows Accent Color
     Private LogSearchTitle As String
     Private DeleteLogConfirm As Boolean = False
     Private WithEvents timerDeleteLog As New Timer
@@ -27,6 +28,7 @@ Public Class Log
         Text = My.Application.Info.Title + " Log"
         LogSearchTitle = TxBxSearch.Text
         timerDeleteLog.Interval = 5000
+        SetAccentColor()
         SetTheme()
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
@@ -35,7 +37,6 @@ Public Class Log
         If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
         If App.SaveWindowMetrics AndAlso App.LogSize.Height >= 0 Then Me.Size = App.LogSize
 #End If
-
     End Sub
     Private Sub Log_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
         App.FRMLog.Dispose()
@@ -212,21 +213,24 @@ Public Class Log
         If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
         If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
-    Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
-        Static c As Color
-        If Not AsTheme Then SuspendLayout()
-        If App.CurrentTheme.IsAccent Then
-            c = App.GetAccentColor()
-            BackColor = c
-            TxBxSearch.BackColor = c
+    Private Sub SetAccentColor(Optional force As Boolean = False)
+        Dim accent As Color = App.GetAccentColor()
+        If CurrentAccentColor <> accent OrElse force Then
+            CurrentAccentColor = accent
+            SuspendLayout()
+            If App.CurrentTheme.IsAccent Then
+                BackColor = CurrentAccentColor
+                TxBxSearch.BackColor = CurrentAccentColor
+            End If
+            ResumeLayout()
+            Debug.Print("Log Accent Color Set")
+            Skye.WinAPI.RedrawWindow(Me.Handle, IntPtr.Zero, IntPtr.Zero, Skye.WinAPI.RDW_INVALIDATE Or Skye.WinAPI.RDW_ERASE Or Skye.WinAPI.RDW_FRAME Or Skye.WinAPI.RDW_ALLCHILDREN Or Skye.WinAPI.RDW_UPDATENOW)
+            Debug.Print("Log Repainted")
         End If
-        If Not AsTheme Then ResumeLayout()
-        Debug.Print("Log Accent Color Set")
     End Sub
-    Friend Sub SetTheme()
+    Private Sub SetTheme()
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
-            SetAccentColor(True)
             LBLLogInfo.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
@@ -245,6 +249,10 @@ Public Class Log
         If TxBxSearch.Text = LogSearchTitle Then TxBxSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
         ResumeLayout()
         Debug.Print("Log Theme Set")
+    End Sub
+    Friend Sub SetColors() 'Used By Options Form
+        SetAccentColor(True)
+        SetTheme()
     End Sub
 
 End Class

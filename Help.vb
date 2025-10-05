@@ -22,6 +22,7 @@ Public Class Help
     Private Sub Help_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = My.Application.Info.Title + " Help"
         RTxBxHelp.Rtf = My.Resources.HelpRT
+        SetAccentColor()
         SetTheme()
     End Sub
     Private Sub Help_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
@@ -69,22 +70,20 @@ Public Class Help
         If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
         If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
-    Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
+    Private Sub SetAccentColor()
         Static c As Color
-        If Not AsTheme Then SuspendLayout()
+        SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
             RTxBxHelp.BackColor = c
         End If
-        If Not AsTheme Then ResumeLayout()
+        ResumeLayout()
         Debug.Print("Help Accent Color Set")
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
-        If App.CurrentTheme.IsAccent Then
-            SetAccentColor(True)
-        Else
+        If Not App.CurrentTheme.IsAccent Then
             BackColor = App.CurrentTheme.BackColor
             RTxBxHelp.BackColor = App.CurrentTheme.BackColor
         End If

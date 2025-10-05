@@ -35,6 +35,7 @@ Public Class Library
     End Structure
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private CurrentAccentColor As Color 'Current Windows Accent Color
     Private LibraryImageList As New ImageList
     Private AlbumArtIndex As Byte = 0
     Private PicBoxAlbumArtSmallSize As Size
@@ -136,6 +137,7 @@ Public Class Library
         header = Nothing
 
         LibrarySearchTitle = TxbxLibrarySearch.Text
+        SetAccentColor()
         SetTheme()
         LibraryImageList.Images.Add("AlbumArt", Resources.ImageAlbumArtSelect)
         LVLibrary.SmallImageList = LibraryImageList
@@ -2088,45 +2090,48 @@ Public Class Library
                 TipLibrary.SetText(LblHistory, h)
             End If
             LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
-            Dim fInfo As IO.FileInfo
-            fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
-            LblExtFileInfo.Text = fInfo.Extension.TrimStart(CChar(".")).ToUpper
-            LblExtFileInfo.Text += " " + Skye.Common.FormatFileSize(fInfo.Length, Skye.Common.FormatFileSizeUnits.Auto, 2, False)
-            fInfo = Nothing
-            Dim tlFile As TagLib.File = Nothing
-            Try
-                tlFile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
-            Catch
-            Finally
-                If tlFile IsNot Nothing Then
-                    Select Case tlFile.Properties.MediaTypes
-                        Case TagLib.MediaTypes.Audio
-                            LblExtProperties.Text = tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
-                            Select Case tlFile.Properties.AudioChannels
-                                Case 1 : LblExtProperties.Text += "Mono"
-                                Case 2 : LblExtProperties.Text += "Stereo"
-                                Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
-                            End Select
-                        Case TagLib.MediaTypes.Video Or TagLib.MediaTypes.Audio
-                            LblExtProperties.Text = tlFile.Properties.VideoWidth.ToString + "x" + tlFile.Properties.VideoHeight.ToString + ", Audio: "
-                            LblExtProperties.Text += tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
-                            Select Case tlFile.Properties.AudioChannels
-                                Case 1 : LblExtProperties.Text += "Mono"
-                                Case 2 : LblExtProperties.Text += "Stereo"
-                                Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
-                            End Select
-                    End Select
-                    h = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
-                    LblExtType.Text = GenerateEllipsis(LblExtType.CreateGraphics(), h, LblExtType.Font, LblExtType.Size.Width)
-                    If LblExtType.Text = h Then
-                        TipLibrary.SetText(LblExtType, Nothing)
-                    Else
-                        TipLibrary.SetText(LblExtType, h)
-                    End If
-                    tlFile.Dispose()
-                    tlFile = Nothing
-                End If
-            End Try
+            If IO.File.Exists(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text) Then
+                Dim fInfo As IO.FileInfo
+                fInfo = New IO.FileInfo(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+                LblExtFileInfo.Text = fInfo.Extension.TrimStart(CChar(".")).ToUpper
+                LblExtFileInfo.Text += " " + Skye.Common.FormatFileSize(fInfo.Length, Skye.Common.FormatFileSizeUnits.Auto, 2, False)
+                fInfo = Nothing
+                Try
+                    Using tlFile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+                        Select Case tlFile.Properties.MediaTypes
+                            Case TagLib.MediaTypes.Audio
+                                LblExtProperties.Text = tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
+                                Select Case tlFile.Properties.AudioChannels
+                                    Case 1 : LblExtProperties.Text += "Mono"
+                                    Case 2 : LblExtProperties.Text += "Stereo"
+                                    Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
+                                End Select
+                            Case TagLib.MediaTypes.Video Or TagLib.MediaTypes.Audio
+                                LblExtProperties.Text = tlFile.Properties.VideoWidth.ToString + "x" + tlFile.Properties.VideoHeight.ToString + ", Audio: "
+                                LblExtProperties.Text += tlFile.Properties.AudioBitrate.ToString + " Kbps, " + tlFile.Properties.AudioSampleRate.ToString + " Hz, "
+                                Select Case tlFile.Properties.AudioChannels
+                                    Case 1 : LblExtProperties.Text += "Mono"
+                                    Case 2 : LblExtProperties.Text += "Stereo"
+                                    Case Else : LblExtProperties.Text += tlFile.Properties.AudioChannels.ToString + " channels"
+                                End Select
+                        End Select
+                        h = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
+                        LblExtType.Text = GenerateEllipsis(LblExtType.CreateGraphics(), h, LblExtType.Font, LblExtType.Size.Width)
+                        If LblExtType.Text = h Then
+                            TipLibrary.SetText(LblExtType, Nothing)
+                        Else
+                            TipLibrary.SetText(LblExtType, h)
+                        End If
+                    End Using
+                Catch
+                    LblExtProperties.Text = String.Empty
+                    LblExtType.Text = String.Empty
+                End Try
+            Else
+                LblExtFileInfo.Text = "**Missing File, Try Re-Searching Folders**"
+                LblExtProperties.Text = String.Empty
+                LblExtType.Text = String.Empty
+            End If
         End If
     End Sub
     Private Sub ResetExtInfo()
@@ -2155,22 +2160,25 @@ Public Class Library
         If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
         If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
-    Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
-        Static c As Color
-        If Not AsTheme Then SuspendLayout()
-        If App.CurrentTheme.IsAccent Then
-            c = App.GetAccentColor()
-            BackColor = c
-            TxbxLibrarySearch.BackColor = c
+    Private Sub SetAccentColor(Optional force As Boolean = False)
+        Dim accent As Color = App.GetAccentColor()
+        If CurrentAccentColor <> accent OrElse force Then
+            CurrentAccentColor = accent
+            SuspendLayout()
+            If App.CurrentTheme.IsAccent Then
+                BackColor = CurrentAccentColor
+                TxbxLibrarySearch.BackColor = CurrentAccentColor
+            End If
+            ResumeLayout()
+            Debug.Print("Library Accent Color Set")
+            Skye.WinAPI.RedrawWindow(Me.Handle, IntPtr.Zero, IntPtr.Zero, Skye.WinAPI.RDW_INVALIDATE Or Skye.WinAPI.RDW_ERASE Or Skye.WinAPI.RDW_FRAME Or Skye.WinAPI.RDW_ALLCHILDREN Or Skye.WinAPI.RDW_UPDATENOW)
+            Debug.Print("Library Repainted")
         End If
-        If Not AsTheme Then ResumeLayout()
-        Debug.Print("Library Accent Color Set")
     End Sub
-    Friend Sub SetTheme()
+    Private Sub SetTheme()
         Static forecolor As Color
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
-            SetAccentColor(True)
             forecolor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
@@ -2208,6 +2216,10 @@ Public Class Library
         GrpBoxGroupBy.ForeColor = forecolor
         ResumeLayout()
         Debug.Print("Library Theme Set")
+    End Sub
+    Friend Sub SetColors() 'Used By Options Form
+        SetAccentColor(True)
+        SetTheme()
     End Sub
     Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
 

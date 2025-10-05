@@ -20,6 +20,7 @@ Public Class About
         End Try
     End Sub
     Private Sub AboutLoad(sender As Object, e As EventArgs) Handles MyBase.Load
+        SetAccentColor()
         SetTheme()
         Text = "About " + My.Application.Info.Title
         LblAbout.Text = My.Application.Info.Description
@@ -142,20 +143,19 @@ Public Class About
         If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
         If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
-    Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
+    Private Sub SetAccentColor()
         Static c As Color
-        If Not AsTheme Then SuspendLayout()
+        SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
         End If
-        If Not AsTheme Then ResumeLayout()
+        ResumeLayout()
         Debug.Print("About Accent Color Set")
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
-            SetAccentColor(True)
             LblAbout.ForeColor = App.CurrentTheme.AccentTextColor
             LblVersion.ForeColor = App.CurrentTheme.AccentTextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.AccentTextColor

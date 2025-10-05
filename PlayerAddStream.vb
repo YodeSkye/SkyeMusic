@@ -24,6 +24,7 @@ Public Class PlayerAddStream
         End Try
     End Sub
     Private Sub AddStream_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        SetAccentColor()
         SetTheme()
         TxtBoxStreamPath.Text = NewStream.Path
     End Sub
@@ -97,7 +98,6 @@ Public Class PlayerAddStream
     End Sub
     Private Sub SetTheme()
         If App.CurrentTheme.IsAccent Then
-            SetAccentColor()
             LblStreamTitle.ForeColor = App.CurrentTheme.AccentTextColor
             LblStreamPath.ForeColor = App.CurrentTheme.AccentTextColor
         Else

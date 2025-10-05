@@ -25,6 +25,7 @@ Public Class Options
     End Sub
     Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = "Options For " + My.Application.Info.Title
+        SetAccentColor()
         SetTheme()
 
         'Settings
@@ -251,12 +252,13 @@ Public Class Options
         App.Theme = CType(CoBoxTheme.SelectedIndex, App.Themes)
         Debug.Print("Theme set to " + App.Theme.ToString)
         App.CurrentTheme = App.GetCurrentThemeProperties
+        If App.CurrentTheme.IsAccent Then SetAccentColor()
         SetTheme()
         If App.FRMLog IsNot Nothing Then
-            App.FRMLog.SetTheme()
+            App.FRMLog.SetColors()
         End If
-        App.FRMLibrary.SetTheme()
-        Player.SetTheme()
+        App.FRMLibrary.SetColors()
+        Player.SetColors()
     End Sub
     Private Sub CoBoxPlaylistTitleFormat_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistTitleFormat.SelectionChangeCommitted
         App.PlaylistTitleFormat = CType(CoBoxPlaylistTitleFormat.SelectedIndex, App.PlaylistTitleFormats)
@@ -466,9 +468,9 @@ Public Class Options
         If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
         If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
-    Private Sub SetAccentColor(Optional AsTheme As Boolean = False)
+    Private Sub SetAccentColor()
         Static c As Color
-        If Not AsTheme Then SuspendLayout()
+        SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
@@ -477,14 +479,13 @@ Public Class Options
             CkBoxLibrarySearchSubFolders.BackColor = c
             TCOptions.TabPanelBackColor = c
         End If
-        If Not AsTheme Then ResumeLayout()
+        ResumeLayout()
         Debug.Print("Options Accent Color Set")
     End Sub
     Private Sub SetTheme()
         Static forecolor As Color
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
-            SetAccentColor(True)
             forecolor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor

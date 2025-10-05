@@ -3066,9 +3066,9 @@ Public Class Player
             MIVisualizer.BackColor = Color.Transparent
         End If
     End Sub
-    Private Sub SetAccentColor()
+    Private Sub SetAccentColor(Optional force As Boolean = False)
         Dim accent As Color = App.GetAccentColor()
-        If CurrentAccentColor <> accent Then
+        If CurrentAccentColor <> accent OrElse force Then
             CurrentAccentColor = accent
             SuspendLayout()
             SetActiveTitleBarColor()
@@ -3098,7 +3098,7 @@ Public Class Player
             Debug.Print("Player InActive Title Bar Color Set")
         End If
     End Sub
-    Friend Sub SetTheme()
+    Private Sub SetTheme()
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             LblPlaylistCount.ForeColor = App.CurrentTheme.AccentTextColor
@@ -3151,6 +3151,10 @@ Public Class Player
         TipPlaylist.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("Player Theme Set")
+    End Sub
+    Friend Sub SetColors() 'Used By Options Form
+        SetAccentColor(True)
+        SetTheme()
     End Sub
     Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
 

@@ -19,6 +19,7 @@ Public Class PlayerQueue
         End Try
     End Sub
     Private Sub PlayerQueue_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        SetAccentColor()
         SetTheme()
         Populate()
     End Sub
@@ -175,9 +176,7 @@ Public Class PlayerQueue
         End If
     End Sub
     Private Sub SetTheme()
-        If App.CurrentTheme.IsAccent Then
-            SetAccentColor()
-        Else
+        If Not App.CurrentTheme.IsAccent Then
             BackColor = App.CurrentTheme.BackColor
         End If
         LVQueue.BackColor = App.CurrentTheme.BackColor
