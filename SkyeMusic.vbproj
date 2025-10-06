@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="CoreAudio.dll" />
+    <None Remove="SkyeLibrary.1.2.8.nupkg" />
   </ItemGroup>
 
   <ItemGroup>
