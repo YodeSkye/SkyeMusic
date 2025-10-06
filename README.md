@@ -90,3 +90,20 @@ To add the CoreAudio component:
 3. In the Reference Manager, click **Browse**.
 4. Navigate to the path where you saved the `CoreAudio.dll` file from the repository.
 5. Select `CoreAudio.dll` and click **OK** to add the reference.
+
+---
+
+## 🧩 Required Licensing
+
+### 🔑 Syncfusion License Key Setup
+
+SkyeMusic uses Syncfusion UI components. To run the app without trial limitations or watermarks, you’ll need a free community license key from Syncfusion.
+
+**Steps:**
+1. Visit https://www.syncfusion.com/ and register for a free community license.
+2. Copy `LicenseKey.Sample.vb` to `LicenseKey.vb` in the project root.
+3. Replace `"YOUR_ACTUAL_LICENSE_KEY_HERE"` with your own key.
+4. Do **not** commit `LicenseKey.vb`—it’s ignored by default via `.gitignore`.
+
+You can find your license key in the **License & Downloads** section of your Syncfusion account.  
+For more information, visit https://help.syncfusion.com/common/essential-studio/licensing/license-key

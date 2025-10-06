@@ -29,6 +29,9 @@
 	<NoWarn>MSB3305</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="LicenseKey.Sample.vb" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="CoreAudio.dll" />
   </ItemGroup>
 
@@ -57,6 +60,10 @@
     <Import Include="System.Data" />
     <Import Include="System.Drawing" />
     <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="LicenseKey.Sample.vb" />
   </ItemGroup>
 
   <ItemGroup>
