@@ -764,9 +764,11 @@ Public Class Player
     End Sub
     Private Sub MILibrary_MouseEnter(sender As Object, e As EventArgs) Handles MILibrary.MouseEnter
         MILibrary.ForeColor = Color.Black
+        'TipPlaylist.ShowTooltipAt(New Point(Me.Left + MILibrary.Bounds.Left, Me.Top + MILibrary.Bounds.Top), "Show Library (L)")
     End Sub
     Private Sub MILibrary_MouseLeave(sender As Object, e As EventArgs) Handles MILibrary.MouseLeave
         MILibrary.ForeColor = App.CurrentTheme.AccentTextColor
+        'TipPlaylist.HideTooltip()
     End Sub
     Private Sub MIShowHelpClick(sender As Object, e As EventArgs) Handles MIShowHelp.Click
         ShowHelp()

@@ -792,14 +792,16 @@ Public Class Library
 
     'Procedures
     Friend Overloads Sub Show(filename As String)
-        LVLibrary.SelectedItems.Clear()
-        Show()
-        Dim item As ListViewItem = LVLibrary.FindItemWithText(filename, True, 0)
-        If item IsNot Nothing Then
-            item.Selected = True
-            item.EnsureVisible()
+        If Not String.IsNullOrWhiteSpace(filename) Then
+            LVLibrary.SelectedItems.Clear()
+            MyBase.Show()
+            Dim item As ListViewItem = LVLibrary.FindItemWithText(filename, True, 0)
+            If item IsNot Nothing Then
+                item.Selected = True
+                item.EnsureVisible()
+            End If
+            BringToFront()
         End If
-        BringToFront()
     End Sub
     Private Function FormatPlaylistTitle(ByRef item As ListViewItem) As String
         FormatPlaylistTitle = ""
