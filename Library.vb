@@ -803,6 +803,16 @@ Public Class Library
             BringToFront()
         End If
     End Sub
+    Friend Sub DoWatcherWork(paths As List(Of String))
+        LblStatus.Visible = True
+
+        For Each path As String In paths
+            LblStatus.Text = path
+            LblStatus.Refresh()
+        Next
+
+        LblStatus.Visible = False
+    End Sub
     Private Function FormatPlaylistTitle(ByRef item As ListViewItem) As String
         FormatPlaylistTitle = ""
         Select Case App.PlaylistTitleFormat

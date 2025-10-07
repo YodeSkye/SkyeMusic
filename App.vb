@@ -1,9 +1,10 @@
 ﻿
+Imports System.IO
+Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
 Imports Microsoft.Win32
 Imports Skye
 Imports SkyeMusic.Player
-Imports System.Runtime.InteropServices
-Imports System.Windows.Forms
 
 Namespace My
 
@@ -169,6 +170,9 @@ Namespace My
         Private WithEvents timerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
+        Private Watchers As New List(Of System.IO.FileSystemWatcher) 'Watchers is a set of file system watchers that monitors changes in the library folders.
+        Private WithEvents WatcherWorkTimer As New Timers.Timer(1000) 'WatcherWorkTimer is a timer that debounces file system watcher events to prevent multiple rapid events from being processed.
+        Private WatcherWorkList As New Collections.Generic.List(Of String) 'WatcherWorkList is a list of files that have been changed, created, deleted, or renamed by the file system watchers.
         Friend ReadOnly TrimEndSearch() As Char = {CChar(" "), CChar("("), CChar(")"), CChar("0"), CChar("1"), CChar("2"), CChar("3"), CChar("4"), CChar("5"), CChar("6"), CChar("7"), CChar("8"), CChar("9")} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
         Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
         Friend ReadOnly AttributionSyncFusion As String = "https://www.syncfusion.com/" 'AttributionSyncFusion is the URL for Syncfusion, which provides UI controls and libraries used in the application.
@@ -310,6 +314,9 @@ Namespace My
         Friend RandomHistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to add the currently playing song to the shuffle play history.
         Friend HistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to update the play count of the currently playing song.
         Friend HistoryAutoSaveInterval As UShort = 5 '1-1440 'Interval in minutes to automatically save the history.
+        Friend WatcherEnabled As Boolean = False 'Flag that indicates whether to watch for changes in the library folders.
+        Friend WatcherUpdateLibrary As Boolean = False 'Flag that indicates whether to automatically update the library when changes are detected in the file system.
+        Friend WatcherUpdatePlaylist As Boolean = False 'Flag that indicates whether to automatically update the playlist when changes are detected in the file system.
         Friend Theme As Themes = Themes.Red 'The current theme of the application.
         Friend PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend PlayerSize As New Size(-1, -1)
@@ -355,13 +362,44 @@ Namespace My
                     WriteToLog("Screen Unlocked @ " & Now)
             End Select
         End Sub
+        Private Sub watcher_Created(sender As Object, e As FileSystemEventArgs)
+            QueueWatcherWork(e.FullPath)
+            Debug.Print("File Created: " + e.FullPath)
+        End Sub
+        Private Sub watcher_Renamed(sender As Object, e As RenamedEventArgs)
+            QueueWatcherWork(e.OldFullPath)
+            QueueWatcherWork(e.FullPath)
+            Debug.Print("File Renamed: " + e.OldFullPath + " to " + e.FullPath)
+        End Sub
+        Private Sub watcher_Deleted(sender As Object, e As FileSystemEventArgs)
+            QueueWatcherWork(e.FullPath)
+            Debug.Print("File Deleted: " + e.FullPath)
+        End Sub
+        Private Sub watcher_Changed(sender As Object, e As FileSystemEventArgs)
+            QueueWatcherWork(e.FullPath)
+            Debug.Print("File Changed: " + e.FullPath)
+        End Sub
+        Private Sub WatcherWorkTimer_Elapsed(sender As Object, e As Timers.ElapsedEventArgs) Handles WatcherWorkTimer.Elapsed
+
+            Dim workItems As List(Of String)
+            SyncLock WatcherWorkList
+                workItems = WatcherWorkList.ToList()
+                WatcherWorkList.Clear()
+            End SyncLock
+
+            WatcherDoWork(workItems)
+
+        End Sub
 
         'App Procedures
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
+
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense()
+
             GetOptions()
+            GetDebugOptions()
             CurrentTheme = GetCurrentThemeProperties()
             LoadHistory()
 
@@ -445,6 +483,10 @@ Namespace My
             timerScreenSaverWatcher.Interval = 1000
             timerScreenSaverWatcher.Start()
             AddHandler Microsoft.Win32.SystemEvents.SessionSwitch, AddressOf SessionSwitchHandler 'SessionSwitchHandler is a handler for session switch events, sets the ScreenLocked flag, and acts accordingly.
+
+            WatcherWorkTimer.AutoReset = False
+            SetWatchers()
+
         End Sub
         Friend Sub Finalize()
             UnRegisterHotKeys()
@@ -629,6 +671,13 @@ Namespace My
                 WriteToLog("Error Loading Options" + vbCr + ex.Message)
             End Try
         End Sub
+        Private Sub GetDebugOptions()
+#If DEBUG Then
+            WatcherEnabled = True
+            WatcherUpdateLibrary = True
+            WatcherUpdatePlaylist = True
+#End If
+        End Sub
         Private Sub GenerateHotKeyList()
             HotKeys.Clear()
             HotKeys.Add(HotKeyPlay)
@@ -681,6 +730,52 @@ Namespace My
             Catch
             Finally : fInfo = Nothing
             End Try
+        End Sub
+        Private Sub SetWatchers()
+
+            'Clear existing watchers
+            For Each watcher In Watchers
+                watcher.EnableRaisingEvents = False
+                watcher.Dispose()
+            Next
+            Watchers.Clear()
+
+            'Set new watchers
+            If WatcherEnabled AndAlso LibrarySearchFolders.Count > 0 Then
+                For Each folder In LibrarySearchFolders
+                    Dim watcher As New FileSystemWatcher(folder)
+                    watcher.IncludeSubdirectories = LibrarySearchSubFolders
+                    watcher.NotifyFilter = NotifyFilters.FileName Or NotifyFilters.Size Or NotifyFilters.LastWrite
+                    AddHandler watcher.Created, AddressOf watcher_Created
+                    AddHandler watcher.Renamed, AddressOf watcher_Renamed
+                    AddHandler watcher.Deleted, AddressOf watcher_Deleted
+                    AddHandler watcher.Changed, AddressOf watcher_Changed
+                    Watchers.Add(watcher)
+                    watcher.EnableRaisingEvents = True
+                    Debug.WriteLine("Watching folder: " & folder)
+                Next
+            End If
+
+        End Sub
+        Private Sub QueueWatcherWork(path As String)
+
+            SyncLock WatcherWorkList
+                If Not WatcherWorkList.Contains(path) Then
+                    WatcherWorkList.Add(path)
+                End If
+            End SyncLock
+
+            WatcherWorkTimer.Stop()
+            WatcherWorkTimer.Start()
+
+        End Sub
+        Private Sub WatcherDoWork(paths As List(Of String))
+            If FRMLibrary.InvokeRequired Then
+                FRMLibrary.Invoke(Sub() FRMLibrary.DoWatcherWork(paths))
+            Else
+                FRMLibrary.DoWatcherWork(paths)
+            End If
+
         End Sub
         Friend Sub ShowOptions()
             Options.ShowDialog()
