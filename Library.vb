@@ -1818,7 +1818,6 @@ Public Class Library
     End Sub
     Private Sub AddToPlaylist(item As ListViewItem)
         Player.AddToPlaylistFromLibrary(FormatPlaylistTitle(item), item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
-        item = Nothing
     End Sub
     Private Sub SaveLibrary()
         If LVLibrary.Items.Count = 0 Then

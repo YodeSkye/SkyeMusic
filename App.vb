@@ -500,6 +500,7 @@ Namespace My
             FRMLibrary.Dispose()
             SaveHistory()
             SaveOptions()
+            SetWatchers(True) 'Dispose watchers
             My.App.WriteToLog(My.Application.Info.ProductName + " Closed")
         End Sub
         Friend Sub SaveHistory()
@@ -736,7 +737,7 @@ Namespace My
             Finally : fInfo = Nothing
             End Try
         End Sub
-        Private Sub SetWatchers()
+        Friend Sub SetWatchers(Optional forcestop As Boolean = False)
 
             'Clear existing watchers
             For Each watcher In Watchers
@@ -746,7 +747,7 @@ Namespace My
             Watchers.Clear()
 
             'Set new watchers
-            If WatcherEnabled AndAlso LibrarySearchFolders.Count > 0 Then
+            If WatcherEnabled AndAlso LibrarySearchFolders.Count > 0 AndAlso Not forcestop Then
                 For Each folder In LibrarySearchFolders
                     Dim watcher As New FileSystemWatcher(folder)
                     watcher.IncludeSubdirectories = LibrarySearchSubFolders
