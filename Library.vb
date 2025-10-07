@@ -804,14 +804,44 @@ Public Class Library
         End If
     End Sub
     Friend Sub DoWatcherWork(paths As List(Of String))
+        Dim removelist As New List(Of String)
+        Dim existingindex As Integer
         LblStatus.Visible = True
 
         For Each path As String In paths
-            LblStatus.Text = path
-            LblStatus.Refresh()
+            existingindex = -1
+            If App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(path)) Then
+                LblStatus.Text = "Processing " & path
+                LblStatus.Refresh()
+
+                'if exists in library, remove
+                Dim lvi As ListViewItem = LVLibrary.FindItemWithText(path, True, 0)
+                If lvi IsNot Nothing Then
+                    existingindex = lvi.Index
+                    LVLibrary.Items.Remove(lvi)
+                End If
+
+                'If file exists, add to library
+                If File.Exists(path) Then
+                    If existingindex > -1 Then
+                        LVLibrary.Items.Insert(existingindex, CreateLibraryItem(path))
+                    Else
+                        LVLibrary.Items.Add(CreateLibraryItem(path))
+                    End If
+                End If
+
+            Else
+                removelist.Add(path)
+            End If
+        Next
+
+        For Each path As String In removelist
+            paths.Remove(path)
         Next
 
         LblStatus.Visible = False
+        SetLibraryCountText()
+        Debug.Print("Library Watcher Work Complete: " + paths.Count.ToString)
     End Sub
     Private Function FormatPlaylistTitle(ByRef item As ListViewItem) As String
         FormatPlaylistTitle = ""
@@ -1659,12 +1689,87 @@ Public Class Library
             FormatPlaylistTitle += App.PlaylistVideoIdentifier
         End If
     End Function
+    Private Function CreateLibraryItem(path As String) As ListViewItem
+        Dim item As ListViewItem = Nothing
+        Dim tlfile As TagLib.File
+        If App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(path)) Then
+            item = New ListViewItem
+            'Keep this in sync with number of columns set in Load Event
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            item.SubItems.Add(String.Empty)
+            Try
+                tlfile = TagLib.File.Create(path)
+            Catch ex As Exception
+                WriteToLog("TagLib Error while Creating Library Item, Cannot read from file: " + path + Chr(13) + ex.Message)
+                tlfile = Nothing
+            End Try
+            If tlfile Is Nothing Then
+                item.SubItems(LVLibrary.Columns("Title").Index).Text = IO.Path.GetFileNameWithoutExtension(path)
+            Else
+                'Artist
+                item.SubItems(LVLibrary.Columns("Artist").Index).Text = tlfile.Tag.FirstPerformer
+                'Title
+                If tlfile.Tag.Title = String.Empty Then
+                    item.SubItems(LVLibrary.Columns("Title").Index).Text = IO.Path.GetFileNameWithoutExtension(path)
+                Else
+                    item.SubItems(LVLibrary.Columns("Title").Index).Text = tlfile.Tag.Title
+                End If
+                'Album
+                item.SubItems(LVLibrary.Columns("Album").Index).Text = tlfile.Tag.Album
+                'Genre
+                item.SubItems(LVLibrary.Columns("Genre").Index).Text = tlfile.Tag.FirstGenre
+                'Year
+                If tlfile.Tag.Year <> 0 Then
+                    item.SubItems(LVLibrary.Columns("Year").Index).Text = tlfile.Tag.Year.ToString
+                End If
+                'Track
+                If tlfile.Tag.Track > 0 Then item.SubItems(LVLibrary.Columns("Track").Index).Text = tlfile.Tag.Track.ToString
+                'Tracks
+                If tlfile.Tag.TrackCount > 0 Then item.SubItems(LVLibrary.Columns("Tracks").Index).Text = tlfile.Tag.TrackCount.ToString
+                'Duration
+                If tlfile.Properties IsNot Nothing AndAlso tlfile.Properties.Duration <> TimeSpan.Zero Then
+                    item.SubItems(LVLibrary.Columns("Duration").Index).Text = tlfile.Properties.Duration.ToString("hh\:mm\:ss")
+                End If
+                'Artists
+                If tlfile.Tag.Performers IsNot Nothing Then
+                    If tlfile.Tag.Performers.Count > 1 Then
+                        For index = 1 To tlfile.Tag.Performers.Count - 1
+                            item.SubItems(LVLibrary.Columns("Artists").Index).Text += tlfile.Tag.Performers(index) + ", "
+                        Next
+                        item.SubItems(LVLibrary.Columns("Artists").Index).Text = item.SubItems(LVLibrary.Columns("Artists").Index).Text.TrimEnd(", ".ToCharArray)
+                    End If
+                End If
+                'Comments
+                item.SubItems(LVLibrary.Columns("Comments").Index).Text = tlfile.Tag.Comment
+                'Album Art Identifier
+                If tlfile.Tag.Pictures.Count > 0 Then item.ImageKey = "AlbumArt"
+                tlfile.Dispose()
+            End If
+            'Filename
+            item.SubItems(LVLibrary.Columns("FilePath").Index).Text = path
+            If App.AudioExtensionDictionary.ContainsKey(IO.Path.GetExtension(path)) Then
+                item.SubItems(LVLibrary.Columns("AV").Index).Text = "A"
+            Else
+                item.SubItems(LVLibrary.Columns("AV").Index).Text = "V"
+            End If
+        End If
+        Return item
+    End Function
     Private Sub SearchFolders()
         If App.LibrarySearchFolders.Count > 0 Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim files As New Collections.Generic.List(Of String)
-            Dim tlfile As TagLib.File
-            Dim item As New ListViewItem()
+            'Dim tlfile As TagLib.File
+            'Dim item As New ListViewItem()
             Dim col As New Collections.Generic.List(Of ListViewItem)
             LblStatus.Text = "Searching your Folders for Media Files..."
             LblStatus.Visible = True
@@ -1684,84 +1789,16 @@ Public Class Library
                     WriteToLog("Error while Searching Folder: " + folder + Chr(13) + ex.Message)
                 End Try
                 For Each file As String In files
-                    If App.ExtensionDictionary.ContainsKey(Path.GetExtension(file)) Then
-                        item = New ListViewItem
-                        'Keep this in sync with number of columns set in Load Event
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        item.SubItems.Add(String.Empty)
-                        Try
-                            tlfile = TagLib.File.Create(file)
-                        Catch ex As Exception
-                            WriteToLog("TagLib Error while Searching Folders, Cannot read from file: " + file + Chr(13) + ex.Message)
-                            tlfile = Nothing
-                        End Try
-                        If tlfile Is Nothing Then
-                            item.SubItems(LVLibrary.Columns("Title").Index).Text = IO.Path.GetFileNameWithoutExtension(file)
-                        Else
-                            'Artist
-                            item.SubItems(LVLibrary.Columns("Artist").Index).Text = tlfile.Tag.FirstPerformer
-                            'Title
-                            If tlfile.Tag.Title = String.Empty Then
-                                item.SubItems(LVLibrary.Columns("Title").Index).Text = IO.Path.GetFileNameWithoutExtension(file)
-                            Else
-                                item.SubItems(LVLibrary.Columns("Title").Index).Text = tlfile.Tag.Title
-                            End If
-                            'Album
-                            item.SubItems(LVLibrary.Columns("Album").Index).Text = tlfile.Tag.Album
-                            'Genre
-                            item.SubItems(LVLibrary.Columns("Genre").Index).Text = tlfile.Tag.FirstGenre
-                            'Year
-                            If tlfile.Tag.Year <> 0 Then
-                                item.SubItems(LVLibrary.Columns("Year").Index).Text = tlfile.Tag.Year.ToString
-                            End If
-                            'Track
-                            If tlfile.Tag.Track > 0 Then item.SubItems(LVLibrary.Columns("Track").Index).Text = tlfile.Tag.Track.ToString
-                            'Tracks
-                            If tlfile.Tag.TrackCount > 0 Then item.SubItems(LVLibrary.Columns("Tracks").Index).Text = tlfile.Tag.TrackCount.ToString
-                            'Duration
-                            If tlfile.Properties IsNot Nothing AndAlso tlfile.Properties.Duration <> TimeSpan.Zero Then
-                                item.SubItems(LVLibrary.Columns("Duration").Index).Text = tlfile.Properties.Duration.ToString("hh\:mm\:ss")
-                            End If
-                            'Artists
-                            If tlfile.Tag.Performers IsNot Nothing Then
-                                If tlfile.Tag.Performers.Count > 1 Then
-                                    For index = 1 To tlfile.Tag.Performers.Count - 1
-                                        item.SubItems(LVLibrary.Columns("Artists").Index).Text += tlfile.Tag.Performers(index) + ", "
-                                    Next
-                                    item.SubItems(LVLibrary.Columns("Artists").Index).Text = item.SubItems(LVLibrary.Columns("Artists").Index).Text.TrimEnd(", ".ToCharArray)
-                                End If
-                            End If
-                            'Comments
-                            item.SubItems(LVLibrary.Columns("Comments").Index).Text = tlfile.Tag.Comment
-                            'Album Art Identifier
-                            If tlfile.Tag.Pictures.Count > 0 Then item.ImageKey = "AlbumArt"
-                        End If
-                        'Filename
-                        item.SubItems(LVLibrary.Columns("FilePath").Index).Text = file
-                        If App.AudioExtensionDictionary.ContainsKey(Path.GetExtension(file)) Then
-                            item.SubItems(LVLibrary.Columns("AV").Index).Text = "A"
-                        Else
-                            item.SubItems(LVLibrary.Columns("AV").Index).Text = "V"
-                        End If
-                        col.Add(item)
-                        AddToHistoryFromLibrary(file)
-                    End If
+                    col.Add(CreateLibraryItem(file))
+                    Debug.Print(col.Count.ToString)
+                    AddToHistoryFromLibrary(file)
                 Next
                 files.Clear()
             Next
-            LVLibrary.Items.AddRange(col.ToArray)
+            LVLibrary.Items.AddRange(col.Where(Function(i) i IsNot Nothing).ToArray())
             col.Clear()
-            item = Nothing
-            tlfile = Nothing
+            'item = Nothing
+            'tlfile = Nothing
             LVLibrary.EndUpdate()
             LblStatus.Visible = False
             ShowAlbumArt()

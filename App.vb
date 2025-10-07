@@ -477,6 +477,11 @@ Namespace My
 #End Region
 
             FRMLibrary = New Library
+            FRMLibrary.Opacity = 0 'This is done to initialize the form on startup, but keep it hidden from the user, to prevent null reference errors when the FileSystemWatcher fires and the user hasn't opened the form yet.
+            FRMLibrary.Show()
+            FRMLibrary.Hide()
+            FRMLibrary.Opacity = 1
+
             GenerateHotKeyList()
             RegisterHotKeys()
             SetHistoryAutoSaveTimer()
