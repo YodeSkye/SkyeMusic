@@ -1195,7 +1195,6 @@ Public Class Player
         Select Case e.newState
             Case 0 'Undefined
             Case 1 'Stopped
-                'OnStop()
             Case 2 'Paused
                 OnPause()
             Case 3 'Playing
