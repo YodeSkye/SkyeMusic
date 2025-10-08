@@ -124,12 +124,7 @@ Public Class Options
         SetPruneHistoryButtonText()
     End Sub
     Private Sub Options_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        App.LibrarySearchFolders.Clear()
-        For Each item In LBLibrarySearchFolders.Items
-            App.LibrarySearchFolders.Add(item.ToString)
-        Next
         App.SaveOptions()
-        App.SetWatchers()
         Player.ShowPlayMode()
     End Sub
     Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, GrBoxTime.MouseDown, LblTitleFormat.MouseDown, LblTitleSeparator.MouseDown, LblVideoIdentifier.MouseDown, LblSongPlayMode.MouseDown, LblDefaultPlaylistAction.MouseDown, LblPlaylistSearchAction.MouseDown, LblTheme.MouseDown, LblHelperApp2Path.MouseDown, LblHelperApp2Name.MouseDown, LblHelperApp1Path.MouseDown, LblHelperApp1Name.MouseDown, TCOptions.MouseDown, TPApp.MouseDown, TPPlayer.MouseDown, TPPlaylist.MouseDown, TPLibrary.MouseDown, LblHistoryAutoSaveInterval1.MouseDown, LblHistoryAutoSaveInterval2.MouseDown, LblLibrarySearchFolders.MouseDown, LblHistoryUpdateInterval1.MouseDown, LblHistoryUpdateInterval2.MouseDown, LblPlaylistFormatting.MouseDown
@@ -434,7 +429,6 @@ Public Class Options
                 Case Keys.Insert
             End Select
         End If
-
     End Sub
     Private Sub LBLibrarySearchFoldersMouseDown(sender As Object, e As MouseEventArgs) Handles LBLibrarySearchFolders.MouseDown
         If e.Button = MouseButtons.Right Then
@@ -460,13 +454,22 @@ Public Class Options
         Dim r As DialogResult = UIFolderBrowser.ShowDialog(Me)
         If r = DialogResult.OK And Not UIFolderBrowser.SelectedPath = String.Empty And Not LBLibrarySearchFolders.Items.Contains(UIFolderBrowser.SelectedPath) Then
             LBLibrarySearchFolders.Items.Add(UIFolderBrowser.SelectedPath)
+            SetLibrarySearchFolders()
         End If
         LBLibrarySearchFolders.Focus()
     End Sub
     Private Sub LibrarySearchFoldersRemove()
         If LBLibrarySearchFolders.SelectedItems.Count = 1 Then
             LBLibrarySearchFolders.Items.RemoveAt(LBLibrarySearchFolders.SelectedIndex)
+            SetLibrarySearchFolders()
         End If
+    End Sub
+    Private Sub SetLibrarySearchFolders()
+        App.LibrarySearchFolders.Clear()
+        For Each item In LBLibrarySearchFolders.Items
+            App.LibrarySearchFolders.Add(item.ToString)
+        Next
+        App.SetWatchers()
     End Sub
     Private Sub SetPrunePlaylistButtonText()
         BtnPrunePlaylist.Text = BtnPrunePlaylist.Text.TrimEnd(App.TrimEndSearch) + " (" + Player.LVPlaylist.Items.Count.ToString + ")"

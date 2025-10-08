@@ -781,7 +781,6 @@ Namespace My
             Next
             Watchers.Clear()
 
-
             'Set new watchers
             If WatcherEnabled AndAlso LibrarySearchFolders.Count > 0 AndAlso Not forcestop Then
                 For Each folder In LibrarySearchFolders
