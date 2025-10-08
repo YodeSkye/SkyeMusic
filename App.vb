@@ -743,8 +743,10 @@ Namespace My
             For Each watcher In Watchers
                 watcher.EnableRaisingEvents = False
                 watcher.Dispose()
+                Debug.WriteLine("Watcher Cleared: " & watcher.Path)
             Next
             Watchers.Clear()
+
 
             'Set new watchers
             If WatcherEnabled AndAlso LibrarySearchFolders.Count > 0 AndAlso Not forcestop Then
@@ -758,7 +760,7 @@ Namespace My
                     AddHandler watcher.Changed, AddressOf watcher_Changed
                     Watchers.Add(watcher)
                     watcher.EnableRaisingEvents = True
-                    Debug.WriteLine("Watching folder: " & folder)
+                    Debug.WriteLine("Watching Folder: " & folder)
                 Next
             End If
 

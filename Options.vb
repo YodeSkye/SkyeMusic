@@ -97,6 +97,9 @@ Public Class Options
             LBLibrarySearchFolders.Items.Add(item)
         Next
         CkBoxLibrarySearchSubFolders.Checked = App.LibrarySearchSubFolders
+        CkBoxWatchFolders.Checked = App.WatcherEnabled
+        CkBoxWatchFoldersUpdateLibrary.Checked = App.WatcherUpdateLibrary
+        CkBoxWatchFoldersUpdatePlaylist.Checked = App.WatcherUpdatePlaylist
         CkBoxSaveWindowMetrics.Checked = App.SaveWindowMetrics
         CkBoxSuspendOnSessionChange.Checked = App.SuspendOnSessionChange
         TxtBoxHelperApp1Name.Text = App.HelperApp1Name
@@ -384,7 +387,17 @@ Public Class Options
         App.PlaylistTitleRemoveSpaces = Not App.PlaylistTitleRemoveSpaces
     End Sub
     Private Sub CkBoxSearchSubFoldersClick(sender As Object, e As EventArgs) Handles CkBoxLibrarySearchSubFolders.Click
-        App.LibrarySearchSubFolders = Not App.LibrarySearchSubFolders
+        LibrarySearchSubFolders = Not LibrarySearchSubFolders
+    End Sub
+    Private Sub CkBoxWatchFolders_Click(sender As Object, e As EventArgs) Handles CkBoxWatchFolders.Click
+        App.WatcherEnabled = Not App.WatcherEnabled
+        App.SetWatchers()
+    End Sub
+    Private Sub CkBoxWatchFoldersUpdateLibrary_Click(sender As Object, e As EventArgs) Handles CkBoxWatchFoldersUpdateLibrary.Click
+        App.WatcherUpdateLibrary = Not App.WatcherUpdateLibrary
+    End Sub
+    Private Sub CkBoxWatchFoldersUpdatePlaylist_Click(sender As Object, e As EventArgs) Handles CkBoxWatchFoldersUpdatePlaylist.Click
+        App.WatcherUpdatePlaylist = Not App.WatcherUpdatePlaylist
     End Sub
     Private Sub CkBoxSaveWindowMetricsClick(sender As Object, e As EventArgs) Handles CkBoxSaveWindowMetrics.Click
         App.SaveWindowMetrics = Not App.SaveWindowMetrics
@@ -478,6 +491,9 @@ Public Class Options
             GrBoxTime.BackColor = c
             RadBtnRemaining.BackColor = c
             CkBoxLibrarySearchSubFolders.BackColor = c
+            CkBoxWatchFolders.BackColor = c
+            CkBoxWatchFoldersUpdateLibrary.BackColor = c
+            CkBoxWatchFoldersUpdatePlaylist.BackColor = c
             TCOptions.TabPanelBackColor = c
         End If
         ResumeLayout()
@@ -493,6 +509,9 @@ Public Class Options
             GrBoxTime.BackColor = App.CurrentTheme.BackColor
             RadBtnRemaining.BackColor = App.CurrentTheme.BackColor
             CkBoxLibrarySearchSubFolders.BackColor = App.CurrentTheme.BackColor
+            CkBoxWatchFolders.BackColor = App.CurrentTheme.BackColor
+            CkBoxWatchFoldersUpdateLibrary.BackColor = App.CurrentTheme.BackColor
+            CkBoxWatchFoldersUpdatePlaylist.BackColor = App.CurrentTheme.BackColor
             TCOptions.TabPanelBackColor = App.CurrentTheme.BackColor
             forecolor = App.CurrentTheme.TextColor
         End If
@@ -540,6 +559,9 @@ Public Class Options
         CkBoxSaveWindowMetrics.ForeColor = forecolor
         CkBoxSuspendOnSessionChange.ForeColor = forecolor
         CkBoxLibrarySearchSubFolders.ForeColor = forecolor
+        CkBoxWatchFolders.ForeColor = forecolor
+        CkBoxWatchFoldersUpdateLibrary.ForeColor = forecolor
+        CkBoxWatchFoldersUpdatePlaylist.ForeColor = forecolor
         CkBoxPlaylistRemoveSpaces.ForeColor = forecolor
         LblHelperApp1Name.ForeColor = forecolor
         LblHelperApp1Path.ForeColor = forecolor

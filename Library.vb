@@ -163,6 +163,9 @@ Public Class Library
 #End If
 
     End Sub
+    Private Sub Library_Activated(sender As Object, e As EventArgs) Handles MyBase.Activated
+        Player.WatcherNotification = String.Empty
+    End Sub
     Private Sub Library_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         e.Cancel = True
         SaveLibrary()
@@ -805,32 +808,42 @@ Public Class Library
     End Sub
     Friend Sub DoWatcherWork(paths As List(Of String))
         Dim removelist As New List(Of String)
-        Dim existingindex As Integer
+        Dim existinglibraryindex As Integer
         LblStatus.Visible = True
 
         For Each path As String In paths
-            existingindex = -1
+            existinglibraryindex = -1
             If App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(path)) Then
                 LblStatus.Text = "Processing " & path
                 LblStatus.Refresh()
 
-                'if exists in library, remove
-                Dim lvi As ListViewItem = LVLibrary.FindItemWithText(path, True, 0)
-                If lvi IsNot Nothing Then
-                    existingindex = lvi.Index
-                    LVLibrary.Items.Remove(lvi)
+                'if exists in library or playlist, remove
+                If WatcherUpdateLibrary Then
+                    Dim lvi As ListViewItem = LVLibrary.FindItemWithText(path, True, 0)
+                    If lvi IsNot Nothing Then
+                        existinglibraryindex = lvi.Index
+                        LVLibrary.Items.Remove(lvi)
+                    End If
                 End If
+                If WatcherUpdatePlaylist Then RemoveFromPlaylist(path)
 
-                'If file exists, add to library
-                If File.Exists(path) Then
-                    If existingindex > -1 Then
-                        LVLibrary.Items.Insert(existingindex, CreateLibraryItem(path))
-                    Else
-                        LVLibrary.Items.Add(CreateLibraryItem(path))
+                'If file exists, add to library & playlist
+                If WatcherUpdateLibrary Or WatcherUpdatePlaylist Then
+                    If File.Exists(path) Then
+                        Dim lvi As ListViewItem = CreateLibraryItem(path)
+                        If WatcherUpdateLibrary Then
+                            If existinglibraryindex > -1 Then
+                                LVLibrary.Items.Insert(existinglibraryindex, lvi)
+                            Else
+                                LVLibrary.Items.Add(lvi)
+                            End If
+                        End If
+                        If WatcherUpdatePlaylist Then AddToPlaylist(lvi)
                     End If
                 End If
 
             Else
+                'Remove files that aren't audio or video formats
                 removelist.Add(path)
             End If
         Next
@@ -841,7 +854,14 @@ Public Class Library
 
         LblStatus.Visible = False
         SetLibraryCountText()
-        Debug.Print("Library Watcher Work Complete: " + paths.Count.ToString)
+        If WatcherUpdateLibrary Or WatcherUpdatePlaylist Then
+            Player.WatcherNotification = "Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs")
+            App.WriteToLog("Library Watcher Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs"))
+        Else
+            Player.WatcherNotification = If(paths.Count = 1, "Song Update Available", "Song Updates Available: " & paths.Count.ToString)
+            App.WriteToLog("Library Watcher " & If(paths.Count = 1, "Update Available", "Updates Available: " & paths.Count.ToString))
+        End If
+        Debug.Print("Library Watcher Work Complete: " & paths.Count.ToString)
     End Sub
     Private Function FormatPlaylistTitle(ByRef item As ListViewItem) As String
         FormatPlaylistTitle = ""
@@ -1818,6 +1838,9 @@ Public Class Library
     End Sub
     Private Sub AddToPlaylist(item As ListViewItem)
         Player.AddToPlaylistFromLibrary(FormatPlaylistTitle(item), item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
+    End Sub
+    Private Sub RemoveFromPlaylist(path As String)
+        Player.RemoveFromPlaylistFromLibrary(path)
     End Sub
     Private Sub SaveLibrary()
         If LVLibrary.Items.Count = 0 Then

@@ -49,10 +49,26 @@ Public Class Player
     Private PlaylistFirstPlayedSort As SortOrder = SortOrder.None
     Private PlaylistAddedSort As SortOrder = SortOrder.None
 
+    'Properties
     Friend ReadOnly Property Fullscreen As Boolean 'Property to check if the player is in fullscreen mode
         Get
             Return AxPlayer.fullScreen
         End Get
+    End Property
+    Private _watchernotification As String
+    <System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)>
+    Friend Property WatcherNotification As String
+        Get
+            Return _watchernotification
+        End Get
+        Set(value As String)
+            _watchernotification = value
+            If String.IsNullOrWhiteSpace(_watchernotification) Then
+                MILibrary.Font = New Font(MILibrary.Font, FontStyle.Regular)
+            Else
+                MILibrary.Font = New Font(MILibrary.Font, FontStyle.Bold Or FontStyle.Underline)
+            End If
+        End Set
     End Property
 
     'Form Events                    
@@ -764,11 +780,11 @@ Public Class Player
     End Sub
     Private Sub MILibrary_MouseEnter(sender As Object, e As EventArgs) Handles MILibrary.MouseEnter
         MILibrary.ForeColor = Color.Black
-        'TipPlaylist.ShowTooltipAt(New Point(Me.Left + MILibrary.Bounds.Left, Me.Top + MILibrary.Bounds.Top), "Show Library (L)")
+        If Not String.IsNullOrWhiteSpace(_watchernotification) Then TipWatcherNotification.ShowTooltipAtCursor(_watchernotification)
     End Sub
     Private Sub MILibrary_MouseLeave(sender As Object, e As EventArgs) Handles MILibrary.MouseLeave
         MILibrary.ForeColor = App.CurrentTheme.AccentTextColor
-        'TipPlaylist.HideTooltip()
+        TipWatcherNotification.HideTooltip()
     End Sub
     Private Sub MIShowHelpClick(sender As Object, e As EventArgs) Handles MIShowHelp.Click
         ShowHelp()
@@ -2340,6 +2356,13 @@ Public Class Player
         SetPlaylistCountText()
         lvi = Nothing
     End Sub
+    Friend Sub RemoveFromPlaylistFromLibrary(filename As String)
+        If LVPlaylist.Items.Count > 0 Then
+            Dim lvi As ListViewItem
+            lvi = LVPlaylist.FindItemWithText(filename, True, 0)
+            If lvi IsNot Nothing Then LVPlaylist.Items.Remove(lvi)
+        End If
+    End Sub
     Friend Sub UpdateHistoryInPlaylist(path As String)
         Dim lvi As ListViewItem
         Try
@@ -3151,6 +3174,9 @@ Public Class Player
         TipPlaylist.BackColor = App.CurrentTheme.BackColor
         TipPlaylist.ForeColor = App.CurrentTheme.TextColor
         TipPlaylist.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipWatcherNotification.BackColor = App.CurrentTheme.BackColor
+        TipWatcherNotification.ForeColor = App.CurrentTheme.TextColor
+        TipWatcherNotification.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("Player Theme Set")
     End Sub

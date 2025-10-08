@@ -80,6 +80,9 @@ Partial Class Options
         LblRandomHistoryUpdateInterval2 = New Skye.UI.Label()
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         TPLibrary = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        CkBoxWatchFoldersUpdatePlaylist = New CheckBox()
+        CkBoxWatchFoldersUpdateLibrary = New CheckBox()
+        CkBoxWatchFolders = New CheckBox()
         LblLibrarySearchFolders = New Label()
         TipOptionsEX = New Skye.UI.ToolTipEX(components)
         GrBoxTime.SuspendLayout()
@@ -256,7 +259,7 @@ Partial Class Options
         BtnLibrarySearchFoldersAdd.Location = New Point(643, 147)
         BtnLibrarySearchFoldersAdd.Name = "BtnLibrarySearchFoldersAdd"
         BtnLibrarySearchFoldersAdd.Size = New Size(32, 31)
-        BtnLibrarySearchFoldersAdd.TabIndex = 82
+        BtnLibrarySearchFoldersAdd.TabIndex = 150
         TipOptionsEX.SetText(BtnLibrarySearchFoldersAdd, "Add folder to list.")
         BtnLibrarySearchFoldersAdd.UseVisualStyleBackColor = True
         ' 
@@ -806,6 +809,9 @@ Partial Class Options
         ' TPLibrary
         ' 
         TPLibrary.BorderStyle = BorderStyle.Fixed3D
+        TPLibrary.Controls.Add(CkBoxWatchFoldersUpdatePlaylist)
+        TPLibrary.Controls.Add(CkBoxWatchFoldersUpdateLibrary)
+        TPLibrary.Controls.Add(CkBoxWatchFolders)
         TPLibrary.Controls.Add(BtnLibrarySearchFoldersAdd)
         TPLibrary.Controls.Add(LBLibrarySearchFolders)
         TPLibrary.Controls.Add(LblLibrarySearchFolders)
@@ -820,6 +826,51 @@ Partial Class Options
         TPLibrary.TabIndex = 4
         TPLibrary.Text = " Library "
         TPLibrary.ThemesEnabled = False
+        ' 
+        ' CkBoxWatchFoldersUpdatePlaylist
+        ' 
+        CkBoxWatchFoldersUpdatePlaylist.AutoSize = True
+        CkBoxWatchFoldersUpdatePlaylist.BackColor = SystemColors.Control
+        CkBoxWatchFoldersUpdatePlaylist.FlatStyle = FlatStyle.Flat
+        CkBoxWatchFoldersUpdatePlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipOptionsEX.SetImage(CkBoxWatchFoldersUpdatePlaylist, Nothing)
+        CkBoxWatchFoldersUpdatePlaylist.Location = New Point(151, 221)
+        CkBoxWatchFoldersUpdatePlaylist.Name = "CkBoxWatchFoldersUpdatePlaylist"
+        CkBoxWatchFoldersUpdatePlaylist.Size = New Size(168, 25)
+        CkBoxWatchFoldersUpdatePlaylist.TabIndex = 94
+        CkBoxWatchFoldersUpdatePlaylist.Text = "Auto-Update Playlist"
+        TipOptionsEX.SetText(CkBoxWatchFoldersUpdatePlaylist, resources.GetString("CkBoxWatchFoldersUpdatePlaylist.Text"))
+        CkBoxWatchFoldersUpdatePlaylist.UseVisualStyleBackColor = False
+        ' 
+        ' CkBoxWatchFoldersUpdateLibrary
+        ' 
+        CkBoxWatchFoldersUpdateLibrary.AutoSize = True
+        CkBoxWatchFoldersUpdateLibrary.BackColor = SystemColors.Control
+        CkBoxWatchFoldersUpdateLibrary.FlatStyle = FlatStyle.Flat
+        CkBoxWatchFoldersUpdateLibrary.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipOptionsEX.SetImage(CkBoxWatchFoldersUpdateLibrary, Nothing)
+        CkBoxWatchFoldersUpdateLibrary.Location = New Point(151, 198)
+        CkBoxWatchFoldersUpdateLibrary.Name = "CkBoxWatchFoldersUpdateLibrary"
+        CkBoxWatchFoldersUpdateLibrary.Size = New Size(168, 25)
+        CkBoxWatchFoldersUpdateLibrary.TabIndex = 92
+        CkBoxWatchFoldersUpdateLibrary.Text = "Auto-Update Library"
+        TipOptionsEX.SetText(CkBoxWatchFoldersUpdateLibrary, "Automatically update the Library when files are added, renamed, deleted, or changed.")
+        CkBoxWatchFoldersUpdateLibrary.UseVisualStyleBackColor = False
+        ' 
+        ' CkBoxWatchFolders
+        ' 
+        CkBoxWatchFolders.AutoSize = True
+        CkBoxWatchFolders.BackColor = SystemColors.Control
+        CkBoxWatchFolders.FlatStyle = FlatStyle.Flat
+        CkBoxWatchFolders.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipOptionsEX.SetImage(CkBoxWatchFolders, Nothing)
+        CkBoxWatchFolders.Location = New Point(140, 175)
+        CkBoxWatchFolders.Name = "CkBoxWatchFolders"
+        CkBoxWatchFolders.Size = New Size(215, 25)
+        CkBoxWatchFolders.TabIndex = 90
+        CkBoxWatchFolders.Text = "Watch Folders For Changes"
+        TipOptionsEX.SetText(CkBoxWatchFolders, "Monitor Library Search Folders for changes and notify the user when changes occur.")
+        CkBoxWatchFolders.UseVisualStyleBackColor = False
         ' 
         ' LblLibrarySearchFolders
         ' 
@@ -931,4 +982,7 @@ Partial Class Options
     Friend WithEvents LblRandomHistoryUpdateInterval1 As Skye.UI.Label
     Friend WithEvents BtnPrunePlaylist As Button
     Friend WithEvents TipOptionsEX As Skye.UI.ToolTipEX
+    Friend WithEvents CkBoxWatchFoldersUpdatePlaylist As CheckBox
+    Friend WithEvents CkBoxWatchFoldersUpdateLibrary As CheckBox
+    Friend WithEvents CkBoxWatchFolders As CheckBox
 End Class
