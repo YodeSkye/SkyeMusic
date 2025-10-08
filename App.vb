@@ -60,6 +60,7 @@ Namespace My
             PinkAccent
             Light
             Dark
+            DarkPink
             Pink
             Red
         End Enum
@@ -212,7 +213,7 @@ Namespace My
             .PlayerPrevious = Resources.ImagePlayerAccentPrevious,
             .PlayerFastForward = Resources.ImagePlayerAccentFastForward,
             .PlayerFastReverse = Resources.ImagePlayerAccentFastReverse}
-        Private ReadOnly PinkAccentTheme As New ThemeProperties With { 'Used by Splash Screen
+        Private ReadOnly PinkAccentTheme As New ThemeProperties With {
             .IsAccent = True,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
             .TextColor = Color.DeepPink,
@@ -263,6 +264,23 @@ Namespace My
             .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
+        Private ReadOnly DarkPinkTheme As New ThemeProperties With {
+            .IsAccent = False,
+            .BackColor = Color.FromArgb(255, 35, 35, 35),
+            .TextColor = Color.DeepPink,
+            .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
+            .ButtonBackColor = Color.SlateGray,
+            .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
         Private ReadOnly PinkTheme As New ThemeProperties With {
             .IsAccent = False,
             .BackColor = Color.Pink,
@@ -280,7 +298,7 @@ Namespace My
             .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
-        Friend ReadOnly RedTheme As New ThemeProperties With {
+        Friend ReadOnly RedTheme As New ThemeProperties With { 'Used by Splash Screen
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 128, 13, 13),
             .TextColor = Color.AntiqueWhite,
@@ -584,6 +602,9 @@ Namespace My
                 For Each s As String In LibrarySearchFolders : RegSubKey.SetValue("Folder" + Str(LibrarySearchFolders.IndexOf(s) + 1).Trim, s, Microsoft.Win32.RegistryValueKind.String) : Next
                 RegSubKey.Close()
                 RegKey.SetValue("LibrarySearchSubFolders", LibrarySearchSubFolders.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("WatcherEnabled", WatcherEnabled.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("WatcherUpdateLibrary", WatcherUpdateLibrary.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("WatcherUpdatePlaylist", WatcherUpdatePlaylist.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.Flush()
                 RegSubKey.Dispose()
                 RegKey.Close()
@@ -669,6 +690,18 @@ Namespace My
                     Case "False", "0" : LibrarySearchSubFolders = False
                     Case Else : LibrarySearchSubFolders = True
                 End Select
+                Select Case RegKey.GetValue("WatcherEnabled", "False").ToString
+                    Case "True", "1" : WatcherEnabled = True
+                    Case Else : WatcherEnabled = False
+                End Select
+                Select Case RegKey.GetValue("WatcherUpdateLibrary", "False").ToString
+                    Case "True", "1" : WatcherUpdateLibrary = True
+                    Case Else : WatcherUpdateLibrary = False
+                End Select
+                Select Case RegKey.GetValue("WatcherUpdatePlaylist", "False").ToString
+                    Case "True", "1" : WatcherUpdatePlaylist = True
+                    Case Else : WatcherUpdatePlaylist = False
+                End Select
                 RegSubKey.Dispose()
                 RegKey.Close()
                 RegKey.Dispose()
@@ -679,9 +712,9 @@ Namespace My
         End Sub
         Private Sub GetDebugOptions()
 #If DEBUG Then
-            WatcherEnabled = True
-            WatcherUpdateLibrary = True
-            WatcherUpdatePlaylist = True
+            'WatcherEnabled = True
+            'WatcherUpdateLibrary = True
+            'WatcherUpdatePlaylist = True
 #End If
         End Sub
         Private Sub GenerateHotKeyList()
@@ -743,7 +776,8 @@ Namespace My
             For Each watcher In Watchers
                 watcher.EnableRaisingEvents = False
                 watcher.Dispose()
-                Debug.WriteLine("Watcher Cleared: " & watcher.Path)
+                App.WriteToLog("Watcher Stopped: " & watcher.Path)
+                Debug.WriteLine("Watcher Stopped: " & watcher.Path)
             Next
             Watchers.Clear()
 
@@ -760,6 +794,7 @@ Namespace My
                     AddHandler watcher.Changed, AddressOf watcher_Changed
                     Watchers.Add(watcher)
                     watcher.EnableRaisingEvents = True
+                    App.WriteToLog("Watching Folder: " & folder)
                     Debug.WriteLine("Watching Folder: " & folder)
                 Next
             End If
@@ -1112,6 +1147,8 @@ Namespace My
                     Return LightTheme
                 Case Themes.Dark
                     Return DarkTheme
+                Case Themes.DarkPink
+                    Return DarkPinkTheme
                 Case Themes.Pink
                     Return PinkTheme
                 Case Themes.Red

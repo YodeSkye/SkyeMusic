@@ -53,6 +53,7 @@ Public Class Options
         CoBoxTheme.Items.Add("Pink Accent")
         CoBoxTheme.Items.Add(App.Themes.Light.ToString)
         CoBoxTheme.Items.Add(App.Themes.Dark.ToString)
+        CoBoxTheme.Items.Add("Dark Pink")
         CoBoxTheme.Items.Add(App.Themes.Pink.ToString)
         CoBoxTheme.Items.Add(App.Themes.Red.ToString)
         CoBoxTheme.SelectedIndex = App.Theme

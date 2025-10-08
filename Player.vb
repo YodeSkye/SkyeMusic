@@ -65,7 +65,9 @@ Public Class Player
             _watchernotification = value
             If String.IsNullOrWhiteSpace(_watchernotification) Then
                 MILibrary.Font = New Font(MILibrary.Font, FontStyle.Regular)
+                MILibrary.Text = StrConv(MILibrary.Text, VbStrConv.ProperCase)
             Else
+                MILibrary.Text = MILibrary.Text.ToUpper
                 MILibrary.Font = New Font(MILibrary.Font, FontStyle.Bold Or FontStyle.Underline)
             End If
         End Set
@@ -2224,6 +2226,12 @@ Public Class Player
             End If
         Next
     End Function
+    Private Sub EnsurePlaylistItemIsVisible(index As Integer)
+        If CMPlaylist.Visible Then CMPlaylist.Close()
+        LVPlaylist.EnsureVisible(index)
+        LVPlaylist.SelectedIndices.Clear()
+        LVPlaylist.SelectedIndices.Add(index)
+    End Sub
     Private Function ClearPlaylistSorts(currentsort As SortOrder) As SortOrder
         ClearPlaylistTitles()
         Return currentsort
@@ -2517,9 +2525,7 @@ Public Class Player
                 LVPlaylist.Items.RemoveAt(i)
                 LVPlaylist.Items.Insert(i, existingitem)
             End If
-            LVPlaylist.EnsureVisible(existingitem.Index)
-            LVPlaylist.SelectedIndices.Clear()
-            LVPlaylist.SelectedIndices.Add(existingitem.Index)
+            EnsurePlaylistItemIsVisible(existingitem.Index)
             existingitem = Nothing
         End If
         StopPlay()
@@ -2534,9 +2540,7 @@ Public Class Player
             Case PlayModes.Repeat
                 TimerPlayNext.Start()
             Case PlayModes.Linear
-                If LVPlaylist.Items.Count = 0 Then
-                    'AxPlayer.Ctlcontrols.stop()
-                Else
+                If LVPlaylist.Items.Count > 0 Then
                     Dim item As ListViewItem = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
                     Dim newindex As Integer = LVPlaylist.Items.Count - 1
                     If item Is Nothing Then
@@ -2567,11 +2571,8 @@ Public Class Player
                             'App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
                         End If
                     End If
-                    LVPlaylist.SelectedIndices.Clear()
-                    LVPlaylist.SelectedIndices.Add(newindex)
-                    LVPlaylist.EnsureVisible(newindex)
+                    EnsurePlaylistItemIsVisible(newindex)
                     item = Nothing
-                    'TimerPlayNext.Start()
                 End If
             Case PlayModes.Random
                 If RandomHistory.Count > 0 Then
@@ -2600,9 +2601,7 @@ Public Class Player
                             Else
                                 PlayFile(item.SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousRandom")
                             End If
-                            LVPlaylist.SelectedIndices.Clear()
-                            LVPlaylist.SelectedIndices.Add(item.Index)
-                            LVPlaylist.EnsureVisible(item.Index)
+                            EnsurePlaylistItemIsVisible(item.Index)
                             item = Nothing
                         End If
                     End If
@@ -2620,9 +2619,7 @@ Public Class Player
                 If Queue.Count > 0 Then
                     PlayQueued()
                 Else
-                    If LVPlaylist.Items.Count = 0 Then
-                        'AxPlayer.Ctlcontrols.stop()
-                    Else
+                    If LVPlaylist.Items.Count > 0 Then
                         Dim item As ListViewItem = Nothing
                         If LVPlaylist.SelectedItems.Count > 0 Then
                             item = LVPlaylist.FindItemWithText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
@@ -2648,9 +2645,7 @@ Public Class Player
                                 'App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextLinear)")
                             End If
                         End If
-                        LVPlaylist.SelectedIndices.Clear()
-                        LVPlaylist.SelectedIndices.Add(newindex)
-                        LVPlaylist.EnsureVisible(newindex)
+                        EnsurePlaylistItemIsVisible(newindex)
                         item = Nothing
                         TimerPlayNext.Start()
                     End If
@@ -2659,10 +2654,7 @@ Public Class Player
                 If Queue.Count > 0 Then
                     PlayQueued()
                 Else
-                    If LVPlaylist.Items.Count = 0 Then
-                        'StopPlay()
-                        'AxPlayer.Ctlcontrols.stop()
-                    Else
+                    If LVPlaylist.Items.Count > 0 Then
                         Dim item As ListViewItem = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
                         Dim randomplaylistindex As System.Random = New System.Random()
                         Dim newindex As Integer = 0
@@ -2686,9 +2678,7 @@ Public Class Player
                             'App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextRandom)")
                         End If
                         'RandomHistoryAdd(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                        LVPlaylist.SelectedIndices.Clear()
-                        LVPlaylist.SelectedIndices.Add(newindex)
-                        LVPlaylist.EnsureVisible(newindex)
+                        EnsurePlaylistItemIsVisible(newindex)
                         item = Nothing
                         randomplaylistindex = Nothing
                         TimerPlayNext.Start()
@@ -2703,15 +2693,10 @@ Public Class Player
                 PlayStream(Queue(0))
             Else
                 PlayFile(Queue(0), "PlayQueued")
-                'Stream = False
-                'AxPlayer.URL = Queue(0)
-                'App.WriteToLog("Playing " + AxPlayer.URL + " (PlayQueued)")
             End If
             Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
             If item IsNot Nothing Then
-                LVPlaylist.SelectedIndices.Clear()
-                LVPlaylist.SelectedIndices.Add(item.Index)
-                LVPlaylist.EnsureVisible(item.Index)
+                EnsurePlaylistItemIsVisible(item.Index)
                 item = Nothing
             End If
             Queue.RemoveAt(0)
