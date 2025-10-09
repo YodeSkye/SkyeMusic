@@ -4,6 +4,7 @@ Imports System.IO
 Imports AxWMPLib
 Imports SkyeMusic.My
 Imports Syncfusion.Windows.Forms
+Imports TagLib
 
 Public Class Player
 
@@ -73,6 +74,129 @@ Public Class Player
         End Set
     End Property
 
+    'Interface
+    Private _player As IMediaPlayer
+    Public Interface IMediaPlayer
+
+        Sub Play(path As String)
+        Sub Play()
+        Sub Pause()
+        Sub [Stop]()
+
+        ReadOnly Property HasMedia As Boolean
+        ReadOnly Property Path As String
+        Property Volume As Integer
+        Property Position As Double
+        ReadOnly Property Duration As Double
+        ReadOnly Property VideoWidth As Integer
+        ReadOnly Property VideoHeight As Integer
+        ReadOnly Property AspectRatio As Double
+
+        Event PlaybackStarted()
+        Event PlaybackEnded()
+
+    End Interface
+    Public Class WMPlayer
+        Implements IMediaPlayer
+
+        Private ReadOnly _wmp As AxWMPLib.AxWindowsMediaPlayer
+
+        Public Sub New(wmpControl As AxWMPLib.AxWindowsMediaPlayer)
+            _wmp = wmpControl
+            AddHandler _wmp.PlayStateChange, AddressOf OnPlayStateChange
+        End Sub
+
+        Public Sub Play(path As String) Implements IMediaPlayer.Play
+            _wmp.URL = path
+        End Sub
+        Public Sub Play() Implements IMediaPlayer.Play
+            _wmp.Ctlcontrols.play()
+        End Sub
+        Public Sub Pause() Implements IMediaPlayer.Pause
+            _wmp.Ctlcontrols.pause()
+        End Sub
+        Public Sub [Stop]() Implements IMediaPlayer.Stop
+            _wmp.Ctlcontrols.stop()
+        End Sub
+
+        Public ReadOnly Property HasMedia As Boolean Implements IMediaPlayer.HasMedia
+            Get
+                Return _wmp.currentMedia IsNot Nothing
+            End Get
+        End Property
+        Public ReadOnly Property Path As String Implements IMediaPlayer.Path
+            Get
+                Return _wmp.URL
+            End Get
+        End Property
+        Public Property Volume As Integer Implements IMediaPlayer.Volume
+            Get
+                Return _wmp.settings.volume
+            End Get
+            Set(value As Integer)
+                _wmp.settings.volume = value
+            End Set
+        End Property
+        Public Property Position As Double Implements IMediaPlayer.Position
+            Get
+                Return _wmp.Ctlcontrols.currentPosition
+            End Get
+            Set(value As Double)
+                _wmp.Ctlcontrols.currentPosition = value
+            End Set
+        End Property
+        Public ReadOnly Property Duration As Double Implements IMediaPlayer.Duration
+            Get
+                If _wmp.currentMedia IsNot Nothing Then
+                    Return _wmp.currentMedia.duration
+                Else
+                    Return 0
+                End If
+            End Get
+        End Property
+        Public ReadOnly Property VideoWidth As Integer Implements IMediaPlayer.VideoWidth
+            Get
+                If _wmp.currentMedia IsNot Nothing Then
+                    Return _wmp.currentMedia.imageSourceWidth
+                Else
+                    Return 0
+                End If
+            End Get
+        End Property
+        Public ReadOnly Property VideoHeight As Integer Implements IMediaPlayer.VideoHeight
+            Get
+                If _wmp.currentMedia IsNot Nothing Then
+                    Return _wmp.currentMedia.imageSourceHeight
+                Else
+                    Return 0
+                End If
+            End Get
+        End Property
+        Public ReadOnly Property AspectRatio As Double Implements IMediaPlayer.AspectRatio
+            Get
+                If _wmp.currentMedia IsNot Nothing AndAlso _wmp.currentMedia.imageSourceHeight > 0 Then
+                    Return _wmp.currentMedia.imageSourceWidth / _wmp.currentMedia.imageSourceHeight
+                Else
+                    Return 0
+                End If
+            End Get
+        End Property
+
+        Private Sub OnPlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
+            Select Case e.newState
+                Case WMPLib.WMPPlayState.wmppsPlaying
+                    RaiseEvent PlaybackStarted()
+                Case WMPLib.WMPPlayState.wmppsMediaEnded
+                    RaiseEvent PlaybackEnded()
+            End Select
+
+        End Sub
+
+        Public Event PlaybackStarted() Implements IMediaPlayer.PlaybackStarted
+        Public Event PlaybackEnded() Implements IMediaPlayer.PlaybackEnded
+
+    End Class
+
     'Form Events                    
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
@@ -114,6 +238,10 @@ Public Class Player
         End Try
     End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        _player = New WMPlayer(AxPlayer)
+        AddHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
+        AddHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
 
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
@@ -173,7 +301,7 @@ Public Class Player
         AxPlayer.enableContextMenu = False
         AxPlayer.Ctlenabled = False
         AxPlayer.stretchToFit = True
-        AxPlayer.settings.volume = 100
+        _player.Volume = 100
 
         'Set tooltips for buttons
         TipPlayer.SetText(BtnPlay, "Play / Pause")
@@ -715,7 +843,7 @@ Public Class Player
         If Not MIView.DropDown.Visible Then MIView.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub MIViewDropDownOpening(sender As Object, e As EventArgs) Handles MIView.DropDownOpening
-        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(AxPlayer.URL)) And Not PlayState = PlayStates.Stopped Then
+        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) And Not PlayState = PlayStates.Stopped Then
             MIFullscreen.Enabled = True
         Else
             MIFullscreen.Enabled = False
@@ -924,7 +1052,7 @@ Public Class Player
     Private Sub CMIShowCurrentClick(sender As Object, e As EventArgs) Handles CMIShowCurrent.Click
         Dim item As ListViewItem
         Try
-            item = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
+            item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
             If item IsNot Nothing Then
                 LVPlaylist.SelectedItems.Clear()
                 item.Selected = True
@@ -1038,9 +1166,9 @@ Public Class Player
         pString_format.Alignment = StringAlignment.Center
         pString_format.LineAlignment = StringAlignment.Center
         'Try
-        Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
+        Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(_player.Path, True, 0)
         If lvi Is Nothing Then
-            pText = AxPlayer.URL
+            pText = _player.Path
         Else
             pText = lvi.Text
             lvi = Nothing
@@ -1121,7 +1249,7 @@ Public Class Player
         End If
     End Sub
     Private Sub TxtBoxLyrics_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxLyrics.PreviewKeyDown
-        CMLyrics.ShortcutKeys(CType(sender, TextBox), e)
+        CMLyrics.ShortcutKeys(CType(sender, System.Windows.Forms.TextBox), e)
     End Sub
     Private Sub ListBoxPlaylistSearchSelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBoxPlaylistSearch.SelectedIndexChanged
         If ListBoxPlaylistSearch.SelectedItems.Count = 1 Then
@@ -1170,7 +1298,8 @@ Public Class Player
         LVPlaylist.Focus()
     End Sub
     Private Sub TrackBarPosition_Scroll(sender As Object, e As EventArgs) Handles TrackBarPosition.Scroll
-        AxPlayer.Ctlcontrols.pause()
+        _player.Pause()
+        OnPause()
     End Sub
     Private Sub TrackBarPosition_MouseUp(sender As Object, e As MouseEventArgs) Handles TrackBarPosition.MouseUp
         Dim newposition As Double
@@ -1182,8 +1311,8 @@ Public Class Player
         End If
         TrackBarPosition.Value = Convert.ToInt32(newposition)
         Debug.Print((TrackBarPosition.Value / TrackBarScale).ToString)
-        AxPlayer.Ctlcontrols.currentPosition = TrackBarPosition.Value / TrackBarScale
-        AxPlayer.Ctlcontrols.play()
+        _player.Position = TrackBarPosition.Value / TrackBarScale
+        _player.Play()
         LVPlaylist.Focus()
     End Sub
     Private Sub TrackBarPosition_MouseWheel(sender As Object, e As MouseEventArgs)
@@ -1191,44 +1320,56 @@ Public Class Player
     End Sub
 
     'Handlers
-    Private Sub AxPlayer_PlayStateChange(sender As Object, e As AxWMPLib._WMPOCXEvents_PlayStateChangeEvent) Handles AxPlayer.PlayStateChange
-        Select Case e.newState
-            Case 0 'Undefined
-            Case 1 'Stopped
-            Case 2 'Paused
-                OnPause()
-            Case 3 'Playing
-                OnPlay()
-            Case 4 'ScanForward
-            Case 5 'ScanReverse
-            Case 6 'Buffering
-            Case 7 'Waiting
-            Case 8 'MediaEnded
-                PlayState = PlayStates.Stopped
-                BtnPlay.Image = App.CurrentTheme.PlayerPlay
-                TrackBarPosition.Value = 0
-                PEXLeft.Value = 0
-                PEXRight.Value = 0
-                ResetLblPositionText()
-                If Not App.PlayMode = App.PlayModes.None Then PlayNext()
-            Case 9 'Transitioning
-            Case 10 'Ready
-            Case 11 'Reconnecting
-            Case 12 'Last
-            Case Else 'Unknown State
-        End Select
+    'Private Sub AxPlayer_PlayStateChange(sender As Object, e As AxWMPLib._WMPOCXEvents_PlayStateChangeEvent) Handles AxPlayer.PlayStateChange
+    '    Select Case e.newState
+    '        Case 0 'Undefined
+    '        Case 1 'Stopped
+    '        Case 2 'Paused
+    '            'OnPause()
+    '        Case 3 'Playing
+    '            'OnPlay()
+    '        Case 4 'ScanForward
+    '        Case 5 'ScanReverse
+    '        Case 6 'Buffering
+    '        Case 7 'Waiting
+    '        Case 8 'MediaEnded
+    '            'PlayState = PlayStates.Stopped
+    '            'BtnPlay.Image = App.CurrentTheme.PlayerPlay
+    '            'TrackBarPosition.Value = 0
+    '            'PEXLeft.Value = 0
+    '            'PEXRight.Value = 0
+    '            'ResetLblPositionText()
+    '            'If Not App.PlayMode = App.PlayModes.None Then PlayNext()
+    '        Case 9 'Transitioning
+    '        Case 10 'Ready
+    '        Case 11 'Reconnecting
+    '        Case 12 'Last
+    '        Case Else 'Unknown State
+    '    End Select
+    'End Sub
+    Private Sub OnPlaybackStarted()
+        OnPlay()
+    End Sub
+    Private Sub OnPlaybackEnded()
+        PlayState = PlayStates.Stopped
+        BtnPlay.Image = App.CurrentTheme.PlayerPlay
+        TrackBarPosition.Value = 0
+        PEXLeft.Value = 0
+        PEXRight.Value = 0
+        ResetLblPositionText()
+        If Not App.PlayMode = App.PlayModes.None Then PlayNext()
     End Sub
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
-        If AxPlayer.currentMedia IsNot Nothing AndAlso PlayState = PlayStates.Playing Then
+        If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             Try
-                If Not Stream Then TrackBarPosition.Value = CInt(AxPlayer.Ctlcontrols.currentPosition * TrackBarScale)
+                If Not Stream Then TrackBarPosition.Value = CInt(_player.Position * TrackBarScale)
                 If My.App.PlayerPositionShowElapsed Then
-                    LblPosition.Text = FormatPosition(AxPlayer.Ctlcontrols.currentPosition)
+                    LblPosition.Text = FormatPosition(_player.Position)
                 Else
                     If Stream Then
                         LblPosition.Text = "00:00"
                     Else
-                        LblPosition.Text = FormatPosition(AxPlayer.currentMedia.duration - AxPlayer.Ctlcontrols.currentPosition)
+                        LblPosition.Text = FormatPosition(_player.Duration - _player.Position)
                     End If
                 End If
             Catch
@@ -1238,7 +1379,7 @@ Public Class Player
         End If
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
-        If AxPlayer.currentMedia IsNot Nothing And PlayState = PlayStates.Playing Then
+        If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             Try : cLeftMeter = CByte(aDev.AudioMeterInformation.PeakValues(0) * 100)
             Catch : cLeftMeter = 0
             End Try
@@ -1263,7 +1404,7 @@ Public Class Player
     End Sub
     Private Sub TimerPlayNext_Tick(sender As Object, e As EventArgs) Handles TimerPlayNext.Tick
         TimerPlayNext.Stop()
-        AxPlayer.Ctlcontrols.play()
+        _player.Play()
     End Sub
 
     'Procedures
@@ -2192,28 +2333,27 @@ Public Class Player
         End If
     End Function
     Private Function VideoGetHeight(width As Integer) As Integer
-        If AxPlayer.currentMedia Is Nothing Then
-            Return 0
-        Else
+        If _player.HasMedia Then
             Try
-                'Debug.Print(AxPlayer.currentMedia.imageSourceHeight.ToString + " " + AxPlayer.currentMedia.imageSourceWidth.ToString)
-                Return CInt(Int(AxPlayer.currentMedia.imageSourceHeight * (width / AxPlayer.currentMedia.imageSourceWidth)))
+                Return CInt(Int(_player.VideoHeight * (width / _player.VideoWidth)))
             Catch ex As Exception
                 Debug.Print("Error calculating video height: " + ex.Message)
                 Return 0
             End Try
+        Else
+            Return 0
         End If
     End Function
     Private Function VideoGetWidth(height As Integer) As Integer
-        If AxPlayer.currentMedia Is Nothing Then
-            Return 0
-        Else
+        If _player.HasMedia Then
             Try
-                Return CInt(Int(AxPlayer.currentMedia.imageSourceWidth * (height / AxPlayer.currentMedia.imageSourceHeight)))
+                Return CInt(Int(_player.VideoWidth * (height / _player.VideoHeight)))
             Catch ex As Exception
                 Debug.Print("Error calculating video width: " + ex.Message)
                 Return 0
             End Try
+        Else
+            Return 0
         End If
     End Function
     Private Function RandomHistoryFull() As Boolean
@@ -2414,25 +2554,25 @@ Public Class Player
         End Select
     End Sub
     Friend Sub TogglePlay()
-        If AxPlayer.currentMedia Is Nothing Then
+        If _player.HasMedia Then
+            If PlayState = PlayStates.Playing Then
+                _player.Pause()
+                OnPause()
+            Else
+                _player.Play()
+                '''OnPlay()
+            End If
+        Else
             If LVPlaylist.Items.Count > 0 Then
                 If LVPlaylist.SelectedItems.Count = 0 Then LVPlaylist.Items(0).Selected = True
                 PlayFromPlaylist()
-            End If
-        Else
-            If PlayState = PlayStates.Playing Then
-                AxPlayer.Ctlcontrols.pause()
-                '''OnPause()
-            Else
-                AxPlayer.Ctlcontrols.play()
-                '''OnPlay()
             End If
         End If
         LVPlaylist.Focus()
     End Sub
     Friend Sub StopPlay()
-        If AxPlayer.currentMedia IsNot Nothing Then
-            AxPlayer.Ctlcontrols.stop()
+        If _player.HasMedia Then
+            _player.Stop()
             OnStop()
         End If
     End Sub
@@ -2440,7 +2580,7 @@ Public Class Player
         If Not String.IsNullOrEmpty(url) Then
             Stream = True
             Try
-                AxPlayer.URL = url
+                _player.Play(url)
                 TrackBarPosition.Enabled = False
                 TrackBarPosition.Value = 0
                 '''OnPlay()
@@ -2455,7 +2595,7 @@ Public Class Player
         If Not String.IsNullOrEmpty(path) Then
             Stream = False
             Try
-                AxPlayer.URL = path
+                _player.Play(path)
                 If Not My.Computer.FileSystem.FileExists(path) Then
                     LblPosition.Text = String.Empty
                     LblDuration.Text = String.Empty
@@ -2493,10 +2633,7 @@ Public Class Player
             Else
                 Stream = False
                 PlayFile(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayFromPlaylist")
-                'AxPlayer.URL = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text
-                'App.WriteToLog("Playing " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayFromPlaylist)")
             End If
-            'RandomHistoryAdd(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
         End If
     End Sub
     Friend Sub PlayFromLibrary(title As String, filename As String)
@@ -2540,34 +2677,26 @@ Public Class Player
                 TimerPlayNext.Start()
             Case PlayModes.Linear
                 If LVPlaylist.Items.Count > 0 Then
-                    Dim item As ListViewItem = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
+                    Dim item As ListViewItem = LVPlaylist.FindItemWithText(_player.Path, True, 0)
                     Dim newindex As Integer = LVPlaylist.Items.Count - 1
                     If item Is Nothing Then
                         If IsStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                             PlayStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         Else
                             PlayFile(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousLinear")
-                            'AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text
-                            'App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
                         End If
-                        'App.WriteToLog("Playing " + LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
                     ElseIf item.Index = 0 Then
                         If IsStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                             PlayStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         Else
                             PlayFile(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousLinear")
-                            'AxPlayer.URL = LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text
-                            'App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
                         End If
-                        'App.WriteToLog("Playing " + LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
                     Else
                         newindex = item.Index - 1
                         If IsStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                             PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         Else
                             PlayFile(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousLinear")
-                            'AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
-                            'App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayPreviousLinear)")
                         End If
                     End If
                     EnsurePlaylistItemIsVisible(newindex)
@@ -2581,7 +2710,7 @@ Public Class Player
                         Else
                             RandomHistoryIndex = RandomHistory.Count - 1
                         End If
-                        If RandomHistory.Item(RandomHistoryIndex) = AxPlayer.URL Then
+                        If RandomHistory.Item(RandomHistoryIndex) = _player.Path Then
                             'Already Playing Previous Random
                             RandomHistoryIndex -= 1
                             If RandomHistoryIndex < 0 Then
@@ -2623,7 +2752,7 @@ Public Class Player
                         If LVPlaylist.SelectedItems.Count > 0 Then
                             item = LVPlaylist.FindItemWithText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         Else
-                            item = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
+                            item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
                         End If
                         Dim newindex As Integer = 0
                         If item Is Nothing OrElse item.Index + 1 = LVPlaylist.Items.Count Then
@@ -2631,8 +2760,6 @@ Public Class Player
                                 PlayStream(LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
                             Else
                                 PlayFile(LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayNextLinear")
-                                'AxPlayer.URL = LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text
-                                'App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextLinear)")
                             End If
                         Else
                             newindex = item.Index + 1
@@ -2640,8 +2767,6 @@ Public Class Player
                                 PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                             Else
                                 PlayFile(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayNextLinear")
-                                'AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
-                                'App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextLinear)")
                             End If
                         End If
                         EnsurePlaylistItemIsVisible(newindex)
@@ -2654,7 +2779,7 @@ Public Class Player
                     PlayQueued()
                 Else
                     If LVPlaylist.Items.Count > 0 Then
-                        Dim item As ListViewItem = LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0)
+                        Dim item As ListViewItem = LVPlaylist.FindItemWithText(_player.Path, True, 0)
                         Dim randomplaylistindex As System.Random = New System.Random()
                         Dim newindex As Integer = 0
                         If RandomHistoryFull() Then RandomHistory.Clear()
@@ -2673,10 +2798,7 @@ Public Class Player
                             PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         Else
                             PlayFile(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayNextRandom")
-                            'AxPlayer.URL = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
-                            'App.WriteToLog("Playing " + LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text + " (PlayNextRandom)")
                         End If
-                        'RandomHistoryAdd(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         EnsurePlaylistItemIsVisible(newindex)
                         item = Nothing
                         randomplaylistindex = Nothing
@@ -2705,19 +2827,19 @@ Public Class Player
     End Sub
     Private Sub OnPlay()
         PlayState = PlayStates.Playing
-        UpdateHistory(AxPlayer.URL)
+        UpdateHistory(_player.Path)
         BtnPlay.Image = App.CurrentTheme.PlayerPause
-        TrackBarPosition.Maximum = CInt(AxPlayer.currentMedia.duration * TrackBarScale)
+        TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
-        LblDuration.Text = FormatDuration(AxPlayer.currentMedia.duration)
+        LblDuration.Text = FormatDuration(_player.Duration)
         Try
             If Stream Then
-                Text = My.Application.Info.Title + " - " + AxPlayer.URL
+                Text = My.Application.Info.Title + " - " + _player.Path
             Else
-                Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(AxPlayer.URL, True, 0).Text + " @ " + AxPlayer.URL
+                Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path, True, 0).Text + " @ " + _player.Path
             End If
         Catch ex As Exception
-            Text = My.Application.Info.Title + " - " + AxPlayer.URL
+            Text = My.Application.Info.Title + " - " + _player.Path
         End Try
         ShowMedia()
     End Sub
@@ -2770,18 +2892,18 @@ Public Class Player
         RandomHistory.Clear()
     End Sub
     Private Sub UpdatePosition(ByVal forward As Boolean, Optional ByVal seconds As Byte = 20)
-        If AxPlayer.currentMedia IsNot Nothing And PlayState = PlayStates.Playing Then
+        If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             If forward Then
-                If AxPlayer.Ctlcontrols.currentPosition + seconds > AxPlayer.currentMedia.duration Then
-                    AxPlayer.Ctlcontrols.currentPosition = AxPlayer.currentMedia.duration
+                If _player.Position + seconds > _player.Duration Then
+                    _player.Position = _player.Duration
                 Else
-                    AxPlayer.Ctlcontrols.currentPosition += seconds
+                    _player.Position += seconds
                 End If
             Else
-                If AxPlayer.Ctlcontrols.currentPosition <= seconds Then
-                    AxPlayer.Ctlcontrols.currentPosition = 0
+                If _player.Position <= seconds Then
+                    _player.Position = 0
                 Else
-                    AxPlayer.Ctlcontrols.currentPosition -= seconds
+                    _player.Position -= seconds
                 End If
             End If
             LVPlaylist.Focus()
@@ -2789,33 +2911,26 @@ Public Class Player
     End Sub
     Private Sub ToggleMute()
         If Mute Then
-            AxPlayer.settings.volume = 100
+            _player.Volume = 100
             BtnMute.Image = Resources.ImagePlayerSound
             Mute = False
         Else
-            AxPlayer.settings.volume = 0
+            _player.Volume = 0
             BtnMute.Image = Resources.ImagePlayerSoundMute
             Mute = True
         End If
     End Sub
     Private Sub ShowMedia()
-        If AxPlayer.currentMedia Is Nothing Then
-            PicBoxAlbumArt.Visible = False
-            LblAlbumArtSelect.Visible = False
-            TxtBoxLyrics.Visible = False
-            AxPlayer.Visible = False
-            PicBoxVisualizer.Visible = False
-            TimerVisualizer.Stop()
-        Else
+        If _player.HasMedia Then
             Dim tlfile As TagLib.File
             Try
                 If Stream Then
                     tlfile = Nothing
                 Else
-                    tlfile = TagLib.File.Create(AxPlayer.URL)
+                    tlfile = TagLib.File.Create(_player.Path)
                 End If
             Catch ex As Exception
-                WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + AxPlayer.URL + Chr(13) + ex.Message)
+                WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + _player.Path + Chr(13) + ex.Message)
                 tlfile = Nothing
             End Try
             If Lyrics AndAlso Not Stream Then 'Show Lyrics
@@ -2840,7 +2955,7 @@ Public Class Player
                     TxtBoxLyrics.Visible = False
                     AxPlayer.Visible = False
                 Else
-                    If App.AudioExtensionDictionary.ContainsKey(Path.GetExtension(AxPlayer.URL)) Then 'Show Album Art
+                    If App.AudioExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Album Art
                         AxPlayer.Visible = False
                         PicBoxVisualizer.Visible = False
                         TxtBoxLyrics.Visible = False
@@ -2857,10 +2972,10 @@ Public Class Player
                                 If AlbumArtIndex + 1 > tlfile.Tag.Pictures.Count Then AlbumArtIndex = 0
                                 Dim ms As New IO.MemoryStream(tlfile.Tag.Pictures(AlbumArtIndex).Data.Data)
                                 Try
-                                    PicBoxAlbumArt.Image = Image.FromStream(ms)
+                                    PicBoxAlbumArt.Image = Drawing.Image.FromStream(ms)
                                     PicBoxAlbumArt.Visible = True
                                 Catch ex As Exception
-                                    WriteToLog("Error Loading Album Art for " + AxPlayer.URL + vbCr + ex.Message)
+                                    WriteToLog("Error Loading Album Art for " + _player.Path + vbCr + ex.Message)
                                     PicBoxAlbumArt.Visible = False
                                     LblAlbumArtSelect.Visible = False
                                 End Try
@@ -2871,7 +2986,7 @@ Public Class Player
                                 End If
                             End If
                         End If
-                    ElseIf App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(AxPlayer.URL)) Then 'Show Video
+                    ElseIf App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Video
                         Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
                         LblAlbumArtSelect.Visible = False
@@ -2904,6 +3019,13 @@ Public Class Player
                 End If
             End If
             tlfile = Nothing
+        Else
+            PicBoxAlbumArt.Visible = False
+            LblAlbumArtSelect.Visible = False
+            TxtBoxLyrics.Visible = False
+            AxPlayer.Visible = False
+            PicBoxVisualizer.Visible = False
+            TimerVisualizer.Stop()
         End If
     End Sub
     Friend Sub Suspend() 'Called when the user locks the screen or activates the screen saver
@@ -2916,8 +3038,8 @@ Public Class Player
     End Sub
     Private Sub VideoSetSize()
         Try
-            If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(AxPlayer.URL)) Then
-                If AxPlayer.currentMedia.imageSourceHeight / AxPlayer.currentMedia.imageSourceWidth > PanelMedia.Height / PanelMedia.Width Then
+            If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
+                If _player.VideoHeight / _player.VideoWidth > PanelMedia.Height / PanelMedia.Width Then
                     'Height > Width, Set Height then Get Width, then Set Centers
                     AxPlayer.Width = VideoGetWidth(PanelMedia.Height)
                     AxPlayer.Height = PanelMedia.Height
@@ -2981,14 +3103,14 @@ Public Class Player
         LblPlaylistCount.Text += ", " + Queue.Count.ToString + " Queued"
     End Sub
     Private Sub ResetLblPositionText()
-        If AxPlayer.currentMedia Is Nothing Then
-            LblPosition.ResetText()
-        Else
+        If _player.HasMedia Then
             If App.PlayerPositionShowElapsed Then
                 LblPosition.Text = "00:00"
             Else
-                LblPosition.Text = "-" + FormatDuration(AxPlayer.currentMedia.duration)
+                LblPosition.Text = "-" + FormatDuration(_player.Duration)
             End If
+        Else
+            LblPosition.ResetText()
         End If
     End Sub
     Private Sub ResetTxtBoxPlaylistSearch()
