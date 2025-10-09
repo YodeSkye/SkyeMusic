@@ -510,10 +510,6 @@ Public Class Player
         If e.Alt Then
         ElseIf e.Control Then
             Select Case e.KeyCode
-                'Case Keys.A
-                '    For Each item As ListViewItem In LVPlaylist.Items
-                '        item.Selected = True
-                '    Next
             End Select
         ElseIf e.Shift Then
             Select Case e.KeyCode
@@ -541,7 +537,6 @@ Public Class Player
                 Case Keys.Delete : PlaylistRemoveItems()
                 Case Keys.Insert
             End Select
-            'e.Handled = True
         End If
     End Sub
     Private Sub LVPlaylist_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVPlaylist.ColumnClick
@@ -702,7 +697,7 @@ Public Class Player
             Dim filedrop = DirectCast(e.Data.GetData(DataFormats.FileDrop, True), String())
             Dim files As New List(Of String)
             For Each s In filedrop
-                If Computer.FileSystem.FileExists(s) Then files.Add(s)
+                If Computer.FileSystem.FileExists(s) AndAlso App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(s)) Then files.Add(s)
             Next
             If files.Count > 0 Then : e.Effect = DragDropEffects.Link
             Else : e.Effect = DragDropEffects.None
@@ -718,10 +713,10 @@ Public Class Player
             Dim filedrop = DirectCast(e.Data.GetData(DataFormats.FileDrop, True), String())
             Dim files As New List(Of String)
             For Each s In filedrop
-                If Computer.FileSystem.FileExists(s) Then files.Add(s)
+                If Computer.FileSystem.FileExists(s) AndAlso App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(s)) Then files.Add(s)
             Next
             If files.Count > 0 Then
-                WriteToLog("Drag&Drop Performed (" + files.Count.ToString + " " + IIf(files.Count = 1, "File", "Files").ToString + ")")
+                WriteToLog("Player Drag&Drop Performed (" + files.Count.ToString + " " + IIf(files.Count = 1, "File", "Files").ToString + ")")
                 Dim lvi As ListViewItem
                 Dim clientpoint = LVPlaylist.PointToClient(New System.Drawing.Point(e.X, e.Y))
                 Dim itemover = LVPlaylist.GetItemAt(clientpoint.X, clientpoint.Y)
@@ -3091,7 +3086,7 @@ Public Class Player
         LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played"
         LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added"
     End Sub
-    Private Sub SetPlaylistCountText()
+    Friend Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()
         LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString
         If LVPlaylist.Items.Count = 1 Then

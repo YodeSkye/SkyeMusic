@@ -1,9 +1,12 @@
 ﻿
+Imports System.IO
+
 Public Class PlayerQueue
 
     'Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private QueueItemMove As ListViewItem 'Item being moved in the playlist
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -90,7 +93,126 @@ Public Class PlayerQueue
     Private Sub LVQueue_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVQueue.DrawSubItem
         e.DrawDefault = True
     End Sub
+    Private Sub LVQueue_MouseDown(sender As Object, e As MouseEventArgs) Handles LVQueue.MouseDown
+        If e.Clicks = 1 Then QueueItemMove = LVQueue.GetItemAt(e.X, e.Y)
+    End Sub
+    Private Sub LVQueue_MouseMove(sender As Object, e As MouseEventArgs) Handles LVQueue.MouseMove
+        If QueueItemMove IsNot Nothing Then
+            Cursor = Cursors.Hand
+            Dim lastItemBottom = Math.Min(e.Y, LVQueue.Items(LVQueue.Items.Count - 1).GetBounds(ItemBoundsPortion.Entire).Bottom - 1)
+            Dim itemover = LVQueue.GetItemAt(0, lastItemBottom)
+            If itemover IsNot Nothing Then
+                Dim rc = itemover.GetBounds(ItemBoundsPortion.Entire)
+                If e.Y < rc.Top + rc.Height / 2 Then
+                    LVQueue.LineBefore = itemover.Index
+                    LVQueue.LineAfter = -1
+                Else
+                    LVQueue.LineBefore = -1
+                    LVQueue.LineAfter = itemover.Index
+                End If
+                LVQueue.Invalidate()
+            End If
+        End If
+    End Sub
+    Private Sub LVQueue_MouseUp(sender As Object, e As MouseEventArgs) Handles LVQueue.MouseUp
+        If QueueItemMove IsNot Nothing Then
+            Dim lastItemBottom = Math.Min(e.Y, LVQueue.Items(LVQueue.Items.Count - 1).GetBounds(ItemBoundsPortion.Entire).Bottom - 1)
+            Dim itemover = LVQueue.GetItemAt(0, lastItemBottom)
+            If itemover IsNot Nothing And itemover IsNot QueueItemMove Then
+                Dim insertbefore = True
+                Dim rc = itemover.GetBounds(ItemBoundsPortion.Entire)
+                If e.Y < rc.Top + rc.Height / 2 Then
+                    insertbefore = True
+                Else
+                    insertbefore = False
+                End If
+                LVQueue.Items.Remove(QueueItemMove)
+                If Not QueueItemMove.Index = itemover.Index Then
+                    If insertbefore Then
+                        LVQueue.Items.Insert(itemover.Index, QueueItemMove)
+                    Else
+                        LVQueue.Items.Insert(itemover.Index + 1, QueueItemMove)
+                    End If
+                End If
+                SaveLVToQueue()
+            End If
+            QueueItemMove = Nothing
+        End If
+        QueueItemMove = Nothing
+        Cursor = Cursors.Default
+        LVQueue.LineBefore = -1
+        LVQueue.LineAfter = -1
+        LVQueue.Invalidate()
+    End Sub
+    Private Sub LVQueue_DragEnter(sender As Object, e As DragEventArgs) Handles LVQueue.DragEnter
+        Activate()
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            Dim filedrop = DirectCast(e.Data.GetData(DataFormats.FileDrop, True), String())
+            Dim files As New List(Of String)
+            For Each s In filedrop
+                If Computer.FileSystem.FileExists(s) AndAlso App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(s)) Then files.Add(s)
+            Next
+            If files.Count > 0 Then : e.Effect = DragDropEffects.Link
+            Else : e.Effect = DragDropEffects.None
+            End If
+            files.Clear()
+            files = Nothing
+            filedrop = Nothing
+        Else : e.Effect = DragDropEffects.None
+        End If
+    End Sub
+    Private Sub LVQueue_DragDrop(sender As Object, e As DragEventArgs) Handles LVQueue.DragDrop
+        If e.Effect = DragDropEffects.Link Then
+            Dim filedrop = DirectCast(e.Data.GetData(DataFormats.FileDrop, True), String())
+            Dim files As New List(Of String)
+            For Each s In filedrop
+                If Computer.FileSystem.FileExists(s) AndAlso App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(s)) Then files.Add(s)
+            Next
+            If files.Count > 0 Then
+                WriteToLog("Queue Drag&Drop Performed (" + files.Count.ToString + " " + IIf(files.Count = 1, "File", "Files").ToString + ")")
+                Dim lvi As ListViewItem
+                Dim clientpoint = LVQueue.PointToClient(New System.Drawing.Point(e.X, e.Y))
+                Dim itemover = LVQueue.GetItemAt(clientpoint.X, clientpoint.Y)
+                For x = 0 To files.Count - 1
+                    'add new playlist entry
+                    If ExtensionDictionary.ContainsKey(Path.GetExtension(files(x))) Then
+                        lvi = New ListViewItem
+                        lvi.SubItems(0).Text = IO.Path.GetFileNameWithoutExtension(files(x))
+                        lvi.SubItems.Add(files(x))
+                        App.AddToHistoryFromPlaylist(files(x))
+                        If itemover Is Nothing Then
+                            LVQueue.Items.Add(lvi)
+                        Else
+                            LVQueue.Items.Insert(itemover.Index, lvi)
+                        End If
+                    End If
+                Next
+                SaveLVToQueue()
+                Player.SetPlaylistCountText()
+                lvi = Nothing
+                clientpoint = Nothing
+                itemover = Nothing
+            End If
+            files.Clear()
+            files = Nothing
+            filedrop = Nothing
+        End If
+    End Sub
     Private Sub CMQueue_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMQueue.Opening
+        CMIMoveBottom.Enabled = False
+        CMIMoveDown.Enabled = False
+        CMIMoveTop.Enabled = False
+        CMIMoveUp.Enabled = False
+        If LVQueue.SelectedItems.Count = 1 Then
+            If LVQueue.SelectedItems(0).Index >= 1 Then
+                CMIMoveTop.Enabled = True
+                CMIMoveUp.Enabled = True
+            End If
+            If LVQueue.SelectedItems(0).Index <= LVQueue.Items.Count - 2 Then
+                CMIMoveBottom.Enabled = True
+                CMIMoveDown.Enabled = True
+            End If
+        End If
         If LVQueue.SelectedItems.Count = 0 Then
             CMIRemove.Text = CMIRemove.Text.TrimEnd(App.TrimEndSearch)
             CMIRemove.Enabled = False
@@ -98,6 +220,32 @@ Public Class PlayerQueue
             CMIRemove.Text = CMIRemove.Text.TrimEnd(App.TrimEndSearch) + " (" + LVQueue.SelectedItems.Count.ToString + ")"
             CMIRemove.Enabled = True
         End If
+    End Sub
+    Private Sub CMIMoveTop_Click(sender As Object, e As EventArgs) Handles CMIMoveTop.Click
+        Dim lvi As ListViewItem = LVQueue.SelectedItems(0)
+        LVQueue.Items.RemoveAt(lvi.Index)
+        LVQueue.Items.Insert(0, lvi)
+        SaveLVToQueue()
+    End Sub
+    Private Sub CMIMoveUp_Click(sender As Object, e As EventArgs) Handles CMIMoveUp.Click
+        Dim lvi As ListViewItem = LVQueue.SelectedItems(0)
+        Dim index As Integer = LVQueue.SelectedItems(0).Index
+        LVQueue.Items.RemoveAt(index)
+        LVQueue.Items.Insert(index - 1, lvi)
+        SaveLVToQueue()
+    End Sub
+    Private Sub CMIMoveDown_Click(sender As Object, e As EventArgs) Handles CMIMoveDown.Click
+        Dim lvi As ListViewItem = LVQueue.SelectedItems(0)
+        Dim index As Integer = LVQueue.SelectedItems(0).Index
+        LVQueue.Items.RemoveAt(index)
+        LVQueue.Items.Insert(index + 1, lvi)
+        SaveLVToQueue()
+    End Sub
+    Private Sub CMIMoveBottom_Click(sender As Object, e As EventArgs) Handles CMIMoveBottom.Click
+        Dim lvi As ListViewItem = LVQueue.SelectedItems(0)
+        LVQueue.Items.RemoveAt(lvi.Index)
+        LVQueue.Items.Insert(LVQueue.Items.Count, lvi)
+        SaveLVToQueue()
     End Sub
     Private Sub CMIRemove_Click(sender As Object, e As EventArgs) Handles CMIRemove.Click
         If LVQueue.SelectedItems.Count > 0 Then
@@ -114,35 +262,6 @@ Public Class PlayerQueue
         Player.PruneQueue()
         Populate()
     End Sub
-    'Private Sub TipQueue_Popup(sender As Object, e As PopupEventArgs) Handles TipQueue.Popup
-    '    Static s As SizeF
-    '    s = TextRenderer.MeasureText(TipQueue.GetToolTip(e.AssociatedControl), App.TipFont)
-    '    s.Width += 14
-    '    s.Height += 16
-    '    e.ToolTipSize = s.ToSize
-    'End Sub
-    'Private Sub TipQueue_Draw(sender As Object, e As DrawToolTipEventArgs) Handles TipQueue.Draw
-
-    '    'Declarations
-    '    Dim g As Graphics = e.Graphics
-
-    '    'Draw background
-    '    Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
-    '    g.FillRectangle(brbg, e.Bounds)
-
-    '    'Draw border
-    '    Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
-    '        g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
-    '    End Using
-
-    '    'Draw text
-    '    TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
-
-    '    'Finalize
-    '    brbg.Dispose()
-    '    g.Dispose()
-
-    'End Sub
 
     'Procedures
     Private Sub Populate()
@@ -160,6 +279,12 @@ Public Class PlayerQueue
             LVQueue.Items.Add(lvi)
         Next
         LVQueue.Columns(1).Width = -2
+    End Sub
+    Private Sub SaveLVToQueue()
+        Player.Queue.Clear()
+        For Each lvi As ListViewItem In LVQueue.Items
+            Player.Queue.Add(lvi.SubItems(1).Text)
+        Next
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
