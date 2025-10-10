@@ -1,6 +1,7 @@
 ﻿
 Imports System.Drawing.Drawing2D
 Imports System.IO
+Imports System.Threading
 Imports AxWMPLib
 Imports SkyeMusic.My
 Imports Syncfusion.Windows.Forms
@@ -75,29 +76,9 @@ Public Class Player
     End Property
 
     'Interface
-    Private _player As IMediaPlayer
-    Public Interface IMediaPlayer
-
-        Sub Play(path As String)
-        Sub Play()
-        Sub Pause()
-        Sub [Stop]()
-
-        ReadOnly Property HasMedia As Boolean
-        ReadOnly Property Path As String
-        Property Volume As Integer
-        Property Position As Double
-        ReadOnly Property Duration As Double
-        ReadOnly Property VideoWidth As Integer
-        ReadOnly Property VideoHeight As Integer
-        ReadOnly Property AspectRatio As Double
-
-        Event PlaybackStarted()
-        Event PlaybackEnded()
-
-    End Interface
+    Private _player As Skye.Contracts.IMediaPlayer
     Public Class WMPlayer
-        Implements IMediaPlayer
+        Implements Skye.Contracts.IMediaPlayer
 
         Private ReadOnly _wmp As AxWMPLib.AxWindowsMediaPlayer
 
@@ -106,30 +87,33 @@ Public Class Player
             AddHandler _wmp.PlayStateChange, AddressOf OnPlayStateChange
         End Sub
 
-        Public Sub Play(path As String) Implements IMediaPlayer.Play
+        Public Sub Play(path As String) Implements Skye.Contracts.IMediaPlayer.Play
             _wmp.URL = path
         End Sub
-        Public Sub Play() Implements IMediaPlayer.Play
+        Public Sub Play(uri As Uri) Implements Skye.Contracts.IMediaPlayer.Play
+            _wmp.URL = uri.AbsoluteUri
+        End Sub
+        Public Sub Play() Implements Skye.Contracts.IMediaPlayer.Play
             _wmp.Ctlcontrols.play()
         End Sub
-        Public Sub Pause() Implements IMediaPlayer.Pause
+        Public Sub Pause() Implements Skye.Contracts.IMediaPlayer.Pause
             _wmp.Ctlcontrols.pause()
         End Sub
-        Public Sub [Stop]() Implements IMediaPlayer.Stop
+        Public Sub [Stop]() Implements Skye.Contracts.IMediaPlayer.Stop
             _wmp.Ctlcontrols.stop()
         End Sub
 
-        Public ReadOnly Property HasMedia As Boolean Implements IMediaPlayer.HasMedia
+        Public ReadOnly Property HasMedia As Boolean Implements Skye.Contracts.IMediaPlayer.HasMedia
             Get
                 Return _wmp.currentMedia IsNot Nothing
             End Get
         End Property
-        Public ReadOnly Property Path As String Implements IMediaPlayer.Path
+        Public ReadOnly Property Path As String Implements Skye.Contracts.IMediaPlayer.Path
             Get
                 Return _wmp.URL
             End Get
         End Property
-        Public Property Volume As Integer Implements IMediaPlayer.Volume
+        Public Property Volume As Integer Implements Skye.Contracts.IMediaPlayer.Volume
             Get
                 Return _wmp.settings.volume
             End Get
@@ -137,7 +121,7 @@ Public Class Player
                 _wmp.settings.volume = value
             End Set
         End Property
-        Public Property Position As Double Implements IMediaPlayer.Position
+        Public Property Position As Double Implements Skye.Contracts.IMediaPlayer.Position
             Get
                 Return _wmp.Ctlcontrols.currentPosition
             End Get
@@ -145,7 +129,7 @@ Public Class Player
                 _wmp.Ctlcontrols.currentPosition = value
             End Set
         End Property
-        Public ReadOnly Property Duration As Double Implements IMediaPlayer.Duration
+        Public ReadOnly Property Duration As Double Implements Skye.Contracts.IMediaPlayer.Duration
             Get
                 If _wmp.currentMedia IsNot Nothing Then
                     Return _wmp.currentMedia.duration
@@ -154,7 +138,7 @@ Public Class Player
                 End If
             End Get
         End Property
-        Public ReadOnly Property VideoWidth As Integer Implements IMediaPlayer.VideoWidth
+        Public ReadOnly Property VideoWidth As Integer Implements Skye.Contracts.IMediaPlayer.VideoWidth
             Get
                 If _wmp.currentMedia IsNot Nothing Then
                     Return _wmp.currentMedia.imageSourceWidth
@@ -163,7 +147,7 @@ Public Class Player
                 End If
             End Get
         End Property
-        Public ReadOnly Property VideoHeight As Integer Implements IMediaPlayer.VideoHeight
+        Public ReadOnly Property VideoHeight As Integer Implements Skye.Contracts.IMediaPlayer.VideoHeight
             Get
                 If _wmp.currentMedia IsNot Nothing Then
                     Return _wmp.currentMedia.imageSourceHeight
@@ -172,7 +156,7 @@ Public Class Player
                 End If
             End Get
         End Property
-        Public ReadOnly Property AspectRatio As Double Implements IMediaPlayer.AspectRatio
+        Public ReadOnly Property AspectRatio As Double Implements Skye.Contracts.IMediaPlayer.AspectRatio
             Get
                 If _wmp.currentMedia IsNot Nothing AndAlso _wmp.currentMedia.imageSourceHeight > 0 Then
                     Return _wmp.currentMedia.imageSourceWidth / _wmp.currentMedia.imageSourceHeight
@@ -189,11 +173,10 @@ Public Class Player
                 Case WMPLib.WMPPlayState.wmppsMediaEnded
                     RaiseEvent PlaybackEnded()
             End Select
-
         End Sub
 
-        Public Event PlaybackStarted() Implements IMediaPlayer.PlaybackStarted
-        Public Event PlaybackEnded() Implements IMediaPlayer.PlaybackEnded
+        Public Event PlaybackStarted() Implements Skye.Contracts.IMediaPlayer.PlaybackStarted
+        Public Event PlaybackEnded() Implements Skye.Contracts.IMediaPlayer.PlaybackEnded
 
     End Class
 
@@ -2575,10 +2558,10 @@ Public Class Player
         If Not String.IsNullOrEmpty(url) Then
             Stream = True
             Try
-                _player.Play(url)
+                _player.Play(New Uri(url))
+                '''OnPlay()
                 TrackBarPosition.Enabled = False
                 TrackBarPosition.Value = 0
-                '''OnPlay()
                 App.WriteToLog("Playing " + url + " (PlayStream)")
                 RandomHistoryAdd(url)
             Catch
@@ -2591,11 +2574,11 @@ Public Class Player
             Stream = False
             Try
                 _player.Play(path)
+                '''OnPlay()
                 If Not My.Computer.FileSystem.FileExists(path) Then
                     LblPosition.Text = String.Empty
                     LblDuration.Text = String.Empty
                 End If
-                '''OnPlay()
                 App.WriteToLog("Playing " + path + " (" + source + ")")
                 RandomHistoryAdd(path)
             Catch
