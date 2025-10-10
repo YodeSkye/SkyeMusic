@@ -306,6 +306,7 @@ Public Class PlayerQueue
         End If
         LVQueue.BackColor = App.CurrentTheme.BackColor
         LVQueue.ForeColor = App.CurrentTheme.TextColor
+        LVQueue.InsertionLineColor = App.CurrentTheme.TextColor
         TipQueue.BackColor = App.CurrentTheme.BackColor
         TipQueue.ForeColor = App.CurrentTheme.TextColor
         TipQueue.BorderColor = App.CurrentTheme.ButtonBackColor
