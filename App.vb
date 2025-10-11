@@ -413,6 +413,11 @@ Namespace My
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
 
+            Dim TracePath As String = IO.Path.Combine(Application.Info.DirectoryPath, "skye_trace.log")
+            Trace.Listeners.Add(New RollingTraceListener(TracePath))
+            Trace.AutoFlush = True
+            Trace.WriteLine("=== SkyeMusic started ===")
+
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense()
 
@@ -1253,6 +1258,40 @@ Namespace My
             End If
         End Function
 
+    End Class
+
+    Public Class RollingTraceListener
+        Inherits TextWriterTraceListener
+
+        Private ReadOnly maxSize As Long = 1024 * 1024 ' 1 MB
+        Private ReadOnly logPath As String
+
+        Public Sub New(path As String)
+            MyBase.New(path)
+            logPath = path
+        End Sub
+
+        Public Overrides Sub WriteLine(message As String)
+            RotateIfNeeded()
+            Dim stamped As String = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} | {message}"
+            MyBase.WriteLine(stamped)
+            Me.Writer.Flush()
+        End Sub
+
+        Private Sub RotateIfNeeded()
+            Try
+                If File.Exists(logPath) AndAlso New FileInfo(logPath).Length > maxSize Then
+                    Dim backupPath As String = Path.ChangeExtension(logPath, ".old")
+                    If File.Exists(backupPath) Then File.Delete(backupPath)
+                    File.Move(logPath, backupPath)
+                    'Reset writer to new file
+                    Me.Writer.Close()
+                    Me.Writer = New StreamWriter(logPath, append:=False)
+                End If
+            Catch
+                'Fail silently — logging should never crash the app
+            End Try
+        End Sub
     End Class
 
 End Namespace
