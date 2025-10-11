@@ -1164,6 +1164,40 @@ Namespace My
 
     End Module
 
+    Friend Class RollingTraceListener
+        Inherits TextWriterTraceListener
+
+        Private ReadOnly maxSize As Long = 1024 * 1024 ' 1 MB
+        Private ReadOnly logPath As String
+
+        Public Sub New(path As String)
+            MyBase.New(path)
+            logPath = path
+        End Sub
+
+        Public Overrides Sub WriteLine(message As String)
+            RotateIfNeeded()
+            Dim stamped As String = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} | {message}"
+            MyBase.WriteLine(stamped)
+            Me.Writer.Flush()
+        End Sub
+
+        Private Sub RotateIfNeeded()
+            Try
+                If File.Exists(logPath) AndAlso New FileInfo(logPath).Length > maxSize Then
+                    Dim backupPath As String = Path.ChangeExtension(logPath, ".old")
+                    If File.Exists(backupPath) Then File.Delete(backupPath)
+                    File.Move(logPath, backupPath)
+                    'Reset writer to new file
+                    Me.Writer.Close()
+                    Me.Writer = New StreamWriter(logPath, append:=False)
+                End If
+            Catch
+                'Fail silently — logging should never crash the app
+            End Try
+        End Sub
+    End Class
+
     Friend Class ListViewItemStringComparer
         Implements IComparer
 
@@ -1260,38 +1294,5 @@ Namespace My
 
     End Class
 
-    Public Class RollingTraceListener
-        Inherits TextWriterTraceListener
-
-        Private ReadOnly maxSize As Long = 1024 * 1024 ' 1 MB
-        Private ReadOnly logPath As String
-
-        Public Sub New(path As String)
-            MyBase.New(path)
-            logPath = path
-        End Sub
-
-        Public Overrides Sub WriteLine(message As String)
-            RotateIfNeeded()
-            Dim stamped As String = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} | {message}"
-            MyBase.WriteLine(stamped)
-            Me.Writer.Flush()
-        End Sub
-
-        Private Sub RotateIfNeeded()
-            Try
-                If File.Exists(logPath) AndAlso New FileInfo(logPath).Length > maxSize Then
-                    Dim backupPath As String = Path.ChangeExtension(logPath, ".old")
-                    If File.Exists(backupPath) Then File.Delete(backupPath)
-                    File.Move(logPath, backupPath)
-                    'Reset writer to new file
-                    Me.Writer.Close()
-                    Me.Writer = New StreamWriter(logPath, append:=False)
-                End If
-            Catch
-                'Fail silently — logging should never crash the app
-            End Try
-        End Sub
-    End Class
 
 End Namespace
