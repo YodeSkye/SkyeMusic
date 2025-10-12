@@ -3,8 +3,10 @@ Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports System.Threading
 Imports AxWMPLib
+Imports Skye
 Imports SkyeMusic.My
 Imports Syncfusion.Windows.Forms
+Imports Syncfusion.Windows.Forms.Tools
 Imports TagLib
 
 Public Class Player
@@ -187,6 +189,13 @@ Public Class Player
                 Case Skye.WinAPI.WM_HOTKEY
                     Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
                     App.PerformHotKeyAction(m.WParam.ToInt32)
+                Case WinAPI.WM_SYSCOMMAND
+                    If m.WParam.ToInt32() = WinAPI.SC_MINIMIZE Then
+                        If CMPlaylist IsNot Nothing AndAlso CMPlaylist.Visible Then
+                            WinAPI.PostMessage(CMPlaylist.Handle, WinAPI.WM_CLOSE, IntPtr.Zero, IntPtr.Zero) 'Closes the Playlist Context Menu on minimize so it doesn't linger upon restore.
+                            TipPlaylist.HideTooltip()
+                        End If
+                    End If
                 Case Skye.WinAPI.WM_ACTIVATE
                     Select Case m.WParam.ToInt32
                         Case 0
@@ -201,8 +210,8 @@ Public Class Player
                 Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
                     SetAccentColor()
                 Case Skye.WinAPI.WM_SIZE
-                    If (m.WParam.ToInt32 = 0 Or m.WParam.ToInt32 = 2) AndAlso Lyrics Then ShowMedia()
-                Case Skye.WinAPI.WM_GET_CUSTOM_DATA
+                    If (m.WParam.ToInt32 = 0 Or m.WParam.ToInt32 = 2) AndAlso Lyrics Then ShowMedia() 'called on restore or maximized to resize the Lyrics text.
+                Case Skye.WinAPI.WM_GET_CUSTOM_DATA 'sends data upon request to SkyeVolume
                     Select Case PlayState
                         Case PlayStates.Playing
                             m.Result = New IntPtr(2)
