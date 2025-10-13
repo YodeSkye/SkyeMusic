@@ -1101,6 +1101,880 @@ Namespace My
         End Sub
 
         'Functions
+        Private Function FormatPlaylistTitleCore(filePath As String) As String 'Core routine: all formatting logic lives here
+            FormatPlaylistTitleCore = String.Empty
+            Dim tlfile As TagLib.File = Nothing
+            If App.PlaylistTitleFormat <> App.PlaylistTitleFormats.UseFilename Then
+                Try
+                    tlfile = TagLib.File.Create(filePath)
+                Catch ex As Exception
+                    WriteToLog("TagLib Error while Formatting Playlist Title, Cannot read from file: " + filePath + Chr(13) + ex.Message)
+                    tlfile = Nothing
+                End Try
+            End If
+            If tlfile Is Nothing Then
+                FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+            Else
+                Select Case App.PlaylistTitleFormat
+                    Case App.PlaylistTitleFormats.Song
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.SongGenre
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.SongArtist
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.SongArtistAlbum
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.SongAlbumArtist
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.SongArtistGenre
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.SongGenreArtist
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.SongArtistAlbumGenre
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.SongAlbumArtistGenre
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.SongGenreArtistAlbum
+                        If tlfile.Tag.Title = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Title
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.ArtistSong
+                        If tlfile.Tag.FirstPerformer = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.ArtistSongAlbum
+                        If tlfile.Tag.FirstPerformer = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.ArtistAlbumSong
+                        If tlfile.Tag.FirstPerformer = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.ArtistGenreSong
+                        If tlfile.Tag.FirstPerformer = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.ArtistSongGenre
+                        If tlfile.Tag.FirstPerformer = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.ArtistSongAlbumGenre
+                        If tlfile.Tag.FirstPerformer = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.ArtistGenreSongAlbum
+                        If tlfile.Tag.FirstPerformer = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.AlbumSongArtist
+                        If tlfile.Tag.Album = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Album
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.AlbumArtistSong
+                        If tlfile.Tag.Album = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Album
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.AlbumGenreSongArtist
+                        If tlfile.Tag.Album = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Album
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.AlbumGenreArtistSong
+                        If tlfile.Tag.Album = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Album
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.AlbumSongArtistGenre
+                        If tlfile.Tag.Album = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Album
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.AlbumArtistSongGenre
+                        If tlfile.Tag.Album = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.Album
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstGenre = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.GenreSong
+                        If tlfile.Tag.FirstGenre = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.GenreSongArtist
+                        If tlfile.Tag.FirstGenre = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.GenreArtistSong
+                        If tlfile.Tag.FirstGenre = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.GenreAlbumSongArtist
+                        If tlfile.Tag.FirstGenre = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.GenreAlbumArtistSong
+                        If tlfile.Tag.FirstGenre = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.GenreSongArtistAlbum
+                        If tlfile.Tag.FirstGenre = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                        End If
+                    Case App.PlaylistTitleFormats.GenreSongAlbumArtist
+                        If tlfile.Tag.FirstGenre = String.Empty Then
+                            FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
+                        Else
+                            If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
+                            Else
+                                FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
+                            End If
+                            If Not tlfile.Tag.Title = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Title
+                                End If
+                            End If
+                            If Not tlfile.Tag.Album = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.Album
+                                End If
+                            End If
+                            If Not tlfile.Tag.FirstPerformer = String.Empty Then
+                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
+                                If App.PlaylistTitleRemoveSpaces Then
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
+                                Else
+                                    FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
+                                End If
+                            End If
+                        End If
+                End Select
+                tlfile = Nothing
+            End If
+            If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(filePath)) Then
+                FormatPlaylistTitleCore += PlaylistVideoIdentifier
+            End If
+        End Function
+        ''' <summary>
+        ''' Called from Library with a ListViewItem
+        ''' </summary>
+        ''' <param name="item">Library listview item type</param>
+        ''' <returns></returns>
+        Friend Function FormatPlaylistTitle(item As ListViewItem) As String
+            Return FormatPlaylistTitleCore(item.SubItems(FRMLibrary.LVLibrary.Columns("FilePath").Index).Text)
+        End Function
+        ''' <summary>
+        ''' Called from Player with a raw filename
+        ''' </summary>
+        ''' <param name="filename">File Path of the target song.</param>
+        ''' <returns></returns>
+        Friend Function FormatPlaylistTitle(filename As String) As String
+            Return FormatPlaylistTitleCore(filename)
+        End Function
         Friend Function GenerateEllipsis(ByRef g As Graphics, s As String, f As System.Drawing.Font, width As Integer) As String
             Dim ellipsistext As String = s
             If width >= 0 Then
