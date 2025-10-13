@@ -1,10 +1,6 @@
 ﻿
 Imports System.IO
-Imports System.Runtime.InteropServices
-Imports System.Windows.Forms
 Imports Microsoft.Win32
-Imports Skye
-Imports SkyeMusic.Player
 
 Namespace My
 
@@ -346,6 +342,64 @@ Namespace My
         Friend HelperApp1Path As String = "C:\Program Files\SkyeApps\SkyeTag.exe"
         Friend HelperApp2Name As String = "MP3Tag"
         Friend HelperApp2Path As String = "C:\Program Files\Mp3tag\Mp3tag.exe"
+
+        'Interfaces
+        Private Interface IPlaylistIOFormat
+            ReadOnly Property Name As String
+            ReadOnly Property FileExtension As String
+            Function Import(path As String) As List(Of Player.PlaylistItemType)
+            Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType))
+        End Interface
+        Private MustInherit Class PlaylistIOFormatM3UBase
+            Implements IPlaylistIOFormat
+
+            Public MustOverride ReadOnly Property Name As String Implements IPlaylistIOFormat.Name
+            Public MustOverride ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
+
+            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of Player.PlaylistItemType)
+                For Each line In IO.File.ReadAllLines(path, System.Text.Encoding.UTF8)
+                    If Not String.IsNullOrWhiteSpace(line) AndAlso Not line.StartsWith("#") Then
+                        items.Add(New Player.PlaylistItemType With {.Path = line, .Title = IO.Path.GetFileNameWithoutExtension(line)})
+                    End If
+                Next
+                Return items
+            End Function
+            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+                Using writer As New IO.StreamWriter(path, False, System.Text.Encoding.UTF8)
+                    writer.WriteLine("#EXTM3U")
+                    For Each item In items
+                        writer.WriteLine(item.Path)
+                    Next
+                End Using
+            End Sub
+
+        End Class
+        Private Class PlaylistIOFormatM3U
+            Inherits PlaylistIOFormatM3UBase
+            Public Overrides ReadOnly Property Name As String = "M3U Playlist"
+            Public Overrides ReadOnly Property FileExtension As String = ".m3u"
+        End Class
+        Private Class PlaylistIOFormatM3U8
+            Inherits PlaylistIOFormatM3UBase
+            Public Overrides ReadOnly Property Name As String = "M3U8 Playlist"
+            Public Overrides ReadOnly Property FileExtension As String = ".m3u8"
+        End Class
+        Friend Class PlaylistIO
+            Private Shared ReadOnly Formats As New List(Of IPlaylistIOFormat) From {
+                New PlaylistIOFormatM3U(),
+                New PlaylistIOFormatM3U8()}       ' Add new formats here later
+            Public Shared Function Import(path As String) As List(Of Player.PlaylistItemType)
+                Dim fmt = Formats.FirstOrDefault(Function(f) path.EndsWith(f.FileExtension, StringComparison.OrdinalIgnoreCase))
+                If fmt Is Nothing Then Throw New NotSupportedException("Unknown playlist format")
+                Return fmt.Import(path)
+            End Function
+            Public Shared Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType))
+                Dim fmt = Formats.FirstOrDefault(Function(f) path.EndsWith(f.FileExtension, StringComparison.OrdinalIgnoreCase))
+                If fmt Is Nothing Then Throw New NotSupportedException("Unknown playlist format")
+                fmt.Export(path, items)
+            End Sub
+        End Class
 
         'App Handlers
         Private Sub timerScreenSaverWatcher_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerScreenSaverWatcher.Tick
