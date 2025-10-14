@@ -640,15 +640,7 @@ Namespace My
                     .PropertyNameCaseInsensitive = True,
                     .IncludeFields = True}
                 Dim parsed = System.Text.Json.JsonSerializer.Deserialize(Of List(Of Player.PlaylistItemType))(json, options)
-                If parsed Is Nothing Then
-                    Debug.WriteLine("JSON Import: parsed is Nothing")
-                Else
-                    Debug.WriteLine($"JSON Import: parsed.Count = {parsed.Count}")
-                    For Each it In parsed
-                        Debug.WriteLine($" -> Path={it.Path}, Title={it.Title}")
-                    Next
-                    items.AddRange(parsed)
-                End If
+                If parsed IsNot Nothing Then items.AddRange(parsed)
                 Return items
             End Function
             Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export

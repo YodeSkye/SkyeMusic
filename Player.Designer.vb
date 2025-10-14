@@ -59,6 +59,8 @@ Partial Class Player
         MIFile = New ToolStripMenuItem()
         MIOpen = New ToolStripMenuItem()
         MIOpenURL = New ToolStripMenuItem()
+        cmiOpenPlaylist = New ToolStripMenuItem()
+        cmiSavePlaylist = New ToolStripMenuItem()
         ToolStripSeparator4 = New ToolStripSeparator()
         MIExit = New ToolStripMenuItem()
         MIView = New ToolStripMenuItem()
@@ -100,6 +102,7 @@ Partial Class Player
         TipPlayer = New Skye.UI.ToolTipEX(components)
         TipPlaylist = New Skye.UI.ToolTipEX(components)
         TipWatcherNotification = New Skye.UI.ToolTipEX(components)
+        TimerStatus = New Timer(components)
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         CType(AxPlayer, ComponentModel.ISupportInitialize).BeginInit()
@@ -352,7 +355,7 @@ Partial Class Player
         ' 
         ' MIFile
         ' 
-        MIFile.DropDownItems.AddRange(New ToolStripItem() {MIOpen, MIOpenURL, ToolStripSeparator4, MIExit})
+        MIFile.DropDownItems.AddRange(New ToolStripItem() {MIOpen, MIOpenURL, cmiOpenPlaylist, cmiSavePlaylist, ToolStripSeparator4, MIExit})
         MIFile.ForeColor = SystemColors.HighlightText
         MIFile.Image = My.Resources.Resources.ImageOpen16
         MIFile.Name = "MIFile"
@@ -363,26 +366,40 @@ Partial Class Player
         ' 
         MIOpen.Image = My.Resources.Resources.ImageOpen16
         MIOpen.Name = "MIOpen"
-        MIOpen.Size = New Size(135, 22)
+        MIOpen.Size = New Size(180, 22)
         MIOpen.Text = "Open"
         ' 
         ' MIOpenURL
         ' 
         MIOpenURL.Image = My.Resources.Resources.ImageGlobe
         MIOpenURL.Name = "MIOpenURL"
-        MIOpenURL.Size = New Size(135, 22)
+        MIOpenURL.Size = New Size(180, 22)
         MIOpenURL.Text = "Open URL"
+        ' 
+        ' cmiOpenPlaylist
+        ' 
+        cmiOpenPlaylist.Image = My.Resources.Resources.ImageImport16
+        cmiOpenPlaylist.Name = "cmiOpenPlaylist"
+        cmiOpenPlaylist.Size = New Size(180, 22)
+        cmiOpenPlaylist.Text = "Open Playlist..."
+        ' 
+        ' cmiSavePlaylist
+        ' 
+        cmiSavePlaylist.Image = My.Resources.Resources.ImageExport16
+        cmiSavePlaylist.Name = "cmiSavePlaylist"
+        cmiSavePlaylist.Size = New Size(180, 22)
+        cmiSavePlaylist.Text = "Save Playlist As..."
         ' 
         ' ToolStripSeparator4
         ' 
         ToolStripSeparator4.Name = "ToolStripSeparator4"
-        ToolStripSeparator4.Size = New Size(132, 6)
+        ToolStripSeparator4.Size = New Size(177, 6)
         ' 
         ' MIExit
         ' 
         MIExit.Image = My.Resources.Resources.ImageExit
         MIExit.Name = "MIExit"
-        MIExit.Size = New Size(135, 22)
+        MIExit.Size = New Size(180, 22)
         MIExit.Text = "Exit"
         ' 
         ' MIView
@@ -827,6 +844,10 @@ Partial Class Player
         TipWatcherNotification.ShadowAlpha = 200
         TipWatcherNotification.ShowDelay = 1000
         ' 
+        ' TimerStatus
+        ' 
+        TimerStatus.Interval = 8000
+        ' 
         ' Player
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -956,4 +977,7 @@ Partial Class Player
     Friend WithEvents TipPlayer As Skye.UI.ToolTipEX
     Friend WithEvents TipPlaylist As Skye.UI.ToolTipEX
     Friend WithEvents TipWatcherNotification As Skye.UI.ToolTipEX
+    Friend WithEvents TimerStatus As Timer
+    Friend WithEvents cmiOpenPlaylist As ToolStripMenuItem
+    Friend WithEvents cmiSavePlaylist As ToolStripMenuItem
 End Class

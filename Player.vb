@@ -1,13 +1,10 @@
 ﻿
 Imports System.Drawing.Drawing2D
 Imports System.IO
-Imports System.Threading
+Imports System.Runtime.CompilerServices
 Imports AxWMPLib
 Imports Skye
 Imports SkyeMusic.My
-Imports Syncfusion.Windows.Forms
-Imports Syncfusion.Windows.Forms.Tools
-Imports TagLib
 
 Public Class Player
 
@@ -320,6 +317,7 @@ Public Class Player
     End Sub
     Private Sub Player_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         TopMost = False
+        ShowStatusMessage("this IS a test message!")
     End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnReverse.KeyDown, BtnPlay.KeyDown, BtnForward.KeyDown, TrackBarPosition.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
         If Not TxtBoxPlaylistSearch.Focused Then
@@ -1307,33 +1305,6 @@ Public Class Player
     End Sub
 
     'Handlers
-    'Private Sub AxPlayer_PlayStateChange(sender As Object, e As AxWMPLib._WMPOCXEvents_PlayStateChangeEvent) Handles AxPlayer.PlayStateChange
-    '    Select Case e.newState
-    '        Case 0 'Undefined
-    '        Case 1 'Stopped
-    '        Case 2 'Paused
-    '            'OnPause()
-    '        Case 3 'Playing
-    '            'OnPlay()
-    '        Case 4 'ScanForward
-    '        Case 5 'ScanReverse
-    '        Case 6 'Buffering
-    '        Case 7 'Waiting
-    '        Case 8 'MediaEnded
-    '            'PlayState = PlayStates.Stopped
-    '            'BtnPlay.Image = App.CurrentTheme.PlayerPlay
-    '            'TrackBarPosition.Value = 0
-    '            'PEXLeft.Value = 0
-    '            'PEXRight.Value = 0
-    '            'ResetLblPositionText()
-    '            'If Not App.PlayMode = App.PlayModes.None Then PlayNext()
-    '        Case 9 'Transitioning
-    '        Case 10 'Ready
-    '        Case 11 'Reconnecting
-    '        Case 12 'Last
-    '        Case Else 'Unknown State
-    '    End Select
-    'End Sub
     Private Sub OnPlaybackStarted()
         OnPlay()
     End Sub
@@ -1393,8 +1364,12 @@ Public Class Player
         TimerPlayNext.Stop()
         _player.Play()
     End Sub
+    Private Sub TimerStatus_Tick(sender As Object, e As EventArgs) Handles TimerStatus.Tick
+        TimerStatus.Stop()
+        SetPlaylistCountText()
+    End Sub
 
-    'Procedures
+    'Functions
     Private Function CreateListviewItem() As ListViewItem
         Dim lvi As New ListViewItem
         lvi.SubItems.Add(String.Empty) 'Path
@@ -1461,6 +1436,15 @@ Public Class Player
         posstr = posstr & Int(pos.Milliseconds / 100).ToString
         Return posstr
     End Function
+    Private Function RandomHistoryFull() As Boolean
+        RandomHistoryFull = True
+        For Each item As ListViewItem In LVPlaylist.Items
+            If Not RandomHistory.Contains(item.SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+                RandomHistoryFull = False
+                Exit For
+            End If
+        Next
+    End Function
     Private Function VideoGetHeight(width As Integer) As Integer
         If _player.HasMedia Then
             Try
@@ -1485,25 +1469,145 @@ Public Class Player
             Return 0
         End If
     End Function
-    Private Function RandomHistoryFull() As Boolean
-        RandomHistoryFull = True
-        For Each item As ListViewItem In LVPlaylist.Items
-            If Not RandomHistory.Contains(item.SubItems(LVPlaylist.Columns("Path").Index).Text) Then
-                RandomHistoryFull = False
+
+    'Procedures
+    Friend Sub QueueFromLibrary(path As String)
+        Dim found As Boolean = False
+        For Each s As String In Queue
+            If s = path Then
+                found = True
                 Exit For
             End If
         Next
-    End Function
-    Private Sub EnsurePlaylistItemIsVisible(index As Integer)
-        If CMPlaylist.Visible Then CMPlaylist.Close()
-        LVPlaylist.EnsureVisible(index)
-        LVPlaylist.SelectedIndices.Clear()
-        LVPlaylist.SelectedIndices.Add(index)
+        If Not found Then
+            Queue.Add(path)
+            SetPlaylistCountText()
+        End If
     End Sub
-    Private Function ClearPlaylistSorts(currentsort As SortOrder) As SortOrder
-        ClearPlaylistTitles()
-        Return currentsort
-    End Function
+    Friend Sub PruneQueue()
+        Dim count As Integer = 0
+        Dim removelist As New System.Collections.Generic.List(Of String)
+        For Each item As String In Queue
+            If LVPlaylist.FindItemWithText(item, True, 0) Is Nothing Then
+                count += 1
+                removelist.Add(item)
+            End If
+        Next
+        For Each item As String In removelist
+            Queue.Remove(item)
+        Next
+        removelist = Nothing
+        SetPlaylistCountText()
+        App.WriteToLog("Queue Pruned (" + count.ToString + ")")
+    End Sub
+    Friend Sub RemoveFromQueue(path As String)
+        Queue.Remove(path)
+        Debug.Print(path + " Removed From Queue")
+        SetPlaylistCountText()
+    End Sub
+    Friend Sub Suspend() 'Called when the user locks the screen or activates the screen saver
+        If App.SuspendOnSessionChange Then
+            Debug.Print("Suspending...")
+            StopPlay()
+            Me.WindowState = FormWindowState.Minimized
+            App.WriteToLog("App Suspended @ " & Now)
+        End If
+    End Sub
+    Friend Sub ShowPlayMode()
+        Select Case App.PlayMode
+            Case PlayModes.None
+                MIPlayMode.Text = "Play Once"
+            Case PlayModes.Repeat
+                MIPlayMode.Text = "Repeat"
+            Case PlayModes.Linear
+                MIPlayMode.Text = "Play Next"
+            Case PlayModes.Random
+                MIPlayMode.Text = "Shuffle"
+        End Select
+    End Sub
+    Friend Sub SetTipPlayer()
+        Select Case App.PlayMode
+            Case App.PlayModes.None, PlayModes.Repeat
+                TipPlayer.SetText(BtnPrevious, String.Empty)
+                TipPlayer.SetText(BtnNext, String.Empty)
+            Case App.PlayModes.Linear
+                TipPlayer.SetText(BtnPrevious, "Previous Song In Playlist")
+                TipPlayer.SetText(BtnNext, "Next Song In Playlist")
+            Case App.PlayModes.Random
+                TipPlayer.SetText(BtnPrevious, "Previous Song Played")
+                TipPlayer.SetText(BtnNext, "Next Random Song")
+        End Select
+        Select Case App.PlayerPositionShowElapsed
+            Case True
+                TipPlayer.SetText(LblPosition, "Elapsed Time")
+            Case False
+                TipPlayer.SetText(LblPosition, "Time Remaining")
+        End Select
+    End Sub
+    Private Sub ShowStatusMessage(msg As String)
+        LblPlaylistCount.Text = StrConv(msg, VbStrConv.ProperCase)
+        TimerStatus.Start()
+    End Sub
+    Friend Sub SetPlaylistCountText()
+        LblPlaylistCount.ResetText()
+        LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString
+        If LVPlaylist.Items.Count = 1 Then
+            LblPlaylistCount.Text += " Song, "
+        Else
+            LblPlaylistCount.Text += " Songs, "
+        End If
+        LblPlaylistCount.Text += LVPlaylist.SelectedItems.Count.ToString + " Selected"
+        LblPlaylistCount.Text += ", " + Queue.Count.ToString + " Queued"
+    End Sub
+    Private Sub ResetLblPositionText()
+        If _player.HasMedia Then
+            If App.PlayerPositionShowElapsed Then
+                LblPosition.Text = "00:00"
+            Else
+                LblPosition.Text = "-" + FormatDuration(_player.Duration)
+            End If
+        Else
+            LblPosition.ResetText()
+        End If
+    End Sub
+    Private Sub ResetTxtBoxPlaylistSearch()
+        If Not TxtBoxPlaylistSearch.Text = PlaylistSearchTitle Then
+            TxtBoxPlaylistSearch.Text = PlaylistSearchTitle
+            TxtBoxPlaylistSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
+            ListBoxPlaylistSearch.Visible = False
+            ListBoxPlaylistSearch.Items.Clear()
+            PlaylistSearchItems.Clear()
+            Debug.Print("Playlist Search Reset")
+        End If
+    End Sub
+    Private Sub CheckMove(ByRef location As Point)
+        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
+        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
+        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
+        If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
+    End Sub
+    Private Sub ToggleMaximized()
+        Select Case WindowState
+            Case FormWindowState.Normal, FormWindowState.Minimized
+                WindowState = FormWindowState.Maximized
+            Case FormWindowState.Maximized
+                WindowState = FormWindowState.Normal
+        End Select
+    End Sub
+    Private Sub LyricsOff()
+        If Lyrics Then
+            Lyrics = False
+            MILyrics.BackColor = Color.Transparent
+        End If
+    End Sub
+    Private Sub VisualizerOff()
+        If Visualizer Then
+            Visualizer = False
+            MIVisualizer.BackColor = Color.Transparent
+        End If
+    End Sub
+
+    'Playlist
     Private Sub SavePlaylist()
         If LVPlaylist.Items.Count = 0 Then
             If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then My.Computer.FileSystem.DeleteFile(App.PlaylistPath)
@@ -1632,23 +1736,19 @@ Public Class Player
         SetPlaylistCountText()
         lvi = Nothing
     End Sub
-    Friend Sub RemoveFromPlaylistFromLibrary(filename As String)
-        If LVPlaylist.Items.Count > 0 Then
-            Dim lvi As ListViewItem
-            lvi = LVPlaylist.FindItemWithText(filename, True, 0)
-            If lvi IsNot Nothing Then LVPlaylist.Items.Remove(lvi)
-        End If
-    End Sub
-    Friend Sub UpdateHistoryInPlaylist(path As String)
-        Dim lvi As ListViewItem
-        Try
-            lvi = LVPlaylist.FindItemWithText(path, True, 0)
-        Catch
-            lvi = Nothing
-        End Try
-        If lvi IsNot Nothing Then
-            GetHistory(lvi, path)
-            Debug.Print("Updated History in Playlist for " + path)
+    Private Sub QueueFromPlaylist()
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            Dim found As Boolean = False
+            For Each s As String In Queue
+                If s = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text Then
+                    found = True
+                    Exit For
+                End If
+            Next
+            If Not found Then
+                Queue.Add(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+                SetPlaylistCountText()
+            End If
         End If
     End Sub
     Private Sub PlaylistRemoveItems()
@@ -1670,18 +1770,101 @@ Public Class Player
             End If
         End If
     End Sub
-    Friend Sub ShowPlayMode()
-        Select Case App.PlayMode
-            Case PlayModes.None
-                MIPlayMode.Text = "Play Once"
-            Case PlayModes.Repeat
-                MIPlayMode.Text = "Repeat"
-            Case PlayModes.Linear
-                MIPlayMode.Text = "Play Next"
-            Case PlayModes.Random
-                MIPlayMode.Text = "Shuffle"
-        End Select
+    Friend Sub RemoveFromPlaylistFromLibrary(filename As String)
+        If LVPlaylist.Items.Count > 0 Then
+            Dim lvi As ListViewItem
+            lvi = LVPlaylist.FindItemWithText(filename, True, 0)
+            If lvi IsNot Nothing Then LVPlaylist.Items.Remove(lvi)
+        End If
     End Sub
+    Friend Sub UpdateHistoryInPlaylist(path As String)
+        Dim lvi As ListViewItem
+        Try
+            lvi = LVPlaylist.FindItemWithText(path, True, 0)
+        Catch
+            lvi = Nothing
+        End Try
+        If lvi IsNot Nothing Then
+            GetHistory(lvi, path)
+            Debug.Print("Updated History in Playlist for " + path)
+        End If
+    End Sub
+    Private Sub RandomHistoryAdd(songorstream As String)
+        If App.PlayMode = App.PlayModes.Random AndAlso LVPlaylist.FindItemWithText(songorstream, True, 0) IsNot Nothing Then
+            If RandomHistory.FindIndex(Function(p) p = songorstream) < 0 Then
+                App.UpdateRandomHistory(songorstream)
+            Else
+                Debug.Print("Not Adding " + songorstream + " to Random History, Already Exists")
+            End If
+        Else
+            Debug.Print("Not Adding " + songorstream + " to Random History, Song Not Found In Playlist or Not In Random PlayMode")
+        End If
+    End Sub
+    Friend Sub AddToRandomHistory(songorstream As String)
+        If App.PlayMode = App.PlayModes.Random Then
+            RandomHistory.Add(songorstream)
+            RandomHistoryIndex = RandomHistory.Count
+            Debug.Print("Added " + songorstream + " to Random History")
+        End If
+    End Sub
+    Friend Sub RandomHistoryClear()
+        RandomHistory.Clear()
+    End Sub
+    Friend Sub PrunePlaylist()
+
+        Debug.Print("Pruning Playlist..." + LVPlaylist.Items.Count.ToString + " total playlist items...")
+
+        'Find files that don't exist
+        Dim prunelist As New System.Collections.Generic.List(Of String)
+        For index As Integer = 0 To LVPlaylist.Items.Count - 1
+            If Not IsStream(LVPlaylist.Items(index).SubItems(1).Text) AndAlso Not My.Computer.FileSystem.FileExists(LVPlaylist.Items(index).SubItems(1).Text) Then
+                prunelist.Add(LVPlaylist.Items(index).SubItems(1).Text)
+            End If
+        Next
+
+        Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found...")
+
+        'Prune History
+        For Each s As String In prunelist
+            Debug.Print(s)
+            LVPlaylist.Items.RemoveAt(LVPlaylist.FindItemWithText(s, True, 0).Index)
+        Next
+        Debug.Print("Playlist Pruned (" + prunelist.Count.ToString + ")")
+        Debug.Print("Pruning Playlist Complete..." + LVPlaylist.Items.Count.ToString + " total playlist items.")
+        WriteToLog("Playlist Pruned (" + prunelist.Count.ToString + ")")
+
+        prunelist = Nothing
+        SetPlaylistCountText()
+
+    End Sub
+    Private Function ClearPlaylistSorts(currentsort As SortOrder) As SortOrder
+        ClearPlaylistTitles()
+        Return currentsort
+    End Function
+    Private Sub ClearPlaylistTitles()
+        PlaylistTitleSort = SortOrder.None
+        PlaylistPathSort = SortOrder.None
+        PlaylistRatingSort = SortOrder.None
+        PlaylistPlayCountSort = SortOrder.None
+        PlaylistLastPlayedSort = SortOrder.None
+        PlaylistFirstPlayedSort = SortOrder.None
+        PlaylistAddedSort = SortOrder.None
+        LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title"
+        LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path"
+        LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating"
+        LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays"
+        LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played"
+        LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played"
+        LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added"
+    End Sub
+    Private Sub EnsurePlaylistItemIsVisible(index As Integer)
+        If CMPlaylist.Visible Then CMPlaylist.Close()
+        LVPlaylist.EnsureVisible(index)
+        LVPlaylist.SelectedIndices.Clear()
+        LVPlaylist.SelectedIndices.Add(index)
+    End Sub
+
+    'Player
     Friend Sub TogglePlay()
         If _player.HasMedia Then
             If PlayState = PlayStates.Playing Then
@@ -1737,19 +1920,22 @@ Public Class Player
             End Try
         End If
     End Sub
-    Private Sub QueueFromPlaylist()
-        If LVPlaylist.SelectedItems.Count > 0 Then
-            Dim found As Boolean = False
-            For Each s As String In Queue
-                If s = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text Then
-                    found = True
-                    Exit For
-                End If
-            Next
-            If Not found Then
-                Queue.Add(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                SetPlaylistCountText()
+    Private Sub PlayQueued()
+        If Queue.Count > 0 Then
+            StopPlay()
+            If IsStream(Queue(0)) Then
+                PlayStream(Queue(0))
+            Else
+                PlayFile(Queue(0), "PlayQueued")
             End If
+            Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
+            If item IsNot Nothing Then
+                EnsurePlaylistItemIsVisible(item.Index)
+                item = Nothing
+            End If
+            Queue.RemoveAt(0)
+            SetPlaylistCountText()
+            TimerPlayNext.Start()
         End If
     End Sub
     Private Sub PlayFromPlaylist()
@@ -1936,24 +2122,6 @@ Public Class Player
                 End If
         End Select
     End Sub
-    Private Sub PlayQueued()
-        If Queue.Count > 0 Then
-            StopPlay()
-            If IsStream(Queue(0)) Then
-                PlayStream(Queue(0))
-            Else
-                PlayFile(Queue(0), "PlayQueued")
-            End If
-            Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
-            If item IsNot Nothing Then
-                EnsurePlaylistItemIsVisible(item.Index)
-                item = Nothing
-            End If
-            Queue.RemoveAt(0)
-            SetPlaylistCountText()
-            TimerPlayNext.Start()
-        End If
-    End Sub
     Private Sub OnPlay()
         PlayState = PlayStates.Playing
         UpdateHistory(_player.Path)
@@ -1986,40 +2154,6 @@ Public Class Player
         ResetLblPositionText()
         AxPlayer.Visible = False
     End Sub
-    Friend Sub QueueFromLibrary(path As String)
-        Dim found As Boolean = False
-        For Each s As String In Queue
-            If s = path Then
-                found = True
-                Exit For
-            End If
-        Next
-        If Not found Then
-            Queue.Add(path)
-            SetPlaylistCountText()
-        End If
-    End Sub
-    Private Sub RandomHistoryAdd(songorstream As String)
-        If App.PlayMode = App.PlayModes.Random AndAlso LVPlaylist.FindItemWithText(songorstream, True, 0) IsNot Nothing Then
-            If RandomHistory.FindIndex(Function(p) p = songorstream) < 0 Then
-                App.UpdateRandomHistory(songorstream)
-            Else
-                Debug.Print("Not Adding " + songorstream + " to Random History, Already Exists")
-            End If
-        Else
-            Debug.Print("Not Adding " + songorstream + " to Random History, Song Not Found In Playlist or Not In Random PlayMode")
-        End If
-    End Sub
-    Friend Sub AddToRandomHistory(songorstream As String)
-        If App.PlayMode = App.PlayModes.Random Then
-            RandomHistory.Add(songorstream)
-            RandomHistoryIndex = RandomHistory.Count
-            Debug.Print("Added " + songorstream + " to Random History")
-        End If
-    End Sub
-    Friend Sub RandomHistoryClear()
-        RandomHistory.Clear()
-    End Sub
     Private Sub UpdatePosition(ByVal forward As Boolean, Optional ByVal seconds As Byte = 20)
         If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             If forward Then
@@ -2048,6 +2182,26 @@ Public Class Player
             BtnMute.Image = Resources.ImagePlayerSoundMute
             Mute = True
         End If
+    End Sub
+    Private Sub VideoSetSize()
+        Try
+            If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
+                If _player.VideoHeight / _player.VideoWidth > PanelMedia.Height / PanelMedia.Width Then
+                    'Height > Width, Set Height then Get Width, then Set Centers
+                    AxPlayer.Width = VideoGetWidth(PanelMedia.Height)
+                    AxPlayer.Height = PanelMedia.Height
+                    AxPlayer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2))
+                    AxPlayer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2))
+                Else
+                    'Width > Height, Set Width then Get Height, then Set Centers
+                    AxPlayer.Width = PanelMedia.Width
+                    AxPlayer.Height = VideoGetHeight(PanelMedia.Width)
+                    AxPlayer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2))
+                    AxPlayer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2))
+                End If
+            End If
+        Catch
+        End Try
     End Sub
     Private Sub ShowMedia()
         If _player.HasMedia Then
@@ -2157,175 +2311,8 @@ Public Class Player
             TimerVisualizer.Stop()
         End If
     End Sub
-    Friend Sub Suspend() 'Called when the user locks the screen or activates the screen saver
-        If App.SuspendOnSessionChange Then
-            Debug.Print("Suspending...")
-            StopPlay()
-            Me.WindowState = FormWindowState.Minimized
-            App.WriteToLog("App Suspended @ " & Now)
-        End If
-    End Sub
-    Private Sub VideoSetSize()
-        Try
-            If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
-                If _player.VideoHeight / _player.VideoWidth > PanelMedia.Height / PanelMedia.Width Then
-                    'Height > Width, Set Height then Get Width, then Set Centers
-                    AxPlayer.Width = VideoGetWidth(PanelMedia.Height)
-                    AxPlayer.Height = PanelMedia.Height
-                    AxPlayer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2))
-                    AxPlayer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2))
-                Else
-                    'Width > Height, Set Width then Get Height, then Set Centers
-                    AxPlayer.Width = PanelMedia.Width
-                    AxPlayer.Height = VideoGetHeight(PanelMedia.Width)
-                    AxPlayer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2))
-                    AxPlayer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2))
-                End If
-            End If
-        Catch
-        End Try
-    End Sub
-    Friend Sub SetTipPlayer()
-        Select Case App.PlayMode
-            Case App.PlayModes.None, PlayModes.Repeat
-                TipPlayer.SetText(BtnPrevious, String.Empty)
-                TipPlayer.SetText(BtnNext, String.Empty)
-            Case App.PlayModes.Linear
-                TipPlayer.SetText(BtnPrevious, "Previous Song In Playlist")
-                TipPlayer.SetText(BtnNext, "Next Song In Playlist")
-            Case App.PlayModes.Random
-                TipPlayer.SetText(BtnPrevious, "Previous Song Played")
-                TipPlayer.SetText(BtnNext, "Next Random Song")
-        End Select
-        Select Case App.PlayerPositionShowElapsed
-            Case True
-                TipPlayer.SetText(LblPosition, "Elapsed Time")
-            Case False
-                TipPlayer.SetText(LblPosition, "Time Remaining")
-        End Select
-    End Sub
-    Private Sub ClearPlaylistTitles()
-        PlaylistTitleSort = SortOrder.None
-        PlaylistPathSort = SortOrder.None
-        PlaylistRatingSort = SortOrder.None
-        PlaylistPlayCountSort = SortOrder.None
-        PlaylistLastPlayedSort = SortOrder.None
-        PlaylistFirstPlayedSort = SortOrder.None
-        PlaylistAddedSort = SortOrder.None
-        LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title"
-        LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path"
-        LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating"
-        LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays"
-        LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played"
-        LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played"
-        LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added"
-    End Sub
-    Friend Sub SetPlaylistCountText()
-        LblPlaylistCount.ResetText()
-        LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString
-        If LVPlaylist.Items.Count = 1 Then
-            LblPlaylistCount.Text += " Song, "
-        Else
-            LblPlaylistCount.Text += " Songs, "
-        End If
-        LblPlaylistCount.Text += LVPlaylist.SelectedItems.Count.ToString + " Selected"
-        LblPlaylistCount.Text += ", " + Queue.Count.ToString + " Queued"
-    End Sub
-    Private Sub ResetLblPositionText()
-        If _player.HasMedia Then
-            If App.PlayerPositionShowElapsed Then
-                LblPosition.Text = "00:00"
-            Else
-                LblPosition.Text = "-" + FormatDuration(_player.Duration)
-            End If
-        Else
-            LblPosition.ResetText()
-        End If
-    End Sub
-    Private Sub ResetTxtBoxPlaylistSearch()
-        If Not TxtBoxPlaylistSearch.Text = PlaylistSearchTitle Then
-            TxtBoxPlaylistSearch.Text = PlaylistSearchTitle
-            TxtBoxPlaylistSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
-            ListBoxPlaylistSearch.Visible = False
-            ListBoxPlaylistSearch.Items.Clear()
-            PlaylistSearchItems.Clear()
-            Debug.Print("Playlist Search Reset")
-        End If
-    End Sub
-    Friend Sub PrunePlaylist()
 
-        Debug.Print("Pruning Playlist..." + LVPlaylist.Items.Count.ToString + " total playlist items...")
-
-        'Find files that don't exist
-        Dim prunelist As New System.Collections.Generic.List(Of String)
-        For index As Integer = 0 To LVPlaylist.Items.Count - 1
-            If Not IsStream(LVPlaylist.Items(index).SubItems(1).Text) AndAlso Not My.Computer.FileSystem.FileExists(LVPlaylist.Items(index).SubItems(1).Text) Then
-                prunelist.Add(LVPlaylist.Items(index).SubItems(1).Text)
-            End If
-        Next
-
-        Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found...")
-
-        'Prune History
-        For Each s As String In prunelist
-            Debug.Print(s)
-            LVPlaylist.Items.RemoveAt(LVPlaylist.FindItemWithText(s, True, 0).Index)
-        Next
-        Debug.Print("Playlist Pruned (" + prunelist.Count.ToString + ")")
-        Debug.Print("Pruning Playlist Complete..." + LVPlaylist.Items.Count.ToString + " total playlist items.")
-        WriteToLog("Playlist Pruned (" + prunelist.Count.ToString + ")")
-
-        prunelist = Nothing
-        SetPlaylistCountText()
-
-    End Sub
-    Friend Sub PruneQueue()
-        Dim count As Integer = 0
-        Dim removelist As New System.Collections.Generic.List(Of String)
-        For Each item As String In Queue
-            If LVPlaylist.FindItemWithText(item, True, 0) Is Nothing Then
-                count += 1
-                removelist.Add(item)
-            End If
-        Next
-        For Each item As String In removelist
-            Queue.Remove(item)
-        Next
-        removelist = Nothing
-        SetPlaylistCountText()
-        App.WriteToLog("Queue Pruned (" + count.ToString + ")")
-    End Sub
-    Friend Sub RemoveFromQueue(path As String)
-        Queue.Remove(path)
-        Debug.Print(path + " Removed From Queue")
-        SetPlaylistCountText()
-    End Sub
-    Private Sub CheckMove(ByRef location As Point)
-        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
-        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
-        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
-        If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
-    End Sub
-    Private Sub ToggleMaximized()
-        Select Case WindowState
-            Case FormWindowState.Normal, FormWindowState.Minimized
-                WindowState = FormWindowState.Maximized
-            Case FormWindowState.Maximized
-                WindowState = FormWindowState.Normal
-        End Select
-    End Sub
-    Private Sub LyricsOff()
-        If Lyrics Then
-            Lyrics = False
-            MILyrics.BackColor = Color.Transparent
-        End If
-    End Sub
-    Private Sub VisualizerOff()
-        If Visualizer Then
-            Visualizer = False
-            MIVisualizer.BackColor = Color.Transparent
-        End If
-    End Sub
+    'Themes
     Private Sub SetAccentColor(Optional force As Boolean = False)
         Dim accent As Color = App.GetAccentColor()
         If CurrentAccentColor <> accent OrElse force Then
