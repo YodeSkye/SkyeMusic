@@ -358,17 +358,34 @@ Namespace My
 
             Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
                 Dim items As New List(Of Player.PlaylistItemType)
+                Dim pendingTitle As String = Nothing
+
                 For Each line In IO.File.ReadAllLines(path, System.Text.Encoding.UTF8)
-                    If Not String.IsNullOrWhiteSpace(line) AndAlso Not line.StartsWith("#") Then
-                        items.Add(New Player.PlaylistItemType With {.Path = line, .Title = IO.Path.GetFileNameWithoutExtension(line)})
+                    If String.IsNullOrWhiteSpace(line) Then Continue For
+
+                    If line.StartsWith("#EXTINF", StringComparison.OrdinalIgnoreCase) Then
+                        ' Format: #EXTINF:duration,Title
+                        Dim parts = line.Split(","c, 2)
+                        If parts.Length = 2 Then
+                            pendingTitle = parts(1).Trim()
+                        End If
+
+                    ElseIf Not line.StartsWith("#") Then
+                        ' This is a file path
+                        Dim title = If(pendingTitle, IO.Path.GetFileNameWithoutExtension(line))
+                        items.Add(New Player.PlaylistItemType With {.Path = line, .Title = title})
+                        pendingTitle = Nothing
                     End If
                 Next
+
                 Return items
             End Function
             Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
                 Using writer As New IO.StreamWriter(path, False, System.Text.Encoding.UTF8)
                     writer.WriteLine("#EXTM3U")
                     For Each item In items
+                        ' Write EXTINF with -1 duration (unknown) and title
+                        writer.WriteLine($"#EXTINF:-1,{item.Title}")
                         writer.WriteLine(item.Path)
                     Next
                 End Using
@@ -385,20 +402,300 @@ Namespace My
             Public Overrides ReadOnly Property Name As String = "M3U8 Playlist"
             Public Overrides ReadOnly Property FileExtension As String = ".m3u8"
         End Class
+        Private Class PlaylistIOFormatPLS
+            Implements IPlaylistIOFormat
+
+            Public ReadOnly Property Name As String Implements IPlaylistIOFormat.Name
+                Get
+                    Return "PLS Playlist"
+                End Get
+            End Property
+            Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
+                Get
+                    Return ".pls"
+                End Get
+            End Property
+
+            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As List(Of Player.PlaylistItemType) = New List(Of Player.PlaylistItemType)
+
+                'Dictionary to hold grouped entries
+                Dim files As New Dictionary(Of Integer, String)
+                Dim titles As New Dictionary(Of Integer, String)
+
+                For Each line In IO.File.ReadAllLines(path, System.Text.Encoding.UTF8)
+                    If line.StartsWith("File", StringComparison.OrdinalIgnoreCase) Then
+                        Dim idx = Integer.Parse(line.Substring(4, line.IndexOf("="c) - 4))
+                        files(idx) = line.Substring(line.IndexOf("="c) + 1).Trim()
+                    ElseIf line.StartsWith("Title", StringComparison.OrdinalIgnoreCase) Then
+                        Dim idx = Integer.Parse(line.Substring(5, line.IndexOf("="c) - 5))
+                        titles(idx) = line.Substring(line.IndexOf("="c) + 1).Trim()
+                    End If
+                Next
+
+                'Build items in order
+                For Each kvp In files.OrderBy(Function(f) f.Key)
+                    Dim idx = kvp.Key
+                    Dim pathVal = kvp.Value
+                    Dim titleVal As String = Nothing
+                    titles.TryGetValue(idx, titleVal)
+                    If String.IsNullOrEmpty(titleVal) Then
+                        titleVal = IO.Path.GetFileNameWithoutExtension(pathVal)
+                    End If
+                    items.Add(New Player.PlaylistItemType With {.Path = pathVal, .Title = titleVal})
+                Next
+
+                Return items
+            End Function
+            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+                Using writer As New IO.StreamWriter(path, False, System.Text.Encoding.UTF8)
+                    writer.WriteLine("[playlist]")
+                    Dim index As Integer = 1
+                    For Each item In items
+                        writer.WriteLine($"File{index}={item.Path}")
+                        writer.WriteLine($"Title{index}={item.Title}")
+                        writer.WriteLine($"Length{index}=-1") ' Unknown length
+                        index += 1
+                    Next
+                    writer.WriteLine($"NumberOfEntries={index - 1}")
+                    writer.WriteLine("Version=2")
+                End Using
+            End Sub
+
+        End Class
+        Private Class PlaylistIOFormatXSPF
+            Implements IPlaylistIOFormat
+
+            Public ReadOnly Property Name As String Implements IPlaylistIOFormat.Name
+                Get
+                    Return "XSPF Playlist"
+                End Get
+            End Property
+            Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
+                Get
+                    Return ".xspf"
+                End Get
+            End Property
+
+            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of Player.PlaylistItemType)
+                Dim doc As XDocument = XDocument.Load(path)
+                Dim ns As XNamespace = "http://xspf.org/ns/0/"
+
+                For Each track In doc.Descendants(ns + "track")
+                    Dim loc = track.Element(ns + "location")?.Value
+                    Dim title = track.Element(ns + "title")?.Value
+
+                    If Not String.IsNullOrEmpty(loc) Then
+                        ' Convert URI back to local path if possible
+                        Dim pathVal As String = loc
+                        If pathVal.StartsWith("file://", StringComparison.OrdinalIgnoreCase) Then
+                            pathVal = New Uri(pathVal).LocalPath
+                        End If
+
+                        If String.IsNullOrEmpty(title) Then
+                            title = IO.Path.GetFileNameWithoutExtension(pathVal)
+                        End If
+
+                        items.Add(New Player.PlaylistItemType With {.Path = pathVal, .Title = title})
+                    End If
+                Next
+
+                Return items
+            End Function
+            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+                Dim ns As XNamespace = "http://xspf.org/ns/0/"
+                Dim doc As New XDocument(
+            New XElement(ns + "playlist",
+                New XAttribute("version", "1"),
+                New XAttribute(XNamespace.Xmlns + "xspf", ns),
+                New XElement(ns + "trackList",
+                    From item In items
+                    Select New XElement(ns + "track",
+                        New XElement(ns + "location", New Uri(item.Path).AbsoluteUri),
+                        New XElement(ns + "title", item.Title)
+                            )
+                        )
+                    )
+                )
+                doc.Save(path)
+            End Sub
+
+        End Class
+        Private Class PlaylistIOFormatWPL
+            Implements IPlaylistIOFormat
+
+            Public ReadOnly Property Name As String Implements IPlaylistIOFormat.Name
+                Get
+                    Return "Windows Media Player Playlist"
+                End Get
+            End Property
+            Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
+                Get
+                    Return ".wpl"
+                End Get
+            End Property
+
+            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of Player.PlaylistItemType)
+                Dim doc As XDocument = XDocument.Load(path)
+
+                'WPL uses no namespace, so we can just query elements directly
+                For Each mediaelement In doc.Descendants("media")
+                    Dim src = mediaelement.Attribute("src")?.Value
+                    If Not String.IsNullOrEmpty(src) Then
+                        Dim title = IO.Path.GetFileNameWithoutExtension(src)
+                        items.Add(New Player.PlaylistItemType With {.Path = src, .Title = title})
+                    End If
+                Next
+
+                Return items
+            End Function
+            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+                Dim doc As New XDocument(
+                    New XElement("smil",
+                    New XElement("head",
+                    New XElement("meta",
+                    New XAttribute("name", "Generator"),
+                    New XAttribute("content", "SkyeMusic")
+                    ),
+                    New XElement("title", "Playlist Export")
+                    ),
+                    New XElement("body",
+                    New XElement("seq",
+                        From item In items
+                        Select New XElement("media",
+                            New XAttribute("src", item.Path)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                doc.Save(path)
+            End Sub
+        End Class
+        Private Class PlaylistIOFormatASX
+            Implements IPlaylistIOFormat
+
+            Public ReadOnly Property Name As String Implements IPlaylistIOFormat.Name
+                Get
+                    Return "ASX Playlist"
+                End Get
+            End Property
+            Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
+                Get
+                    Return ".asx"
+                End Get
+            End Property
+
+            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of Player.PlaylistItemType)
+                Dim doc As XDocument = XDocument.Load(path)
+
+                For Each entry In doc.Descendants("entry")
+                    Dim href = entry.Element("ref")?.Attribute("href")?.Value
+                    Dim title = entry.Element("title")?.Value
+                    If Not String.IsNullOrEmpty(href) Then
+                        If String.IsNullOrEmpty(title) Then
+                            title = IO.Path.GetFileNameWithoutExtension(href)
+                        End If
+                        items.Add(New Player.PlaylistItemType With {.Path = href, .Title = title})
+                    End If
+                Next
+
+                Return items
+            End Function
+            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+                Dim doc As New XDocument(
+                    New XElement("asx",
+                    New XAttribute("version", "3.0"),
+                    From item In items
+                    Select New XElement("entry",
+                        New XElement("title", item.Title),
+                        New XElement("ref", New XAttribute("href", item.Path))
+                            )
+                        )
+                    )
+                doc.Save(path)
+            End Sub
+        End Class
+        Private Class PlaylistIOFormatJSON
+            Implements IPlaylistIOFormat
+
+            Public ReadOnly Property Name As String Implements IPlaylistIOFormat.Name
+                Get
+                    Return "JSON Playlist"
+                End Get
+            End Property
+            Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
+                Get
+                    Return ".json"
+                End Get
+            End Property
+
+            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of Player.PlaylistItemType)
+                Dim json = IO.File.ReadAllText(path, System.Text.Encoding.UTF8)
+                Dim options As New System.Text.Json.JsonSerializerOptions With {
+                    .PropertyNameCaseInsensitive = True,
+                    .IncludeFields = True}
+                Dim parsed = System.Text.Json.JsonSerializer.Deserialize(Of List(Of Player.PlaylistItemType))(json, options)
+                If parsed Is Nothing Then
+                    Debug.WriteLine("JSON Import: parsed is Nothing")
+                Else
+                    Debug.WriteLine($"JSON Import: parsed.Count = {parsed.Count}")
+                    For Each it In parsed
+                        Debug.WriteLine($" -> Path={it.Path}, Title={it.Title}")
+                    Next
+                    items.AddRange(parsed)
+                End If
+                Return items
+            End Function
+            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+                Dim options As New System.Text.Json.JsonSerializerOptions With {
+                    .WriteIndented = True,
+                    .IncludeFields = True}
+                Dim json = System.Text.Json.JsonSerializer.Serialize(items, options)
+                IO.File.WriteAllText(path, json, System.Text.Encoding.UTF8)
+            End Sub
+
+        End Class
         Friend Class PlaylistIO
             Private Shared ReadOnly Formats As New List(Of IPlaylistIOFormat) From {
                 New PlaylistIOFormatM3U(),
-                New PlaylistIOFormatM3U8()}       ' Add new formats here later
+                New PlaylistIOFormatM3U8(),
+                New PlaylistIOFormatPLS,
+                New PlaylistIOFormatXSPF(),
+                New PlaylistIOFormatWPL(),
+                New PlaylistIOFormatASX(),
+                New PlaylistIOFormatJSON()}       'Add new formats here later
             Public Shared Function Import(path As String) As List(Of Player.PlaylistItemType)
                 Dim fmt = Formats.FirstOrDefault(Function(f) path.EndsWith(f.FileExtension, StringComparison.OrdinalIgnoreCase))
-                If fmt Is Nothing Then Throw New NotSupportedException("Unknown playlist format")
-                Return fmt.Import(path)
+                If fmt Is Nothing Then
+                    WriteToLog("Playlist Import: Unknown Playlist Format")
+                    Return New List(Of Player.PlaylistItemType)
+                End If
+                Try
+                    Return fmt.Import(path)
+                Catch ex As Exception
+                    WriteToLog($"{fmt.Name} Import Failed ({If(String.IsNullOrEmpty(path), "<no path provided>", path)}): {ex.Message}")
+                    Return New List(Of Player.PlaylistItemType)
+                End Try
             End Function
-            Public Shared Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType))
+            Public Shared Function Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) As Boolean
                 Dim fmt = Formats.FirstOrDefault(Function(f) path.EndsWith(f.FileExtension, StringComparison.OrdinalIgnoreCase))
-                If fmt Is Nothing Then Throw New NotSupportedException("Unknown playlist format")
-                fmt.Export(path, items)
-            End Sub
+                If fmt Is Nothing Then
+                    WriteToLog("Playlist Export: Unknown Playlist Format")
+                    Return False
+                End If
+                Try
+                    fmt.Export(path, items)
+                    Return True
+                Catch ex As Exception
+                    WriteToLog($"{fmt.Name} Export Failed ({If(String.IsNullOrEmpty(path), "<no path provided>", path)}): {ex.Message}")
+                    Return False
+                End Try
+            End Function
         End Class
 
         'App Handlers
@@ -467,10 +764,10 @@ Namespace My
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
 
-            Dim TracePath As String = IO.Path.Combine(Application.Info.DirectoryPath, "skye_trace.log")
+            Dim TracePath As String = IO.Path.Combine(Application.Info.DirectoryPath, "skyemusic_trace.log")
             Trace.Listeners.Add(New RollingTraceListener(TracePath))
             Trace.AutoFlush = True
-            Trace.WriteLine("=== SkyeMusic started ===")
+            Trace.WriteLine("=== SkyeMusic Started ===")
 
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense()
@@ -2109,7 +2406,6 @@ Namespace My
             MyBase.WriteLine(stamped)
             Me.Writer.Flush()
         End Sub
-
         Private Sub RotateIfNeeded()
             Try
                 If File.Exists(logPath) AndAlso New FileInfo(logPath).Length > maxSize Then
@@ -2124,6 +2420,7 @@ Namespace My
                 'Fail silently — logging should never crash the app
             End Try
         End Sub
+
     End Class
 
     Friend Class ListViewItemStringComparer
