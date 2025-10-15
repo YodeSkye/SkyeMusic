@@ -686,10 +686,18 @@ Public Class Player
             Dim filedrop = DirectCast(e.Data.GetData(DataFormats.FileDrop, True), String())
             Dim files As New List(Of String)
             For Each s In filedrop
-                If Computer.FileSystem.FileExists(s) AndAlso App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(s)) Then files.Add(s)
+                If Computer.FileSystem.FileExists(s) Then
+                    Dim ext = IO.Path.GetExtension(s).TrimStart("."c).ToLower()
+                    'Check if it's a known media or playlist format
+                    Dim isMedia = App.ExtensionDictionary.ContainsKey("." & ext)
+                    Dim isPlaylist = App.PlaylistIO.Formats.Any(Function(f) f.FileExtension.TrimStart("."c).ToLower() = ext)
+                    If isMedia OrElse isPlaylist Then files.Add(s)
+                End If
             Next
-            If files.Count > 0 Then : e.Effect = DragDropEffects.Link
-            Else : e.Effect = DragDropEffects.None
+            If files.Count > 0 Then
+                e.Effect = DragDropEffects.Link
+            Else
+                e.Effect = DragDropEffects.None
             End If
             files.Clear()
             files = Nothing
@@ -700,41 +708,49 @@ Public Class Player
     Private Sub LVPlaylist_DragDrop(sender As Object, e As DragEventArgs) Handles LVPlaylist.DragDrop
         If e.Effect = DragDropEffects.Link Then
             Dim filedrop = DirectCast(e.Data.GetData(DataFormats.FileDrop, True), String())
-            Dim files As New List(Of String)
+            Dim mediafiles As New List(Of String)
+            Dim playlistfiles As New List(Of String)
             For Each s In filedrop
-                If Computer.FileSystem.FileExists(s) AndAlso App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(s)) Then files.Add(s)
+                If Computer.FileSystem.FileExists(s) Then
+                    Dim ext = IO.Path.GetExtension(s).ToLower()
+
+                    'Check if it's a known media or playlist format
+                    Dim isMedia = App.ExtensionDictionary.ContainsKey(ext)
+                    If isMedia Then mediafiles.Add(s)
+                    Dim isPlaylist = App.PlaylistIO.Formats.Any(Function(f) "." & f.FileExtension.TrimStart("."c).ToLower() = ext)
+                    If isPlaylist Then playlistfiles.Add(s)
+                    Debug.Print("LVPlaylist_DragDrop: Media Files (" & mediafiles.Count.ToString & "), Playlist Files (" & playlistfiles.Count.ToString & ")")
+                End If
             Next
-            If files.Count > 0 Then
-                WriteToLog("Player Drag&Drop Performed (" + files.Count.ToString + " " + IIf(files.Count = 1, "File", "Files").ToString + ")")
+            If mediafiles.Count > 0 Then
+                WriteToLog("Player Drag&Drop Performed (" + mediafiles.Count.ToString + " " + IIf(mediafiles.Count = 1, "File", "Files").ToString + ")")
                 Dim lvi As ListViewItem
                 Dim clientpoint = LVPlaylist.PointToClient(New System.Drawing.Point(e.X, e.Y))
                 Dim itemover = LVPlaylist.GetItemAt(clientpoint.X, clientpoint.Y)
-                For x = 0 To files.Count - 1
+                For x = 0 To mediafiles.Count - 1
                     If LVPlaylist.Items.Count = 0 Then
                         lvi = Nothing
                     Else
-                        lvi = LVPlaylist.FindItemWithText(files(x), True, 0)
+                        lvi = LVPlaylist.FindItemWithText(mediafiles(x), True, 0)
                     End If
                     If lvi Is Nothing Then
-                        'add new playlist entry
-                        If ExtensionDictionary.ContainsKey(Path.GetExtension(files(x))) Then
-                            lvi = CreateListviewItem()
-                            lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(files(x))
-                            lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = files(x)
-                            App.AddToHistoryFromPlaylist(files(x))
-                            GetHistory(lvi, files(x))
-                            If itemover Is Nothing Then
-                                LVPlaylist.Items.Add(lvi)
-                            Else
-                                LVPlaylist.ListViewItemSorter = Nothing
-                                ClearPlaylistTitles()
-                                LVPlaylist.Items.Insert(itemover.Index, lvi)
-                            End If
-                            SetPlaylistCountText()
+                        'Add new playlist entry
+                        lvi = CreateListviewItem()
+                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(mediafiles(x))
+                        lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = mediafiles(x)
+                        App.AddToHistoryFromPlaylist(mediafiles(x))
+                        GetHistory(lvi, mediafiles(x))
+                        If itemover Is Nothing Then
+                            LVPlaylist.Items.Add(lvi)
+                        Else
+                            LVPlaylist.ListViewItemSorter = Nothing
+                            ClearPlaylistTitles()
+                            LVPlaylist.Items.Insert(itemover.Index, lvi)
                         End If
+                        SetPlaylistCountText()
                     Else
-                        'update playlist entry
-                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(files(x))
+                        'Update playlist entry
+                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(mediafiles(x))
                         LVPlaylist.Items.RemoveAt(lvi.Index)
                         If itemover Is Nothing Then
                             LVPlaylist.Items.Add(lvi)
@@ -753,9 +769,11 @@ Public Class Player
                 clientpoint = Nothing
                 itemover = Nothing
             End If
-            files.Clear()
-            files = Nothing
-            filedrop = Nothing
+            If playlistfiles.Count > 0 Then
+                For Each file In playlistfiles
+                    MergePlaylistFromFile(file)
+                Next
+            End If
         End If
     End Sub
     Private Sub LVPlaylist_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVPlaylist.SelectedIndexChanged
@@ -1382,34 +1400,6 @@ Public Class Player
     End Sub
 
     'Functions
-    Private Function CreateListviewItem() As ListViewItem
-        Dim lvi As New ListViewItem
-        lvi.SubItems.Add(String.Empty) 'Path
-        lvi.SubItems.Add(String.Empty) 'Rating
-        lvi.SubItems.Add(String.Empty) 'PlayCount
-        lvi.SubItems.Add(String.Empty) 'LastPlayed
-        lvi.SubItems.Add(String.Empty) 'FirstPlayed
-        lvi.SubItems.Add(String.Empty) 'Added
-        lvi.UseItemStyleForSubItems = False
-        lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = PlaylistBoldFont
-        Return lvi
-    End Function
-    Private Sub GetHistory(ByRef lvi As ListViewItem, path As String)
-        Dim s As App.Song = App.History.Find(Function(p) p.Path = path)
-        If Not String.IsNullOrEmpty(s.Path) Then
-            If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
-            lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
-            If Not s.LastPlayed = Nothing Then
-                lvi.SubItems(LVPlaylist.Columns("LastPlayed").Index).Text = s.LastPlayed.ToString()
-            End If
-            If Not s.FirstPlayed = Nothing Then
-                lvi.SubItems(LVPlaylist.Columns("FirstPlayed").Index).Text = s.FirstPlayed.ToString()
-            End If
-            If Not s.Added = Nothing Then
-                lvi.SubItems(LVPlaylist.Columns("Added").Index).Text = s.Added.ToString()
-            End If
-        End If
-    End Sub
     Private Function IsStream(path As String) As Boolean
         If App.History.FindIndex(Function(p) p.Path = path And p.IsStream = True) >= 0 Then
             Return True
@@ -1710,10 +1700,15 @@ Public Class Player
             filename = ofd.FileName
         End Using
 
-        'Detect format by extension
-        ext = IO.Path.GetExtension(filename).TrimStart("."c).ToLower()
-        Dim format = App.PlaylistIO.Formats.FirstOrDefault(Function(f) f.FileExtension.TrimStart("."c).ToLower() = ext)
+        'Import Playlist
+        MergePlaylistFromFile(filename)
 
+    End Sub
+    Private Sub MergePlaylistFromFile(filename As String)
+
+        'Detect format by extension
+        Dim ext = IO.Path.GetExtension(filename).TrimStart("."c).ToLower()
+        Dim format = App.PlaylistIO.Formats.FirstOrDefault(Function(f) f.FileExtension.TrimStart("."c).ToLower() = ext)
         If format Is Nothing Then
             ShowStatusMessage("Unsupported Playlist Format")
             Exit Sub
@@ -1722,14 +1717,32 @@ Public Class Player
         'Import
         Try
             Dim items = format.Import(filename)
-            'LVPlaylist.Items.Clear()
-            'For Each item In items
-            '    LVPlaylist.Items.Add(New ListViewItem(New String() {item.Title, item.Path}))
-            'Next
-            ShowStatusMessage("Playlist Imported Successfully (" & items.Count.ToString & ")")
+            For Each item In items
+                Dim lvi As ListViewItem = Nothing
+                If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(item.Path, True, 0)
+                If lvi Is Nothing Then 'Create new ListViewItem
+                    lvi = CreateListviewItem()
+                    lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = item.Title
+                    lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = item.Path
+                    GetHistory(lvi, item.Path)
+                    If LVPlaylist.SelectedItems.Count > 0 Then
+                        LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
+                    Else
+                        LVPlaylist.Items.Add(lvi)
+                    End If
+                Else 'Update Existing ListViewItem
+                    If String.IsNullOrWhiteSpace(item.Title) Then
+                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = IO.Path.GetFileNameWithoutExtension(item.Path)
+                        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(item.Path)) Then lvi.SubItems(LVPlaylist.Columns("Title").Index).Text += App.PlaylistVideoIdentifier
+                    Else
+                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = item.Title
+                    End If
+                End If
+            Next
+            ShowStatusMessage("Playlist Loaded Successfully (" & items.Count.ToString & ")")
             App.WriteToLog("Imported Playlist from " & filename)
         Catch ex As Exception
-            ShowStatusMessage("Error Importing Playlist")
+            ShowStatusMessage("Error Loading Playlist")
             App.WriteToLog("Error Importing Playlist from " & filename & vbCr & ex.Message)
         End Try
 
@@ -1893,6 +1906,22 @@ Public Class Player
             If lvi IsNot Nothing Then LVPlaylist.Items.Remove(lvi)
         End If
     End Sub
+    Private Sub GetHistory(ByRef lvi As ListViewItem, path As String)
+        Dim s As App.Song = App.History.Find(Function(p) p.Path = path)
+        If Not String.IsNullOrEmpty(s.Path) Then
+            If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
+            lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
+            If Not s.LastPlayed = Nothing Then
+                lvi.SubItems(LVPlaylist.Columns("LastPlayed").Index).Text = s.LastPlayed.ToString()
+            End If
+            If Not s.FirstPlayed = Nothing Then
+                lvi.SubItems(LVPlaylist.Columns("FirstPlayed").Index).Text = s.FirstPlayed.ToString()
+            End If
+            If Not s.Added = Nothing Then
+                lvi.SubItems(LVPlaylist.Columns("Added").Index).Text = s.Added.ToString()
+            End If
+        End If
+    End Sub
     Friend Sub UpdateHistoryInPlaylist(path As String)
         Dim lvi As ListViewItem
         Try
@@ -1953,10 +1982,6 @@ Public Class Player
         SetPlaylistCountText()
 
     End Sub
-    Private Function ClearPlaylistSorts(currentsort As SortOrder) As SortOrder
-        ClearPlaylistTitles()
-        Return currentsort
-    End Function
     Private Sub ClearPlaylistTitles()
         PlaylistTitleSort = SortOrder.None
         PlaylistPathSort = SortOrder.None
@@ -1979,6 +2004,22 @@ Public Class Player
         LVPlaylist.SelectedIndices.Clear()
         LVPlaylist.SelectedIndices.Add(index)
     End Sub
+    Private Function CreateListviewItem() As ListViewItem
+        Dim lvi As New ListViewItem    'Title
+        lvi.SubItems.Add(String.Empty) 'Path
+        lvi.SubItems.Add(String.Empty) 'Rating
+        lvi.SubItems.Add(String.Empty) 'PlayCount
+        lvi.SubItems.Add(String.Empty) 'LastPlayed
+        lvi.SubItems.Add(String.Empty) 'FirstPlayed
+        lvi.SubItems.Add(String.Empty) 'Added
+        lvi.UseItemStyleForSubItems = False
+        lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = PlaylistBoldFont
+        Return lvi
+    End Function
+    Private Function ClearPlaylistSorts(currentsort As SortOrder) As SortOrder
+        ClearPlaylistTitles()
+        Return currentsort
+    End Function
 
     'Player
     Friend Sub TogglePlay()
