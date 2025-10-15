@@ -321,6 +321,7 @@ Namespace My
         Friend PlaylistVideoIdentifier As String = String.Empty
         Friend PlaylistDefaultAction As PlaylistActions = PlaylistActions.Play
         Friend PlaylistSearchAction As PlaylistActions = PlaylistActions.Play
+        Friend PlaylistStatusMessageDisplayTime As Byte = 8 '0 - 60, 0 = Don't display status messages.
         Friend LibrarySearchFolders As New Collections.Generic.List(Of String)
         Friend LibrarySearchSubFolders As Boolean = True
         Friend SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
@@ -923,6 +924,7 @@ Namespace My
                 RegKey.SetValue("PlaylistVideoIdentifier", App.PlaylistVideoIdentifier, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlaylistDefaultAction", App.PlaylistDefaultAction.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlaylistSearchAction", App.PlaylistSearchAction.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("PlaylistStatusMessageDisplayTime", App.PlaylistStatusMessageDisplayTime.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("Theme", App.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SuspendOnSessionChange", App.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SaveWindowMetrics", App.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -989,6 +991,10 @@ Namespace My
                 Try : App.PlaylistSearchAction = CType([Enum].Parse(GetType(App.PlaylistActions), RegKey.GetValue("PlaylistSearchAction", App.PlaylistActions.Play.ToString).ToString), App.PlaylistActions)
                 Catch : App.PlaylistSearchAction = App.PlaylistActions.Play
                 End Try
+                PlaylistStatusMessageDisplayTime = CByte(Val(RegKey.GetValue("PlaylistStatusMessageDisplayTime", 8.ToString)))
+                If PlaylistStatusMessageDisplayTime > 60 Then
+                    PlaylistStatusMessageDisplayTime = 60 'Limit the value to a maximum of 60 seconds
+                End If
                 Try : App.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Red.ToString).ToString), App.Themes)
                 Catch : App.Theme = App.Themes.Red
                 End Try

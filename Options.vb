@@ -93,6 +93,7 @@ Public Class Options
         CkBoxPlaylistRemoveSpaces.Checked = App.PlaylistTitleRemoveSpaces
         TxtBoxPlaylistTitleSeparator.Text = App.PlaylistTitleSeparator
         TxtBoxPlaylistVideoIdentifier.Text = App.PlaylistVideoIdentifier
+        TxtBoxStatusMessageDisplayTime.Text = App.PlaylistStatusMessageDisplayTime.ToString
         LBLibrarySearchFolders.Items.Clear()
         For Each item As String In App.LibrarySearchFolders
             LBLibrarySearchFolders.Items.Add(item)
@@ -263,16 +264,16 @@ Public Class Options
     Private Sub CoBoxPlaylistTitleFormat_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistTitleFormat.SelectionChangeCommitted
         App.PlaylistTitleFormat = CType(CoBoxPlaylistTitleFormat.SelectedIndex, App.PlaylistTitleFormats)
     End Sub
-    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown, TxtBoxHistoryUpdateInterval.KeyDown, TxtBoxRandomHistoryUpdateInterval.KeyDown
+    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown, TxtBoxHistoryUpdateInterval.KeyDown, TxtBoxRandomHistoryUpdateInterval.KeyDown, TxtBoxStatusMessageDisplayTime.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.Handled = True
             Validate()
         End If
     End Sub
-    Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxHistoryAutoSaveInterval.KeyPress, TxtBoxHistoryUpdateInterval.KeyPress, TxtBoxRandomHistoryUpdateInterval.KeyPress
+    Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxHistoryAutoSaveInterval.KeyPress, TxtBoxHistoryUpdateInterval.KeyPress, TxtBoxRandomHistoryUpdateInterval.KeyPress, TxtBoxStatusMessageDisplayTime.KeyPress
         If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
     End Sub
-    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxPlaylistTitleSeparator.PreviewKeyDown, TxtBoxPlaylistVideoIdentifier.PreviewKeyDown, MyBase.PreviewKeyDown, TxtBoxHelperApp1Path.PreviewKeyDown, TxtBoxHelperApp1Name.PreviewKeyDown, TxtBoxHelperApp2Name.PreviewKeyDown, TxtBoxHelperApp2Path.PreviewKeyDown, TxtBoxHistoryAutoSaveInterval.PreviewKeyDown, TxtBoxHistoryUpdateInterval.PreviewKeyDown, TxtBoxRandomHistoryUpdateInterval.PreviewKeyDown
+    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxPlaylistTitleSeparator.PreviewKeyDown, TxtBoxPlaylistVideoIdentifier.PreviewKeyDown, MyBase.PreviewKeyDown, TxtBoxHelperApp1Path.PreviewKeyDown, TxtBoxHelperApp1Name.PreviewKeyDown, TxtBoxHelperApp2Name.PreviewKeyDown, TxtBoxHelperApp2Path.PreviewKeyDown, TxtBoxHistoryAutoSaveInterval.PreviewKeyDown, TxtBoxHistoryUpdateInterval.PreviewKeyDown, TxtBoxRandomHistoryUpdateInterval.PreviewKeyDown, TxtBoxStatusMessageDisplayTime.PreviewKeyDown
         CMTxtBox.ShortcutKeys(CType(sender, TextBox), e)
     End Sub
     Private Sub TxtBoxPlaylistTitleSeparatorValidated(sender As Object, e As EventArgs) Handles TxtBoxPlaylistTitleSeparator.Validated
@@ -282,6 +283,23 @@ Public Class Options
     Private Sub TxtBoxPlaylistVideoIdentifierValidated(sender As Object, e As EventArgs) Handles TxtBoxPlaylistVideoIdentifier.Validated
         PlaylistVideoIdentifier = TxtBoxPlaylistVideoIdentifier.Text
         TxtBoxPlaylistVideoIdentifier.SelectAll()
+    End Sub
+    Private Sub TxtBoxStatusMessageDisplayTime_Validated(sender As Object, e As EventArgs) Handles TxtBoxStatusMessageDisplayTime.Validated
+        If Not String.IsNullOrEmpty(TxtBoxStatusMessageDisplayTime.Text) Then
+            Dim interval As Byte
+            Try
+                interval = CByte(Val(TxtBoxStatusMessageDisplayTime.Text))
+                If interval > 60 Then
+                    interval = 60
+                End If
+            Catch
+                interval = 8
+            End Try
+            TxtBoxStatusMessageDisplayTime.Text = interval.ToString
+            TxtBoxStatusMessageDisplayTime.SelectAll()
+            Debug.Print("TxtBoxStatusMessageDisplayTime_Validated")
+            App.PlaylistStatusMessageDisplayTime = interval
+        End If
     End Sub
     Private Sub TxtBoxHelperApp1NameValidated(sender As Object, e As EventArgs) Handles TxtBoxHelperApp1Name.Validated
         If Not HelperApp1Name = TxtBoxHelperApp1Name.Text Then
@@ -356,7 +374,7 @@ Public Class Options
             TxtBoxHistoryUpdateInterval.Text = interval.ToString
             TxtBoxHistoryUpdateInterval.SelectAll()
             Debug.Print("TxtBoxHistoryUpdateInterval_Validated")
-            App.HistoryUpdateInterval = interval
+            HistoryUpdateInterval = interval
         End If
     End Sub
     Private Sub TxtBoxHistoryAutoSaveInterval_Validated(sender As Object, e As EventArgs) Handles TxtBoxHistoryAutoSaveInterval.Validated
@@ -537,6 +555,8 @@ Public Class Options
         TxtBoxPlaylistTitleSeparator.ForeColor = App.CurrentTheme.TextColor
         TxtBoxPlaylistVideoIdentifier.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxPlaylistVideoIdentifier.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxStatusMessageDisplayTime.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxStatusMessageDisplayTime.ForeColor = App.CurrentTheme.TextColor
         LBLibrarySearchFolders.BackColor = App.CurrentTheme.ControlBackColor
         LBLibrarySearchFolders.ForeColor = App.CurrentTheme.TextColor
         TxtBoxHelperApp1Name.BackColor = App.CurrentTheme.ControlBackColor
@@ -560,6 +580,8 @@ Public Class Options
         LblTitleFormat.ForeColor = forecolor
         LblTitleSeparator.ForeColor = forecolor
         LblVideoIdentifier.ForeColor = forecolor
+        lblStatusMessageDisplayTime1.ForeColor = forecolor
+        lblStatusMessageDisplayTime2.ForeColor = forecolor
         CkBoxSaveWindowMetrics.ForeColor = forecolor
         CkBoxSuspendOnSessionChange.ForeColor = forecolor
         CkBoxLibrarySearchSubFolders.ForeColor = forecolor

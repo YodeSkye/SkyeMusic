@@ -1547,8 +1547,11 @@ Public Class Player
         End Select
     End Sub
     Private Sub ShowStatusMessage(msg As String)
-        LblPlaylistCount.Text = StrConv(msg, VbStrConv.ProperCase)
-        TimerStatus.Start()
+        If App.PlaylistStatusMessageDisplayTime > 0 Then
+            LblPlaylistCount.Text = StrConv(msg, VbStrConv.ProperCase)
+            TimerStatus.Interval = App.PlaylistStatusMessageDisplayTime * 1000
+            TimerStatus.Start()
+        End If
     End Sub
     Friend Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()

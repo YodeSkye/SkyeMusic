@@ -79,6 +79,9 @@ Partial Class Options
         LblRandomHistoryUpdateInterval1 = New Skye.UI.Label()
         LblRandomHistoryUpdateInterval2 = New Skye.UI.Label()
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        TxtBoxStatusMessageDisplayTime = New TextBox()
+        lblStatusMessageDisplayTime1 = New Skye.UI.Label()
+        lblStatusMessageDisplayTime2 = New Skye.UI.Label()
         TPLibrary = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         CkBoxWatchFoldersUpdatePlaylist = New CheckBox()
         CkBoxWatchFoldersUpdateLibrary = New CheckBox()
@@ -594,7 +597,7 @@ Partial Class Options
         BtnPrunePlaylist.Location = New Point(583, 360)
         BtnPrunePlaylist.Name = "BtnPrunePlaylist"
         BtnPrunePlaylist.Size = New Size(218, 40)
-        BtnPrunePlaylist.TabIndex = 256
+        BtnPrunePlaylist.TabIndex = 1000
         TipOptionsEX.SetText(BtnPrunePlaylist, "Prune the Playlist." & vbCrLf & "This will remove any playlist entries that cannot be found in storage, while preserving streams." & vbCrLf & "The total number of playlist entries is given in parentheses.")
         BtnPrunePlaylist.Text = "Prune Playlist"
         BtnPrunePlaylist.TextAlign = ContentAlignment.MiddleRight
@@ -782,6 +785,8 @@ Partial Class Options
         ' TPPlaylist
         ' 
         TPPlaylist.BorderStyle = BorderStyle.Fixed3D
+        TPPlaylist.Controls.Add(TxtBoxStatusMessageDisplayTime)
+        TPPlaylist.Controls.Add(lblStatusMessageDisplayTime1)
         TPPlaylist.Controls.Add(BtnPrunePlaylist)
         TPPlaylist.Controls.Add(LblPlaylistFormatting)
         TPPlaylist.Controls.Add(TxtBoxPlaylistVideoIdentifier)
@@ -795,6 +800,7 @@ Partial Class Options
         TPPlaylist.Controls.Add(LblVideoIdentifier)
         TPPlaylist.Controls.Add(CkBoxPlaylistRemoveSpaces)
         TPPlaylist.Controls.Add(LblDefaultPlaylistAction)
+        TPPlaylist.Controls.Add(lblStatusMessageDisplayTime2)
         TPPlaylist.Image = Nothing
         TipOptionsEX.SetImage(TPPlaylist, Nothing)
         TPPlaylist.ImageSize = New Size(16, 16)
@@ -805,6 +811,43 @@ Partial Class Options
         TPPlaylist.TabIndex = 3
         TPPlaylist.Text = " Playlist "
         TPPlaylist.ThemesEnabled = False
+        ' 
+        ' TxtBoxStatusMessageDisplayTime
+        ' 
+        TxtBoxStatusMessageDisplayTime.ContextMenuStrip = CMTxtBox
+        TxtBoxStatusMessageDisplayTime.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipOptionsEX.SetImage(TxtBoxStatusMessageDisplayTime, Nothing)
+        TxtBoxStatusMessageDisplayTime.Location = New Point(697, 10)
+        TxtBoxStatusMessageDisplayTime.Name = "TxtBoxStatusMessageDisplayTime"
+        TxtBoxStatusMessageDisplayTime.ShortcutsEnabled = False
+        TxtBoxStatusMessageDisplayTime.Size = New Size(44, 29)
+        TxtBoxStatusMessageDisplayTime.TabIndex = 400
+        TipOptionsEX.SetText(TxtBoxStatusMessageDisplayTime, "Update Song History after 1-60 seconds, or 0 for immediate update.")
+        TxtBoxStatusMessageDisplayTime.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' lblStatusMessageDisplayTime1
+        ' 
+        lblStatusMessageDisplayTime1.AutoSize = True
+        lblStatusMessageDisplayTime1.Font = New Font("Segoe UI", 12F)
+        TipOptionsEX.SetImage(lblStatusMessageDisplayTime1, Nothing)
+        lblStatusMessageDisplayTime1.Location = New Point(509, 14)
+        lblStatusMessageDisplayTime1.Name = "lblStatusMessageDisplayTime1"
+        lblStatusMessageDisplayTime1.Size = New Size(195, 21)
+        lblStatusMessageDisplayTime1.TabIndex = 258
+        lblStatusMessageDisplayTime1.Text = "Show Status Messages for "
+        lblStatusMessageDisplayTime1.TextAlign = ContentAlignment.MiddleRight
+        ' 
+        ' lblStatusMessageDisplayTime2
+        ' 
+        lblStatusMessageDisplayTime2.AutoSize = True
+        lblStatusMessageDisplayTime2.Font = New Font("Segoe UI", 12F)
+        TipOptionsEX.SetImage(lblStatusMessageDisplayTime2, Nothing)
+        lblStatusMessageDisplayTime2.Location = New Point(739, 14)
+        lblStatusMessageDisplayTime2.Name = "lblStatusMessageDisplayTime2"
+        lblStatusMessageDisplayTime2.Size = New Size(68, 21)
+        lblStatusMessageDisplayTime2.TabIndex = 259
+        lblStatusMessageDisplayTime2.Text = "Seconds"
+        lblStatusMessageDisplayTime2.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' TPLibrary
         ' 
@@ -985,4 +1028,7 @@ Partial Class Options
     Friend WithEvents CkBoxWatchFoldersUpdatePlaylist As CheckBox
     Friend WithEvents CkBoxWatchFoldersUpdateLibrary As CheckBox
     Friend WithEvents CkBoxWatchFolders As CheckBox
+    Friend WithEvents lblStatusMessageDisplayTime2 As Skye.UI.Label
+    Friend WithEvents TxtBoxStatusMessageDisplayTime As TextBox
+    Friend WithEvents lblStatusMessageDisplayTime1 As Skye.UI.Label
 End Class
