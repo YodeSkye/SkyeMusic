@@ -317,7 +317,6 @@ Public Class Player
     End Sub
     Private Sub Player_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         TopMost = False
-        ShowStatusMessage("this IS a test message!")
     End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnReverse.KeyDown, BtnPlay.KeyDown, BtnForward.KeyDown, TrackBarPosition.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
         If Not TxtBoxPlaylistSearch.Focused Then
@@ -783,6 +782,13 @@ Public Class Player
     Private Sub MIFile_MouseLeave(sender As Object, e As EventArgs) Handles MIFile.MouseLeave
         If Not MIFile.DropDown.Visible Then MIFile.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
+    Private Sub MIFile_DropDownOpening(sender As Object, e As EventArgs) Handles MIFile.DropDownOpening
+        If LVPlaylist.Items.Count = 0 Then
+            MISavePlaylist.Enabled = False
+        Else
+            MISavePlaylist.Enabled = True
+        End If
+    End Sub
     Private Sub MIFile_DropDownClosed(sender As Object, e As EventArgs) Handles MIFile.DropDownClosed
         If Not MIFile.Selected Then MIFile.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
@@ -817,6 +823,12 @@ Public Class Player
         Else
             Debug.Print("Add Stream Cancelled")
         End If
+    End Sub
+    Private Sub MIOpenPlaylist_Click(sender As Object, e As EventArgs) Handles MIOpenPlaylist.Click
+        OpenPlaylist()
+    End Sub
+    Private Sub MISavePlaylist_Click(sender As Object, e As EventArgs) Handles MISavePlaylist.Click
+        SavePlaylistAs()
     End Sub
     Private Sub MIExit_Click(sender As Object, e As EventArgs) Handles MIExit.Click
         Close()
@@ -1608,33 +1620,6 @@ Public Class Player
     End Sub
 
     'Playlist
-    Private Sub SavePlaylist()
-        If LVPlaylist.Items.Count = 0 Then
-            If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then My.Computer.FileSystem.DeleteFile(App.PlaylistPath)
-        Else
-            Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-            Dim items As New System.Collections.Generic.List(Of PlaylistItemType)
-            For Each plitem As ListViewItem In LVPlaylist.Items
-                Dim newitem As New PlaylistItemType
-                newitem.Title = plitem.SubItems(LVPlaylist.Columns("Title").Index).Text
-                newitem.Path = plitem.SubItems(LVPlaylist.Columns("Path").Index).Text
-                items.Add(newitem)
-                newitem = Nothing
-            Next
-            Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of PlaylistItemType)))
-            If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
-                My.Computer.FileSystem.CreateDirectory(App.UserPath)
-            End If
-            Dim file As New System.IO.StreamWriter(App.PlaylistPath)
-            writer.Serialize(file, items)
-            file.Close()
-            file.Dispose()
-            writer = Nothing
-            items.Clear()
-            items = Nothing
-            App.WriteToLog("Playlist Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
-        End If
-    End Sub
     Private Sub LoadPlaylist()
         If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
@@ -1669,6 +1654,137 @@ Public Class Player
             App.WriteToLog("Playlist Not Loaded: File does not exist")
         End If
         SetPlaylistCountText()
+    End Sub
+    Private Sub SavePlaylist()
+        If LVPlaylist.Items.Count = 0 Then
+            If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then My.Computer.FileSystem.DeleteFile(App.PlaylistPath)
+        Else
+            Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+            Dim items As New System.Collections.Generic.List(Of PlaylistItemType)
+            For Each plitem As ListViewItem In LVPlaylist.Items
+                Dim newitem As New PlaylistItemType
+                newitem.Title = plitem.SubItems(LVPlaylist.Columns("Title").Index).Text
+                newitem.Path = plitem.SubItems(LVPlaylist.Columns("Path").Index).Text
+                items.Add(newitem)
+                newitem = Nothing
+            Next
+            Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of PlaylistItemType)))
+            If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
+                My.Computer.FileSystem.CreateDirectory(App.UserPath)
+            End If
+            Dim file As New System.IO.StreamWriter(App.PlaylistPath)
+            writer.Serialize(file, items)
+            file.Close()
+            file.Dispose()
+            writer = Nothing
+            items.Clear()
+            items = Nothing
+            App.WriteToLog("Playlist Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        End If
+    End Sub
+    Private Sub OpenPlaylist()
+        Dim ext As String
+        Dim filename As String
+
+        'Build filter string from format interface
+        Dim allExtensions As New List(Of String)
+        Dim filterParts As New List(Of String)
+        For Each fmt In App.PlaylistIO.Formats
+            ext = fmt.FileExtension.TrimStart("."c).ToLower()
+            allExtensions.Add($"*.{ext}")
+            filterParts.Add($"{fmt.Name} (*.{ext})|*.{ext}")
+        Next
+
+        'Insert "All Supported Types" at the top
+        Dim allSupported = $"All Supported Types ({String.Join(", ", allExtensions)})|{String.Join(";", allExtensions)}"
+        filterParts.Insert(0, allSupported)
+
+        'Create and show dialog
+        Using ofd As New OpenFileDialog With {
+                .Filter = String.Join("|", filterParts),
+                .Title = "Import Playlist",
+                .Multiselect = False,
+                .CheckFileExists = True,
+                .FilterIndex = 1} ' ✅ Default to "All Supported Types"    
+            If ofd.ShowDialog() <> DialogResult.OK Then Exit Sub
+            filename = ofd.FileName
+        End Using
+
+        'Detect format by extension
+        ext = IO.Path.GetExtension(filename).TrimStart("."c).ToLower()
+        Dim format = App.PlaylistIO.Formats.FirstOrDefault(Function(f) f.FileExtension.TrimStart("."c).ToLower() = ext)
+
+        If format Is Nothing Then
+            ShowStatusMessage("Unsupported Playlist Format")
+            Exit Sub
+        End If
+
+        'Import
+        Try
+            Dim items = format.Import(filename)
+            'LVPlaylist.Items.Clear()
+            'For Each item In items
+            '    LVPlaylist.Items.Add(New ListViewItem(New String() {item.Title, item.Path}))
+            'Next
+            ShowStatusMessage("Playlist Imported Successfully (" & items.Count.ToString & ")")
+            App.WriteToLog("Imported Playlist from " & filename)
+        Catch ex As Exception
+            ShowStatusMessage("Error Importing Playlist")
+            App.WriteToLog("Error Importing Playlist from " & filename & vbCr & ex.Message)
+        End Try
+
+        format = Nothing
+    End Sub
+    Private Sub SavePlaylistAs()
+        Dim ext As String
+        Dim filename As String
+
+        'Build filter string from your format interface
+        Dim filterParts As New List(Of String)
+        For Each fmt In App.PlaylistIO.Formats
+            ext = fmt.FileExtension.TrimStart("."c).ToLower()
+            filterParts.Add($"{fmt.Name} (*.{ext})|*.{ext}")
+        Next
+
+        'Create and show dialog
+        Using sfd As New SaveFileDialog With {
+                .Filter = String.Join("|", filterParts),
+                .Title = "Save Playlist As...",
+                .AddExtension = True,
+                .OverwritePrompt = True,
+                .DefaultExt = App.PlaylistIO.Formats(1).FileExtension.TrimStart("."c),
+                .FilterIndex = 2}
+            If sfd.ShowDialog() <> DialogResult.OK Then Exit Sub
+            filename = sfd.FileName
+        End Using
+
+        'Detect format by extension
+        ext = IO.Path.GetExtension(filename).TrimStart("."c).ToLower()
+        Dim format = App.PlaylistIO.Formats.FirstOrDefault(Function(f) f.FileExtension.TrimStart("."c).ToLower() = ext)
+        If format Is Nothing Then
+            ShowStatusMessage("Unsupported Playlist Format")
+            Exit Sub
+        End If
+
+        'Build playlist items
+        Dim items = LVPlaylist.Items.Cast(Of ListViewItem)().
+        Select(Function(lvi) New PlaylistItemType With {.Title = lvi.SubItems(0).Text, .Path = lvi.SubItems(1).Text})
+
+        'Export
+        If LVPlaylist.Items.Count = 0 Then
+            ShowStatusMessage("Playlist is Empty, Nothing to Save")
+            Exit Sub
+        End If
+        Try
+            format.Export(filename, items)
+            ShowStatusMessage("Playlist Successfully Saved")
+            App.WriteToLog("Exported Playlist to " & filename)
+        Catch ex As Exception
+            ShowStatusMessage("Error Saving Playlist")
+            App.WriteToLog("Error Exporting Playlist to " & filename & vbCr & ex.Message)
+        End Try
+
+        format = Nothing
     End Sub
     Private Sub AddToPlaylistFromFile()
         Dim ofd As New OpenFileDialog

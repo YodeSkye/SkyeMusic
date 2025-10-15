@@ -344,7 +344,7 @@ Namespace My
         Friend HelperApp2Path As String = "C:\Program Files\Mp3tag\Mp3tag.exe"
 
         'Interfaces
-        Private Interface IPlaylistIOFormat
+        Friend Interface IPlaylistIOFormat
             ReadOnly Property Name As String
             ReadOnly Property FileExtension As String
             Function Import(path As String) As List(Of Player.PlaylistItemType)
@@ -395,12 +395,12 @@ Namespace My
         Private Class PlaylistIOFormatM3U
             Inherits PlaylistIOFormatM3UBase
             Public Overrides ReadOnly Property Name As String = "M3U Playlist"
-            Public Overrides ReadOnly Property FileExtension As String = ".m3u"
+            Public Overrides ReadOnly Property FileExtension As String = "m3u"
         End Class
         Private Class PlaylistIOFormatM3U8
             Inherits PlaylistIOFormatM3UBase
             Public Overrides ReadOnly Property Name As String = "M3U8 Playlist"
-            Public Overrides ReadOnly Property FileExtension As String = ".m3u8"
+            Public Overrides ReadOnly Property FileExtension As String = "m3u8"
         End Class
         Private Class PlaylistIOFormatPLS
             Implements IPlaylistIOFormat
@@ -412,7 +412,7 @@ Namespace My
             End Property
             Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
                 Get
-                    Return ".pls"
+                    Return "pls"
                 End Get
             End Property
 
@@ -473,7 +473,7 @@ Namespace My
             End Property
             Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
                 Get
-                    Return ".xspf"
+                    Return "xspf"
                 End Get
             End Property
 
@@ -532,7 +532,7 @@ Namespace My
             End Property
             Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
                 Get
-                    Return ".wpl"
+                    Return "wpl"
                 End Get
             End Property
 
@@ -584,7 +584,7 @@ Namespace My
             End Property
             Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
                 Get
-                    Return ".asx"
+                    Return "asx"
                 End Get
             End Property
 
@@ -629,7 +629,7 @@ Namespace My
             End Property
             Public ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
                 Get
-                    Return ".json"
+                    Return "json"
                 End Get
             End Property
 
@@ -653,7 +653,7 @@ Namespace My
 
         End Class
         Friend Class PlaylistIO
-            Private Shared ReadOnly Formats As New List(Of IPlaylistIOFormat) From {
+            Public Shared ReadOnly Formats As New List(Of IPlaylistIOFormat) From {
                 New PlaylistIOFormatM3U(),
                 New PlaylistIOFormatM3U8(),
                 New PlaylistIOFormatPLS,

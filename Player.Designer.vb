@@ -59,8 +59,8 @@ Partial Class Player
         MIFile = New ToolStripMenuItem()
         MIOpen = New ToolStripMenuItem()
         MIOpenURL = New ToolStripMenuItem()
-        cmiOpenPlaylist = New ToolStripMenuItem()
-        cmiSavePlaylist = New ToolStripMenuItem()
+        MIOpenPlaylist = New ToolStripMenuItem()
+        MISavePlaylist = New ToolStripMenuItem()
         ToolStripSeparator4 = New ToolStripSeparator()
         MIExit = New ToolStripMenuItem()
         MIView = New ToolStripMenuItem()
@@ -355,7 +355,7 @@ Partial Class Player
         ' 
         ' MIFile
         ' 
-        MIFile.DropDownItems.AddRange(New ToolStripItem() {MIOpen, MIOpenURL, cmiOpenPlaylist, cmiSavePlaylist, ToolStripSeparator4, MIExit})
+        MIFile.DropDownItems.AddRange(New ToolStripItem() {MIOpen, MIOpenURL, MIOpenPlaylist, MISavePlaylist, ToolStripSeparator4, MIExit})
         MIFile.ForeColor = SystemColors.HighlightText
         MIFile.Image = My.Resources.Resources.ImageOpen16
         MIFile.Name = "MIFile"
@@ -376,19 +376,19 @@ Partial Class Player
         MIOpenURL.Size = New Size(180, 22)
         MIOpenURL.Text = "Open URL"
         ' 
-        ' cmiOpenPlaylist
+        ' MIOpenPlaylist
         ' 
-        cmiOpenPlaylist.Image = My.Resources.Resources.ImageImport16
-        cmiOpenPlaylist.Name = "cmiOpenPlaylist"
-        cmiOpenPlaylist.Size = New Size(180, 22)
-        cmiOpenPlaylist.Text = "Open Playlist..."
+        MIOpenPlaylist.Image = My.Resources.Resources.ImageImport16
+        MIOpenPlaylist.Name = "MIOpenPlaylist"
+        MIOpenPlaylist.Size = New Size(180, 22)
+        MIOpenPlaylist.Text = "Open Playlist..."
         ' 
-        ' cmiSavePlaylist
+        ' MISavePlaylist
         ' 
-        cmiSavePlaylist.Image = My.Resources.Resources.ImageExport16
-        cmiSavePlaylist.Name = "cmiSavePlaylist"
-        cmiSavePlaylist.Size = New Size(180, 22)
-        cmiSavePlaylist.Text = "Save Playlist As..."
+        MISavePlaylist.Image = My.Resources.Resources.ImageExport16
+        MISavePlaylist.Name = "MISavePlaylist"
+        MISavePlaylist.Size = New Size(180, 22)
+        MISavePlaylist.Text = "Save Playlist As..."
         ' 
         ' ToolStripSeparator4
         ' 
@@ -978,6 +978,6 @@ Partial Class Player
     Friend WithEvents TipPlaylist As Skye.UI.ToolTipEX
     Friend WithEvents TipWatcherNotification As Skye.UI.ToolTipEX
     Friend WithEvents TimerStatus As Timer
-    Friend WithEvents cmiOpenPlaylist As ToolStripMenuItem
-    Friend WithEvents cmiSavePlaylist As ToolStripMenuItem
+    Friend WithEvents MIOpenPlaylist As ToolStripMenuItem
+    Friend WithEvents MISavePlaylist As ToolStripMenuItem
 End Class
