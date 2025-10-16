@@ -61,6 +61,23 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}}
+        '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
+        '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
+        '''\pard\cf1\b\f0\fs28\lang9 Skye Music v0.8 What&apos;s New\fs24\par
+        '''\cf0\b0 Released October 2025\par
+        '''\par
+        '''\cf2\b New Features\par
+        '''\cf0\b0 * What&apos;s New Form to keep a rolling list of Features, Improvements, and Fixes. Located in the About Box.\par
+        '''* Drag-and-Drop Playlist Import. Just drop a playlist file into the Pl [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property ChangeLogRT() As String
+            Get
+                Return ResourceManager.GetString("ChangeLogRT", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
         '''\pard\sa200\sl240\slmult1\qc\ul\b\f0\fs28\lang9 Keyboard Shortcuts\par
@@ -155,6 +172,16 @@ Namespace My.Resources
         Friend ReadOnly Property ImageAttributionSyncFusion24() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageAttributionSyncFusion24", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImageChangeLog32() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImageChangeLog32", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

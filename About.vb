@@ -1,4 +1,5 @@
 ﻿
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.Window
 Imports SkyeMusic.My
 Public Class About
 
@@ -25,6 +26,7 @@ Public Class About
         Text = "About " + My.Application.Info.Title
         LblAbout.Text = My.Application.Info.Description
         LblVersion.Text = "v" + My.Application.Info.Version.Major.ToString + "." + My.Application.Info.Version.Minor.ToString + "." + My.Application.Info.Version.Build.ToString
+        BtnOK.Select()
     End Sub
     Private Sub About_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblAbout.MouseDown, LblVersion.MouseDown
         Dim cSender As Control
@@ -62,6 +64,9 @@ Public Class About
     'Control Events
     Private Sub BtnOKClick(sender As Object, e As EventArgs) Handles BtnOK.Click
         Me.Close()
+    End Sub
+    Private Sub BtnChangeLog_Click(sender As Object, e As EventArgs) Handles BtnChangeLog.Click
+        App.ShowChangeLog()
     End Sub
     Private Sub LblVersion_DoubleClick(sender As Object, e As EventArgs) Handles LblVersion.DoubleClick
         Dim classname As String = Space(256)
@@ -175,6 +180,10 @@ Public Class About
         LLblSyncFusion.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblTagLibSharp.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblIcons8.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
+        BtnChangeLog.BackColor = App.CurrentTheme.ButtonBackColor
+        TipAbout.BackColor = App.CurrentTheme.BackColor
+        TipAbout.ForeColor = App.CurrentTheme.TextColor
+        TipAbout.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("About Theme Set")
     End Sub

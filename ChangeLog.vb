@@ -1,6 +1,5 @@
 ﻿
-Imports SkyeMusic.My
-Public Class Help
+Public Class ChangeLog
 
     'Declarations
     Private mMove As Boolean = False
@@ -14,18 +13,24 @@ Public Class Help
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            App.WriteToLog("Help WndProc Handler Error" + Chr(13) + ex.ToString)
+            App.WriteToLog("ChangeLog WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
     End Sub
-    Private Sub Help_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub ChangeLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = My.Application.Info.Title + " Help"
-        RTxBxHelp.Rtf = My.Resources.HelpRT
+        RTBoxChangeLog.Rtf = My.Resources.ChangeLogRT
         SetAccentColor()
         SetTheme()
     End Sub
-    Private Sub Help_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
+    Private Sub ChangeLog_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+        If Not About.Visible Then
+            Player.Activate()
+            Player.BringToFront()
+        End If
+    End Sub
+    Private Sub ChangeLog_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -38,7 +43,7 @@ Public Class Help
         End If
         cSender = Nothing
     End Sub
-    Private Sub Help_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove
+    Private Sub ChangeLog_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -46,15 +51,15 @@ Public Class Help
             Location = mPosition
         End If
     End Sub
-    Private Sub Help_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp
+    Private Sub ChangeLog_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp
         mMove = False
     End Sub
-    Private Sub Help_Move(sender As Object, e As EventArgs) Handles MyBase.Move
+    Private Sub ChangeLog_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
         End If
     End Sub
-    Private Sub HelpKey_Down(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+    Private Sub ChangeLogKey_Down(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyData = Keys.Escape Then Me.Close()
     End Sub
 
@@ -76,7 +81,6 @@ Public Class Help
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
-            RTxBxHelp.BackColor = c
         End If
         ResumeLayout()
         Debug.Print("Help Accent Color Set")
@@ -85,17 +89,9 @@ Public Class Help
         SuspendLayout()
         If Not App.CurrentTheme.IsAccent Then
             BackColor = App.CurrentTheme.BackColor
-            RTxBxHelp.BackColor = App.CurrentTheme.BackColor
         End If
-        RTxBxHelp.SelectAll()
-        If App.CurrentTheme.IsAccent Then
-            RTxBxHelp.SelectionColor = App.CurrentTheme.AccentTextColor
-        Else
-            RTxBxHelp.SelectionColor = App.CurrentTheme.TextColor
-        End If
-        RTxBxHelp.DeselectAll()
         ResumeLayout()
-        Debug.Print("Help Theme Set")
+        Debug.Print("ChangeLog Theme Set")
     End Sub
 
 End Class

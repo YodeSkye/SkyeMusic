@@ -343,6 +343,7 @@ Namespace My
         Friend HelperApp1Path As String = String.Empty
         Friend HelperApp2Name As String = String.Empty
         Friend HelperApp2Path As String = String.Empty
+        Friend ChangeLogLastVersionShown As String = String.Empty
 
         'Interfaces
         Friend Interface IPlaylistIOFormat
@@ -849,12 +850,14 @@ Namespace My
             FRMLibrary.Hide()
             FRMLibrary.Opacity = 1
 
+
             GenerateHotKeyList()
             RegisterHotKeys()
             SetHistoryAutoSaveTimer()
             timerScreenSaverWatcher.Interval = 1000
             timerScreenSaverWatcher.Start()
             AddHandler Microsoft.Win32.SystemEvents.SessionSwitch, AddressOf SessionSwitchHandler 'SessionSwitchHandler is a handler for session switch events, sets the ScreenLocked flag, and acts accordingly.
+
 
             WatcherWorkTimer.AutoReset = False
             SetWatchers()
@@ -947,6 +950,7 @@ Namespace My
                 RegKey.SetValue("HelperApp1Path", App.HelperApp1Path, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HelperApp2Name", App.HelperApp2Name, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HelperApp2Path", App.HelperApp2Path, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("ChangeLogLastVersionShown", App.ChangeLogLastVersionShown, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey = RegKey.OpenSubKey("LibraryWatchFolders", True)
                 For Each s As String In RegSubKey.GetValueNames : RegSubKey.DeleteValue(s) : Next
                 For Each s As String In LibrarySearchFolders : RegSubKey.SetValue("Folder" + Str(LibrarySearchFolders.IndexOf(s) + 1).Trim, s, Microsoft.Win32.RegistryValueKind.String) : Next
@@ -1036,6 +1040,7 @@ Namespace My
                 App.HelperApp1Path = RegKey.GetValue("HelperApp1Path", "C:\Program Files\SkyeApps\SkyeTag.exe").ToString
                 App.HelperApp2Name = RegKey.GetValue("HelperApp2Name", "MP3Tag").ToString
                 App.HelperApp2Path = RegKey.GetValue("HelperApp2Path", "C:\Program Files\Mp3tag\Mp3tag.exe").ToString
+                App.ChangeLogLastVersionShown = RegKey.GetValue("ChangeLogLastVersionShown", String.Empty).ToString
                 LibrarySearchFolders.Clear()
                 RegSubKey = RegKey.CreateSubKey("LibraryWatchFolders")
                 For Each s As String In RegSubKey.GetValueNames : LibrarySearchFolders.Add(RegSubKey.GetValue(s).ToString) : Next
@@ -1224,6 +1229,9 @@ Namespace My
         End Sub
         Friend Sub ShowAbout()
             About.ShowDialog()
+        End Sub
+        Friend Sub ShowChangeLog()
+            ChangeLog.ShowDialog()
         End Sub
         Friend Sub HelperApp1(filename As String)
             If filename IsNot String.Empty Then
@@ -2340,6 +2348,9 @@ Namespace My
                     Return ellipsistext.Substring(0, ellipsistext.Length - 2) + "..."
                 End If
             End If
+        End Function
+        Friend Function GetSimpleVersion() As String
+            GetSimpleVersion = My.Application.Info.Version.Major.ToString & "." & My.Application.Info.Version.Minor.ToString
         End Function
         Friend Function GetAccentColor() As Color
             Dim c As Color

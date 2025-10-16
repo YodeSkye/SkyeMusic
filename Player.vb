@@ -317,6 +317,20 @@ Public Class Player
     End Sub
     Private Sub Player_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         TopMost = False
+        If App.GetSimpleVersion() <> ChangeLogLastVersionShown Then
+            ChangeLogLastVersionShown = App.GetSimpleVersion()
+            SaveOptions()
+            Me.BeginInvoke(Sub()
+                               With New ChangeLog
+                                   .TopMost = True
+                                   .Show()
+                                   .Activate()
+                                   .TopMost = False
+                                   .Visible = False
+                                   .ShowDialog()
+                               End With
+                           End Sub)
+        End If
     End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnReverse.KeyDown, BtnPlay.KeyDown, BtnForward.KeyDown, TrackBarPosition.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
         If Not TxtBoxPlaylistSearch.Focused Then

@@ -374,4 +374,32 @@ Global Media Keys Play/Pause, Stop, Next, and Previous may be used.\par
   <data name="ImageExport16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageExport16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ChangeLogRT" xml:space="preserve">
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}}
+{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
+{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
+\pard\cf1\b\f0\fs28\lang9 Skye Music v0.8 What's New\fs24\par
+\cf0\b0 Released October 2025\par
+\par
+\cf2\b New Features\par
+\cf0\b0 * What's New Form to keep a rolling list of Features, Improvements, and Fixes. Located in the About Box.\par
+* Drag-and-Drop Playlist Import. Just drop a playlist file into the Playlist and watch it merge seamlessly.\par
+* Merge-on-Import Logic. Playlist entries are intelligently added or updated without duplicates.\par
+* Playlist Export to various formats.\par
+\par
+\cf2\b Improvements\par
+\cf0\b0 * Centralized Import Logic. Shared method now powers both dialog and drag &amp; drop workflows.\par
+* Smarter Extension Matching. Unified handling of dots and casing for robust detection.\par
+* Cleaner Diagnostics. WriteToLog now tracks media vs playlist drops.\par
+\par
+\cf2\b Fixes\par
+\cf0\b0 * Tooltip lifecycle stabilized.\par
+\par
+\cf1\b\fs28 Thank you for using Skye Music!\cf0\b0\fs24\par
+}
+ </value>
+  </data>
+  <data name="ImageChangeLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageChangeLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
