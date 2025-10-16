@@ -65,11 +65,11 @@ Namespace My.Resources
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
         '''\pard\cf1\b\f0\fs28\lang9 Skye Music v0.8 What&apos;s New\fs24\par
-        '''\cf0\b0 Released October 2025\par
+        '''\cf0\b0 Released ?? 2025\par
         '''\par
         '''\cf2\b New Features\par
         '''\cf0\b0 * What&apos;s New Form to keep a rolling list of Features, Improvements, and Fixes. Located in the About Box.\par
-        '''* Drag-and-Drop Playlist Import. Just drop a playlist file into the Pl [rest of string was truncated]&quot;;.
+        '''* Drag-and-Drop Playlist Import. Just drop a playlist file into the Playlis [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
             Get
@@ -78,17 +78,18 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}}
+        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}}
+        '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
-        '''\pard\sa200\sl240\slmult1\qc\ul\b\f0\fs28\lang9 Keyboard Shortcuts\par
-        '''\ulnone\i\fs24 &lt;Spacebar&gt; \b0\i0 Toggle Play/Pause\par
-        '''\b\i &lt;Ctrl&gt;+&lt;Spacebar&gt; \b0\i0 Stop\par
-        '''\b\i &lt;M&gt; \b0\i0 Toggle Mute\par
-        '''\b\i &lt;Left Arrow&gt; \b0\i0 Fast Reverse\par
-        '''\b\i &lt;Right Arrow&gt; \b0\i0 Fast Forward\par
-        '''\b\i &lt;B&gt; \b0\i0 Previous Song\par
-        '''\b\i &lt;N&gt; \b0\i0 Next Song\par
-        '''\b\i &lt;L&gt; \b0\ [rest of string was truncated]&quot;;.
+        '''\pard\cf1\b\f0\fs28\lang9 Skye Music Help\par
+        '''\par
+        '''\cf2\f1\fs24 Player Shortcuts &amp; Functions\par
+        '''\cf0 &lt;Spacebar&gt; \b0 Toggle Play/Pause\par
+        '''\b &lt;Ctrl&gt;+&lt;Spacebar&gt; \b0 Stop\par
+        '''\b &lt;M&gt; \b0 Toggle Mute\par
+        '''\b &lt;Left Arrow&gt;\b0  Fast Reverse\par
+        '''\b &lt;Right Arrow&gt; \b0 Fast Forward\par
+        '''\b [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property HelpRT() As String
             Get

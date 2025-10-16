@@ -203,36 +203,37 @@
     <value>ImageMP3Tag16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="HelpRT" xml:space="preserve">
-    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}}
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}}
+{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
-\pard\sa200\sl240\slmult1\qc\ul\b\f0\fs28\lang9 Keyboard Shortcuts\par
-\ulnone\i\fs24 &lt;Spacebar&gt; \b0\i0 Toggle Play/Pause\par
-\b\i &lt;Ctrl&gt;+&lt;Spacebar&gt; \b0\i0 Stop\par
-\b\i &lt;M&gt; \b0\i0 Toggle Mute\par
-\b\i &lt;Left Arrow&gt; \b0\i0 Fast Reverse\par
-\b\i &lt;Right Arrow&gt; \b0\i0 Fast Forward\par
-\b\i &lt;B&gt; \b0\i0 Previous Song\par
-\b\i &lt;N&gt; \b0\i0 Next Song\par
-\b\i &lt;L&gt; \b0\i0 Library\par
-\b\i &lt;F, F11&gt; \b0\i0 Fullsreen (When Playing A Video)\par
-\b\i &lt;Escape&gt; \b0\i0 Exit Fullscreen\par
-Global Media Keys Play/Pause, Stop, Next, and Previous may be used.\par
+\pard\cf1\b\f0\fs28\lang9 Skye Music Help\par
 \par
-\ul\b\fs28 Playlist Shortcuts\ulnone\b0\par
-\b\i\fs24 &lt;Up Arrow&gt; \b0\i0 Select Up\par
-\b\i &lt;Down Arrow&gt; \b0\i0 Select Down\par
-\b\i &lt;Enter&gt; \b0\i0 Play or Queue Song\par
-\b\i &lt;Delete&gt; \b0\i0 Delete Selected Songs\par
-\par
-\ul\b\fs28 Player\par
-\ulnone\i\fs24 Clicking \b0\i0 on video enables Fullscreen\par
+\cf2\f1\fs24 Player Shortcuts &amp; Functions\par
+\cf0 &lt;Spacebar&gt; \b0 Toggle Play/Pause\par
+\b &lt;Ctrl&gt;+&lt;Spacebar&gt; \b0 Stop\par
+\b &lt;M&gt; \b0 Toggle Mute\par
+\b &lt;Left Arrow&gt;\b0  Fast Reverse\par
+\b &lt;Right Arrow&gt; \b0 Fast Forward\par
+\b &lt;B&gt; \b0 Previous Song\par
+\b &lt;N&gt; \b0 Next Song\par
+\b &lt;L&gt; \b0 Library\par
+\b &lt;F, F11&gt; \b0 Fullscreen (When Playing A Video)\par
+\b &lt;Escape&gt; \b0 Exit Fullscreen\par
+\b Play/Pause, Stop, Next, and Previous \b0 Global Media Keys may be used.\par
+\b &lt;Left or Right Click&gt; \b0 on a video enables Fullscreen\par
 \b Minimize App On Screen Lock \b0 will stop play and minimize the app when the screen is locked or the screen saver is activated.\par
-\b\i &lt;Escape&gt; \b0\i0 while window is maximized will return the window to a normal state.\par
-\b\i Double-clicking \b0\i0 on either Album Art or the Visualizer will maximize the window or return it to a normal state.\ul\b\par
+\b &lt;Escape&gt; \b0 while window is maximized will return the window to a normal state.\par
+\b &lt;Double-Click&gt; \b0 on either Album Art or the Visualizer will maximize the window or return it to a normal state.\par
 \par
-\fs28 Library\b0\par
-\ulnone\b\i\fs24 &lt;Escape&gt; \b0\i0 closes Library.\par
-\b\i Left-clicking \b0\i0 on album art enlarges it.\par
+\cf2\b Playlist Shortcuts\cf0\b0\fs28\par
+\b\fs24 &lt;Up Arrow&gt; \b0 Select Up\par
+\b &lt;Down Arrow&gt; \b0 Select Down\par
+\b &lt;Enter&gt; \b0 Play or Queue Song\par
+\b &lt;Delete&gt;\b0  Delete Selected Songs\par
+\par
+\cf2\b Library\cf0\b0\fs28\par
+\b\fs24 &lt;Escape&gt; \b0 closes Library.\par
+\b &lt;Left-Click&gt; \b0 on album art enlarges it.\par
 }
  </value>
   </data>
@@ -379,13 +380,14 @@ Global Media Keys Play/Pause, Stop, Next, and Previous may be used.\par
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 Skye Music v0.8 What's New\fs24\par
-\cf0\b0 Released October 2025\par
+\cf0\b0 Released ?? 2025\par
 \par
 \cf2\b New Features\par
 \cf0\b0 * What's New Form to keep a rolling list of Features, Improvements, and Fixes. Located in the About Box.\par
 * Drag-and-Drop Playlist Import. Just drop a playlist file into the Playlist and watch it merge seamlessly.\par
 * Merge-on-Import Logic. Playlist entries are intelligently added or updated without duplicates.\par
 * Playlist Export to various formats.\par
+* Status Messages. These will provide the user with valuable information about actions performed and provide feedback for automated processes. They will appear under the Playlist and disappear automatically. A new setting was added to the Playlist section to control how long they appear or if they appear at all.\par
 \par
 \cf2\b Improvements\par
 \cf0\b0 * Centralized Import Logic. Shared method now powers both dialog and drag &amp; drop workflows.\par

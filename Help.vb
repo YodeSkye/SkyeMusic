@@ -76,7 +76,6 @@ Public Class Help
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
-            RTxBxHelp.BackColor = c
         End If
         ResumeLayout()
         Debug.Print("Help Accent Color Set")
@@ -85,15 +84,7 @@ Public Class Help
         SuspendLayout()
         If Not App.CurrentTheme.IsAccent Then
             BackColor = App.CurrentTheme.BackColor
-            RTxBxHelp.BackColor = App.CurrentTheme.BackColor
         End If
-        RTxBxHelp.SelectAll()
-        If App.CurrentTheme.IsAccent Then
-            RTxBxHelp.SelectionColor = App.CurrentTheme.AccentTextColor
-        Else
-            RTxBxHelp.SelectionColor = App.CurrentTheme.TextColor
-        End If
-        RTxBxHelp.DeselectAll()
         ResumeLayout()
         Debug.Print("Help Theme Set")
     End Sub

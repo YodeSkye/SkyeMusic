@@ -40,11 +40,12 @@ Partial Class Help
         ' RTxBxHelp
         ' 
         RTxBxHelp.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        RTxBxHelp.BorderStyle = BorderStyle.None
+        RTxBxHelp.BackColor = SystemColors.Window
         RTxBxHelp.Location = New Point(12, 12)
         RTxBxHelp.Name = "RTxBxHelp"
         RTxBxHelp.ReadOnly = True
         RTxBxHelp.ShortcutsEnabled = False
+        RTxBxHelp.ShowSelectionMargin = True
         RTxBxHelp.Size = New Size(776, 345)
         RTxBxHelp.TabIndex = 2
         RTxBxHelp.Text = ""
