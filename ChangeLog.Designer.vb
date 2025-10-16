@@ -60,7 +60,6 @@ Partial Class ChangeLog
         Name = "ChangeLog"
         ShowInTaskbar = False
         StartPosition = FormStartPosition.CenterScreen
-        Text = "What's New in Skye Music"
         ResumeLayout(False)
     End Sub
 

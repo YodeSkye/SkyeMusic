@@ -19,7 +19,7 @@ Public Class ChangeLog
         End Try
     End Sub
     Private Sub ChangeLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Text = My.Application.Info.Title + " Help"
+        Text = "What's New In " & My.Application.Info.Title
         RTBoxChangeLog.Rtf = My.Resources.ChangeLogRT
         SetAccentColor()
         SetTheme()
