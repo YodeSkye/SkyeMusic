@@ -339,10 +339,10 @@ Namespace My
         Friend LibrarySize As New Size(-1, -1)
         Friend LogLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend LogSize As New Size(-1, -1)
-        Friend HelperApp1Name As String = "SkyeTag"
-        Friend HelperApp1Path As String = "C:\Program Files\SkyeApps\SkyeTag.exe"
-        Friend HelperApp2Name As String = "MP3Tag"
-        Friend HelperApp2Path As String = "C:\Program Files\Mp3tag\Mp3tag.exe"
+        Friend HelperApp1Name As String = String.Empty
+        Friend HelperApp1Path As String = String.Empty
+        Friend HelperApp2Name As String = String.Empty
+        Friend HelperApp2Path As String = String.Empty
 
         'Interfaces
         Friend Interface IPlaylistIOFormat

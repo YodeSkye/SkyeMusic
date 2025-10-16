@@ -723,7 +723,7 @@ Public Class Player
                 End If
             Next
             If mediafiles.Count > 0 Then
-                WriteToLog("Player Drag&Drop Performed (" + mediafiles.Count.ToString + " " + IIf(mediafiles.Count = 1, "File", "Files").ToString + ")")
+                WriteToLog("Player Drag&Drop Media Performed (" + mediafiles.Count.ToString + " " + IIf(mediafiles.Count = 1, "File", "Files").ToString + ")")
                 Dim lvi As ListViewItem
                 Dim clientpoint = LVPlaylist.PointToClient(New System.Drawing.Point(e.X, e.Y))
                 Dim itemover = LVPlaylist.GetItemAt(clientpoint.X, clientpoint.Y)
@@ -770,6 +770,7 @@ Public Class Player
                 itemover = Nothing
             End If
             If playlistfiles.Count > 0 Then
+                WriteToLog("Player Drag&Drop Playlist Performed (" + playlistfiles.Count.ToString + " " + IIf(playlistfiles.Count = 1, "File", "Files").ToString + ")")
                 For Each file In playlistfiles
                     MergePlaylistFromFile(file)
                 Next
