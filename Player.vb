@@ -840,15 +840,16 @@ Public Class Player
         frmAddStream.ShowDialog(Me)
         If frmAddStream.DialogResult = DialogResult.OK Then
             If Uri.TryCreate(frmAddStream.NewStream.Path, UriKind.Absolute, uriresult) Then
+                Dim newstream As String = frmAddStream.NewStream.Path.TrimEnd("/"c)
                 'Add to History
-                App.AddToHistoryFromPlaylist(frmAddStream.NewStream.Path, True)
+                App.AddToHistoryFromPlaylist(newstream, True)
                 'Add to Playlist
-                AddToPlaylistFromLibrary(frmAddStream.NewStream.Title, frmAddStream.NewStream.Path)
+                AddToPlaylistFromLibrary(frmAddStream.NewStream.Title, newstream)
                 LVPlaylist.SelectedIndices.Clear()
                 LVPlaylist.SelectedIndices.Add(LVPlaylist.FindItemWithText(frmAddStream.NewStream.Title).Index)
                 'Play Stream
-                PlayStream(frmAddStream.NewStream.Path)
-                Debug.Print("New Stream Added (" + frmAddStream.NewStream.Path + ")")
+                PlayStream(newstream)
+                Debug.Print("New Stream Added (" + newstream + ")")
             Else
                 Debug.Print("Invalid Stream")
                 WriteToLog("Invalid Stream, New Stream Not Added")
@@ -1196,9 +1197,9 @@ Public Class Player
         pString_format.Alignment = StringAlignment.Center
         pString_format.LineAlignment = StringAlignment.Center
         Dim lvi As ListViewItem = Nothing
-        If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+        If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(_player.Path.TrimEnd("/"c), True, 0)
         If lvi Is Nothing Then
-            pText = _player.Path
+            pText = _player.Path.TrimEnd("/"c)
         Else
             pText = lvi.Text
             lvi = Nothing
@@ -1738,7 +1739,7 @@ Public Class Player
                 If lvi Is Nothing Then 'Create new Playlist entry
                     lvi = CreateListviewItem()
                     lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = item.Title
-                    lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = item.Path
+                    lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = item.Path.TrimEnd("/"c)
                     Dim isstream As Boolean = App.IsUrl(item.Path)
                     App.AddToHistoryFromPlaylist(item.Path, isstream)
                     GetHistory(lvi, item.Path)
@@ -2299,7 +2300,7 @@ Public Class Player
     End Sub
     Private Sub OnPlay()
         PlayState = PlayStates.Playing
-        UpdateHistory(_player.Path)
+        UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed because Windows Media Player will add a "/" to the end of streams.
         BtnPlay.Image = App.CurrentTheme.PlayerPause
         TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
