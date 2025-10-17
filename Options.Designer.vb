@@ -822,7 +822,7 @@ Partial Class Options
         TxtBoxStatusMessageDisplayTime.ShortcutsEnabled = False
         TxtBoxStatusMessageDisplayTime.Size = New Size(44, 29)
         TxtBoxStatusMessageDisplayTime.TabIndex = 400
-        TipOptionsEX.SetText(TxtBoxStatusMessageDisplayTime, "Update Song History after 1-60 seconds, or 0 for immediate update.")
+        TipOptionsEX.SetText(TxtBoxStatusMessageDisplayTime, "Show Status Messages below the Playlist for 1-60 seconds, 0 to disable.")
         TxtBoxStatusMessageDisplayTime.TextAlign = HorizontalAlignment.Center
         ' 
         ' lblStatusMessageDisplayTime1
