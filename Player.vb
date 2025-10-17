@@ -1195,17 +1195,14 @@ Public Class Player
         Dim pText As String
         pString_format.Alignment = StringAlignment.Center
         pString_format.LineAlignment = StringAlignment.Center
-        'Try
-        Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+        Dim lvi As ListViewItem = Nothing
+        If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
         If lvi Is Nothing Then
             pText = _player.Path
         Else
             pText = lvi.Text
             lvi = Nothing
         End If
-        'Catch
-        '    pText = String.Empty
-        'End Try
         pFont = New Font(Me.Font.FontFamily, pSize, FontStyle.Bold)
         If Not String.IsNullOrEmpty(pText) Then
             Do
@@ -1738,17 +1735,20 @@ Public Class Player
             For Each item In items
                 Dim lvi As ListViewItem = Nothing
                 If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(item.Path, True, 0)
-                If lvi Is Nothing Then 'Create new ListViewItem
+                If lvi Is Nothing Then 'Create new Playlist entry
                     lvi = CreateListviewItem()
                     lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = item.Title
                     lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = item.Path
+                    Dim isstream As Boolean = App.IsUrl(item.Path)
+                    App.AddToHistoryFromPlaylist(item.Path, isstream)
                     GetHistory(lvi, item.Path)
                     If LVPlaylist.SelectedItems.Count > 0 Then
                         LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
                     Else
                         LVPlaylist.Items.Add(lvi)
                     End If
-                Else 'Update Existing ListViewItem
+                    'Debug.Print("MergePlaylistFromFile isstream = " & isstream.ToString)
+                Else 'Update existing Playlist entry
                     If String.IsNullOrWhiteSpace(item.Title) Then
                         lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = IO.Path.GetFileNameWithoutExtension(item.Path)
                         If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(item.Path)) Then lvi.SubItems(LVPlaylist.Columns("Title").Index).Text += App.PlaylistVideoIdentifier

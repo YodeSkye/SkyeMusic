@@ -2332,6 +2332,16 @@ Namespace My
         Friend Function FormatPlaylistTitle(filename As String) As String
             Return FormatPlaylistTitleCore(filename)
         End Function
+        Public Function IsUrl(input As String) As Boolean
+            If String.IsNullOrWhiteSpace(input) Then Return False
+
+            Dim uriResult As Uri = Nothing
+            If Uri.TryCreate(input, UriKind.Absolute, uriResult) Then
+                Return uriResult.Scheme = Uri.UriSchemeHttp OrElse uriResult.Scheme = Uri.UriSchemeHttps
+            End If
+
+            Return False
+        End Function
         Friend Function GenerateEllipsis(ByRef g As Graphics, s As String, f As System.Drawing.Font, width As Integer) As String
             Dim ellipsistext As String = s
             If width >= 0 Then
