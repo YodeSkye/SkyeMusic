@@ -108,6 +108,12 @@ Namespace My
             End Function
 
         End Structure
+        <Serializable>
+        Public Class SongHistoryData
+            Public Property SchemaVersion As Integer = 1
+            Public Property History As List(Of Song)
+            Public Property TotalPlayedSongs As Integer
+        End Class
         Friend Structure ThemeProperties
             Public IsAccent As Boolean
             Public BackColor As Color
@@ -160,6 +166,7 @@ Namespace My
         Private HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
         Private HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
+        Friend HistoryTotalPlayedSongs As Integer = 0
         Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
         Private WithEvents timerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
         Private WithEvents timerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
@@ -874,46 +881,118 @@ Namespace My
             My.App.WriteToLog(My.Application.Info.ProductName + " Closed")
         End Sub
         Friend Sub SaveHistory()
-            If History.Count = 0 Then
-                If My.Computer.FileSystem.FileExists(HistoryPath) Then My.Computer.FileSystem.DeleteFile(HistoryPath)
+            If History Is Nothing OrElse History.Count = 0 Then
+                If My.Computer.FileSystem.FileExists(HistoryPath) Then
+                    My.Computer.FileSystem.DeleteFile(HistoryPath)
+                End If
             Else
                 Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-                Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of App.Song)))
+                Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(SongHistoryData))
+
                 If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                     My.Computer.FileSystem.CreateDirectory(App.UserPath)
                 End If
-                Dim file As New System.IO.StreamWriter(HistoryPath)
-                writer.Serialize(file, History)
-                file.Close()
-                file.Dispose()
-                writer = Nothing
+
+                Dim data As New SongHistoryData With {.SchemaVersion = 1, .History = History, .TotalPlayedSongs = HistoryTotalPlayedSongs}
+
+                Using file As New System.IO.StreamWriter(HistoryPath)
+                    writer.Serialize(file, data)
+                End Using
+
                 Debug.Print("History Saved")
-                App.WriteToLog("History Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                App.WriteToLog("History Saved (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
             End If
         End Sub
         Private Sub LoadHistory()
             If My.Computer.FileSystem.FileExists(HistoryPath) Then
                 Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-                Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of Song)))
-                Dim file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
-                Try
-                    History = DirectCast(reader.Deserialize(file), Collections.Generic.List(Of Song))
-                Catch
-                    History = Nothing
-                End Try
-                file.Close()
-                file.Dispose()
-                reader = Nothing
-                If History Is Nothing Then
-                    App.WriteToLog("History Not Loaded: File not valid (" + HistoryPath + ")")
-                    History = New Collections.Generic.List(Of Song) 'Initialize an empty history if the file is not valid
-                Else
-                    App.WriteToLog("History Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
-                End If
+
+                'Try new wrapper format first
+                Dim wrapperReader As New System.Xml.Serialization.XmlSerializer(GetType(SongHistoryData))
+                Using file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
+                    Try
+                        Dim data As SongHistoryData = DirectCast(wrapperReader.Deserialize(file), SongHistoryData)
+                        Select Case data.SchemaVersion
+                            Case 1
+                                History = If(data.History, New List(Of Song))
+                                HistoryTotalPlayedSongs = data.TotalPlayedSongs
+                                'Future versions can be handled here
+                            Case Else
+                                History = If(data.History, New List(Of Song))
+                                HistoryTotalPlayedSongs = data.TotalPlayedSongs
+                                App.WriteToLog("Loaded Schema version " & data.SchemaVersion & " (Unknown, using defaults for new fields)")
+                        End Select
+                        App.WriteToLog("History Loaded (Schema v" & data.SchemaVersion & ") (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
+                        Exit Sub
+                    Catch
+                        'Fall back to old format (just a List(Of Song))
+                    End Try
+                End Using
+
+                'Old format fallback
+                Dim listReader As New System.Xml.Serialization.XmlSerializer(GetType(List(Of Song)))
+                Using file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
+                    Try
+                        History = DirectCast(listReader.Deserialize(file), List(Of Song))
+                        HistoryTotalPlayedSongs = 0
+                        App.WriteToLog("History Loaded (Legacy Format) (" &
+                               Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
+                    Catch
+                        History = New List(Of Song)
+                        HistoryTotalPlayedSongs = 0
+                        App.WriteToLog("History Not Loaded: File not valid (" & HistoryPath & ")")
+                    End Try
+                End Using
+
             Else
                 App.WriteToLog("History Not Loaded: File does not exist")
+                History = New List(Of Song)
+                HistoryTotalPlayedSongs = 0
             End If
         End Sub
+
+
+        'Friend Sub SaveHistory()
+        '    If History.Count = 0 Then
+        '        If My.Computer.FileSystem.FileExists(HistoryPath) Then My.Computer.FileSystem.DeleteFile(HistoryPath)
+        '    Else
+        '        Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+        '        Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of App.Song)))
+        '        If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
+        '            My.Computer.FileSystem.CreateDirectory(App.UserPath)
+        '        End If
+        '        Dim file As New System.IO.StreamWriter(HistoryPath)
+        '        writer.Serialize(file, History)
+        '        file.Close()
+        '        file.Dispose()
+        '        writer = Nothing
+        '        Debug.Print("History Saved")
+        '        App.WriteToLog("History Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        '    End If
+        'End Sub
+        'Private Sub LoadHistory()
+        '    If My.Computer.FileSystem.FileExists(HistoryPath) Then
+        '        Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+        '        Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of Song)))
+        '        Dim file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
+        '        Try
+        '            History = DirectCast(reader.Deserialize(file), Collections.Generic.List(Of Song))
+        '        Catch
+        '            History = Nothing
+        '        End Try
+        '        file.Close()
+        '        file.Dispose()
+        '        reader = Nothing
+        '        If History Is Nothing Then
+        '            App.WriteToLog("History Not Loaded: File not valid (" + HistoryPath + ")")
+        '            History = New Collections.Generic.List(Of Song) 'Initialize an empty history if the file is not valid
+        '        Else
+        '            App.WriteToLog("History Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        '        End If
+        '    Else
+        '        App.WriteToLog("History Not Loaded: File does not exist")
+        '    End If
+        'End Sub
         Friend Sub SaveOptions()
             Try
                 Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
