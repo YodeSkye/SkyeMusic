@@ -109,7 +109,7 @@ Namespace My
 
         End Structure
         <Serializable>
-        Public Class SongHistoryData
+        Public Class HistoryData
             Public Property SchemaVersion As Integer = 1
             Public Property History As List(Of Song)
             Public Property TotalPlayedSongs As Integer
@@ -887,13 +887,13 @@ Namespace My
                 End If
             Else
                 Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-                Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(SongHistoryData))
+                Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(HistoryData))
 
                 If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                     My.Computer.FileSystem.CreateDirectory(App.UserPath)
                 End If
 
-                Dim data As New SongHistoryData With {.SchemaVersion = 1, .History = History, .TotalPlayedSongs = HistoryTotalPlayedSongs}
+                Dim data As New HistoryData With {.SchemaVersion = 1, .History = History, .TotalPlayedSongs = HistoryTotalPlayedSongs}
 
                 Using file As New System.IO.StreamWriter(HistoryPath)
                     writer.Serialize(file, data)
@@ -908,10 +908,10 @@ Namespace My
                 Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
 
                 'Try new wrapper format first
-                Dim wrapperReader As New System.Xml.Serialization.XmlSerializer(GetType(SongHistoryData))
+                Dim wrapperReader As New System.Xml.Serialization.XmlSerializer(GetType(HistoryData))
                 Using file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
                     Try
-                        Dim data As SongHistoryData = DirectCast(wrapperReader.Deserialize(file), SongHistoryData)
+                        Dim data As HistoryData = DirectCast(wrapperReader.Deserialize(file), HistoryData)
                         Select Case data.SchemaVersion
                             Case 1
                                 History = If(data.History, New List(Of Song))
