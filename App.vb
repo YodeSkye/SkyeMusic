@@ -112,7 +112,7 @@ Namespace My
         Public Class HistoryData
             Public Property SchemaVersion As Integer = 1
             Public Property History As List(Of Song)
-            Public Property TotalPlayedSongs As Integer
+            Public Property TotalPlayedSongs As UInteger
         End Class
         Friend Structure ThemeProperties
             Public IsAccent As Boolean
@@ -166,7 +166,8 @@ Namespace My
         Private HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
         Private HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
-        Friend HistoryTotalPlayedSongs As Integer = 0
+        Friend HistoryTotalPlayedSongs As UInteger = 0
+        Friend HistoryTotalPlayedSongsThisSession As UInteger = 0
         Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
         Private WithEvents timerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
         Private WithEvents timerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
@@ -950,49 +951,6 @@ Namespace My
                 HistoryTotalPlayedSongs = 0
             End If
         End Sub
-
-
-        'Friend Sub SaveHistory()
-        '    If History.Count = 0 Then
-        '        If My.Computer.FileSystem.FileExists(HistoryPath) Then My.Computer.FileSystem.DeleteFile(HistoryPath)
-        '    Else
-        '        Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-        '        Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of App.Song)))
-        '        If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
-        '            My.Computer.FileSystem.CreateDirectory(App.UserPath)
-        '        End If
-        '        Dim file As New System.IO.StreamWriter(HistoryPath)
-        '        writer.Serialize(file, History)
-        '        file.Close()
-        '        file.Dispose()
-        '        writer = Nothing
-        '        Debug.Print("History Saved")
-        '        App.WriteToLog("History Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
-        '    End If
-        'End Sub
-        'Private Sub LoadHistory()
-        '    If My.Computer.FileSystem.FileExists(HistoryPath) Then
-        '        Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-        '        Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(Collections.Generic.List(Of Song)))
-        '        Dim file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
-        '        Try
-        '            History = DirectCast(reader.Deserialize(file), Collections.Generic.List(Of Song))
-        '        Catch
-        '            History = Nothing
-        '        End Try
-        '        file.Close()
-        '        file.Dispose()
-        '        reader = Nothing
-        '        If History Is Nothing Then
-        '            App.WriteToLog("History Not Loaded: File not valid (" + HistoryPath + ")")
-        '            History = New Collections.Generic.List(Of Song) 'Initialize an empty history if the file is not valid
-        '        Else
-        '            App.WriteToLog("History Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
-        '        End If
-        '    Else
-        '        App.WriteToLog("History Not Loaded: File does not exist")
-        '    End If
-        'End Sub
         Friend Sub SaveOptions()
             Try
                 Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
@@ -1500,13 +1458,16 @@ Namespace My
                 If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
                 existingsong.LastPlayed = DateTime.Now
                 History(existingindex) = existingsong
-                HistoryChanged = True
                 Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
                 WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
                 Player.UpdateHistoryInPlaylist(songorstream)
             Else
                 Debug.Print("Song not found in history: " + songorstream)
             End If
+            HistoryTotalPlayedSongsThisSession += CUInt(1)
+            HistoryTotalPlayedSongs += CUInt(1)
+            Debug.Print("Total Play Count = " & HistoryTotalPlayedSongs.ToString & ", " & HistoryTotalPlayedSongsThisSession & " this Session")
+            HistoryChanged = True
         End Sub
         Friend Sub UpdateRandomHistory(songorstream As String)
             timerRandomHistoryUpdate.Stop()
