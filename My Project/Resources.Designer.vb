@@ -65,11 +65,11 @@ Namespace My.Resources
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
         '''\pard\cf1\b\f0\fs28\lang9 Skye Music v0.8 What&apos;s New\fs24\par
-        '''\cf0\b0 Released ?? 2025\par
+        '''\cf0\b0 Released October 2025\par
         '''\par
         '''\cf2\b New Features\par
-        '''\cf0\b0 * What&apos;s New Form to keep a rolling list of Features, Improvements, and Fixes. Located in the About Box.\par
-        '''* Drag-and-Drop Playlist Import. Just drop a playlist file into the Playlis [rest of string was truncated]&quot;;.
+        '''\cf0\b0 * History tracking now includes Total Played Songs and Session Total\par
+        '''* What&apos;s New Form to keep a rolling list of Features, Improvements, and Fixes. Located in the About Box.\p [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
             Get

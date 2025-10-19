@@ -380,22 +380,25 @@
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 Skye Music v0.8 What's New\fs24\par
-\cf0\b0 Released ?? 2025\par
+\cf0\b0 Released October 2025\par
 \par
 \cf2\b New Features\par
-\cf0\b0 * What's New Form to keep a rolling list of Features, Improvements, and Fixes. Located in the About Box.\par
+\cf0\b0 * History tracking now includes Total Played Songs and Session Total\par
+* What's New Form to keep a rolling list of Features, Improvements, and Fixes. Located in the About Box.\par
 * Drag-and-Drop Playlist Import. Just drop a playlist file into the Playlist and watch it merge seamlessly.\par
 * Merge-on-Import Logic. Playlist entries are intelligently added or updated without duplicates.\par
 * Playlist Export to various formats.\par
 * Status Messages. These will provide the user with valuable information about actions performed and provide feedback for automated processes. They will appear under the Playlist and disappear automatically. A new setting was added to the Playlist section to control how long they appear or if they appear at all.\par
 \par
 \cf2\b Improvements\par
-\cf0\b0 * Centralized Import Logic. Shared method now powers both dialog and drag &amp; drop workflows.\par
-* Smarter Extension Matching. Unified handling of dots and casing for robust detection.\par
+\cf0\b0 * History saving upgraded with Schema versioning for easier future updates, while maintaining backward compatibility.\par
+* Centralized Import Logic. Shared method now powers both dialog and drag &amp; drop workflows.\par
 * Cleaner Diagnostics. WriteToLog now tracks media vs playlist drops.\par
+* Laid the foundation for transition to VLC Media Player as the media engine for Skye Music.\par
 \par
 \cf2\b Fixes\par
 \cf0\b0 * Tooltip lifecycle stabilized.\par
+* Normalized web URLs for consistency and future VLC support by removing ending "/" characters. Windows Media Player adds this character automatically.\par
 \par
 \cf1\b\fs28 Thank you for using Skye Music!\cf0\b0\fs24\par
 }
