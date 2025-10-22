@@ -495,6 +495,7 @@ Public Class Player
                     Case Keys.Delete
                     Case Keys.Insert
                     Case Keys.F, Keys.F11 'Fullscreen
+                        FullScreen = Not FullScreen
                         e.SuppressKeyPress = True
                     Case Keys.M
                         ToggleMute()
@@ -1029,7 +1030,7 @@ Public Class Player
         If Not MIView.Selected Then MIView.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub MIFullscreenClick(sender As Object, e As EventArgs) Handles MIFullscreen.Click
-        'Fullscreen
+        FullScreen = True
     End Sub
     Private Sub MIViewQueue_Click(sender As Object, e As EventArgs) Handles MIViewQueue.Click
         Dim frm As New PlayerQueue
@@ -2759,7 +2760,7 @@ Public Class Player
 
     End Sub
     Private Sub FullScreen_KeyDown(sender As Object, e As KeyEventArgs)
-        If e.KeyCode = Keys.Escape Then FullScreen = False
+        If e.KeyCode = Keys.Escape OrElse e.KeyCode = Keys.F OrElse e.KeyCode = Keys.F11 Then FullScreen = False
     End Sub
 
     'Themes
