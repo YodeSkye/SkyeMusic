@@ -37,26 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <COMReference Include="WMPLib">
-      <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>0</VersionMinor>
-      <VersionMajor>1</VersionMajor>
-      <Guid>6bf52a50-394a-11d3-b153-00c04f79faa6</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="AxWMPLib">
-      <WrapperTool>aximp</WrapperTool>
-      <VersionMinor>0</VersionMinor>
-      <VersionMajor>1</VersionMajor>
-      <Guid>6bf52a50-394a-11d3-b153-00c04f79faa6</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-    </COMReference>
-  </ItemGroup>
-
-  <ItemGroup>
     <Import Include="SkyeMusic.My" />
     <Import Include="System.Data" />
     <Import Include="System.Drawing" />
@@ -118,10 +98,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkyeLibrary" Version="1.2.18" />
-    <PackageReference Include="Syncfusion.Tools.Windows" Version="31.2.2" />
+    <PackageReference Include="LibVLCSharp.WinForms" Version="3.9.4" />
+    <PackageReference Include="SkyeLibrary" Version="1.2.19" />
+    <PackageReference Include="Syncfusion.Tools.Windows" Version="31.2.3" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.10" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>
 
   <ItemGroup>

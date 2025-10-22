@@ -2,9 +2,15 @@
 Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports System.Runtime.CompilerServices
-Imports AxWMPLib
+Imports System.Runtime.InteropServices
+Imports System.Text
+Imports LibVLCSharp.Shared
+Imports LibVLCSharp.WinForms
 Imports Skye
+Imports Skye.Contracts
 Imports SkyeMusic.My
+Imports Syncfusion.Windows.Forms.Tools
+Imports Syncfusion.Windows.Forms.Tools.RibbonControlAdv
 
 Public Class Player
 
@@ -21,16 +27,18 @@ Public Class Player
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Private aDevEnum As New CoreAudio.MMDeviceEnumerator 'Audio Device Enumerator
     Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
+    Private _VLCHook As VLCViewerHook
     Private cLeftMeter, cRightMeter, visR, visB As Byte 'Meter Values and Visualizer Colors
     Private visV As Single 'Visualizer Volume
     Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private Stream As Boolean = False 'True if the current playing item is a stream
     Private Mute As Boolean = False 'True if the player is muted
+    Private IsFullScreen As Boolean = False 'Indicates if the player is in fullscreen mode
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
     Private Lyrics As Boolean = False 'Indicates if the lyrics are active
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
-    Private TrackBarScale As Int16 = 1000 'TrackBar Scale for Position
+    Private TrackBarScale As Int16 = 10000 'TrackBar Scale for Position
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
     Private PlaylistSearchTitle As String 'Title for Playlist Search
     Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
@@ -51,10 +59,14 @@ Public Class Player
     Private PlaylistAddedSort As SortOrder = SortOrder.None
 
     'Properties
-    Friend ReadOnly Property Fullscreen As Boolean 'Property to check if the player is in fullscreen mode
+    Private Property FullScreen As Boolean
         Get
-            Return AxPlayer.fullScreen
+            Return IsFullScreen
         End Get
+        Set(value As Boolean)
+            IsFullScreen = value
+            SetFullScreen()
+        End Set
     End Property
     Private _watchernotification As String
     <System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)>
@@ -76,115 +88,239 @@ Public Class Player
 
     'Interface
     Private _player As Skye.Contracts.IMediaPlayer
-    Public Class WMPlayer
-        Implements Skye.Contracts.IMediaPlayer
+    Public Class VLCPlayer
+        Implements IMediaPlayer, IDisposable
 
-        Private ReadOnly _wmp As AxWMPLib.AxWindowsMediaPlayer
+        Private ReadOnly _libVLC As LibVLC
+        Private ReadOnly _mediaPlayer As MediaPlayer
+        Private _currentMedia As Media
+        Private _currentPath As String
+        Private _transitionGate As Integer = 0 'simple reentrancy guard
 
-        Public Sub New(wmpControl As AxWMPLib.AxWindowsMediaPlayer)
-            _wmp = wmpControl
-            AddHandler _wmp.PlayStateChange, AddressOf OnPlayStateChange
+        Public Sub New(_invoker As Form)
+            'LibVLCSharp.Shared.Core.Initialize()
+            _libVLC = New LibVLC()
+            _mediaPlayer = New MediaPlayer(_libVLC)
+            AddHandler _mediaPlayer.Playing,
+                Sub(sender, e)
+                    _invoker.BeginInvoke(Sub()
+                                             RaiseEvent PlaybackStarted()
+                                         End Sub)
+                End Sub
+            AddHandler _mediaPlayer.EndReached,
+                 Sub(sender, e)
+                     _invoker.BeginInvoke(Sub()
+                                              RaiseEvent PlaybackEnded()
+                                          End Sub)
+                 End Sub
+        End Sub
+        Public Sub Dispose() Implements IDisposable.Dispose
+            _mediaPlayer.Stop()
+            _mediaPlayer.Dispose()
+            If _currentMedia IsNot Nothing Then
+                _currentMedia.Dispose()
+                _currentMedia = Nothing
+            End If
+            _libVLC.Dispose()
         End Sub
 
-        Public Sub Play(path As String) Implements Skye.Contracts.IMediaPlayer.Play
-            _wmp.URL = path
+        Public Sub Play(path As String) Implements IMediaPlayer.Play
+            If Threading.Interlocked.Exchange(_transitionGate, 1) = 1 Then Exit Sub 'Already transitioning; ignore duplicate calls
+            Try
+
+                ' Stop current playback first
+                _mediaPlayer.Stop()
+
+                ' Dispose old media safely
+                If _currentMedia IsNot Nothing Then
+                    _currentMedia.Dispose()
+                    _currentMedia = Nothing
+                End If
+
+                ' Create and keep the new media alive
+                _currentPath = path
+                _currentMedia = New Media(_libVLC, path, FromType.FromPath)
+
+                ' Attach and play
+                _mediaPlayer.Media = _currentMedia
+                _mediaPlayer.Play()
+
+            Finally
+                Threading.Interlocked.Exchange(_transitionGate, 0)
+            End Try
         End Sub
-        Public Sub Play(uri As Uri) Implements Skye.Contracts.IMediaPlayer.Play
-            _wmp.URL = uri.AbsoluteUri
+        Public Sub Play(uri As Uri) Implements IMediaPlayer.Play
+            If Threading.Interlocked.Exchange(_transitionGate, 1) = 1 Then Exit Sub 'Already transitioning; ignore duplicate calls
+            Try
+
+                ' Stop current playback first
+                _mediaPlayer.Stop()
+
+                ' Dispose old media safely
+                If _currentMedia IsNot Nothing Then
+                    _currentMedia.Dispose()
+                    _currentMedia = Nothing
+                End If
+
+                ' Create and keep the new media alive
+                _currentPath = uri.ToString
+                _currentMedia = New Media(_libVLC, uri)
+
+                ' Attach and play
+                _mediaPlayer.Media = _currentMedia
+                _mediaPlayer.Play()
+
+            Finally
+                Threading.Interlocked.Exchange(_transitionGate, 0)
+            End Try
         End Sub
-        Public Sub Play() Implements Skye.Contracts.IMediaPlayer.Play
-            _wmp.Ctlcontrols.play()
+        Public Sub Play() Implements IMediaPlayer.Play
+            _mediaPlayer.Play()
         End Sub
-        Public Sub Pause() Implements Skye.Contracts.IMediaPlayer.Pause
-            _wmp.Ctlcontrols.pause()
+        Public Sub Pause() Implements IMediaPlayer.Pause
+            _mediaPlayer.Pause()
         End Sub
-        Public Sub [Stop]() Implements Skye.Contracts.IMediaPlayer.Stop
-            _wmp.Ctlcontrols.stop()
+        Public Sub [Stop]() Implements IMediaPlayer.Stop
+            _mediaPlayer.Stop()
         End Sub
 
-        Public ReadOnly Property HasMedia As Boolean Implements Skye.Contracts.IMediaPlayer.HasMedia
+        Public ReadOnly Property MediaPlayer As MediaPlayer
             Get
-                Return _wmp.currentMedia IsNot Nothing
+                Return _mediaPlayer
             End Get
         End Property
-        Public ReadOnly Property Path As String Implements Skye.Contracts.IMediaPlayer.Path
+        Public ReadOnly Property HasMedia As Boolean Implements IMediaPlayer.HasMedia
             Get
-                Return _wmp.URL
+                Return (_mediaPlayer IsNot Nothing) AndAlso (_mediaPlayer.Media IsNot Nothing)
             End Get
         End Property
-        Public Property Volume As Integer Implements Skye.Contracts.IMediaPlayer.Volume
+        Public ReadOnly Property Path As String Implements IMediaPlayer.Path
             Get
-                Return _wmp.settings.volume
+                Return _currentPath
+            End Get
+        End Property
+        Public Property Volume As Integer Implements IMediaPlayer.Volume
+            Get
+                Return _mediaPlayer.Volume
             End Get
             Set(value As Integer)
-                _wmp.settings.volume = value
+                _mediaPlayer.Volume = value
             End Set
         End Property
-        Public Property Position As Double Implements Skye.Contracts.IMediaPlayer.Position
+        Public Property Position As Double Implements IMediaPlayer.Position
             Get
-                Return _wmp.Ctlcontrols.currentPosition
+                Return _mediaPlayer.Time / 1000.0
             End Get
             Set(value As Double)
-                _wmp.Ctlcontrols.currentPosition = value
+                _mediaPlayer.Time = CInt(value * 1000)
             End Set
         End Property
-        Public ReadOnly Property Duration As Double Implements Skye.Contracts.IMediaPlayer.Duration
+        Public ReadOnly Property Duration As Double Implements IMediaPlayer.Duration
             Get
-                If _wmp.currentMedia IsNot Nothing Then
-                    Return _wmp.currentMedia.duration
+                Return _mediaPlayer.Length / 1000.0
+            End Get
+        End Property
+        Public ReadOnly Property VideoWidth As Integer Implements IMediaPlayer.VideoWidth
+            Get
+                Dim w As UInteger, h As UInteger
+                If _mediaPlayer.Size(0, w, h) Then
+                    Return CInt(w)
                 Else
                     Return 0
                 End If
             End Get
         End Property
-        Public ReadOnly Property VideoWidth As Integer Implements Skye.Contracts.IMediaPlayer.VideoWidth
+        Public ReadOnly Property VideoHeight As Integer Implements IMediaPlayer.VideoHeight
             Get
-                If _wmp.currentMedia IsNot Nothing Then
-                    Return _wmp.currentMedia.imageSourceWidth
+                Dim w As UInteger, h As UInteger
+                If _mediaPlayer.Size(0, w, h) Then
+                    Return CInt(h)
                 Else
                     Return 0
                 End If
             End Get
         End Property
-        Public ReadOnly Property VideoHeight As Integer Implements Skye.Contracts.IMediaPlayer.VideoHeight
+        Public ReadOnly Property AspectRatio As Double Implements IMediaPlayer.AspectRatio
             Get
-                If _wmp.currentMedia IsNot Nothing Then
-                    Return _wmp.currentMedia.imageSourceHeight
-                Else
-                    Return 0
-                End If
-            End Get
-        End Property
-        Public ReadOnly Property AspectRatio As Double Implements Skye.Contracts.IMediaPlayer.AspectRatio
-            Get
-                If _wmp.currentMedia IsNot Nothing AndAlso _wmp.currentMedia.imageSourceHeight > 0 Then
-                    Return _wmp.currentMedia.imageSourceWidth / _wmp.currentMedia.imageSourceHeight
-                Else
-                    Return 0
-                End If
+                Return If(VideoHeight > 0, CDbl(VideoWidth) / VideoHeight, 0)
             End Get
         End Property
 
-        Private Sub OnPlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
-            Select Case e.newState
-                Case WMPLib.WMPPlayState.wmppsPlaying
-                    RaiseEvent PlaybackStarted()
-                Case WMPLib.WMPPlayState.wmppsMediaEnded
-                    RaiseEvent PlaybackEnded()
-            End Select
-        End Sub
-
-        Public Event PlaybackStarted() Implements Skye.Contracts.IMediaPlayer.PlaybackStarted
-        Public Event PlaybackEnded() Implements Skye.Contracts.IMediaPlayer.PlaybackEnded
+        Public Event PlaybackStarted() Implements IMediaPlayer.PlaybackStarted
+        Public Event PlaybackEnded() Implements IMediaPlayer.PlaybackEnded
 
     End Class
+    Public Class VLCViewerHook
+        Inherits NativeWindow
+
+        Public Event SingleClick(pt As Point)
+        Public Event DoubleClick(pt As Point)
+        Public Event RightClick(pt As Point)
+
+        Private lastClick As DateTime = DateTime.MinValue
+        Private clickTimer As Timer
+
+        Protected Overrides Sub WndProc(ByRef m As Message)
+            If m.Msg = WinAPI.WM_PARENTNOTIFY Then
+                Select Case m.WParam.ToInt32()
+                    Case WinAPI.WM_LBUTTONDOWN
+                        HandleClick()
+                    Case WinAPI.WM_RBUTTONDOWN
+                        RaiseEvent RightClick(Cursor.Position)
+                End Select
+            End If
+            MyBase.WndProc(m)
+        End Sub
+
+        Private Sub HandleClick()
+            Dim now = DateTime.Now
+            If (now - lastClick).TotalMilliseconds <= SystemInformation.DoubleClickTime Then
+                'Second click within double‑click interval → double‑click
+                If clickTimer IsNot Nothing Then
+                    clickTimer.Stop()
+                    clickTimer.Dispose()
+                    clickTimer = Nothing
+                End If
+                RaiseEvent DoubleClick(Cursor.Position)
+                lastClick = DateTime.MinValue
+            Else
+                'First click → start a timer to see if a second one follows
+                lastClick = now
+                clickTimer = New Timer()
+                clickTimer.Interval = SystemInformation.DoubleClickTime
+                AddHandler clickTimer.Tick,
+                Sub()
+                    clickTimer.Stop()
+                    clickTimer.Dispose()
+                    clickTimer = Nothing
+                    'No second click arrived → treat as single click
+                    RaiseEvent SingleClick(Cursor.Position)
+                End Sub
+                clickTimer.Start()
+            End If
+        End Sub
+    End Class
+    Private Function GetVLCChild(parent As IntPtr) As IntPtr
+        Dim h As IntPtr = IntPtr.Zero
+        Do
+            h = WinAPI.FindWindowEx(parent, h, Nothing, Nothing)
+            If h = IntPtr.Zero Then Exit Do
+
+            Dim sb As New StringBuilder(256)
+            WinAPI.GetClassName(h, sb, sb.Capacity)
+            If sb.ToString().StartsWith("VLC video main") Then
+                Return h
+            End If
+        Loop
+        Return IntPtr.Zero
+    End Function
 
     'Form Events                    
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
                 Case Skye.WinAPI.WM_HOTKEY
-                    Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
+                    'Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
                     App.PerformHotKeyAction(m.WParam.ToInt32)
                 Case WinAPI.WM_SYSCOMMAND
                     If m.WParam.ToInt32() = WinAPI.SC_MINIMIZE Then
@@ -197,11 +333,11 @@ Public Class Player
                     Select Case m.WParam.ToInt32
                         Case 0
                             IsFocused = False
-                            Debug.Print("Player Lost Focus")
+                            'Debug.Print("Player Lost Focus")
                             SetInactiveTitleBarColor()
                         Case 1, 2
                             IsFocused = True
-                            Debug.Print("Player Got Focus")
+                            'Debug.Print("Player Got Focus")
                             SetActiveTitleBarColor()
                     End Select
                 Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
@@ -228,7 +364,8 @@ Public Class Player
     End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        _player = New WMPlayer(AxPlayer)
+        _player = New VLCPlayer(Me)
+        VLCViewer.MediaPlayer = CType(_player, VLCPlayer).MediaPlayer
         AddHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
         AddHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
 
@@ -284,14 +421,6 @@ Public Class Player
         ClearPlaylistTitles()
         ShowPlayMode()
 
-        'Initialize the media player
-        AxPlayer.Visible = False
-        AxPlayer.uiMode = "none"
-        AxPlayer.enableContextMenu = False
-        AxPlayer.Ctlenabled = False
-        AxPlayer.stretchToFit = True
-        _player.Volume = 100
-
         'Set tooltips for buttons
         TipPlayer.SetText(BtnPlay, "Play / Pause")
         TipPlayer.SetText(BtnStop, "Stop Playing")
@@ -312,7 +441,6 @@ Public Class Player
 #End If
 
         AddHandler TrackBarPosition.MouseWheel, AddressOf TrackBarPosition_MouseWheel
-        System.Windows.Forms.Application.AddMessageFilter(New MessageFilterPlayerIgnoreFullscreenMouseClick())
 
     End Sub
     Private Sub Player_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
@@ -366,8 +494,7 @@ Public Class Player
                     Case Keys.Home
                     Case Keys.Delete
                     Case Keys.Insert
-                    Case Keys.F, Keys.F11
-                        If AxPlayer.Visible And Not Fullscreen Then AxPlayer.fullScreen = True
+                    Case Keys.F, Keys.F11 'Fullscreen
                         e.SuppressKeyPress = True
                     Case Keys.M
                         ToggleMute()
@@ -434,17 +561,29 @@ Public Class Player
     End Sub
     Private Sub Player_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         SavePlaylist()
+        If _VLCHook IsNot Nothing Then
+            _VLCHook.ReleaseHandle()
+            RemoveHandler _VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
+            RemoveHandler _VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
+            RemoveHandler _VLCHook.RightClick, AddressOf VLCViewer_RightClick
+            _VLCHook = Nothing
+        End If
         My.Finalize()
     End Sub
 
     'Control Events
-    Private Sub AxPlayerKeyUpEvent(sender As Object, e As _WMPOCXEvents_KeyUpEvent) Handles AxPlayer.KeyUpEvent
-        If e.nKeyCode = Keys.Escape And Fullscreen Then AxPlayer.fullScreen = False
-        Cursor = Cursors.Hand
-        Cursor = Cursors.Default
+    Private Sub VLCViewer_SingleClick(clientPoint As Point)
+        FullScreen = Not FullScreen
     End Sub
-    Private Sub AxPlayerClickEvent(sender As Object, e As _WMPOCXEvents_ClickEvent) Handles AxPlayer.ClickEvent
-        If AxPlayer.Visible And Not Fullscreen Then AxPlayer.fullScreen = True
+    Private Sub VLCViewer_DoubleClick(clientPoint As Point)
+        If Me.InvokeRequired Then
+            Me.BeginInvoke(New MethodInvoker(AddressOf ToggleMaximized))
+        Else
+            ToggleMaximized()
+        End If
+    End Sub
+    Private Sub VLCViewer_RightClick(clientPoint As Point)
+        Debug.Print("Show Context Menu")
     End Sub
     Private Sub LVPlaylist_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles LVPlaylist.DrawColumnHeader
         Static b As Rectangle
@@ -890,7 +1029,7 @@ Public Class Player
         If Not MIView.Selected Then MIView.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub MIFullscreenClick(sender As Object, e As EventArgs) Handles MIFullscreen.Click
-        If AxPlayer.Visible And Not Fullscreen Then AxPlayer.fullScreen = True
+        'Fullscreen
     End Sub
     Private Sub MIViewQueue_Click(sender As Object, e As EventArgs) Handles MIViewQueue.Click
         Dim frm As New PlayerQueue
@@ -1228,6 +1367,7 @@ Public Class Player
     End Sub
     Private Sub LblPosition_MouseUp(sender As Object, e As MouseEventArgs) Handles LblPosition.MouseUp
         PlayerPositionShowElapsed = Not PlayerPositionShowElapsed
+        ShowPosition()
         SetTipPlayer()
     End Sub
     Private Sub LblPosition_DoubleClick(sender As Object, e As EventArgs) Handles LblPosition.DoubleClick
@@ -1301,7 +1441,7 @@ Public Class Player
         StopPlay()
         LVPlaylist.Focus()
     End Sub
-    Private Sub BtnReverseMouseDown(sender As Object, e As MouseEventArgs) Handles BtnReverse.MouseDown, BtnReverse.MouseDown
+    Private Sub BtnReverseMouseDown(sender As Object, e As MouseEventArgs) Handles BtnReverse.MouseDown
         If Not Stream Then
             UpdatePosition(False, 10)
             LVPlaylist.Focus()
@@ -1325,9 +1465,8 @@ Public Class Player
         ToggleMute()
         LVPlaylist.Focus()
     End Sub
-    Private Sub TrackBarPosition_Scroll(sender As Object, e As EventArgs) Handles TrackBarPosition.Scroll
-        _player.Pause()
-        OnPause()
+    Private Sub TrackBarPosition_MouseDown(sender As Object, e As MouseEventArgs) Handles TrackBarPosition.MouseDown
+        If PlayState = PlayStates.Playing Then TogglePlay()
     End Sub
     Private Sub TrackBarPosition_MouseUp(sender As Object, e As MouseEventArgs) Handles TrackBarPosition.MouseUp
         Dim newposition As Double
@@ -1340,7 +1479,7 @@ Public Class Player
         TrackBarPosition.Value = Convert.ToInt32(newposition)
         Debug.Print((TrackBarPosition.Value / TrackBarScale).ToString)
         _player.Position = TrackBarPosition.Value / TrackBarScale
-        _player.Play()
+        TogglePlay()
         LVPlaylist.Focus()
     End Sub
     Private Sub TrackBarPosition_MouseWheel(sender As Object, e As MouseEventArgs)
@@ -1350,6 +1489,26 @@ Public Class Player
     'Handlers
     Private Sub OnPlaybackStarted()
         OnPlay()
+
+        'Clean up any previous hook
+        If _VLCHook IsNot Nothing Then
+            _VLCHook.ReleaseHandle()
+            RemoveHandler _VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
+            RemoveHandler _VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
+            RemoveHandler _VLCHook.RightClick, AddressOf VLCViewer_RightClick
+        End If
+
+        'Attach to the new child
+        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
+            Dim child = GetVLCChild(VLCViewer.Handle)
+            If child <> IntPtr.Zero Then
+                _VLCHook = New VLCViewerHook()
+                _VLCHook.AssignHandle(child)
+                AddHandler _VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
+                AddHandler _VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
+                AddHandler _VLCHook.RightClick, AddressOf VLCViewer_RightClick
+            End If
+        End If
     End Sub
     Private Sub OnPlaybackEnded()
         PlayState = PlayStates.Stopped
@@ -1361,23 +1520,7 @@ Public Class Player
         If Not App.PlayMode = App.PlayModes.None Then PlayNext()
     End Sub
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
-        If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
-            Try
-                If Not Stream Then TrackBarPosition.Value = CInt(_player.Position * TrackBarScale)
-                If My.App.PlayerPositionShowElapsed Then
-                    LblPosition.Text = FormatPosition(_player.Position)
-                Else
-                    If Stream Then
-                        LblPosition.Text = "00:00"
-                    Else
-                        LblPosition.Text = FormatPosition(_player.Duration - _player.Position)
-                    End If
-                End If
-            Catch
-                TrackBarPosition.Value = 0
-                LblPosition.Text = "00:00"
-            End Try
-        End If
+        If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then ShowPosition()
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
         If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
@@ -1447,8 +1590,8 @@ Public Class Player
         posstr = posstr & ":"
         If pos.Seconds < 10 Then posstr = posstr & "0"
         posstr = posstr & pos.Seconds.ToString
-        posstr = posstr & "."
-        posstr = posstr & Int(pos.Milliseconds / 100).ToString
+        'posstr = posstr & "."
+        'posstr = posstr & Int(pos.Milliseconds / 100).ToString
         Return posstr
     End Function
     Private Function RandomHistoryFull() As Boolean
@@ -1486,48 +1629,6 @@ Public Class Player
     End Function
 
     'Procedures
-    Friend Sub QueueFromLibrary(path As String)
-        Dim found As Boolean = False
-        For Each s As String In Queue
-            If s = path Then
-                found = True
-                Exit For
-            End If
-        Next
-        If Not found Then
-            Queue.Add(path)
-            SetPlaylistCountText()
-        End If
-    End Sub
-    Friend Sub PruneQueue()
-        Dim count As Integer = 0
-        Dim removelist As New System.Collections.Generic.List(Of String)
-        For Each item As String In Queue
-            If LVPlaylist.FindItemWithText(item, True, 0) Is Nothing Then
-                count += 1
-                removelist.Add(item)
-            End If
-        Next
-        For Each item As String In removelist
-            Queue.Remove(item)
-        Next
-        removelist = Nothing
-        SetPlaylistCountText()
-        App.WriteToLog("Queue Pruned (" + count.ToString + ")")
-    End Sub
-    Friend Sub RemoveFromQueue(path As String)
-        Queue.Remove(path)
-        Debug.Print(path + " Removed From Queue")
-        SetPlaylistCountText()
-    End Sub
-    Friend Sub Suspend() 'Called when the user locks the screen or activates the screen saver
-        If App.SuspendOnSessionChange Then
-            Debug.Print("Suspending...")
-            StopPlay()
-            Me.WindowState = FormWindowState.Minimized
-            App.WriteToLog("App Suspended @ " & Now)
-        End If
-    End Sub
     Friend Sub ShowPlayMode()
         Select Case App.PlayMode
             Case PlayModes.None
@@ -1566,17 +1667,6 @@ Public Class Player
             TimerStatus.Start()
         End If
     End Sub
-    Friend Sub SetPlaylistCountText()
-        LblPlaylistCount.ResetText()
-        LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString
-        If LVPlaylist.Items.Count = 1 Then
-            LblPlaylistCount.Text += " Song, "
-        Else
-            LblPlaylistCount.Text += " Songs, "
-        End If
-        LblPlaylistCount.Text += LVPlaylist.SelectedItems.Count.ToString + " Selected"
-        LblPlaylistCount.Text += ", " + Queue.Count.ToString + " Queued"
-    End Sub
     Private Sub ResetLblPositionText()
         If _player.HasMedia Then
             If App.PlayerPositionShowElapsed Then
@@ -1598,12 +1688,6 @@ Public Class Player
             Debug.Print("Playlist Search Reset")
         End If
     End Sub
-    Private Sub CheckMove(ByRef location As Point)
-        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
-        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
-        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
-        If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
-    End Sub
     Private Sub ToggleMaximized()
         Select Case WindowState
             Case FormWindowState.Normal, FormWindowState.Minimized
@@ -1623,6 +1707,20 @@ Public Class Player
             Visualizer = False
             MIVisualizer.BackColor = Color.Transparent
         End If
+    End Sub
+    Friend Sub Suspend() 'Called when the user locks the screen or activates the screen saver
+        If App.SuspendOnSessionChange Then
+            Debug.Print("Suspending...")
+            StopPlay()
+            Me.WindowState = FormWindowState.Minimized
+            App.WriteToLog("App Suspended @ " & Now)
+        End If
+    End Sub
+    Private Sub CheckMove(ByRef location As Point)
+        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
+        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
+        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
+        If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
 
     'Playlist
@@ -2001,6 +2099,17 @@ Public Class Player
         SetPlaylistCountText()
 
     End Sub
+    Friend Sub SetPlaylistCountText()
+        LblPlaylistCount.ResetText()
+        LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString
+        If LVPlaylist.Items.Count = 1 Then
+            LblPlaylistCount.Text += " Song, "
+        Else
+            LblPlaylistCount.Text += " Songs, "
+        End If
+        LblPlaylistCount.Text += LVPlaylist.SelectedItems.Count.ToString + " Selected"
+        LblPlaylistCount.Text += ", " + Queue.Count.ToString + " Queued"
+    End Sub
     Private Sub ClearPlaylistTitles()
         PlaylistTitleSort = SortOrder.None
         PlaylistPathSort = SortOrder.None
@@ -2039,6 +2148,42 @@ Public Class Player
         ClearPlaylistTitles()
         Return currentsort
     End Function
+
+    'Queue
+    Friend Sub QueueFromLibrary(path As String)
+        Dim found As Boolean = False
+        For Each s As String In Queue
+            If s = path Then
+                found = True
+                Exit For
+            End If
+        Next
+        If Not found Then
+            Queue.Add(path)
+            SetPlaylistCountText()
+        End If
+    End Sub
+    Friend Sub PruneQueue()
+        Dim count As Integer = 0
+        Dim removelist As New System.Collections.Generic.List(Of String)
+        For Each item As String In Queue
+            If LVPlaylist.FindItemWithText(item, True, 0) Is Nothing Then
+                count += 1
+                removelist.Add(item)
+            End If
+        Next
+        For Each item As String In removelist
+            Queue.Remove(item)
+        Next
+        removelist = Nothing
+        SetPlaylistCountText()
+        App.WriteToLog("Queue Pruned (" + count.ToString + ")")
+    End Sub
+    Friend Sub RemoveFromQueue(path As String)
+        Queue.Remove(path)
+        Debug.Print(path + " Removed From Queue")
+        SetPlaylistCountText()
+    End Sub
 
     'Player
     Friend Sub TogglePlay()
@@ -2118,7 +2263,7 @@ Public Class Player
         If LVPlaylist.SelectedItems.Count > 0 Then
             LyricsOff()
             StopPlay()
-            If Mute Then ToggleMute()
+            'If Mute Then ToggleMute()
             If IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                 PlayStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
             Else
@@ -2156,7 +2301,7 @@ Public Class Player
             existingitem = Nothing
         End If
         StopPlay()
-        If Mute Then ToggleMute()
+        'If Mute Then ToggleMute()
         PlayFile(filename, "PlayFromLibrary")
     End Sub
     Friend Sub PlayPrevious()
@@ -2305,6 +2450,7 @@ Public Class Player
         TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
         LblDuration.Text = FormatDuration(_player.Duration)
+        ShowPosition()
         Try
             If Stream Then
                 Text = My.Application.Info.Title + " - " + _player.Path
@@ -2315,6 +2461,7 @@ Public Class Player
             Text = My.Application.Info.Title + " - " + _player.Path
         End Try
         ShowMedia()
+        If Mute Then ToggleMute()
     End Sub
     Private Sub OnPause()
         PlayState = PlayStates.Paused
@@ -2325,10 +2472,28 @@ Public Class Player
         App.StopHistoryUpdates()
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
         TrackBarPosition.Value = 0
+        TrackBarPosition.Enabled = False
         PEXLeft.Value = 0
         PEXRight.Value = 0
         ResetLblPositionText()
-        AxPlayer.Visible = False
+        VLCViewer.Visible = False
+    End Sub
+    Private Sub ShowPosition()
+        Try
+            If My.App.PlayerPositionShowElapsed Then
+                LblPosition.Text = FormatPosition(_player.Position)
+            Else
+                If Stream Then
+                    LblPosition.Text = "00:00"
+                Else
+                    LblPosition.Text = FormatPosition(_player.Duration - _player.Position)
+                End If
+            End If
+            If Not Stream Then TrackBarPosition.Value = CInt(_player.Position * TrackBarScale)
+        Catch
+            TrackBarPosition.Value = 0
+            LblPosition.Text = "00:00"
+        End Try
     End Sub
     Private Sub UpdatePosition(ByVal forward As Boolean, Optional ByVal seconds As Byte = 20)
         If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
@@ -2345,15 +2510,18 @@ Public Class Player
                     _player.Position -= seconds
                 End If
             End If
+            ShowPosition()
             LVPlaylist.Focus()
         End If
     End Sub
     Private Sub ToggleMute()
         If Mute Then
+            Debug.Print("Enabling Sound")
             _player.Volume = 100
             BtnMute.Image = Resources.ImagePlayerSound
             Mute = False
         Else
+            Debug.Print("Disabling Sound")
             _player.Volume = 0
             BtnMute.Image = Resources.ImagePlayerSoundMute
             Mute = True
@@ -2364,16 +2532,16 @@ Public Class Player
             If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
                 If _player.VideoHeight / _player.VideoWidth > PanelMedia.Height / PanelMedia.Width Then
                     'Height > Width, Set Height then Get Width, then Set Centers
-                    AxPlayer.Width = VideoGetWidth(PanelMedia.Height)
-                    AxPlayer.Height = PanelMedia.Height
-                    AxPlayer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2))
-                    AxPlayer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2))
+                    VLCViewer.Width = VideoGetWidth(PanelMedia.Height)
+                    VLCViewer.Height = PanelMedia.Height
+                    VLCViewer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((VLCViewer.Right - VLCViewer.Left) / 2))
+                    VLCViewer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((VLCViewer.Bottom - VLCViewer.Top) / 2))
                 Else
                     'Width > Height, Set Width then Get Height, then Set Centers
-                    AxPlayer.Width = PanelMedia.Width
-                    AxPlayer.Height = VideoGetHeight(PanelMedia.Width)
-                    AxPlayer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((AxPlayer.Right - AxPlayer.Left) / 2))
-                    AxPlayer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((AxPlayer.Bottom - AxPlayer.Top) / 2))
+                    VLCViewer.Width = PanelMedia.Width
+                    VLCViewer.Height = VideoGetHeight(PanelMedia.Width)
+                    VLCViewer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((VLCViewer.Right - VLCViewer.Left) / 2))
+                    VLCViewer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((VLCViewer.Bottom - VLCViewer.Top) / 2))
                 End If
             End If
         Catch
@@ -2399,7 +2567,7 @@ Public Class Player
                 PicBoxVisualizer.Visible = False
                 Visualizer = False
                 TimerVisualizer.Stop()
-                AxPlayer.Visible = False
+                VLCViewer.Visible = False
                 If WindowState = FormWindowState.Maximized Then
                     TxtBoxLyrics.Font = New Font(TxtBoxLyrics.Font.FontFamily, 20, FontStyle.Bold)
                 Else
@@ -2412,10 +2580,10 @@ Public Class Player
                     PicBoxAlbumArt.Visible = False
                     LblAlbumArtSelect.Visible = False
                     TxtBoxLyrics.Visible = False
-                    AxPlayer.Visible = False
+                    VLCViewer.Visible = False
                 Else
                     If App.AudioExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Album Art
-                        AxPlayer.Visible = False
+                        VLCViewer.Visible = False
                         PicBoxVisualizer.Visible = False
                         TxtBoxLyrics.Visible = False
                         TimerVisualizer.Stop()
@@ -2453,12 +2621,12 @@ Public Class Player
                         PicBoxVisualizer.Visible = False
                         TimerVisualizer.Stop()
                         VideoSetSize()
-                        AxPlayer.Visible = True
+                        VLCViewer.Visible = True
                     End If
                 End If
-                If Visualizer OrElse (Not AxPlayer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse Stream Then 'Show Visualizer
+                If Visualizer OrElse (Not VLCViewer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse Stream Then 'Show Visualizer
                     Debug.Print("Showing Visualizer...")
-                    AxPlayer.Visible = False
+                    VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
                     LblAlbumArtSelect.Visible = False
                     TxtBoxLyrics.Visible = False
@@ -2482,7 +2650,7 @@ Public Class Player
             PicBoxAlbumArt.Visible = False
             LblAlbumArtSelect.Visible = False
             TxtBoxLyrics.Visible = False
-            AxPlayer.Visible = False
+            VLCViewer.Visible = False
             PicBoxVisualizer.Visible = False
             TimerVisualizer.Stop()
         End If
@@ -2502,23 +2670,23 @@ Public Class Player
                 TrackBarPosition.TrackBarGradientEnd = CurrentAccentColor
             End If
             ResumeLayout()
-            Debug.Print("Player Accent Color Set")
+            'Debug.Print("Player Accent Color Set")
             Skye.WinAPI.RedrawWindow(Me.Handle, IntPtr.Zero, IntPtr.Zero, Skye.WinAPI.RDW_INVALIDATE Or Skye.WinAPI.RDW_ERASE Or Skye.WinAPI.RDW_FRAME Or Skye.WinAPI.RDW_ALLCHILDREN Or Skye.WinAPI.RDW_UPDATENOW)
-            Debug.Print("Player Repainted")
+            'Debug.Print("Player Repainted")
         End If
     End Sub
     Private Sub SetActiveTitleBarColor()
         If IsFocused And CurrentAccentColor <> Nothing Then
             MenuPlayer.BackColor = CurrentAccentColor
             TxtBoxPlaylistSearch.BackColor = CurrentAccentColor
-            Debug.Print("Player Active Title Bar Color Set: " + CurrentAccentColor.ToString)
+            'Debug.Print("Player Active Title Bar Color Set: " + CurrentAccentColor.ToString)
         End If
     End Sub
     Private Sub SetInactiveTitleBarColor()
         If Not IsFocused Then
             MenuPlayer.BackColor = App.CurrentTheme.InactiveTitleBarColor
             TxtBoxPlaylistSearch.BackColor = App.CurrentTheme.InactiveTitleBarColor
-            Debug.Print("Player InActive Title Bar Color Set")
+            'Debug.Print("Player InActive Title Bar Color Set")
         End If
     End Sub
     Private Sub SetTheme()
@@ -2576,7 +2744,7 @@ Public Class Player
         TipWatcherNotification.ForeColor = App.CurrentTheme.TextColor
         TipWatcherNotification.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
-        Debug.Print("Player Theme Set")
+        'Debug.Print("Player Theme Set")
     End Sub
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor(True)
@@ -2625,5 +2793,67 @@ Public Class Player
             End Sub
 
     End Sub
+
+
+
+    'FullScreen
+    Private fullscreenForm As Form
+    Private originalParent As Control
+    Private originalBounds As Rectangle
+    Private Sub SetFullScreen()
+        If FullScreen Then
+
+        Else
+
+        End If
+    End Sub
+    'Private Sub btnFullscreen_Click(sender As Object, e As EventArgs) Handles btnFullscreen.Click
+    '    If fullscreenForm Is Nothing Then
+    '        'Save original parent and bounds
+    '        originalParent = VLCViewer.Parent
+    '        originalBounds = VLCViewer.Bounds
+
+    '        'Create fullscreen host form
+    '        fullscreenForm = New Form With {
+    '            .FormBorderStyle = FormBorderStyle.None,
+    '            .WindowState = FormWindowState.Maximized,
+    '            .BackColor = Color.Black,
+    '            .TopMost = True,
+    '            .KeyPreview = True ' so ESC is caught
+    '        }
+
+    '        'Handle ESC key
+    '        AddHandler fullscreenForm.KeyDown, AddressOf FullscreenForm_KeyDown
+
+    '        'Reparent the VideoView into the fullscreen form
+    '        fullscreenForm.Controls.Add(VLCViewer)
+    '        VLCViewer.Dock = DockStyle.Fill
+
+    '        fullscreenForm.Show()
+    '        fullscreenForm.Focus()
+    '    Else
+    '        ExitFullscreen()
+    '    End If
+    'End Sub
+    'Private Sub FullscreenForm_KeyDown(sender As Object, e As KeyEventArgs)
+    '    If e.KeyCode = Keys.Escape Then
+    '        ExitFullscreen()
+    '    End If
+    'End Sub
+    'Private Sub ExitFullscreen()
+    '    If fullscreenForm IsNot Nothing Then
+    '        fullscreenForm.Controls.Remove(VLCViewer)
+    '        originalParent.Controls.Add(VLCViewer)
+    '        VLCViewer.Dock = DockStyle.None
+    '        VLCViewer.Bounds = originalBounds
+
+
+    '        fullscreenForm.Close()
+    '        fullscreenForm.Dispose()
+    '        fullscreenForm = Nothing
+    '    End If
+    'End Sub
+
+
 
 End Class

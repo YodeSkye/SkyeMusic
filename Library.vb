@@ -1,6 +1,5 @@
 ﻿
 Imports System.IO
-Imports AxWMPLib
 Imports SkyeMusic.My
 
 Public Class Library

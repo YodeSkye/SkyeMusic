@@ -53,7 +53,6 @@ Partial Class Player
         CMICopyFileName = New ToolStripMenuItem()
         CMICopyFilePath = New ToolStripMenuItem()
         TimerPosition = New Timer(components)
-        AxPlayer = New AxWMPLib.AxWindowsMediaPlayer()
         BtnReverse = New Button()
         MenuPlayer = New MenuStrip()
         MIFile = New ToolStripMenuItem()
@@ -100,15 +99,16 @@ Partial Class Player
         TimerMeter = New Timer(components)
         TimerVisualizer = New Timer(components)
         TipPlayer = New Skye.UI.ToolTipEX(components)
+        VLCViewer = New LibVLCSharp.WinForms.VideoView()
         TipPlaylist = New Skye.UI.ToolTipEX(components)
         TipWatcherNotification = New Skye.UI.ToolTipEX(components)
         TimerStatus = New Timer(components)
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
-        CType(AxPlayer, ComponentModel.ISupportInitialize).BeginInit()
         MenuPlayer.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         CType(PicBoxVisualizer, ComponentModel.ISupportInitialize).BeginInit()
+        CType(VLCViewer, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' BtnPlay
@@ -312,18 +312,7 @@ Partial Class Player
         ' TimerPosition
         ' 
         TimerPosition.Enabled = True
-        TimerPosition.Interval = 10
-        ' 
-        ' AxPlayer
-        ' 
-        AxPlayer.Enabled = True
-        TipPlayer.SetImage(AxPlayer, Nothing)
-        TipPlayer.SetImage(AxPlayer, Nothing)
-        AxPlayer.Location = New Point(1, 27)
-        AxPlayer.Name = "AxPlayer"
-        AxPlayer.OcxState = CType(resources.GetObject("AxPlayer.OcxState"), AxHost.State)
-        AxPlayer.Size = New Size(173, 214)
-        AxPlayer.TabIndex = 35
+        TimerPosition.Interval = 1000
         ' 
         ' BtnReverse
         ' 
@@ -828,6 +817,20 @@ Partial Class Player
         TipPlayer.ShadowAlpha = 200
         TipPlayer.ShowDelay = 1000
         ' 
+        ' VLCViewer
+        ' 
+        VLCViewer.BackColor = Color.Black
+        TipPlaylist.SetImage(VLCViewer, Nothing)
+        TipPlayer.SetImage(VLCViewer, Nothing)
+        TipWatcherNotification.SetImage(VLCViewer, Nothing)
+        VLCViewer.Location = New Point(1, 27)
+        VLCViewer.MediaPlayer = Nothing
+        VLCViewer.Name = "VLCViewer"
+        VLCViewer.Size = New Size(173, 214)
+        VLCViewer.TabIndex = 38
+        VLCViewer.Text = "VideoView1"
+        VLCViewer.Visible = False
+        ' 
         ' TipPlaylist
         ' 
         TipPlaylist.FadeInRate = 25
@@ -853,9 +856,9 @@ Partial Class Player
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(984, 461)
+        Controls.Add(VLCViewer)
         Controls.Add(LblPosition)
         Controls.Add(LblDuration)
-        Controls.Add(AxPlayer)
         Controls.Add(PicBoxAlbumArt)
         Controls.Add(PicBoxVisualizer)
         Controls.Add(ListBoxPlaylistSearch)
@@ -889,18 +892,17 @@ Partial Class Player
         TopMost = True
         CMPlaylist.ResumeLayout(False)
         CMRatings.ResumeLayout(False)
-        CType(AxPlayer, ComponentModel.ISupportInitialize).EndInit()
         MenuPlayer.ResumeLayout(False)
         MenuPlayer.PerformLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).EndInit()
         CType(PicBoxVisualizer, ComponentModel.ISupportInitialize).EndInit()
+        CType(VLCViewer, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
 
     Friend WithEvents BtnPlay As Button
     Friend WithEvents TimerPosition As Timer
-    Friend WithEvents AxPlayer As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents BtnReverse As Button
     Friend WithEvents MenuPlayer As MenuStrip
     Friend WithEvents MIAbout As ToolStripMenuItem
@@ -980,4 +982,5 @@ Partial Class Player
     Friend WithEvents TimerStatus As Timer
     Friend WithEvents MIOpenPlaylist As ToolStripMenuItem
     Friend WithEvents MISavePlaylist As ToolStripMenuItem
+    Friend WithEvents VLCViewer As LibVLCSharp.WinForms.VideoView
 End Class

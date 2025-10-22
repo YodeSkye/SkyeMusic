@@ -773,6 +773,7 @@ Namespace My
 
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense()
+            LibVLCSharp.Shared.Core.Initialize() 'Initialize LibVLCSharp
 
             GetOptions()
             GetDebugOptions()
@@ -1125,7 +1126,7 @@ Namespace My
             For Each key As HotKey In HotKeys
                 If Not key.Key = Keys.None Then
                     status = Skye.WinAPI.RegisterHotKey(Player.Handle, key.WinID, key.KeyMod, key.KeyCode)
-                    Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
+                    'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
                     WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
                 End If
             Next
@@ -2564,19 +2565,5 @@ Namespace My
         End Function
 
     End Class
-
-    Public Class MessageFilterPlayerIgnoreFullscreenMouseClick
-
-        Implements IMessageFilter
-        Public Function PreFilterMessage(ByRef m As Message) As Boolean Implements IMessageFilter.PreFilterMessage
-            If Player.Fullscreen AndAlso (m.Msg = Skye.WinAPI.WM_LBUTTONDOWN OrElse m.Msg = Skye.WinAPI.WM_LBUTTONUP OrElse m.Msg = Skye.WinAPI.WM_LBUTTONDBLCLK OrElse m.Msg = Skye.WinAPI.WM_RBUTTONDOWN OrElse m.Msg = Skye.WinAPI.WM_RBUTTONUP) Then
-                Return True
-            Else
-                Return False
-            End If
-        End Function
-
-    End Class
-
 
 End Namespace
