@@ -38,7 +38,7 @@ Public Class Player
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
     Private Lyrics As Boolean = False 'Indicates if the lyrics are active
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
-    Private TrackBarScale As Int16 = 10000 'TrackBar Scale for Position
+    Private TrackBarScale As Int16 = 100 'TrackBar Scale for Position
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
     Private PlaylistSearchTitle As String 'Title for Playlist Search
     Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
@@ -1487,8 +1487,22 @@ Public Class Player
     End Sub
 
     'Handlers
-    Private Sub OnPlaybackStarted()
+    Private Async Sub OnPlaybackStarted()
         OnPlay()
+
+        ' ✅ Safe to dispose frmFullScreen:
+        ' - When user exits fullscreen manually (ESC key)
+        ' - Before next playback starts (OnPlay)
+        ' ❌ NOT safe during playback end — LibVLC may be tearing down
+        If frmFullScreen IsNot Nothing Then
+            frmFullScreen.Close()
+            frmFullScreen.Dispose()
+            frmFullScreen = Nothing
+        End If
+
+        ' ⚠️ VLCViewerHook attach may fail if LibVLC hasn't created its child window yet.
+        ' Use retry loop with delay to wait for GetVLCChild() to return valid handle.
+        ' Avoid attaching hooks too early after playback starts.
 
         'Clean up any previous hook
         If _VLCHook IsNot Nothing Then
@@ -1496,19 +1510,37 @@ Public Class Player
             RemoveHandler _VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
             RemoveHandler _VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
             RemoveHandler _VLCHook.RightClick, AddressOf VLCViewer_RightClick
+            _VLCHook = Nothing
+            Debug.Print("VLC Viewer Hook Detached")
         End If
 
         'Attach to the new child
         If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
-            Dim child = GetVLCChild(VLCViewer.Handle)
-            If child <> IntPtr.Zero Then
+            Debug.Print("Attaching VLC Viewer Hook...")
+
+            Dim child As IntPtr = IntPtr.Zero
+            Dim attempts As Integer = 0
+
+            ' Retry loop to wait for LibVLC to create its child window
+            Do
+                child = GetVLCChild(VLCViewer.Handle)
+                If child <> IntPtr.Zero Then Exit Do
+                Await Task.Delay(50)
+                attempts += 1
+            Loop While attempts < 10
+
+            If child = IntPtr.Zero Then
+                Debug.Print("VLC Viewer Hook Failed: No child window found after 10 attempts.")
+            Else
                 _VLCHook = New VLCViewerHook()
                 _VLCHook.AssignHandle(child)
                 AddHandler _VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
                 AddHandler _VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
                 AddHandler _VLCHook.RightClick, AddressOf VLCViewer_RightClick
+                Debug.Print("VLC Viewer Hook Attached")
             End If
         End If
+
     End Sub
     Private Sub OnPlaybackEnded()
         PlayState = PlayStates.Stopped
@@ -1518,6 +1550,10 @@ Public Class Player
         PEXRight.Value = 0
         ResetLblPositionText()
         If Not App.PlayMode = App.PlayModes.None Then PlayNext()
+        ' ⚠️ WARNING: Do NOT call FullScreen = False here.
+        ' LibVLC is already tearing down its rendering surface.
+        ' Reparenting VLCViewer during this moment causes WinForms to freeze.
+        ' Let fullscreen collapse naturally — cleanup happens safely elsewhere, in OnPlaybackStarted.
     End Sub
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
         If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then ShowPosition()
@@ -2444,6 +2480,10 @@ Public Class Player
         End Select
     End Sub
     Private Sub OnPlay()
+        ' 🧠 Playback lifecycle is sensitive:
+        ' - LibVLC creates/destroys native windows asynchronously
+        ' - UI transitions (fullscreen, hooks) must be marshaled and timed carefully
+        ' - Avoid cross-thread reparenting or teardown collisions
         PlayState = PlayStates.Playing
         UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed because Windows Media Player will add a "/" to the end of streams.
         BtnPlay.Image = App.CurrentTheme.PlayerPause
@@ -2476,6 +2516,7 @@ Public Class Player
         PEXLeft.Value = 0
         PEXRight.Value = 0
         ResetLblPositionText()
+        If FullScreen Then FullScreen = False
         VLCViewer.Visible = False
     End Sub
     Private Sub ShowPosition()
@@ -2656,6 +2697,71 @@ Public Class Player
         End If
     End Sub
 
+    'FullScreen
+    Private frmFullScreen As Form
+    Private originalParent As Control
+    Private originalBounds As Rectangle
+    Private Sub SetFullScreen()
+        ' ⚠️ Handle with care: this method re-parents VLCViewer between forms.
+        ' Must only be called from UI thread — use BeginInvoke if needed.
+        ' Avoid calling during LibVLC teardown (e.g. OnPlaybackEnded).
+        ' Reparenting while VLCViewer's native window is invalid causes hangs.
+
+        If Me.InvokeRequired Then
+            Me.BeginInvoke(New MethodInvoker(AddressOf SetFullScreen))
+            Return
+        End If
+
+        If FullScreen Then
+            If frmFullScreen Is Nothing Then
+
+                'Save original parent and bounds
+                originalParent = VLCViewer.Parent
+                originalBounds = VLCViewer.Bounds
+
+                'Create fullscreen host form
+                frmFullScreen = New FullScreen With {
+                    .FormBorderStyle = FormBorderStyle.None,
+                    .WindowState = FormWindowState.Maximized,
+                    .BackColor = Color.Black,
+                    .TopMost = True,
+                    .KeyPreview = True} 'So ESC is caught
+
+                'Handle ESC key
+                AddHandler frmFullScreen.KeyDown, AddressOf FullScreen_KeyDown
+
+                'Reparent the VideoView into the fullscreen form
+                frmFullScreen.Controls.Add(VLCViewer)
+                VLCViewer.Dock = DockStyle.Fill
+
+                frmFullScreen.Show()
+                frmFullScreen.Focus()
+
+            End If
+        Else
+            If frmFullScreen IsNot Nothing Then
+
+                    If VLCViewer.IsHandleCreated AndAlso Not VLCViewer.IsDisposed Then
+                        frmFullScreen.Controls.Remove(VLCViewer)
+                        originalParent.Controls.Add(VLCViewer)
+                        VLCViewer.Dock = DockStyle.None
+                        VLCViewer.Bounds = originalBounds
+                    Else
+                        Debug.Print("VLCViewer handle not valid — skipping reparent.")
+                    End If
+
+                    frmFullScreen.Close()
+                    frmFullScreen.Dispose()
+                    frmFullScreen = Nothing
+
+                End If
+            End If
+
+    End Sub
+    Private Sub FullScreen_KeyDown(sender As Object, e As KeyEventArgs)
+        If e.KeyCode = Keys.Escape Then FullScreen = False
+    End Sub
+
     'Themes
     Private Sub SetAccentColor(Optional force As Boolean = False)
         Dim accent As Color = App.GetAccentColor()
@@ -2793,67 +2899,5 @@ Public Class Player
             End Sub
 
     End Sub
-
-
-
-    'FullScreen
-    Private fullscreenForm As Form
-    Private originalParent As Control
-    Private originalBounds As Rectangle
-    Private Sub SetFullScreen()
-        If FullScreen Then
-
-        Else
-
-        End If
-    End Sub
-    'Private Sub btnFullscreen_Click(sender As Object, e As EventArgs) Handles btnFullscreen.Click
-    '    If fullscreenForm Is Nothing Then
-    '        'Save original parent and bounds
-    '        originalParent = VLCViewer.Parent
-    '        originalBounds = VLCViewer.Bounds
-
-    '        'Create fullscreen host form
-    '        fullscreenForm = New Form With {
-    '            .FormBorderStyle = FormBorderStyle.None,
-    '            .WindowState = FormWindowState.Maximized,
-    '            .BackColor = Color.Black,
-    '            .TopMost = True,
-    '            .KeyPreview = True ' so ESC is caught
-    '        }
-
-    '        'Handle ESC key
-    '        AddHandler fullscreenForm.KeyDown, AddressOf FullscreenForm_KeyDown
-
-    '        'Reparent the VideoView into the fullscreen form
-    '        fullscreenForm.Controls.Add(VLCViewer)
-    '        VLCViewer.Dock = DockStyle.Fill
-
-    '        fullscreenForm.Show()
-    '        fullscreenForm.Focus()
-    '    Else
-    '        ExitFullscreen()
-    '    End If
-    'End Sub
-    'Private Sub FullscreenForm_KeyDown(sender As Object, e As KeyEventArgs)
-    '    If e.KeyCode = Keys.Escape Then
-    '        ExitFullscreen()
-    '    End If
-    'End Sub
-    'Private Sub ExitFullscreen()
-    '    If fullscreenForm IsNot Nothing Then
-    '        fullscreenForm.Controls.Remove(VLCViewer)
-    '        originalParent.Controls.Add(VLCViewer)
-    '        VLCViewer.Dock = DockStyle.None
-    '        VLCViewer.Bounds = originalBounds
-
-
-    '        fullscreenForm.Close()
-    '        fullscreenForm.Dispose()
-    '        fullscreenForm = Nothing
-    '    End If
-    'End Sub
-
-
 
 End Class
