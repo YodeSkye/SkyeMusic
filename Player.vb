@@ -1779,7 +1779,7 @@ Public Class Player
                     lvi = Nothing
                 Next
             Catch
-                items = Nothing
+            items = Nothing
             End Try
             file.Close()
             file.Dispose()
@@ -2569,24 +2569,21 @@ Public Class Player
         End If
     End Sub
     Private Sub VideoSetSize()
-        Try
-            If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
-                If _player.VideoHeight / _player.VideoWidth > PanelMedia.Height / PanelMedia.Width Then
-                    'Height > Width, Set Height then Get Width, then Set Centers
-                    VLCViewer.Width = VideoGetWidth(PanelMedia.Height)
-                    VLCViewer.Height = PanelMedia.Height
-                    VLCViewer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((VLCViewer.Right - VLCViewer.Left) / 2))
-                    VLCViewer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((VLCViewer.Bottom - VLCViewer.Top) / 2))
-                Else
-                    'Width > Height, Set Width then Get Height, then Set Centers
-                    VLCViewer.Width = PanelMedia.Width
-                    VLCViewer.Height = VideoGetHeight(PanelMedia.Width)
-                    VLCViewer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((VLCViewer.Right - VLCViewer.Left) / 2))
-                    VLCViewer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((VLCViewer.Bottom - VLCViewer.Top) / 2))
-                End If
+        If _player IsNot Nothing AndAlso _player.HasMedia AndAlso App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
+            If _player.VideoHeight / _player.VideoWidth > PanelMedia.Height / PanelMedia.Width Then
+                'Height > Width, Set Height then Get Width, then Set Centers
+                VLCViewer.Width = VideoGetWidth(PanelMedia.Height)
+                VLCViewer.Height = PanelMedia.Height
+                VLCViewer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((VLCViewer.Right - VLCViewer.Left) / 2))
+                VLCViewer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((VLCViewer.Bottom - VLCViewer.Top) / 2))
+            Else
+                'Width > Height, Set Width then Get Height, then Set Centers
+                VLCViewer.Width = PanelMedia.Width
+                VLCViewer.Height = VideoGetHeight(PanelMedia.Width)
+                VLCViewer.Left = CInt(PanelMedia.Right - ((PanelMedia.Right - PanelMedia.Left) / 2) - ((VLCViewer.Right - VLCViewer.Left) / 2))
+                VLCViewer.Top = CInt(PanelMedia.Bottom - ((PanelMedia.Bottom - PanelMedia.Top) / 2) - ((VLCViewer.Bottom - VLCViewer.Top) / 2))
             End If
-        Catch
-        End Try
+        End If
     End Sub
     Private Sub ShowMedia()
         If _player.HasMedia Then
@@ -2598,8 +2595,8 @@ Public Class Player
                     tlfile = TagLib.File.Create(_player.Path)
                 End If
             Catch ex As Exception
-                WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + _player.Path + Chr(13) + ex.Message)
-                tlfile = Nothing
+            WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + _player.Path + Chr(13) + ex.Message)
+            tlfile = Nothing
             End Try
             If Lyrics AndAlso Not Stream Then 'Show Lyrics
                 Debug.Print("Showing Lyrics...")
