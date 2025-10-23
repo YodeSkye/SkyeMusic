@@ -766,10 +766,13 @@ Namespace My
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
 
+#If Not DEBUG Then
             Dim TracePath As String = IO.Path.Combine(Application.Info.DirectoryPath, "skyemusic_trace.log")
             Trace.Listeners.Add(New RollingTraceListener(TracePath))
             Trace.AutoFlush = True
             Trace.WriteLine("=== SkyeMusic Started ===")
+#End If
+
 
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense()
