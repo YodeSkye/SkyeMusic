@@ -62,8 +62,8 @@ Install-Package System.Text.Encoding.CodePages
 ```
 
 **Usage Tip:**
-```csharp
-Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+```vbnet
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 ```
 
 ---
@@ -77,11 +77,11 @@ Install-Package TagLibSharp
 ```
 
 **Example:**
-```csharp
-var file = TagLib.File.Create("song.mp3");
-Console.WriteLine($"Title: {file.Tag.Title}");
-file.Tag.Title = "New Title";
-file.Save();
+```vbnet
+Dim file = TagLib.File.Create("song.mp3")
+Console.WriteLine($"Title: {file.Tag.Title}")
+file.Tag.Title = "New Title"
+file.Save()
 ```
 
 ---
