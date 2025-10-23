@@ -1014,7 +1014,7 @@ Public Class Player
         If Not MIView.DropDown.Visible Then MIView.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub MIViewDropDownOpening(sender As Object, e As EventArgs) Handles MIView.DropDownOpening
-        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) And Not PlayState = PlayStates.Stopped Then
+        If Not PlayState = PlayStates.Stopped AndAlso App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
             MIFullscreen.Enabled = True
         Else
             MIFullscreen.Enabled = False

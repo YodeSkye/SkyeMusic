@@ -220,10 +220,10 @@
 \b &lt;F, F11&gt; \b0 Fullscreen (When Playing A Video)\par
 \b &lt;Escape&gt; \b0 Exit Fullscreen\par
 \b Play/Pause, Stop, Next, and Previous \b0 Global Media Keys may be used.\par
-\b &lt;Left or Right Click&gt; \b0 on a video enables Fullscreen\par
+\b &lt;Left-Click&gt; \b0 on a video enables Fullscreen\par
 \b Minimize App On Screen Lock \b0 will stop play and minimize the app when the screen is locked or the screen saver is activated.\par
 \b &lt;Escape&gt; \b0 while window is maximized will return the window to a normal state.\par
-\b &lt;Double-Click&gt; \b0 on either Album Art or the Visualizer will maximize the window or return it to a normal state.\par
+\b &lt;Double-Click&gt; \b0 on either Album Art, the Visualizer, or the Video will maximize the window or return it to a normal state.\par
 \par
 \cf2\b Playlist Shortcuts\cf0\b0\fs28\par
 \b\fs24 &lt;Up Arrow&gt; \b0 Select Up\par
@@ -376,10 +376,27 @@
     <value>ImageExport16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ChangeLogRT" xml:space="preserve">
-    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}}
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil Segoe UI;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
-\pard\cf1\b\f0\fs28\lang9 Skye Music v0.8 What's New\fs24\par
+\pard\cf1\b\f0\fs28\lang9 Skye Music v1.0 What's New\fs24\par
+This upgrade marks a major milestone in SkyeMusic\rquote s playback architecture \f1\emdash  smoother, smarter, and built to last.\par
+\cf0\b0\f0 Released ?? 2025\cf1\b\fs28\par
+\par
+\cf2\fs24 New Features\par
+\cf0\b0 * Full VLC Integration. Replaced legacy Windows Media Player(WMP) with modern LibVLC backend for improved format support and performance.\par
+* Custom Fullscreen Mode. Implemented fullscreen support from scratch, tailored for VLC\rquote s rendering model.\par
+\cf2\b\par
+Improvements\par
+\cf0\b0 * Hook Reliability. Improved timing and resilience of mouse hook attachment to VLC\rquote s native window.\par
+* Playback Lifecycle Management. Smoothed transitions between playback states to prevent UI hangs and race conditions.\par
+* FullScreen Usage and Stability Overhaul. Added keyboard shortcuts and uniform click events to fullscreen functionality. Increased stability and reliability of fullscreen mode.\par
+\cf2\b\par
+Fixes\par
+\cf0\b0 * Ensured all UI updates are safely marshaled to the main thread\par
+* Various FullScreen Lifecylce and Stability fixes.\par
+\cf1\b\par
+Skye Music v0.8\par
 \cf0\b0 Released October 2025\par
 \par
 \cf2\b New Features\par
