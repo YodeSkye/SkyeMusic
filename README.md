@@ -24,7 +24,26 @@ Make sure the **Default Project** dropdown (top of the console) is set to the pr
 
 To ensure full functionality of **Skye Music**, install the following NuGet packages:
 
-### 1. Syncfusion.Tools.Windows
+### 1. LibVLCSharp.WinForms
+Provides bindings for the VLC media player in WinForms applications.
+
+```powershell
+Install-Package LibVLCSharp.WinForms
+```
+
+---
+
+### 2. VideoLAN.LibVLC.Windows
+
+Provides the Windows-specific implementation of the LibVLC library.
+
+```powershell
+Install-Package VideoLAN.LibVLC.Windows
+```
+
+---
+
+### 3. Syncfusion.Tools.Windows
 
 Provides advanced WinForms UI components like Ribbon, Docking Manager, and TreeView. It 's free for individual developers and small businesses. To get a license, visit their website [Syncfusion Community License](https://www.syncfusion.com/products/communitylicense).
 
@@ -34,7 +53,7 @@ Install-Package Syncfusion.Tools.Windows
 
 ---
 
-### 2. System.Text.Encoding.CodePages
+### 4. System.Text.Encoding.CodePages
 
 Adds support for legacy code page encodings (e.g., Windows-1252, Shift-JIS).
 
@@ -49,7 +68,7 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 ---
 
-### 3. TagLibSharp
+### 5. TagLibSharp
 
 A cross-platform library for reading and writing metadata in media files.
 
@@ -69,19 +88,7 @@ file.Save();
 
 ## 🧩 Required COM References
 
-### 1. Windows Media Player COM Component
-
-To add the Windows Media Player COM component:
-
-1. Right-click on your project in **Solution Explorer**.
-2. Select **Add > Reference**.
-3. In the Reference Manager, go to **COM**.
-4. Find and check **Windows Media Player**.
-5. Click **OK** to add the reference.
-
----
-
-### 2. CoreAudio
+### 1. CoreAudio
 
 To add the CoreAudio component:
 
