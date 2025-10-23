@@ -2452,8 +2452,8 @@ Public Class Player
                     PlayQueued()
                 Else
                     If LVPlaylist.Items.Count > 0 Then
-                        Dim item As ListViewItem = LVPlaylist.FindItemWithText(_player.Path, True, 0)
-                        Dim randomplaylistindex As System.Random = New System.Random()
+                        Dim item As ListViewItem = Nothing
+                        If _player.HasMedia Then LVPlaylist.FindItemWithText(_player.Path, True, 0)
                         Dim newindex As Integer = 0
                         If RandomHistoryFull() Then RandomHistory.Clear()
                         If item Is Nothing Then
@@ -2463,7 +2463,7 @@ Public Class Player
                                 newindex = 0
                             Else
                                 Do
-                                    newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1) 'randomplaylistindex.Next(0, LVPlaylist.Items.Count)
+                                    newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
                                 Loop Until newindex <> item.Index And Not RandomHistory.Contains(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
                             End If
                         End If
@@ -2474,7 +2474,6 @@ Public Class Player
                         End If
                         EnsurePlaylistItemIsVisible(newindex)
                         item = Nothing
-                        randomplaylistindex = Nothing
                         TimerPlayNext.Start()
                     End If
                 End If
