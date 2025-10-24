@@ -2493,7 +2493,7 @@ Public Class Player
         ShowPosition()
         Try
             If Stream Then
-                Text = My.Application.Info.Title + " - " + _player.Path
+                Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path.TrimEnd("/"c), True, 0).Text + " @ " + _player.Path.TrimEnd("/"c)
             Else
                 Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path, True, 0).Text + " @ " + _player.Path
             End If
