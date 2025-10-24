@@ -1217,7 +1217,6 @@ Namespace My
             Else
                 FRMLibrary.DoWatcherWork(paths)
             End If
-
         End Sub
         Friend Sub ShowOptions()
             Options.ShowDialog()

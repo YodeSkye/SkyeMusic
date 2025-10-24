@@ -33,7 +33,6 @@ Public Class Player
     Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private Stream As Boolean = False 'True if the current playing item is a stream
     Private Mute As Boolean = False 'True if the player is muted
-    Private IsFullScreen As Boolean = False 'Indicates if the player is in fullscreen mode
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
     Private Lyrics As Boolean = False 'Indicates if the lyrics are active
@@ -58,7 +57,11 @@ Public Class Player
     Private PlaylistFirstPlayedSort As SortOrder = SortOrder.None
     Private PlaylistAddedSort As SortOrder = SortOrder.None
 
-    'Properties
+    'FullScreen
+    Private frmFullScreen As Form 'Fullscreen Form
+    Private originalParent As Control 'Original Parent Control of VLC Viewer
+    Private originalBounds As Rectangle 'Original Bounds of VLC Viewer
+    Private IsFullScreen As Boolean = False 'Indicates if the player is in fullscreen mode
     Private Property FullScreen As Boolean
         Get
             Return IsFullScreen
@@ -68,6 +71,8 @@ Public Class Player
             SetFullScreen()
         End Set
     End Property
+
+    'Watcher Property
     Private _watchernotification As String
     <System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)>
     Friend Property WatcherNotification As String
@@ -2058,6 +2063,7 @@ Public Class Player
             Dim lvi As ListViewItem
             lvi = LVPlaylist.FindItemWithText(filename, True, 0)
             If lvi IsNot Nothing Then LVPlaylist.Items.Remove(lvi)
+            SetPlaylistCountText()
         End If
     End Sub
     Private Sub GetHistory(ByRef lvi As ListViewItem, path As String)
@@ -2695,9 +2701,6 @@ Public Class Player
     End Sub
 
     'FullScreen
-    Private frmFullScreen As Form
-    Private originalParent As Control
-    Private originalBounds As Rectangle
     Private Sub SetFullScreen()
         ' ⚠️ Handle with care: this method re-parents VLCViewer between forms.
         ' Must only be called from UI thread — use BeginInvoke if needed.
@@ -2738,21 +2741,21 @@ Public Class Player
         Else
             If frmFullScreen IsNot Nothing Then
 
-                    If VLCViewer.IsHandleCreated AndAlso Not VLCViewer.IsDisposed Then
-                        frmFullScreen.Controls.Remove(VLCViewer)
-                        originalParent.Controls.Add(VLCViewer)
-                        VLCViewer.Dock = DockStyle.None
-                        VLCViewer.Bounds = originalBounds
-                    Else
-                        Debug.Print("VLCViewer handle not valid — skipping reparent.")
-                    End If
-
-                    frmFullScreen.Close()
-                    frmFullScreen.Dispose()
-                    frmFullScreen = Nothing
-
+                If VLCViewer.IsHandleCreated AndAlso Not VLCViewer.IsDisposed Then
+                    frmFullScreen.Controls.Remove(VLCViewer)
+                    originalParent.Controls.Add(VLCViewer)
+                    VLCViewer.Dock = DockStyle.None
+                    VLCViewer.Bounds = originalBounds
+                Else
+                    Debug.Print("VLCViewer handle not valid — skipping reparent.")
                 End If
+
+                frmFullScreen.Close()
+                frmFullScreen.Dispose()
+                frmFullScreen = Nothing
+
             End If
+        End If
 
     End Sub
     Private Sub FullScreen_KeyDown(sender As Object, e As KeyEventArgs)
