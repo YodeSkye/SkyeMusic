@@ -810,8 +810,8 @@ Partial Class Player
         ' 
         ' TipPlayer
         ' 
-        TipPlayer.FadeInRate = 25
-        TipPlayer.FadeOutRate = 25
+        TipPlayer.FadeInRate = 0
+        TipPlayer.FadeOutRate = 0
         TipPlayer.Font = New Font("Segoe UI", 12F)
         TipPlayer.HideDelay = 1000
         TipPlayer.ShadowAlpha = 200
@@ -833,8 +833,8 @@ Partial Class Player
         ' 
         ' TipPlaylist
         ' 
-        TipPlaylist.FadeInRate = 25
-        TipPlaylist.FadeOutRate = 25
+        TipPlaylist.FadeInRate = 0
+        TipPlaylist.FadeOutRate = 0
         TipPlaylist.Font = New Font("Segoe UI", 12F)
         TipPlaylist.HideDelay = 1000000
         TipPlaylist.ShadowAlpha = 200
@@ -842,6 +842,8 @@ Partial Class Player
         ' 
         ' TipWatcherNotification
         ' 
+        TipWatcherNotification.FadeInRate = 0
+        TipWatcherNotification.FadeOutRate = 0
         TipWatcherNotification.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipWatcherNotification.HideDelay = 7500
         TipWatcherNotification.ShadowAlpha = 200

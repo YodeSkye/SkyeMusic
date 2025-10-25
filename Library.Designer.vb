@@ -472,8 +472,8 @@ Partial Class Library
         ' 
         ' TipLibrary
         ' 
-        TipLibrary.FadeInRate = 25
-        TipLibrary.FadeOutRate = 25
+        TipLibrary.FadeInRate = 0
+        TipLibrary.FadeOutRate = 0
         TipLibrary.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipLibrary.HideDelay = 100
         TipLibrary.ShadowAlpha = 200
