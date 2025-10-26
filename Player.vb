@@ -104,9 +104,11 @@ Public Class Player
 
         Public Sub New(_invoker As Form)
             Dim args As String() = {
-                "--aout=directsound",          ' force DirectSound output
-                "--no-audio-time-stretch",     ' can reduce distortion on pitch correction
-                "--audio-resampler=soxr"}      ' higher quality resampler
+                "--aout=wasapi",               '"--aout=directsound",          'force DirectSound output
+                "--no-audio-time-stretch",     'can reduce distortion on pitch correction
+                "--audio-resampler=soxr",      'higher quality resampler
+                "--file-caching=1000",         '1 second buffer for local files
+                "--network-caching=1500"}      'if streaming
             _libVLC = New LibVLC(args)
             _mediaPlayer = New MediaPlayer(_libVLC)
             AddHandler _mediaPlayer.Playing,
