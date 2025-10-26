@@ -34,6 +34,7 @@ Namespace My
         Protected Overrides Function OnStartup(e As ApplicationServices.StartupEventArgs) As Boolean
             If e.Cancel Then : Return False
             Else
+                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High
                 My.App.Initialize()
                 Return True
             End If
