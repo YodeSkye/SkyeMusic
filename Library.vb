@@ -854,10 +854,10 @@ Public Class Library
         LblStatus.Visible = False
         SetLibraryCountText()
         If WatcherUpdateLibrary Or WatcherUpdatePlaylist Then
-            Player.WatcherNotification = "Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs")
+            If paths.Count > 0 Then Player.WatcherNotification = "Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs")
             App.WriteToLog("Library Watcher Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs"))
         Else
-            Player.WatcherNotification = If(paths.Count = 1, "Song Update Available", "Song Updates Available: " & paths.Count.ToString)
+            If paths.Count > 0 Then Player.WatcherNotification = If(paths.Count = 1, "Song Update Available", "Song Updates Available: " & paths.Count.ToString)
             App.WriteToLog("Library Watcher " & If(paths.Count = 1, "Update Available", "Updates Available: " & paths.Count.ToString))
         End If
         Debug.Print("Library Watcher Work Complete: " & paths.Count.ToString)
