@@ -103,8 +103,11 @@ Public Class Player
         Private _transitionGate As Integer = 0 'simple reentrancy guard
 
         Public Sub New(_invoker As Form)
-            'LibVLCSharp.Shared.Core.Initialize()
-            _libVLC = New LibVLC()
+            Dim args As String() = {
+                "--aout=directsound",          ' force DirectSound output
+                "--no-audio-time-stretch",     ' can reduce distortion on pitch correction
+                "--audio-resampler=soxr"}      ' higher quality resampler
+            _libVLC = New LibVLC(args)
             _mediaPlayer = New MediaPlayer(_libVLC)
             AddHandler _mediaPlayer.Playing,
                 Sub(sender, e)
@@ -2601,8 +2604,8 @@ Public Class Player
                     tlfile = TagLib.File.Create(_player.Path)
                 End If
             Catch ex As Exception
-            WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + _player.Path + Chr(13) + ex.Message)
-            tlfile = Nothing
+                WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + _player.Path + Chr(13) + ex.Message)
+                tlfile = Nothing
             End Try
             If Lyrics AndAlso Not Stream Then 'Show Lyrics
                 Debug.Print("Showing Lyrics...")
