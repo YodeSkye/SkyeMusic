@@ -36,6 +36,7 @@ Public Class Player
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
     Private Lyrics As Boolean = False 'Indicates if the lyrics are active
+    Private AlbumArtCount As Byte = 0 'Number of album art available
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
     Private TrackBarScale As Int16 = 100 'TrackBar Scale for Position
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
@@ -47,6 +48,7 @@ Public Class Player
     Private CurrentAccentColor As Color 'Current Windows Accent Color
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
+    Private PicBoxAlbumArtClickTimer As Timer
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -61,13 +63,13 @@ Public Class Player
     Private frmFullScreen As Form 'Fullscreen Form
     Private originalParent As Control 'Original Parent Control of VLC Viewer
     Private originalBounds As Rectangle 'Original Bounds of VLC Viewer
-    Private IsFullScreen As Boolean = False 'Indicates if the player is in fullscreen mode
-    Private Property FullScreen As Boolean
+    Private _FullScreen As Boolean = False 'ONLY Used by FullScreen Property Getter/Setter
+    Private Property FullScreen As Boolean 'Indicates if the player is in fullscreen mode
         Get
-            Return IsFullScreen
+            Return _FullScreen
         End Get
         Set(value As Boolean)
-            IsFullScreen = value
+            _FullScreen = value
             SetFullScreen()
         End Set
     End Property
@@ -1314,11 +1316,54 @@ Public Class Player
     Private Sub CMICopyFilePathClick(sender As Object, e As EventArgs) Handles CMICopyFilePath.Click
         If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
+    Private Sub PicBoxAlbumArt_Paint(sender As Object, e As PaintEventArgs) Handles PicBoxAlbumArt.Paint
+        If AlbumArtCount > 1 Then
+            Dim g = e.Graphics
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+
+            'Badge background (semi-transparent black circle)
+            Dim badgeSize As Integer = 28
+            Dim badgeRect As New Rectangle(PicBoxAlbumArt.Width - badgeSize - 6, 6, badgeSize, badgeSize)
+            Using bgBrush As New SolidBrush(App.CurrentTheme.BackColor)
+                g.FillEllipse(bgBrush, badgeRect)
+            End Using
+
+            'Count text
+            Dim overlayText As String = AlbumArtCount.ToString()
+            Using f As New Font("Segoe UI", 12, FontStyle.Bold),
+                textBrush As New SolidBrush(App.CurrentTheme.TextColor),
+                sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
+                badgeRect.Offset(1, 1) ' Slight offset for better centering
+                g.DrawString(overlayText, f, textBrush, badgeRect, sf)
+            End Using
+
+        End If
+    End Sub
     Private Sub PicBoxAlbumArt_Click(sender As Object, e As EventArgs) Handles PicBoxAlbumArt.Click
-        AlbumArtIndex += CByte(1)
-        ShowMedia()
+        'Start a timer for single-click
+        If PicBoxAlbumArtClickTimer Is Nothing Then
+            PicBoxAlbumArtClickTimer = New Timer()
+            PicBoxAlbumArtClickTimer.Interval = SystemInformation.DoubleClickTime
+            AddHandler PicBoxAlbumArtClickTimer.Tick,
+            Sub()
+                PicBoxAlbumArtClickTimer?.Stop()
+                PicBoxAlbumArtClickTimer?.Dispose()
+                PicBoxAlbumArtClickTimer = Nothing
+
+                'Single-click action
+                AlbumArtIndex += CByte(1)
+                ShowMedia()
+            End Sub
+            PicBoxAlbumArtClickTimer.Start()
+        End If
     End Sub
     Private Sub PicBoxAlbumArt_DoubleClick(sender As Object, e As EventArgs) Handles PicBoxAlbumArt.DoubleClick
+        'Cancel pending single-click
+        PicBoxAlbumArtClickTimer?.Stop()
+        PicBoxAlbumArtClickTimer?.Dispose()
+        PicBoxAlbumArtClickTimer = Nothing
+
+        'Double-click action
         ToggleMaximized()
     End Sub
     Private Sub PicBoxVisualizer_DoubleClick(sender As Object, e As EventArgs) Handles PicBoxVisualizer.DoubleClick
@@ -2611,7 +2656,7 @@ Public Class Player
             If Lyrics AndAlso Not Stream Then 'Show Lyrics
                 Debug.Print("Showing Lyrics...")
                 PicBoxAlbumArt.Visible = False
-                LblMedia.Visible = False
+                'LblMedia.Visible = False
                 PicBoxVisualizer.Visible = False
                 Visualizer = False
                 TimerVisualizer.Stop()
@@ -2626,7 +2671,7 @@ Public Class Player
             Else
                 If Visualizer Then
                     PicBoxAlbumArt.Visible = False
-                    LblMedia.Visible = False
+                    'LblMedia.Visible = False
                     TxtBoxLyrics.Visible = False
                     VLCViewer.Visible = False
                 Else
@@ -2637,11 +2682,11 @@ Public Class Player
                         TimerVisualizer.Stop()
                         If tlfile Is Nothing Then
                             PicBoxAlbumArt.Visible = False
-                            LblMedia.Visible = False
+                            'LblMedia.Visible = False
                         Else
                             If tlfile.Tag.Pictures.Length = 0 Then
                                 PicBoxAlbumArt.Visible = False
-                                LblMedia.Visible = False
+                                'LblMedia.Visible = False
                             Else
                                 Debug.Print("Showing Album Art...")
                                 If AlbumArtIndex + 1 > tlfile.Tag.Pictures.Count Then AlbumArtIndex = 0
@@ -2652,19 +2697,23 @@ Public Class Player
                                 Catch ex As Exception
                                     WriteToLog("Error Loading Album Art for " + _player.Path + vbCr + ex.Message)
                                     PicBoxAlbumArt.Visible = False
-                                    LblMedia.Visible = False
+                                    'LblMedia.Visible = False
                                 End Try
                                 ms.Dispose()
                                 ms = Nothing
-                                If tlfile.Tag.Pictures.Count > 1 Then : LblMedia.Visible = True
-                                Else : LblMedia.Visible = False
-                                End If
+                                AlbumArtCount = CByte(tlfile.Tag.Pictures.Count)
+                                PicBoxAlbumArt.Invalidate()
+                                'If tlfile.Tag.Pictures.Count > 1 Then
+                                'LblMedia.Visible = True
+                                'Else
+                                'LblMedia.Visible = False
+                                'End If
                             End If
                         End If
                     ElseIf App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Video
                         Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
-                        LblMedia.Visible = False
+                        'LblMedia.Visible = False
                         TxtBoxLyrics.Visible = False
                         PicBoxVisualizer.Visible = False
                         TimerVisualizer.Stop()
@@ -2676,7 +2725,7 @@ Public Class Player
                     Debug.Print("Showing Visualizer...")
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
-                    LblMedia.Visible = False
+                    'LblMedia.Visible = False
                     TxtBoxLyrics.Visible = False
                     TimerVisualizer.Start()
                     PicBoxVisualizer.Visible = True
@@ -2696,7 +2745,7 @@ Public Class Player
             tlfile = Nothing
         Else
             PicBoxAlbumArt.Visible = False
-            LblMedia.Visible = False
+            'LblMedia.Visible = False
             TxtBoxLyrics.Visible = False
             VLCViewer.Visible = False
             PicBoxVisualizer.Visible = False

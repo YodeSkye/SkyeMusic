@@ -69,7 +69,7 @@ Namespace My.Resources
         '''\cf0\b0\f0 Released ?? 2025\cf1\b\fs28\par
         '''\par
         '''\cf2\fs24 New Features\par
-        '''\cf0\b0 * Full VLC I [rest of string was truncated]&quot;;.
+        '''\cf0\b0 * A Text Lab [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
             Get
@@ -78,7 +78,7 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}}
+        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}}
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
         '''\pard\cf1\b\f0\fs28\lang9 Skye Music Help\par
@@ -88,8 +88,7 @@ Namespace My.Resources
         '''\b &lt;Ctrl&gt;+&lt;Spacebar&gt; \b0 Stop\par
         '''\b &lt;M&gt; \b0 Toggle Mute\par
         '''\b &lt;Left Arrow&gt;\b0  Fast Reverse\par
-        '''\b &lt;Right Arrow&gt; \b0 Fast Forward\par
-        '''\b [rest of string was truncated]&quot;;.
+        '''\b &lt;Right Arrow&gt; \b [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property HelpRT() As String
             Get

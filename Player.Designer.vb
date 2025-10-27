@@ -830,7 +830,6 @@ Partial Class Player
         LblMedia.Name = "LblMedia"
         LblMedia.Size = New Size(214, 32)
         LblMedia.TabIndex = 15
-        LblMedia.Text = "Test Media Text Entry Here"
         LblMedia.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' TipPlaylist
