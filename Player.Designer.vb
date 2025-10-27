@@ -83,7 +83,6 @@ Partial Class Player
         PEXLeft = New Skye.UI.ProgressEX()
         PEXRight = New Skye.UI.ProgressEX()
         PicBoxAlbumArt = New PictureBox()
-        LblAlbumArtSelect = New Label()
         TxtBoxPlaylistSearch = New TextBox()
         ListBoxPlaylistSearch = New ListBox()
         PanelMedia = New Panel()
@@ -100,6 +99,7 @@ Partial Class Player
         TimerVisualizer = New Timer(components)
         TipPlayer = New Skye.UI.ToolTipEX(components)
         VLCViewer = New LibVLCSharp.WinForms.VideoView()
+        LblMedia = New Skye.UI.Label()
         TipPlaylist = New Skye.UI.ToolTipEX(components)
         TipWatcherNotification = New Skye.UI.ToolTipEX(components)
         TimerStatus = New Timer(components)
@@ -599,20 +599,6 @@ Partial Class Player
         PicBoxAlbumArt.TabStop = False
         PicBoxAlbumArt.Visible = False
         ' 
-        ' LblAlbumArtSelect
-        ' 
-        LblAlbumArtSelect.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        LblAlbumArtSelect.BackColor = Color.Transparent
-        TipWatcherNotification.SetImage(LblAlbumArtSelect, Nothing)
-        LblAlbumArtSelect.Image = My.Resources.Resources.ImageAlbumArtSelect
-        TipPlayer.SetImage(LblAlbumArtSelect, Nothing)
-        TipPlaylist.SetImage(LblAlbumArtSelect, Nothing)
-        LblAlbumArtSelect.Location = New Point(98, 321)
-        LblAlbumArtSelect.Name = "LblAlbumArtSelect"
-        LblAlbumArtSelect.Size = New Size(214, 32)
-        LblAlbumArtSelect.TabIndex = 15
-        LblAlbumArtSelect.Visible = False
-        ' 
         ' TxtBoxPlaylistSearch
         ' 
         TxtBoxPlaylistSearch.Anchor = AnchorStyles.Top Or AnchorStyles.Right
@@ -831,6 +817,22 @@ Partial Class Player
         VLCViewer.Text = "VideoView1"
         VLCViewer.Visible = False
         ' 
+        ' LblMedia
+        ' 
+        LblMedia.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        LblMedia.BackColor = Color.Transparent
+        LblMedia.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LblMedia.ForeColor = SystemColors.WindowText
+        TipWatcherNotification.SetImage(LblMedia, Nothing)
+        TipPlayer.SetImage(LblMedia, Nothing)
+        TipPlaylist.SetImage(LblMedia, Nothing)
+        LblMedia.Location = New Point(98, 321)
+        LblMedia.Name = "LblMedia"
+        LblMedia.Size = New Size(214, 32)
+        LblMedia.TabIndex = 15
+        LblMedia.Text = "Test Media Text Entry Here"
+        LblMedia.TextAlign = ContentAlignment.MiddleCenter
+        ' 
         ' TipPlaylist
         ' 
         TipPlaylist.FadeInRate = 0
@@ -858,6 +860,7 @@ Partial Class Player
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(984, 461)
+        Controls.Add(LblMedia)
         Controls.Add(VLCViewer)
         Controls.Add(LblPosition)
         Controls.Add(LblDuration)
@@ -880,7 +883,6 @@ Partial Class Player
         Controls.Add(TxtBoxLyrics)
         Controls.Add(LblPlaylistCount)
         Controls.Add(TrackBarPosition)
-        Controls.Add(LblAlbumArtSelect)
         ForeColor = SystemColors.HighlightText
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         TipWatcherNotification.SetImage(Me, Nothing)
@@ -926,7 +928,6 @@ Partial Class Player
     Friend WithEvents PEXLeft As Skye.UI.ProgressEX
     Friend WithEvents PEXRight As Skye.UI.ProgressEX
     Friend WithEvents PicBoxAlbumArt As PictureBox
-    Friend WithEvents LblAlbumArtSelect As Label
     Friend WithEvents TxtBoxPlaylistSearch As TextBox
     Friend WithEvents ListBoxPlaylistSearch As ListBox
     Friend WithEvents PanelMedia As Panel
@@ -985,4 +986,5 @@ Partial Class Player
     Friend WithEvents MIOpenPlaylist As ToolStripMenuItem
     Friend WithEvents MISavePlaylist As ToolStripMenuItem
     Friend WithEvents VLCViewer As LibVLCSharp.WinForms.VideoView
+    Friend WithEvents LblMedia As Skye.UI.Label
 End Class

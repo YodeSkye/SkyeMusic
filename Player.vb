@@ -437,7 +437,6 @@ Public Class Player
         TipPlayer.SetText(BtnReverse, "Skip Backward")
         TipPlayer.SetText(BtnForward, "Skip Forward")
         TipPlayer.SetText(BtnMute, "Mute")
-        TipPlayer.SetText(LblAlbumArtSelect, "Show Next Album Art")
         TipPlayer.SetText(LblDuration, "Song Duration")
         SetTipPlayer()
         CustomDrawCMToolTip(CMPlaylist)
@@ -1315,6 +1314,10 @@ Public Class Player
     Private Sub CMICopyFilePathClick(sender As Object, e As EventArgs) Handles CMICopyFilePath.Click
         If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
+    Private Sub PicBoxAlbumArt_Click(sender As Object, e As EventArgs) Handles PicBoxAlbumArt.Click
+        AlbumArtIndex += CByte(1)
+        ShowMedia()
+    End Sub
     Private Sub PicBoxAlbumArt_DoubleClick(sender As Object, e As EventArgs) Handles PicBoxAlbumArt.DoubleClick
         ToggleMaximized()
     End Sub
@@ -1371,10 +1374,6 @@ Public Class Player
         End If
         pString_format.Dispose()
         pFont.Dispose()
-    End Sub
-    Private Sub LblAlbumArtSelectClick(sender As Object, e As EventArgs) Handles LblAlbumArtSelect.Click
-        AlbumArtIndex += CByte(1)
-        ShowMedia()
     End Sub
     Private Sub LblPosition_MouseUp(sender As Object, e As MouseEventArgs) Handles LblPosition.MouseUp
         PlayerPositionShowElapsed = Not PlayerPositionShowElapsed
@@ -1789,7 +1788,7 @@ Public Class Player
                     lvi = Nothing
                 Next
             Catch
-            items = Nothing
+                items = Nothing
             End Try
             file.Close()
             file.Dispose()
@@ -2612,7 +2611,7 @@ Public Class Player
             If Lyrics AndAlso Not Stream Then 'Show Lyrics
                 Debug.Print("Showing Lyrics...")
                 PicBoxAlbumArt.Visible = False
-                LblAlbumArtSelect.Visible = False
+                LblMedia.Visible = False
                 PicBoxVisualizer.Visible = False
                 Visualizer = False
                 TimerVisualizer.Stop()
@@ -2627,7 +2626,7 @@ Public Class Player
             Else
                 If Visualizer Then
                     PicBoxAlbumArt.Visible = False
-                    LblAlbumArtSelect.Visible = False
+                    LblMedia.Visible = False
                     TxtBoxLyrics.Visible = False
                     VLCViewer.Visible = False
                 Else
@@ -2638,11 +2637,11 @@ Public Class Player
                         TimerVisualizer.Stop()
                         If tlfile Is Nothing Then
                             PicBoxAlbumArt.Visible = False
-                            LblAlbumArtSelect.Visible = False
+                            LblMedia.Visible = False
                         Else
                             If tlfile.Tag.Pictures.Length = 0 Then
                                 PicBoxAlbumArt.Visible = False
-                                LblAlbumArtSelect.Visible = False
+                                LblMedia.Visible = False
                             Else
                                 Debug.Print("Showing Album Art...")
                                 If AlbumArtIndex + 1 > tlfile.Tag.Pictures.Count Then AlbumArtIndex = 0
@@ -2653,19 +2652,19 @@ Public Class Player
                                 Catch ex As Exception
                                     WriteToLog("Error Loading Album Art for " + _player.Path + vbCr + ex.Message)
                                     PicBoxAlbumArt.Visible = False
-                                    LblAlbumArtSelect.Visible = False
+                                    LblMedia.Visible = False
                                 End Try
                                 ms.Dispose()
                                 ms = Nothing
-                                If tlfile.Tag.Pictures.Count > 1 Then : LblAlbumArtSelect.Visible = True
-                                Else : LblAlbumArtSelect.Visible = False
+                                If tlfile.Tag.Pictures.Count > 1 Then : LblMedia.Visible = True
+                                Else : LblMedia.Visible = False
                                 End If
                             End If
                         End If
                     ElseIf App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Video
                         Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
-                        LblAlbumArtSelect.Visible = False
+                        LblMedia.Visible = False
                         TxtBoxLyrics.Visible = False
                         PicBoxVisualizer.Visible = False
                         TimerVisualizer.Stop()
@@ -2677,7 +2676,7 @@ Public Class Player
                     Debug.Print("Showing Visualizer...")
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
-                    LblAlbumArtSelect.Visible = False
+                    LblMedia.Visible = False
                     TxtBoxLyrics.Visible = False
                     TimerVisualizer.Start()
                     PicBoxVisualizer.Visible = True
@@ -2697,7 +2696,7 @@ Public Class Player
             tlfile = Nothing
         Else
             PicBoxAlbumArt.Visible = False
-            LblAlbumArtSelect.Visible = False
+            LblMedia.Visible = False
             TxtBoxLyrics.Visible = False
             VLCViewer.Visible = False
             PicBoxVisualizer.Visible = False
