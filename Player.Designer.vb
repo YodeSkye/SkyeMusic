@@ -848,8 +848,8 @@ Partial Class Player
         ' 
         ' TipPlaylist
         ' 
-        TipPlaylist.FadeInRate = 25
-        TipPlaylist.FadeOutRate = 25
+        TipPlaylist.FadeInRate = 0
+        TipPlaylist.FadeOutRate = 0
         TipPlaylist.Font = New Font("Segoe UI", 12F)
         TipPlaylist.HideDelay = 1000000
         TipPlaylist.ShadowAlpha = 200
