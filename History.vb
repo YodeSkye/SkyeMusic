@@ -4,6 +4,7 @@ Public Class History
     'Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private views As List(Of App.SongView)
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -18,12 +19,10 @@ Public Class History
             MyBase.WndProc(m)
         End Try
     End Sub
-    Private Sub History_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub History_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = My.Application.Info.Title + " History & Statistics"
         SetAccentColor()
         SetTheme()
-        GetData()
-        PutData()
 #If DEBUG Then
         If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
         If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
@@ -31,6 +30,8 @@ Public Class History
         If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
         If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
 #End If
+        views = Await GetDataAsync()
+        PutData()
     End Sub
     Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
         Dim cSender As Control
@@ -77,12 +78,25 @@ Public Class History
     End Sub
 
     'Procedures
-    Private Sub GetData()
-        Dim views As New List(Of SongView)
-        For Each s As App.Song In App.History
-            views.Add(New App.SongView(s)) 'loads metadata fresh
-        Next
-    End Sub
+    Private Async Function GetDataAsync() As Task(Of List(Of App.SongView))
+
+        'Show loading message
+        Text &= " - LOADING..."
+
+        'Run the heavy work off the UI thread
+        Dim views = Await Task.Run(Function()
+                                       Dim list As New List(Of App.SongView)
+                                       For Each s As App.Song In App.History
+                                           list.Add(New App.SongView(s))
+                                       Next
+                                       Return list
+                                   End Function)
+
+        'Now we're back on the UI thread after Await
+        Text = Text.TrimEnd(" - LOADING...".ToCharArray)
+
+        Return views
+    End Function
     Private Sub PutData()
         TxtBoxTotalPlayedSongs.Text = App.HistoryTotalPlayedSongs.ToString("N0")
         TxtBoxSessionPlayedSongs.Text = App.HistoryTotalPlayedSongsThisSession.ToString("N0")
