@@ -258,6 +258,9 @@ Public Class Options
         If App.FRMLog IsNot Nothing Then
             App.FRMLog.SetColors()
         End If
+        If App.FRMHistory IsNot Nothing Then
+            App.FRMHistory.SetColors()
+        End If
         App.FRMLibrary.SetColors()
         Player.SetColors()
     End Sub

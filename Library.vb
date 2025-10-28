@@ -977,6 +977,9 @@ Public Class Library
             ShowAlbumArt()
             SetLibraryCountText()
             App.WriteToLog("Folders Searched (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        Else
+            LVLibrary.Items.Clear()
+            SetLibraryCountText()
         End If
     End Sub
     Private Sub Play()

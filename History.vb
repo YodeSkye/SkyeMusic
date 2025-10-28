@@ -32,6 +32,7 @@ Public Class History
 #End If
         views = Await GetDataAsync()
         PutData()
+        BtnOK.Focus()
     End Sub
     Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
         Dim cSender As Control
@@ -98,8 +99,19 @@ Public Class History
         Return views
     End Function
     Private Sub PutData()
-        TxtBoxTotalPlayedSongs.Text = App.HistoryTotalPlayedSongs.ToString("N0")
         TxtBoxSessionPlayedSongs.Text = App.HistoryTotalPlayedSongsThisSession.ToString("N0")
+        TxtBoxTotalPlayedSongs.Text = App.HistoryTotalPlayedSongs.ToString("N0")
+        Dim TotalDuration As TimeSpan = TimeSpan.Zero
+        For Each v As App.SongView In views
+            TotalDuration += (v.Duration * v.Data.PlayCount)
+        Next
+        TxtBoxTotalDuration.Text = TotalDuration.ToString("hh\:mm\:ss")
+        Dim mostPlayed = views.OrderByDescending(Function(v) v.Data.PlayCount).ThenByDescending(Function(v) v.Data.LastPlayed).FirstOrDefault()
+        If mostPlayed Is Nothing Then
+            TxtBoxMostPlayedSong.Text = "No songs played yet."
+        Else
+            TxtBoxMostPlayedSong.Text = $"{mostPlayed.Title} - {mostPlayed.Artist} ({mostPlayed.Data.PlayCount} plays)"
+        End If
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
@@ -122,14 +134,27 @@ Public Class History
         If Not App.CurrentTheme.IsAccent Then
             BackColor = App.CurrentTheme.BackColor
         End If
-        LblTotalPlayedSongs.ForeColor = App.CurrentTheme.TextColor
-        TxtBoxTotalPlayedSongs.BackColor = App.CurrentTheme.BackColor
-        TxtBoxTotalPlayedSongs.ForeColor = App.CurrentTheme.TextColor
+        LblMostPlayedSong.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxMostPlayedSong.BackColor = App.CurrentTheme.BackColor
+        TxtBoxMostPlayedSong.ForeColor = App.CurrentTheme.TextColor
         LblSessionPlayedSongs.ForeColor = App.CurrentTheme.TextColor
         TxtBoxSessionPlayedSongs.BackColor = App.CurrentTheme.BackColor
         TxtBoxSessionPlayedSongs.ForeColor = App.CurrentTheme.TextColor
+        LblTotalPlayedSongs.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxTotalPlayedSongs.BackColor = App.CurrentTheme.BackColor
+        TxtBoxTotalPlayedSongs.ForeColor = App.CurrentTheme.TextColor
+        LblTotalDuration.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxTotalDuration.BackColor = App.CurrentTheme.BackColor
+        TxtBoxTotalDuration.ForeColor = App.CurrentTheme.TextColor
+        LVHistory.BackColor = App.CurrentTheme.BackColor
+        LVHistory.ForeColor = App.CurrentTheme.TextColor
+        GrpBoxHistory.ForeColor = App.CurrentTheme.TextColor
         ResumeLayout()
         Debug.Print("Help Theme Set")
+    End Sub
+    Friend Sub SetColors() 'Used By Options Form
+        SetAccentColor()
+        SetTheme()
     End Sub
 
 End Class
