@@ -1047,6 +1047,9 @@ Public Class Player
         Dim frm As New PlayerQueue
         frm.ShowDialog()
     End Sub
+    Private Sub MIViewHistory_Click(sender As Object, e As EventArgs) Handles MIViewHistory.Click
+        App.ShowHistory()
+    End Sub
     Private Sub MIOptionsClick(sender As Object, e As EventArgs) Handles MIOptions.Click
         ShowOptions()
     End Sub

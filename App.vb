@@ -114,6 +114,59 @@ Namespace My
             Public Property History As List(Of Song)
             Public Property TotalPlayedSongs As UInteger
         End Class
+        Public Class SongView 'Wrapper for your serialized Song History data to provide easy access to metadata and present on Stats form
+            Public Property Data As Song   'The original serialized Song History data
+
+            'Metadata fields (resolved fresh each time you build SongView)
+            Public Property Artist As String
+            Public Property Title As String
+            Public Property Album As String
+            Public Property Genre As String
+            Public Property Year As UInteger
+            Public Property Duration As TimeSpan
+
+            Public Sub New(s As Song) 'Convenience constructor
+                Data = s
+                LoadMetadata()
+            End Sub
+            Public Overrides Function ToString() As String 'For display in lists
+                Return $"{Title} - {Artist} ({Album}, {Year})"
+            End Function
+
+            Private Sub LoadMetadata()
+                Try
+                    If IO.File.Exists(Data.Path) Then
+                        Using f = TagLib.File.Create(Data.Path)
+                            Artist = If(f.Tag.Performers.Length > 0, f.Tag.Performers(0), "")
+                            Title = If(String.IsNullOrEmpty(f.Tag.Title),
+                               IO.Path.GetFileNameWithoutExtension(Data.Path),
+                               f.Tag.Title)
+                            Album = f.Tag.Album
+                            Genre = If(f.Tag.Genres.Length > 0, f.Tag.Genres(0), "")
+                            Year = f.Tag.Year
+                            Duration = f.Properties.Duration
+                        End Using
+                    Else
+                        'Fallbacks if file is missing
+                        Artist = String.Empty
+                        Title = IO.Path.GetFileNameWithoutExtension(Data.Path)
+                        Album = String.Empty
+                        Genre = String.Empty
+                        Year = 0
+                        Duration = TimeSpan.Zero
+                    End If
+                Catch
+                    'Graceful fallback if TagLib fails
+                    Artist = String.Empty
+                    Title = IO.Path.GetFileNameWithoutExtension(Data.Path)
+                    Album = String.Empty
+                    Genre = String.Empty
+                    Year = 0
+                    Duration = TimeSpan.Zero
+                End Try
+            End Sub
+
+        End Class
         Friend Structure ThemeProperties
             Public IsAccent As Boolean
             Public BackColor As Color
@@ -157,6 +210,7 @@ Namespace My
         Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
         Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
         Friend FRMLibrary As Library 'FRMLibrary is the main library window that displays the media library.
+        Friend FRMHistory As History 'FRMHistory is the history window that displays the playback history and statistics.
         Friend FRMLog As Log 'FRMLog is the log window that displays application logs.
         Friend AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
         Friend AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
@@ -345,6 +399,8 @@ Namespace My
         Friend PlayerSize As New Size(-1, -1)
         Friend LibraryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend LibrarySize As New Size(-1, -1)
+        Friend HistoryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
+        Friend HistorySize As New Size(-1, -1)
         Friend LogLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend LogSize As New Size(-1, -1)
         Friend HelperApp1Name As String = String.Empty
@@ -862,14 +918,12 @@ Namespace My
             FRMLibrary.Hide()
             FRMLibrary.Opacity = 1
 
-
             GenerateHotKeyList()
             RegisterHotKeys()
             SetHistoryAutoSaveTimer()
             timerScreenSaverWatcher.Interval = 1000
             timerScreenSaverWatcher.Start()
             AddHandler Microsoft.Win32.SystemEvents.SessionSwitch, AddressOf SessionSwitchHandler 'SessionSwitchHandler is a handler for session switch events, sets the ScreenLocked flag, and acts accordingly.
-
 
             WatcherWorkTimer.AutoReset = False
             SetWatchers()
@@ -983,6 +1037,10 @@ Namespace My
                 RegKey.SetValue("LibraryLocationY", App.LibraryLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("LibrarySizeX", App.LibrarySize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("LibrarySizeY", App.LibrarySize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("HistoryLocationX", App.HistoryLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("HistoryLocationY", App.HistoryLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("HistorySizeX", App.HistorySize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("HistorySizeY", App.HistorySize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("LogLocationX", App.LogLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("LogLocationY", App.LogLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("LogSizeX", App.LogSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1073,6 +1131,10 @@ Namespace My
                 App.LibraryLocation.Y = CInt(Val(RegKey.GetValue("LibraryLocationY", (-1).ToString)))
                 App.LibrarySize.Width = CInt(Val(RegKey.GetValue("LibrarySizeX", (-1).ToString)))
                 App.LibrarySize.Height = CInt(Val(RegKey.GetValue("LibrarySizeY", (-1).ToString)))
+                App.HistoryLocation.X = CInt(Val(RegKey.GetValue("HistoryLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
+                App.HistoryLocation.Y = CInt(Val(RegKey.GetValue("HistoryLocationY", (-1).ToString)))
+                App.HistorySize.Width = CInt(Val(RegKey.GetValue("HistorySizeX", (-1).ToString)))
+                App.HistorySize.Height = CInt(Val(RegKey.GetValue("HistorySizeY", (-1).ToString)))
                 App.LogLocation.X = CInt(Val(RegKey.GetValue("LogLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
                 App.LogLocation.Y = CInt(Val(RegKey.GetValue("LogLocationY", (-1).ToString)))
                 App.LogSize.Width = CInt(Val(RegKey.GetValue("LogSizeX", (-1).ToString)))
@@ -1216,6 +1278,20 @@ Namespace My
                 FRMLibrary.Invoke(Sub() FRMLibrary.DoWatcherWork(paths))
             Else
                 FRMLibrary.DoWatcherWork(paths)
+            End If
+        End Sub
+        Friend Sub ShowHistory()
+            If FRMHistory Is Nothing OrElse FRMHistory.IsDisposed Then
+                FRMHistory = New History
+                FRMHistory.Show()
+            Else
+                If FRMHistory.WindowState = FormWindowState.Minimized Then
+                    FRMHistory.WindowState = FormWindowState.Normal
+                ElseIf FRMHistory.Visible Then
+                    FRMHistory.BringToFront()
+                Else
+                    FRMHistory.Show()
+                End If
             End If
         End Sub
         Friend Sub ShowOptions()

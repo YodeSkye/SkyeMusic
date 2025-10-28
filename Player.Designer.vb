@@ -65,6 +65,8 @@ Partial Class Player
         MIView = New ToolStripMenuItem()
         MIFullscreen = New ToolStripMenuItem()
         MIViewQueue = New ToolStripMenuItem()
+        ToolStripSeparator2 = New ToolStripSeparator()
+        MIViewHistory = New ToolStripMenuItem()
         ToolStripSeparator5 = New ToolStripSeparator()
         MIOptions = New ToolStripMenuItem()
         MIVisualizer = New ToolStripMenuItem()
@@ -393,7 +395,7 @@ Partial Class Player
         ' 
         ' MIView
         ' 
-        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIViewQueue, ToolStripSeparator5, MIOptions})
+        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIViewQueue, ToolStripSeparator2, MIViewHistory, ToolStripSeparator5, MIOptions})
         MIView.ForeColor = SystemColors.HighlightText
         MIView.Image = My.Resources.Resources.ImageView
         MIView.Name = "MIView"
@@ -404,26 +406,38 @@ Partial Class Player
         ' 
         MIFullscreen.Image = My.Resources.Resources.ImageFullscreen16
         MIFullscreen.Name = "MIFullscreen"
-        MIFullscreen.Size = New Size(138, 22)
+        MIFullscreen.Size = New Size(185, 22)
         MIFullscreen.Text = "Full Screen"
         ' 
         ' MIViewQueue
         ' 
         MIViewQueue.Image = My.Resources.Resources.ImagePlay
         MIViewQueue.Name = "MIViewQueue"
-        MIViewQueue.Size = New Size(138, 22)
+        MIViewQueue.Size = New Size(185, 22)
         MIViewQueue.Text = "Queue"
+        ' 
+        ' ToolStripSeparator2
+        ' 
+        ToolStripSeparator2.Name = "ToolStripSeparator2"
+        ToolStripSeparator2.Size = New Size(182, 6)
+        ' 
+        ' MIViewHistory
+        ' 
+        MIViewHistory.Image = My.Resources.Resources.ImageHistory
+        MIViewHistory.Name = "MIViewHistory"
+        MIViewHistory.Size = New Size(185, 22)
+        MIViewHistory.Text = "History && Statistics"
         ' 
         ' ToolStripSeparator5
         ' 
         ToolStripSeparator5.Name = "ToolStripSeparator5"
-        ToolStripSeparator5.Size = New Size(135, 6)
+        ToolStripSeparator5.Size = New Size(182, 6)
         ' 
         ' MIOptions
         ' 
         MIOptions.Image = My.Resources.Resources.ImageSettings16
         MIOptions.Name = "MIOptions"
-        MIOptions.Size = New Size(138, 22)
+        MIOptions.Size = New Size(185, 22)
         MIOptions.Text = "Options"
         ' 
         ' MIVisualizer
@@ -796,8 +810,8 @@ Partial Class Player
         ' 
         ' TipPlayer
         ' 
-        TipPlayer.FadeInRate = 0
-        TipPlayer.FadeOutRate = 0
+        TipPlayer.FadeInRate = 25
+        TipPlayer.FadeOutRate = 25
         TipPlayer.Font = New Font("Segoe UI", 12F)
         TipPlayer.HideDelay = 1000
         TipPlayer.ShadowAlpha = 200
@@ -834,8 +848,8 @@ Partial Class Player
         ' 
         ' TipPlaylist
         ' 
-        TipPlaylist.FadeInRate = 0
-        TipPlaylist.FadeOutRate = 0
+        TipPlaylist.FadeInRate = 25
+        TipPlaylist.FadeOutRate = 25
         TipPlaylist.Font = New Font("Segoe UI", 12F)
         TipPlaylist.HideDelay = 1000000
         TipPlaylist.ShadowAlpha = 200
@@ -843,8 +857,8 @@ Partial Class Player
         ' 
         ' TipWatcherNotification
         ' 
-        TipWatcherNotification.FadeInRate = 0
-        TipWatcherNotification.FadeOutRate = 0
+        TipWatcherNotification.FadeInRate = 25
+        TipWatcherNotification.FadeOutRate = 25
         TipWatcherNotification.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipWatcherNotification.HideDelay = 7500
         TipWatcherNotification.ShadowAlpha = 200
@@ -986,4 +1000,6 @@ Partial Class Player
     Friend WithEvents MISavePlaylist As ToolStripMenuItem
     Friend WithEvents VLCViewer As LibVLCSharp.WinForms.VideoView
     Friend WithEvents LblMedia As Skye.UI.Label
+    Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
+    Friend WithEvents MIViewHistory As ToolStripMenuItem
 End Class

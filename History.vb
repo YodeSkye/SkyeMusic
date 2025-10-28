@@ -1,6 +1,5 @@
 ﻿
-Imports SkyeMusic.My
-Public Class Help
+Public Class History
 
     'Declarations
     Private mMove As Boolean = False
@@ -19,13 +18,21 @@ Public Class Help
             MyBase.WndProc(m)
         End Try
     End Sub
-    Private Sub Help_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Text = My.Application.Info.Title + " Help"
-        RTxBxHelp.Rtf = My.Resources.HelpRT
+    Private Sub History_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Text = My.Application.Info.Title + " History & Statistics"
         SetAccentColor()
         SetTheme()
+        GetData()
+        PutData()
+#If DEBUG Then
+        If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
+        If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
+#Else
+        If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
+        If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
+#End If
     End Sub
-    Private Sub Help_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
+    Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -38,7 +45,7 @@ Public Class Help
         End If
         cSender = Nothing
     End Sub
-    Private Sub Help_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove
+    Private Sub History_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -46,24 +53,40 @@ Public Class Help
             Location = mPosition
         End If
     End Sub
-    Private Sub Help_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp
+    Private Sub History_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp
         mMove = False
     End Sub
-    Private Sub Help_Move(sender As Object, e As EventArgs) Handles MyBase.Move
+    Private Sub History_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
+            App.HistoryLocation = Location
         End If
     End Sub
-    Private Sub Help_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+    Private Sub History_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
+        If Visible AndAlso WindowState = FormWindowState.Normal Then
+            App.HistorySize = Me.Size
+        End If
+    End Sub
+    Private Sub History_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyData = Keys.Escape Then Me.Close()
     End Sub
 
     'Control Events
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
-        Close()
+        Me.Close()
     End Sub
 
     'Procedures
+    Private Sub GetData()
+        Dim views As New List(Of SongView)
+        For Each s As App.Song In App.History
+            views.Add(New App.SongView(s)) 'loads metadata fresh
+        Next
+    End Sub
+    Private Sub PutData()
+        TxtBoxTotalPlayedSongs.Text = App.HistoryTotalPlayedSongs.ToString("N0")
+        TxtBoxSessionPlayedSongs.Text = App.HistoryTotalPlayedSongsThisSession.ToString("N0")
+    End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
@@ -85,6 +108,12 @@ Public Class Help
         If Not App.CurrentTheme.IsAccent Then
             BackColor = App.CurrentTheme.BackColor
         End If
+        LblTotalPlayedSongs.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxTotalPlayedSongs.BackColor = App.CurrentTheme.BackColor
+        TxtBoxTotalPlayedSongs.ForeColor = App.CurrentTheme.TextColor
+        LblSessionPlayedSongs.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxSessionPlayedSongs.BackColor = App.CurrentTheme.BackColor
+        TxtBoxSessionPlayedSongs.ForeColor = App.CurrentTheme.TextColor
         ResumeLayout()
         Debug.Print("Help Theme Set")
     End Sub
