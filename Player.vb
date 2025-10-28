@@ -532,9 +532,9 @@ Public Class Player
         PEXRight.Size = New Size(BtnMute.Location.X + BtnMute.Width - PEXRight.Left, PEXRight.Height)
         VideoSetSize()
     End Sub
-    Private Sub Player_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxAlbumArt.MouseDown, PicBoxVisualizer.MouseDown, MenuPlayer.MouseDown, LblPlaylistCount.MouseDown, LblDuration.MouseDown, PEXLeft.MouseDown, PEXRight.MouseDown
+    Private Sub Player_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxVisualizer.MouseDown, MenuPlayer.MouseDown, LblPlaylistCount.MouseDown, LblDuration.MouseDown, PEXLeft.MouseDown, PEXRight.MouseDown
         Dim cSender As Control
-        If e.Button = MouseButtons.Left AndAlso Me.WindowState = FormWindowState.Normal Then
+        If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
             cSender = CType(sender, Control)
             If cSender Is Me Then
@@ -1342,23 +1342,28 @@ Public Class Player
 
         End If
     End Sub
-    Private Sub PicBoxAlbumArt_Click(sender As Object, e As EventArgs) Handles PicBoxAlbumArt.Click
-        'Start a timer for single-click
-        If PicBoxAlbumArtClickTimer Is Nothing Then
-            PicBoxAlbumArtClickTimer = New Timer()
-            PicBoxAlbumArtClickTimer.Interval = SystemInformation.DoubleClickTime
-            AddHandler PicBoxAlbumArtClickTimer.Tick,
-            Sub()
-                PicBoxAlbumArtClickTimer?.Stop()
-                PicBoxAlbumArtClickTimer?.Dispose()
-                PicBoxAlbumArtClickTimer = Nothing
+    Private Sub PicBoxAlbumArt_MouseDown(sender As Object, e As MouseEventArgs) Handles PicBoxAlbumArt.MouseDown
+        Select Case e.Button
+            Case MouseButtons.Left
+                'Start a timer for single-click
+                If PicBoxAlbumArtClickTimer Is Nothing Then
+                    PicBoxAlbumArtClickTimer = New Timer()
+                    PicBoxAlbumArtClickTimer.Interval = SystemInformation.DoubleClickTime
+                    AddHandler PicBoxAlbumArtClickTimer.Tick,
+                        Sub()
+                            PicBoxAlbumArtClickTimer?.Stop()
+                            PicBoxAlbumArtClickTimer?.Dispose()
+                            PicBoxAlbumArtClickTimer = Nothing
 
-                'Single-click action
-                AlbumArtIndex += CByte(1)
-                ShowMedia()
-            End Sub
-            PicBoxAlbumArtClickTimer.Start()
-        End If
+                            'Single-click action
+                            AlbumArtIndex += CByte(1)
+                            ShowMedia()
+                        End Sub
+                    PicBoxAlbumArtClickTimer.Start()
+                    Player_MouseDown(sender, e)
+                End If
+            Case MouseButtons.Right
+        End Select
     End Sub
     Private Sub PicBoxAlbumArt_DoubleClick(sender As Object, e As EventArgs) Handles PicBoxAlbumArt.DoubleClick
         'Cancel pending single-click
