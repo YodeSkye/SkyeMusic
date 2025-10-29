@@ -34,9 +34,12 @@ Partial Class History
         LblMostPlayedSong = New Skye.UI.Label()
         LVHistory = New Skye.UI.ListViewEX()
         GrpBoxHistory = New GroupBox()
+        TxtBoxMaxRecords = New TextBox()
+        BtnShowAll = New Button()
         RadBtnFavorites = New RadioButton()
         RadBtnRecentlyPlayed = New RadioButton()
         RadBtnMostPlayed = New RadioButton()
+        LblMaxRecords = New Label()
         GrpBoxHistory.SuspendLayout()
         SuspendLayout()
         ' 
@@ -155,7 +158,10 @@ Partial Class History
         ' 
         ' LVHistory
         ' 
+        LVHistory.AllowColumnReorder = True
         LVHistory.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        LVHistory.FullRowSelect = True
+        LVHistory.HeaderStyle = ColumnHeaderStyle.Nonclickable
         LVHistory.InsertionLineColor = Color.Teal
         LVHistory.Location = New Point(13, 124)
         LVHistory.Margin = New Padding(4)
@@ -169,49 +175,77 @@ Partial Class History
         ' 
         GrpBoxHistory.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         GrpBoxHistory.BackColor = Color.Transparent
+        GrpBoxHistory.Controls.Add(TxtBoxMaxRecords)
+        GrpBoxHistory.Controls.Add(BtnShowAll)
         GrpBoxHistory.Controls.Add(RadBtnFavorites)
         GrpBoxHistory.Controls.Add(RadBtnRecentlyPlayed)
         GrpBoxHistory.Controls.Add(RadBtnMostPlayed)
-        GrpBoxHistory.Location = New Point(826, 213)
+        GrpBoxHistory.Controls.Add(LblMaxRecords)
+        GrpBoxHistory.Location = New Point(826, 174)
         GrpBoxHistory.Margin = New Padding(4)
         GrpBoxHistory.Name = "GrpBoxHistory"
         GrpBoxHistory.Padding = New Padding(4)
-        GrpBoxHistory.Size = New Size(190, 182)
-        GrpBoxHistory.TabIndex = 10
+        GrpBoxHistory.Size = New Size(190, 261)
+        GrpBoxHistory.TabIndex = 0
         GrpBoxHistory.TabStop = False
+        ' 
+        ' TxtBoxMaxRecords
+        ' 
+        TxtBoxMaxRecords.Location = New Point(7, 187)
+        TxtBoxMaxRecords.Name = "TxtBoxMaxRecords"
+        TxtBoxMaxRecords.Size = New Size(176, 29)
+        TxtBoxMaxRecords.TabIndex = 4
+        TxtBoxMaxRecords.TabStop = False
+        TxtBoxMaxRecords.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' BtnShowAll
+        ' 
+        BtnShowAll.Location = New Point(7, 222)
+        BtnShowAll.Name = "BtnShowAll"
+        BtnShowAll.Size = New Size(176, 32)
+        BtnShowAll.TabIndex = 3
+        BtnShowAll.TabStop = False
+        BtnShowAll.Text = "Show All"
+        BtnShowAll.UseVisualStyleBackColor = True
         ' 
         ' RadBtnFavorites
         ' 
-        RadBtnFavorites.Location = New Point(7, 119)
+        RadBtnFavorites.Location = New Point(7, 96)
         RadBtnFavorites.Name = "RadBtnFavorites"
         RadBtnFavorites.Size = New Size(176, 32)
         RadBtnFavorites.TabIndex = 2
-        RadBtnFavorites.TabStop = True
         RadBtnFavorites.Text = "Favorites"
         RadBtnFavorites.TextAlign = ContentAlignment.MiddleCenter
         RadBtnFavorites.UseVisualStyleBackColor = True
         ' 
         ' RadBtnRecentlyPlayed
         ' 
-        RadBtnRecentlyPlayed.Location = New Point(7, 81)
+        RadBtnRecentlyPlayed.Location = New Point(7, 58)
         RadBtnRecentlyPlayed.Name = "RadBtnRecentlyPlayed"
         RadBtnRecentlyPlayed.Size = New Size(176, 32)
         RadBtnRecentlyPlayed.TabIndex = 1
-        RadBtnRecentlyPlayed.TabStop = True
         RadBtnRecentlyPlayed.Text = "Recently Played"
         RadBtnRecentlyPlayed.TextAlign = ContentAlignment.MiddleCenter
         RadBtnRecentlyPlayed.UseVisualStyleBackColor = True
         ' 
         ' RadBtnMostPlayed
         ' 
-        RadBtnMostPlayed.Location = New Point(7, 43)
+        RadBtnMostPlayed.Location = New Point(7, 20)
         RadBtnMostPlayed.Name = "RadBtnMostPlayed"
         RadBtnMostPlayed.Size = New Size(176, 32)
         RadBtnMostPlayed.TabIndex = 0
-        RadBtnMostPlayed.TabStop = True
         RadBtnMostPlayed.Text = "Most Played"
         RadBtnMostPlayed.TextAlign = ContentAlignment.MiddleCenter
         RadBtnMostPlayed.UseVisualStyleBackColor = True
+        ' 
+        ' LblMaxRecords
+        ' 
+        LblMaxRecords.Location = New Point(7, 161)
+        LblMaxRecords.Name = "LblMaxRecords"
+        LblMaxRecords.Size = New Size(176, 25)
+        LblMaxRecords.TabIndex = 5
+        LblMaxRecords.Text = "Max Songs"
+        LblMaxRecords.TextAlign = ContentAlignment.BottomCenter
         ' 
         ' History
         ' 
@@ -237,6 +271,7 @@ Partial Class History
         StartPosition = FormStartPosition.CenterScreen
         Text = "History & Statistics"
         GrpBoxHistory.ResumeLayout(False)
+        GrpBoxHistory.PerformLayout()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -255,4 +290,7 @@ Partial Class History
     Friend WithEvents RadBtnFavorites As RadioButton
     Friend WithEvents RadBtnRecentlyPlayed As RadioButton
     Friend WithEvents RadBtnMostPlayed As RadioButton
+    Friend WithEvents BtnShowAll As Button
+    Friend WithEvents TxtBoxMaxRecords As TextBox
+    Friend WithEvents LblMaxRecords As Label
 End Class

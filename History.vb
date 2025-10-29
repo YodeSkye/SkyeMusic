@@ -37,6 +37,7 @@ Public Class History
         If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
         If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
 #End If
+
         views = Await GetDataAsync()
         PutData()
 
@@ -74,6 +75,7 @@ Public Class History
         LVHistory.Columns.Add(header)
 
         PutViewData()
+
         Select Case CurrentView
             Case HistoryView.MostPlayed
                 RadBtnMostPlayed.Checked = True
@@ -82,6 +84,14 @@ Public Class History
             Case HistoryView.Favorites
                 RadBtnFavorites.Checked = True
         End Select
+        Select Case App.HistoryViewMaxRecords
+            Case 0
+                TxtBoxMaxRecords.Text = "All"
+            Case Else
+                TxtBoxMaxRecords.Text = App.HistoryViewMaxRecords.ToString
+        End Select
+        SetShowAll()
+
         BtnOK.Focus()
     End Sub
     Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblMostPlayedSong.MouseDown, LblSessionPlayedSongs.MouseDown, LblTotalDuration.MouseDown, LblTotalPlayedSongs.MouseDown, GrpBoxHistory.MouseDown
@@ -127,6 +137,12 @@ Public Class History
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Me.Close()
     End Sub
+    Private Sub BtnShowAll_Click(sender As Object, e As EventArgs) Handles BtnShowAll.Click
+        CurrentViewMaxRecords = 0
+        TxtBoxMaxRecords.Text = "All"
+        SetShowAll()
+        PutViewData()
+    End Sub
     Private Sub RadBtnMostPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnMostPlayed.Click
         CurrentView = HistoryView.MostPlayed
         PutViewData()
@@ -139,7 +155,29 @@ Public Class History
         CurrentView = HistoryView.Favorites
         PutViewData()
     End Sub
-
+    Private Sub TxtBoxMaxRecords_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxMaxRecords.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            e.SuppressKeyPress = True
+            TxtBoxMaxRecords_Validated(sender, EventArgs.Empty)
+        End If
+    End Sub
+    Private Sub TxtBoxMaxRecords_Validated(sender As Object, e As EventArgs) Handles TxtBoxMaxRecords.Validated
+        Try
+            CurrentViewMaxRecords = CInt(TxtBoxMaxRecords.Text)
+        Catch
+            CurrentViewMaxRecords = 0
+            TxtBoxMaxRecords.Text = "All"
+        End Try
+        SetShowAll()
+        PutViewData()
+    End Sub
+    Private Sub SetShowAll()
+        If CurrentViewMaxRecords = 0 Then
+            BtnShowAll.Enabled = False
+        Else
+            BtnShowAll.Enabled = True
+        End If
+    End Sub
     'Procedures
     Private Async Function GetDataAsync() As Task(Of List(Of App.SongView))
 
@@ -245,6 +283,11 @@ Public Class History
         RadBtnRecentlyPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnFavorites.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnFavorites.ForeColor = App.CurrentTheme.ButtonTextColor
+        LblMaxRecords.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxMaxRecords.BackColor = App.CurrentTheme.BackColor
+        TxtBoxMaxRecords.ForeColor = App.CurrentTheme.TextColor
+        BtnShowAll.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnShowAll.ForeColor = App.CurrentTheme.ButtonTextColor
         ResumeLayout()
         Debug.Print("Help Theme Set")
     End Sub
