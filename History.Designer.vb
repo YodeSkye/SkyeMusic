@@ -34,16 +34,20 @@ Partial Class History
         LblMostPlayedSong = New Skye.UI.Label()
         LVHistory = New Skye.UI.ListViewEX()
         GrpBoxHistory = New GroupBox()
+        RadBtnFavorites = New RadioButton()
+        RadBtnRecentlyPlayed = New RadioButton()
+        RadBtnMostPlayed = New RadioButton()
+        GrpBoxHistory.SuspendLayout()
         SuspendLayout()
         ' 
         ' BtnOK
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
-        BtnOK.Location = New Point(473, 524)
+        BtnOK.Location = New Point(482, 504)
         BtnOK.Margin = New Padding(4)
         BtnOK.Name = "BtnOK"
-        BtnOK.Size = New Size(82, 90)
+        BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 0
         BtnOK.UseVisualStyleBackColor = True
         ' 
@@ -52,7 +56,7 @@ Partial Class History
         LblTotalPlayedSongs.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         LblTotalPlayedSongs.BackColor = Color.Transparent
         LblTotalPlayedSongs.Font = New Font("Segoe UI", 12F)
-        LblTotalPlayedSongs.Location = New Point(733, 47)
+        LblTotalPlayedSongs.Location = New Point(719, 47)
         LblTotalPlayedSongs.Margin = New Padding(4, 0, 4, 0)
         LblTotalPlayedSongs.Name = "LblTotalPlayedSongs"
         LblTotalPlayedSongs.Size = New Size(180, 32)
@@ -64,11 +68,11 @@ Partial Class History
         ' 
         TxtBoxTotalPlayedSongs.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TxtBoxTotalPlayedSongs.Font = New Font("Segoe UI", 12F)
-        TxtBoxTotalPlayedSongs.Location = New Point(910, 50)
+        TxtBoxTotalPlayedSongs.Location = New Point(896, 50)
         TxtBoxTotalPlayedSongs.Margin = New Padding(4)
         TxtBoxTotalPlayedSongs.Name = "TxtBoxTotalPlayedSongs"
         TxtBoxTotalPlayedSongs.ReadOnly = True
-        TxtBoxTotalPlayedSongs.Size = New Size(106, 29)
+        TxtBoxTotalPlayedSongs.Size = New Size(120, 29)
         TxtBoxTotalPlayedSongs.TabIndex = 2
         TxtBoxTotalPlayedSongs.TabStop = False
         TxtBoxTotalPlayedSongs.TextAlign = HorizontalAlignment.Center
@@ -77,11 +81,11 @@ Partial Class History
         ' 
         TxtBoxSessionPlayedSongs.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TxtBoxSessionPlayedSongs.Font = New Font("Segoe UI", 12F)
-        TxtBoxSessionPlayedSongs.Location = New Point(910, 13)
+        TxtBoxSessionPlayedSongs.Location = New Point(896, 13)
         TxtBoxSessionPlayedSongs.Margin = New Padding(4)
         TxtBoxSessionPlayedSongs.Name = "TxtBoxSessionPlayedSongs"
         TxtBoxSessionPlayedSongs.ReadOnly = True
-        TxtBoxSessionPlayedSongs.Size = New Size(106, 29)
+        TxtBoxSessionPlayedSongs.Size = New Size(120, 29)
         TxtBoxSessionPlayedSongs.TabIndex = 4
         TxtBoxSessionPlayedSongs.TabStop = False
         TxtBoxSessionPlayedSongs.TextAlign = HorizontalAlignment.Center
@@ -91,7 +95,7 @@ Partial Class History
         LblSessionPlayedSongs.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         LblSessionPlayedSongs.BackColor = Color.Transparent
         LblSessionPlayedSongs.Font = New Font("Segoe UI", 12F)
-        LblSessionPlayedSongs.Location = New Point(697, 11)
+        LblSessionPlayedSongs.Location = New Point(683, 11)
         LblSessionPlayedSongs.Margin = New Padding(4, 0, 4, 0)
         LblSessionPlayedSongs.Name = "LblSessionPlayedSongs"
         LblSessionPlayedSongs.Size = New Size(216, 32)
@@ -103,11 +107,11 @@ Partial Class History
         ' 
         TxtBoxTotalDuration.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TxtBoxTotalDuration.Font = New Font("Segoe UI", 12F)
-        TxtBoxTotalDuration.Location = New Point(910, 87)
+        TxtBoxTotalDuration.Location = New Point(896, 87)
         TxtBoxTotalDuration.Margin = New Padding(4)
         TxtBoxTotalDuration.Name = "TxtBoxTotalDuration"
         TxtBoxTotalDuration.ReadOnly = True
-        TxtBoxTotalDuration.Size = New Size(106, 29)
+        TxtBoxTotalDuration.Size = New Size(120, 29)
         TxtBoxTotalDuration.TabIndex = 5
         TxtBoxTotalDuration.TabStop = False
         TxtBoxTotalDuration.TextAlign = HorizontalAlignment.Center
@@ -117,7 +121,7 @@ Partial Class History
         LblTotalDuration.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         LblTotalDuration.BackColor = Color.Transparent
         LblTotalDuration.Font = New Font("Segoe UI", 12F)
-        LblTotalDuration.Location = New Point(733, 84)
+        LblTotalDuration.Location = New Point(719, 84)
         LblTotalDuration.Margin = New Padding(4, 0, 4, 0)
         LblTotalDuration.Name = "LblTotalDuration"
         LblTotalDuration.Size = New Size(180, 32)
@@ -156,7 +160,7 @@ Partial Class History
         LVHistory.Location = New Point(13, 124)
         LVHistory.Margin = New Padding(4)
         LVHistory.Name = "LVHistory"
-        LVHistory.Size = New Size(805, 336)
+        LVHistory.Size = New Size(805, 360)
         LVHistory.TabIndex = 9
         LVHistory.UseCompatibleStateImageBehavior = False
         ' 
@@ -164,19 +168,55 @@ Partial Class History
         ' 
         GrpBoxHistory.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         GrpBoxHistory.BackColor = Color.Transparent
-        GrpBoxHistory.Location = New Point(826, 184)
+        GrpBoxHistory.Controls.Add(RadBtnFavorites)
+        GrpBoxHistory.Controls.Add(RadBtnRecentlyPlayed)
+        GrpBoxHistory.Controls.Add(RadBtnMostPlayed)
+        GrpBoxHistory.Location = New Point(826, 213)
         GrpBoxHistory.Margin = New Padding(4)
         GrpBoxHistory.Name = "GrpBoxHistory"
         GrpBoxHistory.Padding = New Padding(4)
-        GrpBoxHistory.Size = New Size(190, 217)
+        GrpBoxHistory.Size = New Size(190, 182)
         GrpBoxHistory.TabIndex = 10
         GrpBoxHistory.TabStop = False
+        ' 
+        ' RadBtnFavorites
+        ' 
+        RadBtnFavorites.Location = New Point(7, 119)
+        RadBtnFavorites.Name = "RadBtnFavorites"
+        RadBtnFavorites.Size = New Size(176, 32)
+        RadBtnFavorites.TabIndex = 2
+        RadBtnFavorites.TabStop = True
+        RadBtnFavorites.Text = "Favorites"
+        RadBtnFavorites.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnFavorites.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnRecentlyPlayed
+        ' 
+        RadBtnRecentlyPlayed.Location = New Point(7, 81)
+        RadBtnRecentlyPlayed.Name = "RadBtnRecentlyPlayed"
+        RadBtnRecentlyPlayed.Size = New Size(176, 32)
+        RadBtnRecentlyPlayed.TabIndex = 1
+        RadBtnRecentlyPlayed.TabStop = True
+        RadBtnRecentlyPlayed.Text = "Recently Played"
+        RadBtnRecentlyPlayed.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnRecentlyPlayed.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnMostPlayed
+        ' 
+        RadBtnMostPlayed.Location = New Point(7, 43)
+        RadBtnMostPlayed.Name = "RadBtnMostPlayed"
+        RadBtnMostPlayed.Size = New Size(176, 32)
+        RadBtnMostPlayed.TabIndex = 0
+        RadBtnMostPlayed.TabStop = True
+        RadBtnMostPlayed.Text = "Most Played"
+        RadBtnMostPlayed.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnMostPlayed.UseVisualStyleBackColor = True
         ' 
         ' History
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1029, 630)
+        ClientSize = New Size(1029, 581)
         Controls.Add(GrpBoxHistory)
         Controls.Add(LVHistory)
         Controls.Add(TxtBoxMostPlayedSong)
@@ -191,9 +231,11 @@ Partial Class History
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(4)
+        MinimumSize = New Size(900, 400)
         Name = "History"
         StartPosition = FormStartPosition.CenterScreen
         Text = "History & Statistics"
+        GrpBoxHistory.ResumeLayout(False)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -209,4 +251,7 @@ Partial Class History
     Friend WithEvents GrpBoxHistory As GroupBox
     Private WithEvents TxtBoxMostPlayedSong As TextBox
     Private WithEvents LblMostPlayedSong As Skye.UI.Label
+    Friend WithEvents RadBtnFavorites As RadioButton
+    Friend WithEvents RadBtnRecentlyPlayed As RadioButton
+    Friend WithEvents RadBtnMostPlayed As RadioButton
 End Class

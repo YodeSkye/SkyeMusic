@@ -24,8 +24,8 @@ Public Class History
         SetAccentColor()
         SetTheme()
 #If DEBUG Then
-        If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
-        If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
+        'If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
+        'If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
 #Else
         If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
         If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
@@ -34,7 +34,7 @@ Public Class History
         PutData()
         BtnOK.Focus()
     End Sub
-    Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
+    Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblMostPlayedSong.MouseDown, LblSessionPlayedSongs.MouseDown, LblTotalDuration.MouseDown, LblTotalPlayedSongs.MouseDown, GrpBoxHistory.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -47,7 +47,7 @@ Public Class History
         End If
         cSender = Nothing
     End Sub
-    Private Sub History_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove
+    Private Sub History_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblMostPlayedSong.MouseMove, LblSessionPlayedSongs.MouseMove, LblTotalDuration.MouseMove, LblTotalPlayedSongs.MouseMove, GrpBoxHistory.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -55,7 +55,7 @@ Public Class History
             Location = mPosition
         End If
     End Sub
-    Private Sub History_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp
+    Private Sub History_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LblMostPlayedSong.MouseUp, LblSessionPlayedSongs.MouseUp, LblTotalDuration.MouseUp, LblTotalPlayedSongs.MouseUp, GrpBoxHistory.MouseUp
         mMove = False
     End Sub
     Private Sub History_Move(sender As Object, e As EventArgs) Handles MyBase.Move
@@ -77,12 +77,22 @@ Public Class History
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Me.Close()
     End Sub
+    Private Sub RadBtnMostPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnMostPlayed.Click
+
+    End Sub
+    Private Sub RadBtnRecentlyPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnRecentlyPlayed.Click
+
+    End Sub
+    Private Sub RadBtnFavorites_Click(sender As Object, e As EventArgs) Handles RadBtnFavorites.Click
+
+    End Sub
 
     'Procedures
     Private Async Function GetDataAsync() As Task(Of List(Of App.SongView))
 
         'Show loading message
         Text &= " - LOADING..."
+        GrpBoxHistory.Enabled = False
 
         'Run the heavy work off the UI thread
         Dim views = Await Task.Run(Function()
@@ -95,6 +105,7 @@ Public Class History
 
         'Now we're back on the UI thread after Await
         Text = Text.TrimEnd(" - LOADING...".ToCharArray)
+        GrpBoxHistory.Enabled = True
 
         Return views
     End Function
@@ -105,7 +116,7 @@ Public Class History
         For Each v As App.SongView In views
             TotalDuration += (v.Duration * v.Data.PlayCount)
         Next
-        TxtBoxTotalDuration.Text = TotalDuration.ToString("hh\:mm\:ss")
+        TxtBoxTotalDuration.Text = $"{CInt(TotalDuration.TotalDays)}d {TotalDuration.Hours:D2}:{TotalDuration.Minutes:D2}:{TotalDuration.Seconds:D2}"
         Dim mostPlayed = views.OrderByDescending(Function(v) v.Data.PlayCount).ThenByDescending(Function(v) v.Data.LastPlayed).FirstOrDefault()
         If mostPlayed Is Nothing Then
             TxtBoxMostPlayedSong.Text = "No songs played yet."
@@ -149,6 +160,12 @@ Public Class History
         LVHistory.BackColor = App.CurrentTheme.BackColor
         LVHistory.ForeColor = App.CurrentTheme.TextColor
         GrpBoxHistory.ForeColor = App.CurrentTheme.TextColor
+        RadBtnMostPlayed.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnMostPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnRecentlyPlayed.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnRecentlyPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnFavorites.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnFavorites.ForeColor = App.CurrentTheme.ButtonTextColor
         ResumeLayout()
         Debug.Print("Help Theme Set")
     End Sub
