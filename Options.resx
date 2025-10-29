@@ -128,7 +128,7 @@
   </metadata>
   <data name="BtnHistoryPrune.Text" xml:space="preserve">
     <value>Prune the song history.
-This will remove any song history entries that aren't in the library, cannot be found in storage, or are a stream that cannot be found in the playlist.
+This will remove any song history entries that aren't in the library, cannot be found in storage, are not a valid type, or are a stream that cannot be found in the playlist.
 The total number of song history entries is given in parentheses.</value>
   </data>
   <data name="TxtBoxRandomHistoryUpdateInterval.Text" xml:space="preserve">
