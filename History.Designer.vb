@@ -163,6 +163,7 @@ Partial Class History
         LVHistory.Size = New Size(805, 360)
         LVHistory.TabIndex = 9
         LVHistory.UseCompatibleStateImageBehavior = False
+        LVHistory.View = View.Details
         ' 
         ' GrpBoxHistory
         ' 

@@ -391,6 +391,7 @@ Namespace My
         Friend RandomHistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to add the currently playing song to the shuffle play history.
         Friend HistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to update the play count of the currently playing song.
         Friend HistoryAutoSaveInterval As UShort = 5 '1-1440 'Interval in minutes to automatically save the history.
+        Friend HistoryViewMaxRecords As UShort = 25 'Maximum number of records to display in the history view.
         Friend WatcherEnabled As Boolean = False 'Flag that indicates whether to watch for changes in the library folders.
         Friend WatcherUpdateLibrary As Boolean = False 'Flag that indicates whether to automatically update the library when changes are detected in the file system.
         Friend WatcherUpdatePlaylist As Boolean = False 'Flag that indicates whether to automatically update the playlist when changes are detected in the file system.

@@ -4,6 +4,13 @@ Public Class History
     'Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private Enum HistoryView
+        MostPlayed
+        RecentlyPlayed
+        Favorites
+    End Enum
+    Private CurrentView As HistoryView = HistoryView.MostPlayed
+    Private CurrentViewMaxRecords As Integer = CInt(App.HistoryViewMaxRecords)
     Private views As List(Of App.SongView)
 
     'Form Events
@@ -32,6 +39,49 @@ Public Class History
 #End If
         views = Await GetDataAsync()
         PutData()
+
+        'Define 6 Columns
+        Dim header As ColumnHeader
+        header = New ColumnHeader()
+        header.Name = "Title"
+        header.Text = "Title"
+        header.Width = 200
+        LVHistory.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "Artist"
+        header.Text = "Artist"
+        header.Width = 200
+        LVHistory.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "Album"
+        header.Text = "Album"
+        header.Width = 200
+        LVHistory.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "Genre"
+        header.Text = "Genre"
+        header.Width = 200
+        LVHistory.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "PlayCount"
+        header.Text = "Plays"
+        header.Width = 200
+        LVHistory.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "LastPlayed"
+        header.Text = "Last Played"
+        header.Width = 200
+        LVHistory.Columns.Add(header)
+
+        PutViewData()
+        Select Case CurrentView
+            Case HistoryView.MostPlayed
+                RadBtnMostPlayed.Checked = True
+            Case HistoryView.RecentlyPlayed
+                RadBtnRecentlyPlayed.Checked = True
+            Case HistoryView.Favorites
+                RadBtnFavorites.Checked = True
+        End Select
         BtnOK.Focus()
     End Sub
     Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblMostPlayedSong.MouseDown, LblSessionPlayedSongs.MouseDown, LblTotalDuration.MouseDown, LblTotalPlayedSongs.MouseDown, GrpBoxHistory.MouseDown
@@ -78,13 +128,16 @@ Public Class History
         Me.Close()
     End Sub
     Private Sub RadBtnMostPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnMostPlayed.Click
-
+        CurrentView = HistoryView.MostPlayed
+        PutViewData()
     End Sub
     Private Sub RadBtnRecentlyPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnRecentlyPlayed.Click
-
+        CurrentView = HistoryView.RecentlyPlayed
+        PutViewData()
     End Sub
     Private Sub RadBtnFavorites_Click(sender As Object, e As EventArgs) Handles RadBtnFavorites.Click
-
+        CurrentView = HistoryView.Favorites
+        PutViewData()
     End Sub
 
     'Procedures
@@ -123,6 +176,32 @@ Public Class History
         Else
             TxtBoxMostPlayedSong.Text = $"{mostPlayed.Title} - {mostPlayed.Artist} ({mostPlayed.Data.PlayCount} plays)"
         End If
+    End Sub
+    Private Sub PutViewData()
+        LVHistory.BeginUpdate()
+        LVHistory.Items.Clear()
+        Dim sortedViews As IEnumerable(Of App.SongView) = Nothing
+        Select Case CurrentView
+            Case HistoryView.MostPlayed
+                sortedViews = views.OrderByDescending(Function(v) v.Data.PlayCount).ThenByDescending(Function(v) v.Data.LastPlayed)
+            Case HistoryView.RecentlyPlayed
+                sortedViews = views.OrderByDescending(Function(v) v.Data.LastPlayed)
+            Case HistoryView.Favorites
+                sortedViews = views.OrderByDescending(Function(v) v.Data.Rating).ThenByDescending(Function(v) v.Data.LastPlayed)
+        End Select
+        If CurrentViewMaxRecords > 0 Then
+            sortedViews = sortedViews.Take(CurrentViewMaxRecords)
+        End If
+        For Each v As App.SongView In sortedViews
+            Dim lvi As New ListViewItem(v.Title)
+            lvi.SubItems.Add(v.Artist)
+            lvi.SubItems.Add(v.Album)
+            lvi.SubItems.Add(v.Genre)
+            lvi.SubItems.Add(v.Data.PlayCount.ToString("N0"))
+            lvi.SubItems.Add(v.Data.LastPlayed.ToString("g"))
+            LVHistory.Items.Add(lvi)
+        Next
+        LVHistory.EndUpdate()
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
