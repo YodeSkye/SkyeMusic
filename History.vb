@@ -41,7 +41,7 @@ Public Class History
         views = Await GetDataAsync()
         PutData()
 
-        'Define 6 Columns
+        'Define 7 Columns
         Dim header As ColumnHeader
         header = New ColumnHeader()
         header.Name = "Title"
@@ -61,17 +61,22 @@ Public Class History
         header = New ColumnHeader()
         header.Name = "Genre"
         header.Text = "Genre"
-        header.Width = 200
+        header.Width = 100
         LVHistory.Columns.Add(header)
         header = New ColumnHeader()
         header.Name = "PlayCount"
         header.Text = "Plays"
-        header.Width = 200
+        header.Width = 50
         LVHistory.Columns.Add(header)
         header = New ColumnHeader()
         header.Name = "LastPlayed"
         header.Text = "Last Played"
         header.Width = 200
+        LVHistory.Columns.Add(header)
+        header = New ColumnHeader()
+        header.Name = "Path"
+        header.Text = "Path"
+        header.Width = 400
         LVHistory.Columns.Add(header)
 
         PutViewData()
@@ -93,6 +98,12 @@ Public Class History
         SetShowAll()
 
         BtnOK.Focus()
+    End Sub
+    Private Sub History_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        If CurrentViewMaxRecords <> App.HistoryViewMaxRecords Then
+            App.HistoryViewMaxRecords = CUShort(CurrentViewMaxRecords)
+            App.SaveOptions()
+        End If
     End Sub
     Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblMostPlayedSong.MouseDown, LblSessionPlayedSongs.MouseDown, LblTotalDuration.MouseDown, LblTotalPlayedSongs.MouseDown, GrpBoxHistory.MouseDown
         Dim cSender As Control
@@ -171,13 +182,7 @@ Public Class History
         SetShowAll()
         PutViewData()
     End Sub
-    Private Sub SetShowAll()
-        If CurrentViewMaxRecords = 0 Then
-            BtnShowAll.Enabled = False
-        Else
-            BtnShowAll.Enabled = True
-        End If
-    End Sub
+
     'Procedures
     Private Async Function GetDataAsync() As Task(Of List(Of App.SongView))
 
@@ -231,15 +236,32 @@ Public Class History
             sortedViews = sortedViews.Take(CurrentViewMaxRecords)
         End If
         For Each v As App.SongView In sortedViews
-            Dim lvi As New ListViewItem(v.Title)
+            Dim lvi As ListViewItem
+            If App.IsUrl(v.Data.Path) Then
+                lvi = New ListViewItem(v.Data.Path)
+            Else
+                lvi = New ListViewItem(v.Title)
+            End If
             lvi.SubItems.Add(v.Artist)
             lvi.SubItems.Add(v.Album)
             lvi.SubItems.Add(v.Genre)
             lvi.SubItems.Add(v.Data.PlayCount.ToString("N0"))
             lvi.SubItems.Add(v.Data.LastPlayed.ToString("g"))
+            lvi.SubItems.Add(v.Data.Path)
             LVHistory.Items.Add(lvi)
         Next
+        LVHistory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)
+        LVHistory.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
+        LVHistory.Columns(4).TextAlign = HorizontalAlignment.Center
         LVHistory.EndUpdate()
+        LblHistoryViewCount.Text = LVHistory.Items.Count.ToString("N0") + If(LVHistory.Items.Count = 1, " song", " songs")
+    End Sub
+    Private Sub SetShowAll()
+        If CurrentViewMaxRecords = 0 Then
+            BtnShowAll.Enabled = False
+        Else
+            BtnShowAll.Enabled = True
+        End If
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
@@ -288,6 +310,7 @@ Public Class History
         TxtBoxMaxRecords.ForeColor = App.CurrentTheme.TextColor
         BtnShowAll.BackColor = App.CurrentTheme.ButtonBackColor
         BtnShowAll.ForeColor = App.CurrentTheme.ButtonTextColor
+        LblHistoryViewCount.ForeColor = App.CurrentTheme.TextColor
         ResumeLayout()
         Debug.Print("Help Theme Set")
     End Sub

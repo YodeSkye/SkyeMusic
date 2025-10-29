@@ -40,6 +40,7 @@ Partial Class History
         RadBtnRecentlyPlayed = New RadioButton()
         RadBtnMostPlayed = New RadioButton()
         LblMaxRecords = New Label()
+        LblHistoryViewCount = New Label()
         GrpBoxHistory.SuspendLayout()
         SuspendLayout()
         ' 
@@ -247,6 +248,15 @@ Partial Class History
         LblMaxRecords.Text = "Max Songs"
         LblMaxRecords.TextAlign = ContentAlignment.BottomCenter
         ' 
+        ' LblHistoryViewCount
+        ' 
+        LblHistoryViewCount.AutoSize = True
+        LblHistoryViewCount.Location = New Point(11, 483)
+        LblHistoryViewCount.Name = "LblHistoryViewCount"
+        LblHistoryViewCount.Size = New Size(112, 21)
+        LblHistoryViewCount.TabIndex = 10
+        LblHistoryViewCount.Text = "Listview Count"
+        ' 
         ' History
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
@@ -263,8 +273,10 @@ Partial Class History
         Controls.Add(BtnOK)
         Controls.Add(LblTotalPlayedSongs)
         Controls.Add(LblTotalDuration)
+        Controls.Add(LblHistoryViewCount)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
+        KeyPreview = True
         Margin = New Padding(4)
         MinimumSize = New Size(900, 400)
         Name = "History"
@@ -293,4 +305,5 @@ Partial Class History
     Friend WithEvents BtnShowAll As Button
     Friend WithEvents TxtBoxMaxRecords As TextBox
     Friend WithEvents LblMaxRecords As Label
+    Friend WithEvents LblHistoryViewCount As Label
 End Class

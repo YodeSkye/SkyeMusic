@@ -962,9 +962,11 @@ Public Class Library
                     WriteToLog("Error while Searching Folder: " + folder + Chr(13) + ex.Message)
                 End Try
                 For Each file As String In files
-                    col.Add(CreateLibraryItem(file))
-                    Debug.Print(col.Count.ToString)
-                    AddToHistoryFromLibrary(file)
+                    If ExtensionDictionary.ContainsKey(IO.Path.GetExtension(file).ToLower) Then
+                        col.Add(CreateLibraryItem(file))
+                        Debug.Print(col.Count.ToString)
+                        AddToHistoryFromLibrary(file)
+                    End If
                 Next
                 files.Clear()
             Next

@@ -1030,6 +1030,7 @@ Namespace My
                 RegKey.SetValue("RandomHistoryUpdateInterval", App.RandomHistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HistoryUpdateInterval", App.HistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HistoryAutoSaveInterval", App.HistoryAutoSaveInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("HistoryViewMaxRecords", App.HistoryViewMaxRecords.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationX", App.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationY", App.PlayerLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerSizeX", App.PlayerSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1124,6 +1125,7 @@ Namespace My
                 ElseIf HistoryAutoSaveInterval > 1440 Then
                     HistoryAutoSaveInterval = 1440 'Limit the interval to a maximum of 1440 minutes (24 hours)
                 End If
+                HistoryViewMaxRecords = CUShort(Val(RegKey.GetValue("HistoryViewMaxRecords", 25.ToString)))
                 App.PlayerLocation.X = CInt(Val(RegKey.GetValue("PlayerLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
                 App.PlayerLocation.Y = CInt(Val(RegKey.GetValue("PlayerLocationY", (-1).ToString)))
                 App.PlayerSize.Width = CInt(Val(RegKey.GetValue("PlayerSizeX", (-1).ToString)))
@@ -1490,8 +1492,14 @@ Namespace My
             End If
         End Sub
         Friend Sub PruneHistory()
-
             Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
+
+            'Find songs with invalid file types
+            Dim invalidfiletypelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not ExtensionDictionary.ContainsKey(IO.Path.GetExtension(p.Path).ToLower()) AndAlso Not p.IsStream)
+            Debug.Print("Pruning History InvalidsOnly..." + invalidfiletypelist.Count.ToString + " items found so far...")
+            For Each s As Song In invalidfiletypelist
+                History.Remove(s)
+            Next
 
             'Find songs that are not in the library and don't exist
             Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
