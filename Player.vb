@@ -1759,7 +1759,7 @@ Public Class Player
                 TipPlayer.SetText(LblPosition, "Time Remaining")
         End Select
     End Sub
-    Private Sub ShowStatusMessage(msg As String)
+    Friend Sub ShowStatusMessage(msg As String)
         If App.PlaylistStatusMessageDisplayTime > 0 Then
             LblPlaylistCount.Text = StrConv(msg, VbStrConv.ProperCase)
             TimerStatus.Interval = App.PlaylistStatusMessageDisplayTime * 1000
@@ -2123,7 +2123,7 @@ Public Class Player
             SetPlaylistCountText()
         End If
     End Sub
-    Private Sub GetHistory(ByRef lvi As ListViewItem, path As String)
+    Friend Sub GetHistory(ByRef lvi As ListViewItem, path As String)
         Dim s As App.Song = App.History.Find(Function(p) p.Path = path)
         If Not String.IsNullOrEmpty(s.Path) Then
             If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
@@ -2210,7 +2210,7 @@ Public Class Player
         LblPlaylistCount.Text += LVPlaylist.SelectedItems.Count.ToString + " Selected"
         LblPlaylistCount.Text += ", " + Queue.Count.ToString + " Queued"
     End Sub
-    Private Sub ClearPlaylistTitles()
+    Friend Sub ClearPlaylistTitles()
         PlaylistTitleSort = SortOrder.None
         PlaylistPathSort = SortOrder.None
         PlaylistRatingSort = SortOrder.None
@@ -2232,7 +2232,7 @@ Public Class Player
         LVPlaylist.SelectedIndices.Clear()
         LVPlaylist.SelectedIndices.Add(index)
     End Sub
-    Private Function CreateListviewItem() As ListViewItem
+    Friend Function CreateListviewItem() As ListViewItem
         Dim lvi As New ListViewItem    'Title
         lvi.SubItems.Add(String.Empty) 'Path
         lvi.SubItems.Add(String.Empty) 'Rating

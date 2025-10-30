@@ -22,6 +22,7 @@ Partial Class History
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(History))
         BtnOK = New Button()
         LblTotalPlayedSongs = New Skye.UI.Label()
@@ -33,6 +34,9 @@ Partial Class History
         TxtBoxMostPlayedSong = New TextBox()
         LblMostPlayedSong = New Skye.UI.Label()
         LVHistory = New Skye.UI.ListViewEX()
+        CMHistoryView = New ContextMenuStrip(components)
+        CMIQueue = New ToolStripMenuItem()
+        CMIAddToPlaylist = New ToolStripMenuItem()
         GrpBoxHistory = New GroupBox()
         TxtBoxMaxRecords = New TextBox()
         BtnShowAll = New Button()
@@ -41,6 +45,9 @@ Partial Class History
         RadBtnMostPlayed = New RadioButton()
         LblMaxRecords = New Label()
         LblHistoryViewCount = New Label()
+        BtnQueueAll = New Button()
+        BtnAddAllToPlaylist = New Button()
+        CMHistoryView.SuspendLayout()
         GrpBoxHistory.SuspendLayout()
         SuspendLayout()
         ' 
@@ -161,6 +168,7 @@ Partial Class History
         ' 
         LVHistory.AllowColumnReorder = True
         LVHistory.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        LVHistory.ContextMenuStrip = CMHistoryView
         LVHistory.FullRowSelect = True
         LVHistory.HeaderStyle = ColumnHeaderStyle.Nonclickable
         LVHistory.InsertionLineColor = Color.Teal
@@ -171,6 +179,26 @@ Partial Class History
         LVHistory.TabIndex = 9
         LVHistory.UseCompatibleStateImageBehavior = False
         LVHistory.View = View.Details
+        ' 
+        ' CMHistoryView
+        ' 
+        CMHistoryView.Items.AddRange(New ToolStripItem() {CMIQueue, CMIAddToPlaylist})
+        CMHistoryView.Name = "CMHistoryView"
+        CMHistoryView.Size = New Size(181, 70)
+        ' 
+        ' CMIQueue
+        ' 
+        CMIQueue.Image = My.Resources.Resources.ImagePlay
+        CMIQueue.Name = "CMIQueue"
+        CMIQueue.Size = New Size(180, 22)
+        CMIQueue.Text = "Queue"
+        ' 
+        ' CMIAddToPlaylist
+        ' 
+        CMIAddToPlaylist.Image = My.Resources.Resources.ImagePlay
+        CMIAddToPlaylist.Name = "CMIAddToPlaylist"
+        CMIAddToPlaylist.Size = New Size(180, 22)
+        CMIAddToPlaylist.Text = "Add To Playlist"
         ' 
         ' GrpBoxHistory
         ' 
@@ -257,11 +285,33 @@ Partial Class History
         LblHistoryViewCount.TabIndex = 10
         LblHistoryViewCount.Text = "Listview Count"
         ' 
+        ' BtnQueueAll
+        ' 
+        BtnQueueAll.Location = New Point(12, 521)
+        BtnQueueAll.Name = "BtnQueueAll"
+        BtnQueueAll.Size = New Size(101, 48)
+        BtnQueueAll.TabIndex = 11
+        BtnQueueAll.TabStop = False
+        BtnQueueAll.Text = "Queue All"
+        BtnQueueAll.UseVisualStyleBackColor = True
+        ' 
+        ' BtnAddAllToPlaylist
+        ' 
+        BtnAddAllToPlaylist.Location = New Point(119, 521)
+        BtnAddAllToPlaylist.Name = "BtnAddAllToPlaylist"
+        BtnAddAllToPlaylist.Size = New Size(145, 48)
+        BtnAddAllToPlaylist.TabIndex = 12
+        BtnAddAllToPlaylist.TabStop = False
+        BtnAddAllToPlaylist.Text = "Add All To Playlist"
+        BtnAddAllToPlaylist.UseVisualStyleBackColor = True
+        ' 
         ' History
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1029, 581)
+        Controls.Add(BtnAddAllToPlaylist)
+        Controls.Add(BtnQueueAll)
         Controls.Add(GrpBoxHistory)
         Controls.Add(LVHistory)
         Controls.Add(TxtBoxMostPlayedSong)
@@ -282,6 +332,7 @@ Partial Class History
         Name = "History"
         StartPosition = FormStartPosition.CenterScreen
         Text = "History & Statistics"
+        CMHistoryView.ResumeLayout(False)
         GrpBoxHistory.ResumeLayout(False)
         GrpBoxHistory.PerformLayout()
         ResumeLayout(False)
@@ -306,4 +357,9 @@ Partial Class History
     Friend WithEvents TxtBoxMaxRecords As TextBox
     Friend WithEvents LblMaxRecords As Label
     Friend WithEvents LblHistoryViewCount As Label
+    Friend WithEvents BtnQueueAll As Button
+    Friend WithEvents BtnAddAllToPlaylist As Button
+    Friend WithEvents CMHistoryView As ContextMenuStrip
+    Friend WithEvents CMIQueue As ToolStripMenuItem
+    Friend WithEvents CMIAddToPlaylist As ToolStripMenuItem
 End Class

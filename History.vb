@@ -1,4 +1,6 @@
 ﻿
+Imports LibVLCSharp.Shared
+
 Public Class History
 
     'Declarations
@@ -154,6 +156,25 @@ Public Class History
         SetShowAll()
         PutViewData()
     End Sub
+    Private Sub BtnQueueAll_Click(sender As Object, e As EventArgs) Handles BtnQueueAll.Click
+        Queue(True)
+    End Sub
+    Private Sub BtnAddAllToPlaylist_Click(sender As Object, e As EventArgs) Handles BtnAddAllToPlaylist.Click
+        AddToPlaylist(True)
+    End Sub
+    Private Sub CMHistoryView_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMHistoryView.Opening
+        CMIQueue.Text = CMIQueue.Text.TrimEnd(App.TrimEndSearch) & " (" & LVHistory.SelectedItems.Count.ToString("N0") & ")"
+        CMIAddToPlaylist.Text = CMIAddToPlaylist.Text.TrimEnd(App.TrimEndSearch) & " (" & LVHistory.SelectedItems.Count.ToString("N0") & ")"
+    End Sub
+    Private Sub CMIQueue_Click(sender As Object, e As EventArgs) Handles CMIQueue.Click
+        Queue()
+    End Sub
+    Private Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
+        AddToPlaylist()
+    End Sub
+    Private Sub LVHistory_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVHistory.SelectedIndexChanged
+        ShowCounts()
+    End Sub
     Private Sub RadBtnMostPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnMostPlayed.Click
         CurrentView = HistoryView.MostPlayed
         PutViewData()
@@ -254,7 +275,62 @@ Public Class History
         LVHistory.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
         LVHistory.Columns(4).TextAlign = HorizontalAlignment.Center
         LVHistory.EndUpdate()
-        LblHistoryViewCount.Text = LVHistory.Items.Count.ToString("N0") + If(LVHistory.Items.Count = 1, " song", " songs")
+        ShowCounts()
+    End Sub
+    Private Sub Queue(Optional queueall As Boolean = False)
+        Dim queuelist As New List(Of ListViewItem)
+        If queueall Then
+            For Each item As ListViewItem In LVHistory.Items
+                queuelist.Add(item)
+            Next
+        Else
+            For Each item As ListViewItem In LVHistory.SelectedItems
+                queuelist.Add(item)
+            Next
+        End If
+        If queuelist.Count > 0 Then
+            For Each lvi As ListViewItem In queuelist
+                Dim found As Boolean = False
+                For Each q As String In Player.Queue
+                    If q = lvi.SubItems(LVHistory.Columns("Path").Index).Text Then
+                        found = True
+                        Exit For
+                    End If
+                Next
+                If Not found Then
+                    Player.Queue.Add(lvi.SubItems(LVHistory.Columns("Path").Index).Text)
+                    Player.SetPlaylistCountText()
+                End If
+            Next
+        End If
+    End Sub
+    Private Sub AddToPlaylist(Optional addall As Boolean = False)
+        Dim addlist = If(addall, LVHistory.Items.Cast(Of ListViewItem).ToList(), LVHistory.SelectedItems.Cast(Of ListViewItem).ToList())
+        If addlist.Count > 0 Then
+            Dim addedcount As Integer = 0
+            Player.LVPlaylist.BeginUpdate()
+            For Each lvi As ListViewItem In addlist
+                Dim path As String = lvi.SubItems(LVHistory.Columns("Path").Index).Text
+                Dim existingitem As ListViewItem = Player.LVPlaylist.FindItemWithText(path, True, 0)
+                If existingitem Is Nothing Then
+                    Dim newlvi As ListViewItem = Player.CreateListviewItem
+                    newlvi.SubItems(Player.LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(path)
+                    newlvi.SubItems(Player.LVPlaylist.Columns("Path").Index).Text = path
+                    Player.GetHistory(newlvi, path)
+                    Player.ClearPlaylistTitles()
+                    Player.LVPlaylist.ListViewItemSorter = Nothing
+                    If Player.LVPlaylist.SelectedItems.Count = 0 Then
+                        Player.LVPlaylist.Items.Add(newlvi)
+                    Else
+                        Player.LVPlaylist.Items.Insert(Player.LVPlaylist.SelectedItems(0).Index, newlvi)
+                    End If
+                    addedcount += 1
+                    Player.SetPlaylistCountText()
+                End If
+            Next
+            Player.LVPlaylist.EndUpdate()
+            Player.ShowStatusMessage("Added " & addedcount.ToString("N0") & If(addedcount = 1, " song", " songs") & " to playlist")
+        End If
     End Sub
     Private Sub SetShowAll()
         If CurrentViewMaxRecords = 0 Then
@@ -262,6 +338,10 @@ Public Class History
         Else
             BtnShowAll.Enabled = True
         End If
+    End Sub
+    Private Sub ShowCounts()
+        LblHistoryViewCount.Text = LVHistory.Items.Count.ToString("N0") & If(LVHistory.Items.Count = 1, " song", " songs")
+        LblHistoryViewCount.Text &= ", " & LVHistory.SelectedItems.Count.ToString("N0") & " selected"
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
