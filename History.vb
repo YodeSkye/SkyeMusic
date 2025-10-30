@@ -1,11 +1,14 @@
 ﻿
 Imports System.Windows.Forms.DataVisualization.Charting
+Imports WordCloudSharp
+Imports System.Drawing
 
 Public Class History
 
     'Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private IsLoading As Boolean = False
     Private Enum HistoryView
         MostPlayed
         RecentlyPlayed
@@ -17,7 +20,9 @@ Public Class History
     Private Enum ChartView
         Genres
         GenrePolar
+        GenrePareto
         Artists
+        ArtistWordCloud
     End Enum
     Private CurrentChartView As ChartView = ChartView.Genres
 
@@ -45,7 +50,7 @@ Public Class History
         If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
         If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
 #End If
-
+        IsLoading = True
         views = Await GetDataAsync()
         PutData()
 
@@ -88,6 +93,7 @@ Public Class History
         LVHistory.Columns.Add(header)
 
         PutViewData()
+        IsLoading = False
 
         Select Case CurrentView
             Case HistoryView.MostPlayed
@@ -225,8 +231,16 @@ Public Class History
         CurrentChartView = ChartView.GenrePolar
         PutChartData()
     End Sub
+    Private Sub RadBtnGenrePareto_Click(sender As Object, e As EventArgs) Handles RadBtnGenrePareto.Click
+        CurrentChartView = ChartView.GenrePareto
+        PutChartData()
+    End Sub
     Private Sub RadBtnArtists_Click(sender As Object, e As EventArgs) Handles RadBtnArtists.Click
         CurrentChartView = ChartView.Artists
+        PutChartData()
+    End Sub
+    Private Sub RadBtnArtistWordCloud_Click(sender As Object, e As EventArgs) Handles RadBtnArtistWordCloud.Click
+        CurrentChartView = ChartView.ArtistWordCloud
         PutChartData()
     End Sub
     Private Sub TxtBoxMaxRecords_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxMaxRecords.KeyDown
@@ -269,6 +283,7 @@ Public Class History
         Return views
     End Function
     Private Sub PutData()
+        If IsLoading Then Exit Sub
         TxtBoxSessionPlayedSongs.Text = App.HistoryTotalPlayedSongsThisSession.ToString("N0")
         TxtBoxTotalPlayedSongs.Text = App.HistoryTotalPlayedSongs.ToString("N0")
         Dim TotalDuration As TimeSpan = TimeSpan.Zero
@@ -284,6 +299,7 @@ Public Class History
         End If
     End Sub
     Private Sub PutViewData()
+        If IsLoading Then Exit Sub
         LVHistory.BeginUpdate()
         LVHistory.Items.Clear()
         Dim sortedViews As IEnumerable(Of App.SongView) = Nothing
@@ -320,6 +336,7 @@ Public Class History
         ShowCounts()
     End Sub
     Private Sub PutChartData()
+        If IsLoading Then Exit Sub
         Select Case CurrentChartView
             Case ChartView.Genres
                 Dim genreCounts As New Dictionary(Of String, Integer)
@@ -424,6 +441,123 @@ Public Class History
                 'Show chart
                 PanelCharts.Controls.Clear()
                 PanelCharts.Controls.Add(chart)
+            Case ChartView.GenrePareto
+                'Count plays per genre
+                Dim genreCounts As New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+                Dim genreIndex = LVHistory.Columns("Genre").Index
+
+                For Each lvi As ListViewItem In LVHistory.Items
+                    Dim genre = lvi.SubItems(genreIndex).Text.Trim()
+                    If Not String.IsNullOrEmpty(genre) Then
+                        If Not genreCounts.ContainsKey(genre) Then
+                            genreCounts(genre) = 0
+                        End If
+                        genreCounts(genre) += 1
+                    End If
+                Next
+
+                'Sort by descending play count
+                Dim sorted = genreCounts.OrderByDescending(Function(k) k.Value).ToList()
+                Dim totalPlays = sorted.Sum(Function(k) k.Value)
+
+                'Create chart
+                Dim chart As New Chart With {.Dock = DockStyle.Fill}
+                Dim area As New ChartArea("ParetoArea")
+                chart.ChartAreas.Add(area)
+                With chart.ChartAreas(0).AxisX
+                    .Interval = 1
+                    .MajorGrid.Enabled = False
+                    .MinorTickMark.LineColor = App.CurrentTheme.TextColor
+                    .MajorTickMark.LineColor = App.CurrentTheme.TextColor
+                    .LineColor = App.CurrentTheme.TextColor
+                    .LineDashStyle = ChartDashStyle.Solid
+                    .LabelStyle.IsStaggered = True
+                End With
+                With chart.ChartAreas(0).AxisY
+                    .MinorTickMark.LineColor = App.CurrentTheme.TextColor
+                    .MajorTickMark.LineColor = App.CurrentTheme.TextColor
+                    .LineColor = App.CurrentTheme.TextColor
+                    .LineDashStyle = ChartDashStyle.Solid
+                End With
+                With chart.ChartAreas(0).AxisY2
+                    .Title = "Cumulative %"
+                    .Minimum = 0
+                    .Maximum = 100
+                    .MajorGrid.Enabled = True
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor
+                    .MajorGrid.LineDashStyle = ChartDashStyle.Solid
+                    .MinorTickMark.LineColor = App.CurrentTheme.TextColor
+                    .MajorTickMark.LineColor = App.CurrentTheme.TextColor
+                    .TitleForeColor = App.CurrentTheme.TextColor
+                    .LineColor = App.CurrentTheme.TextColor
+                    .LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                End With
+
+                'Configure axes
+                With area
+                    .AxisX.Interval = 1
+                    .AxisX.LabelStyle.Angle = -45
+                    .AxisX.LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .AxisY.LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .AxisY2.LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .BackColor = App.CurrentTheme.BackColor
+                End With
+
+                'Bar series (play counts)
+                Dim barSeries As New Series("Plays") With {
+                    .ChartType = SeriesChartType.Column,
+                    .Color = App.CurrentTheme.ButtonBackColor,
+                    .IsValueShownAsLabel = True,
+                    .LabelForeColor = App.CurrentTheme.TextColor,
+                    .YAxisType = AxisType.Primary
+                }
+
+                'Line series (cumulative %)
+                Dim lineSeries As New Series("Cumulative %") With {
+                    .ChartType = SeriesChartType.Line,
+                    .BorderWidth = 2,
+                    .Color = App.CurrentTheme.TextColor,
+                    .YAxisType = AxisType.Secondary
+                }
+
+                Debug.WriteLine(String.Join(", ", genreCounts.Keys))
+
+                'Populate both series
+                Dim runningTotal As Integer = 0
+                Dim i As Integer = 0
+                For Each kvp In sorted
+                    Dim genre = kvp.Key
+                    Dim plays = kvp.Value
+                    runningTotal += plays
+                    Dim cumulativePct = (runningTotal / totalPlays) * 100
+
+                    'Add with numeric X
+                    Dim barIdx = barSeries.Points.AddXY(i, plays)
+                    barSeries.Points(barIdx).AxisLabel = genre
+
+                    Dim lineIdx = lineSeries.Points.AddXY(i, cumulativePct)
+                    lineSeries.Points(lineIdx).AxisLabel = genre
+
+                    i += 1
+                Next
+
+                chart.Series.Add(barSeries)
+                chart.Series.Add(lineSeries)
+
+                'Optional: add 80% reference line
+                Dim strip As New StripLine()
+                strip.IntervalOffset = 80
+                strip.StripWidth = 0
+                strip.BorderColor = App.CurrentTheme.ButtonBackColor
+                strip.BorderDashStyle = ChartDashStyle.Dash
+                chart.ChartAreas(0).AxisY2.StripLines.Add(strip)
+
+                'Apply theme
+                chart.BackColor = App.CurrentTheme.BackColor
+
+                'Show chart
+                PanelCharts.Controls.Clear()
+                PanelCharts.Controls.Add(chart)
             Case ChartView.Artists
                 'Dictionary to hold artist → play count
                 'Use case-insensitive comparer so "Avril Lavigne" and "avril lavigne" are treated the same
@@ -487,6 +621,54 @@ Public Class History
                 'Show chart in the panel
                 PanelCharts.Controls.Clear()
                 PanelCharts.Controls.Add(chart)
+            Case ChartView.ArtistWordCloud
+                'Dictionary to hold artist → play count
+                Dim artistCounts As New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+
+                'Find the index of the Artist column in the ListView
+                Dim artistIndex = LVHistory.Columns("Artist").Index
+
+                'Count artists from history list
+                For Each lvi As ListViewItem In LVHistory.Items
+                    Dim artist = lvi.SubItems(artistIndex).Text.Trim()
+                    If Not String.IsNullOrEmpty(artist) Then
+                        If Not artistCounts.ContainsKey(artist) Then
+                            artistCounts(artist) = 0
+                        End If
+                        artistCounts(artist) += 1
+                    End If
+                Next
+
+                'Convert dictionary to arrays for WordCloud.NET
+                Dim words = artistCounts.Keys.ToArray()
+                Dim frequencies = artistCounts.Values.ToArray()
+
+                'Create the word cloud generator
+                Dim wc As New WordCloud(
+                    width:=PanelCharts.ClientSize.Width,
+                    height:=PanelCharts.ClientSize.Height,
+                    useRank:=False,
+                    fontColor:=App.CurrentTheme.TextColor,     'single color for all words
+                    maxFontSize:=60,                           'cap size
+                    fontStep:=2,                               'spacing between sizes
+                    mask:=Nothing,
+                    allowVerical:=False,                       'spelled as in lib
+                    fontname:="Segoe UI"                       'font family
+                )
+
+                'Generate the image
+                Dim bmp As Image = wc.Draw(words, frequencies)
+
+                'Show in a PictureBox (or directly in your panel)
+                Dim pb As New PictureBox With {
+                    .Dock = DockStyle.Fill,
+                    .Image = bmp,
+                    .SizeMode = PictureBoxSizeMode.Zoom,
+                    .BackColor = App.CurrentTheme.BackColor
+                }
+
+                PanelCharts.Controls.Clear()
+                PanelCharts.Controls.Add(pb)
         End Select
     End Sub
     Private Sub Queue(Optional queueall As Boolean = False)
@@ -569,8 +751,12 @@ Public Class History
         RadBtnGenres.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGenrePolar.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGenrePolar.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnGenrePareto.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnGenrePareto.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnArtists.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnArtists.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnArtistWordCloud.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnArtistWordCloud.ForeColor = App.CurrentTheme.ButtonTextColor
         LblMaxRecords.ForeColor = App.CurrentTheme.TextColor
         TxtBoxMaxRecords.BackColor = App.CurrentTheme.BackColor
         TxtBoxMaxRecords.ForeColor = App.CurrentTheme.TextColor
@@ -592,6 +778,9 @@ Public Class History
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor()
         SetTheme()
+        If GrpBoxCharts.Visible Then
+            PutChartData()
+        End If
     End Sub
 
 End Class

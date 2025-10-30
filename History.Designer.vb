@@ -46,6 +46,7 @@ Partial Class History
         RadBtnMostPlayed = New RadioButton()
         LblMaxRecords = New Label()
         GrpBoxCharts = New GroupBox()
+        RadBtnGenrePareto = New RadioButton()
         RadBtnGenrePolar = New RadioButton()
         BtnLists = New Button()
         RadBtnArtists = New RadioButton()
@@ -54,6 +55,7 @@ Partial Class History
         BtnQueueAll = New Button()
         BtnAddAllToPlaylist = New Button()
         PanelCharts = New Panel()
+        RadBtnArtistWordCloud = New RadioButton()
         CMHistoryView.SuspendLayout()
         GrpBoxHistory.SuspendLayout()
         GrpBoxCharts.SuspendLayout()
@@ -299,21 +301,32 @@ Partial Class History
         ' 
         GrpBoxCharts.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         GrpBoxCharts.BackColor = Color.Transparent
+        GrpBoxCharts.Controls.Add(RadBtnArtistWordCloud)
+        GrpBoxCharts.Controls.Add(RadBtnGenrePareto)
         GrpBoxCharts.Controls.Add(RadBtnGenrePolar)
         GrpBoxCharts.Controls.Add(BtnLists)
         GrpBoxCharts.Controls.Add(RadBtnArtists)
         GrpBoxCharts.Controls.Add(RadBtnGenres)
-        GrpBoxCharts.Location = New Point(826, 199)
+        GrpBoxCharts.Location = New Point(826, 190)
         GrpBoxCharts.Margin = New Padding(4)
         GrpBoxCharts.Name = "GrpBoxCharts"
         GrpBoxCharts.Padding = New Padding(4)
-        GrpBoxCharts.Size = New Size(190, 211)
+        GrpBoxCharts.Size = New Size(190, 228)
         GrpBoxCharts.TabIndex = 7
         GrpBoxCharts.TabStop = False
         ' 
+        ' RadBtnGenrePareto
+        ' 
+        RadBtnGenrePareto.Location = New Point(7, 84)
+        RadBtnGenrePareto.Name = "RadBtnGenrePareto"
+        RadBtnGenrePareto.Size = New Size(176, 32)
+        RadBtnGenrePareto.TabIndex = 8
+        RadBtnGenrePareto.Text = "Genre Pareto"
+        RadBtnGenrePareto.TextAlign = ContentAlignment.MiddleCenter
+        ' 
         ' RadBtnGenrePolar
         ' 
-        RadBtnGenrePolar.Location = New Point(7, 58)
+        RadBtnGenrePolar.Location = New Point(7, 52)
         RadBtnGenrePolar.Name = "RadBtnGenrePolar"
         RadBtnGenrePolar.Size = New Size(176, 32)
         RadBtnGenrePolar.TabIndex = 7
@@ -323,7 +336,7 @@ Partial Class History
         ' 
         ' BtnLists
         ' 
-        BtnLists.Location = New Point(7, 172)
+        BtnLists.Location = New Point(7, 189)
         BtnLists.Name = "BtnLists"
         BtnLists.Size = New Size(176, 32)
         BtnLists.TabIndex = 6
@@ -333,7 +346,7 @@ Partial Class History
         ' 
         ' RadBtnArtists
         ' 
-        RadBtnArtists.Location = New Point(7, 96)
+        RadBtnArtists.Location = New Point(7, 115)
         RadBtnArtists.Name = "RadBtnArtists"
         RadBtnArtists.Size = New Size(176, 32)
         RadBtnArtists.TabIndex = 1
@@ -388,6 +401,16 @@ Partial Class History
         PanelCharts.Size = New Size(805, 360)
         PanelCharts.TabIndex = 13
         ' 
+        ' RadBtnArtistWordCloud
+        ' 
+        RadBtnArtistWordCloud.Location = New Point(7, 144)
+        RadBtnArtistWordCloud.Name = "RadBtnArtistWordCloud"
+        RadBtnArtistWordCloud.Size = New Size(176, 32)
+        RadBtnArtistWordCloud.TabIndex = 9
+        RadBtnArtistWordCloud.Text = "Artist Word Cloud"
+        RadBtnArtistWordCloud.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnArtistWordCloud.UseVisualStyleBackColor = True
+        ' 
         ' History
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
@@ -407,8 +430,8 @@ Partial Class History
         Controls.Add(LVHistory)
         Controls.Add(GrpBoxHistory)
         Controls.Add(LblHistoryViewCount)
-        Controls.Add(GrpBoxCharts)
         Controls.Add(PanelCharts)
+        Controls.Add(GrpBoxCharts)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
@@ -455,4 +478,6 @@ Partial Class History
     Friend WithEvents BtnShowAll As Button
     Friend WithEvents LblMaxRecords As Label
     Friend WithEvents RadBtnGenrePolar As RadioButton
+    Friend WithEvents RadBtnGenrePareto As RadioButton
+    Friend WithEvents RadBtnArtistWordCloud As RadioButton
 End Class
