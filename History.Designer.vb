@@ -46,6 +46,7 @@ Partial Class History
         RadBtnMostPlayed = New RadioButton()
         LblMaxRecords = New Label()
         GrpBoxCharts = New GroupBox()
+        RadBtnGenrePolar = New RadioButton()
         BtnLists = New Button()
         RadBtnArtists = New RadioButton()
         RadBtnGenres = New RadioButton()
@@ -238,7 +239,7 @@ Partial Class History
         ' 
         ' TxtBoxMaxRecords
         ' 
-        TxtBoxMaxRecords.Location = New Point(7, 187)
+        TxtBoxMaxRecords.Location = New Point(7, 178)
         TxtBoxMaxRecords.Name = "TxtBoxMaxRecords"
         TxtBoxMaxRecords.Size = New Size(176, 29)
         TxtBoxMaxRecords.TabIndex = 4
@@ -247,7 +248,7 @@ Partial Class History
         ' 
         ' BtnShowAll
         ' 
-        BtnShowAll.Location = New Point(7, 222)
+        BtnShowAll.Location = New Point(7, 213)
         BtnShowAll.Name = "BtnShowAll"
         BtnShowAll.Size = New Size(176, 32)
         BtnShowAll.TabIndex = 3
@@ -287,7 +288,7 @@ Partial Class History
         ' 
         ' LblMaxRecords
         ' 
-        LblMaxRecords.Location = New Point(7, 161)
+        LblMaxRecords.Location = New Point(7, 152)
         LblMaxRecords.Name = "LblMaxRecords"
         LblMaxRecords.Size = New Size(176, 25)
         LblMaxRecords.TabIndex = 5
@@ -298,20 +299,31 @@ Partial Class History
         ' 
         GrpBoxCharts.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         GrpBoxCharts.BackColor = Color.Transparent
+        GrpBoxCharts.Controls.Add(RadBtnGenrePolar)
         GrpBoxCharts.Controls.Add(BtnLists)
         GrpBoxCharts.Controls.Add(RadBtnArtists)
         GrpBoxCharts.Controls.Add(RadBtnGenres)
-        GrpBoxCharts.Location = New Point(826, 219)
+        GrpBoxCharts.Location = New Point(826, 199)
         GrpBoxCharts.Margin = New Padding(4)
         GrpBoxCharts.Name = "GrpBoxCharts"
         GrpBoxCharts.Padding = New Padding(4)
-        GrpBoxCharts.Size = New Size(190, 157)
+        GrpBoxCharts.Size = New Size(190, 211)
         GrpBoxCharts.TabIndex = 7
         GrpBoxCharts.TabStop = False
         ' 
+        ' RadBtnGenrePolar
+        ' 
+        RadBtnGenrePolar.Location = New Point(7, 58)
+        RadBtnGenrePolar.Name = "RadBtnGenrePolar"
+        RadBtnGenrePolar.Size = New Size(176, 32)
+        RadBtnGenrePolar.TabIndex = 7
+        RadBtnGenrePolar.Text = "Genre Polar"
+        RadBtnGenrePolar.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnGenrePolar.UseVisualStyleBackColor = True
+        ' 
         ' BtnLists
         ' 
-        BtnLists.Location = New Point(7, 118)
+        BtnLists.Location = New Point(7, 172)
         BtnLists.Name = "BtnLists"
         BtnLists.Size = New Size(176, 32)
         BtnLists.TabIndex = 6
@@ -321,7 +333,7 @@ Partial Class History
         ' 
         ' RadBtnArtists
         ' 
-        RadBtnArtists.Location = New Point(7, 58)
+        RadBtnArtists.Location = New Point(7, 96)
         RadBtnArtists.Name = "RadBtnArtists"
         RadBtnArtists.Size = New Size(176, 32)
         RadBtnArtists.TabIndex = 1
@@ -347,6 +359,7 @@ Partial Class History
         LblHistoryViewCount.Size = New Size(112, 21)
         LblHistoryViewCount.TabIndex = 10
         LblHistoryViewCount.Text = "Listview Count"
+        LblHistoryViewCount.Visible = False
         ' 
         ' BtnQueueAll
         ' 
@@ -391,11 +404,11 @@ Partial Class History
         Controls.Add(BtnOK)
         Controls.Add(LblTotalPlayedSongs)
         Controls.Add(LblTotalDuration)
-        Controls.Add(LblHistoryViewCount)
-        Controls.Add(PanelCharts)
         Controls.Add(LVHistory)
         Controls.Add(GrpBoxHistory)
+        Controls.Add(LblHistoryViewCount)
         Controls.Add(GrpBoxCharts)
+        Controls.Add(PanelCharts)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
@@ -426,9 +439,6 @@ Partial Class History
     Friend WithEvents RadBtnFavorites As RadioButton
     Friend WithEvents RadBtnRecentlyPlayed As RadioButton
     Friend WithEvents RadBtnMostPlayed As RadioButton
-    Friend WithEvents BtnShowAll As Button
-    Friend WithEvents TxtBoxMaxRecords As TextBox
-    Friend WithEvents LblMaxRecords As Label
     Friend WithEvents LblHistoryViewCount As Label
     Friend WithEvents BtnQueueAll As Button
     Friend WithEvents BtnAddAllToPlaylist As Button
@@ -441,4 +451,8 @@ Partial Class History
     Friend WithEvents BtnLists As Button
     Friend WithEvents RadBtnArtists As RadioButton
     Friend WithEvents RadBtnGenres As RadioButton
+    Friend WithEvents TxtBoxMaxRecords As TextBox
+    Friend WithEvents BtnShowAll As Button
+    Friend WithEvents LblMaxRecords As Label
+    Friend WithEvents RadBtnGenrePolar As RadioButton
 End Class

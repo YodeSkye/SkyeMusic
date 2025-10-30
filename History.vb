@@ -16,6 +16,7 @@ Public Class History
     Private views As List(Of App.SongView)
     Private Enum ChartView
         Genres
+        GenrePolar
         Artists
     End Enum
     Private CurrentChartView As ChartView = ChartView.Genres
@@ -105,10 +106,13 @@ Public Class History
         Select Case CurrentChartView
             Case ChartView.Genres
                 RadBtnGenres.Checked = True
+            Case ChartView.GenrePolar
+                RadBtnGenrePolar.Checked = True
             Case ChartView.Artists
                 RadBtnArtists.Checked = True
         End Select
         SetShowAll()
+        LVHistory.BringToFront()
 
         BtnOK.Focus()
     End Sub
@@ -172,12 +176,15 @@ Public Class History
         GrpBoxCharts.Visible = True
         GrpBoxCharts.BringToFront()
         GrpBoxHistory.Visible = False
+        LblHistoryViewCount.Visible = False
+        PutChartData()
     End Sub
     Private Sub BtnLists_Click(sender As Object, e As EventArgs) Handles BtnLists.Click
         PanelCharts.SendToBack()
         GrpBoxCharts.Visible = False
         GrpBoxHistory.Visible = True
         GrpBoxHistory.BringToFront()
+        ShowCounts()
     End Sub
     Private Sub BtnQueueAll_Click(sender As Object, e As EventArgs) Handles BtnQueueAll.Click
         Queue(True)
@@ -212,6 +219,10 @@ Public Class History
     End Sub
     Private Sub RadBtnGenres_Click(sender As Object, e As EventArgs) Handles RadBtnGenres.Click
         CurrentChartView = ChartView.Genres
+        PutChartData()
+    End Sub
+    Private Sub RadBtnGenrePolar_Click(sender As Object, e As EventArgs) Handles RadBtnGenrePolar.Click
+        CurrentChartView = ChartView.GenrePolar
         PutChartData()
     End Sub
     Private Sub RadBtnArtists_Click(sender As Object, e As EventArgs) Handles RadBtnArtists.Click
@@ -309,38 +320,174 @@ Public Class History
         ShowCounts()
     End Sub
     Private Sub PutChartData()
-        Dim genreCounts As New Dictionary(Of String, Integer)
-        Dim genreIndex = LVHistory.Columns("Genre").Index
+        Select Case CurrentChartView
+            Case ChartView.Genres
+                Dim genreCounts As New Dictionary(Of String, Integer)
+                Dim genreIndex = LVHistory.Columns("Genre").Index
 
-        ' Count genres from history list
-        For Each lvi As ListViewItem In LVHistory.Items
-            Dim genre = lvi.SubItems(genreIndex).Text
-            If Not String.IsNullOrEmpty(genre) Then
-                If Not genreCounts.ContainsKey(genre) Then
-                    genreCounts(genre) = 0
-                End If
-                genreCounts(genre) += 1
-            End If
-        Next
+                'Count genres from history list
+                For Each lvi As ListViewItem In LVHistory.Items
+                    Dim genre = lvi.SubItems(genreIndex).Text
+                    If Not String.IsNullOrEmpty(genre) Then
+                        If Not genreCounts.ContainsKey(genre) Then
+                            genreCounts(genre) = 0
+                        End If
+                        genreCounts(genre) += 1
+                    End If
+                Next
 
-        ' Create chart
-        Dim chart As New Chart With {.Dock = DockStyle.Fill}
-        Dim area As New ChartArea()
-        chart.ChartAreas.Add(area)
+                'Create chart
+                Dim chart As New Chart With {.Dock = DockStyle.Fill}
+                Dim area As New ChartArea()
+                chart.ChartAreas.Add(area)
 
-        Dim series As New Series("Genres") With {
-            .ChartType = SeriesChartType.Pie
-        }
+                Dim series As New Series("Genres") With {.ChartType = SeriesChartType.Pie}
 
-        For Each kvp In genreCounts
-            series.Points.AddXY(kvp.Key, kvp.Value)
-        Next
+                For Each kvp In genreCounts
+                    series.Points.AddXY(kvp.Key, kvp.Value)
+                Next
 
-        chart.Series.Add(series)
+                chart.Series.Add(series)
+                chart.BackColor = App.CurrentTheme.BackColor
+                chart.ChartAreas(0).BackColor = App.CurrentTheme.BackColor
 
-        ' Show in a panel or form
-        PanelCharts.Controls.Clear()
-        PanelCharts.Controls.Add(chart)
+                'Show in a panel or form
+                PanelCharts.Controls.Clear()
+                PanelCharts.Controls.Add(chart)
+            Case ChartView.GenrePolar
+                'Count genres from history list
+                Dim genreCounts As New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+                Dim genreIndex = LVHistory.Columns("Genre").Index
+
+                For Each lvi As ListViewItem In LVHistory.Items
+                    Dim genre = lvi.SubItems(genreIndex).Text.Trim()
+                    If Not String.IsNullOrEmpty(genre) Then
+                        If Not genreCounts.ContainsKey(genre) Then
+                            genreCounts(genre) = 0
+                        End If
+                        genreCounts(genre) += 1
+                    End If
+                Next
+
+                'Create chart
+                Dim chart As New Chart With {.Dock = DockStyle.Fill}
+                Dim area As New ChartArea("PolarArea")
+                chart.ChartAreas.Add(area)
+                With chart.ChartAreas(0).AxisY.MajorGrid
+                    .LineColor = App.CurrentTheme.TextColor   'or any Color you like
+                    .LineDashStyle = ChartDashStyle.Solid     'optional: Solid, Dash, Dot, etc.
+                    .LineWidth = 1                            'thickness of the circles
+                End With
+                With chart.ChartAreas(0).AxisX
+                    .LineColor = App.CurrentTheme.TextColor             'horizontal axis line
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor   'radial spokes
+                    .LineWidth = 2
+                End With
+                With chart.ChartAreas(0).AxisY
+                    .LineColor = App.CurrentTheme.TextColor             'vertical axis line (the radius line)
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor   'concentric circles
+                    .LineWidth = 2
+                End With
+
+                'Configure axis for polar/radar style
+                With area
+                    .AxisX.Interval = 1
+                    .AxisX.LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .AxisY.LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .BackColor = App.CurrentTheme.BackColor
+                End With
+
+                'Create radar series
+                Dim series As New Series("Genres") With {
+                    .ChartType = SeriesChartType.Radar,
+                    .BorderWidth = 4,
+                    .Color = Color.FromArgb(100, App.CurrentTheme.ButtonBackColor), 'fill color
+                    .BackSecondaryColor = App.CurrentTheme.ButtonTextColor,         'outline color
+                    .BackGradientStyle = GradientStyle.DiagonalRight,
+                    .IsValueShownAsLabel = True,
+                    .LabelForeColor = App.CurrentTheme.TextColor}
+
+                'Add each genre as a spoke
+                Dim i As Integer = 0
+                For Each kvp In genreCounts.OrderByDescending(Function(k) k.Value)
+                    Dim idx As Integer = series.Points.AddXY(i, kvp.Value) ' numeric X
+                    series.Points(idx).AxisLabel = kvp.Key                  ' label on spoke
+                    i += 1
+                Next
+
+                chart.Series.Clear()
+                chart.Series.Add(series)
+
+                'Apply theme
+                chart.BackColor = App.CurrentTheme.BackColor
+
+                'Show chart
+                PanelCharts.Controls.Clear()
+                PanelCharts.Controls.Add(chart)
+            Case ChartView.Artists
+                'Dictionary to hold artist → play count
+                'Use case-insensitive comparer so "Avril Lavigne" and "avril lavigne" are treated the same
+                Dim artistCounts As New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+
+                'Find the index of the Artist column in the ListView
+                Dim artistIndex = LVHistory.Columns("Artist").Index
+
+                'Count artists from history list
+                For Each lvi As ListViewItem In LVHistory.Items
+                    Dim artist = lvi.SubItems(artistIndex).Text.Trim() ' Trim to remove stray spaces
+                    If Not String.IsNullOrEmpty(artist) Then
+                        If Not artistCounts.ContainsKey(artist) Then
+                            artistCounts(artist) = 0
+                        End If
+                        artistCounts(artist) += 1
+                    End If
+                Next
+
+                'Create a new chart and chart area
+                Dim chart As New Chart With {.Dock = DockStyle.Fill}
+                Dim area As New ChartArea("MainArea")
+                chart.ChartAreas.Add(area)
+
+                'Configure the series for a vertical bar chart
+                Dim series As New Series("Artists") With {
+                    .ChartType = SeriesChartType.Column,
+                    .IsValueShownAsLabel = True, ' Show play counts above bars
+                    .LabelForeColor = App.CurrentTheme.TextColor}
+
+                'Sort artists by play count descending before plotting
+                Dim sortedArtists = artistCounts.OrderByDescending(Function(kvp) kvp.Value)
+
+                'Add each artist as a separate bar
+                Dim i As Integer = 0
+                For Each kvp In sortedArtists
+                    'Add a point with numeric X (i) and Y = play count
+                    Dim idx As Integer = series.Points.AddXY(i, kvp.Value)
+                    'Set the label under the bar to the artist name
+                    series.Points(idx).AxisLabel = kvp.Key
+                    i += 1
+                Next
+
+                'Clear any existing series and add our new one
+                chart.Series.Clear()
+                chart.Series.Add(series)
+
+                'Configure X axis so every artist label shows
+                With chart.ChartAreas(0).AxisX
+                    .Interval = 1
+                    .LabelStyle.IsStaggered = False
+                    .MajorGrid.Enabled = False
+                End With
+
+                'Apply theme colors
+                chart.BackColor = App.CurrentTheme.BackColor
+                chart.ChartAreas(0).BackColor = App.CurrentTheme.BackColor
+                chart.ChartAreas(0).AxisY.LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                chart.ChartAreas(0).AxisX.LabelStyle.ForeColor = App.CurrentTheme.TextColor
+
+                'Show chart in the panel
+                PanelCharts.Controls.Clear()
+                PanelCharts.Controls.Add(chart)
+        End Select
     End Sub
     Private Sub Queue(Optional queueall As Boolean = False)
         Dim queuelist = If(queueall, LVHistory.Items.Cast(Of ListViewItem).ToList(), LVHistory.SelectedItems.Cast(Of ListViewItem).ToList())
@@ -370,6 +517,7 @@ Public Class History
         End If
     End Sub
     Private Sub ShowCounts()
+        LblHistoryViewCount.Visible = True
         LblHistoryViewCount.Text = LVHistory.Items.Count.ToString("N0") & If(LVHistory.Items.Count = 1, " song", " songs")
         LblHistoryViewCount.Text &= ", " & LVHistory.SelectedItems.Count.ToString("N0") & " selected"
     End Sub
@@ -419,6 +567,8 @@ Public Class History
         RadBtnFavorites.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGenres.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGenres.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnGenrePolar.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnGenrePolar.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnArtists.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnArtists.ForeColor = App.CurrentTheme.ButtonTextColor
         LblMaxRecords.ForeColor = App.CurrentTheme.TextColor
@@ -431,6 +581,10 @@ Public Class History
         BtnCharts.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnLists.BackColor = App.CurrentTheme.ButtonBackColor
         BtnLists.ForeColor = App.CurrentTheme.ButtonTextColor
+        BtnQueueAll.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnQueueAll.ForeColor = App.CurrentTheme.ButtonTextColor
+        BtnAddAllToPlaylist.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnAddAllToPlaylist.ForeColor = App.CurrentTheme.ButtonTextColor
 
         ResumeLayout()
         Debug.Print("History Theme Set")
