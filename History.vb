@@ -1,5 +1,5 @@
 ﻿
-Imports LibVLCSharp.Shared
+Imports System.Windows.Forms.DataVisualization.Charting
 
 Public Class History
 
@@ -14,6 +14,11 @@ Public Class History
     Private CurrentView As HistoryView = HistoryView.MostPlayed
     Private CurrentViewMaxRecords As Integer = CInt(App.HistoryViewMaxRecords)
     Private views As List(Of App.SongView)
+    Private Enum ChartView
+        Genres
+        Artists
+    End Enum
+    Private CurrentChartView As ChartView = ChartView.Genres
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -97,6 +102,12 @@ Public Class History
             Case Else
                 TxtBoxMaxRecords.Text = App.HistoryViewMaxRecords.ToString
         End Select
+        Select Case CurrentChartView
+            Case ChartView.Genres
+                RadBtnGenres.Checked = True
+            Case ChartView.Artists
+                RadBtnArtists.Checked = True
+        End Select
         SetShowAll()
 
         BtnOK.Focus()
@@ -156,6 +167,18 @@ Public Class History
         SetShowAll()
         PutViewData()
     End Sub
+    Private Sub BtnCharts_Click(sender As Object, e As EventArgs) Handles BtnCharts.Click
+        PanelCharts.BringToFront()
+        GrpBoxCharts.Visible = True
+        GrpBoxCharts.BringToFront()
+        GrpBoxHistory.Visible = False
+    End Sub
+    Private Sub BtnLists_Click(sender As Object, e As EventArgs) Handles BtnLists.Click
+        PanelCharts.SendToBack()
+        GrpBoxCharts.Visible = False
+        GrpBoxHistory.Visible = True
+        GrpBoxHistory.BringToFront()
+    End Sub
     Private Sub BtnQueueAll_Click(sender As Object, e As EventArgs) Handles BtnQueueAll.Click
         Queue(True)
     End Sub
@@ -186,6 +209,14 @@ Public Class History
     Private Sub RadBtnFavorites_Click(sender As Object, e As EventArgs) Handles RadBtnFavorites.Click
         CurrentView = HistoryView.Favorites
         PutViewData()
+    End Sub
+    Private Sub RadBtnGenres_Click(sender As Object, e As EventArgs) Handles RadBtnGenres.Click
+        CurrentChartView = ChartView.Genres
+        PutChartData()
+    End Sub
+    Private Sub RadBtnArtists_Click(sender As Object, e As EventArgs) Handles RadBtnArtists.Click
+        CurrentChartView = ChartView.Artists
+        PutChartData()
     End Sub
     Private Sub TxtBoxMaxRecords_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxMaxRecords.KeyDown
         If e.KeyCode = Keys.Enter Then
@@ -277,6 +308,40 @@ Public Class History
         LVHistory.EndUpdate()
         ShowCounts()
     End Sub
+    Private Sub PutChartData()
+        Dim genreCounts As New Dictionary(Of String, Integer)
+        Dim genreIndex = LVHistory.Columns("Genre").Index
+
+        ' Count genres from history list
+        For Each lvi As ListViewItem In LVHistory.Items
+            Dim genre = lvi.SubItems(genreIndex).Text
+            If Not String.IsNullOrEmpty(genre) Then
+                If Not genreCounts.ContainsKey(genre) Then
+                    genreCounts(genre) = 0
+                End If
+                genreCounts(genre) += 1
+            End If
+        Next
+
+        ' Create chart
+        Dim chart As New Chart With {.Dock = DockStyle.Fill}
+        Dim area As New ChartArea()
+        chart.ChartAreas.Add(area)
+
+        Dim series As New Series("Genres") With {
+            .ChartType = SeriesChartType.Pie
+        }
+
+        For Each kvp In genreCounts
+            series.Points.AddXY(kvp.Key, kvp.Value)
+        Next
+
+        chart.Series.Add(series)
+
+        ' Show in a panel or form
+        PanelCharts.Controls.Clear()
+        PanelCharts.Controls.Add(chart)
+    End Sub
     Private Sub Queue(Optional queueall As Boolean = False)
         Dim queuelist = If(queueall, LVHistory.Items.Cast(Of ListViewItem).ToList(), LVHistory.SelectedItems.Cast(Of ListViewItem).ToList())
         If queuelist.Count > 0 Then
@@ -322,13 +387,15 @@ Public Class History
             BackColor = c
         End If
         ResumeLayout()
-        Debug.Print("Help Accent Color Set")
+        Debug.Print("History Accent Color Set")
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
+
         If Not App.CurrentTheme.IsAccent Then
             BackColor = App.CurrentTheme.BackColor
         End If
+
         LblMostPlayedSong.ForeColor = App.CurrentTheme.TextColor
         TxtBoxMostPlayedSong.BackColor = App.CurrentTheme.BackColor
         TxtBoxMostPlayedSong.ForeColor = App.CurrentTheme.TextColor
@@ -350,14 +417,23 @@ Public Class History
         RadBtnRecentlyPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnFavorites.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnFavorites.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnGenres.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnGenres.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnArtists.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnArtists.ForeColor = App.CurrentTheme.ButtonTextColor
         LblMaxRecords.ForeColor = App.CurrentTheme.TextColor
         TxtBoxMaxRecords.BackColor = App.CurrentTheme.BackColor
         TxtBoxMaxRecords.ForeColor = App.CurrentTheme.TextColor
         BtnShowAll.BackColor = App.CurrentTheme.ButtonBackColor
         BtnShowAll.ForeColor = App.CurrentTheme.ButtonTextColor
         LblHistoryViewCount.ForeColor = App.CurrentTheme.TextColor
+        BtnCharts.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnCharts.ForeColor = App.CurrentTheme.ButtonTextColor
+        BtnLists.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnLists.ForeColor = App.CurrentTheme.ButtonTextColor
+
         ResumeLayout()
-        Debug.Print("Help Theme Set")
+        Debug.Print("History Theme Set")
     End Sub
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor()

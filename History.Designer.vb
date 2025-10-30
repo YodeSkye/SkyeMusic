@@ -38,17 +38,24 @@ Partial Class History
         CMIQueue = New ToolStripMenuItem()
         CMIAddToPlaylist = New ToolStripMenuItem()
         GrpBoxHistory = New GroupBox()
+        BtnCharts = New Button()
         TxtBoxMaxRecords = New TextBox()
         BtnShowAll = New Button()
         RadBtnFavorites = New RadioButton()
         RadBtnRecentlyPlayed = New RadioButton()
         RadBtnMostPlayed = New RadioButton()
         LblMaxRecords = New Label()
+        GrpBoxCharts = New GroupBox()
+        BtnLists = New Button()
+        RadBtnArtists = New RadioButton()
+        RadBtnGenres = New RadioButton()
         LblHistoryViewCount = New Label()
         BtnQueueAll = New Button()
         BtnAddAllToPlaylist = New Button()
+        PanelCharts = New Panel()
         CMHistoryView.SuspendLayout()
         GrpBoxHistory.SuspendLayout()
+        GrpBoxCharts.SuspendLayout()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -184,39 +191,50 @@ Partial Class History
         ' 
         CMHistoryView.Items.AddRange(New ToolStripItem() {CMIQueue, CMIAddToPlaylist})
         CMHistoryView.Name = "CMHistoryView"
-        CMHistoryView.Size = New Size(181, 70)
+        CMHistoryView.Size = New Size(153, 48)
         ' 
         ' CMIQueue
         ' 
         CMIQueue.Image = My.Resources.Resources.ImagePlay
         CMIQueue.Name = "CMIQueue"
-        CMIQueue.Size = New Size(180, 22)
+        CMIQueue.Size = New Size(152, 22)
         CMIQueue.Text = "Queue"
         ' 
         ' CMIAddToPlaylist
         ' 
         CMIAddToPlaylist.Image = My.Resources.Resources.ImagePlay
         CMIAddToPlaylist.Name = "CMIAddToPlaylist"
-        CMIAddToPlaylist.Size = New Size(180, 22)
+        CMIAddToPlaylist.Size = New Size(152, 22)
         CMIAddToPlaylist.Text = "Add To Playlist"
         ' 
         ' GrpBoxHistory
         ' 
         GrpBoxHistory.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         GrpBoxHistory.BackColor = Color.Transparent
+        GrpBoxHistory.Controls.Add(BtnCharts)
         GrpBoxHistory.Controls.Add(TxtBoxMaxRecords)
         GrpBoxHistory.Controls.Add(BtnShowAll)
         GrpBoxHistory.Controls.Add(RadBtnFavorites)
         GrpBoxHistory.Controls.Add(RadBtnRecentlyPlayed)
         GrpBoxHistory.Controls.Add(RadBtnMostPlayed)
         GrpBoxHistory.Controls.Add(LblMaxRecords)
-        GrpBoxHistory.Location = New Point(826, 174)
+        GrpBoxHistory.Location = New Point(826, 149)
         GrpBoxHistory.Margin = New Padding(4)
         GrpBoxHistory.Name = "GrpBoxHistory"
         GrpBoxHistory.Padding = New Padding(4)
-        GrpBoxHistory.Size = New Size(190, 261)
+        GrpBoxHistory.Size = New Size(190, 311)
         GrpBoxHistory.TabIndex = 0
         GrpBoxHistory.TabStop = False
+        ' 
+        ' BtnCharts
+        ' 
+        BtnCharts.Location = New Point(7, 272)
+        BtnCharts.Name = "BtnCharts"
+        BtnCharts.Size = New Size(176, 32)
+        BtnCharts.TabIndex = 6
+        BtnCharts.TabStop = False
+        BtnCharts.Text = "Charts"
+        BtnCharts.UseVisualStyleBackColor = True
         ' 
         ' TxtBoxMaxRecords
         ' 
@@ -276,6 +294,51 @@ Partial Class History
         LblMaxRecords.Text = "Max Songs"
         LblMaxRecords.TextAlign = ContentAlignment.BottomCenter
         ' 
+        ' GrpBoxCharts
+        ' 
+        GrpBoxCharts.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
+        GrpBoxCharts.BackColor = Color.Transparent
+        GrpBoxCharts.Controls.Add(BtnLists)
+        GrpBoxCharts.Controls.Add(RadBtnArtists)
+        GrpBoxCharts.Controls.Add(RadBtnGenres)
+        GrpBoxCharts.Location = New Point(826, 219)
+        GrpBoxCharts.Margin = New Padding(4)
+        GrpBoxCharts.Name = "GrpBoxCharts"
+        GrpBoxCharts.Padding = New Padding(4)
+        GrpBoxCharts.Size = New Size(190, 157)
+        GrpBoxCharts.TabIndex = 7
+        GrpBoxCharts.TabStop = False
+        ' 
+        ' BtnLists
+        ' 
+        BtnLists.Location = New Point(7, 118)
+        BtnLists.Name = "BtnLists"
+        BtnLists.Size = New Size(176, 32)
+        BtnLists.TabIndex = 6
+        BtnLists.TabStop = False
+        BtnLists.Text = "Lists"
+        BtnLists.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnArtists
+        ' 
+        RadBtnArtists.Location = New Point(7, 58)
+        RadBtnArtists.Name = "RadBtnArtists"
+        RadBtnArtists.Size = New Size(176, 32)
+        RadBtnArtists.TabIndex = 1
+        RadBtnArtists.Text = "Artists"
+        RadBtnArtists.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnArtists.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnGenres
+        ' 
+        RadBtnGenres.Location = New Point(7, 20)
+        RadBtnGenres.Name = "RadBtnGenres"
+        RadBtnGenres.Size = New Size(176, 32)
+        RadBtnGenres.TabIndex = 0
+        RadBtnGenres.Text = "Genres"
+        RadBtnGenres.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnGenres.UseVisualStyleBackColor = True
+        ' 
         ' LblHistoryViewCount
         ' 
         LblHistoryViewCount.AutoSize = True
@@ -305,6 +368,13 @@ Partial Class History
         BtnAddAllToPlaylist.Text = "Add All To Playlist"
         BtnAddAllToPlaylist.UseVisualStyleBackColor = True
         ' 
+        ' PanelCharts
+        ' 
+        PanelCharts.Location = New Point(13, 124)
+        PanelCharts.Name = "PanelCharts"
+        PanelCharts.Size = New Size(805, 360)
+        PanelCharts.TabIndex = 13
+        ' 
         ' History
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
@@ -312,8 +382,6 @@ Partial Class History
         ClientSize = New Size(1029, 581)
         Controls.Add(BtnAddAllToPlaylist)
         Controls.Add(BtnQueueAll)
-        Controls.Add(GrpBoxHistory)
-        Controls.Add(LVHistory)
         Controls.Add(TxtBoxMostPlayedSong)
         Controls.Add(LblMostPlayedSong)
         Controls.Add(TxtBoxTotalDuration)
@@ -324,6 +392,10 @@ Partial Class History
         Controls.Add(LblTotalPlayedSongs)
         Controls.Add(LblTotalDuration)
         Controls.Add(LblHistoryViewCount)
+        Controls.Add(PanelCharts)
+        Controls.Add(LVHistory)
+        Controls.Add(GrpBoxHistory)
+        Controls.Add(GrpBoxCharts)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
@@ -335,6 +407,7 @@ Partial Class History
         CMHistoryView.ResumeLayout(False)
         GrpBoxHistory.ResumeLayout(False)
         GrpBoxHistory.PerformLayout()
+        GrpBoxCharts.ResumeLayout(False)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -362,4 +435,10 @@ Partial Class History
     Friend WithEvents CMHistoryView As ContextMenuStrip
     Friend WithEvents CMIQueue As ToolStripMenuItem
     Friend WithEvents CMIAddToPlaylist As ToolStripMenuItem
+    Friend WithEvents BtnCharts As Button
+    Friend WithEvents PanelCharts As Panel
+    Friend WithEvents GrpBoxCharts As GroupBox
+    Friend WithEvents BtnLists As Button
+    Friend WithEvents RadBtnArtists As RadioButton
+    Friend WithEvents RadBtnGenres As RadioButton
 End Class
