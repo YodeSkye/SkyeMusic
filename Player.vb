@@ -1759,7 +1759,7 @@ Public Class Player
                 TipPlayer.SetText(LblPosition, "Time Remaining")
         End Select
     End Sub
-    Friend Sub ShowStatusMessage(msg As String)
+    Private Sub ShowStatusMessage(msg As String)
         If App.PlaylistStatusMessageDisplayTime > 0 Then
             LblPlaylistCount.Text = StrConv(msg, VbStrConv.ProperCase)
             TimerStatus.Interval = App.PlaylistStatusMessageDisplayTime * 1000
@@ -2081,6 +2081,30 @@ Public Class Player
         SetPlaylistCountText()
         lvi = Nothing
     End Sub
+    Friend Sub AddToPlaylist(items As List(Of String))
+        Dim addedcount As Integer = 0
+        LVPlaylist.BeginUpdate()
+        For Each item As String In items
+            Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(item, True, 0)
+            If existingitem Is Nothing Then
+                Dim newlvi As ListViewItem = CreateListviewItem()
+                newlvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(item)
+                newlvi.SubItems(LVPlaylist.Columns("Path").Index).Text = item
+                GetHistory(newlvi, item)
+                ClearPlaylistTitles()
+                LVPlaylist.ListViewItemSorter = Nothing
+                If LVPlaylist.SelectedItems.Count = 0 Then
+                    LVPlaylist.Items.Add(newlvi)
+                Else
+                    LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, newlvi)
+                End If
+                addedcount += 1
+                SetPlaylistCountText()
+            End If
+        Next
+        LVPlaylist.EndUpdate()
+        ShowStatusMessage("Added " & addedcount.ToString("N0") & If(addedcount = 1, " song", " songs") & " to playlist")
+    End Sub
     Private Sub QueueFromPlaylist()
         If LVPlaylist.SelectedItems.Count > 0 Then
             Dim found As Boolean = False
@@ -2094,6 +2118,19 @@ Public Class Player
                 Queue.Add(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
                 SetPlaylistCountText()
             End If
+        End If
+    End Sub
+    Friend Sub QueuePath(path As String)
+        Dim found As Boolean = False
+        For Each s As String In Queue
+            If s = path Then
+                found = True
+                Exit For
+            End If
+        Next
+        If Not found Then
+            Queue.Add(path)
+            SetPlaylistCountText()
         End If
     End Sub
     Private Sub PlaylistRemoveItems()
@@ -2123,7 +2160,7 @@ Public Class Player
             SetPlaylistCountText()
         End If
     End Sub
-    Friend Sub GetHistory(ByRef lvi As ListViewItem, path As String)
+    Private Sub GetHistory(ByRef lvi As ListViewItem, path As String)
         Dim s As App.Song = App.History.Find(Function(p) p.Path = path)
         If Not String.IsNullOrEmpty(s.Path) Then
             If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
@@ -2210,7 +2247,7 @@ Public Class Player
         LblPlaylistCount.Text += LVPlaylist.SelectedItems.Count.ToString + " Selected"
         LblPlaylistCount.Text += ", " + Queue.Count.ToString + " Queued"
     End Sub
-    Friend Sub ClearPlaylistTitles()
+    Private Sub ClearPlaylistTitles()
         PlaylistTitleSort = SortOrder.None
         PlaylistPathSort = SortOrder.None
         PlaylistRatingSort = SortOrder.None

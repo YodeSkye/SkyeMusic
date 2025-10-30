@@ -278,58 +278,23 @@ Public Class History
         ShowCounts()
     End Sub
     Private Sub Queue(Optional queueall As Boolean = False)
-        Dim queuelist As New List(Of ListViewItem)
-        If queueall Then
-            For Each item As ListViewItem In LVHistory.Items
-                queuelist.Add(item)
-            Next
-        Else
-            For Each item As ListViewItem In LVHistory.SelectedItems
-                queuelist.Add(item)
-            Next
-        End If
+        Dim queuelist = If(queueall, LVHistory.Items.Cast(Of ListViewItem).ToList(), LVHistory.SelectedItems.Cast(Of ListViewItem).ToList())
         If queuelist.Count > 0 Then
+            Dim pathindex = LVHistory.Columns("Path").Index
             For Each lvi As ListViewItem In queuelist
-                Dim found As Boolean = False
-                For Each q As String In Player.Queue
-                    If q = lvi.SubItems(LVHistory.Columns("Path").Index).Text Then
-                        found = True
-                        Exit For
-                    End If
-                Next
-                If Not found Then
-                    Player.Queue.Add(lvi.SubItems(LVHistory.Columns("Path").Index).Text)
-                    Player.SetPlaylistCountText()
-                End If
+                Player.QueuePath(lvi.SubItems(pathindex).Text)
             Next
         End If
     End Sub
     Private Sub AddToPlaylist(Optional addall As Boolean = False)
         Dim addlist = If(addall, LVHistory.Items.Cast(Of ListViewItem).ToList(), LVHistory.SelectedItems.Cast(Of ListViewItem).ToList())
         If addlist.Count > 0 Then
-            Dim addedcount As Integer = 0
-            Player.LVPlaylist.BeginUpdate()
+            Dim pathindex = LVHistory.Columns("Path").Index
+            Dim paths As New List(Of String)
             For Each lvi As ListViewItem In addlist
-                Dim path As String = lvi.SubItems(LVHistory.Columns("Path").Index).Text
-                Dim existingitem As ListViewItem = Player.LVPlaylist.FindItemWithText(path, True, 0)
-                If existingitem Is Nothing Then
-                    Dim newlvi As ListViewItem = Player.CreateListviewItem
-                    newlvi.SubItems(Player.LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(path)
-                    newlvi.SubItems(Player.LVPlaylist.Columns("Path").Index).Text = path
-                    Player.GetHistory(newlvi, path)
-                    Player.ClearPlaylistTitles()
-                    Player.LVPlaylist.ListViewItemSorter = Nothing
-                    If Player.LVPlaylist.SelectedItems.Count = 0 Then
-                        Player.LVPlaylist.Items.Add(newlvi)
-                    Else
-                        Player.LVPlaylist.Items.Insert(Player.LVPlaylist.SelectedItems(0).Index, newlvi)
-                    End If
-                    addedcount += 1
-                    Player.SetPlaylistCountText()
-                End If
+                paths.Add(lvi.SubItems(pathindex).Text)
             Next
-            Player.LVPlaylist.EndUpdate()
-            Player.ShowStatusMessage("Added " & addedcount.ToString("N0") & If(addedcount = 1, " song", " songs") & " to playlist")
+            Player.AddToPlaylist(paths)
         End If
     End Sub
     Private Sub SetShowAll()
