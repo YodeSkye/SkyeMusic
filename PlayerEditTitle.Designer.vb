@@ -24,9 +24,9 @@ Partial Class PlayerEditTitle
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(PlayerEditTitle))
         TxtBoxTitle = New TextBox()
+        CMEditTitle = New Skye.UI.TextBoxContextMenu()
         BtnOK = New Button()
         LblTitle = New Label()
-        CMEditTitle = New Skye.UI.TextBoxContextMenu()
         SuspendLayout()
         ' 
         ' TxtBoxTitle
@@ -39,6 +39,11 @@ Partial Class PlayerEditTitle
         TxtBoxTitle.ShortcutsEnabled = False
         TxtBoxTitle.Size = New Size(463, 29)
         TxtBoxTitle.TabIndex = 11
+        ' 
+        ' CMEditTitle
+        ' 
+        CMEditTitle.Name = "CMEditTitle"
+        CMEditTitle.Size = New Size(138, 176)
         ' 
         ' BtnOK
         ' 
@@ -59,11 +64,6 @@ Partial Class PlayerEditTitle
         LblTitle.Size = New Size(39, 21)
         LblTitle.TabIndex = 13
         LblTitle.Text = "Title"
-        ' 
-        ' CMEditTitle
-        ' 
-        CMEditTitle.Name = "CMEditTitle"
-        CMEditTitle.Size = New Size(138, 176)
         ' 
         ' PlayerEditTitle
         ' 

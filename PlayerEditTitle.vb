@@ -23,12 +23,12 @@ Public Class PlayerEditTitle
             MyBase.WndProc(m)
         End Try
     End Sub
-    Private Sub AddStream_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub PlayerEditTitle_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetAccentColor()
         SetTheme()
         TxtBoxTitle.Text = NewTitle
     End Sub
-    Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblTitle.MouseDown
+    Private Sub PlayerEditTitle_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblTitle.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -41,7 +41,7 @@ Public Class PlayerEditTitle
         End If
         cSender = Nothing
     End Sub
-    Private Sub Options_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblTitle.MouseMove
+    Private Sub PlayerEditTitle_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblTitle.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -49,10 +49,10 @@ Public Class PlayerEditTitle
             Location = mPosition
         End If
     End Sub
-    Private Sub Options_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LblTitle.MouseUp
+    Private Sub PlayerEditTitle_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LblTitle.MouseUp
         mMove = False
     End Sub
-    Private Sub Options_Move(sender As Object, e As EventArgs) Handles MyBase.Move
+    Private Sub PlayerEditTitle_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
         End If
@@ -60,6 +60,20 @@ Public Class PlayerEditTitle
 
     'Control Events
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
+        OK()
+    End Sub
+    Private Sub TxtBoxTitle_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxTitle.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            e.SuppressKeyPress = True
+            OK()
+        End If
+    End Sub
+    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxTitle.PreviewKeyDown
+        CMEditTitle.ShortcutKeys(DirectCast(sender, TextBox), e)
+    End Sub
+
+    'Procedures
+    Private Sub OK()
         If String.IsNullOrEmpty(TxtBoxTitle.Text) Then
             LblTitle.ForeColor = Color.Red
             TxtBoxTitle.Text = "Please Enter A Title Here"
@@ -71,11 +85,6 @@ Public Class PlayerEditTitle
             Me.Close()
         End If
     End Sub
-    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxTitle.PreviewKeyDown
-        CMEditTitle.ShortcutKeys(DirectCast(sender, TextBox), e)
-    End Sub
-
-    'Procedures
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
