@@ -92,8 +92,8 @@ Public Class History
         header.Width = 400
         LVHistory.Columns.Add(header)
 
-        PutViewData()
         IsLoading = False
+        PutViewData()
 
         Select Case CurrentView
             Case HistoryView.MostPlayed
@@ -283,7 +283,6 @@ Public Class History
         Return views
     End Function
     Private Sub PutData()
-        If IsLoading Then Exit Sub
         TxtBoxSessionPlayedSongs.Text = App.HistoryTotalPlayedSongsThisSession.ToString("N0")
         TxtBoxTotalPlayedSongs.Text = App.HistoryTotalPlayedSongs.ToString("N0")
         Dim TotalDuration As TimeSpan = TimeSpan.Zero
