@@ -1,7 +1,8 @@
 ﻿
+Imports System.Drawing
+Imports System.Threading
 Imports System.Windows.Forms.DataVisualization.Charting
 Imports WordCloudSharp
-Imports System.Drawing
 
 Public Class History
 
@@ -9,6 +10,7 @@ Public Class History
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
     Private IsLoading As Boolean = False
+    Private cts As CancellationTokenSource
     Private Enum HistoryView
         MostPlayed
         RecentlyPlayed
@@ -50,77 +52,96 @@ Public Class History
         If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
         If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
 #End If
+        Text &= " - LOADING..."
         IsLoading = True
-        views = Await GetDataAsync()
-        PutData()
+        cts = New CancellationTokenSource()
+        Try
+            views = Await GetDataAsync(cts.Token)
+            If Not Me.IsDisposed AndAlso views IsNot Nothing Then
+                IsLoading = False
+                PutData()
 
-        'Define 7 Columns
-        Dim header As ColumnHeader
-        header = New ColumnHeader()
-        header.Name = "Title"
-        header.Text = "Title"
-        header.Width = 200
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Artist"
-        header.Text = "Artist"
-        header.Width = 200
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Album"
-        header.Text = "Album"
-        header.Width = 200
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Genre"
-        header.Text = "Genre"
-        header.Width = 100
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "PlayCount"
-        header.Text = "Plays"
-        header.Width = 50
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "LastPlayed"
-        header.Text = "Last Played"
-        header.Width = 200
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Path"
-        header.Text = "Path"
-        header.Width = 400
-        LVHistory.Columns.Add(header)
+                'Define 7 Columns
+                Dim header As ColumnHeader
+                header = New ColumnHeader()
+                header.Name = "Title"
+                header.Text = "Title"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Artist"
+                header.Text = "Artist"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Album"
+                header.Text = "Album"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Genre"
+                header.Text = "Genre"
+                header.Width = 100
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "PlayCount"
+                header.Text = "Plays"
+                header.Width = 50
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "LastPlayed"
+                header.Text = "Last Played"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Path"
+                header.Text = "Path"
+                header.Width = 400
+                LVHistory.Columns.Add(header)
 
-        IsLoading = False
-        PutViewData()
+                PutViewData()
 
-        Select Case CurrentView
-            Case HistoryView.MostPlayed
-                RadBtnMostPlayed.Checked = True
-            Case HistoryView.RecentlyPlayed
-                RadBtnRecentlyPlayed.Checked = True
-            Case HistoryView.Favorites
-                RadBtnFavorites.Checked = True
-        End Select
-        Select Case App.HistoryViewMaxRecords
-            Case 0
-                TxtBoxMaxRecords.Text = "All"
-            Case Else
-                TxtBoxMaxRecords.Text = App.HistoryViewMaxRecords.ToString
-        End Select
-        Select Case CurrentChartView
-            Case ChartView.Genres
-                RadBtnGenres.Checked = True
-            Case ChartView.GenrePolar
-                RadBtnGenrePolar.Checked = True
-            Case ChartView.Artists
-                RadBtnArtists.Checked = True
-        End Select
-        SetShowAll()
-        LVHistory.BringToFront()
+                Select Case CurrentView
+                    Case HistoryView.MostPlayed
+                        RadBtnMostPlayed.Checked = True
+                    Case HistoryView.RecentlyPlayed
+                        RadBtnRecentlyPlayed.Checked = True
+                    Case HistoryView.Favorites
+                        RadBtnFavorites.Checked = True
+                End Select
+                Select Case App.HistoryViewMaxRecords
+                    Case 0
+                        TxtBoxMaxRecords.Text = "All"
+                    Case Else
+                        TxtBoxMaxRecords.Text = App.HistoryViewMaxRecords.ToString
+                End Select
+                Select Case CurrentChartView
+                    Case ChartView.Genres
+                        RadBtnGenres.Checked = True
+                    Case ChartView.GenrePolar
+                        RadBtnGenrePolar.Checked = True
+                    Case ChartView.Artists
+                        RadBtnArtists.Checked = True
+                End Select
+                SetShowAll()
+                LVHistory.BringToFront()
 
-        BtnOK.Focus()
+                BtnOK.Focus()
+            End If
+        Catch ex As OperationCanceledException
+            'Expected if the form was closed before load finished, swallow quietly
+        Catch ex As Exception
+            App.WriteToLog("History Load Error" + Chr(13) + ex.ToString)
+        Finally
+            If cts IsNot Nothing Then
+                cts.Dispose()
+                cts = Nothing
+            End If
+            IsLoading = False
+            Text = Text.TrimEnd(" - LOADING...".ToCharArray)
+            GrpBoxHistory.Enabled = True
+            GrpBoxCharts.Enabled = True
+        End Try
     End Sub
     Private Sub History_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If CurrentViewMaxRecords <> App.HistoryViewMaxRecords Then
@@ -261,24 +282,17 @@ Public Class History
     End Sub
 
     'Procedures
-    Private Async Function GetDataAsync() As Task(Of List(Of App.SongView))
-
-        'Show loading message
-        Text &= " - LOADING..."
-        GrpBoxHistory.Enabled = False
+    Private Async Function GetDataAsync(token As CancellationToken) As Task(Of List(Of App.SongView))
 
         'Run the heavy work off the UI thread
         Dim views = Await Task.Run(Function()
                                        Dim list As New List(Of App.SongView)
                                        For Each s As App.Song In App.History
+                                           token.ThrowIfCancellationRequested()
                                            list.Add(New App.SongView(s))
                                        Next
                                        Return list
-                                   End Function)
-
-        'Now we're back on the UI thread after Await
-        Text = Text.TrimEnd(" - LOADING...".ToCharArray)
-        GrpBoxHistory.Enabled = True
+                                   End Function, token)
 
         Return views
     End Function

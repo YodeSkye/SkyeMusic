@@ -46,6 +46,7 @@ Partial Class History
         RadBtnMostPlayed = New RadioButton()
         LblMaxRecords = New Label()
         GrpBoxCharts = New GroupBox()
+        RadBtnArtistWordCloud = New RadioButton()
         RadBtnGenrePareto = New RadioButton()
         RadBtnGenrePolar = New RadioButton()
         BtnLists = New Button()
@@ -55,7 +56,6 @@ Partial Class History
         BtnQueueAll = New Button()
         BtnAddAllToPlaylist = New Button()
         PanelCharts = New Panel()
-        RadBtnArtistWordCloud = New RadioButton()
         CMHistoryView.SuspendLayout()
         GrpBoxHistory.SuspendLayout()
         GrpBoxCharts.SuspendLayout()
@@ -205,7 +205,7 @@ Partial Class History
         ' 
         ' CMIAddToPlaylist
         ' 
-        CMIAddToPlaylist.Image = My.Resources.Resources.ImagePlay
+        CMIAddToPlaylist.Image = My.Resources.Resources.ImageAdd16
         CMIAddToPlaylist.Name = "CMIAddToPlaylist"
         CMIAddToPlaylist.Size = New Size(152, 22)
         CMIAddToPlaylist.Text = "Add To Playlist"
@@ -221,6 +221,7 @@ Partial Class History
         GrpBoxHistory.Controls.Add(RadBtnRecentlyPlayed)
         GrpBoxHistory.Controls.Add(RadBtnMostPlayed)
         GrpBoxHistory.Controls.Add(LblMaxRecords)
+        GrpBoxHistory.Enabled = False
         GrpBoxHistory.Location = New Point(826, 149)
         GrpBoxHistory.Margin = New Padding(4)
         GrpBoxHistory.Name = "GrpBoxHistory"
@@ -307,6 +308,7 @@ Partial Class History
         GrpBoxCharts.Controls.Add(BtnLists)
         GrpBoxCharts.Controls.Add(RadBtnArtists)
         GrpBoxCharts.Controls.Add(RadBtnGenres)
+        GrpBoxCharts.Enabled = False
         GrpBoxCharts.Location = New Point(826, 190)
         GrpBoxCharts.Margin = New Padding(4)
         GrpBoxCharts.Name = "GrpBoxCharts"
@@ -314,6 +316,16 @@ Partial Class History
         GrpBoxCharts.Size = New Size(190, 228)
         GrpBoxCharts.TabIndex = 7
         GrpBoxCharts.TabStop = False
+        ' 
+        ' RadBtnArtistWordCloud
+        ' 
+        RadBtnArtistWordCloud.Location = New Point(7, 144)
+        RadBtnArtistWordCloud.Name = "RadBtnArtistWordCloud"
+        RadBtnArtistWordCloud.Size = New Size(176, 32)
+        RadBtnArtistWordCloud.TabIndex = 9
+        RadBtnArtistWordCloud.Text = "Artist Word Cloud"
+        RadBtnArtistWordCloud.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnArtistWordCloud.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGenrePareto
         ' 
@@ -400,16 +412,6 @@ Partial Class History
         PanelCharts.Name = "PanelCharts"
         PanelCharts.Size = New Size(805, 360)
         PanelCharts.TabIndex = 13
-        ' 
-        ' RadBtnArtistWordCloud
-        ' 
-        RadBtnArtistWordCloud.Location = New Point(7, 144)
-        RadBtnArtistWordCloud.Name = "RadBtnArtistWordCloud"
-        RadBtnArtistWordCloud.Size = New Size(176, 32)
-        RadBtnArtistWordCloud.TabIndex = 9
-        RadBtnArtistWordCloud.Text = "Artist Word Cloud"
-        RadBtnArtistWordCloud.TextAlign = ContentAlignment.MiddleCenter
-        RadBtnArtistWordCloud.UseVisualStyleBackColor = True
         ' 
         ' History
         ' 
