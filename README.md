@@ -86,6 +86,56 @@ file.Save()
 
 ---
 
+### 6. WinForms.DataVisualization
+
+Provides the **System.Windows.Forms.DataVisualization.Charting** namespace, which includes chart controls (Pie, Bar, Radar, Pareto, etc.) used in the **History & Statistics** page.
+
+```powershell
+Install-Package WinForms.DataVisualization
+```
+
+**Example:**
+```vbnet
+Dim chart As New DataVisualization.Charting.Chart()
+Dim area As New DataVisualization.Charting.ChartArea("Main")
+chart.ChartAreas.Add(area)
+Dim series As New DataVisualization.Charting.Series("Genres") With {
+    .ChartType = DataVisualization.Charting.SeriesChartType.Pie
+}
+series.Points.AddXY("Rock", 10)
+series.Points.AddXY("Pop", 5)
+chart.Series.Add(series)
+```
+
+---
+
+### 7. WordCloudSharp
+
+Provides word cloud generation for visualizing artist frequency in SkyeMusic. Used in the **Artist Word Cloud** chart view.
+
+```powershell
+Install-Package WordCloudSharp
+```
+
+**Example:**
+```vbnet
+Dim words = {"Avril Lavigne", "Belinda Carlisle", "Lily Allen"}
+Dim frequencies = {5, 3, 2}
+Dim wc As New WordCloudSharp.WordCloud(
+    width:=800,
+    height:=600,
+    useRank:=False,
+    fontColor:=Color.Black,
+    maxFontSize:=60,
+    allowVerical:=False,
+    fontname:="Segoe UI"
+)
+Dim bmp As Bitmap = wc.Draw(words, frequencies)
+PictureBox1.Image = bmp
+```
+
+---
+
 ## 🧩 Required COM References
 
 ### 1. CoreAudio
