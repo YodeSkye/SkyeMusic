@@ -69,7 +69,7 @@ Namespace My.Resources
         '''\cf0\b0\f0 Released ?? 2025\cf1\b\fs28\par
         '''\par
         '''\cf2\fs24 New Features\par
-        '''\cf0\b0 * A Text Lab [rest of string was truncated]&quot;;.
+        '''\cf0\b0 * History &amp;  [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
             Get
