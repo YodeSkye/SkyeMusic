@@ -2536,6 +2536,15 @@ Namespace My
 
     End Module
 
+    Public Module RichTextBoxExtensions
+        <System.Runtime.CompilerServices.Extension>
+        Public Sub SetAlignment(rtb As RichTextBox, align As HorizontalAlignment)
+            rtb.SelectAll()
+            rtb.SelectionAlignment = align
+            rtb.DeselectAll()
+        End Sub
+    End Module
+
     Friend Class RollingTraceListener
         Inherits TextWriterTraceListener
 

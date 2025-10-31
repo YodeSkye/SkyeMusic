@@ -61,15 +61,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil Segoe UI;}}
+        '''  Looks up a localized string similar to {\rtf1\fbidis\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil Segoe UI;}}
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
         '''\pard\cf1\b\f0\fs28\lang9 Skye Music v1.0 What&apos;s New\fs24\par
-        '''This upgrade marks a major milestone in SkyeMusic\rquote s playback architecture \f1\emdash  smoother, smarter, and built to last.\par
+        '''This upgrade marks a major milestone in SkyeMusic\f1\rquote\f0 s playback architecture \f1\emdash  smoother, smarter, and built to last.\par
         '''\cf0\b0\f0 Released ?? 2025\cf1\b\fs28\par
         '''\par
         '''\cf2\fs24 New Features\par
-        '''\cf0\b0 * History &amp;  [rest of string was truncated]&quot;;.
+        '''\cf0\b0 [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
             Get

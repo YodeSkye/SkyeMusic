@@ -27,7 +27,7 @@ Public Class Player
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Private aDevEnum As New CoreAudio.MMDeviceEnumerator 'Audio Device Enumerator
     Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
-    Private _VLCHook As VLCViewerHook
+    Private VLCHook As VLCViewerHook
     Private cLeftMeter, cRightMeter, visR, visB As Byte 'Meter Values and Visualizer Colors
     Private visV As Single 'Visualizer Volume
     Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
@@ -35,7 +35,15 @@ Public Class Player
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
+    Private HasLyrics As Boolean = False 'Indicates if the current playing item has lyrics available
+    Private HasLyricsSynced As Boolean = False 'Indicates if the current playing item has synced lyrics available
     Private Lyrics As Boolean = False 'Indicates if the lyrics are active
+    Private LyricsText As String = String.Empty
+    Private LyricsSynced As List(Of TimedLyric)
+    Public Class TimedLyric
+        Public Property Time As TimeSpan
+        Public Property Text As String
+    End Class
     Private AlbumArtCount As Byte = 0 'Number of album art available
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
     Private TrackBarScale As Int16 = 100 'TrackBar Scale for Position
@@ -380,6 +388,7 @@ Public Class Player
         VLCViewer.MediaPlayer = CType(_player, VLCPlayer).MediaPlayer
         AddHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
         AddHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
+        _player.Volume = 100
 
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
@@ -573,12 +582,12 @@ Public Class Player
     End Sub
     Private Sub Player_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         SavePlaylist()
-        If _VLCHook IsNot Nothing Then
-            _VLCHook.ReleaseHandle()
-            RemoveHandler _VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
-            RemoveHandler _VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
-            RemoveHandler _VLCHook.RightClick, AddressOf VLCViewer_RightClick
-            _VLCHook = Nothing
+        If VLCHook IsNot Nothing Then
+            VLCHook.ReleaseHandle()
+            RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
+            RemoveHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
+            RemoveHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
+            VLCHook = Nothing
         End If
         My.Finalize()
     End Sub
@@ -1442,6 +1451,25 @@ Public Class Player
     Private Sub LblPlaylistCount_DoubleClick(sender As Object, e As EventArgs) Handles LblPlaylistCount.DoubleClick
         ToggleMaximized()
     End Sub
+    Private Sub LblMedia_Paint(sender As Object, e As PaintEventArgs) Handles LblMedia.Paint
+
+        'Paint the parent background first
+        If LblMedia.Parent IsNot Nothing Then
+            Dim state = e.Graphics.Save()
+            e.Graphics.TranslateTransform(-LblMedia.Left, -LblMedia.Top)
+            Dim pe As New PaintEventArgs(e.Graphics, LblMedia.Parent.ClientRectangle)
+            InvokePaintBackground(LblMedia.Parent, pe)
+            InvokePaint(LblMedia.Parent, pe)
+            e.Graphics.Restore(state)
+        End If
+
+        Dim flags As TextFormatFlags = TextFormatFlags.EndEllipsis Or TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter Or TextFormatFlags.SingleLine
+        TextRenderer.DrawText(e.Graphics, LblMedia.Text, LblMedia.Font, LblMedia.ClientRectangle, LblMedia.ForeColor, flags)
+
+    End Sub
+    Private Sub LblMedia_DoubleClick(sender As Object, e As EventArgs) Handles LblMedia.DoubleClick
+        ToggleMaximized()
+    End Sub
     Private Sub TxtBoxPlaylistSearch_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TxtBoxPlaylistSearch.KeyPress
         Select Case e.KeyChar
             Case Convert.ToChar(Keys.Escape)
@@ -1479,8 +1507,8 @@ Public Class Player
             End If
         End If
     End Sub
-    Private Sub TxtBoxLyrics_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxLyrics.PreviewKeyDown
-        CMLyrics.ShortcutKeys(CType(sender, System.Windows.Forms.TextBox), e)
+    Private Sub TxtBoxLyrics_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs)
+        CMLyrics.ShortcutKeys(CType(sender, TextBox), e)
     End Sub
     Private Sub ListBoxPlaylistSearchSelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBoxPlaylistSearch.SelectedIndexChanged
         If ListBoxPlaylistSearch.SelectedItems.Count = 1 Then
@@ -1568,12 +1596,12 @@ Public Class Player
         ' Avoid attaching hooks too early after playback starts.
 
         'Clean up any previous hook
-        If _VLCHook IsNot Nothing Then
-            _VLCHook.ReleaseHandle()
-            RemoveHandler _VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
-            RemoveHandler _VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
-            RemoveHandler _VLCHook.RightClick, AddressOf VLCViewer_RightClick
-            _VLCHook = Nothing
+        If VLCHook IsNot Nothing Then
+            VLCHook.ReleaseHandle()
+            RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
+            RemoveHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
+            RemoveHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
+            VLCHook = Nothing
             Debug.Print("VLC Viewer Hook Detached")
         End If
 
@@ -1595,11 +1623,11 @@ Public Class Player
             If child = IntPtr.Zero Then
                 Debug.Print("VLC Viewer Hook Failed: No child window found after 10 attempts.")
             Else
-                _VLCHook = New VLCViewerHook()
-                _VLCHook.AssignHandle(child)
-                AddHandler _VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
-                AddHandler _VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
-                AddHandler _VLCHook.RightClick, AddressOf VLCViewer_RightClick
+                VLCHook = New VLCViewerHook()
+                VLCHook.AssignHandle(child)
+                AddHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
+                AddHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
+                AddHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
                 Debug.Print("VLC Viewer Hook Attached")
             End If
         End If
@@ -1645,15 +1673,60 @@ Public Class Player
         End Try
         PicBoxVisualizer.Invalidate()
     End Sub
-    Private Sub TimerPlayNext_Tick(sender As Object, e As EventArgs) Handles TimerPlayNext.Tick
-        TimerPlayNext.Stop()
-        _player.Play()
+    Private Sub TimerShowMedia_Tick(sender As Object, e As EventArgs) Handles TimerShowMedia.Tick
+        TimerShowMedia.Stop()
+        ShowMedia()
+        If Mute Then ToggleMute()
     End Sub
     Private Sub TimerStatus_Tick(sender As Object, e As EventArgs) Handles TimerStatus.Tick
         TimerStatus.Stop()
         SetPlaylistCountText()
     End Sub
+    Private Sub TimerLyrics_Tick(sender As Object, e As EventArgs) Handles TimerLyrics.Tick
+        If _player.HasMedia AndAlso PlayState = PlayStates.Playing AndAlso HasLyricsSynced Then
 
+            Dim pos As TimeSpan = TimeSpan.FromSeconds(_player.Position)
+
+            'Find the index of the last lyric whose time is <= current position
+            Dim currentIndex As Integer = LyricsSynced.FindLastIndex(Function(l) l.Time <= pos)
+
+            'Get the text safely (empty if we're before the first line)
+            Dim currentText As String = If(currentIndex >= 0, LyricsSynced(currentIndex).Text, String.Empty)
+
+            If Lyrics Then
+                Static lastIndex As Integer = -1
+
+                'Only update if the line actually changed
+                If currentIndex <> lastIndex AndAlso currentIndex >= 0 Then
+                    'Reset the old line
+                    If lastIndex >= 0 AndAlso lastIndex < RTBLyrics.Lines.Length Then
+                        Dim startOld = RTBLyrics.GetFirstCharIndexFromLine(lastIndex)
+                        Dim lengthOld = RTBLyrics.Lines(lastIndex).Length
+                        RTBLyrics.Select(startOld, lengthOld)
+                        RTBLyrics.SelectionFont = New Font(RTBLyrics.Font, FontStyle.Regular)
+                    End If
+
+                    'Bold the new line
+                    If currentIndex < RTBLyrics.Lines.Length Then
+                        Dim startNew = RTBLyrics.GetFirstCharIndexFromLine(currentIndex)
+                        Dim lengthNew = RTBLyrics.Lines(currentIndex).Length
+                        RTBLyrics.Select(startNew, lengthNew)
+                        RTBLyrics.SelectionFont = New Font(RTBLyrics.Font, FontStyle.Bold)
+                        RTBLyrics.ScrollToCaret()
+                        RTBLyrics.DeselectAll()
+                    End If
+
+                    lastIndex = currentIndex
+                End If
+            Else
+                'Album art view: always keep label in sync
+                If LblMedia.Text <> currentText Then LblMedia.Text = currentText
+                If Not LblMedia.Visible Then LblMedia.Visible = True
+            End If
+        Else
+            LblMedia.Text = String.Empty
+        End If
+    End Sub
     'Functions
     Private Function IsStream(path As String) As Boolean
         If App.History.FindIndex(Function(p) p.Path = path And p.IsStream = True) >= 0 Then
@@ -1705,6 +1778,7 @@ Public Class Player
     Private Function VideoGetHeight(width As Integer) As Integer
         If _player.HasMedia Then
             Try
+                Debug.Print("Calculating video height: VideoWidth=" + _player.VideoWidth.ToString + ", VideoHeight=" + _player.VideoHeight.ToString)
                 Return CInt(Int(_player.VideoHeight * (width / _player.VideoWidth)))
             Catch ex As Exception
                 Debug.Print("Error calculating video height: " + ex.Message)
@@ -2393,7 +2467,7 @@ Public Class Player
             End If
             Queue.RemoveAt(0)
             SetPlaylistCountText()
-            TimerPlayNext.Start()
+            TimerShowMedia.Start()
         End If
     End Sub
     Private Sub PlayFromPlaylist()
@@ -2447,7 +2521,7 @@ Public Class Player
         LyricsOff()
         Select Case App.PlayMode
             Case PlayModes.Repeat
-                TimerPlayNext.Start()
+                TimerShowMedia.Start()
             Case PlayModes.Linear
                 If LVPlaylist.Items.Count > 0 Then
                     Dim item As ListViewItem = LVPlaylist.FindItemWithText(_player.Path, True, 0)
@@ -2515,7 +2589,7 @@ Public Class Player
         LyricsOff()
         Select Case App.PlayMode
             Case PlayModes.Repeat
-                TimerPlayNext.Start()
+                TimerShowMedia.Start()
             Case PlayModes.Linear
                 If Queue.Count > 0 Then
                     PlayQueued()
@@ -2544,7 +2618,7 @@ Public Class Player
                         End If
                         EnsurePlaylistItemIsVisible(newindex)
                         item = Nothing
-                        TimerPlayNext.Start()
+                        TimerShowMedia.Start()
                     End If
                 End If
             Case PlayModes.Random
@@ -2574,7 +2648,7 @@ Public Class Player
                         End If
                         EnsurePlaylistItemIsVisible(newindex)
                         item = Nothing
-                        TimerPlayNext.Start()
+                        TimerShowMedia.Start()
                     End If
                 End If
         End Select
@@ -2585,7 +2659,7 @@ Public Class Player
         ' - UI transitions (fullscreen, hooks) must be marshaled and timed carefully
         ' - Avoid cross-thread reparenting or teardown collisions
         PlayState = PlayStates.Playing
-        UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed because Windows Media Player will add a "/" to the end of streams.
+        UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed for uniformity.
         BtnPlay.Image = App.CurrentTheme.PlayerPause
         TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
@@ -2596,12 +2670,12 @@ Public Class Player
                 Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path.TrimEnd("/"c), True, 0).Text + " @ " + _player.Path.TrimEnd("/"c)
             Else
                 Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path, True, 0).Text + " @ " + _player.Path
+                LoadLyrics(_player.Path)
             End If
         Catch ex As Exception
             Text = My.Application.Info.Title + " - " + _player.Path
         End Try
-        ShowMedia()
-        If Mute Then ToggleMute()
+        TimerShowMedia.Start()
     End Sub
     Private Sub OnPause()
         PlayState = PlayStates.Paused
@@ -2701,29 +2775,30 @@ Public Class Player
             If Lyrics AndAlso Not Stream Then 'Show Lyrics
                 Debug.Print("Showing Lyrics...")
                 PicBoxAlbumArt.Visible = False
-                'LblMedia.Visible = False
+                LblMedia.Visible = False
                 PicBoxVisualizer.Visible = False
                 Visualizer = False
                 TimerVisualizer.Stop()
                 VLCViewer.Visible = False
                 If WindowState = FormWindowState.Maximized Then
-                    TxtBoxLyrics.Font = New Font(TxtBoxLyrics.Font.FontFamily, 20, FontStyle.Bold)
+                    RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 20, FontStyle.Regular)
                 Else
-                    TxtBoxLyrics.Font = New Font(TxtBoxLyrics.Font.FontFamily, 12, FontStyle.Bold)
+                    RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 12, FontStyle.Regular)
                 End If
-                TxtBoxLyrics.Text = tlfile.Tag.Lyrics
-                TxtBoxLyrics.Visible = True
+                RTBLyrics.Text = LyricsText
+                RTBLyrics.SetAlignment(HorizontalAlignment.Center)
+                RTBLyrics.Visible = True
             Else
                 If Visualizer Then
                     PicBoxAlbumArt.Visible = False
                     'LblMedia.Visible = False
-                    TxtBoxLyrics.Visible = False
+                    RTBLyrics.Visible = False
                     VLCViewer.Visible = False
                 Else
                     If App.AudioExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Album Art
                         VLCViewer.Visible = False
                         PicBoxVisualizer.Visible = False
-                        TxtBoxLyrics.Visible = False
+                        RTBLyrics.Visible = False
                         TimerVisualizer.Stop()
                         If tlfile Is Nothing Then
                             PicBoxAlbumArt.Visible = False
@@ -2759,7 +2834,7 @@ Public Class Player
                         Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
                         'LblMedia.Visible = False
-                        TxtBoxLyrics.Visible = False
+                        RTBLyrics.Visible = False
                         PicBoxVisualizer.Visible = False
                         TimerVisualizer.Stop()
                         VideoSetSize()
@@ -2771,7 +2846,7 @@ Public Class Player
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
                     'LblMedia.Visible = False
-                    TxtBoxLyrics.Visible = False
+                    RTBLyrics.Visible = False
                     TimerVisualizer.Start()
                     PicBoxVisualizer.Visible = True
                     PicBoxVisualizer.BringToFront()
@@ -2791,7 +2866,7 @@ Public Class Player
         Else
             PicBoxAlbumArt.Visible = False
             'LblMedia.Visible = False
-            TxtBoxLyrics.Visible = False
+            RTBLyrics.Visible = False
             VLCViewer.Visible = False
             PicBoxVisualizer.Visible = False
             TimerVisualizer.Stop()
@@ -2860,6 +2935,89 @@ Public Class Player
         If e.KeyCode = Keys.Escape OrElse e.KeyCode = Keys.F OrElse e.KeyCode = Keys.F11 Then FullScreen = False
     End Sub
 
+    'Lryics
+    Private Sub LoadLyrics(songPath As String)
+        HasLyrics = False
+        HasLyricsSynced = False
+        LyricsText = String.Empty
+        LyricsSynced = Nothing
+
+        Dim lrcPath = IO.Path.ChangeExtension(songPath, ".lrc")
+        Dim txtPath = IO.Path.ChangeExtension(songPath, ".txt")
+
+        '1. Try LRC file
+        If IO.File.Exists(lrcPath) Then
+            Dim lyrics As String = IO.File.ReadAllText(lrcPath)
+            LyricsText = ExtractPlainLyrics(lyrics)
+            LyricsSynced = ParseLRC(lyrics)
+            HasLyrics = True
+            HasLyricsSynced = True
+            Debug.Print("Loaded Synced Lyrics from " + lrcPath)
+            Exit Sub
+        End If
+
+        '2. Try TXT file
+        If IO.File.Exists(txtPath) Then
+            LyricsText = IO.File.ReadAllText(txtPath)
+            HasLyrics = True
+            Debug.Print("Loaded Lyrics from " + txtPath)
+            Exit Sub
+        End If
+
+        '3. Try metadata
+        Try
+            Using f = TagLib.File.Create(songPath)
+                If Not String.IsNullOrEmpty(f.Tag.Lyrics) Then
+                    LyricsText = f.Tag.Lyrics
+                    HasLyrics = True
+                    Debug.Print("Loaded Lyrics from metadata for " + songPath)
+                End If
+            End Using
+        Catch ex As Exception
+            Debug.Print("Error loading lyrics from metadata for " + songPath + vbCr + ex.Message)
+        End Try
+    End Sub
+    Private Function ParseLRC(lrcContent As String) As List(Of TimedLyric)
+        Dim result As New List(Of TimedLyric)
+        'Regex now matches ALL [mm:ss.xx] tags in a line
+        Dim rx As New System.Text.RegularExpressions.Regex("\[(\d{2}):(\d{2})\.(\d{2})\]")
+
+        For Each line In lrcContent.Split({vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+            'Find all timestamps in this line
+            Dim matches = rx.Matches(line)
+            If matches.Count > 0 Then
+                'The lyric text is whatever comes after the last timestamp
+                Dim lyric = line.Substring(matches(matches.Count - 1).Index + matches(matches.Count - 1).Length).Trim()
+
+                For Each m As System.Text.RegularExpressions.Match In matches
+                    Dim minutes = Integer.Parse(m.Groups(1).Value)
+                    Dim seconds = Integer.Parse(m.Groups(2).Value)
+                    Dim hundredths = Integer.Parse(m.Groups(3).Value)
+
+                    'hundredths → milliseconds
+                    Dim ts = New TimeSpan(0, 0, minutes, seconds, hundredths * 10)
+                    result.Add(New TimedLyric With {.Time = ts, .Text = lyric})
+                Next
+            End If
+        Next
+
+        result.Sort(Function(a, b) a.Time.CompareTo(b.Time))
+        Return result
+    End Function
+    Private Function ExtractPlainLyrics(lrcContent As String) As String
+        Dim lines As New List(Of String)
+
+        For Each line In lrcContent.Split({vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+            ' Remove all [mm:ss.xx] tags
+            Dim plain = System.Text.RegularExpressions.Regex.Replace(line, "\[[0-9:\.]+\]", "").Trim()
+            If plain.Length > 0 Then
+                lines.Add(plain)
+            End If
+        Next
+
+        Return String.Join(Environment.NewLine, lines)
+    End Function
+
     'Themes
     Private Sub SetAccentColor(Optional force As Boolean = False)
         Dim accent As Color = App.GetAccentColor()
@@ -2869,7 +3027,7 @@ Public Class Player
             SetActiveTitleBarColor()
             If App.CurrentTheme.IsAccent Then
                 BackColor = CurrentAccentColor
-                TxtBoxLyrics.BackColor = CurrentAccentColor
+                RTBLyrics.BackColor = CurrentAccentColor
                 TrackBarPosition.TrackBarGradientStart = CurrentAccentColor
                 TrackBarPosition.TrackBarGradientEnd = CurrentAccentColor
             End If
@@ -2899,7 +3057,8 @@ Public Class Player
             LblPlaylistCount.ForeColor = App.CurrentTheme.AccentTextColor
             LblDuration.ForeColor = App.CurrentTheme.AccentTextColor
             LblPosition.ForeColor = App.CurrentTheme.AccentTextColor
-            TxtBoxLyrics.ForeColor = App.CurrentTheme.AccentTextColor
+            RTBLyrics.ForeColor = App.CurrentTheme.AccentTextColor
+            LblMedia.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
             TrackBarPosition.TrackBarGradientStart = App.CurrentTheme.BackColor
@@ -2907,8 +3066,9 @@ Public Class Player
             LblPlaylistCount.ForeColor = App.CurrentTheme.TextColor
             LblDuration.ForeColor = App.CurrentTheme.TextColor
             LblPosition.ForeColor = App.CurrentTheme.TextColor
-            TxtBoxLyrics.BackColor = App.CurrentTheme.BackColor
-            TxtBoxLyrics.ForeColor = App.CurrentTheme.TextColor
+            RTBLyrics.BackColor = App.CurrentTheme.BackColor
+            RTBLyrics.ForeColor = App.CurrentTheme.TextColor
+            LblMedia.ForeColor = App.CurrentTheme.TextColor
         End If
         LVPlaylist.BackColor = App.CurrentTheme.BackColor
         LVPlaylist.ForeColor = App.CurrentTheme.TextColor

@@ -377,15 +377,16 @@
     <value>ImageExport16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ChangeLogRT" xml:space="preserve">
-    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil Segoe UI;}}
+    <value>{\rtf1\fbidis\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil Segoe UI;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 Skye Music v1.0 What's New\fs24\par
-This upgrade marks a major milestone in SkyeMusic\rquote s playback architecture \f1\emdash  smoother, smarter, and built to last.\par
+This upgrade marks a major milestone in SkyeMusic\f1\rquote\f0 s playback architecture \f1\emdash  smoother, smarter, and built to last.\par
 \cf0\b0\f0 Released ?? 2025\cf1\b\fs28\par
 \par
 \cf2\fs24 New Features\par
-\cf0\b0 * History &amp; Statistics page\par
+\cf0\b0 * Full synced lyrics view with RichTextBox display. Current lyric line now bolded in real time with smooth switching between album\f1\_art view (single line) and full\_lyrics view\f0\lang1033 . Requires a matching '.LRC' file alongside the audio file for synced audio.\lang9\par
+* History &amp; Statistics page\par
   - Added play stats: most played song, total songs, total duration\par
   - Added 7\f1\_column list view (Title, Artist, Album, Genre, Plays, Last Played, Path)\par
   - Added multiple views: Most Played, Recently Played, Favorites\par
@@ -394,17 +395,19 @@ This upgrade marks a major milestone in SkyeMusic\rquote s playback architecture
   - Added context menu actions: Queue selected, Add selected to playlist\par
 \f0 * A Text Label has been added where the Album Art button was located. This may be used in the future for song information or a lyrics display.\par
 * Full VLC Integration. Replaced legacy Windows Media Player(WMP) with modern LibVLC backend for improved format support and performance.\par
-* Custom Fullscreen Mode. Implemented fullscreen support from scratch, tailored for VLC\rquote s rendering model.\par
+* Custom Fullscreen Mode. Implemented fullscreen support from scratch, tailored for VLC\f1\rquote\f0 s rendering model.\par
 \cf2\b\par
 Improvements\par
-\cf0\b0\lang1033 * Cycle through Album Art simply by left-clicking the Art. The Album Art button has been removed.\par
+\cf0\b0\lang1033 * Lyrics support includes '.LRC' files, plain text files, and metadata from the song file itself.\par
+* Cycle through Album Art simply by left-clicking the Art. The Album Art button has been removed.\par
 *\lang9  Audio Playback Update. Improved stability by aligning with system audio settings. Tip: For best results, set your playback device to 16\f1\_bit, 44.1 kHz (CD Quality).\f0\lang1033  \f1\lang9 This matches most music files and avoids unnecessary resampling that can cause static.\f0\par
-* Hook Reliability. Improved timing and resilience of mouse hook attachment to VLC\rquote s native window.\par
+* Hook Reliability. Improved timing and resilience of mouse hook attachment to VLC\f1\rquote\f0 s native window.\par
 * Playback Lifecycle Management. Smoothed transitions between playback states to prevent UI hangs and race conditions.\par
 * FullScreen Usage and Stability Overhaul. Added keyboard shortcuts and uniform click events to fullscreen functionality. Increased stability and reliability of fullscreen mode.\par
 \cf2\b\par
 Fixes\par
-\cf0\b0 * Fixed errors when loading history and statistics page and user interacts by clicking a button or closing prematurely.\par
+\cf0\b0 * MPEG playback timing issue stabilized. A\f1 dded a startup timer to safely grab video dimensions and toggle mute, eliminating divide\_by\_zero and silent playback quirks.\f0\par
+* Fixed errors when loading history and statistics page and user interacts by clicking a button or closing prematurely.\par
 * Ensured all UI updates are safely marshaled to the main thread\par
 * Various FullScreen Lifecylce and Stability fixes.\par
 * File System Watcher now updates Playlist Count when removing files.\par

@@ -77,7 +77,7 @@ Partial Class Player
         MIShowHelp = New ToolStripMenuItem()
         MIShowLog = New ToolStripMenuItem()
         MIShowAbout = New ToolStripMenuItem()
-        TimerPlayNext = New Timer(components)
+        TimerShowMedia = New Timer(components)
         BtnForward = New Button()
         BtnStop = New Button()
         BtnMute = New Button()
@@ -91,7 +91,6 @@ Partial Class Player
         BtnPrevious = New Button()
         LVPlaylist = New Skye.UI.ListViewEX()
         PicBoxVisualizer = New PictureBox()
-        TxtBoxLyrics = New TextBox()
         CMLyrics = New Skye.UI.TextBoxContextMenu()
         LblPlaylistCount = New Skye.UI.Label()
         LblDuration = New Skye.UI.Label()
@@ -105,6 +104,8 @@ Partial Class Player
         TipPlaylist = New Skye.UI.ToolTipEX(components)
         TipWatcherNotification = New Skye.UI.ToolTipEX(components)
         TimerStatus = New Timer(components)
+        TimerLyrics = New Timer(components)
+        RTBLyrics = New RichTextBox()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -499,9 +500,9 @@ Partial Class Player
         MIShowAbout.Size = New Size(111, 22)
         MIShowAbout.Text = "About"
         ' 
-        ' TimerPlayNext
+        ' TimerShowMedia
         ' 
-        TimerPlayNext.Interval = 250
+        TimerShowMedia.Interval = 200
         ' 
         ' BtnForward
         ' 
@@ -703,27 +704,6 @@ Partial Class Player
         PicBoxVisualizer.TabStop = False
         PicBoxVisualizer.Visible = False
         ' 
-        ' TxtBoxLyrics
-        ' 
-        TxtBoxLyrics.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        TxtBoxLyrics.BorderStyle = BorderStyle.None
-        TxtBoxLyrics.ContextMenuStrip = CMLyrics
-        TxtBoxLyrics.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TxtBoxLyrics.ForeColor = Color.White
-        TipPlaylist.SetImage(TxtBoxLyrics, Nothing)
-        TipPlayer.SetImage(TxtBoxLyrics, Nothing)
-        TipWatcherNotification.SetImage(TxtBoxLyrics, Nothing)
-        TxtBoxLyrics.Location = New Point(1, 27)
-        TxtBoxLyrics.Multiline = True
-        TxtBoxLyrics.Name = "TxtBoxLyrics"
-        TxtBoxLyrics.ReadOnly = True
-        TxtBoxLyrics.ScrollBars = ScrollBars.Vertical
-        TxtBoxLyrics.ShortcutsEnabled = False
-        TxtBoxLyrics.Size = New Size(407, 294)
-        TxtBoxLyrics.TabIndex = 36
-        TxtBoxLyrics.TextAlign = HorizontalAlignment.Center
-        TxtBoxLyrics.Visible = False
-        ' 
         ' CMLyrics
         ' 
         CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -834,6 +814,7 @@ Partial Class Player
         ' LblMedia
         ' 
         LblMedia.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        LblMedia.AutoEllipsis = True
         LblMedia.BackColor = Color.Transparent
         LblMedia.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblMedia.ForeColor = SystemColors.WindowText
@@ -868,11 +849,34 @@ Partial Class Player
         ' 
         TimerStatus.Interval = 8000
         ' 
+        ' TimerLyrics
+        ' 
+        TimerLyrics.Enabled = True
+        ' 
+        ' RTBLyrics
+        ' 
+        RTBLyrics.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        RTBLyrics.BorderStyle = BorderStyle.None
+        RTBLyrics.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipPlaylist.SetImage(RTBLyrics, Nothing)
+        TipPlayer.SetImage(RTBLyrics, Nothing)
+        TipWatcherNotification.SetImage(RTBLyrics, Nothing)
+        RTBLyrics.Location = New Point(1, 27)
+        RTBLyrics.Name = "RTBLyrics"
+        RTBLyrics.ReadOnly = True
+        RTBLyrics.ScrollBars = RichTextBoxScrollBars.Vertical
+        RTBLyrics.ShortcutsEnabled = False
+        RTBLyrics.Size = New Size(407, 294)
+        RTBLyrics.TabIndex = 39
+        RTBLyrics.Text = ""
+        RTBLyrics.Visible = False
+        ' 
         ' Player
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(984, 461)
+        Controls.Add(RTBLyrics)
         Controls.Add(LblMedia)
         Controls.Add(VLCViewer)
         Controls.Add(LblPosition)
@@ -893,7 +897,6 @@ Partial Class Player
         Controls.Add(PEXRight)
         Controls.Add(MenuPlayer)
         Controls.Add(PanelMedia)
-        Controls.Add(TxtBoxLyrics)
         Controls.Add(LblPlaylistCount)
         Controls.Add(TrackBarPosition)
         ForeColor = SystemColors.HighlightText
@@ -933,7 +936,7 @@ Partial Class Player
     Friend WithEvents MIOpen As ToolStripMenuItem
     Friend WithEvents MIView As ToolStripMenuItem
     Friend WithEvents MIOptions As ToolStripMenuItem
-    Friend WithEvents TimerPlayNext As Timer
+    Friend WithEvents TimerShowMedia As Timer
     Friend WithEvents BtnForward As Button
     Friend WithEvents BtnStop As Button
     Friend WithEvents BtnMute As Button
@@ -973,7 +976,6 @@ Partial Class Player
     Friend WithEvents PicBoxVisualizer As PictureBox
     Friend WithEvents MIPlayMode As ToolStripMenuItem
     Friend WithEvents MILyrics As ToolStripMenuItem
-    Friend WithEvents TxtBoxLyrics As TextBox
     Friend WithEvents Labelcsy1 As Skye.UI.Label
     Friend WithEvents LblPlaylistCount As Skye.UI.Label
     Friend WithEvents MIVisualizer As ToolStripMenuItem
@@ -1002,4 +1004,6 @@ Partial Class Player
     Friend WithEvents LblMedia As Skye.UI.Label
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
     Friend WithEvents MIViewHistory As ToolStripMenuItem
+    Friend WithEvents TimerLyrics As Timer
+    Friend WithEvents RTBLyrics As RichTextBox
 End Class
