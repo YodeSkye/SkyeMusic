@@ -43,12 +43,20 @@ Install-Package VideoLAN.LibVLC.Windows
 
 ---
 
-### 3. Syncfusion.Tools.Windows
+### 3. TagLibSharp
 
-Provides advanced WinForms UI components like Ribbon, Docking Manager, and TreeView. It 's free for individual developers and small businesses. To get a license, visit their website [Syncfusion Community License](https://www.syncfusion.com/products/communitylicense).
+A cross-platform library for reading and writing metadata in media files.
 
 ```powershell
-Install-Package Syncfusion.Tools.Windows
+Install-Package TagLibSharp
+```
+
+**Example:**
+```vbnet
+Dim file = TagLib.File.Create("song.mp3")
+Console.WriteLine($"Title: {file.Tag.Title}")
+file.Tag.Title = "New Title"
+file.Save()
 ```
 
 ---
@@ -68,20 +76,12 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 
 ---
 
-### 5. TagLibSharp
+### 5. Syncfusion.Tools.Windows
 
-A cross-platform library for reading and writing metadata in media files.
+Provides advanced WinForms UI components like Ribbon, Docking Manager, and TreeView. It 's free for individual developers and small businesses. To get a license, visit their website [Syncfusion Community License](https://www.syncfusion.com/products/communitylicense).
 
 ```powershell
-Install-Package TagLibSharp
-```
-
-**Example:**
-```vbnet
-Dim file = TagLib.File.Create("song.mp3")
-Console.WriteLine($"Title: {file.Tag.Title}")
-file.Tag.Title = "New Title"
-file.Save()
+Install-Package Syncfusion.Tools.Windows
 ```
 
 ---
