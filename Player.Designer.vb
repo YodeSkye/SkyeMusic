@@ -101,11 +101,11 @@ Partial Class Player
         TipPlayer = New Skye.UI.ToolTipEX(components)
         VLCViewer = New LibVLCSharp.WinForms.VideoView()
         LblMedia = New Skye.UI.Label()
+        RTBLyrics = New Skye.UI.RichTextBox()
         TipPlaylist = New Skye.UI.ToolTipEX(components)
         TipWatcherNotification = New Skye.UI.ToolTipEX(components)
         TimerStatus = New Timer(components)
         TimerLyrics = New Timer(components)
-        RTBLyrics = New RichTextBox()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -827,6 +827,25 @@ Partial Class Player
         LblMedia.TabIndex = 15
         LblMedia.TextAlign = ContentAlignment.MiddleCenter
         ' 
+        ' RTBLyrics
+        ' 
+        RTBLyrics.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        RTBLyrics.BorderStyle = BorderStyle.None
+        RTBLyrics.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipPlaylist.SetImage(RTBLyrics, Nothing)
+        TipPlayer.SetImage(RTBLyrics, Nothing)
+        TipWatcherNotification.SetImage(RTBLyrics, Nothing)
+        RTBLyrics.Location = New Point(1, 27)
+        RTBLyrics.Name = "RTBLyrics"
+        RTBLyrics.ReadOnly = True
+        RTBLyrics.ScrollBars = RichTextBoxScrollBars.Vertical
+        RTBLyrics.ShortcutsEnabled = False
+        RTBLyrics.Size = New Size(407, 294)
+        RTBLyrics.TabIndex = 39
+        RTBLyrics.TabStop = False
+        RTBLyrics.Text = ""
+        RTBLyrics.Visible = False
+        ' 
         ' TipPlaylist
         ' 
         TipPlaylist.FadeInRate = 0
@@ -852,24 +871,6 @@ Partial Class Player
         ' TimerLyrics
         ' 
         TimerLyrics.Enabled = True
-        ' 
-        ' RTBLyrics
-        ' 
-        RTBLyrics.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        RTBLyrics.BorderStyle = BorderStyle.None
-        RTBLyrics.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipPlaylist.SetImage(RTBLyrics, Nothing)
-        TipPlayer.SetImage(RTBLyrics, Nothing)
-        TipWatcherNotification.SetImage(RTBLyrics, Nothing)
-        RTBLyrics.Location = New Point(1, 27)
-        RTBLyrics.Name = "RTBLyrics"
-        RTBLyrics.ReadOnly = True
-        RTBLyrics.ScrollBars = RichTextBoxScrollBars.Vertical
-        RTBLyrics.ShortcutsEnabled = False
-        RTBLyrics.Size = New Size(407, 294)
-        RTBLyrics.TabIndex = 39
-        RTBLyrics.Text = ""
-        RTBLyrics.Visible = False
         ' 
         ' Player
         ' 
@@ -1005,5 +1006,5 @@ Partial Class Player
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
     Friend WithEvents MIViewHistory As ToolStripMenuItem
     Friend WithEvents TimerLyrics As Timer
-    Friend WithEvents RTBLyrics As RichTextBox
+    Friend WithEvents RTBLyrics As Skye.UI.RichTextBox
 End Class

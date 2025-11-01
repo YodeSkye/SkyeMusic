@@ -99,7 +99,7 @@
 
   <ItemGroup>
     <PackageReference Include="LibVLCSharp.WinForms" Version="3.9.4" />
-    <PackageReference Include="SkyeLibrary" Version="1.2.23" />
+    <PackageReference Include="SkyeLibrary" Version="1.2.25" />
     <PackageReference Include="Syncfusion.Tools.Windows" Version="31.2.4" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.10" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />

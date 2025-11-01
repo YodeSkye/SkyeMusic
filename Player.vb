@@ -1869,12 +1869,6 @@ Public Class Player
                 WindowState = FormWindowState.Normal
         End Select
     End Sub
-    Private Sub LyricsOff()
-        If Lyrics Then
-            Lyrics = False
-            MILyrics.BackColor = Color.Transparent
-        End If
-    End Sub
     Private Sub VisualizerOff()
         If Visualizer Then
             Visualizer = False
@@ -2665,6 +2659,8 @@ Public Class Player
         If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
         LblDuration.Text = FormatDuration(_player.Duration)
         ShowPosition()
+        HasLyrics = False
+        HasLyricsSynced = False
         Try
             If Stream Then
                 Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path.TrimEnd("/"c), True, 0).Text + " @ " + _player.Path.TrimEnd("/"c)
@@ -2852,14 +2848,10 @@ Public Class Player
                     PicBoxVisualizer.BringToFront()
                 End If
                 'Show Lyrics Menu Button
-                If tlfile Is Nothing Then
-                    MILyrics.Visible = False
+                If HasLyrics Then
+                    MILyrics.Visible = True
                 Else
-                    If String.IsNullOrEmpty(tlfile.Tag.Lyrics) Then
-                        MILyrics.Visible = False
-                    Else
-                        MILyrics.Visible = True
-                    End If
+                    MILyrics.Visible = False
                 End If
             End If
             tlfile = Nothing
@@ -2937,8 +2929,6 @@ Public Class Player
 
     'Lryics
     Private Sub LoadLyrics(songPath As String)
-        HasLyrics = False
-        HasLyricsSynced = False
         LyricsText = String.Empty
         LyricsSynced = Nothing
 
@@ -3017,6 +3007,12 @@ Public Class Player
 
         Return String.Join(Environment.NewLine, lines)
     End Function
+    Private Sub LyricsOff()
+        If Lyrics Then
+            Lyrics = False
+            MILyrics.BackColor = Color.Transparent
+        End If
+    End Sub
 
     'Themes
     Private Sub SetAccentColor(Optional force As Boolean = False)

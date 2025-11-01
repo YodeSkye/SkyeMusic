@@ -89,7 +89,7 @@ Public Class Log
 
     'Control Events
     Private Sub RTBLog_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles RTBLog.PreviewKeyDown
-        RTBCMLog.ShortcutKeys(CType(sender, RichTextBox), e)
+        RTBCMLog.ShortcutKeys(CType(sender, System.Windows.Forms.RichTextBox), e)
     End Sub
     Private Sub LBLLogInfo_DoubleClick(sender As Object, e As EventArgs) Handles LBLLogInfo.DoubleClick
         App.OpenFileLocation(App.LogPath)
