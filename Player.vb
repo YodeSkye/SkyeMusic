@@ -35,9 +35,9 @@ Public Class Player
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
+    Private Lyrics As Boolean = False 'Indicates if the lyrics are active
     Private HasLyrics As Boolean = False 'Indicates if the current playing item has lyrics available
     Private HasLyricsSynced As Boolean = False 'Indicates if the current playing item has synced lyrics available
-    Private Lyrics As Boolean = False 'Indicates if the lyrics are active
     Private LyricsText As String = String.Empty
     Private LyricsSynced As List(Of TimedLyric)
     Public Class TimedLyric
@@ -597,10 +597,12 @@ Public Class Player
         FullScreen = Not FullScreen
     End Sub
     Private Sub VLCViewer_DoubleClick(clientPoint As Point)
-        If Me.InvokeRequired Then
-            Me.BeginInvoke(New MethodInvoker(AddressOf ToggleMaximized))
-        Else
-            ToggleMaximized()
+        If Not FullScreen Then
+            If Me.InvokeRequired Then
+                Me.BeginInvoke(New MethodInvoker(AddressOf ToggleMaximized))
+            Else
+                ToggleMaximized()
+            End If
         End If
     End Sub
     Private Sub VLCViewer_RightClick(clientPoint As Point)
