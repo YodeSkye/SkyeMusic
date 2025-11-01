@@ -1,5 +1,6 @@
 ﻿
 Imports System.IO
+Imports System.Data.SQLite
 Imports Microsoft.Win32
 
 Namespace My
@@ -42,6 +43,12 @@ Namespace My
         End Enum
         Friend Enum PlayModes
             None
+            Repeat
+            Linear
+            Random
+        End Enum
+        Friend Enum PlayTriggers
+            Manual
             Repeat
             Linear
             Random
@@ -244,12 +251,14 @@ Namespace My
         Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
         Private ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.xml" 'HistoryPath is the path to the media history XML file.
+        Private ReadOnly DatabasePath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.db" 'DatabasePath is the path to the SQLite database file.
 #Else
         Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "Log.txt" 'LogPath is the path to the log file.
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName 'RegPath is the path to the registry key where application settings are stored.
         Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
         Private ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "History.xml" 'HistoryPath is the path to the media history XML file.
+        Private ReadOnly DatabasePath As String = UserPath + My.Application.Info.ProductName + "History.db" 'DatabasePath is the path to the SQLite database file.
 #End If
 
         'Themes
@@ -839,6 +848,7 @@ Namespace My
             GetDebugOptions()
             CurrentTheme = GetCurrentThemeProperties()
             LoadHistory()
+            LoadDatabase()
 
             'Setup Dictionaries
 #Region "            Audio Types"
@@ -1583,6 +1593,56 @@ Namespace My
             timerHistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
             timerHistoryAutoSave.Start()
             Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
+        End Sub
+
+        'Database Procedures
+        Private Sub LoadDatabase()
+            If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
+                My.Computer.FileSystem.CreateDirectory(App.UserPath)
+            End If
+
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+
+            'Create the database file if it doesn't exist
+            If Not File.Exists(DatabasePath) Then
+                SQLiteConnection.CreateFile(DatabasePath)
+            End If
+
+            'Create the Plays table if needed
+            Using connection As New SQLiteConnection(connectionString)
+                connection.Open()
+                Dim createTableSql As String = "
+                    CREATE TABLE IF NOT EXISTS Plays (
+                        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Path TEXT NOT NULL,
+                        StartPlayTime DATETIME NOT NULL,
+                        StopPlayTime DATETIME NOT NULL,
+                        Duration INTEGER NOT NULL,
+                        PlayTrigger TEXT NOT NULL
+                    );"
+                Using command As New SQLiteCommand(createTableSql, connection)
+                    command.ExecuteNonQuery()
+                End Using
+            End Using
+
+        End Sub
+        Friend Sub LogPlay(path As String, startTime As DateTime, stopTime As DateTime, trigger As PlayTriggers)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim durationSeconds As Integer = CInt((stopTime - startTime).TotalSeconds)
+            Dim insertSql As String = "INSERT INTO Plays (Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger) VALUES (@Path, @Start, @Stop, @Duration, @Trigger);"
+
+            Using connection As New SQLiteConnection(connectionString)
+                connection.Open()
+                Using command As New SQLiteCommand(insertSql, connection)
+                    command.Parameters.AddWithValue("@Path", path)
+                    command.Parameters.AddWithValue("@Start", startTime)
+                    command.Parameters.AddWithValue("@Stop", stopTime)
+                    command.Parameters.AddWithValue("@Duration", durationSeconds)
+                    command.Parameters.AddWithValue("@Trigger", trigger.ToString)
+                    command.ExecuteNonQuery()
+                End Using
+            End Using
+
         End Sub
 
         'Functions
