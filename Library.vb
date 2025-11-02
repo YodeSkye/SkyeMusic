@@ -1399,9 +1399,9 @@ Public Class Library
                 TxbxLibrarySearch.BackColor = CurrentAccentColor
             End If
             ResumeLayout()
-            Debug.Print("Library Accent Color Set")
+            'Debug.Print("Library Accent Color Set")
             Skye.WinAPI.RedrawWindow(Me.Handle, IntPtr.Zero, IntPtr.Zero, Skye.WinAPI.RDW_INVALIDATE Or Skye.WinAPI.RDW_ERASE Or Skye.WinAPI.RDW_FRAME Or Skye.WinAPI.RDW_ALLCHILDREN Or Skye.WinAPI.RDW_UPDATENOW)
-            Debug.Print("Library Repainted")
+            'Debug.Print("Library Repainted")
         End If
     End Sub
     Private Sub SetTheme()
@@ -1444,7 +1444,7 @@ Public Class Library
         LblExtType.ForeColor = forecolor
         GrpBoxGroupBy.ForeColor = forecolor
         ResumeLayout()
-        Debug.Print("Library Theme Set")
+        'Debug.Print("Library Theme Set")
     End Sub
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor(True)

@@ -490,8 +490,6 @@ Public Class Player
                         e.SuppressKeyPress = True
                 End Select
             ElseIf e.Shift Then
-                Select Case e.KeyCode
-                End Select
             Else
                 Select Case e.KeyCode
                     Case Keys.Enter
@@ -1570,7 +1568,7 @@ Public Class Player
             newposition = TrackBarPosition.Maximum
         End If
         TrackBarPosition.Value = Convert.ToInt32(newposition)
-        Debug.Print((TrackBarPosition.Value / TrackBarScale).ToString)
+        'Debug.Print((TrackBarPosition.Value / TrackBarScale).ToString)
         _player.Position = TrackBarPosition.Value / TrackBarScale
         TogglePlay()
         LVPlaylist.Focus()
@@ -1729,6 +1727,7 @@ Public Class Player
             LblMedia.Text = String.Empty
         End If
     End Sub
+
     'Functions
     Private Function IsStream(path As String) As Boolean
         If App.History.FindIndex(Function(p) p.Path = path And p.IsStream = True) >= 0 Then
@@ -2255,7 +2254,7 @@ Public Class Player
         End Try
         If lvi IsNot Nothing Then
             GetHistory(lvi, path)
-            Debug.Print("Updated History in Playlist for " + path)
+            'Debug.Print("Updated History in Playlist for " + path)
         End If
     End Sub
     Private Sub RandomHistoryAdd(songorstream As String)
@@ -2263,17 +2262,17 @@ Public Class Player
             If RandomHistory.FindIndex(Function(p) p = songorstream) < 0 Then
                 App.UpdateRandomHistory(songorstream)
             Else
-                Debug.Print("Not Adding " + songorstream + " to Random History, Already Exists")
+                'Debug.Print("Not Adding " + songorstream + " to Random History, Already Exists")
             End If
         Else
-            Debug.Print("Not Adding " + songorstream + " to Random History, Song Not Found In Playlist or Not In Random PlayMode")
+            'Debug.Print("Not Adding " + songorstream + " to Random History, Song Not Found In Playlist or Not In Random PlayMode")
         End If
     End Sub
     Friend Sub AddToRandomHistory(songorstream As String)
         If App.PlayMode = App.PlayModes.Random Then
             RandomHistory.Add(songorstream)
             RandomHistoryIndex = RandomHistory.Count
-            Debug.Print("Added " + songorstream + " to Random History")
+            'Debug.Print("Added " + songorstream + " to Random History")
         End If
     End Sub
     Friend Sub RandomHistoryClear()
@@ -2470,7 +2469,6 @@ Public Class Player
         If LVPlaylist.SelectedItems.Count > 0 Then
             LyricsOff()
             StopPlay()
-            'If Mute Then ToggleMute()
             If IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                 PlayStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
             Else
@@ -2508,7 +2506,6 @@ Public Class Player
             existingitem = Nothing
         End If
         StopPlay()
-        'If Mute Then ToggleMute()
         PlayFile(filename, "PlayFromLibrary")
     End Sub
     Friend Sub PlayPrevious()
@@ -2656,6 +2653,8 @@ Public Class Player
         ' - Avoid cross-thread reparenting or teardown collisions
         PlayState = PlayStates.Playing
         UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed for uniformity.
+        App.SongPlayData.Path = _player.Path.TrimEnd("/"c)
+        App.SongPlayData.StartPlayTime = Now
         BtnPlay.Image = App.CurrentTheme.PlayerPause
         TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
@@ -2682,6 +2681,12 @@ Public Class Player
     Private Sub OnStop()
         PlayState = PlayStates.Stopped
         App.StopHistoryUpdates()
+
+        App.SongPlayData.StopPlayTime = Now
+        If App.SongPlayData.IsValid Then App.LogPlay(App.SongPlayData.Path, App.SongPlayData.StartPlayTime, App.SongPlayData.StopPlayTime, Nothing)
+        Debug.Print("LOGGING PLAY: " + App.SongPlayData.Path + " | " + App.SongPlayData.IsValid.ToString + " | " + App.SongPlayData.StartPlayTime.ToString + " - " + App.SongPlayData.StopPlayTime.ToString + " | Trigger: " + App.SongPlayData.PlayTrigger.ToString)
+        App.SongPlayData = New App.PlayData
+
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
         TrackBarPosition.Value = 0
         TrackBarPosition.Enabled = False

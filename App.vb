@@ -174,6 +174,14 @@ Namespace My
             End Sub
 
         End Class
+        Friend Class PlayData
+            Public Property Path As String
+            Public Property StartPlayTime As DateTime
+            Public Property IsValid As Boolean = False
+            Public Property StopPlayTime As DateTime
+            Public Property PlayTrigger As PlayTriggers
+        End Class
+        Friend SongPlayData As New PlayData
         Friend Structure ThemeProperties
             Public IsAccent As Boolean
             Public BackColor As Color
@@ -832,12 +840,12 @@ Namespace My
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
 
-#If Not DEBUG Then
-            Dim TracePath As String = IO.Path.Combine(Application.Info.DirectoryPath, "skyemusic_trace.log")
-            Trace.Listeners.Add(New RollingTraceListener(TracePath))
-            Trace.AutoFlush = True
-            Trace.WriteLine("=== SkyeMusic Started ===")
-#End If
+            '#If Not DEBUG Then
+            '            Dim TracePath As String = IO.Path.Combine(Application.Info.DirectoryPath, "skyemusic_trace.log")
+            '            Trace.Listeners.Add(New RollingTraceListener(TracePath))
+            '            Trace.AutoFlush = True
+            '            Trace.WriteLine("=== SkyeMusic Started ===")
+            '#End If
 
 
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
@@ -1556,15 +1564,16 @@ Namespace My
                 If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
                 existingsong.LastPlayed = DateTime.Now
                 History(existingindex) = existingsong
-                Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
+                'Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
                 WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
                 Player.UpdateHistoryInPlaylist(songorstream)
             Else
-                Debug.Print("Song not found in history: " + songorstream)
+                'Debug.Print("Song not found in history: " + songorstream)
             End If
             HistoryTotalPlayedSongsThisSession += CUInt(1)
             HistoryTotalPlayedSongs += CUInt(1)
-            Debug.Print("Total Play Count = " & HistoryTotalPlayedSongs.ToString & ", " & HistoryTotalPlayedSongsThisSession & " this Session")
+            'Debug.Print("Total Play Count = " & HistoryTotalPlayedSongs.ToString & ", " & HistoryTotalPlayedSongsThisSession & " this Session")
+            App.SongPlayData.IsValid = True
             HistoryChanged = True
         End Sub
         Friend Sub UpdateRandomHistory(songorstream As String)
@@ -1586,13 +1595,13 @@ Namespace My
         Friend Sub StopHistoryUpdates()
             timerHistoryUpdate.Stop()
             timerRandomHistoryUpdate.Stop()
-            Debug.Print("History Update Timers Stopped")
+            'Debug.Print("History Update Timers Stopped")
         End Sub
         Friend Sub SetHistoryAutoSaveTimer()
             timerHistoryAutoSave.Stop()
             timerHistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
             timerHistoryAutoSave.Start()
-            Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
+            'Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
         End Sub
 
         'Database Procedures
@@ -1638,7 +1647,7 @@ Namespace My
                     command.Parameters.AddWithValue("@Start", startTime)
                     command.Parameters.AddWithValue("@Stop", stopTime)
                     command.Parameters.AddWithValue("@Duration", durationSeconds)
-                    command.Parameters.AddWithValue("@Trigger", trigger.ToString)
+                    command.Parameters.AddWithValue("@Trigger", If(trigger = Nothing, String.Empty, trigger.ToString))
                     command.ExecuteNonQuery()
                 End Using
             End Using
@@ -2596,48 +2605,39 @@ Namespace My
 
     End Module
 
-    Public Module RichTextBoxExtensions
-        <System.Runtime.CompilerServices.Extension>
-        Public Sub SetAlignment(rtb As RichTextBox, align As HorizontalAlignment)
-            rtb.SelectAll()
-            rtb.SelectionAlignment = align
-            rtb.DeselectAll()
-        End Sub
-    End Module
+    'Friend Class RollingTraceListener
+    '    Inherits TextWriterTraceListener
 
-    Friend Class RollingTraceListener
-        Inherits TextWriterTraceListener
+    '    Private ReadOnly maxSize As Long = 1024 * 1024 ' 1 MB
+    '    Private ReadOnly logPath As String
 
-        Private ReadOnly maxSize As Long = 1024 * 1024 ' 1 MB
-        Private ReadOnly logPath As String
+    '    Public Sub New(path As String)
+    '        MyBase.New(path)
+    '        logPath = path
+    '    End Sub
 
-        Public Sub New(path As String)
-            MyBase.New(path)
-            logPath = path
-        End Sub
+    '    Public Overrides Sub WriteLine(message As String)
+    '        RotateIfNeeded()
+    '        Dim stamped As String = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} | {message}"
+    '        MyBase.WriteLine(stamped)
+    '        Me.Writer.Flush()
+    '    End Sub
+    '    Private Sub RotateIfNeeded()
+    '        Try
+    '            If File.Exists(logPath) AndAlso New FileInfo(logPath).Length > maxSize Then
+    '                Dim backupPath As String = Path.ChangeExtension(logPath, ".old")
+    '                If File.Exists(backupPath) Then File.Delete(backupPath)
+    '                File.Move(logPath, backupPath)
+    '                'Reset writer to new file
+    '                Me.Writer.Close()
+    '                Me.Writer = New StreamWriter(logPath, append:=False)
+    '            End If
+    '        Catch
+    '            'Fail silently — logging should never crash the app
+    '        End Try
+    '    End Sub
 
-        Public Overrides Sub WriteLine(message As String)
-            RotateIfNeeded()
-            Dim stamped As String = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} | {message}"
-            MyBase.WriteLine(stamped)
-            Me.Writer.Flush()
-        End Sub
-        Private Sub RotateIfNeeded()
-            Try
-                If File.Exists(logPath) AndAlso New FileInfo(logPath).Length > maxSize Then
-                    Dim backupPath As String = Path.ChangeExtension(logPath, ".old")
-                    If File.Exists(backupPath) Then File.Delete(backupPath)
-                    File.Move(logPath, backupPath)
-                    'Reset writer to new file
-                    Me.Writer.Close()
-                    Me.Writer = New StreamWriter(logPath, append:=False)
-                End If
-            Catch
-                'Fail silently — logging should never crash the app
-            End Try
-        End Sub
-
-    End Class
+    'End Class
 
     Friend Class ListViewItemStringComparer
         Implements IComparer
