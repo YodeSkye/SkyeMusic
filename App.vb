@@ -227,6 +227,7 @@ Namespace My
         Friend FRMLibrary As Library 'FRMLibrary is the main library window that displays the media library.
         Friend FRMHistory As History 'FRMHistory is the history window that displays the playback history and statistics.
         Friend FRMLog As Log 'FRMLog is the log window that displays application logs.
+        Friend FRMDevTools As DevTools 'FRMDevTools is the developer tools window that provides debugging and database access features.
         Friend AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
         Friend AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
         Private HotKeys As New Collections.Generic.List(Of HotKey) 'HotKeys is a list of hotkeys used in the application for global media control.
@@ -856,7 +857,7 @@ Namespace My
             GetDebugOptions()
             CurrentTheme = GetCurrentThemeProperties()
             LoadHistory()
-            LoadDatabase()
+            LoadPlayHistoryDatabase()
 
             'Setup Dictionaries
 #Region "            Audio Types"
@@ -1301,6 +1302,20 @@ Namespace My
                 FRMLibrary.DoWatcherWork(paths)
             End If
         End Sub
+        Friend Sub ShowDevTools()
+            If FRMDevTools Is Nothing OrElse FRMDevTools.IsDisposed Then
+                FRMDevTools = New DevTools
+                FRMDevTools.Show()
+            Else
+                If FRMDevTools.WindowState = FormWindowState.Minimized Then
+                    FRMDevTools.WindowState = FormWindowState.Normal
+                ElseIf FRMDevTools.Visible Then
+                    FRMDevTools.BringToFront()
+                Else
+                    FRMDevTools.Show()
+                End If
+            End If
+        End Sub
         Friend Sub ShowHistory()
             If FRMHistory Is Nothing OrElse FRMHistory.IsDisposed Then
                 FRMHistory = New History
@@ -1605,7 +1620,7 @@ Namespace My
         End Sub
 
         'Database Procedures
-        Private Sub LoadDatabase()
+        Private Sub LoadPlayHistoryDatabase()
             If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                 My.Computer.FileSystem.CreateDirectory(App.UserPath)
             End If
@@ -1635,7 +1650,7 @@ Namespace My
             End Using
 
         End Sub
-        Friend Sub LogPlay(path As String, startTime As DateTime, stopTime As DateTime, trigger As PlayTriggers)
+        Friend Sub LogPlayHistory(path As String, startTime As DateTime, stopTime As DateTime, trigger As PlayTriggers)
             Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Dim durationSeconds As Integer = CInt((stopTime - startTime).TotalSeconds)
             Dim insertSql As String = "INSERT INTO Plays (Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger) VALUES (@Path, @Start, @Stop, @Duration, @Trigger);"
@@ -1647,12 +1662,54 @@ Namespace My
                     command.Parameters.AddWithValue("@Start", startTime)
                     command.Parameters.AddWithValue("@Stop", stopTime)
                     command.Parameters.AddWithValue("@Duration", durationSeconds)
-                    command.Parameters.AddWithValue("@Trigger", If(trigger = Nothing, String.Empty, trigger.ToString))
+                    command.Parameters.AddWithValue("@Trigger", trigger.ToString)
                     command.ExecuteNonQuery()
                 End Using
             End Using
 
         End Sub
+        Public Function GetPlayHistoryTable() As DataTable
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim dt As New DataTable()
+
+            Try
+                Using conn As New SQLiteConnection(connectionString)
+                    conn.Open()
+
+                    Dim query As String = "SELECT * FROM Plays ORDER BY StartPlayTime DESC"
+                    Using cmd As New SQLiteCommand(query, conn)
+                        Using adapter As New SQLiteDataAdapter(cmd)
+                            adapter.Fill(dt)
+                        End Using
+                    End Using
+
+                End Using
+            Catch ex As Exception
+                Debug.Print("Error loading play history: " & ex.Message)
+            End Try
+
+            Return dt
+        End Function
+        Public Function DeletePlayHistoryById(recordId As Integer) As Boolean
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Try
+                Using conn As New SQLiteConnection(connectionString)
+                    conn.Open()
+
+                    Dim query As String = "DELETE FROM Plays WHERE Id = @Id"
+                    Using cmd As New SQLiteCommand(query, conn)
+                        cmd.Parameters.AddWithValue("@Id", recordId)
+                        Dim rowsAffected As Integer = cmd.ExecuteNonQuery()
+                        Return rowsAffected > 0
+                    End Using
+
+                End Using
+
+            Catch ex As Exception
+                Debug.Print("Error deleting play record: " & ex.Message)
+                Return False
+            End Try
+        End Function
 
         'Functions
         Private Function FormatPlaylistTitleCore(filePath As String) As String 'Core routine: all formatting logic lives here

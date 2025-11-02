@@ -57,6 +57,7 @@ Public Class Player
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
     Private PicBoxAlbumArtClickTimer As Timer
+    Private AutoNext As Boolean = False 'Indicates if the player will automatically play the next item.
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -485,6 +486,8 @@ Public Class Player
             If e.Alt Then
             ElseIf e.Control Then
                 Select Case e.KeyCode
+                    Case Keys.D
+                        If e.Shift Then App.ShowDevTools()
                     Case Keys.Space
                         StopPlay()
                         e.SuppressKeyPress = True
@@ -1640,7 +1643,10 @@ Public Class Player
         PEXLeft.Value = 0
         PEXRight.Value = 0
         ResetLblPositionText()
-        If Not App.PlayMode = App.PlayModes.None Then PlayNext()
+        If Not App.PlayMode = App.PlayModes.None Then
+            AutoNext = True
+            PlayNext()
+        End If
         ' ⚠️ WARNING: Do NOT call FullScreen = False here.
         ' LibVLC is already tearing down its rendering surface.
         ' Reparenting VLCViewer during this moment causes WinForms to freeze.
@@ -2582,6 +2588,7 @@ Public Class Player
         LyricsOff()
         Select Case App.PlayMode
             Case PlayModes.Repeat
+                TogglePlay()
                 TimerShowMedia.Start()
             Case PlayModes.Linear
                 If Queue.Count > 0 Then
@@ -2683,9 +2690,22 @@ Public Class Player
         App.StopHistoryUpdates()
 
         App.SongPlayData.StopPlayTime = Now
-        If App.SongPlayData.IsValid Then App.LogPlay(App.SongPlayData.Path, App.SongPlayData.StartPlayTime, App.SongPlayData.StopPlayTime, Nothing)
+        If App.SongPlayData.IsValid Then App.LogPlayHistory(App.SongPlayData.Path, App.SongPlayData.StartPlayTime, App.SongPlayData.StopPlayTime, App.SongPlayData.PlayTrigger)
         Debug.Print("LOGGING PLAY: " + App.SongPlayData.Path + " | " + App.SongPlayData.IsValid.ToString + " | " + App.SongPlayData.StartPlayTime.ToString + " - " + App.SongPlayData.StopPlayTime.ToString + " | Trigger: " + App.SongPlayData.PlayTrigger.ToString)
         App.SongPlayData = New App.PlayData
+        If AutoNext Then
+            Select Case App.PlayMode
+                Case App.PlayModes.Repeat
+                    App.SongPlayData.PlayTrigger = App.PlayTriggers.Repeat
+                Case App.PlayModes.Linear
+                    App.SongPlayData.PlayTrigger = App.PlayTriggers.Linear
+                Case App.PlayModes.Random
+                    App.SongPlayData.PlayTrigger = App.PlayTriggers.Random
+            End Select
+            AutoNext = False
+        Else
+            App.SongPlayData.PlayTrigger = App.PlayTriggers.Manual
+        End If
 
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
         TrackBarPosition.Value = 0
