@@ -58,6 +58,18 @@ Public Class PlayerQueue
     Private Sub PlayerQueue_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         LVQueue.Columns(1).Width = -2
     End Sub
+    Private Sub PlayerQueue_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        Select Case e.KeyCode
+            Case Keys.A
+                If e.Control Then
+                    For Each item As ListViewItem In LVQueue.Items
+                        item.Selected = True
+                    Next
+                End If
+            Case Keys.Delete
+                RemoveFromQueue()
+        End Select
+    End Sub
 
     'Control Events
     Private Sub LVQueue_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles LVQueue.DrawColumnHeader
@@ -248,12 +260,7 @@ Public Class PlayerQueue
         SaveLVToQueue()
     End Sub
     Private Sub CMIRemove_Click(sender As Object, e As EventArgs) Handles CMIRemove.Click
-        If LVQueue.SelectedItems.Count > 0 Then
-            For Each item As ListViewItem In LVQueue.SelectedItems
-                Player.RemoveFromQueue(item.SubItems(1).Text)
-            Next
-            Populate()
-        End If
+        RemoveFromQueue()
     End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
@@ -285,6 +292,14 @@ Public Class PlayerQueue
         For Each lvi As ListViewItem In LVQueue.Items
             Player.Queue.Add(lvi.SubItems(1).Text)
         Next
+    End Sub
+    Private Sub RemoveFromQueue()
+        If LVQueue.SelectedItems.Count > 0 Then
+            For Each item As ListViewItem In LVQueue.SelectedItems
+                Player.RemoveFromQueue(item.SubItems(1).Text)
+            Next
+            Populate()
+        End If
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow

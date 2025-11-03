@@ -1223,7 +1223,7 @@ Namespace My
             For Each key As HotKey In HotKeys
                 If Not key.Key = Keys.None Then
                     status = Skye.WinAPI.UnregisterHotKey(Player.Handle, key.WinID)
-                    Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
+                    'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
                     WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
                 End If
             Next

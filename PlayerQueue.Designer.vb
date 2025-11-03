@@ -155,6 +155,7 @@ Partial Class PlayerQueue
         Controls.Add(BtnOK)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         TipQueue.SetImage(Me, Nothing)
+        KeyPreview = True
         MinimumSize = New Size(800, 300)
         Name = "PlayerQueue"
         StartPosition = FormStartPosition.CenterParent

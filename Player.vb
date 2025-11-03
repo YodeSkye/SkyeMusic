@@ -1608,12 +1608,12 @@ Public Class Player
             RemoveHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
             RemoveHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
             VLCHook = Nothing
-            Debug.Print("VLC Viewer Hook Detached")
+            'Debug.Print("VLC Viewer Hook Detached")
         End If
 
         'Attach to the new child
         If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
-            Debug.Print("Attaching VLC Viewer Hook...")
+            'Debug.Print("Attaching VLC Viewer Hook...")
 
             Dim child As IntPtr = IntPtr.Zero
             Dim attempts As Integer = 0
@@ -1634,7 +1634,7 @@ Public Class Player
                 AddHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
                 AddHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
                 AddHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
-                Debug.Print("VLC Viewer Hook Attached")
+                'Debug.Print("VLC Viewer Hook Attached")
             End If
         End If
 
@@ -1793,7 +1793,7 @@ Public Class Player
     Private Function VideoGetHeight(width As Integer) As Integer
         If _player.HasMedia Then
             Try
-                Debug.Print("Calculating video height: VideoWidth=" + _player.VideoWidth.ToString + ", VideoHeight=" + _player.VideoHeight.ToString)
+                'Debug.Print("Calculating video height: VideoWidth=" + _player.VideoWidth.ToString + ", VideoHeight=" + _player.VideoHeight.ToString)
                 Return CInt(Int(_player.VideoHeight * (width / _player.VideoWidth)))
             Catch ex As Exception
                 Debug.Print("Error calculating video height: " + ex.Message)
