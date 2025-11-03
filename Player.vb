@@ -58,6 +58,8 @@ Public Class Player
     Private mOffset, mPosition As System.Drawing.Point
     Private PicBoxAlbumArtClickTimer As Timer
     Private AutoNext As Boolean = False 'Indicates if the player will automatically play the next item.
+    Private PausedAt As DateTime? = Nothing
+    Private TotalPausedDuration As TimeSpan = TimeSpan.Zero
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -2659,9 +2661,20 @@ Public Class Player
         ' - UI transitions (fullscreen, hooks) must be marshaled and timed carefully
         ' - Avoid cross-thread reparenting or teardown collisions
         PlayState = PlayStates.Playing
+
+        'Update The Histories
         UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed for uniformity.
-        App.SongPlayData.Path = _player.Path.TrimEnd("/"c)
-        App.SongPlayData.StartPlayTime = Now
+        If PausedAt IsNot Nothing Then
+            Dim pausedDuration = DateTime.Now - PausedAt.Value
+            TotalPausedDuration += pausedDuration
+            PausedAt = Nothing
+            Debug.Print("Resumed, total paused: " & TotalPausedDuration.TotalSeconds & "s")
+        End If
+        If App.SongPlayData.StartPlayTime = DateTime.MinValue Then 'Because of OnPlay happening on seek.
+            App.SongPlayData.Path = _player.Path.TrimEnd("/"c)
+            App.SongPlayData.StartPlayTime = Now
+        End If
+
         BtnPlay.Image = App.CurrentTheme.PlayerPause
         TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
@@ -2683,16 +2696,28 @@ Public Class Player
     End Sub
     Private Sub OnPause()
         PlayState = PlayStates.Paused
+        If PausedAt Is Nothing Then
+            PausedAt = DateTime.Now
+            Debug.Print("Paused at: " & PausedAt.ToString())
+        End If
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
     End Sub
     Private Sub OnStop()
         PlayState = PlayStates.Stopped
         App.StopHistoryUpdates()
 
+        'Save Song Play Data and reset
+        If PausedAt IsNot Nothing Then
+            Dim finalPause = DateTime.Now - PausedAt.Value
+            TotalPausedDuration += finalPause
+            PausedAt = Nothing
+            Debug.Print("Final pause added: total paused: " & TotalPausedDuration.TotalSeconds & "s")
+        End If
         App.SongPlayData.StopPlayTime = Now
-        If App.SongPlayData.IsValid Then App.LogPlayHistory(App.SongPlayData.Path, App.SongPlayData.StartPlayTime, App.SongPlayData.StopPlayTime, App.SongPlayData.PlayTrigger)
+        If App.SongPlayData.IsValid Then App.LogPlayHistory(App.SongPlayData.Path, App.SongPlayData.StartPlayTime, App.SongPlayData.StopPlayTime, CInt((App.SongPlayData.StopPlayTime - App.SongPlayData.StartPlayTime - TotalPausedDuration).TotalSeconds), App.SongPlayData.PlayTrigger)
         Debug.Print("LOGGING PLAY: " + App.SongPlayData.Path + " | " + App.SongPlayData.IsValid.ToString + " | " + App.SongPlayData.StartPlayTime.ToString + " - " + App.SongPlayData.StopPlayTime.ToString + " | Trigger: " + App.SongPlayData.PlayTrigger.ToString)
         App.SongPlayData = New App.PlayData
+        TotalPausedDuration = TimeSpan.Zero
         If AutoNext Then
             Select Case App.PlayMode
                 Case App.PlayModes.Repeat

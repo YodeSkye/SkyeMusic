@@ -1650,9 +1650,10 @@ Namespace My
             End Using
 
         End Sub
-        Friend Sub LogPlayHistory(path As String, startTime As DateTime, stopTime As DateTime, trigger As PlayTriggers)
+        Friend Sub LogPlayHistory(path As String, startTime As DateTime, stopTime As DateTime, durationSeconds As Integer, trigger As PlayTriggers)
             Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Dim durationSeconds As Integer = CInt((stopTime - startTime).TotalSeconds)
+            If durationSeconds < 0 Then WriteToLog("LogPlayHistory Duration was less than zero (" & durationSeconds.ToString & "), for " & path)
+            If durationSeconds <= 0 Then durationSeconds = CInt((stopTime - startTime).TotalSeconds)
             Dim insertSql As String = "INSERT INTO Plays (Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger) VALUES (@Path, @Start, @Stop, @Duration, @Trigger);"
 
             Using connection As New SQLiteConnection(connectionString)
