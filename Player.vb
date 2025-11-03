@@ -60,6 +60,7 @@ Public Class Player
     Private AutoNext As Boolean = False 'Indicates if the player will automatically play the next item.
     Private PausedAt As DateTime? = Nothing
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero
+    Private LastLyricsIndex As Integer = -1
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -1702,14 +1703,13 @@ Public Class Player
             Dim currentText As String = If(currentIndex >= 0, LyricsSynced(currentIndex).Text, String.Empty)
 
             If Lyrics Then
-                Static lastIndex As Integer = -1
 
                 'Only update if the line actually changed
-                If currentIndex <> lastIndex AndAlso currentIndex >= 0 Then
+                If currentIndex <> LastLyricsIndex AndAlso currentIndex >= 0 Then
                     'Reset the old line
-                    If lastIndex >= 0 AndAlso lastIndex < RTBLyrics.Lines.Length Then
-                        Dim startOld = RTBLyrics.GetFirstCharIndexFromLine(lastIndex)
-                        Dim lengthOld = RTBLyrics.Lines(lastIndex).Length
+                    If LastLyricsIndex >= 0 AndAlso LastLyricsIndex < RTBLyrics.Lines.Length Then
+                        Dim startOld = RTBLyrics.GetFirstCharIndexFromLine(LastLyricsIndex)
+                        Dim lengthOld = RTBLyrics.Lines(LastLyricsIndex).Length
                         RTBLyrics.Select(startOld, lengthOld)
                         RTBLyrics.SelectionFont = New Font(RTBLyrics.Font, FontStyle.Regular)
                     End If
@@ -1720,11 +1720,17 @@ Public Class Player
                         Dim lengthNew = RTBLyrics.Lines(currentIndex).Length
                         RTBLyrics.Select(startNew, lengthNew)
                         RTBLyrics.SelectionFont = New Font(RTBLyrics.Font, FontStyle.Bold)
-                        RTBLyrics.ScrollToCaret()
+
+                        Dim firstVisible = RTBLyrics.GetLineFromCharIndex(RTBLyrics.GetCharIndexFromPosition(New Point(0, 0)))
+                        Dim lastVisible = RTBLyrics.GetLineFromCharIndex(RTBLyrics.GetCharIndexFromPosition(New Point(0, RTBLyrics.Height - 1)))
+                        If currentIndex < firstVisible OrElse currentIndex > lastVisible Then
+                            RTBLyrics.ScrollToCaret()
+                        End If
+
                         RTBLyrics.DeselectAll()
                     End If
 
-                    lastIndex = currentIndex
+                    LastLyricsIndex = currentIndex
                 End If
             Else
                 'Album art view: always keep label in sync
@@ -2833,7 +2839,7 @@ Public Class Player
                 Else
                     RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 12, FontStyle.Regular)
                 End If
-                RTBLyrics.Text = LyricsText
+                RTBLyrics.Lines = LyricsSynced.Select(Function(l) l.Text).ToArray()
                 RTBLyrics.SetAlignment(HorizontalAlignment.Center)
                 RTBLyrics.Visible = True
             Else
@@ -2983,6 +2989,7 @@ Public Class Player
     Private Sub LoadLyrics(songPath As String)
         LyricsText = String.Empty
         LyricsSynced = Nothing
+        LastLyricsIndex = -1
 
         Dim lrcPath = IO.Path.ChangeExtension(songPath, ".lrc")
         Dim txtPath = IO.Path.ChangeExtension(songPath, ".txt")

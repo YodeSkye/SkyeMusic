@@ -502,7 +502,7 @@ Partial Class Player
         ' 
         ' TimerShowMedia
         ' 
-        TimerShowMedia.Interval = 200
+        TimerShowMedia.Interval = 250
         ' 
         ' BtnForward
         ' 

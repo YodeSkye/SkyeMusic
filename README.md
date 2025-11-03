@@ -61,7 +61,26 @@ file.Save()
 
 ---
 
-### 4. System.Text.Encoding.CodePages
+### 4. System.Data.SQLite.Core
+
+Provides a lightweight, embedded SQL database engine for local storage of play history and metadata cache.
+
+```powershell
+Install-Package System.Data.SQLite.Core
+```
+
+**Usage Tip:**
+```vbnet
+'Example: open a connection to the local database file
+Using conn As New SQLiteConnection("Data Source=skyeMusic.db;Version=3;")
+    conn.Open()
+    ' Execute commands here
+End Using
+```
+
+---
+
+### 5. System.Text.Encoding.CodePages
 
 Adds support for legacy code page encodings (e.g., Windows-1252, Shift-JIS).
 
@@ -76,7 +95,7 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 
 ---
 
-### 5. Syncfusion.Tools.Windows
+### 6. Syncfusion.Tools.Windows
 
 Provides advanced WinForms UI components like Ribbon, Docking Manager, and TreeView. It 's free for individual developers and small businesses. To get a license, visit their website [Syncfusion Community License](https://www.syncfusion.com/products/communitylicense).
 
@@ -86,7 +105,7 @@ Install-Package Syncfusion.Tools.Windows
 
 ---
 
-### 6. WinForms.DataVisualization
+### 7. WinForms.DataVisualization
 
 Provides the **System.Windows.Forms.DataVisualization.Charting** namespace, which includes chart controls (Pie, Bar, Radar, Pareto, etc.) used in the **History & Statistics** page.
 
@@ -109,7 +128,7 @@ chart.Series.Add(series)
 
 ---
 
-### 7. WordCloudSharp
+### 8. WordCloudSharp
 
 Provides word cloud generation for visualizing artist frequency in SkyeMusic. Used in the **Artist Word Cloud** chart view.
 
