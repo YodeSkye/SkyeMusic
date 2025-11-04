@@ -1,7 +1,7 @@
 ﻿# Skye Music 🎶
 
 [⬇️ Download Skye Music](https://github.com/YodeSkye/SkyeMusic/releases/tag/v1.0)
-![Skye Music screenshot](My Project/ScreenShot 20251103.png)
+![Skye Music screenshot](My%20Project/ScreenShot%2020251103.png)
 
 
 
