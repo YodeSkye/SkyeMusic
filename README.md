@@ -1,4 +1,12 @@
-﻿
+﻿# Skye Music 🎶
+
+[⬇️ Download Skye Music](https://github.com/YodeSkye/SkyeMusic/releases/tag/v1.0)
+![Skye Music screenshot](My Project/ScreenShot 20251103.png)
+
+
+
+# Using from the repo:
+
 ## 📥 Installing SkyeLibrary from a Local `.nupkg` File
 
 After cloning this repo:
