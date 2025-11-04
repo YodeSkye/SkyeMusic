@@ -9,6 +9,7 @@
     <Title>Skye Music</Title>
     <Description>Skye's Music Library &amp; Player</Description>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -20,14 +21,27 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
 	<NoWarn>MSB3305</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <NoWarn>MSB3305</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
 	<NoWarn>MSB3305</NoWarn>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <NoWarn>MSB3305</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="libvlc\**" />
+    <EmbeddedResource Remove="libvlc\**" />
+    <None Remove="libvlc\**" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Remove="LicenseKey.Sample.vb" />
   </ItemGroup>
