@@ -3,7 +3,8 @@ Public Class DevTools
 
     'Form Events
     Private Sub DevTools_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Text = My.Application.Info.Title & " " & Me.Text
+        Text = My.Application.Info.Title & " " & Text
+        GetHistoryData()
         GetPlaysData()
     End Sub
     Private Sub DevTools_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
@@ -12,15 +13,21 @@ Public Class DevTools
         DGVPlays.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells)
 
         'Resize form
-        Me.Size = New Size(DGVPlays.PreferredSize.Width, Me.Height)
+        'Size = New Size(DGVPlays.PreferredSize.Width, Height)
 
     End Sub
 
     'Control Events
-    Private Sub BtnRefreshData_Click(sender As Object, e As EventArgs) Handles BtnRefreshData.Click
+    Private Sub BtnHistoryRefresh_Click(sender As Object, e As EventArgs) Handles BtnHistoryRefresh.Click
+        GetHistoryData()
+    End Sub
+    Private Sub BtnHistoryDeleteSelected_Click(sender As Object, e As EventArgs) Handles BtnHistoryDeleteSelected.Click
+
+    End Sub
+    Private Sub BtnPlaysRefresh_Click(sender As Object, e As EventArgs) Handles BtnPlaysRefresh.Click
         GetPlaysData()
     End Sub
-    Private Sub BtnDeleteSelected_Click(sender As Object, e As EventArgs) Handles BtnDeleteSelected.Click
+    Private Sub BtnPlaysDeleteSelected_Click(sender As Object, e As EventArgs) Handles BtnPlaysDeleteSelected.Click
         If DGVPlays.SelectedRows.Count > 0 Then
             Dim idsToDelete As New List(Of Integer)
 
@@ -43,17 +50,20 @@ Public Class DevTools
 
             'Feedback
             If failedCount > 0 Then
-                LblCount.Text = $"{failedCount} record(s) failed to delete."
+                LblPlaysCounts.Text = $"{failedCount} record(s) failed to delete."
             Else
-                LblCount.Text = "Selected records deleted."
+                LblPlaysCounts.Text = "Selected records deleted."
             End If
         End If
     End Sub
 
     'Procedures
+    Private Sub GetHistoryData()
+
+    End Sub
     Private Sub GetPlaysData()
         DGVPlays.DataSource = App.GetPlayHistoryTable()
-        LblCount.Text = DGVPlays.Rows.Count.ToString & " Rows"
+        LblPlaysCounts.Text = DGVPlays.Rows.Count.ToString & " Rows"
     End Sub
 
 End Class

@@ -2849,7 +2849,6 @@ Public Class Player
             Else
                 If Visualizer Then
                     PicBoxAlbumArt.Visible = False
-                    'LblMedia.Visible = False
                     RTBLyrics.Visible = False
                     VLCViewer.Visible = False
                 Else
@@ -2860,11 +2859,9 @@ Public Class Player
                         TimerVisualizer.Stop()
                         If tlfile Is Nothing Then
                             PicBoxAlbumArt.Visible = False
-                            'LblMedia.Visible = False
                         Else
                             If tlfile.Tag.Pictures.Length = 0 Then
                                 PicBoxAlbumArt.Visible = False
-                                'LblMedia.Visible = False
                             Else
                                 Debug.Print("Showing Album Art...")
                                 If AlbumArtIndex + 1 > tlfile.Tag.Pictures.Count Then AlbumArtIndex = 0
@@ -2875,23 +2872,16 @@ Public Class Player
                                 Catch ex As Exception
                                     WriteToLog("Error Loading Album Art for " + _player.Path + vbCr + ex.Message)
                                     PicBoxAlbumArt.Visible = False
-                                    'LblMedia.Visible = False
                                 End Try
                                 ms.Dispose()
                                 ms = Nothing
                                 AlbumArtCount = CByte(tlfile.Tag.Pictures.Count)
                                 PicBoxAlbumArt.Invalidate()
-                                'If tlfile.Tag.Pictures.Count > 1 Then
-                                'LblMedia.Visible = True
-                                'Else
-                                'LblMedia.Visible = False
-                                'End If
                             End If
                         End If
                     ElseIf App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Video
                         Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
-                        'LblMedia.Visible = False
                         RTBLyrics.Visible = False
                         PicBoxVisualizer.Visible = False
                         TimerVisualizer.Stop()
@@ -2903,7 +2893,6 @@ Public Class Player
                     Debug.Print("Showing Visualizer...")
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
-                    'LblMedia.Visible = False
                     RTBLyrics.Visible = False
                     TimerVisualizer.Start()
                     PicBoxVisualizer.Visible = True
@@ -2919,7 +2908,6 @@ Public Class Player
             tlfile = Nothing
         Else
             PicBoxAlbumArt.Visible = False
-            'LblMedia.Visible = False
             RTBLyrics.Visible = False
             VLCViewer.Visible = False
             PicBoxVisualizer.Visible = False
