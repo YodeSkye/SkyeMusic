@@ -2839,7 +2839,11 @@ Public Class Player
                 Else
                     RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 12, FontStyle.Regular)
                 End If
-                RTBLyrics.Lines = LyricsSynced.Select(Function(l) l.Text).ToArray()
+                If HasLyricsSynced Then
+                    RTBLyrics.Lines = LyricsSynced.Select(Function(l) l.Text).ToArray()
+                Else
+                    RTBLyrics.Text = LyricsText
+                End If
                 RTBLyrics.SetAlignment(HorizontalAlignment.Center)
                 RTBLyrics.Visible = True
             Else
