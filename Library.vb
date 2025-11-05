@@ -149,7 +149,7 @@ Public Class Library
         LblExtFileInfo.Text = String.Empty
         LblExtProperties.Text = String.Empty
         LblExtType.Text = String.Empty
-        TipLibrary.SetText(LblAlbumArtSelect, "Show Next Album Art")
+        TipLibrarySL.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
         CustomDrawCMToolTip(CMLibrary)
         LoadLibrary()
 
@@ -1314,9 +1314,9 @@ Public Class Library
             Dim h As String = App.History.Find(Function(p) p.Path = (LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)).ToStringFull
             LblHistory.Text = GenerateEllipsis(LblHistory.CreateGraphics(), h, LblHistory.Font, LblHistory.Size.Width)
             If LblHistory.Text = h Then
-                TipLibrary.SetText(LblHistory, Nothing)
+                TipLibrarySL.SetToolTip(LblHistory, Nothing)
             Else
-                TipLibrary.SetText(LblHistory, h)
+                TipLibrarySL.SetToolTip(LblHistory, h)
             End If
             LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             If IO.File.Exists(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text) Then
@@ -1347,9 +1347,9 @@ Public Class Library
                         h = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
                         LblExtType.Text = GenerateEllipsis(LblExtType.CreateGraphics(), h, LblExtType.Font, LblExtType.Size.Width)
                         If LblExtType.Text = h Then
-                            TipLibrary.SetText(LblExtType, Nothing)
+                            TipLibrarySL.SetToolTip(LblExtType, Nothing)
                         Else
-                            TipLibrary.SetText(LblExtType, h)
+                            TipLibrarySL.SetToolTip(LblExtType, h)
                         End If
                     End Using
                 Catch
@@ -1432,9 +1432,9 @@ Public Class Library
         RadBtnGroupByType.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGroupByNone.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGroupByNone.ForeColor = App.CurrentTheme.ButtonTextColor
-        TipLibrary.BackColor = App.CurrentTheme.BackColor
-        TipLibrary.ForeColor = App.CurrentTheme.TextColor
-        TipLibrary.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipLibrarySL.BackColor = App.CurrentTheme.BackColor
+        TipLibrarySL.ForeColor = App.CurrentTheme.TextColor
+        TipLibrarySL.BorderColor = App.CurrentTheme.ButtonBackColor
         If TxbxLibrarySearch.Text = LibrarySearchTitle Then TxbxLibrarySearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
         LblLibraryCounts.ForeColor = forecolor
         LblHistory.ForeColor = forecolor
@@ -1463,7 +1463,7 @@ Public Class Library
         AddHandler MyToolTip.Popup,
             Sub(sender, e)
                 Dim s As SizeF
-                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), TipLibrary.Font)
+                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), Me.Font)
                 s.Width += 14
                 s.Height += 16
                 e.ToolTipSize = s.ToSize
@@ -1479,12 +1479,12 @@ Public Class Library
                 g.FillRectangle(brbg, e.Bounds)
 
                 'Draw border
-                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipLibrary.Font.Size / 4)) 'Scale border thickness with font
+                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(Me.Font.Size / 4)) 'Scale border thickness with font
                     g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
                 End Using
 
                 'Draw text
-                TextRenderer.DrawText(g, e.ToolTipText, TipLibrary.Font, New Point(7, 7), App.CurrentTheme.TextColor)
+                TextRenderer.DrawText(g, e.ToolTipText, Me.Font, New Point(7, 7), App.CurrentTheme.TextColor)
 
                 'Finalize
                 brbg.Dispose()

@@ -64,7 +64,7 @@ Partial Class Library
         LblStatus = New Skye.UI.Label()
         LVLibrary = New ListView()
         LblHistory = New Skye.UI.Label()
-        TipLibrary = New Skye.UI.ToolTipEX(components)
+        TipLibrarySL = New Skye.UI.ToolTip(components)
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -73,10 +73,10 @@ Partial Class Library
         ' CMLibrary
         ' 
         CMLibrary.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipLibrary.SetImage(CMLibrary, Nothing)
         CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMLibrary.Name = "CMLibrary"
         CMLibrary.Size = New Size(229, 392)
+        TipLibrarySL.SetToolTipImage(CMLibrary, Nothing)
         ' 
         ' CMIPlay
         ' 
@@ -197,7 +197,6 @@ Partial Class Library
         ' BtnSearchFolders
         ' 
         BtnSearchFolders.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        TipLibrary.SetImage(BtnSearchFolders, Nothing)
         BtnSearchFolders.Image = My.Resources.Resources.ImageSearchFolder
         BtnSearchFolders.ImageAlign = ContentAlignment.MiddleLeft
         BtnSearchFolders.Location = New Point(841, 394)
@@ -207,18 +206,19 @@ Partial Class Library
         BtnSearchFolders.TabStop = False
         BtnSearchFolders.Text = "Search Folders"
         BtnSearchFolders.TextAlign = ContentAlignment.MiddleRight
+        TipLibrarySL.SetToolTipImage(BtnSearchFolders, Nothing)
         BtnSearchFolders.UseVisualStyleBackColor = True
         ' 
         ' BtnOK
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        TipLibrary.SetImage(BtnOK, Nothing)
         BtnOK.Image = My.Resources.Resources.ImageOK
         BtnOK.Location = New Point(874, 444)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 3
         BtnOK.TabStop = False
+        TipLibrarySL.SetToolTipImage(BtnOK, Nothing)
         BtnOK.UseVisualStyleBackColor = True
         ' 
         ' TxbxLibrarySearch
@@ -226,46 +226,46 @@ Partial Class Library
         TxbxLibrarySearch.BorderStyle = BorderStyle.None
         TxbxLibrarySearch.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxbxLibrarySearch.ForeColor = SystemColors.InactiveCaption
-        TipLibrary.SetImage(TxbxLibrarySearch, Nothing)
         TxbxLibrarySearch.Location = New Point(14, 19)
         TxbxLibrarySearch.Name = "TxbxLibrarySearch"
         TxbxLibrarySearch.ShortcutsEnabled = False
         TxbxLibrarySearch.Size = New Size(153, 18)
         TxbxLibrarySearch.TabIndex = 4
         TxbxLibrarySearch.Text = "Search Library"
+        TipLibrarySL.SetToolTipImage(TxbxLibrarySearch, Nothing)
         ' 
         ' LBXLibrarySearch
         ' 
         LBXLibrarySearch.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LBXLibrarySearch.FormattingEnabled = True
-        TipLibrary.SetImage(LBXLibrarySearch, Nothing)
         LBXLibrarySearch.Location = New Point(12, 42)
         LBXLibrarySearch.Name = "LBXLibrarySearch"
         LBXLibrarySearch.Size = New Size(491, 88)
         LBXLibrarySearch.TabIndex = 5
+        TipLibrarySL.SetToolTipImage(LBXLibrarySearch, Nothing)
         LBXLibrarySearch.Visible = False
         ' 
         ' PicBoxAlbumArt
         ' 
         PicBoxAlbumArt.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        TipLibrary.SetImage(PicBoxAlbumArt, Nothing)
         PicBoxAlbumArt.Location = New Point(12, 394)
         PicBoxAlbumArt.Name = "PicBoxAlbumArt"
         PicBoxAlbumArt.Size = New Size(101, 114)
         PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.Zoom
         PicBoxAlbumArt.TabIndex = 7
         PicBoxAlbumArt.TabStop = False
+        TipLibrarySL.SetToolTipImage(PicBoxAlbumArt, Nothing)
         PicBoxAlbumArt.Visible = False
         ' 
         ' LblAlbumArtSelect
         ' 
         LblAlbumArtSelect.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        TipLibrary.SetImage(LblAlbumArtSelect, Nothing)
         LblAlbumArtSelect.Image = My.Resources.Resources.ImageAlbumArtSelect
         LblAlbumArtSelect.Location = New Point(115, 436)
         LblAlbumArtSelect.Name = "LblAlbumArtSelect"
         LblAlbumArtSelect.Size = New Size(32, 36)
         LblAlbumArtSelect.TabIndex = 16
+        TipLibrarySL.SetToolTipImage(LblAlbumArtSelect, Nothing)
         LblAlbumArtSelect.Visible = False
         ' 
         ' RadBtnGroupByGenre
@@ -273,13 +273,13 @@ Partial Class Library
         RadBtnGroupByGenre.Appearance = Appearance.Button
         RadBtnGroupByGenre.Font = New Font("Segoe UI", 9.75F)
         RadBtnGroupByGenre.ForeColor = SystemColors.ControlText
-        TipLibrary.SetImage(RadBtnGroupByGenre, Nothing)
         RadBtnGroupByGenre.Location = New Point(124, 25)
         RadBtnGroupByGenre.Name = "RadBtnGroupByGenre"
         RadBtnGroupByGenre.Size = New Size(53, 28)
         RadBtnGroupByGenre.TabIndex = 21
         RadBtnGroupByGenre.Text = "Genre"
         RadBtnGroupByGenre.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrarySL.SetToolTipImage(RadBtnGroupByGenre, Nothing)
         RadBtnGroupByGenre.UseVisualStyleBackColor = True
         ' 
         ' GrpBoxGroupBy
@@ -291,26 +291,26 @@ Partial Class Library
         GrpBoxGroupBy.Controls.Add(RadBtnGroupByAlbum)
         GrpBoxGroupBy.Controls.Add(RadBtnGroupByNone)
         GrpBoxGroupBy.Controls.Add(RadBtnGroupByGenre)
-        TipLibrary.SetImage(GrpBoxGroupBy, Nothing)
         GrpBoxGroupBy.Location = New Point(589, 402)
         GrpBoxGroupBy.Name = "GrpBoxGroupBy"
         GrpBoxGroupBy.Size = New Size(242, 97)
         GrpBoxGroupBy.TabIndex = 18
         GrpBoxGroupBy.TabStop = False
         GrpBoxGroupBy.Text = "Group By"
+        TipLibrarySL.SetToolTipImage(GrpBoxGroupBy, Nothing)
         ' 
         ' RadBtnGroupByType
         ' 
         RadBtnGroupByType.Appearance = Appearance.Button
         RadBtnGroupByType.Font = New Font("Segoe UI", 9.75F)
         RadBtnGroupByType.ForeColor = SystemColors.ControlText
-        TipLibrary.SetImage(RadBtnGroupByType, Nothing)
         RadBtnGroupByType.Location = New Point(6, 60)
         RadBtnGroupByType.Name = "RadBtnGroupByType"
         RadBtnGroupByType.Size = New Size(53, 28)
         RadBtnGroupByType.TabIndex = 24
         RadBtnGroupByType.Text = "Type"
         RadBtnGroupByType.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrarySL.SetToolTipImage(RadBtnGroupByType, Nothing)
         RadBtnGroupByType.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByYear
@@ -318,13 +318,13 @@ Partial Class Library
         RadBtnGroupByYear.Appearance = Appearance.Button
         RadBtnGroupByYear.Font = New Font("Segoe UI", 9.75F)
         RadBtnGroupByYear.ForeColor = SystemColors.ControlText
-        TipLibrary.SetImage(RadBtnGroupByYear, Nothing)
         RadBtnGroupByYear.Location = New Point(183, 25)
         RadBtnGroupByYear.Name = "RadBtnGroupByYear"
         RadBtnGroupByYear.Size = New Size(53, 28)
         RadBtnGroupByYear.TabIndex = 23
         RadBtnGroupByYear.Text = "Year"
         RadBtnGroupByYear.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrarySL.SetToolTipImage(RadBtnGroupByYear, Nothing)
         RadBtnGroupByYear.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByArtist
@@ -332,13 +332,13 @@ Partial Class Library
         RadBtnGroupByArtist.Appearance = Appearance.Button
         RadBtnGroupByArtist.Font = New Font("Segoe UI", 9.75F)
         RadBtnGroupByArtist.ForeColor = SystemColors.ControlText
-        TipLibrary.SetImage(RadBtnGroupByArtist, Nothing)
         RadBtnGroupByArtist.Location = New Point(6, 25)
         RadBtnGroupByArtist.Name = "RadBtnGroupByArtist"
         RadBtnGroupByArtist.Size = New Size(53, 28)
         RadBtnGroupByArtist.TabIndex = 20
         RadBtnGroupByArtist.Text = "Artist"
         RadBtnGroupByArtist.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrarySL.SetToolTipImage(RadBtnGroupByArtist, Nothing)
         RadBtnGroupByArtist.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByAlbum
@@ -346,13 +346,13 @@ Partial Class Library
         RadBtnGroupByAlbum.Appearance = Appearance.Button
         RadBtnGroupByAlbum.Font = New Font("Segoe UI", 9.75F)
         RadBtnGroupByAlbum.ForeColor = SystemColors.ControlText
-        TipLibrary.SetImage(RadBtnGroupByAlbum, Nothing)
         RadBtnGroupByAlbum.Location = New Point(65, 25)
         RadBtnGroupByAlbum.Name = "RadBtnGroupByAlbum"
         RadBtnGroupByAlbum.Size = New Size(53, 28)
         RadBtnGroupByAlbum.TabIndex = 19
         RadBtnGroupByAlbum.Text = "Album"
         RadBtnGroupByAlbum.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrarySL.SetToolTipImage(RadBtnGroupByAlbum, Nothing)
         RadBtnGroupByAlbum.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByNone
@@ -360,7 +360,6 @@ Partial Class Library
         RadBtnGroupByNone.Appearance = Appearance.Button
         RadBtnGroupByNone.Checked = True
         RadBtnGroupByNone.ForeColor = SystemColors.ControlText
-        TipLibrary.SetImage(RadBtnGroupByNone, Nothing)
         RadBtnGroupByNone.Location = New Point(65, 60)
         RadBtnGroupByNone.Name = "RadBtnGroupByNone"
         RadBtnGroupByNone.Size = New Size(171, 28)
@@ -368,79 +367,80 @@ Partial Class Library
         RadBtnGroupByNone.TabStop = True
         RadBtnGroupByNone.Text = "No Grouping"
         RadBtnGroupByNone.TextAlign = ContentAlignment.MiddleCenter
+        TipLibrarySL.SetToolTipImage(RadBtnGroupByNone, Nothing)
         RadBtnGroupByNone.UseVisualStyleBackColor = True
         ' 
         ' LblExtTitle
         ' 
         LblExtTitle.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtTitle.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TipLibrary.SetImage(LblExtTitle, Nothing)
         LblExtTitle.Location = New Point(147, 420)
         LblExtTitle.Name = "LblExtTitle"
         LblExtTitle.Size = New Size(436, 20)
         LblExtTitle.TabIndex = 19
         LblExtTitle.Text = "Title"
         LblExtTitle.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrarySL.SetToolTipImage(LblExtTitle, Nothing)
         ' 
         ' LblExtFileInfo
         ' 
         LblExtFileInfo.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtFileInfo.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TipLibrary.SetImage(LblExtFileInfo, Nothing)
         LblExtFileInfo.Location = New Point(147, 441)
         LblExtFileInfo.Name = "LblExtFileInfo"
         LblExtFileInfo.Size = New Size(436, 20)
         LblExtFileInfo.TabIndex = 20
         LblExtFileInfo.Text = "File Info"
         LblExtFileInfo.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrarySL.SetToolTipImage(LblExtFileInfo, Nothing)
         ' 
         ' LblExtProperties
         ' 
         LblExtProperties.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtProperties.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TipLibrary.SetImage(LblExtProperties, Nothing)
         LblExtProperties.Location = New Point(147, 461)
         LblExtProperties.Name = "LblExtProperties"
         LblExtProperties.Size = New Size(436, 20)
         LblExtProperties.TabIndex = 21
         LblExtProperties.Text = "Properties"
         LblExtProperties.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrarySL.SetToolTipImage(LblExtProperties, Nothing)
         ' 
         ' LblExtType
         ' 
         LblExtType.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtType.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TipLibrary.SetImage(LblExtType, Nothing)
         LblExtType.Location = New Point(147, 482)
         LblExtType.Name = "LblExtType"
         LblExtType.Size = New Size(436, 20)
         LblExtType.TabIndex = 22
         LblExtType.Text = "Type"
         LblExtType.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrarySL.SetToolTipImage(LblExtType, Nothing)
         ' 
         ' LblLibraryCounts
         ' 
         LblLibraryCounts.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         LblLibraryCounts.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TipLibrary.SetImage(LblLibraryCounts, Nothing)
         LblLibraryCounts.Location = New Point(549, 12)
         LblLibraryCounts.Name = "LblLibraryCounts"
         LblLibraryCounts.Size = New Size(423, 28)
         LblLibraryCounts.TabIndex = 23
         LblLibraryCounts.TextAlign = ContentAlignment.MiddleRight
+        TipLibrarySL.SetToolTipImage(LblLibraryCounts, Nothing)
         ' 
         ' LblStatus
         ' 
         LblStatus.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         LblStatus.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblStatus.ForeColor = Color.Red
-        TipLibrary.SetImage(LblStatus, Nothing)
         LblStatus.Location = New Point(549, 12)
         LblStatus.Name = "LblStatus"
         LblStatus.Size = New Size(423, 28)
         LblStatus.TabIndex = 24
         LblStatus.Text = "Status"
         LblStatus.TextAlign = ContentAlignment.MiddleRight
+        TipLibrarySL.SetToolTipImage(LblStatus, Nothing)
         LblStatus.Visible = False
         ' 
         ' LVLibrary
@@ -449,12 +449,12 @@ Partial Class Library
         LVLibrary.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LVLibrary.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LVLibrary.FullRowSelect = True
-        TipLibrary.SetImage(LVLibrary, Nothing)
         LVLibrary.Location = New Point(12, 42)
         LVLibrary.Name = "LVLibrary"
         LVLibrary.OwnerDraw = True
         LVLibrary.Size = New Size(960, 339)
         LVLibrary.TabIndex = 0
+        TipLibrarySL.SetToolTipImage(LVLibrary, Nothing)
         LVLibrary.UseCompatibleStateImageBehavior = False
         LVLibrary.View = View.Details
         ' 
@@ -462,22 +462,19 @@ Partial Class Library
         ' 
         LblHistory.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblHistory.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TipLibrary.SetImage(LblHistory, Nothing)
         LblHistory.Location = New Point(147, 400)
         LblHistory.Name = "LblHistory"
         LblHistory.Size = New Size(436, 20)
         LblHistory.TabIndex = 25
         LblHistory.Text = "History"
         LblHistory.TextAlign = ContentAlignment.MiddleLeft
+        TipLibrarySL.SetToolTipImage(LblHistory, Nothing)
         ' 
-        ' TipLibrary
+        ' TipLibrarySL
         ' 
-        TipLibrary.FadeInRate = 25
-        TipLibrary.FadeOutRate = 25
-        TipLibrary.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipLibrary.HideDelay = 100
-        TipLibrary.ShadowAlpha = 200
-        TipLibrary.ShowDelay = 1000
+        TipLibrarySL.Font = New Font("Segoe UI", 10F)
+        TipLibrarySL.InitialDelay = 500
+        TipLibrarySL.OwnerDraw = True
         ' 
         ' Library
         ' 
@@ -502,12 +499,12 @@ Partial Class Library
         Controls.Add(LblHistory)
         Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
-        TipLibrary.SetImage(Me, Nothing)
         KeyPreview = True
         MinimumSize = New Size(1000, 561)
         Name = "Library"
         StartPosition = FormStartPosition.CenterScreen
         Text = "Library"
+        TipLibrarySL.SetToolTipImage(Me, Nothing)
         CMLibrary.ResumeLayout(False)
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).EndInit()
         GrpBoxGroupBy.ResumeLayout(False)
@@ -554,5 +551,5 @@ Partial Class Library
     Friend WithEvents RadBtnGroupByYear As RadioButton
     Friend WithEvents CMIQueue As ToolStripMenuItem
     Friend WithEvents RadBtnGroupByType As RadioButton
-    Friend WithEvents TipLibrary As Skye.UI.ToolTipEX
+    Friend WithEvents TipLibrarySL As Skye.UI.ToolTip
 End Class
