@@ -107,3 +107,11 @@ Public Class DevTools
     End Sub
 
 End Class
+
+'''Function to find duplicates in a List(of T)
+'Dim dupes = App.History _
+'        .GroupBy(Function(s) s.Path) _
+'        .Where(Function(g) g.Count > 1) _
+'        .SelectMany(Function(g) g) _
+'        .ToList
+'DGVHistory.DataSource = dupes
