@@ -1,5 +1,11 @@
 ﻿
+Imports System.ComponentModel
+
 Public Class DevTools
+
+    'Declarations
+    Private lastHistorySortColumn As String = ""
+    Private lastHistorySortAscending As Boolean = True
 
     'Form Events
     Private Sub DevTools_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -7,22 +13,50 @@ Public Class DevTools
         GetHistoryData()
         GetPlaysData()
     End Sub
-    Private Sub DevTools_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
-
-        'Force layout update
-        DGVPlays.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells)
-
-        'Resize form
-        'Size = New Size(DGVPlays.PreferredSize.Width, Height)
-
-    End Sub
 
     'Control Events
+    Private Sub DGVHistory_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DGVHistory.ColumnHeaderMouseClick
+        Dim col = DGVHistory.Columns(e.ColumnIndex)
+        Dim propName = col.DataPropertyName
+
+        'Toggle if same column clicked
+        If lastHistorySortColumn = propName Then
+            lastHistorySortAscending = Not lastHistorySortAscending
+        Else
+            lastHistorySortColumn = propName
+            lastHistorySortAscending = True
+        End If
+
+        'Sort the list
+        If lastHistorySortAscending Then
+            App.History = App.History.OrderBy(Function(s) CallByName(s, propName, CallType.Get)).ToList()
+            col.HeaderCell.SortGlyphDirection = SortOrder.Ascending
+        Else
+            App.History = App.History.OrderByDescending(Function(s) CallByName(s, propName, CallType.Get)).ToList()
+            col.HeaderCell.SortGlyphDirection = SortOrder.Descending
+        End If
+
+        'Rebind
+        GetHistoryData()
+    End Sub
     Private Sub BtnHistoryRefresh_Click(sender As Object, e As EventArgs) Handles BtnHistoryRefresh.Click
         GetHistoryData()
     End Sub
     Private Sub BtnHistoryDeleteSelected_Click(sender As Object, e As EventArgs) Handles BtnHistoryDeleteSelected.Click
+        'Collect selected rows
+        Dim rowsToDelete As New List(Of Song)
+        For Each r As DataGridViewRow In DGVHistory.SelectedRows
+            Dim song As Song = CType(r.DataBoundItem, Song)
+            rowsToDelete.Add(song)
+        Next
 
+        'Remove them from History
+        For Each s In rowsToDelete
+            App.History.Remove(s)
+        Next
+
+        'Refresh the grid
+        GetHistoryData()
     End Sub
     Private Sub BtnPlaysRefresh_Click(sender As Object, e As EventArgs) Handles BtnPlaysRefresh.Click
         GetPlaysData()
@@ -59,7 +93,13 @@ Public Class DevTools
 
     'Procedures
     Private Sub GetHistoryData()
-
+        DGVHistory.DataSource = Nothing
+        DGVHistory.AutoGenerateColumns = True
+        DGVHistory.DataSource = App.History
+        For Each col As DataGridViewColumn In DGVHistory.Columns
+            col.SortMode = DataGridViewColumnSortMode.Automatic
+        Next
+        LblHistoryCounts.Text = DGVHistory.Rows.Count.ToString & " Rows"
     End Sub
     Private Sub GetPlaysData()
         DGVPlays.DataSource = App.GetPlayHistoryTable()

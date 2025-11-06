@@ -74,16 +74,16 @@ Namespace My
             MegaBytes
             GigaBytes
         End Enum
-        Public Structure Song
+        Public Class Song
 
-            Public Path As String 'Path to the media.
-            Public InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
-            Public IsStream As Boolean 'IsStream indicates whether the song is a stream.
-            Public PlayCount As UShort 'PlayCount is the number of times the song has been played.
-            Public Added As DateTime 'DateAdded is the date and time when the song was added to the History.
-            Public FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
-            Public LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
-            Public Rating As Byte 'Rating is the rating of the song, from 0 to 5.
+            Public Property Path As String 'Path to the media.
+            Public Property InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
+            Public Property IsStream As Boolean 'IsStream indicates whether the song is a stream.
+            Public Property PlayCount As UShort 'PlayCount is the number of times the song has been played.
+            Public Property Added As DateTime 'DateAdded is the date and time when the song was added to the History.
+            Public Property FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
+            Public Property LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
+            Public Property Rating As Byte 'Rating is the rating of the song, from 0 to 5.
 
             Public Overrides Function ToString() As String
                 Dim s As String = String.Empty
@@ -114,7 +114,7 @@ Namespace My
                 Return s
             End Function
 
-        End Structure
+        End Class
         <Serializable>
         Public Class HistoryData
             Public Property SchemaVersion As Integer = 1
