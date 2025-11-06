@@ -745,6 +745,9 @@ Public Class History
         LblSessionPlayedSongs.ForeColor = App.CurrentTheme.TextColor
         TxtBoxSessionPlayedSongs.BackColor = App.CurrentTheme.BackColor
         TxtBoxSessionPlayedSongs.ForeColor = App.CurrentTheme.TextColor
+        LblSessionPlayedDuration.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxSessionPlayedDuration.BackColor = App.CurrentTheme.BackColor
+        TxtBoxSessionPlayedDuration.ForeColor = App.CurrentTheme.TextColor
         LblTotalPlayedSongs.ForeColor = App.CurrentTheme.TextColor
         TxtBoxTotalPlayedSongs.BackColor = App.CurrentTheme.BackColor
         TxtBoxTotalPlayedSongs.ForeColor = App.CurrentTheme.TextColor

@@ -2401,7 +2401,7 @@ Public Class Player
     End Sub
     Friend Sub RemoveFromQueue(path As String)
         Queue.Remove(path)
-        Debug.Print(path + " Removed From Queue")
+        'Debug.Print(path + " Removed From Queue")
         SetPlaylistCountText()
     End Sub
 
