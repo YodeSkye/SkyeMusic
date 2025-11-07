@@ -38,6 +38,7 @@ Partial Class History
         CMIQueue = New ToolStripMenuItem()
         CMIAddToPlaylist = New ToolStripMenuItem()
         GrpBoxHistory = New GroupBox()
+        RadBtnMostPlayedArtists = New RadioButton()
         BtnCharts = New Button()
         RadBtnFavorites = New RadioButton()
         RadBtnRecentlyPlayed = New RadioButton()
@@ -216,6 +217,7 @@ Partial Class History
         ' 
         GrpBoxHistory.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         GrpBoxHistory.BackColor = Color.Transparent
+        GrpBoxHistory.Controls.Add(RadBtnMostPlayedArtists)
         GrpBoxHistory.Controls.Add(BtnCharts)
         GrpBoxHistory.Controls.Add(RadBtnFavorites)
         GrpBoxHistory.Controls.Add(RadBtnRecentlyPlayed)
@@ -227,6 +229,16 @@ Partial Class History
         GrpBoxHistory.Size = New Size(190, 427)
         GrpBoxHistory.TabIndex = 0
         GrpBoxHistory.TabStop = False
+        ' 
+        ' RadBtnMostPlayedArtists
+        ' 
+        RadBtnMostPlayedArtists.Location = New Point(7, 51)
+        RadBtnMostPlayedArtists.Name = "RadBtnMostPlayedArtists"
+        RadBtnMostPlayedArtists.Size = New Size(176, 32)
+        RadBtnMostPlayedArtists.TabIndex = 7
+        RadBtnMostPlayedArtists.Text = "Most Played Artists"
+        RadBtnMostPlayedArtists.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnMostPlayedArtists.UseVisualStyleBackColor = True
         ' 
         ' BtnCharts
         ' 
@@ -241,7 +253,7 @@ Partial Class History
         ' 
         ' RadBtnFavorites
         ' 
-        RadBtnFavorites.Location = New Point(7, 96)
+        RadBtnFavorites.Location = New Point(7, 114)
         RadBtnFavorites.Name = "RadBtnFavorites"
         RadBtnFavorites.Size = New Size(176, 32)
         RadBtnFavorites.TabIndex = 2
@@ -251,7 +263,7 @@ Partial Class History
         ' 
         ' RadBtnRecentlyPlayed
         ' 
-        RadBtnRecentlyPlayed.Location = New Point(7, 58)
+        RadBtnRecentlyPlayed.Location = New Point(7, 82)
         RadBtnRecentlyPlayed.Name = "RadBtnRecentlyPlayed"
         RadBtnRecentlyPlayed.Size = New Size(176, 32)
         RadBtnRecentlyPlayed.TabIndex = 1
@@ -265,7 +277,7 @@ Partial Class History
         RadBtnMostPlayed.Name = "RadBtnMostPlayed"
         RadBtnMostPlayed.Size = New Size(176, 32)
         RadBtnMostPlayed.TabIndex = 0
-        RadBtnMostPlayed.Text = "Most Played"
+        RadBtnMostPlayed.Text = "Most Played Song"
         RadBtnMostPlayed.TextAlign = ContentAlignment.MiddleCenter
         RadBtnMostPlayed.UseVisualStyleBackColor = True
         ' 
@@ -520,4 +532,5 @@ Partial Class History
     Friend WithEvents RadBtnArtistWordCloud As RadioButton
     Friend WithEvents TxtBoxSessionPlayedDuration As TextBox
     Friend WithEvents LblSessionPlayedDuration As Skye.UI.Label
+    Friend WithEvents RadBtnMostPlayedArtists As RadioButton
 End Class

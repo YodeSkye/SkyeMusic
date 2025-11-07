@@ -9,14 +9,15 @@ Public Class History
     'Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private PanelLoading As New Panel()
+    Private PBLoading As New Skye.UI.ProgressEX
     Private Enum HistoryView
         MostPlayed
+        MostPlayedArtists
         RecentlyPlayed
         Favorites
     End Enum
     Private CurrentView As HistoryView = HistoryView.MostPlayed
-    Private CurrentViewMaxRecords As Integer = CInt(App.HistoryViewMaxRecords)
-    Private views As List(Of App.SongView)
     Private Enum ChartView
         Genres
         GenrePolar
@@ -25,6 +26,13 @@ Public Class History
         ArtistWordCloud
     End Enum
     Private CurrentChartView As ChartView = ChartView.Genres
+    Private CurrentViewMaxRecords As Integer = CInt(App.HistoryViewMaxRecords)
+    Private views As List(Of App.SongView)
+    Public Class MostPlayedArtistsReport
+        Public Property Artist As String
+        Public Property PlayCount As Integer
+        Public Property LastPlayed As Date
+    End Class
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -50,54 +58,26 @@ Public Class History
         If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
         If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
 #End If
+        PanelLoading.BackColor = App.CurrentTheme.BackColor
+        PanelLoading.Parent = Me
+        PanelLoading.Dock = DockStyle.Fill
+        PanelLoading.BringToFront()
+        PBLoading.Minimum = 0
+        PBLoading.Maximum = App.History.Count
+        PBLoading.Value = 0
+        PBLoading.DrawingColor = App.CurrentTheme.BackColor
+        PBLoading.ForeColor = App.CurrentTheme.TextColor
+        PBLoading.Parent = PanelLoading
+        PBLoading.Left = (PanelLoading.ClientSize.Width - PBLoading.Width) \ 2
+        PBLoading.Top = (PanelLoading.ClientSize.Height - PBLoading.Height) \ 2
     End Sub
     Private Sub History_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         Text &= " - LOADING..."
         Enabled = False
-        Refresh()
+        Application.DoEvents()
 
         views = GetData()
-
         PutData()
-
-        'Define 7 Columns
-        Dim header As ColumnHeader
-        header = New ColumnHeader()
-        header.Name = "Title"
-        header.Text = "Title"
-        header.Width = 200
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Artist"
-        header.Text = "Artist"
-        header.Width = 200
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Album"
-        header.Text = "Album"
-        header.Width = 200
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Genre"
-        header.Text = "Genre"
-        header.Width = 100
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "PlayCount"
-        header.Text = "Plays"
-        header.Width = 50
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "LastPlayed"
-        header.Text = "Last Played"
-        header.Width = 200
-        LVHistory.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Path"
-        header.Text = "Path"
-        header.Width = 400
-        LVHistory.Columns.Add(header)
-
         PutViewData()
 
         Select Case CurrentView
@@ -128,6 +108,7 @@ Public Class History
         BtnOK.Focus()
 
         Text = Text.TrimEnd(" - LOADING...".ToCharArray)
+        PanelLoading.Visible = False
         Enabled = True
     End Sub
     Private Sub History_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
@@ -135,6 +116,8 @@ Public Class History
             App.HistoryViewMaxRecords = CUShort(CurrentViewMaxRecords)
             App.SaveOptions()
         End If
+        App.FRMHistory.Dispose()
+        App.FRMHistory = Nothing
     End Sub
     Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblMostPlayedSong.MouseDown, LblSessionPlayedSongs.MouseDown, LblTotalDuration.MouseDown, LblTotalPlayedSongs.MouseDown, GrpBoxHistory.MouseDown
         Dim cSender As Control
@@ -207,8 +190,18 @@ Public Class History
         AddToPlaylist(True)
     End Sub
     Private Sub CMHistoryView_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMHistoryView.Opening
-        CMIQueue.Text = CMIQueue.Text.TrimEnd(App.TrimEndSearch) & " (" & LVHistory.SelectedItems.Count.ToString("N0") & ")"
-        CMIAddToPlaylist.Text = CMIAddToPlaylist.Text.TrimEnd(App.TrimEndSearch) & " (" & LVHistory.SelectedItems.Count.ToString("N0") & ")"
+        Select Case CurrentView
+            Case HistoryView.MostPlayed, HistoryView.RecentlyPlayed, HistoryView.Favorites
+                CMIQueue.Enabled = True
+                CMIAddToPlaylist.Enabled = True
+                CMIQueue.Text = CMIQueue.Text.TrimEnd(App.TrimEndSearch) & " (" & LVHistory.SelectedItems.Count.ToString("N0") & ")"
+                CMIAddToPlaylist.Text = CMIAddToPlaylist.Text.TrimEnd(App.TrimEndSearch) & " (" & LVHistory.SelectedItems.Count.ToString("N0") & ")"
+            Case HistoryView.MostPlayedArtists
+                CMIQueue.Enabled = False
+                CMIAddToPlaylist.Enabled = False
+                CMIQueue.Text = CMIQueue.Text.TrimEnd(App.TrimEndSearch)
+                CMIAddToPlaylist.Text = CMIAddToPlaylist.Text.TrimEnd(App.TrimEndSearch)
+        End Select
     End Sub
     Private Sub CMIQueue_Click(sender As Object, e As EventArgs) Handles CMIQueue.Click
         Queue()
@@ -221,6 +214,10 @@ Public Class History
     End Sub
     Private Sub RadBtnMostPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnMostPlayed.Click
         CurrentView = HistoryView.MostPlayed
+        PutViewData()
+    End Sub
+    Private Sub RadBtnMostPlayedArtists_Click(sender As Object, e As EventArgs) Handles RadBtnMostPlayedArtists.Click
+        CurrentView = HistoryView.MostPlayedArtists
         PutViewData()
     End Sub
     Private Sub RadBtnRecentlyPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnRecentlyPlayed.Click
@@ -274,6 +271,8 @@ Public Class History
 
         For Each s As App.Song In App.History
             list.Add(New App.SongView(s))
+            PBLoading.Value += 1
+            Application.DoEvents()
         Next
 
         Return list
@@ -302,35 +301,121 @@ Public Class History
         Dim sortedViews As IEnumerable(Of App.SongView) = Nothing
         Select Case CurrentView
             Case HistoryView.MostPlayed
+                ConfigureColumns()
                 sortedViews = views.OrderByDescending(Function(v) v.Data.PlayCount).ThenByDescending(Function(v) v.Data.LastPlayed)
+                If CurrentViewMaxRecords > 0 Then
+                    sortedViews = sortedViews.Take(CurrentViewMaxRecords)
+                End If
+                For Each v As App.SongView In sortedViews
+                    Dim lvi As ListViewItem
+                    If App.IsUrl(v.Data.Path) Then
+                        lvi = New ListViewItem(v.Data.Path)
+                    Else
+                        lvi = New ListViewItem(v.Title)
+                    End If
+                    lvi.SubItems.Add(v.Artist)
+                    lvi.SubItems.Add(v.Album)
+                    lvi.SubItems.Add(v.Genre)
+                    lvi.SubItems.Add(v.Data.PlayCount.ToString("N0"))
+                    lvi.SubItems.Add(v.Data.LastPlayed.ToString("g"))
+                    lvi.SubItems.Add(v.Data.Path)
+                    LVHistory.Items.Add(lvi)
+                Next
+                LVHistory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)
+                LVHistory.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
+                LVHistory.Columns(4).TextAlign = HorizontalAlignment.Center
+                LVHistory.EndUpdate()
+                ShowCounts()
+            Case HistoryView.MostPlayedArtists
+                ConfigureColumns()
+
+                Dim artistGroups As IEnumerable(Of MostPlayedArtistsReport) =
+                    views.GroupBy(Function(v)
+                                      Dim artistName As String = v.Artist
+                                      If String.IsNullOrWhiteSpace(v.Artist) Then
+                                          Return "Video"
+                                      Else
+                                          Return v.Artist
+                                      End If
+                                  End Function) _
+                         .Select(Function(g) New MostPlayedArtistsReport With {
+                             .Artist = g.Key,
+                             .PlayCount = g.Sum(Function(v) v.Data.PlayCount),
+                             .LastPlayed = g.Max(Function(v) v.Data.LastPlayed)
+                         }) _
+                         .OrderByDescending(Function(x) x.PlayCount) _
+                         .ThenByDescending(Function(x) x.LastPlayed)
+
+                If CurrentViewMaxRecords > 0 Then
+                    artistGroups = artistGroups.Take(CurrentViewMaxRecords)
+                End If
+
+                For Each g As MostPlayedArtistsReport In artistGroups
+                    Dim lvi As New ListViewItem(g.Artist)
+                    lvi.SubItems.Add(g.PlayCount.ToString("N0"))
+                    lvi.SubItems.Add(g.LastPlayed.ToString("g"))
+                    LVHistory.Items.Add(lvi)
+                Next
+
+                LVHistory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)
+                LVHistory.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.HeaderSize)
+                LVHistory.Columns(1).TextAlign = HorizontalAlignment.Center
+
+                LVHistory.EndUpdate()
+                ShowCounts()
             Case HistoryView.RecentlyPlayed
+                ConfigureColumns()
                 sortedViews = views.OrderByDescending(Function(v) v.Data.LastPlayed)
+                If CurrentViewMaxRecords > 0 Then
+                    sortedViews = sortedViews.Take(CurrentViewMaxRecords)
+                End If
+                For Each v As App.SongView In sortedViews
+                    Dim lvi As ListViewItem
+                    If App.IsUrl(v.Data.Path) Then
+                        lvi = New ListViewItem(v.Data.Path)
+                    Else
+                        lvi = New ListViewItem(v.Title)
+                    End If
+                    lvi.SubItems.Add(v.Artist)
+                    lvi.SubItems.Add(v.Album)
+                    lvi.SubItems.Add(v.Genre)
+                    lvi.SubItems.Add(v.Data.PlayCount.ToString("N0"))
+                    lvi.SubItems.Add(v.Data.LastPlayed.ToString("g"))
+                    lvi.SubItems.Add(v.Data.Path)
+                    LVHistory.Items.Add(lvi)
+                Next
+                LVHistory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)
+                LVHistory.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
+                LVHistory.Columns(4).TextAlign = HorizontalAlignment.Center
+                LVHistory.EndUpdate()
+                ShowCounts()
             Case HistoryView.Favorites
+                ConfigureColumns()
                 sortedViews = views.OrderByDescending(Function(v) v.Data.Rating).ThenByDescending(Function(v) v.Data.LastPlayed)
+                If CurrentViewMaxRecords > 0 Then
+                    sortedViews = sortedViews.Take(CurrentViewMaxRecords)
+                End If
+                For Each v As App.SongView In sortedViews
+                    Dim lvi As ListViewItem
+                    If App.IsUrl(v.Data.Path) Then
+                        lvi = New ListViewItem(v.Data.Path)
+                    Else
+                        lvi = New ListViewItem(v.Title)
+                    End If
+                    lvi.SubItems.Add(v.Artist)
+                    lvi.SubItems.Add(v.Album)
+                    lvi.SubItems.Add(v.Genre)
+                    lvi.SubItems.Add(v.Data.PlayCount.ToString("N0"))
+                    lvi.SubItems.Add(v.Data.LastPlayed.ToString("g"))
+                    lvi.SubItems.Add(v.Data.Path)
+                    LVHistory.Items.Add(lvi)
+                Next
+                LVHistory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)
+                LVHistory.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
+                LVHistory.Columns(4).TextAlign = HorizontalAlignment.Center
+                LVHistory.EndUpdate()
+                ShowCounts()
         End Select
-        If CurrentViewMaxRecords > 0 Then
-            sortedViews = sortedViews.Take(CurrentViewMaxRecords)
-        End If
-        For Each v As App.SongView In sortedViews
-            Dim lvi As ListViewItem
-            If App.IsUrl(v.Data.Path) Then
-                lvi = New ListViewItem(v.Data.Path)
-            Else
-                lvi = New ListViewItem(v.Title)
-            End If
-            lvi.SubItems.Add(v.Artist)
-            lvi.SubItems.Add(v.Album)
-            lvi.SubItems.Add(v.Genre)
-            lvi.SubItems.Add(v.Data.PlayCount.ToString("N0"))
-            lvi.SubItems.Add(v.Data.LastPlayed.ToString("g"))
-            lvi.SubItems.Add(v.Data.Path)
-            LVHistory.Items.Add(lvi)
-        Next
-        LVHistory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)
-        LVHistory.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
-        LVHistory.Columns(4).TextAlign = HorizontalAlignment.Center
-        LVHistory.EndUpdate()
-        ShowCounts()
     End Sub
     Private Sub PutChartData()
         Select Case CurrentChartView
@@ -698,6 +783,73 @@ Public Class History
         LblHistoryViewCount.Visible = True
         LblHistoryViewCount.Text = LVHistory.Items.Count.ToString("N0") & If(LVHistory.Items.Count = 1, " song", " songs")
         LblHistoryViewCount.Text &= ", " & LVHistory.SelectedItems.Count.ToString("N0") & " selected"
+        BtnQueueAll.Enabled = False
+        BtnAddAllToPlaylist.Enabled = False
+        Select Case CurrentView
+            Case HistoryView.MostPlayed, HistoryView.RecentlyPlayed, HistoryView.Favorites
+                BtnQueueAll.Enabled = True
+                BtnAddAllToPlaylist.Enabled = True
+        End Select
+    End Sub
+    Private Sub ConfigureColumns()
+        Dim header As ColumnHeader
+        LVHistory.Columns.Clear()
+        Select Case CurrentView
+            Case HistoryView.MostPlayed, HistoryView.RecentlyPlayed, HistoryView.Favorites
+                'Define 7 Columns
+                header = New ColumnHeader()
+                header.Name = "Title"
+                header.Text = "Title"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Artist"
+                header.Text = "Artist"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Album"
+                header.Text = "Album"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Genre"
+                header.Text = "Genre"
+                header.Width = 100
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "PlayCount"
+                header.Text = "Plays"
+                header.Width = 50
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "LastPlayed"
+                header.Text = "Last Played"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Path"
+                header.Text = "Path"
+                header.Width = 400
+                LVHistory.Columns.Add(header)
+            Case HistoryView.MostPlayedArtists
+                'Define 7 Columns
+                header = New ColumnHeader()
+                header.Name = "Artist"
+                header.Text = "Artist"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "PlayCount"
+                header.Text = "Count"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "LastPlayed"
+                header.Text = "Last Played"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+        End Select
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
@@ -742,6 +894,8 @@ Public Class History
         GrpBoxHistory.ForeColor = App.CurrentTheme.TextColor
         RadBtnMostPlayed.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnMostPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnMostPlayedArtists.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnMostPlayedArtists.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnRecentlyPlayed.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnRecentlyPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnFavorites.BackColor = App.CurrentTheme.ButtonBackColor
