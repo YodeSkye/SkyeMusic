@@ -228,31 +228,32 @@ Namespace My
         Friend FRMHistory As History 'FRMHistory is the history window that displays the playback history and statistics.
         Friend FRMLog As Log 'FRMLog is the log window that displays application logs.
         Friend FRMDevTools As DevTools 'FRMDevTools is the developer tools window that provides debugging and database access features.
-        Friend AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
-        Friend AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
         Private HotKeys As New Collections.Generic.List(Of HotKey) 'HotKeys is a list of hotkeys used in the application for global media control.
         Private HotKeyPlay As New HotKey(0, "Global Play/Pause", Keys.MediaPlayPause, Skye.WinAPI.VK_MEDIA_PLAY_PAUSE, 0) 'HotKeyPlay is a hotkey for global play/pause functionality.
         Private HotKeyStop As New HotKey(1, "Global Stop", Keys.MediaStop, Skye.WinAPI.VK_MEDIA_STOP, 0) 'HotKeyStop is a hotkey for global stop functionality.
         Private HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
         Private HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
-        Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
-        Friend HistoryTotalPlayedSongs As UInteger = 0
-        Friend HistoryTotalPlayedSongsThisSession As UInteger = 0
+        Friend HistoryTotalPlayedSongsThisSession As UInteger = 0 'Tracks the total number of songs played during the current session.
+        Friend HistoryThisSessionStartTime As DateTime = DateTime.Now 'Records the time when the current session started.
         Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
         Private WithEvents timerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
         Private WithEvents timerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
         Private WithEvents timerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
         Private WithEvents timerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
-        Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
-        Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
         Private Watchers As New List(Of System.IO.FileSystemWatcher) 'Watchers is a set of file system watchers that monitors changes in the library folders.
         Private WithEvents WatcherWorkTimer As New Timers.Timer(1000) 'WatcherWorkTimer is a timer that debounces file system watcher events to prevent multiple rapid events from being processed.
         Private WatcherWorkList As New Collections.Generic.List(Of String) 'WatcherWorkList is a list of files that have been changed, created, deleted, or renamed by the file system watchers.
+        Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
+        Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
+        Friend AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
+        Friend AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
         Friend ReadOnly TrimEndSearch() As Char = {CChar(" "), CChar("("), CChar(")"), CChar("0"), CChar("1"), CChar("2"), CChar("3"), CChar("4"), CChar("5"), CChar("6"), CChar("7"), CChar("8"), CChar("9")} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
         Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
         Friend ReadOnly AttributionSyncFusion As String = "https://www.syncfusion.com/" 'AttributionSyncFusion is the URL for Syncfusion, which provides UI controls and libraries used in the application.
         Friend ReadOnly AttributionTagLibSharp As String = "https://github.com/mono/taglib-sharp" 'AttributionTagLibSharp is the URL for TagLib# library, which is used for reading and writing metadata in media files.
         Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/" 'AttributionIcons8 is the URL for Icons8, which provides icons used in the application.
+
+        'Paths
         Friend ReadOnly UserPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" 'UserPath is the base path for user-specific files.
 #If DEBUG Then
         Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt" 'LogPath is the path to the log file.
@@ -392,7 +393,11 @@ Namespace My
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
 
-        'Saved Settings
+        'XML Saved History
+        Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
+        Friend HistoryTotalPlayedSongs As UInteger = 0 'Tracks the total number of songs played since the history was first created.
+
+        'Registry Saved Settings
         Friend PlayerPositionShowElapsed As Boolean = True
         Friend PlayMode As PlayModes = PlayModes.Random
         Friend PlaylistTitleFormat As PlaylistTitleFormats = PlaylistTitleFormats.ArtistSong
@@ -1710,6 +1715,58 @@ Namespace My
                 Debug.Print("Error deleting play record: " & ex.Message)
                 Return False
             End Try
+        End Function
+        Public Function GetSessionStats() As (Count As Integer, Duration As TimeSpan)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim count As Integer = 0
+            Dim duration As TimeSpan = TimeSpan.Zero
+
+            Using conn As New SQLiteConnection(connectionString)
+                conn.Open()
+
+                'Count plays this session
+                Dim countQuery As String = "SELECT COUNT(*) FROM Plays WHERE StartPlayTime >= @SessionStart"
+                Using cmd As New SQLiteCommand(countQuery, conn)
+                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
+                    count = Convert.ToInt32(cmd.ExecuteScalar())
+                End Using
+
+                'Sum duration this session
+                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays WHERE StartPlayTime >= @SessionStart"
+                Using cmd As New SQLiteCommand(durationQuery, conn)
+                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
+                    Dim totalSecondsObj = cmd.ExecuteScalar()
+                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
+                    duration = TimeSpan.FromSeconds(totalSeconds)
+                End Using
+            End Using
+
+            Return (count, duration)
+        End Function
+        Public Function GetLifetimeStats() As (Count As Integer, Duration As TimeSpan)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim count As Integer = 0
+            Dim duration As TimeSpan = TimeSpan.Zero
+
+            Using conn As New SQLiteConnection(connectionString)
+                conn.Open()
+
+                ' Count all plays
+                Dim countQuery As String = "SELECT COUNT(*) FROM Plays"
+                Using cmd As New SQLiteCommand(countQuery, conn)
+                    count = Convert.ToInt32(cmd.ExecuteScalar())
+                End Using
+
+                ' Sum all durations
+                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays"
+                Using cmd As New SQLiteCommand(durationQuery, conn)
+                    Dim totalSecondsObj = cmd.ExecuteScalar()
+                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
+                    duration = TimeSpan.FromSeconds(totalSeconds)
+                End Using
+            End Using
+
+            Return (count, duration)
         End Function
 
         'Functions

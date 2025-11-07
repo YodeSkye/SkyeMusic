@@ -220,7 +220,6 @@ Partial Class History
         GrpBoxHistory.Controls.Add(RadBtnFavorites)
         GrpBoxHistory.Controls.Add(RadBtnRecentlyPlayed)
         GrpBoxHistory.Controls.Add(RadBtnMostPlayed)
-        GrpBoxHistory.Enabled = False
         GrpBoxHistory.Location = New Point(826, 87)
         GrpBoxHistory.Margin = New Padding(4)
         GrpBoxHistory.Name = "GrpBoxHistory"
@@ -311,7 +310,6 @@ Partial Class History
         GrpBoxCharts.Controls.Add(BtnLists)
         GrpBoxCharts.Controls.Add(RadBtnArtists)
         GrpBoxCharts.Controls.Add(RadBtnGenres)
-        GrpBoxCharts.Enabled = False
         GrpBoxCharts.Location = New Point(826, 87)
         GrpBoxCharts.Margin = New Padding(4)
         GrpBoxCharts.Name = "GrpBoxCharts"
