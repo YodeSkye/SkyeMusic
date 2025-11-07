@@ -26,12 +26,21 @@ Public Class History
         ArtistWordCloud
     End Enum
     Private CurrentChartView As ChartView = ChartView.Genres
+    Private Enum ViewMode
+        Lists
+        Charts
+    End Enum
+    Private CurrentViewMode As ViewMode = ViewMode.Lists
     Private CurrentViewMaxRecords As Integer = CInt(App.HistoryViewMaxRecords)
     Private views As List(Of App.SongView)
-    Public Class MostPlayedArtistsReport
+    Public Class MostPlayedArtistsList
         Public Property Artist As String
         Public Property PlayCount As Integer
         Public Property LastPlayed As Date
+    End Class
+    Public Class GenreChart
+        Public Property Genre As String
+        Public Property Count As Integer
     End Class
 
     'Form Events
@@ -167,8 +176,10 @@ Public Class History
         TxtBoxMaxRecords.Text = "All"
         SetShowAll()
         PutViewData()
+        PutChartData()
     End Sub
     Private Sub BtnCharts_Click(sender As Object, e As EventArgs) Handles BtnCharts.Click
+        CurrentViewMode = ViewMode.Charts
         PanelCharts.BringToFront()
         GrpBoxCharts.Visible = True
         GrpBoxCharts.BringToFront()
@@ -177,6 +188,7 @@ Public Class History
         PutChartData()
     End Sub
     Private Sub BtnLists_Click(sender As Object, e As EventArgs) Handles BtnLists.Click
+        CurrentViewMode = ViewMode.Lists
         PanelCharts.SendToBack()
         GrpBoxCharts.Visible = False
         GrpBoxHistory.Visible = True
@@ -263,6 +275,7 @@ Public Class History
         End Try
         SetShowAll()
         PutViewData()
+        PutChartData()
     End Sub
 
     'Procedures
@@ -329,7 +342,7 @@ Public Class History
             Case HistoryView.MostPlayedArtists
                 ConfigureColumns()
 
-                Dim artistGroups As IEnumerable(Of MostPlayedArtistsReport) =
+                Dim artistGroups As IEnumerable(Of MostPlayedArtistsList) =
                     views.GroupBy(Function(v)
                                       Dim artistName As String = v.Artist
                                       If String.IsNullOrWhiteSpace(v.Artist) Then
@@ -338,7 +351,7 @@ Public Class History
                                           Return v.Artist
                                       End If
                                   End Function) _
-                         .Select(Function(g) New MostPlayedArtistsReport With {
+                         .Select(Function(g) New MostPlayedArtistsList With {
                              .Artist = g.Key,
                              .PlayCount = g.Sum(Function(v) v.Data.PlayCount),
                              .LastPlayed = g.Max(Function(v) v.Data.LastPlayed)
@@ -350,7 +363,7 @@ Public Class History
                     artistGroups = artistGroups.Take(CurrentViewMaxRecords)
                 End If
 
-                For Each g As MostPlayedArtistsReport In artistGroups
+                For Each g As MostPlayedArtistsList In artistGroups
                     Dim lvi As New ListViewItem(g.Artist)
                     lvi.SubItems.Add(g.PlayCount.ToString("N0"))
                     lvi.SubItems.Add(g.LastPlayed.ToString("g"))
@@ -420,19 +433,19 @@ Public Class History
     Private Sub PutChartData()
         Select Case CurrentChartView
             Case ChartView.Genres
-                Dim genreCounts As New Dictionary(Of String, Integer)
-                Dim genreIndex = LVHistory.Columns("Genre").Index
+                'Use the global dataset instead of scraping LVHistory
+                Dim genreCounts As IEnumerable(Of GenreChart) =
+                    views.Where(Function(sv) Not String.IsNullOrWhiteSpace(sv.Genre)) _
+                         .GroupBy(Function(sv) sv.Genre) _
+                         .Select(Function(g) New GenreChart With {
+                             .Genre = g.Key,
+                             .Count = g.Count()
+                         }) _
+                         .OrderByDescending(Function(x) x.Count)
 
-                'Count genres from history list
-                For Each lvi As ListViewItem In LVHistory.Items
-                    Dim genre = lvi.SubItems(genreIndex).Text
-                    If Not String.IsNullOrEmpty(genre) Then
-                        If Not genreCounts.ContainsKey(genre) Then
-                            genreCounts(genre) = 0
-                        End If
-                        genreCounts(genre) += 1
-                    End If
-                Next
+                If CurrentViewMaxRecords > 0 Then
+                    genreCounts = genreCounts.Take(CurrentViewMaxRecords)
+                End If
 
                 'Create chart
                 Dim chart As New Chart With {.Dock = DockStyle.Fill}
@@ -442,7 +455,7 @@ Public Class History
                 Dim series As New Series("Genres") With {.ChartType = SeriesChartType.Pie}
 
                 For Each kvp In genreCounts
-                    series.Points.AddXY(kvp.Key, kvp.Value)
+                    series.Points.AddXY(kvp.Genre, kvp.Count)
                 Next
 
                 chart.Series.Add(series)
@@ -453,37 +466,40 @@ Public Class History
                 PanelCharts.Controls.Clear()
                 PanelCharts.Controls.Add(chart)
             Case ChartView.GenrePolar
-                'Count genres from history list
-                Dim genreCounts As New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
-                Dim genreIndex = LVHistory.Columns("Genre").Index
+                'Build genre dataset from views
+                Dim genreCounts As IEnumerable(Of GenreChart) =
+                    views.Where(Function(sv) Not String.IsNullOrWhiteSpace(sv.Genre)) _
+                         .GroupBy(Function(sv) sv.Genre.Trim()) _
+                         .Select(Function(g) New GenreChart With {
+                             .Genre = g.Key,
+                             .Count = g.Count()
+                         }) _
+                         .OrderByDescending(Function(x) x.Count)
 
-                For Each lvi As ListViewItem In LVHistory.Items
-                    Dim genre = lvi.SubItems(genreIndex).Text.Trim()
-                    If Not String.IsNullOrEmpty(genre) Then
-                        If Not genreCounts.ContainsKey(genre) Then
-                            genreCounts(genre) = 0
-                        End If
-                        genreCounts(genre) += 1
-                    End If
-                Next
+                'Apply limit if set
+                If CurrentViewMaxRecords > 0 Then
+                    genreCounts = genreCounts.Take(CurrentViewMaxRecords)
+                End If
 
                 'Create chart
                 Dim chart As New Chart With {.Dock = DockStyle.Fill}
                 Dim area As New ChartArea("PolarArea")
                 chart.ChartAreas.Add(area)
+
+                'Axis styling
                 With chart.ChartAreas(0).AxisY.MajorGrid
-                    .LineColor = App.CurrentTheme.TextColor   'or any Color you like
-                    .LineDashStyle = ChartDashStyle.Solid     'optional: Solid, Dash, Dot, etc.
-                    .LineWidth = 1                            'thickness of the circles
+                    .LineColor = App.CurrentTheme.TextColor
+                    .LineDashStyle = ChartDashStyle.Solid
+                    .LineWidth = 1
                 End With
                 With chart.ChartAreas(0).AxisX
-                    .LineColor = App.CurrentTheme.TextColor             'horizontal axis line
-                    .MajorGrid.LineColor = App.CurrentTheme.TextColor   'radial spokes
+                    .LineColor = App.CurrentTheme.TextColor
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor
                     .LineWidth = 2
                 End With
                 With chart.ChartAreas(0).AxisY
-                    .LineColor = App.CurrentTheme.TextColor             'vertical axis line (the radius line)
-                    .MajorGrid.LineColor = App.CurrentTheme.TextColor   'concentric circles
+                    .LineColor = App.CurrentTheme.TextColor
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor
                     .LineWidth = 2
                 End With
 
@@ -499,17 +515,18 @@ Public Class History
                 Dim series As New Series("Genres") With {
                     .ChartType = SeriesChartType.Radar,
                     .BorderWidth = 4,
-                    .Color = Color.FromArgb(100, App.CurrentTheme.ButtonBackColor), 'fill color
-                    .BackSecondaryColor = App.CurrentTheme.ButtonTextColor,         'outline color
+                    .Color = Color.FromArgb(100, App.CurrentTheme.ButtonBackColor),
+                    .BackSecondaryColor = App.CurrentTheme.ButtonTextColor,
                     .BackGradientStyle = GradientStyle.DiagonalRight,
                     .IsValueShownAsLabel = True,
-                    .LabelForeColor = App.CurrentTheme.TextColor}
+                    .LabelForeColor = App.CurrentTheme.TextColor
+                }
 
                 'Add each genre as a spoke
                 Dim i As Integer = 0
-                For Each kvp In genreCounts.OrderByDescending(Function(k) k.Value)
-                    Dim idx As Integer = series.Points.AddXY(i, kvp.Value) ' numeric X
-                    series.Points(idx).AxisLabel = kvp.Key                  ' label on spoke
+                For Each g As GenreChart In genreCounts
+                    Dim idx As Integer = series.Points.AddXY(i, g.Count)
+                    series.Points(idx).AxisLabel = g.Genre
                     i += 1
                 Next
 
@@ -523,28 +540,30 @@ Public Class History
                 PanelCharts.Controls.Clear()
                 PanelCharts.Controls.Add(chart)
             Case ChartView.GenrePareto
-                'Count plays per genre
-                Dim genreCounts As New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
-                Dim genreIndex = LVHistory.Columns("Genre").Index
+                ' Build genre dataset from views
+                Dim genreCounts As IEnumerable(Of GenreChart) =
+                    views.Where(Function(sv) Not String.IsNullOrWhiteSpace(sv.Genre)) _
+                         .GroupBy(Function(sv) sv.Genre.Trim()) _
+                         .Select(Function(g) New GenreChart With {
+                             .Genre = g.Key,
+                             .Count = g.Count()
+                         }) _
+                         .OrderByDescending(Function(x) x.Count)
 
-                For Each lvi As ListViewItem In LVHistory.Items
-                    Dim genre = lvi.SubItems(genreIndex).Text.Trim()
-                    If Not String.IsNullOrEmpty(genre) Then
-                        If Not genreCounts.ContainsKey(genre) Then
-                            genreCounts(genre) = 0
-                        End If
-                        genreCounts(genre) += 1
-                    End If
-                Next
+                ' Apply limit if set
+                If CurrentViewMaxRecords > 0 Then
+                    genreCounts = genreCounts.Take(CurrentViewMaxRecords)
+                End If
 
-                'Sort by descending play count
-                Dim sorted = genreCounts.OrderByDescending(Function(k) k.Value).ToList()
-                Dim totalPlays = sorted.Sum(Function(k) k.Value)
+                ' Total plays for cumulative %
+                Dim totalPlays As Integer = genreCounts.Sum(Function(g) g.Count)
 
-                'Create chart
+                ' Create chart
                 Dim chart As New Chart With {.Dock = DockStyle.Fill}
                 Dim area As New ChartArea("ParetoArea")
                 chart.ChartAreas.Add(area)
+
+                ' Axis styling
                 With chart.ChartAreas(0).AxisX
                     .Interval = 1
                     .MajorGrid.Enabled = False
@@ -574,7 +593,7 @@ Public Class History
                     .LabelStyle.ForeColor = App.CurrentTheme.TextColor
                 End With
 
-                'Configure axes
+                ' Configure axes
                 With area
                     .AxisX.Interval = 1
                     .AxisX.LabelStyle.Angle = -45
@@ -584,7 +603,7 @@ Public Class History
                     .BackColor = App.CurrentTheme.BackColor
                 End With
 
-                'Bar series (play counts)
+                ' Bar series (play counts)
                 Dim barSeries As New Series("Plays") With {
                     .ChartType = SeriesChartType.Column,
                     .Color = App.CurrentTheme.ButtonBackColor,
@@ -593,7 +612,7 @@ Public Class History
                     .YAxisType = AxisType.Primary
                 }
 
-                'Line series (cumulative %)
+                ' Line series (cumulative %)
                 Dim lineSeries As New Series("Cumulative %") With {
                     .ChartType = SeriesChartType.Line,
                     .BorderWidth = 2,
@@ -601,23 +620,18 @@ Public Class History
                     .YAxisType = AxisType.Secondary
                 }
 
-                Debug.WriteLine(String.Join(", ", genreCounts.Keys))
-
-                'Populate both series
+                ' Populate both series
                 Dim runningTotal As Integer = 0
                 Dim i As Integer = 0
-                For Each kvp In sorted
-                    Dim genre = kvp.Key
-                    Dim plays = kvp.Value
-                    runningTotal += plays
-                    Dim cumulativePct = (runningTotal / totalPlays) * 100
+                For Each g As GenreChart In genreCounts
+                    runningTotal += g.Count
+                    Dim cumulativePct As Double = (runningTotal / totalPlays) * 100
 
-                    'Add with numeric X
-                    Dim barIdx = barSeries.Points.AddXY(i, plays)
-                    barSeries.Points(barIdx).AxisLabel = genre
+                    Dim barIdx = barSeries.Points.AddXY(i, g.Count)
+                    barSeries.Points(barIdx).AxisLabel = g.Genre
 
                     Dim lineIdx = lineSeries.Points.AddXY(i, cumulativePct)
-                    lineSeries.Points(lineIdx).AxisLabel = genre
+                    lineSeries.Points(lineIdx).AxisLabel = g.Genre
 
                     i += 1
                 Next
@@ -625,122 +639,114 @@ Public Class History
                 chart.Series.Add(barSeries)
                 chart.Series.Add(lineSeries)
 
-                'Optional: add 80% reference line
-                Dim strip As New StripLine()
-                strip.IntervalOffset = 80
-                strip.StripWidth = 0
-                strip.BorderColor = App.CurrentTheme.ButtonBackColor
-                strip.BorderDashStyle = ChartDashStyle.Dash
+                ' Optional: add 80% reference line
+                Dim strip As New StripLine() With {
+                    .IntervalOffset = 80,
+                    .StripWidth = 0,
+                    .BorderColor = App.CurrentTheme.ButtonBackColor,
+                    .BorderDashStyle = ChartDashStyle.Dash
+                }
                 chart.ChartAreas(0).AxisY2.StripLines.Add(strip)
 
-                'Apply theme
+                ' Apply theme
                 chart.BackColor = App.CurrentTheme.BackColor
 
-                'Show chart
+                ' Show chart
                 PanelCharts.Controls.Clear()
                 PanelCharts.Controls.Add(chart)
             Case ChartView.Artists
-                'Dictionary to hold artist → play count
-                'Use case-insensitive comparer so "Avril Lavigne" and "avril lavigne" are treated the same
-                Dim artistCounts As New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+                ' Build artist dataset from views
+                Dim artistCounts As IEnumerable(Of MostPlayedArtistsList) =
+                    views.GroupBy(Function(v) If(String.IsNullOrWhiteSpace(v.Artist), "Video", v.Artist.Trim())) _
+                         .Select(Function(g) New MostPlayedArtistsList With {
+                             .Artist = g.Key,
+                             .PlayCount = g.Count(),
+                             .LastPlayed = g.Max(Function(v) v.Data.LastPlayed)
+                         }) _
+                         .OrderByDescending(Function(x) x.PlayCount)
 
-                'Find the index of the Artist column in the ListView
-                Dim artistIndex = LVHistory.Columns("Artist").Index
+                ' Apply limit if set
+                If CurrentViewMaxRecords > 0 Then
+                    artistCounts = artistCounts.Take(CurrentViewMaxRecords)
+                End If
 
-                'Count artists from history list
-                For Each lvi As ListViewItem In LVHistory.Items
-                    Dim artist = lvi.SubItems(artistIndex).Text.Trim() ' Trim to remove stray spaces
-                    If Not String.IsNullOrEmpty(artist) Then
-                        If Not artistCounts.ContainsKey(artist) Then
-                            artistCounts(artist) = 0
-                        End If
-                        artistCounts(artist) += 1
-                    End If
-                Next
-
-                'Create a new chart and chart area
+                ' Create chart
                 Dim chart As New Chart With {.Dock = DockStyle.Fill}
                 Dim area As New ChartArea("MainArea")
                 chart.ChartAreas.Add(area)
 
-                'Configure the series for a vertical bar chart
+                ' Configure series for vertical bar chart
                 Dim series As New Series("Artists") With {
                     .ChartType = SeriesChartType.Column,
-                    .IsValueShownAsLabel = True, ' Show play counts above bars
-                    .LabelForeColor = App.CurrentTheme.TextColor}
+                    .IsValueShownAsLabel = True,
+                    .LabelForeColor = App.CurrentTheme.TextColor
+                }
 
-                'Sort artists by play count descending before plotting
-                Dim sortedArtists = artistCounts.OrderByDescending(Function(kvp) kvp.Value)
-
-                'Add each artist as a separate bar
+                ' Add each artist as a separate bar
                 Dim i As Integer = 0
-                For Each kvp In sortedArtists
-                    'Add a point with numeric X (i) and Y = play count
-                    Dim idx As Integer = series.Points.AddXY(i, kvp.Value)
-                    'Set the label under the bar to the artist name
-                    series.Points(idx).AxisLabel = kvp.Key
+                For Each a As MostPlayedArtistsList In artistCounts
+                    Dim idx As Integer = series.Points.AddXY(i, a.PlayCount)
+                    series.Points(idx).AxisLabel = a.Artist
                     i += 1
                 Next
 
-                'Clear any existing series and add our new one
+                ' Clear any existing series and add our new one
                 chart.Series.Clear()
                 chart.Series.Add(series)
 
-                'Configure X axis so every artist label shows
+                ' Configure X axis so every artist label shows
                 With chart.ChartAreas(0).AxisX
                     .Interval = 1
                     .LabelStyle.IsStaggered = False
                     .MajorGrid.Enabled = False
+                    .LabelStyle.ForeColor = App.CurrentTheme.TextColor
                 End With
 
-                'Apply theme colors
+                ' Apply theme colors
                 chart.BackColor = App.CurrentTheme.BackColor
                 chart.ChartAreas(0).BackColor = App.CurrentTheme.BackColor
                 chart.ChartAreas(0).AxisY.LabelStyle.ForeColor = App.CurrentTheme.TextColor
-                chart.ChartAreas(0).AxisX.LabelStyle.ForeColor = App.CurrentTheme.TextColor
 
-                'Show chart in the panel
+                ' Show chart in the panel
                 PanelCharts.Controls.Clear()
                 PanelCharts.Controls.Add(chart)
             Case ChartView.ArtistWordCloud
-                'Dictionary to hold artist → play count
-                Dim artistCounts As New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+                ' Build artist dataset from views
+                Dim artistCounts As IEnumerable(Of MostPlayedArtistsList) =
+                    views.GroupBy(Function(v) If(String.IsNullOrWhiteSpace(v.Artist), "Video", v.Artist.Trim())) _
+                         .Select(Function(g) New MostPlayedArtistsList With {
+                             .Artist = g.Key,
+                             .PlayCount = g.Count(),
+                             .LastPlayed = g.Max(Function(v) v.Data.LastPlayed)
+                         }) _
+                         .OrderByDescending(Function(x) x.PlayCount)
 
-                'Find the index of the Artist column in the ListView
-                Dim artistIndex = LVHistory.Columns("Artist").Index
+                ' Apply limit if set
+                If CurrentViewMaxRecords > 0 Then
+                    artistCounts = artistCounts.Take(CurrentViewMaxRecords)
+                End If
 
-                'Count artists from history list
-                For Each lvi As ListViewItem In LVHistory.Items
-                    Dim artist = lvi.SubItems(artistIndex).Text.Trim()
-                    If Not String.IsNullOrEmpty(artist) Then
-                        If Not artistCounts.ContainsKey(artist) Then
-                            artistCounts(artist) = 0
-                        End If
-                        artistCounts(artist) += 1
-                    End If
-                Next
+                ' Convert to arrays for WordCloud.NET
+                Dim words = artistCounts.Select(Function(a) a.Artist).ToArray()
+                Dim frequencies = artistCounts.Select(Function(a) a.PlayCount).ToArray()
 
-                'Convert dictionary to arrays for WordCloud.NET
-                Dim words = artistCounts.Keys.ToArray()
-                Dim frequencies = artistCounts.Values.ToArray()
-
-                'Create the word cloud generator
+                ' Create the word cloud generator
                 Dim wc As New WordCloud(
                     width:=PanelCharts.ClientSize.Width,
                     height:=PanelCharts.ClientSize.Height,
                     useRank:=False,
-                    fontColor:=App.CurrentTheme.TextColor,     'single color for all words
-                    maxFontSize:=60,                           'cap size
-                    fontStep:=2,                               'spacing between sizes
+                    fontColor:=App.CurrentTheme.TextColor,     ' single color for all words
+                    maxFontSize:=60,                           ' cap size
+                    fontStep:=2,                               ' spacing between sizes
                     mask:=Nothing,
-                    allowVerical:=False,                       'spelled as in lib
-                    fontname:="Segoe UI"                       'font family
+                    allowVerical:=False,                       ' spelled as in lib
+                    fontname:="Segoe UI"                       ' font family
                 )
 
-                'Generate the image
+                ' Generate the image
                 Dim bmp As Image = wc.Draw(words, frequencies)
 
-                'Show in a PictureBox (or directly in your panel)
+                ' Show in a PictureBox
                 Dim pb As New PictureBox With {
                     .Dock = DockStyle.Fill,
                     .Image = bmp,
@@ -780,15 +786,20 @@ Public Class History
         End If
     End Sub
     Private Sub ShowCounts()
-        LblHistoryViewCount.Visible = True
-        LblHistoryViewCount.Text = LVHistory.Items.Count.ToString("N0") & If(LVHistory.Items.Count = 1, " song", " songs")
-        LblHistoryViewCount.Text &= ", " & LVHistory.SelectedItems.Count.ToString("N0") & " selected"
-        BtnQueueAll.Enabled = False
-        BtnAddAllToPlaylist.Enabled = False
-        Select Case CurrentView
-            Case HistoryView.MostPlayed, HistoryView.RecentlyPlayed, HistoryView.Favorites
-                BtnQueueAll.Enabled = True
-                BtnAddAllToPlaylist.Enabled = True
+        Select Case CurrentViewMode
+            Case ViewMode.Lists
+                LblHistoryViewCount.Visible = True
+                LblHistoryViewCount.Text = LVHistory.Items.Count.ToString("N0") & If(LVHistory.Items.Count = 1, " record", " records")
+                LblHistoryViewCount.Text &= ", " & LVHistory.SelectedItems.Count.ToString("N0") & " selected"
+                BtnQueueAll.Enabled = False
+                BtnAddAllToPlaylist.Enabled = False
+                Select Case CurrentView
+                    Case HistoryView.MostPlayed, HistoryView.RecentlyPlayed, HistoryView.Favorites
+                        BtnQueueAll.Enabled = True
+                        BtnAddAllToPlaylist.Enabled = True
+                End Select
+            Case ViewMode.Charts
+                LblHistoryViewCount.Visible = False
         End Select
     End Sub
     Private Sub ConfigureColumns()
