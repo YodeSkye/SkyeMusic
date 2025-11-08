@@ -98,13 +98,12 @@ Partial Class Player
         TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
         TimerMeter = New Timer(components)
         TimerVisualizer = New Timer(components)
-        TipPlayer = New Skye.UI.ToolTipEX(components)
         VLCViewer = New LibVLCSharp.WinForms.VideoView()
         LblMedia = New Skye.UI.Label()
         RTBLyrics = New Skye.UI.RichTextBox()
-        TipWatcherNotification = New Skye.UI.ToolTipEX(components)
         TimerStatus = New Timer(components)
         TimerLyrics = New Timer(components)
+        TipPlayer = New Skye.UI.ToolTip(components)
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -118,23 +117,21 @@ Partial Class Player
         BtnPlay.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnPlay.BackColor = Color.Transparent
         BtnPlay.Font = New Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TipPlayer.SetImage(BtnPlay, Nothing)
-        TipWatcherNotification.SetImage(BtnPlay, Nothing)
         BtnPlay.Location = New Point(12, 399)
         BtnPlay.Name = "BtnPlay"
         BtnPlay.Size = New Size(50, 50)
         BtnPlay.TabIndex = 1
         BtnPlay.TabStop = False
+        TipPlayer.SetToolTipImage(BtnPlay, Nothing)
         BtnPlay.UseVisualStyleBackColor = False
         ' 
         ' CMPlaylist
         ' 
         CMPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipPlayer.SetImage(CMPlaylist, Nothing)
-        TipWatcherNotification.SetImage(CMPlaylist, Nothing)
         CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMPlaylist.Name = "CMPlaylist"
         CMPlaylist.Size = New Size(217, 444)
+        TipPlayer.SetToolTipImage(CMPlaylist, Nothing)
         ' 
         ' CMIPlay
         ' 
@@ -213,13 +210,12 @@ Partial Class Player
         ' CMRatings
         ' 
         CMRatings.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipPlayer.SetImage(CMRatings, Nothing)
-        TipWatcherNotification.SetImage(CMRatings, Nothing)
         CMRatings.Items.AddRange(New ToolStripItem() {CMIRating5Stars, CMIRating4Stars, CMIRating3Stars, CMIRating2Stars, CMIRating1Star})
         CMRatings.Name = "CMRatings"
         CMRatings.OwnerItem = CMIRating
         CMRatings.ShowImageMargin = False
         CMRatings.Size = New Size(121, 134)
+        TipPlayer.SetToolTipImage(CMRatings, Nothing)
         ' 
         ' CMIRating5Stars
         ' 
@@ -317,27 +313,25 @@ Partial Class Player
         ' 
         BtnReverse.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnReverse.BackColor = Color.Transparent
-        TipPlayer.SetImage(BtnReverse, Nothing)
-        TipWatcherNotification.SetImage(BtnReverse, Nothing)
         BtnReverse.Location = New Point(124, 399)
         BtnReverse.Name = "BtnReverse"
         BtnReverse.Size = New Size(50, 50)
         BtnReverse.TabIndex = 6
         BtnReverse.TabStop = False
+        TipPlayer.SetToolTipImage(BtnReverse, Nothing)
         BtnReverse.UseVisualStyleBackColor = False
         ' 
         ' MenuPlayer
         ' 
         MenuPlayer.BackColor = Color.Black
         MenuPlayer.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipPlayer.SetImage(MenuPlayer, Nothing)
-        TipWatcherNotification.SetImage(MenuPlayer, Nothing)
         MenuPlayer.Items.AddRange(New ToolStripItem() {MIFile, MIView, MIVisualizer, MILyrics, MIPlayMode, MILibrary, MIAbout})
         MenuPlayer.Location = New Point(0, 0)
         MenuPlayer.Name = "MenuPlayer"
         MenuPlayer.Size = New Size(984, 25)
         MenuPlayer.TabIndex = 12
         MenuPlayer.Text = "MenuStrip1"
+        TipPlayer.SetToolTipImage(MenuPlayer, Nothing)
         ' 
         ' MIFile
         ' 
@@ -502,13 +496,12 @@ Partial Class Player
         ' 
         BtnForward.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnForward.BackColor = Color.Transparent
-        TipPlayer.SetImage(BtnForward, Nothing)
-        TipWatcherNotification.SetImage(BtnForward, Nothing)
         BtnForward.Location = New Point(180, 399)
         BtnForward.Name = "BtnForward"
         BtnForward.Size = New Size(50, 50)
         BtnForward.TabIndex = 7
         BtnForward.TabStop = False
+        TipPlayer.SetToolTipImage(BtnForward, Nothing)
         BtnForward.UseVisualStyleBackColor = False
         ' 
         ' BtnStop
@@ -516,13 +509,12 @@ Partial Class Player
         BtnStop.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnStop.BackColor = Color.Transparent
         BtnStop.Font = New Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TipPlayer.SetImage(BtnStop, Nothing)
-        TipWatcherNotification.SetImage(BtnStop, Nothing)
         BtnStop.Location = New Point(68, 399)
         BtnStop.Name = "BtnStop"
         BtnStop.Size = New Size(50, 50)
         BtnStop.TabIndex = 4
         BtnStop.TabStop = False
+        TipPlayer.SetToolTipImage(BtnStop, Nothing)
         BtnStop.UseVisualStyleBackColor = False
         ' 
         ' BtnMute
@@ -530,26 +522,24 @@ Partial Class Player
         BtnMute.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         BtnMute.BackColor = Color.Transparent
         BtnMute.Image = My.Resources.Resources.ImagePlayerSound
-        TipPlayer.SetImage(BtnMute, Nothing)
-        TipWatcherNotification.SetImage(BtnMute, Nothing)
         BtnMute.Location = New Point(348, 399)
         BtnMute.Name = "BtnMute"
         BtnMute.Size = New Size(50, 50)
         BtnMute.TabIndex = 11
         BtnMute.TabStop = False
+        TipPlayer.SetToolTipImage(BtnMute, Nothing)
         BtnMute.UseVisualStyleBackColor = False
         ' 
         ' BtnNext
         ' 
         BtnNext.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnNext.BackColor = Color.Transparent
-        TipPlayer.SetImage(BtnNext, Nothing)
-        TipWatcherNotification.SetImage(BtnNext, Nothing)
         BtnNext.Location = New Point(292, 399)
         BtnNext.Name = "BtnNext"
         BtnNext.Size = New Size(50, 50)
         BtnNext.TabIndex = 9
         BtnNext.TabStop = False
+        TipPlayer.SetToolTipImage(BtnNext, Nothing)
         BtnNext.UseVisualStyleBackColor = False
         ' 
         ' PEXLeft
@@ -558,8 +548,6 @@ Partial Class Player
         PEXLeft.BackColor = Color.Transparent
         PEXLeft.DrawingColor = Color.DodgerBlue
         PEXLeft.DrawingColorMode = Skye.UI.ProgressEX.colorDrawModes.Smooth
-        TipPlayer.SetImage(PEXLeft, Nothing)
-        TipWatcherNotification.SetImage(PEXLeft, Nothing)
         PEXLeft.Location = New Point(12, 352)
         PEXLeft.MaximumSize = New Size(Integer.MaxValue, 40)
         PEXLeft.MinimumSize = New Size(50, 5)
@@ -569,6 +557,7 @@ Partial Class Player
         PEXLeft.Step = 1
         PEXLeft.TabIndex = 17
         PEXLeft.TabStop = False
+        TipPlayer.SetToolTipImage(PEXLeft, Nothing)
         ' 
         ' PEXRight
         ' 
@@ -576,8 +565,6 @@ Partial Class Player
         PEXRight.BackColor = Color.Transparent
         PEXRight.DrawingColor = Color.DodgerBlue
         PEXRight.DrawingColorMode = Skye.UI.ProgressEX.colorDrawModes.Smooth
-        TipPlayer.SetImage(PEXRight, Nothing)
-        TipWatcherNotification.SetImage(PEXRight, Nothing)
         PEXRight.Location = New Point(12, 389)
         PEXRight.MaximumSize = New Size(Integer.MaxValue, 40)
         PEXRight.MinimumSize = New Size(50, 5)
@@ -587,18 +574,18 @@ Partial Class Player
         PEXRight.Step = 1
         PEXRight.TabIndex = 18
         PEXRight.TabStop = False
+        TipPlayer.SetToolTipImage(PEXRight, Nothing)
         ' 
         ' PicBoxAlbumArt
         ' 
         PicBoxAlbumArt.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        TipPlayer.SetImage(PicBoxAlbumArt, Nothing)
-        TipWatcherNotification.SetImage(PicBoxAlbumArt, Nothing)
         PicBoxAlbumArt.Location = New Point(1, 27)
         PicBoxAlbumArt.Name = "PicBoxAlbumArt"
         PicBoxAlbumArt.Size = New Size(407, 294)
         PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.Zoom
         PicBoxAlbumArt.TabIndex = 20
         PicBoxAlbumArt.TabStop = False
+        TipPlayer.SetToolTipImage(PicBoxAlbumArt, Nothing)
         PicBoxAlbumArt.Visible = False
         ' 
         ' TxtBoxPlaylistSearch
@@ -608,8 +595,6 @@ Partial Class Player
         TxtBoxPlaylistSearch.BorderStyle = BorderStyle.None
         TxtBoxPlaylistSearch.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxPlaylistSearch.ForeColor = SystemColors.InactiveCaption
-        TipWatcherNotification.SetImage(TxtBoxPlaylistSearch, Nothing)
-        TipPlayer.SetImage(TxtBoxPlaylistSearch, Nothing)
         TxtBoxPlaylistSearch.Location = New Point(414, 5)
         TxtBoxPlaylistSearch.Name = "TxtBoxPlaylistSearch"
         TxtBoxPlaylistSearch.ShortcutsEnabled = False
@@ -617,42 +602,40 @@ Partial Class Player
         TxtBoxPlaylistSearch.TabIndex = 22
         TxtBoxPlaylistSearch.TabStop = False
         TxtBoxPlaylistSearch.Text = "Search Playlist"
+        TipPlayer.SetToolTipImage(TxtBoxPlaylistSearch, Nothing)
         ' 
         ' ListBoxPlaylistSearch
         ' 
         ListBoxPlaylistSearch.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         ListBoxPlaylistSearch.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         ListBoxPlaylistSearch.FormattingEnabled = True
-        TipWatcherNotification.SetImage(ListBoxPlaylistSearch, Nothing)
-        TipPlayer.SetImage(ListBoxPlaylistSearch, Nothing)
         ListBoxPlaylistSearch.Location = New Point(410, 25)
         ListBoxPlaylistSearch.Name = "ListBoxPlaylistSearch"
         ListBoxPlaylistSearch.Size = New Size(574, 88)
         ListBoxPlaylistSearch.TabIndex = 25
+        TipPlayer.SetToolTipImage(ListBoxPlaylistSearch, Nothing)
         ListBoxPlaylistSearch.Visible = False
         ' 
         ' PanelMedia
         ' 
         PanelMedia.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        TipWatcherNotification.SetImage(PanelMedia, Nothing)
-        TipPlayer.SetImage(PanelMedia, Nothing)
         PanelMedia.Location = New Point(1, 27)
         PanelMedia.Name = "PanelMedia"
         PanelMedia.Size = New Size(407, 294)
         PanelMedia.TabIndex = 30
+        TipPlayer.SetToolTipImage(PanelMedia, Nothing)
         PanelMedia.Visible = False
         ' 
         ' BtnPrevious
         ' 
         BtnPrevious.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnPrevious.BackColor = Color.Transparent
-        TipPlayer.SetImage(BtnPrevious, Nothing)
-        TipWatcherNotification.SetImage(BtnPrevious, Nothing)
         BtnPrevious.Location = New Point(236, 399)
         BtnPrevious.Name = "BtnPrevious"
         BtnPrevious.Size = New Size(50, 50)
         BtnPrevious.TabIndex = 8
         BtnPrevious.TabStop = False
+        TipPlayer.SetToolTipImage(BtnPrevious, Nothing)
         BtnPrevious.UseVisualStyleBackColor = False
         ' 
         ' LVPlaylist
@@ -662,74 +645,68 @@ Partial Class Player
         LVPlaylist.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         LVPlaylist.ContextMenuStrip = CMPlaylist
         LVPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipWatcherNotification.SetImage(LVPlaylist, Nothing)
-        TipPlayer.SetImage(LVPlaylist, Nothing)
         LVPlaylist.InsertionLineColor = Color.Teal
         LVPlaylist.Location = New Point(410, 27)
         LVPlaylist.Name = "LVPlaylist"
         LVPlaylist.OwnerDraw = True
         LVPlaylist.Size = New Size(574, 409)
         LVPlaylist.TabIndex = 0
+        TipPlayer.SetToolTipImage(LVPlaylist, Nothing)
         LVPlaylist.UseCompatibleStateImageBehavior = False
         LVPlaylist.View = View.Details
         ' 
         ' PicBoxVisualizer
         ' 
         PicBoxVisualizer.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        TipPlayer.SetImage(PicBoxVisualizer, Nothing)
-        TipWatcherNotification.SetImage(PicBoxVisualizer, Nothing)
         PicBoxVisualizer.Location = New Point(1, 27)
         PicBoxVisualizer.Name = "PicBoxVisualizer"
         PicBoxVisualizer.Size = New Size(407, 294)
         PicBoxVisualizer.TabIndex = 31
         PicBoxVisualizer.TabStop = False
+        TipPlayer.SetToolTipImage(PicBoxVisualizer, Nothing)
         PicBoxVisualizer.Visible = False
         ' 
         ' CMLyrics
         ' 
         CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipWatcherNotification.SetImage(CMLyrics, Nothing)
-        TipPlayer.SetImage(CMLyrics, Nothing)
         CMLyrics.Name = "CMLyrics"
         CMLyrics.Size = New Size(149, 176)
+        TipPlayer.SetToolTipImage(CMLyrics, Nothing)
         ' 
         ' LblPlaylistCount
         ' 
         LblPlaylistCount.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         LblPlaylistCount.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        TipWatcherNotification.SetImage(LblPlaylistCount, Nothing)
-        TipPlayer.SetImage(LblPlaylistCount, Nothing)
         LblPlaylistCount.Location = New Point(410, 436)
         LblPlaylistCount.Name = "LblPlaylistCount"
         LblPlaylistCount.Size = New Size(572, 22)
         LblPlaylistCount.TabIndex = 37
         LblPlaylistCount.TextAlign = ContentAlignment.TopCenter
+        TipPlayer.SetToolTipImage(LblPlaylistCount, Nothing)
         ' 
         ' LblDuration
         ' 
         LblDuration.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         LblDuration.BackColor = Color.Transparent
         LblDuration.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipWatcherNotification.SetImage(LblDuration, Nothing)
-        TipPlayer.SetImage(LblDuration, Nothing)
         LblDuration.Location = New Point(318, 327)
         LblDuration.Name = "LblDuration"
         LblDuration.Size = New Size(80, 25)
         LblDuration.TabIndex = 15
         LblDuration.TextAlign = ContentAlignment.TopCenter
+        TipPlayer.SetToolTipImage(LblDuration, Nothing)
         ' 
         ' LblPosition
         ' 
         LblPosition.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         LblPosition.BackColor = Color.Transparent
         LblPosition.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipWatcherNotification.SetImage(LblPosition, Nothing)
-        TipPlayer.SetImage(LblPosition, Nothing)
         LblPosition.Location = New Point(12, 327)
         LblPosition.Name = "LblPosition"
         LblPosition.Size = New Size(80, 25)
         LblPosition.TabIndex = 14
         LblPosition.TextAlign = ContentAlignment.TopCenter
+        TipPlayer.SetToolTipImage(LblPosition, Nothing)
         ' 
         ' TrackBarPosition
         ' 
@@ -740,8 +717,6 @@ Partial Class Player
         TrackBarPosition.ChannelHeight = 8
         TrackBarPosition.DecreaseButtonSize = New Size(0, 0)
         TrackBarPosition.Enabled = False
-        TipWatcherNotification.SetImage(TrackBarPosition, Nothing)
-        TipPlayer.SetImage(TrackBarPosition, Nothing)
         TrackBarPosition.IncreaseButtonSize = New Size(0, 0)
         TrackBarPosition.Location = New Point(13, 360)
         TrackBarPosition.Name = "TrackBarPosition"
@@ -753,6 +728,7 @@ Partial Class Player
         TrackBarPosition.TabStop = False
         TrackBarPosition.ThemeName = "Default"
         TrackBarPosition.TimerInterval = 100
+        TipPlayer.SetToolTipImage(TrackBarPosition, Nothing)
         TrackBarPosition.Value = 0
         ' 
         ' TimerMeter
@@ -764,26 +740,16 @@ Partial Class Player
         ' 
         TimerVisualizer.Interval = 75
         ' 
-        ' TipPlayer
-        ' 
-        TipPlayer.FadeInRate = 25
-        TipPlayer.FadeOutRate = 25
-        TipPlayer.Font = New Font("Segoe UI", 12F)
-        TipPlayer.HideDelay = 1000
-        TipPlayer.ShadowAlpha = 200
-        TipPlayer.ShowDelay = 1000
-        ' 
         ' VLCViewer
         ' 
         VLCViewer.BackColor = Color.Black
-        TipPlayer.SetImage(VLCViewer, Nothing)
-        TipWatcherNotification.SetImage(VLCViewer, Nothing)
         VLCViewer.Location = New Point(1, 27)
         VLCViewer.MediaPlayer = Nothing
         VLCViewer.Name = "VLCViewer"
         VLCViewer.Size = New Size(173, 214)
         VLCViewer.TabIndex = 38
         VLCViewer.Text = "VideoView1"
+        TipPlayer.SetToolTipImage(VLCViewer, Nothing)
         VLCViewer.Visible = False
         ' 
         ' LblMedia
@@ -793,21 +759,18 @@ Partial Class Player
         LblMedia.BackColor = Color.Transparent
         LblMedia.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblMedia.ForeColor = SystemColors.WindowText
-        TipWatcherNotification.SetImage(LblMedia, Nothing)
-        TipPlayer.SetImage(LblMedia, Nothing)
         LblMedia.Location = New Point(98, 321)
         LblMedia.Name = "LblMedia"
         LblMedia.Size = New Size(214, 32)
         LblMedia.TabIndex = 15
         LblMedia.TextAlign = ContentAlignment.MiddleCenter
+        TipPlayer.SetToolTipImage(LblMedia, Nothing)
         ' 
         ' RTBLyrics
         ' 
         RTBLyrics.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         RTBLyrics.BorderStyle = BorderStyle.None
         RTBLyrics.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipWatcherNotification.SetImage(RTBLyrics, Nothing)
-        TipPlayer.SetImage(RTBLyrics, Nothing)
         RTBLyrics.Location = New Point(1, 27)
         RTBLyrics.Name = "RTBLyrics"
         RTBLyrics.ReadOnly = True
@@ -817,16 +780,8 @@ Partial Class Player
         RTBLyrics.TabIndex = 39
         RTBLyrics.TabStop = False
         RTBLyrics.Text = ""
+        TipPlayer.SetToolTipImage(RTBLyrics, Nothing)
         RTBLyrics.Visible = False
-        ' 
-        ' TipWatcherNotification
-        ' 
-        TipWatcherNotification.FadeInRate = 25
-        TipWatcherNotification.FadeOutRate = 25
-        TipWatcherNotification.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipWatcherNotification.HideDelay = 7500
-        TipWatcherNotification.ShadowAlpha = 200
-        TipWatcherNotification.ShowDelay = 1000
         ' 
         ' TimerStatus
         ' 
@@ -835,6 +790,11 @@ Partial Class Player
         ' TimerLyrics
         ' 
         TimerLyrics.Enabled = True
+        ' 
+        ' TipPlayer
+        ' 
+        TipPlayer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipPlayer.OwnerDraw = True
         ' 
         ' Player
         ' 
@@ -866,13 +826,12 @@ Partial Class Player
         Controls.Add(TrackBarPosition)
         ForeColor = SystemColors.HighlightText
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
-        TipWatcherNotification.SetImage(Me, Nothing)
-        TipPlayer.SetImage(Me, Nothing)
         KeyPreview = True
         MinimumSize = New Size(1000, 500)
         Name = "Player"
         StartPosition = FormStartPosition.CenterScreen
         Text = "Player"
+        TipPlayer.SetToolTipImage(Me, Nothing)
         TopMost = True
         CMPlaylist.ResumeLayout(False)
         CMRatings.ResumeLayout(False)
@@ -958,8 +917,6 @@ Partial Class Player
     Friend WithEvents CMIRating1Star As ToolStripMenuItem
     Friend WithEvents CMIEditTitle As ToolStripMenuItem
     Friend WithEvents MIViewQueue As ToolStripMenuItem
-    Friend WithEvents TipPlayer As Skye.UI.ToolTipEX
-    Friend WithEvents TipWatcherNotification As Skye.UI.ToolTipEX
     Friend WithEvents TimerStatus As Timer
     Friend WithEvents MIOpenPlaylist As ToolStripMenuItem
     Friend WithEvents MISavePlaylist As ToolStripMenuItem
@@ -969,4 +926,5 @@ Partial Class Player
     Friend WithEvents MIViewHistory As ToolStripMenuItem
     Friend WithEvents TimerLyrics As Timer
     Friend WithEvents RTBLyrics As Skye.UI.RichTextBox
+    Friend WithEvents TipPlayer As Skye.UI.ToolTip
 End Class

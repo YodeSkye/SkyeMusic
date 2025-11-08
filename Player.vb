@@ -61,8 +61,9 @@ Public Class Player
     Private PausedAt As DateTime? = Nothing
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero
     Private LastLyricsIndex As Integer = -1
-    Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private TipPlaylistFont As Font = New Font("Segoe UI", 12) 'Font for Playlist Tooltip
+    Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
+    Private TipWatcherNotification As Skye.UI.ToolTipEX 'Tooltip for Watcher Notifications
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -449,12 +450,12 @@ Public Class Player
         ShowPlayMode()
 
         'Set tooltips for buttons
-        TipPlayer.SetText(BtnPlay, "Play / Pause")
-        TipPlayer.SetText(BtnStop, "Stop Playing")
-        TipPlayer.SetText(BtnReverse, "Skip Backward")
-        TipPlayer.SetText(BtnForward, "Skip Forward")
-        TipPlayer.SetText(BtnMute, "Mute")
-        TipPlayer.SetText(LblDuration, "Song Duration")
+        TipPlayer.SetToolTip(BtnPlay, "Play / Pause")
+        TipPlayer.SetToolTip(BtnStop, "Stop Playing")
+        TipPlayer.SetToolTip(BtnReverse, "Skip Backward")
+        TipPlayer.SetToolTip(BtnForward, "Skip Forward")
+        TipPlayer.SetToolTip(BtnMute, "Mute")
+        TipPlayer.SetToolTip(LblDuration, "Song Duration")
         SetTipPlayer()
         CustomDrawCMToolTip(CMPlaylist)
 
@@ -1108,15 +1109,25 @@ Public Class Player
         MIPlayMode.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub MILibraryClick(sender As Object, e As EventArgs) Handles MILibrary.Click
+        If Not String.IsNullOrWhiteSpace(WatcherNotification) Then
+            TipWatcherNotification?.HideTooltip()
+            TipWatcherNotification?.Dispose()
+            TipWatcherNotification = Nothing
+        End If
         App.ShowLibrary()
     End Sub
     Private Sub MILibrary_MouseEnter(sender As Object, e As EventArgs) Handles MILibrary.MouseEnter
         MILibrary.ForeColor = Color.Black
-        If Not String.IsNullOrWhiteSpace(_watchernotification) Then TipWatcherNotification.ShowTooltipAtCursor(_watchernotification)
+        If Not String.IsNullOrWhiteSpace(WatcherNotification) Then
+            SetWatcherToolTip()
+            TipWatcherNotification?.ShowTooltipAtCursor(WatcherNotification)
+        End If
     End Sub
     Private Sub MILibrary_MouseLeave(sender As Object, e As EventArgs) Handles MILibrary.MouseLeave
         MILibrary.ForeColor = App.CurrentTheme.AccentTextColor
-        TipWatcherNotification.HideTooltip()
+        If Not String.IsNullOrEmpty(WatcherNotification) Then
+            TipWatcherNotification?.HideTooltip()
+        End If
     End Sub
     Private Sub MIShowHelpClick(sender As Object, e As EventArgs) Handles MIShowHelp.Click
         ShowHelp()
@@ -1139,25 +1150,6 @@ Public Class Player
     End Sub
     Private Sub MIAbout_DropDownClosed(sender As Object, e As EventArgs) Handles MIAbout.DropDownClosed
         If Not MIAbout.Selected Then MIAbout.ForeColor = App.CurrentTheme.AccentTextColor
-    End Sub
-
-
-    Private Sub SetPlaylistToolTip()
-        If TipPlaylist IsNot Nothing Then
-            TipPlaylist?.HideTooltip()
-            TipPlaylist?.Dispose()
-            TipPlaylist = Nothing
-        End If
-        TipPlaylist = New Skye.UI.ToolTipEX(components)
-        TipPlaylist.BackColor = App.CurrentTheme.BackColor
-        TipPlaylist.ForeColor = App.CurrentTheme.TextColor
-        TipPlaylist.BorderColor = App.CurrentTheme.ButtonBackColor
-        TipPlaylist.Font = TipPlaylistFont
-        TipPlaylist.ShadowAlpha = 200
-        TipPlaylist.FadeInRate = 0
-        TipPlaylist.FadeOutRate = 0
-        TipPlaylist.HideDelay = 1000000
-        TipPlaylist.ShowDelay = 1000
     End Sub
     Private Sub CMPlaylist_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylist.Opening
         If LVPlaylist.SelectedItems.Count > 0 Then
@@ -1859,20 +1851,20 @@ Public Class Player
     Friend Sub SetTipPlayer()
         Select Case App.PlayMode
             Case App.PlayModes.None, PlayModes.Repeat
-                TipPlayer.SetText(BtnPrevious, String.Empty)
-                TipPlayer.SetText(BtnNext, String.Empty)
+                TipPlayer.SetToolTip(BtnPrevious, String.Empty)
+                TipPlayer.SetToolTip(BtnNext, String.Empty)
             Case App.PlayModes.Linear
-                TipPlayer.SetText(BtnPrevious, "Previous Song In Playlist")
-                TipPlayer.SetText(BtnNext, "Next Song In Playlist")
+                TipPlayer.SetToolTip(BtnPrevious, "Previous Song In Playlist")
+                TipPlayer.SetToolTip(BtnNext, "Next Song In Playlist")
             Case App.PlayModes.Random
-                TipPlayer.SetText(BtnPrevious, "Previous Song Played")
-                TipPlayer.SetText(BtnNext, "Next Random Song")
+                TipPlayer.SetToolTip(BtnPrevious, "Previous Song Played")
+                TipPlayer.SetToolTip(BtnNext, "Next Random Song")
         End Select
         Select Case App.PlayerPositionShowElapsed
             Case True
-                TipPlayer.SetText(LblPosition, "Elapsed Time")
+                TipPlayer.SetToolTip(LblPosition, "Elapsed Time")
             Case False
-                TipPlayer.SetText(LblPosition, "Time Remaining")
+                TipPlayer.SetToolTip(LblPosition, "Time Remaining")
         End Select
     End Sub
     Private Sub ShowStatusMessage(msg As String)
@@ -1903,6 +1895,24 @@ Public Class Player
             Debug.Print("Playlist Search Reset")
         End If
     End Sub
+    Private Sub SetWatcherToolTip()
+        If TipWatcherNotification IsNot Nothing Then
+            TipWatcherNotification?.HideTooltip()
+            TipWatcherNotification?.Dispose()
+            TipWatcherNotification = Nothing
+        End If
+        TipWatcherNotification = New Skye.UI.ToolTipEX(components)
+        TipWatcherNotification.BackColor = App.CurrentTheme.BackColor
+        TipWatcherNotification.ForeColor = App.CurrentTheme.TextColor
+        TipWatcherNotification.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipWatcherNotification.Font = TipPlaylistFont
+        TipWatcherNotification.ShadowAlpha = 200
+        TipWatcherNotification.FadeInRate = 25
+        TipWatcherNotification.FadeOutRate = 25
+        TipWatcherNotification.HideDelay = 1000000
+        TipWatcherNotification.ShowDelay = 500
+    End Sub
+
     Private Sub ToggleMaximized()
         Select Case WindowState
             Case FormWindowState.Normal, FormWindowState.Minimized
@@ -2345,6 +2355,23 @@ Public Class Player
         prunelist = Nothing
         SetPlaylistCountText()
 
+    End Sub
+    Private Sub SetPlaylistToolTip()
+        If TipPlaylist IsNot Nothing Then
+            TipPlaylist?.HideTooltip()
+            TipPlaylist?.Dispose()
+            TipPlaylist = Nothing
+        End If
+        TipPlaylist = New Skye.UI.ToolTipEX(components)
+        TipPlaylist.BackColor = App.CurrentTheme.BackColor
+        TipPlaylist.ForeColor = App.CurrentTheme.TextColor
+        TipPlaylist.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipPlaylist.Font = TipPlaylistFont
+        TipPlaylist.ShadowAlpha = 200
+        TipPlaylist.FadeInRate = 0
+        TipPlaylist.FadeOutRate = 0
+        TipPlaylist.HideDelay = 1000000
+        TipPlaylist.ShowDelay = 1000
     End Sub
     Friend Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()
@@ -3175,9 +3202,6 @@ Public Class Player
         TipPlayer.BackColor = App.CurrentTheme.BackColor
         TipPlayer.ForeColor = App.CurrentTheme.TextColor
         TipPlayer.BorderColor = App.CurrentTheme.ButtonBackColor
-        TipWatcherNotification.BackColor = App.CurrentTheme.BackColor
-        TipWatcherNotification.ForeColor = App.CurrentTheme.TextColor
-        TipWatcherNotification.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         'Debug.Print("Player Theme Set")
     End Sub
@@ -3198,7 +3222,7 @@ Public Class Player
         AddHandler MyToolTip.Popup,
             Sub(sender, e)
                 Dim s As SizeF
-                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), TipPlayer.Font)
+                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), TipPlaylistFont)
                 s.Width += 14
                 s.Height += 16
                 e.ToolTipSize = s.ToSize
@@ -3214,12 +3238,12 @@ Public Class Player
                 g.FillRectangle(brbg, e.Bounds)
 
                 'Draw border
-                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipPlayer.Font.Size / 4)) 'Scale border thickness with font
+                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipPlaylistFont.Size / 4)) 'Scale border thickness with font
                     g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
                 End Using
 
                 'Draw text
-                TextRenderer.DrawText(g, e.ToolTipText, TipPlayer.Font, New Point(7, 7), App.CurrentTheme.TextColor)
+                TextRenderer.DrawText(g, e.ToolTipText, TipPlaylistFont, New Point(7, 7), App.CurrentTheme.TextColor)
 
                 'Finalize
                 brbg.Dispose()
