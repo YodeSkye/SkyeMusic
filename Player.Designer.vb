@@ -90,7 +90,6 @@ Partial Class Player
         PanelMedia = New Panel()
         BtnPrevious = New Button()
         LVPlaylist = New Skye.UI.ListViewEX()
-        PicBoxVisualizer = New PictureBox()
         CMLyrics = New Skye.UI.TextBoxContextMenu()
         LblPlaylistCount = New Skye.UI.Label()
         LblDuration = New Skye.UI.Label()
@@ -104,11 +103,11 @@ Partial Class Player
         TimerStatus = New Timer(components)
         TimerLyrics = New Timer(components)
         TipPlayer = New Skye.UI.ToolTip(components)
+        PanelVisualizer = New Panel()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PicBoxVisualizer, ComponentModel.ISupportInitialize).BeginInit()
         CType(VLCViewer, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
@@ -655,17 +654,6 @@ Partial Class Player
         LVPlaylist.UseCompatibleStateImageBehavior = False
         LVPlaylist.View = View.Details
         ' 
-        ' PicBoxVisualizer
-        ' 
-        PicBoxVisualizer.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        PicBoxVisualizer.Location = New Point(1, 27)
-        PicBoxVisualizer.Name = "PicBoxVisualizer"
-        PicBoxVisualizer.Size = New Size(407, 294)
-        PicBoxVisualizer.TabIndex = 31
-        PicBoxVisualizer.TabStop = False
-        TipPlayer.SetToolTipImage(PicBoxVisualizer, Nothing)
-        PicBoxVisualizer.Visible = False
-        ' 
         ' CMLyrics
         ' 
         CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -796,18 +784,27 @@ Partial Class Player
         TipPlayer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipPlayer.OwnerDraw = True
         ' 
+        ' PanelVisualizer
+        ' 
+        PanelVisualizer.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        PanelVisualizer.Location = New Point(1, 27)
+        PanelVisualizer.Name = "PanelVisualizer"
+        PanelVisualizer.Size = New Size(407, 294)
+        PanelVisualizer.TabIndex = 40
+        TipPlayer.SetToolTipImage(PanelVisualizer, Nothing)
+        ' 
         ' Player
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(984, 461)
+        Controls.Add(PanelVisualizer)
         Controls.Add(RTBLyrics)
         Controls.Add(LblMedia)
         Controls.Add(VLCViewer)
         Controls.Add(LblPosition)
         Controls.Add(LblDuration)
         Controls.Add(PicBoxAlbumArt)
-        Controls.Add(PicBoxVisualizer)
         Controls.Add(ListBoxPlaylistSearch)
         Controls.Add(LVPlaylist)
         Controls.Add(BtnPrevious)
@@ -838,7 +835,6 @@ Partial Class Player
         MenuPlayer.ResumeLayout(False)
         MenuPlayer.PerformLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).EndInit()
-        CType(PicBoxVisualizer, ComponentModel.ISupportInitialize).EndInit()
         CType(VLCViewer, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
@@ -896,7 +892,6 @@ Partial Class Player
     Friend WithEvents ToolStripSeparator6 As ToolStripSeparator
     Friend WithEvents CMIClearPlaylist As ToolStripMenuItem
     Friend WithEvents TimerVisualizer As Timer
-    Friend WithEvents PicBoxVisualizer As PictureBox
     Friend WithEvents MIPlayMode As ToolStripMenuItem
     Friend WithEvents MILyrics As ToolStripMenuItem
     Friend WithEvents Labelcsy1 As Skye.UI.Label
@@ -927,4 +922,5 @@ Partial Class Player
     Friend WithEvents TimerLyrics As Timer
     Friend WithEvents RTBLyrics As Skye.UI.RichTextBox
     Friend WithEvents TipPlayer As Skye.UI.ToolTip
+    Friend WithEvents PanelVisualizer As Panel
 End Class

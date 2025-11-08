@@ -10,7 +10,6 @@ Imports Skye
 Imports Skye.Contracts
 Imports SkyeMusic.My
 Imports Syncfusion.Windows.Forms.Tools
-Imports Syncfusion.Windows.Forms.Tools.RibbonControlAdv
 
 Public Class Player
 
@@ -548,7 +547,7 @@ Public Class Player
         PEXRight.Size = New Size(BtnMute.Location.X + BtnMute.Width - PEXRight.Left, PEXRight.Height)
         VideoSetSize()
     End Sub
-    Private Sub Player_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxVisualizer.MouseDown, MenuPlayer.MouseDown, LblPlaylistCount.MouseDown, LblDuration.MouseDown, PEXLeft.MouseDown, PEXRight.MouseDown
+    Private Sub Player_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, MenuPlayer.MouseDown, LblPlaylistCount.MouseDown, LblDuration.MouseDown, PEXLeft.MouseDown, PEXRight.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -561,15 +560,15 @@ Public Class Player
         End If
         cSender = Nothing
     End Sub
-    Private Sub Player_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, PicBoxVisualizer.MouseMove, MenuPlayer.MouseMove, LblPlaylistCount.MouseMove, LblDuration.MouseMove, PEXLeft.MouseMove, PEXRight.MouseMove
+    Private Sub Player_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, MenuPlayer.MouseMove, LblPlaylistCount.MouseMove, LblDuration.MouseMove, PEXLeft.MouseMove, PEXRight.MouseMove
         If mMove Then
-            mPosition = Control.MousePosition
+            mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
         End If
     End Sub
-    Private Sub Player_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp, PicBoxVisualizer.MouseUp, MenuPlayer.MouseUp, LblPlaylistCount.MouseUp, LblDuration.MouseUp, PEXLeft.MouseUp, PEXRight.MouseUp
+    Private Sub Player_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp, MenuPlayer.MouseUp, LblPlaylistCount.MouseUp, LblDuration.MouseUp, PEXLeft.MouseUp, PEXRight.MouseUp
         mMove = False
     End Sub
     Private Sub Player_Move(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Move
@@ -1408,59 +1407,8 @@ Public Class Player
         'Double-click action
         ToggleMaximized()
     End Sub
-    Private Sub PicBoxVisualizer_DoubleClick(sender As Object, e As EventArgs) Handles PicBoxVisualizer.DoubleClick
+    Private Sub PicBoxVisualizer_DoubleClick(sender As Object, e As EventArgs)
         ToggleMaximized()
-    End Sub
-    Private Sub PicBoxVisualizer_Paint(sender As Object, e As PaintEventArgs) Handles PicBoxVisualizer.Paint
-        If PlayState = PlayStates.Playing Then
-            'Draw the background gradient
-            Dim pBrush As New LinearGradientBrush(New Point(0, 0), New Point(Me.ClientSize.Width, 0), Color.Red, Color.Blue)
-            Dim pColorBlend As New ColorBlend
-            Dim pColorMiddle As New Color
-            pColorMiddle = Color.FromArgb(255, visR, 0, visB)
-            pColorBlend.Colors = New Color() {BackColor, pColorMiddle, BackColor} '{pColorStartPoint, pColorMiddle, pColorEndPoint}
-            pColorBlend.Positions = New Single() {0, 1 - visV, 1}
-            pBrush.InterpolationColors = pColorBlend
-            e.Graphics.FillRectangle(pBrush, Me.ClientRectangle)
-            pBrush.Dispose()
-        Else
-            'Draw plain background
-            Dim pBrush As New SolidBrush(BackColor)
-            e.Graphics.FillRectangle(pBrush, Me.ClientRectangle)
-            pBrush.Dispose()
-        End If
-        'Draw the text
-        Dim pFont As Font
-        Dim pSize As Byte = 42 'Maximum Font Size
-        Dim pString_format As New StringFormat
-        Dim pText As String
-        pString_format.Alignment = StringAlignment.Center
-        pString_format.LineAlignment = StringAlignment.Center
-        Dim lvi As ListViewItem = Nothing
-        If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(_player.Path.TrimEnd("/"c), True, 0)
-        If lvi Is Nothing Then
-            pText = _player.Path.TrimEnd("/"c)
-        Else
-            pText = lvi.Text
-            lvi = Nothing
-        End If
-        pFont = New Font(Me.Font.FontFamily, pSize, FontStyle.Bold)
-        If Not String.IsNullOrEmpty(pText) Then
-            Do
-                pSize -= CByte(1)
-                pFont = New Font(Me.Font.FontFamily, pSize, FontStyle.Bold)
-                If pSize = 8 Then Exit Do 'Minimum Font Size
-            Loop Until e.Graphics.MeasureString(pText, pFont).Width < PicBoxVisualizer.Width
-            Dim pBrush As SolidBrush
-            If App.CurrentTheme.IsAccent Then
-                pBrush = New SolidBrush(App.CurrentTheme.AccentTextColor)
-            Else
-                pBrush = New SolidBrush(App.CurrentTheme.TextColor)
-            End If
-            e.Graphics.DrawString(pText, pFont, pBrush, PicBoxVisualizer.ClientSize.Width \ 2, PicBoxVisualizer.ClientSize.Height \ 2, pString_format)
-        End If
-        pString_format.Dispose()
-        pFont.Dispose()
     End Sub
     Private Sub LblPosition_MouseUp(sender As Object, e As MouseEventArgs) Handles LblPosition.MouseUp
         PlayerPositionShowElapsed = Not PlayerPositionShowElapsed
@@ -1690,16 +1638,16 @@ Public Class Player
         End If
     End Sub
     Private Sub TimerVisualizer_Tick(sender As Object, e As EventArgs) Handles TimerVisualizer.Tick
-        Try : visB = CByte(aDev.AudioMeterInformation.PeakValues(0) * 255)
-        Catch : visB = 0
-        End Try
-        Try : visR = CByte(aDev.AudioMeterInformation.PeakValues(1) * 255)
-        Catch : visR = 0
-        End Try
-        Try : visV = aDev.AudioEndpointVolume.MasterVolumeLevelScalar
-        Catch : visV = 0
-        End Try
-        PicBoxVisualizer.Invalidate()
+        'Try : visB = CByte(aDev.AudioMeterInformation.PeakValues(0) * 255)
+        'Catch : visB = 0
+        'End Try
+        'Try : visR = CByte(aDev.AudioMeterInformation.PeakValues(1) * 255)
+        'Catch : visR = 0
+        'End Try
+        'Try : visV = aDev.AudioEndpointVolume.MasterVolumeLevelScalar
+        'Catch : visV = 0
+        'End Try
+        'PicBoxVisualizer.Invalidate()
     End Sub
     Private Sub TimerShowMedia_Tick(sender As Object, e As EventArgs) Handles TimerShowMedia.Tick
         TimerShowMedia.Stop()
@@ -2884,7 +2832,7 @@ Public Class Player
                 Debug.Print("Showing Lyrics...")
                 PicBoxAlbumArt.Visible = False
                 LblMedia.Visible = False
-                PicBoxVisualizer.Visible = False
+                PanelVisualizer.Visible = False
                 Visualizer = False
                 TimerVisualizer.Stop()
                 VLCViewer.Visible = False
@@ -2908,7 +2856,7 @@ Public Class Player
                 Else
                     If App.AudioExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Album Art
                         VLCViewer.Visible = False
-                        PicBoxVisualizer.Visible = False
+                        PanelVisualizer.Visible = False
                         RTBLyrics.Visible = False
                         TimerVisualizer.Stop()
                         If tlfile Is Nothing Then
@@ -2937,7 +2885,7 @@ Public Class Player
                         Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
                         RTBLyrics.Visible = False
-                        PicBoxVisualizer.Visible = False
+                        PanelVisualizer.Visible = False
                         TimerVisualizer.Stop()
                         VideoSetSize()
                         VLCViewer.Visible = True
@@ -2949,8 +2897,8 @@ Public Class Player
                     PicBoxAlbumArt.Visible = False
                     RTBLyrics.Visible = False
                     TimerVisualizer.Start()
-                    PicBoxVisualizer.Visible = True
-                    PicBoxVisualizer.BringToFront()
+                    PanelVisualizer.Visible = True
+                    PanelVisualizer.BringToFront()
                 End If
                 'Show Lyrics Menu Button
                 If HasLyrics Then
@@ -2964,7 +2912,7 @@ Public Class Player
             PicBoxAlbumArt.Visible = False
             RTBLyrics.Visible = False
             VLCViewer.Visible = False
-            PicBoxVisualizer.Visible = False
+            PanelVisualizer.Visible = False
             TimerVisualizer.Stop()
         End If
     End Sub
