@@ -2245,7 +2245,7 @@ Public Class Player
     End Sub
     Private Sub GetHistory(ByRef lvi As ListViewItem, path As String)
         Dim s As App.Song = App.History.Find(Function(p) p.Path = path)
-        If Not String.IsNullOrEmpty(s.Path) Then
+        If s IsNot Nothing AndAlso Not String.IsNullOrEmpty(s.Path) Then
             If s.Rating > 0 Then lvi.SubItems(LVPlaylist.Columns("Rating").Index).Text = New String("★"c, s.Rating)
             lvi.SubItems(LVPlaylist.Columns("PlayCount").Index).Text = s.PlayCount.ToString()
             If Not s.LastPlayed = Nothing Then
