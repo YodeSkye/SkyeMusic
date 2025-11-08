@@ -1,5 +1,6 @@
 ﻿
 Imports System.Drawing
+Imports System.Numerics
 Imports System.Threading
 Imports System.Windows.Forms.DataVisualization.Charting
 Imports WordCloudSharp
@@ -15,6 +16,7 @@ Public Class History
         MostPlayed
         MostPlayedArtists
         RecentlyPlayed
+        RecentlyAddedNotPlayed
         Favorites
     End Enum
     Private CurrentView As HistoryView = HistoryView.MostPlayed
@@ -24,6 +26,9 @@ Public Class History
         GenrePareto
         Artists
         ArtistWordCloud
+        Streaks
+        PeakHours
+        RatingVsPlays
     End Enum
     Private CurrentChartView As ChartView = ChartView.Genres
     Private Enum ViewMode
@@ -195,22 +200,20 @@ Public Class History
         GrpBoxHistory.BringToFront()
         ShowCounts()
     End Sub
-    Private Sub BtnQueueAll_Click(sender As Object, e As EventArgs) Handles BtnQueueAll.Click
-        Queue(True)
-    End Sub
-    Private Sub BtnAddAllToPlaylist_Click(sender As Object, e As EventArgs) Handles BtnAddAllToPlaylist.Click
-        AddToPlaylist(True)
-    End Sub
     Private Sub CMHistoryView_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMHistoryView.Opening
         Select Case CurrentView
             Case HistoryView.MostPlayed, HistoryView.RecentlyPlayed, HistoryView.Favorites
                 CMIQueue.Enabled = True
+                CMIQueueAll.Enabled = True
                 CMIAddToPlaylist.Enabled = True
+                CMIAddAllToPlaylist.Enabled = True
                 CMIQueue.Text = CMIQueue.Text.TrimEnd(App.TrimEndSearch) & " (" & LVHistory.SelectedItems.Count.ToString("N0") & ")"
                 CMIAddToPlaylist.Text = CMIAddToPlaylist.Text.TrimEnd(App.TrimEndSearch) & " (" & LVHistory.SelectedItems.Count.ToString("N0") & ")"
             Case HistoryView.MostPlayedArtists
                 CMIQueue.Enabled = False
+                CMIQueueAll.Enabled = False
                 CMIAddToPlaylist.Enabled = False
+                CMIAddAllToPlaylist.Enabled = False
                 CMIQueue.Text = CMIQueue.Text.TrimEnd(App.TrimEndSearch)
                 CMIAddToPlaylist.Text = CMIAddToPlaylist.Text.TrimEnd(App.TrimEndSearch)
         End Select
@@ -220,6 +223,12 @@ Public Class History
     End Sub
     Private Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
         AddToPlaylist()
+    End Sub
+    Private Sub CMIQueueAll_Click(sender As Object, e As EventArgs) Handles CMIQueueAll.Click
+        Queue(True)
+    End Sub
+    Private Sub CMIAddAllToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddAllToPlaylist.Click
+        AddToPlaylist(True)
     End Sub
     Private Sub LVHistory_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVHistory.SelectedIndexChanged
         ShowCounts()
@@ -234,6 +243,10 @@ Public Class History
     End Sub
     Private Sub RadBtnRecentlyPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnRecentlyPlayed.Click
         CurrentView = HistoryView.RecentlyPlayed
+        PutViewData()
+    End Sub
+    Private Sub RadBtnRecentlyAddedNotPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnRecentlyAddedNotPlayed.Click
+        CurrentView = HistoryView.RecentlyAddedNotPlayed
         PutViewData()
     End Sub
     Private Sub RadBtnFavorites_Click(sender As Object, e As EventArgs) Handles RadBtnFavorites.Click
@@ -258,6 +271,18 @@ Public Class History
     End Sub
     Private Sub RadBtnArtistWordCloud_Click(sender As Object, e As EventArgs) Handles RadBtnArtistWordCloud.Click
         CurrentChartView = ChartView.ArtistWordCloud
+        PutChartData()
+    End Sub
+    Private Sub RadBtnStreaks_Click(sender As Object, e As EventArgs) Handles RadBtnStreaks.Click
+        CurrentChartView = ChartView.Streaks
+        PutChartData()
+    End Sub
+    Private Sub RadBtnPeakHours_Click(sender As Object, e As EventArgs) Handles RadBtnPeakHours.Click
+        CurrentChartView = ChartView.PeakHours
+        PutChartData()
+    End Sub
+    Private Sub RadBtnRatingVsPlays_Click(sender As Object, e As EventArgs) Handles RadBtnRatingVsPlays.Click
+        CurrentChartView = ChartView.RatingVsPlays
         PutChartData()
     End Sub
     Private Sub TxtBoxMaxRecords_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxMaxRecords.KeyDown
@@ -400,6 +425,39 @@ Public Class History
                 LVHistory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)
                 LVHistory.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
                 LVHistory.Columns(4).TextAlign = HorizontalAlignment.Center
+                LVHistory.EndUpdate()
+                ShowCounts()
+            Case HistoryView.RecentlyAddedNotPlayed
+                ConfigureColumns()
+
+                ' Filter: songs never played, sorted by Added date (newest first)
+                sortedViews = views.Where(Function(v) v.Data.PlayCount = 0) _
+                                   .OrderByDescending(Function(v) v.Data.Added)
+
+                If CurrentViewMaxRecords > 0 Then
+                    sortedViews = sortedViews.Take(CurrentViewMaxRecords)
+                End If
+
+                For Each v As App.SongView In sortedViews
+                    Dim lvi As ListViewItem
+                    If App.IsUrl(v.Data.Path) Then
+                        lvi = New ListViewItem(v.Data.Path)
+                    Else
+                        lvi = New ListViewItem(v.Title)
+                    End If
+                    lvi.SubItems.Add(v.Artist)
+                    lvi.SubItems.Add(v.Album)
+                    lvi.SubItems.Add(v.Genre)
+                    lvi.SubItems.Add(v.Data.PlayCount.ToString("N0"))
+                    lvi.SubItems.Add(v.Data.Added.ToString("g")) ' show Added date instead of LastPlayed
+                    lvi.SubItems.Add(v.Data.Path)
+                    LVHistory.Items.Add(lvi)
+                Next
+
+                LVHistory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)
+                LVHistory.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
+                LVHistory.Columns(4).TextAlign = HorizontalAlignment.Center
+
                 LVHistory.EndUpdate()
                 ShowCounts()
             Case HistoryView.Favorites
@@ -756,6 +814,199 @@ Public Class History
 
                 PanelCharts.Controls.Clear()
                 PanelCharts.Controls.Add(pb)
+            Case ChartView.Streaks
+                ' Build streaks from plays database
+                Dim plays = GetPlays() ' returns List(Of PlayRecord) ordered by StartPlayTime
+
+                Dim streaks As New List(Of Tuple(Of DateTime, DateTime, Double))
+                Dim longest As IEnumerable(Of Tuple(Of DateTime, DateTime, Double)) = Enumerable.Empty(Of Tuple(Of DateTime, DateTime, Double))
+
+                If plays.Any() Then
+                    Dim streakStart As DateTime = plays(0).StartPlayTime
+                    Dim lastStop As DateTime = plays(0).StopPlayTime
+
+                    For i As Integer = 1 To plays.Count - 1
+                        Dim currentStart = plays(i).StartPlayTime
+                        If (currentStart - lastStop).TotalMinutes <= 1 Then
+                            ' continue streak
+                            lastStop = plays(i).StopPlayTime
+                        Else
+                            ' close streak
+                            Dim durationHours = (lastStop - streakStart).TotalHours
+                            streaks.Add(Tuple.Create(streakStart, lastStop, durationHours))
+                            ' start new streak
+                            streakStart = plays(i).StartPlayTime
+                            lastStop = plays(i).StopPlayTime
+                        End If
+                    Next
+
+                    ' close final streak
+                    Dim finalDuration = (lastStop - streakStart).TotalHours
+                    streaks.Add(Tuple.Create(streakStart, lastStop, finalDuration))
+
+                    ' Sort by duration descending and apply limit
+                    longest = streaks.OrderByDescending(Function(s) s.Item3)
+                    If CurrentViewMaxRecords > 0 Then
+                        longest = longest.Take(CurrentViewMaxRecords)
+                    End If
+                End If
+
+                'Create chart
+                Dim chart As New Chart With {.Dock = DockStyle.Fill}
+                Dim area As New ChartArea("StreakArea")
+                chart.ChartAreas.Add(area)
+                'Configure X axis
+                With chart.ChartAreas(0).AxisX
+                    .Interval = 1
+                    .LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .LineColor = App.CurrentTheme.TextColor
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor
+                End With
+                'Configure Y axis
+                With chart.ChartAreas(0).AxisY
+                    .Title = "Hours"
+                    .TitleForeColor = App.CurrentTheme.TextColor
+                    .LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .LineColor = App.CurrentTheme.TextColor
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor
+                End With
+
+                Dim series As New Series("Streaks") With {
+                    .ChartType = SeriesChartType.Column,
+                    .IsValueShownAsLabel = True,
+                    .LabelForeColor = App.CurrentTheme.TextColor,
+                    .LabelFormat = "{0:N2} hrs"
+                }
+
+                Dim idx As Integer = 0
+                For Each s In longest
+                    Dim pointIdx = series.Points.AddXY(idx, s.Item3)
+                    series.Points(pointIdx).AxisLabel = s.Item1.ToString("MMM dd HH:mm") & " → " & s.Item2.ToString("HH:mm")
+                    idx += 1
+                Next
+
+                chart.Series.Clear()
+                chart.Series.Add(series)
+                chart.BackColor = App.CurrentTheme.BackColor
+                chart.ChartAreas(0).BackColor = App.CurrentTheme.BackColor
+
+                PanelCharts.Controls.Clear()
+                PanelCharts.Controls.Add(chart)
+            Case ChartView.PeakHours
+                ' Pull plays from DB
+                Dim plays = GetPlays() ' returns List(Of PlayRecord) ordered by StartPlayTime
+
+                ' Apply days-back filter
+                If CurrentViewMaxRecords > 0 Then
+                    Dim cutoff = DateTime.Now.AddDays(-CurrentViewMaxRecords)
+                    plays = plays.Where(Function(p) p.StartPlayTime >= cutoff).ToList()
+                End If
+
+                ' Group by hour of day
+                Dim hourlyCounts = plays.GroupBy(Function(p) p.StartPlayTime.Hour) _
+                            .Select(Function(g) New With {
+                                .Hour = g.Key,
+                                .Count = g.Count()
+                            }) _
+                            .OrderBy(Function(x) x.Hour)
+
+                ' Create chart
+                Dim chart As New Chart With {.Dock = DockStyle.Fill}
+                Dim area As New ChartArea("PeakArea")
+                chart.ChartAreas.Add(area)
+
+                ' Theme axes
+                With area.AxisX
+                    .Interval = 1
+                    .LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .LineColor = App.CurrentTheme.TextColor
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor
+                    .Title = "Hour of Day"
+                    .TitleForeColor = App.CurrentTheme.TextColor
+                End With
+                With area.AxisY
+                    .LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .LineColor = App.CurrentTheme.TextColor
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor
+                    .Title = "Play Count"
+                    .TitleForeColor = App.CurrentTheme.TextColor
+                End With
+
+                ' Series
+                Dim series As New Series("Hours") With {
+                    .ChartType = SeriesChartType.Column,
+                    .IsValueShownAsLabel = True,
+                    .LabelForeColor = App.CurrentTheme.TextColor
+                }
+
+                ' Add points
+                For Each h In hourlyCounts
+                    Dim pointIdx = series.Points.AddXY(h.Hour, h.Count)
+                    series.Points(pointIdx).AxisLabel = h.Hour.ToString("00") & ":00"
+                Next
+
+                chart.Series.Clear()
+                chart.Series.Add(series)
+                chart.BackColor = App.CurrentTheme.BackColor
+                chart.ChartAreas(0).BackColor = App.CurrentTheme.BackColor
+
+                PanelCharts.Controls.Clear()
+                PanelCharts.Controls.Add(chart)
+            Case ChartView.RatingVsPlays
+                ' Filter history by days-back
+                Dim songs = App.History
+                If CurrentViewMaxRecords > 0 Then
+                    Dim cutoff = DateTime.Now.AddDays(-CurrentViewMaxRecords)
+                    songs = songs.Where(Function(s) s.LastPlayed >= cutoff).ToList()
+                End If
+
+                ' Create chart
+                Dim chart As New Chart With {.Dock = DockStyle.Fill}
+                Dim area As New ChartArea("RatingVsPlaysArea")
+                chart.ChartAreas.Add(area)
+
+                ' Theme axes
+                With area.AxisX
+                    .Title = "Rating"
+                    .TitleForeColor = App.CurrentTheme.TextColor
+                    .LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .LineColor = App.CurrentTheme.TextColor
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor
+                    .Minimum = 0
+                    .Maximum = 5
+                    .Interval = 1
+                End With
+                With area.AxisY
+                    .Title = "Play Count"
+                    .TitleForeColor = App.CurrentTheme.TextColor
+                    .LabelStyle.ForeColor = App.CurrentTheme.TextColor
+                    .LineColor = App.CurrentTheme.TextColor
+                    .MajorGrid.LineColor = App.CurrentTheme.TextColor
+                End With
+
+                ' Series
+                Dim series As New Series("Correlation") With {
+                    .ChartType = SeriesChartType.Point,
+                    .MarkerStyle = MarkerStyle.Circle,
+                    .MarkerSize = 8,
+                    .Color = App.CurrentTheme.TextColor,
+                    .LabelForeColor = App.CurrentTheme.TextColor
+                }
+
+                ' Add points from history
+                For Each s In songs
+                    Dim pointIdx = series.Points.AddXY(s.Rating, s.PlayCount)
+                    ' Optional: label with filename or stars
+                    series.Points(pointIdx).Label = IO.Path.GetFileNameWithoutExtension(s.Path)
+                Next
+
+                chart.Series.Clear()
+                chart.Series.Add(series)
+                chart.BackColor = App.CurrentTheme.BackColor
+                chart.ChartAreas(0).BackColor = App.CurrentTheme.BackColor
+
+                PanelCharts.Controls.Clear()
+                PanelCharts.Controls.Add(chart)
         End Select
     End Sub
     Private Sub Queue(Optional queueall As Boolean = False)
@@ -791,13 +1042,6 @@ Public Class History
                 LblHistoryViewCount.Visible = True
                 LblHistoryViewCount.Text = LVHistory.Items.Count.ToString("N0") & If(LVHistory.Items.Count = 1, " record", " records")
                 LblHistoryViewCount.Text &= ", " & LVHistory.SelectedItems.Count.ToString("N0") & " selected"
-                BtnQueueAll.Enabled = False
-                BtnAddAllToPlaylist.Enabled = False
-                Select Case CurrentView
-                    Case HistoryView.MostPlayed, HistoryView.RecentlyPlayed, HistoryView.Favorites
-                        BtnQueueAll.Enabled = True
-                        BtnAddAllToPlaylist.Enabled = True
-                End Select
             Case ViewMode.Charts
                 LblHistoryViewCount.Visible = False
         End Select
@@ -844,7 +1088,7 @@ Public Class History
                 header.Width = 400
                 LVHistory.Columns.Add(header)
             Case HistoryView.MostPlayedArtists
-                'Define 7 Columns
+                'Define 3 Columns
                 header = New ColumnHeader()
                 header.Name = "Artist"
                 header.Text = "Artist"
@@ -859,6 +1103,43 @@ Public Class History
                 header.Name = "LastPlayed"
                 header.Text = "Last Played"
                 header.Width = 200
+                LVHistory.Columns.Add(header)
+            Case HistoryView.RecentlyAddedNotPlayed
+                'Define 7 Columns
+                header = New ColumnHeader()
+                header.Name = "Title"
+                header.Text = "Title"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Artist"
+                header.Text = "Artist"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Album"
+                header.Text = "Album"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Genre"
+                header.Text = "Genre"
+                header.Width = 100
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "PlayCount"
+                header.Text = "Plays"
+                header.Width = 50
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Added"
+                header.Text = "Added"
+                header.Width = 200
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader()
+                header.Name = "Path"
+                header.Text = "Path"
+                header.Width = 400
                 LVHistory.Columns.Add(header)
         End Select
     End Sub
@@ -909,6 +1190,8 @@ Public Class History
         RadBtnMostPlayedArtists.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnRecentlyPlayed.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnRecentlyPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnRecentlyAddedNotPlayed.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnRecentlyAddedNotPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnFavorites.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnFavorites.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGenres.BackColor = App.CurrentTheme.ButtonBackColor
@@ -921,6 +1204,12 @@ Public Class History
         RadBtnArtists.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnArtistWordCloud.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnArtistWordCloud.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnStreaks.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnStreaks.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnPeakHours.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnPeakHours.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnRatingVsPlays.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnRatingVsPlays.ForeColor = App.CurrentTheme.ButtonTextColor
         LblMaxRecords.ForeColor = App.CurrentTheme.TextColor
         TxtBoxMaxRecords.BackColor = App.CurrentTheme.BackColor
         TxtBoxMaxRecords.ForeColor = App.CurrentTheme.TextColor
@@ -931,10 +1220,6 @@ Public Class History
         BtnCharts.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnLists.BackColor = App.CurrentTheme.ButtonBackColor
         BtnLists.ForeColor = App.CurrentTheme.ButtonTextColor
-        BtnQueueAll.BackColor = App.CurrentTheme.ButtonBackColor
-        BtnQueueAll.ForeColor = App.CurrentTheme.ButtonTextColor
-        BtnAddAllToPlaylist.BackColor = App.CurrentTheme.ButtonBackColor
-        BtnAddAllToPlaylist.ForeColor = App.CurrentTheme.ButtonTextColor
 
         ResumeLayout()
         Debug.Print("History Theme Set")

@@ -174,14 +174,6 @@ Namespace My
             End Sub
 
         End Class
-        Friend Class PlayData
-            Public Property Path As String
-            Public Property StartPlayTime As DateTime
-            Public Property IsValid As Boolean = False
-            Public Property StopPlayTime As DateTime
-            Public Property PlayTrigger As PlayTriggers
-        End Class
-        Friend SongPlayData As New PlayData
         Friend Structure ThemeProperties
             Public IsAccent As Boolean
             Public BackColor As Color
@@ -392,6 +384,24 @@ Namespace My
             .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
+
+        'Database
+        Friend Class PlayData
+            Public Property Path As String
+            Public Property StartPlayTime As DateTime
+            Public Property IsValid As Boolean = False
+            Public Property StopPlayTime As DateTime
+            Public Property PlayTrigger As PlayTriggers
+        End Class
+        Friend SongPlayData As New PlayData
+        Friend Class PlayRecord
+            Public Property ID As Integer
+            Public Property Path As String
+            Public Property StartPlayTime As DateTime
+            Public Property StopPlayTime As DateTime
+            Public Property Duration As Integer
+            Public Property PlayTrigger As String
+        End Class
 
         'XML Saved History
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
@@ -1674,7 +1684,7 @@ Namespace My
             End Using
 
         End Sub
-        Public Function GetPlayHistoryTable() As DataTable
+        Friend Function GetPlayHistoryTable() As DataTable
             Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Dim dt As New DataTable()
 
@@ -1696,7 +1706,7 @@ Namespace My
 
             Return dt
         End Function
-        Public Function DeletePlayHistoryById(recordId As Integer) As Boolean
+        Friend Function DeletePlayHistoryById(recordId As Integer) As Boolean
             Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Try
                 Using conn As New SQLiteConnection(connectionString)
@@ -1716,7 +1726,7 @@ Namespace My
                 Return False
             End Try
         End Function
-        Public Function GetSessionStats() As (Count As Integer, Duration As TimeSpan)
+        Friend Function GetSessionStats() As (Count As Integer, Duration As TimeSpan)
             Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Dim count As Integer = 0
             Dim duration As TimeSpan = TimeSpan.Zero
@@ -1743,7 +1753,7 @@ Namespace My
 
             Return (count, duration)
         End Function
-        Public Function GetLifetimeStats() As (Count As Integer, Duration As TimeSpan)
+        Friend Function GetLifetimeStats() As (Count As Integer, Duration As TimeSpan)
             Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Dim count As Integer = 0
             Dim duration As TimeSpan = TimeSpan.Zero
@@ -1767,6 +1777,35 @@ Namespace My
             End Using
 
             Return (count, duration)
+        End Function
+        Friend Function GetPlays() As List(Of PlayRecord)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim plays As New List(Of PlayRecord)
+
+            Using conn As New SQLiteConnection(connectionString)
+                conn.Open()
+
+                Dim sql = "SELECT ID, Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger 
+                   FROM Plays 
+                   ORDER BY StartPlayTime ASC"
+
+                Using cmd As New SQLiteCommand(sql, conn)
+                    Using rdr As SQLiteDataReader = cmd.ExecuteReader()
+                        While rdr.Read()
+                            plays.Add(New PlayRecord With {
+                                .ID = rdr.GetInt32(0),
+                                .Path = rdr.GetString(1),
+                                .StartPlayTime = DateTime.Parse(rdr.GetString(2)),
+                                .StopPlayTime = DateTime.Parse(rdr.GetString(3)),
+                                .Duration = rdr.GetInt32(4),
+                                .PlayTrigger = rdr.GetString(5)
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            Return plays
         End Function
 
         'Functions
