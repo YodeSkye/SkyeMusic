@@ -48,7 +48,6 @@ Partial Class Library
         TxbxLibrarySearch = New TextBox()
         LBXLibrarySearch = New ListBox()
         PicBoxAlbumArt = New PictureBox()
-        LblAlbumArtSelect = New Label()
         RadBtnGroupByGenre = New RadioButton()
         GrpBoxGroupBy = New GroupBox()
         RadBtnGroupByType = New RadioButton()
@@ -64,7 +63,7 @@ Partial Class Library
         LblStatus = New Skye.UI.Label()
         LVLibrary = New ListView()
         LblHistory = New Skye.UI.Label()
-        TipLibrarySL = New Skye.UI.ToolTip(components)
+        TipLibrary = New Skye.UI.ToolTip(components)
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -76,7 +75,7 @@ Partial Class Library
         CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMLibrary.Name = "CMLibrary"
         CMLibrary.Size = New Size(229, 392)
-        TipLibrarySL.SetToolTipImage(CMLibrary, Nothing)
+        TipLibrary.SetToolTipImage(CMLibrary, Nothing)
         ' 
         ' CMIPlay
         ' 
@@ -206,7 +205,7 @@ Partial Class Library
         BtnSearchFolders.TabStop = False
         BtnSearchFolders.Text = "Search Folders"
         BtnSearchFolders.TextAlign = ContentAlignment.MiddleRight
-        TipLibrarySL.SetToolTipImage(BtnSearchFolders, Nothing)
+        TipLibrary.SetToolTipImage(BtnSearchFolders, Nothing)
         BtnSearchFolders.UseVisualStyleBackColor = True
         ' 
         ' BtnOK
@@ -218,7 +217,7 @@ Partial Class Library
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 3
         BtnOK.TabStop = False
-        TipLibrarySL.SetToolTipImage(BtnOK, Nothing)
+        TipLibrary.SetToolTipImage(BtnOK, Nothing)
         BtnOK.UseVisualStyleBackColor = True
         ' 
         ' TxbxLibrarySearch
@@ -232,7 +231,7 @@ Partial Class Library
         TxbxLibrarySearch.Size = New Size(153, 18)
         TxbxLibrarySearch.TabIndex = 4
         TxbxLibrarySearch.Text = "Search Library"
-        TipLibrarySL.SetToolTipImage(TxbxLibrarySearch, Nothing)
+        TipLibrary.SetToolTipImage(TxbxLibrarySearch, Nothing)
         ' 
         ' LBXLibrarySearch
         ' 
@@ -242,7 +241,7 @@ Partial Class Library
         LBXLibrarySearch.Name = "LBXLibrarySearch"
         LBXLibrarySearch.Size = New Size(491, 88)
         LBXLibrarySearch.TabIndex = 5
-        TipLibrarySL.SetToolTipImage(LBXLibrarySearch, Nothing)
+        TipLibrary.SetToolTipImage(LBXLibrarySearch, Nothing)
         LBXLibrarySearch.Visible = False
         ' 
         ' PicBoxAlbumArt
@@ -254,19 +253,8 @@ Partial Class Library
         PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.Zoom
         PicBoxAlbumArt.TabIndex = 7
         PicBoxAlbumArt.TabStop = False
-        TipLibrarySL.SetToolTipImage(PicBoxAlbumArt, Nothing)
+        TipLibrary.SetToolTipImage(PicBoxAlbumArt, Nothing)
         PicBoxAlbumArt.Visible = False
-        ' 
-        ' LblAlbumArtSelect
-        ' 
-        LblAlbumArtSelect.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        LblAlbumArtSelect.Image = My.Resources.Resources.ImageAlbumArtSelect
-        LblAlbumArtSelect.Location = New Point(115, 436)
-        LblAlbumArtSelect.Name = "LblAlbumArtSelect"
-        LblAlbumArtSelect.Size = New Size(32, 36)
-        LblAlbumArtSelect.TabIndex = 16
-        TipLibrarySL.SetToolTipImage(LblAlbumArtSelect, Nothing)
-        LblAlbumArtSelect.Visible = False
         ' 
         ' RadBtnGroupByGenre
         ' 
@@ -279,7 +267,7 @@ Partial Class Library
         RadBtnGroupByGenre.TabIndex = 21
         RadBtnGroupByGenre.Text = "Genre"
         RadBtnGroupByGenre.TextAlign = ContentAlignment.MiddleCenter
-        TipLibrarySL.SetToolTipImage(RadBtnGroupByGenre, Nothing)
+        TipLibrary.SetToolTipImage(RadBtnGroupByGenre, Nothing)
         RadBtnGroupByGenre.UseVisualStyleBackColor = True
         ' 
         ' GrpBoxGroupBy
@@ -297,7 +285,7 @@ Partial Class Library
         GrpBoxGroupBy.TabIndex = 18
         GrpBoxGroupBy.TabStop = False
         GrpBoxGroupBy.Text = "Group By"
-        TipLibrarySL.SetToolTipImage(GrpBoxGroupBy, Nothing)
+        TipLibrary.SetToolTipImage(GrpBoxGroupBy, Nothing)
         ' 
         ' RadBtnGroupByType
         ' 
@@ -310,7 +298,7 @@ Partial Class Library
         RadBtnGroupByType.TabIndex = 24
         RadBtnGroupByType.Text = "Type"
         RadBtnGroupByType.TextAlign = ContentAlignment.MiddleCenter
-        TipLibrarySL.SetToolTipImage(RadBtnGroupByType, Nothing)
+        TipLibrary.SetToolTipImage(RadBtnGroupByType, Nothing)
         RadBtnGroupByType.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByYear
@@ -324,7 +312,7 @@ Partial Class Library
         RadBtnGroupByYear.TabIndex = 23
         RadBtnGroupByYear.Text = "Year"
         RadBtnGroupByYear.TextAlign = ContentAlignment.MiddleCenter
-        TipLibrarySL.SetToolTipImage(RadBtnGroupByYear, Nothing)
+        TipLibrary.SetToolTipImage(RadBtnGroupByYear, Nothing)
         RadBtnGroupByYear.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByArtist
@@ -338,7 +326,7 @@ Partial Class Library
         RadBtnGroupByArtist.TabIndex = 20
         RadBtnGroupByArtist.Text = "Artist"
         RadBtnGroupByArtist.TextAlign = ContentAlignment.MiddleCenter
-        TipLibrarySL.SetToolTipImage(RadBtnGroupByArtist, Nothing)
+        TipLibrary.SetToolTipImage(RadBtnGroupByArtist, Nothing)
         RadBtnGroupByArtist.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByAlbum
@@ -352,7 +340,7 @@ Partial Class Library
         RadBtnGroupByAlbum.TabIndex = 19
         RadBtnGroupByAlbum.Text = "Album"
         RadBtnGroupByAlbum.TextAlign = ContentAlignment.MiddleCenter
-        TipLibrarySL.SetToolTipImage(RadBtnGroupByAlbum, Nothing)
+        TipLibrary.SetToolTipImage(RadBtnGroupByAlbum, Nothing)
         RadBtnGroupByAlbum.UseVisualStyleBackColor = True
         ' 
         ' RadBtnGroupByNone
@@ -367,56 +355,56 @@ Partial Class Library
         RadBtnGroupByNone.TabStop = True
         RadBtnGroupByNone.Text = "No Grouping"
         RadBtnGroupByNone.TextAlign = ContentAlignment.MiddleCenter
-        TipLibrarySL.SetToolTipImage(RadBtnGroupByNone, Nothing)
+        TipLibrary.SetToolTipImage(RadBtnGroupByNone, Nothing)
         RadBtnGroupByNone.UseVisualStyleBackColor = True
         ' 
         ' LblExtTitle
         ' 
         LblExtTitle.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtTitle.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtTitle.Location = New Point(147, 420)
+        LblExtTitle.Location = New Point(119, 420)
         LblExtTitle.Name = "LblExtTitle"
-        LblExtTitle.Size = New Size(436, 20)
+        LblExtTitle.Size = New Size(464, 20)
         LblExtTitle.TabIndex = 19
         LblExtTitle.Text = "Title"
         LblExtTitle.TextAlign = ContentAlignment.MiddleLeft
-        TipLibrarySL.SetToolTipImage(LblExtTitle, Nothing)
+        TipLibrary.SetToolTipImage(LblExtTitle, Nothing)
         ' 
         ' LblExtFileInfo
         ' 
         LblExtFileInfo.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtFileInfo.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtFileInfo.Location = New Point(147, 441)
+        LblExtFileInfo.Location = New Point(119, 441)
         LblExtFileInfo.Name = "LblExtFileInfo"
-        LblExtFileInfo.Size = New Size(436, 20)
+        LblExtFileInfo.Size = New Size(464, 20)
         LblExtFileInfo.TabIndex = 20
         LblExtFileInfo.Text = "File Info"
         LblExtFileInfo.TextAlign = ContentAlignment.MiddleLeft
-        TipLibrarySL.SetToolTipImage(LblExtFileInfo, Nothing)
+        TipLibrary.SetToolTipImage(LblExtFileInfo, Nothing)
         ' 
         ' LblExtProperties
         ' 
         LblExtProperties.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtProperties.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtProperties.Location = New Point(147, 461)
+        LblExtProperties.Location = New Point(119, 461)
         LblExtProperties.Name = "LblExtProperties"
-        LblExtProperties.Size = New Size(436, 20)
+        LblExtProperties.Size = New Size(464, 20)
         LblExtProperties.TabIndex = 21
         LblExtProperties.Text = "Properties"
         LblExtProperties.TextAlign = ContentAlignment.MiddleLeft
-        TipLibrarySL.SetToolTipImage(LblExtProperties, Nothing)
+        TipLibrary.SetToolTipImage(LblExtProperties, Nothing)
         ' 
         ' LblExtType
         ' 
         LblExtType.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblExtType.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblExtType.Location = New Point(147, 482)
+        LblExtType.Location = New Point(119, 482)
         LblExtType.Name = "LblExtType"
-        LblExtType.Size = New Size(436, 20)
+        LblExtType.Size = New Size(464, 20)
         LblExtType.TabIndex = 22
         LblExtType.Text = "Type"
         LblExtType.TextAlign = ContentAlignment.MiddleLeft
-        TipLibrarySL.SetToolTipImage(LblExtType, Nothing)
+        TipLibrary.SetToolTipImage(LblExtType, Nothing)
         ' 
         ' LblLibraryCounts
         ' 
@@ -427,7 +415,7 @@ Partial Class Library
         LblLibraryCounts.Size = New Size(423, 28)
         LblLibraryCounts.TabIndex = 23
         LblLibraryCounts.TextAlign = ContentAlignment.MiddleRight
-        TipLibrarySL.SetToolTipImage(LblLibraryCounts, Nothing)
+        TipLibrary.SetToolTipImage(LblLibraryCounts, Nothing)
         ' 
         ' LblStatus
         ' 
@@ -440,13 +428,14 @@ Partial Class Library
         LblStatus.TabIndex = 24
         LblStatus.Text = "Status"
         LblStatus.TextAlign = ContentAlignment.MiddleRight
-        TipLibrarySL.SetToolTipImage(LblStatus, Nothing)
+        TipLibrary.SetToolTipImage(LblStatus, Nothing)
         LblStatus.Visible = False
         ' 
         ' LVLibrary
         ' 
         LVLibrary.AllowColumnReorder = True
         LVLibrary.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        LVLibrary.ContextMenuStrip = CMLibrary
         LVLibrary.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LVLibrary.FullRowSelect = True
         LVLibrary.Location = New Point(12, 42)
@@ -454,7 +443,7 @@ Partial Class Library
         LVLibrary.OwnerDraw = True
         LVLibrary.Size = New Size(960, 339)
         LVLibrary.TabIndex = 0
-        TipLibrarySL.SetToolTipImage(LVLibrary, Nothing)
+        TipLibrary.SetToolTipImage(LVLibrary, Nothing)
         LVLibrary.UseCompatibleStateImageBehavior = False
         LVLibrary.View = View.Details
         ' 
@@ -462,33 +451,31 @@ Partial Class Library
         ' 
         LblHistory.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LblHistory.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblHistory.Location = New Point(147, 400)
+        LblHistory.Location = New Point(119, 400)
         LblHistory.Name = "LblHistory"
-        LblHistory.Size = New Size(436, 20)
+        LblHistory.Size = New Size(464, 20)
         LblHistory.TabIndex = 25
         LblHistory.Text = "History"
         LblHistory.TextAlign = ContentAlignment.MiddleLeft
-        TipLibrarySL.SetToolTipImage(LblHistory, Nothing)
+        TipLibrary.SetToolTipImage(LblHistory, Nothing)
         ' 
-        ' TipLibrarySL
+        ' TipLibrary
         ' 
-        TipLibrarySL.Font = New Font("Segoe UI", 10F)
-        TipLibrarySL.InitialDelay = 500
-        TipLibrarySL.OwnerDraw = True
+        TipLibrary.Font = New Font("Segoe UI", 10F)
+        TipLibrary.InitialDelay = 500
+        TipLibrary.OwnerDraw = True
         ' 
         ' Library
         ' 
         AutoScaleDimensions = New SizeF(7F, 17F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(984, 522)
-        ContextMenuStrip = CMLibrary
         Controls.Add(PicBoxAlbumArt)
         Controls.Add(LblStatus)
         Controls.Add(LblLibraryCounts)
         Controls.Add(LBXLibrarySearch)
         Controls.Add(BtnOK)
         Controls.Add(BtnSearchFolders)
-        Controls.Add(LblAlbumArtSelect)
         Controls.Add(GrpBoxGroupBy)
         Controls.Add(TxbxLibrarySearch)
         Controls.Add(LblExtType)
@@ -504,7 +491,7 @@ Partial Class Library
         Name = "Library"
         StartPosition = FormStartPosition.CenterScreen
         Text = "Library"
-        TipLibrarySL.SetToolTipImage(Me, Nothing)
+        TipLibrary.SetToolTipImage(Me, Nothing)
         CMLibrary.ResumeLayout(False)
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).EndInit()
         GrpBoxGroupBy.ResumeLayout(False)
@@ -516,7 +503,6 @@ Partial Class Library
     Friend WithEvents TxbxLibrarySearch As TextBox
     Friend WithEvents LBXLibrarySearch As ListBox
     Friend WithEvents PicBoxAlbumArt As PictureBox
-    Friend WithEvents LblAlbumArtSelect As Label
     Friend WithEvents CMLibrary As ContextMenuStrip
     Friend WithEvents CMIHelperApp1 As ToolStripMenuItem
     Friend WithEvents CMIAddToPlaylist As ToolStripMenuItem
@@ -551,5 +537,5 @@ Partial Class Library
     Friend WithEvents RadBtnGroupByYear As RadioButton
     Friend WithEvents CMIQueue As ToolStripMenuItem
     Friend WithEvents RadBtnGroupByType As RadioButton
-    Friend WithEvents TipLibrarySL As Skye.UI.ToolTip
+    Friend WithEvents TipLibrary As Skye.UI.ToolTip
 End Class

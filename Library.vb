@@ -34,9 +34,11 @@ Public Class Library
     End Structure
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private AlbumArtCount As Byte = 0 'Number of album art available
+    Private AlbumArtIndex As Byte = 0 'Current album art index being shown
+    Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating single and double clicks on album art
     Private CurrentAccentColor As Color 'Current Windows Accent Color
     Private LibraryImageList As New ImageList
-    Private AlbumArtIndex As Byte = 0
     Private PicBoxAlbumArtSmallSize As Size
     Private PicBoxAlbumArtLargeSize As Size
     Private PicBoxAlbumArtSuperSize As Size
@@ -149,7 +151,6 @@ Public Class Library
         LblExtFileInfo.Text = String.Empty
         LblExtProperties.Text = String.Empty
         LblExtType.Text = String.Empty
-        TipLibrarySL.SetToolTip(LblAlbumArtSelect, "Show Next Album Art")
         CustomDrawCMToolTip(CMLibrary)
         LoadLibrary()
 
@@ -183,13 +184,13 @@ Public Class Library
         End If
         cSender = Nothing
     End Sub
-    Private Sub Library_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblLibraryCounts.MouseMove, LblExtTitle.MouseMove, LblExtFileInfo.MouseMove, LblExtProperties.MouseMove, LblExtType.MouseMove, GrpBoxGroupBy.MouseMove
+    Private Sub Library_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblLibraryCounts.MouseMove, LblExtTitle.MouseMove, LblExtFileInfo.MouseMove, LblExtProperties.MouseMove, LblExtType.MouseMove, GrpBoxGroupBy.MouseMove, PicBoxAlbumArt.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
-            App.LibraryLocation = Location
+            LibraryLocation = Location
         End If
     End Sub
     Private Sub Library_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LblLibraryCounts.MouseUp, LblExtTitle.MouseUp, LblExtFileInfo.MouseUp, LblExtProperties.MouseUp, LblExtType.MouseUp, GrpBoxGroupBy.MouseUp
@@ -631,25 +632,84 @@ Public Class Library
     Private Sub CMICopyFilePathClick(sender As Object, e As EventArgs) Handles CMICopyFilePath.Click
         If LVLibrary.SelectedItems.Count > 0 Then Clipboard.SetText(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
-    Private Sub PicBoxAlbumArtMouseDown(sender As Object, e As MouseEventArgs) Handles PicBoxAlbumArt.MouseDown
-        If PicBoxAlbumArt.Visible AndAlso e.Button = MouseButtons.Left Then
-            PicBoxAlbumArtStartLocation = PicBoxAlbumArt.Location
-            If Me.Width > PicBoxAlbumArtSuperSize.Width AndAlso Me.Height > PicBoxAlbumArtSuperSize.Height Then
-                PicBoxAlbumArt.Top = PicBoxAlbumArt.Bottom - PicBoxAlbumArtSuperSize.Height
-                PicBoxAlbumArt.Size = PicBoxAlbumArtSuperSize
-            Else
-                PicBoxAlbumArt.Top = PicBoxAlbumArt.Bottom - PicBoxAlbumArtLargeSize.Height
-                PicBoxAlbumArt.Size = PicBoxAlbumArtLargeSize
-            End If
+    Private Sub PicBoxAlbumArt_Paint(sender As Object, e As PaintEventArgs) Handles PicBoxAlbumArt.Paint
+        If AlbumArtCount > 1 Then
+            Dim g = e.Graphics
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+
+            'Badge background (semi-transparent black circle)
+            Dim badgeSize As Integer = 28
+            'Dim badgeRect As New Rectangle(PicBoxAlbumArt.Width - badgeSize - 6, 6, badgeSize, badgeSize)
+            Dim badgeRect As New Rectangle(-1, PicBoxAlbumArt.Height - badgeSize - 1, badgeSize, badgeSize)
+            Using bgBrush As New SolidBrush(App.CurrentTheme.BackColor)
+                g.FillEllipse(bgBrush, badgeRect)
+            End Using
+
+            'Count text
+            Dim overlayText As String = AlbumArtCount.ToString()
+            Using f As New Font("Segoe UI", 12, FontStyle.Bold),
+                textBrush As New SolidBrush(App.CurrentTheme.TextColor),
+                sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
+                badgeRect.Offset(1, 1) ' Slight offset for better centering
+                g.DrawString(overlayText, f, textBrush, badgeRect, sf)
+            End Using
+
         End If
+    End Sub
+    Private Sub PicBoxAlbumArtMouseDown(sender As Object, e As MouseEventArgs) Handles PicBoxAlbumArt.MouseDown
+        Select Case e.Button
+            Case MouseButtons.Left
+                'Start a timer for single-click
+                If PicBoxAlbumArtClickTimer Is Nothing Then
+                    PicBoxAlbumArtClickTimer = New Timer()
+                    PicBoxAlbumArtClickTimer.Interval = SystemInformation.DoubleClickTime
+                    AddHandler PicBoxAlbumArtClickTimer.Tick,
+                        Sub()
+                            PicBoxAlbumArtClickTimer?.Stop()
+                            PicBoxAlbumArtClickTimer?.Dispose()
+                            PicBoxAlbumArtClickTimer = Nothing
+
+                            'Single-click action
+                            AlbumArtIndex += CType(1, Byte)
+                            ShowAlbumArt()
+                        End Sub
+                    PicBoxAlbumArtClickTimer.Start()
+                    Library_MouseDown(sender, e)
+                End If
+            Case MouseButtons.Right
+                If PicBoxAlbumArt.Visible Then
+                    PicBoxAlbumArtStartLocation = PicBoxAlbumArt.Location
+                    If Me.Width > PicBoxAlbumArtSuperSize.Width AndAlso Me.Height > PicBoxAlbumArtSuperSize.Height Then
+                        PicBoxAlbumArt.Top = PicBoxAlbumArt.Bottom - PicBoxAlbumArtSuperSize.Height
+                        PicBoxAlbumArt.Size = PicBoxAlbumArtSuperSize
+                    Else
+                        PicBoxAlbumArt.Top = PicBoxAlbumArt.Bottom - PicBoxAlbumArtLargeSize.Height
+                        PicBoxAlbumArt.Size = PicBoxAlbumArtLargeSize
+                    End If
+                End If
+        End Select
     End Sub
     Private Sub PicBoxAlbumArtMouseUp(sender As Object, e As MouseEventArgs) Handles PicBoxAlbumArt.MouseUp
-        If PicBoxAlbumArt.Visible AndAlso e.Button = MouseButtons.Left Then
-            PicBoxAlbumArt.Size = PicBoxAlbumArtSmallSize
-            PicBoxAlbumArt.Location = PicBoxAlbumArtStartLocation
-        End If
+        Select Case e.Button
+            Case MouseButtons.Left
+                Library_MouseUp(sender, e)
+            Case MouseButtons.Right
+                If PicBoxAlbumArt.Visible Then
+                    PicBoxAlbumArt.Size = PicBoxAlbumArtSmallSize
+                    PicBoxAlbumArt.Location = PicBoxAlbumArtStartLocation
+                End If
+        End Select
     End Sub
-    Private Sub LblAlbumArtSelectClick(sender As Object, e As EventArgs) Handles LblAlbumArtSelect.Click
+    Private Sub PicBoxAlbumArt_DoubleClick(sender As Object, e As EventArgs) Handles PicBoxAlbumArt.DoubleClick
+        'Cancel pending single-click
+        PicBoxAlbumArtClickTimer?.Stop()
+        PicBoxAlbumArtClickTimer?.Dispose()
+        PicBoxAlbumArtClickTimer = Nothing
+
+        'Double-click action
+        If PicBoxAlbumArt.Size = PicBoxAlbumArtSmallSize Then ToggleMaximized()
+    End Sub
+    Private Sub LblAlbumArtSelectClick(sender As Object, e As EventArgs)
         AlbumArtIndex += CType(1, Byte)
         ShowAlbumArt()
     End Sub
@@ -1109,13 +1169,12 @@ Public Class Library
             End Try
             If tlfile Is Nothing Then
                 PicBoxAlbumArt.Visible = False
-                LblAlbumArtSelect.Visible = False
             Else
                 If tlfile.Tag.Pictures.Length = 0 Then
                     PicBoxAlbumArt.Visible = False
-                    LblAlbumArtSelect.Visible = False
                 Else
-                    If AlbumArtIndex + 1 > tlfile.Tag.Pictures.Count Then AlbumArtIndex = 0
+                    AlbumArtCount = CByte(tlfile.Tag.Pictures.Count)
+                    If AlbumArtIndex + 1 > AlbumArtCount Then AlbumArtIndex = 0
                     Dim ms As New IO.MemoryStream(tlfile.Tag.Pictures(AlbumArtIndex).Data.Data)
                     Try
                         PicBoxAlbumArt.Image = Image.FromStream(ms)
@@ -1123,19 +1182,14 @@ Public Class Library
                     Catch ex As Exception
                         WriteToLog("Error Loading Album Art for " + LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text + vbCr + ex.Message)
                         PicBoxAlbumArt.Visible = False
-                        LblAlbumArtSelect.Visible = False
                     End Try
                     ms.Dispose()
                     ms = Nothing
-                    If tlfile.Tag.Pictures.Count > 1 Then : LblAlbumArtSelect.Visible = True
-                    Else : LblAlbumArtSelect.Visible = False
-                    End If
                 End If
                 tlfile = Nothing
             End If
         Else
             PicBoxAlbumArt.Visible = False
-            LblAlbumArtSelect.Visible = False
         End If
     End Sub
     Private Sub SetLibraryCountText()
@@ -1314,9 +1368,9 @@ Public Class Library
             Dim h As String = App.History.Find(Function(p) p.Path = (LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)).ToStringFull
             LblHistory.Text = GenerateEllipsis(LblHistory.CreateGraphics(), h, LblHistory.Font, LblHistory.Size.Width)
             If LblHistory.Text = h Then
-                TipLibrarySL.SetToolTip(LblHistory, Nothing)
+                TipLibrary.SetToolTip(LblHistory, Nothing)
             Else
-                TipLibrarySL.SetToolTip(LblHistory, h)
+                TipLibrary.SetToolTip(LblHistory, h)
             End If
             LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             If IO.File.Exists(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text) Then
@@ -1347,9 +1401,9 @@ Public Class Library
                         h = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
                         LblExtType.Text = GenerateEllipsis(LblExtType.CreateGraphics(), h, LblExtType.Font, LblExtType.Size.Width)
                         If LblExtType.Text = h Then
-                            TipLibrarySL.SetToolTip(LblExtType, Nothing)
+                            TipLibrary.SetToolTip(LblExtType, Nothing)
                         Else
-                            TipLibrarySL.SetToolTip(LblExtType, h)
+                            TipLibrary.SetToolTip(LblExtType, h)
                         End If
                     End Using
                 Catch
@@ -1432,9 +1486,9 @@ Public Class Library
         RadBtnGroupByType.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGroupByNone.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGroupByNone.ForeColor = App.CurrentTheme.ButtonTextColor
-        TipLibrarySL.BackColor = App.CurrentTheme.BackColor
-        TipLibrarySL.ForeColor = App.CurrentTheme.TextColor
-        TipLibrarySL.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipLibrary.BackColor = App.CurrentTheme.BackColor
+        TipLibrary.ForeColor = App.CurrentTheme.TextColor
+        TipLibrary.BorderColor = App.CurrentTheme.ButtonBackColor
         If TxbxLibrarySearch.Text = LibrarySearchTitle Then TxbxLibrarySearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
         LblLibraryCounts.ForeColor = forecolor
         LblHistory.ForeColor = forecolor
