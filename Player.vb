@@ -61,6 +61,8 @@ Public Class Player
     Private PausedAt As DateTime? = Nothing
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero
     Private LastLyricsIndex As Integer = -1
+    Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
+    Private TipPlaylistFont As Font = New Font("Segoe UI", 12) 'Font for Playlist Tooltip
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -350,7 +352,7 @@ Public Class Player
                     If m.WParam.ToInt32() = WinAPI.SC_MINIMIZE Then
                         If CMPlaylist IsNot Nothing AndAlso CMPlaylist.Visible Then
                             WinAPI.PostMessage(CMPlaylist.Handle, WinAPI.WM_CLOSE, IntPtr.Zero, IntPtr.Zero) 'Closes the Playlist Context Menu on minimize so it doesn't linger upon restore.
-                            TipPlaylist.HideTooltip()
+                            'If TipPlaylist IsNot Nothing Then TipPlaylist.HideTooltip()
                         End If
                     End If
                 Case Skye.WinAPI.WM_ACTIVATE
@@ -1138,8 +1140,31 @@ Public Class Player
     Private Sub MIAbout_DropDownClosed(sender As Object, e As EventArgs) Handles MIAbout.DropDownClosed
         If Not MIAbout.Selected Then MIAbout.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
+
+
+    Private Sub SetPlaylistToolTip()
+        If TipPlaylist IsNot Nothing Then
+            TipPlaylist?.HideTooltip()
+            TipPlaylist?.Dispose()
+            TipPlaylist = Nothing
+        End If
+        TipPlaylist = New Skye.UI.ToolTipEX(components)
+        TipPlaylist.BackColor = App.CurrentTheme.BackColor
+        TipPlaylist.ForeColor = App.CurrentTheme.TextColor
+        TipPlaylist.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipPlaylist.Font = TipPlaylistFont
+        TipPlaylist.ShadowAlpha = 200
+        TipPlaylist.FadeInRate = 0
+        TipPlaylist.FadeOutRate = 0
+        TipPlaylist.HideDelay = 1000000
+        TipPlaylist.ShowDelay = 1000
+    End Sub
     Private Sub CMPlaylist_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylist.Opening
-        If LVPlaylist.SelectedItems.Count > 0 Then TipPlaylist.ShowTooltipAt(New Point(CMPlaylist.Location.X, CMPlaylist.Location.Y - 37), App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text).ToString)
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            SetPlaylistToolTip()
+            Dim tiptext As String = App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)?.ToString
+            If TipPlaylist IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(tiptext) Then TipPlaylist.ShowTooltipAt(New Point(CMPlaylist.Location.X, CMPlaylist.Location.Y - 37), tiptext)
+        End If
         CMIHelperApp1.Text = "Open with " + App.HelperApp1Name
         CMIHelperApp2.Text = "Open with " + App.HelperApp2Name
         If LVPlaylist.Items.Count = 0 Then
@@ -1212,7 +1237,9 @@ Public Class Player
         End If
     End Sub
     Private Sub CMPlaylist_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles CMPlaylist.Closing
-        TipPlaylist.HideTooltip()
+        TipPlaylist?.HideTooltip()
+        TipPlaylist?.Dispose()
+        TipPlaylist = Nothing
     End Sub
     Private Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
         PlayFromPlaylist()
@@ -3148,9 +3175,6 @@ Public Class Player
         TipPlayer.BackColor = App.CurrentTheme.BackColor
         TipPlayer.ForeColor = App.CurrentTheme.TextColor
         TipPlayer.BorderColor = App.CurrentTheme.ButtonBackColor
-        TipPlaylist.BackColor = App.CurrentTheme.BackColor
-        TipPlaylist.ForeColor = App.CurrentTheme.TextColor
-        TipPlaylist.BorderColor = App.CurrentTheme.ButtonBackColor
         TipWatcherNotification.BackColor = App.CurrentTheme.BackColor
         TipWatcherNotification.ForeColor = App.CurrentTheme.TextColor
         TipWatcherNotification.BorderColor = App.CurrentTheme.ButtonBackColor
