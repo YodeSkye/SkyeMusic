@@ -96,7 +96,6 @@ Partial Class Player
         LblPosition = New Skye.UI.Label()
         TrackBarPosition = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
         TimerMeter = New Timer(components)
-        TimerVisualizer = New Timer(components)
         VLCViewer = New LibVLCSharp.WinForms.VideoView()
         LblMedia = New Skye.UI.Label()
         RTBLyrics = New Skye.UI.RichTextBox()
@@ -722,11 +721,7 @@ Partial Class Player
         ' TimerMeter
         ' 
         TimerMeter.Enabled = True
-        TimerMeter.Interval = 75
-        ' 
-        ' TimerVisualizer
-        ' 
-        TimerVisualizer.Interval = 75
+        TimerMeter.Interval = 20
         ' 
         ' VLCViewer
         ' 
@@ -891,7 +886,6 @@ Partial Class Player
     Friend WithEvents CMIViewInLibrary As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator6 As ToolStripSeparator
     Friend WithEvents CMIClearPlaylist As ToolStripMenuItem
-    Friend WithEvents TimerVisualizer As Timer
     Friend WithEvents MIPlayMode As ToolStripMenuItem
     Friend WithEvents MILyrics As ToolStripMenuItem
     Friend WithEvents Labelcsy1 As Skye.UI.Label

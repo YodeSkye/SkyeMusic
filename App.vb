@@ -265,6 +265,10 @@ Namespace My
 
         'Themes
         Friend CurrentTheme As ThemeProperties 'Holds the current theme settings of the application.
+        Friend Event ThemeChanged As EventHandler
+        Friend Sub InvokeThemeChanged()
+            RaiseEvent ThemeChanged(Nothing, EventArgs.Empty)
+        End Sub
         Private ReadOnly BlueAccentTheme As New ThemeProperties With { 'Used by Splash Screen
             .IsAccent = True,
             .BackColor = Color.FromArgb(255, 35, 35, 35),

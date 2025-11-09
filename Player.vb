@@ -27,10 +27,8 @@ Public Class Player
         Public Path As String
     End Structure
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
-    'Private aDevEnum As New CoreAudio.MMDeviceEnumerator 'Audio Device Enumerator
-    'Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
-    Private meterNAudioDevice As MMDevice
-    Private cLeftMeter, cRightMeter As Byte 'Meter Values
+    Private MeterAudioCapture As WasapiLoopbackCapture ' keep a field so you can dispose later
+    Private MeterPeakLeft, MeterPeakRight, MeterDecayLeft, MeterDecayRight As Single
     Private VLCHook As VLCViewerHook
     Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private Stream As Boolean = False 'True if the current playing item is a stream
@@ -128,26 +126,52 @@ Public Class Player
 
         Public Sub New(panel As Panel)
             hostPanel = panel
+            AddHandler App.ThemeChanged, AddressOf OnThemeChanged
+        End Sub
+        Private Sub OnThemeChanged(sender As Object, e As EventArgs)
+            'Update background colors when theme changes
+            If currentVisualizer IsNot Nothing Then
+                currentVisualizer.DockedControl.BackColor = App.CurrentTheme.BackColor
+            End If
+            hostPanel.BackColor = App.CurrentTheme.BackColor
+        End Sub
+        Private Sub OnMouseClick(sender As Object, e As MouseEventArgs)
+            If e.Button = MouseButtons.Right Then
+                'implement context menu later
+            End If
+        End Sub
+        Private Sub OnMouseDoubleClick(sender As Object, e As MouseEventArgs)
+            Player.ToggleMaximized()
         End Sub
 
         Public Sub LoadVisualizer(v As IVisualizer)
+            ' Stop and clear old visualizer
             If currentVisualizer IsNot Nothing Then
+                Dim oldCtrl As Control = currentVisualizer.DockedControl
+                RemoveHandler oldCtrl.MouseClick, AddressOf Me.OnMouseClick
+                RemoveHandler oldCtrl.MouseDoubleClick, AddressOf Me.OnMouseDoubleClick
                 currentVisualizer.Stop()
                 hostPanel.Controls.Clear()
             End If
 
             currentVisualizer = v
-            hostPanel.Controls.Add(v.DockedControl)
-            v.DockedControl.Dock = DockStyle.Fill
+
+            Dim ctrl As Control = v.DockedControl
+            ctrl.Dock = DockStyle.Fill
+            ctrl.BackColor = App.CurrentTheme.BackColor
+
+            ' Attach handlers for double‑click and right‑click
+            AddHandler ctrl.MouseClick, AddressOf Me.OnMouseClick
+            AddHandler ctrl.MouseDoubleClick, AddressOf Me.OnMouseDoubleClick
+
+            hostPanel.Controls.Add(ctrl)
             v.Start()
         End Sub
         Public Sub FeedAudio(data As Single())
             currentVisualizer?.Update(data)
         End Sub
         Public Sub ResizeHost()
-            If currentVisualizer IsNot Nothing Then
-                currentVisualizer.Resize(hostPanel.Width, hostPanel.Height)
-            End If
+            currentVisualizer?.Resize(hostPanel.Width, hostPanel.Height)
         End Sub
 
     End Class
@@ -219,7 +243,6 @@ Public Class Player
         Private gain As Single = 100.0F 'You can tweak this later
         Private hueOffset As Single = 0.0F
         Private peakValues() As Single
-        Private peakThreshold As Integer = 10 'Pixels above bottom before we show peak
 
         Public Sub New()
             Me.DoubleBuffered = True
@@ -250,7 +273,7 @@ Public Class Player
             Me.Invalidate()
         End Sub
         Protected Overrides Sub OnPaint(pe As PaintEventArgs)
-            Me.BackColor = App.CurrentTheme.BackColor
+            'Me.BackColor = App.CurrentTheme.BackColor
             MyBase.OnPaint(pe)
             If audioData Is Nothing OrElse audioData.Length = 0 Then Exit Sub
 
@@ -268,7 +291,7 @@ Public Class Player
             End If
 
             ' Threshold to avoid flicker at bottom
-            Dim peakThreshold As Integer = 10 ' pixels above bottom
+            Dim peakThreshold As Integer = 50 ' pixels above bottom
 
             For i = 0 To barCount - 1
                 Dim valueIdx = i * audioData.Length \ barCount
@@ -297,19 +320,24 @@ Public Class Player
                 ' --- Peak bar logic ---
                 Dim currentPeak As Integer = CInt(smoothed * maxHeight)
 
-                ' If bar is higher, update peak immediately
                 If currentPeak > peakValues(i) Then
                     peakValues(i) = currentPeak
                 Else
-                    ' Otherwise, let peak fall slowly (decay speed = 4-8px per frame)
-                    peakValues(i) = Math.Max(0, peakValues(i) - 4)
+                    ' Dynamic decay speed based on panel height
+                    Dim decay As Integer = 7
+                    peakValues(i) = Math.Max(0, peakValues(i) - decay)
                 End If
 
                 ' Only draw peak if above threshold
                 If peakValues(i) > peakThreshold Then
-                    Dim peakY As Integer = maxHeight - CInt(peakValues(i))
-                    g.FillRectangle(Brushes.Red, x, peakY, width, 3)
+                    Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
+                    Dim thickness As Integer = 6 ' fixed thickness preset
+                    Dim peakColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
+                    Using peakbrush As New SolidBrush(peakColor)
+                        g.FillRectangle(peakbrush, x, peakY, width, thickness)
+                    End Using
                 End If
+
             Next
 
             ' Advance hue offset for next frame
@@ -625,11 +653,13 @@ Public Class Player
         AddHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
         _player.Volume = 100
 
-        'For Meter(s)
-        Dim enumerator As New MMDeviceEnumerator()
-        meterNAudioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)
+        'For Meters
+        MeterAudioCapture = New WasapiLoopbackCapture()
+        AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
+        MeterAudioCapture.StartRecording()
 
         VisualizerHost = New VisualizerHostClass(PanelVisualizer)
+        VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
 
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
@@ -829,6 +859,12 @@ Public Class Player
             RemoveHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
             RemoveHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
             VLCHook = Nothing
+        End If
+        If MeterAudioCapture IsNot Nothing Then
+            MeterAudioCapture.StopRecording()
+            RemoveHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
+            MeterAudioCapture.Dispose()
+            MeterAudioCapture = Nothing
         End If
         My.Finalize()
     End Sub
@@ -1857,33 +1893,81 @@ Public Class Player
         ' Reparenting VLCViewer during this moment causes WinForms to freeze.
         ' Let fullscreen collapse naturally — cleanup happens safely elsewhere, in OnPlaybackStarted.
     End Sub
-    Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
-        If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then ShowPosition()
+    Private Sub OnMeterDataAvailable(sender As Object, e As WaveInEventArgs)
+        Dim wf = MeterAudioCapture.WaveFormat
+        Dim channels As Integer = wf.Channels
+        If channels <> 2 Then
+            ' Fallback: mono -> duplicate into both channels
+            ' Convert appropriately below
+        End If
+
+        Dim leftMax As Single = 0.0F
+        Dim rightMax As Single = 0.0F
+
+        If wf.Encoding = WaveFormatEncoding.IeeeFloat Then
+            ' 32-bit float: 4 bytes per sample per channel, 8 bytes per stereo frame
+            Dim waveBuffer As New WaveBuffer(e.Buffer)
+            Dim totalSamples As Integer = e.BytesRecorded \ 4
+            ' Iterate by frame (two samples per frame)
+            For i As Integer = 0 To totalSamples - 2 Step 2
+                Dim l As Single = waveBuffer.FloatBuffer(i)
+                Dim r As Single = waveBuffer.FloatBuffer(i + 1)
+                leftMax = Math.Max(leftMax, Math.Abs(l))
+                rightMax = Math.Max(rightMax, Math.Abs(r))
+            Next
+
+        ElseIf wf.Encoding = WaveFormatEncoding.Pcm AndAlso wf.BitsPerSample = 16 Then
+            ' 16-bit PCM: 2 bytes per sample per channel, 4 bytes per stereo frame
+            Dim frames As Integer = e.BytesRecorded \ (channels * 2)
+            For f As Integer = 0 To frames - 1
+                Dim baseIndex As Integer = f * channels * 2
+
+                ' Little-endian Int16
+                Dim lInt As Short = CShort(e.Buffer(baseIndex) Or (e.Buffer(baseIndex + 1) << 8))
+                Dim rInt As Short
+                If channels >= 2 Then
+                    Dim rBase As Integer = baseIndex + 2
+                    rInt = CShort(e.Buffer(rBase) Or (e.Buffer(rBase + 1) << 8))
+                Else
+                    rInt = lInt ' mono fallback
+                End If
+
+                ' Normalize to -1..+1
+                Dim l As Single = Math.Abs(lInt / 32768.0F)
+                Dim r As Single = Math.Abs(rInt / 32768.0F)
+
+                leftMax = Math.Max(leftMax, l)
+                rightMax = Math.Max(rightMax, r)
+            Next
+
+        Else
+            ' Other encodings: add branches as needed (24-bit PCM, etc.)
+            ' For safety, bail out or treat as zero
+            leftMax = 0.0F
+            rightMax = 0.0F
+        End If
+
+        ' Optional smoothing: peak hold with gentle decay to avoid jitter
+        Dim decay As Single = 0.85F
+        MeterDecayLeft = Math.Max(leftMax, MeterDecayLeft * decay)
+        MeterDecayRight = Math.Max(rightMax, MeterDecayRight * decay)
+
+        ' Store normalized peaks (0..1). Use smoothed or raw max:
+        MeterPeakLeft = MeterDecayLeft
+        MeterPeakRight = MeterDecayRight
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
         If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
-            'Try : cLeftMeter = CByte(aDev.AudioMeterInformation.PeakValues(0) * 100)
-            'Catch : cLeftMeter = 0
-            'End Try
-            'Try : cRightMeter = CByte(aDev.AudioMeterInformation.PeakValues(1) * 100)
-            'Catch : cRightMeter = 0
-            'End Try
-            Dim peak As Single = meterNAudioDevice.AudioMeterInformation.MasterPeakValue
-            PEXLeft.Value = CInt(peak * 100)
-            PEXRight.Value = CInt(peak * 100)
+            Dim leftScaled As Single = MeterPeakLeft * 100.0F
+            Dim rightScaled As Single = MeterPeakRight * 100.0F
+            Dim leftVal As Integer = CInt(Math.Max(PEXLeft.Minimum, Math.Min(PEXLeft.Maximum, leftScaled)))
+            Dim rightVal As Integer = CInt(Math.Max(PEXRight.Minimum, Math.Min(PEXRight.Maximum, rightScaled)))
+            PEXLeft.Value = leftVal
+            PEXRight.Value = rightVal
         End If
     End Sub
-    Private Sub TimerVisualizer_Tick(sender As Object, e As EventArgs) Handles TimerVisualizer.Tick
-        'Try : visB = CByte(aDev.AudioMeterInformation.PeakValues(0) * 255)
-        'Catch : visB = 0
-        'End Try
-        'Try : visR = CByte(aDev.AudioMeterInformation.PeakValues(1) * 255)
-        'Catch : visR = 0
-        'End Try
-        'Try : visV = aDev.AudioEndpointVolume.MasterVolumeLevelScalar
-        'Catch : visV = 0
-        'End Try
-        'PicBoxVisualizer.Invalidate()
+    Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
+        If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then ShowPosition()
     End Sub
     Private Sub TimerShowMedia_Tick(sender As Object, e As EventArgs) Handles TimerShowMedia.Tick
         TimerShowMedia.Stop()
@@ -3071,7 +3155,6 @@ Public Class Player
                 PanelVisualizer.Visible = False
                 VisualizerEngine?.Stop()
                 Visualizer = False
-                TimerVisualizer.Stop()
                 VLCViewer.Visible = False
                 If WindowState = FormWindowState.Maximized Then
                     RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 20, FontStyle.Regular)
@@ -3096,7 +3179,6 @@ Public Class Player
                         PanelVisualizer.Visible = False
                         VisualizerEngine?.Stop()
                         RTBLyrics.Visible = False
-                        TimerVisualizer.Stop()
                         If tlfile Is Nothing Then
                             PicBoxAlbumArt.Visible = False
                         Else
@@ -3125,7 +3207,6 @@ Public Class Player
                         RTBLyrics.Visible = False
                         PanelVisualizer.Visible = False
                         VisualizerEngine?.Stop()
-                        TimerVisualizer.Stop()
                         VideoSetSize()
                         VLCViewer.Visible = True
                     End If
@@ -3135,14 +3216,8 @@ Public Class Player
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
                     RTBLyrics.Visible = False
-
-                    'TimerVisualizer.Start()
-
-                    'Dim host As New VisualizerHostClass(PanelVisualizer)
                     VisualizerHost.LoadVisualizer(New VisualizerRainbowBar())
-                    VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
-                    VisualizerEngine.Start()
-
+                    VisualizerEngine?.Start()
                     PanelVisualizer.Visible = True
                     PanelVisualizer.BringToFront()
                 End If
@@ -3160,7 +3235,6 @@ Public Class Player
             VLCViewer.Visible = False
             PanelVisualizer.Visible = False
             VisualizerEngine?.Stop()
-            TimerVisualizer.Stop()
         End If
     End Sub
 

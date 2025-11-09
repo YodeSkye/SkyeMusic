@@ -255,6 +255,7 @@ Public Class Options
         App.CurrentTheme = App.GetCurrentThemeProperties
         If App.CurrentTheme.IsAccent Then SetAccentColor()
         SetTheme()
+        App.InvokeThemeChanged()
         If App.FRMLog IsNot Nothing Then
             App.FRMLog.SetColors()
         End If
