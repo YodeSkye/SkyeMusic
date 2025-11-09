@@ -248,11 +248,9 @@ Public Class Player
         Implements IVisualizer
 
         'Declarations
-        Private audioData() As Single
         Private updateTimer As Timer
-        Private lastMagnitudes() As Single
+        Private audioData(), lastMagnitudes(), peakValues() As Single
         Private hueOffset As Single = 0.0F
-        Private peakValues() As Single
         Private gain As Single = 100.0F 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
 
         'Constructor
@@ -287,7 +285,6 @@ Public Class Player
             Me.Invalidate()
         End Sub
         Protected Overrides Sub OnPaint(pe As PaintEventArgs)
-            'Me.BackColor = App.CurrentTheme.BackColor
             MyBase.OnPaint(pe)
             If audioData Is Nothing OrElse audioData.Length = 0 Then Exit Sub
 
@@ -295,8 +292,9 @@ Public Class Player
             Dim barCount = 32
             Dim barWidth As Single = CSng(Me.Width) / barCount
             Dim maxHeight = Me.Height
+            Dim peakThreshold As Integer = 50 'Pixels above bottom 'Threshold to avoid flicker at bottom
 
-            ' Initialize smoothing buffer if needed
+            'Initialize smoothing buffer if needed
             If lastMagnitudes Is Nothing OrElse lastMagnitudes.Length <> barCount Then
                 ReDim lastMagnitudes(barCount - 1)
             End If
@@ -304,34 +302,31 @@ Public Class Player
                 ReDim peakValues(barCount - 1)
             End If
 
-            ' Threshold to avoid flicker at bottom
-            Dim peakThreshold As Integer = 50 ' pixels above bottom
-
             For i = 0 To barCount - 1
                 Dim valueIdx = i * audioData.Length \ barCount
                 Dim rawMagnitude = audioData(valueIdx)
 
-                ' Apply gain and clamp
+                'Apply gain and clamp
                 Dim boosted = Math.Min(rawMagnitude * gain, 1.0F)
 
-                ' Smooth with previous frame
+                'Smooth with previous frame
                 Dim smoothed = (lastMagnitudes(i) * 0.7F) + (boosted * 0.3F)
                 lastMagnitudes(i) = smoothed
 
-                ' Scale to height
+                'Scale to height
                 Dim barHeight = CInt(smoothed * maxHeight)
                 Dim x = CInt(i * barWidth)
                 Dim y = maxHeight - barHeight
                 Dim width = CInt(barWidth) - 2
 
-                ' Draw main bar
+                'Draw main bar
                 Dim hue As Single = (CSng(i) / barCount * 360.0F + hueOffset) Mod 360.0F
                 Dim rainbowColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
                 Using brush As New SolidBrush(rainbowColor)
                     g.FillRectangle(brush, x, y, width, barHeight)
                 End Using
 
-                ' --- Peak bar logic ---
+                'Peak bar logic
                 Dim currentPeak As Integer = CInt(smoothed * maxHeight)
 
                 If currentPeak > peakValues(i) Then
@@ -342,7 +337,7 @@ Public Class Player
                     peakValues(i) = Math.Max(0, peakValues(i) - decay)
                 End If
 
-                ' Only draw peak if above threshold
+                'Only draw peak if above threshold
                 If peakValues(i) > peakThreshold Then
                     Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
                     Dim thickness As Integer = 6 ' fixed thickness preset
@@ -354,7 +349,7 @@ Public Class Player
 
             Next
 
-            ' Advance hue offset for next frame
+            'Advance hue offset for next frame
             hueOffset = (hueOffset + 2.0F) Mod 360.0F
         End Sub
 
