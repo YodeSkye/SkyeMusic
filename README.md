@@ -59,7 +59,29 @@ Install-Package VideoLAN.LibVLC.Windows
 
 ---
 
-### 3. TagLibSharp
+### 3. NAudio
+
+A powerful audio library for .NET, used for audio playback and processing.
+
+```powershell
+Install-Package NAudio
+```
+
+**Example:**
+```vbnet
+Dim waveOut As New NAudio.Wave.WaveOutEvent()
+Dim audioFile As New NAudio.Wave.AudioFileReader("song.mp3")
+waveOut.Init(audioFile)
+waveOut.Play()
+
+Dim MeterAudioCapture As New WasapiLoopbackCapture()
+AddHandler MeterAudioCapture.DataAvailable, AddressOf OnDataAvailable
+MeterAudioCapture.StartRecording()
+```
+
+---
+
+### 4. TagLibSharp
 
 A cross-platform library for reading and writing metadata in media files.
 
@@ -77,7 +99,7 @@ file.Save()
 
 ---
 
-### 4. System.Data.SQLite.Core
+### 5. System.Data.SQLite.Core
 
 Provides a lightweight, embedded SQL database engine for local storage of play history and metadata cache.
 
@@ -96,7 +118,7 @@ End Using
 
 ---
 
-### 5. System.Text.Encoding.CodePages
+### 6. System.Text.Encoding.CodePages
 
 Adds support for legacy code page encodings (e.g., Windows-1252, Shift-JIS).
 
@@ -111,7 +133,7 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 
 ---
 
-### 6. Syncfusion.Tools.Windows
+### 7. Syncfusion.Tools.Windows
 
 Provides advanced WinForms UI components like Ribbon, Docking Manager, and TreeView. It 's free for individual developers and small businesses. To get a license, visit their website [Syncfusion Community License](https://www.syncfusion.com/products/communitylicense).
 
@@ -121,7 +143,7 @@ Install-Package Syncfusion.Tools.Windows
 
 ---
 
-### 7. WinForms.DataVisualization
+### 8. WinForms.DataVisualization
 
 Provides the **System.Windows.Forms.DataVisualization.Charting** namespace, which includes chart controls (Pie, Bar, Radar, Pareto, etc.) used in the **History & Statistics** page.
 
@@ -144,7 +166,7 @@ chart.Series.Add(series)
 
 ---
 
-### 8. WordCloudSharp
+### 9. WordCloudSharp
 
 Provides word cloud generation for visualizing artist frequency in SkyeMusic. Used in the **Artist Word Cloud** chart view.
 
@@ -168,20 +190,6 @@ Dim wc As New WordCloudSharp.WordCloud(
 Dim bmp As Bitmap = wc.Draw(words, frequencies)
 PictureBox1.Image = bmp
 ```
-
----
-
-## 🧩 Required COM References
-
-### 1. CoreAudio
-
-To add the CoreAudio component:
-
-1. Right-click on your project in **Solution Explorer**.
-2. Select **Add > COM Reference**.
-3. In the Reference Manager, click **Browse**.
-4. Navigate to the path where you saved the `CoreAudio.dll` file from the repository.
-5. Select `CoreAudio.dll` and click **OK** to add the reference.
 
 ---
 

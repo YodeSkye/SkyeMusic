@@ -27,22 +27,22 @@ Public Class Player
         Public Path As String
     End Structure
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
-    Private MeterAudioCapture As WasapiLoopbackCapture ' keep a field so you can dispose later
-    Private MeterPeakLeft, MeterPeakRight, MeterDecayLeft, MeterDecayRight As Single
-    Private VLCHook As VLCViewerHook
+    Private MeterAudioCapture As WasapiLoopbackCapture 'Audio Capture for Meters
+    Private MeterPeakLeft, MeterPeakRight, MeterDecayLeft, MeterDecayRight As Single 'Meter Values
+    Private VLCHook As VLCViewerHook 'Hook for VLC Viewer Control
     Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private Stream As Boolean = False 'True if the current playing item is a stream
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
-    Private Lyrics As Boolean = False 'Indicates if the lyrics are active
-    Private HasLyrics As Boolean = False 'Indicates if the current playing item has lyrics available
-    Private HasLyricsSynced As Boolean = False 'Indicates if the current playing item has synced lyrics available
-    Private LyricsText As String = String.Empty
-    Private LyricsSynced As List(Of TimedLyric)
     Public Class TimedLyric
         Public Property Time As TimeSpan
         Public Property Text As String
     End Class
+    Private Lyrics As Boolean = False 'Indicates if the lyrics are active
+    Private HasLyrics As Boolean = False 'Indicates if the current playing item has lyrics available
+    Private HasLyricsSynced As Boolean = False 'Indicates if the current playing item has synced lyrics available
+    Private LyricsText As String = String.Empty 'Lyrics text for unsynced lyrics
+    Private LyricsSynced As List(Of TimedLyric) 'Lyrics for synced lyrics
     Private AlbumArtCount As Byte = 0 'Number of album art available
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
     Private TrackBarScale As Int16 = 100 'TrackBar Scale for Position
