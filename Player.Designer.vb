@@ -800,7 +800,6 @@ Partial Class Player
         ClientSize = New Size(984, 461)
         Controls.Add(PanelVisualizer)
         Controls.Add(RTBLyrics)
-        Controls.Add(LblMedia)
         Controls.Add(VLCViewer)
         Controls.Add(LblPosition)
         Controls.Add(LblDuration)
@@ -821,6 +820,7 @@ Partial Class Player
         Controls.Add(PanelMedia)
         Controls.Add(LblPlaylistCount)
         Controls.Add(TrackBarPosition)
+        Controls.Add(LblMedia)
         ForeColor = SystemColors.HighlightText
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True

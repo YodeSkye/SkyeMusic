@@ -6,6 +6,9 @@ Imports System.Runtime.InteropServices
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports LibVLCSharp.WinForms
+Imports NAudio.CoreAudioApi
+Imports NAudio.Dsp
+Imports NAudio.Wave
 Imports Skye
 Imports Skye.Contracts
 Imports SkyeMusic.My
@@ -24,16 +27,15 @@ Public Class Player
         Public Path As String
     End Structure
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
-    Private aDevEnum As New CoreAudio.MMDeviceEnumerator 'Audio Device Enumerator
-    Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
+    'Private aDevEnum As New CoreAudio.MMDeviceEnumerator 'Audio Device Enumerator
+    'Private aDev As CoreAudio.MMDevice = aDevEnum.GetDefaultAudioEndpoint(CoreAudio.EDataFlow.eRender, CoreAudio.ERole.eMultimedia) 'Default Audio Device
+    Private meterNAudioDevice As MMDevice
+    Private cLeftMeter, cRightMeter As Byte 'Meter Values
     Private VLCHook As VLCViewerHook
-    Private cLeftMeter, cRightMeter, visR, visB As Byte 'Meter Values and Visualizer Colors
-    Private visV As Single 'Visualizer Volume
     Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private Stream As Boolean = False 'True if the current playing item is a stream
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
-    Private Visualizer As Boolean = False 'Indicates if the visualizer is active
     Private Lyrics As Boolean = False 'Indicates if the lyrics are active
     Private HasLyrics As Boolean = False 'Indicates if the current playing item has lyrics available
     Private HasLyricsSynced As Boolean = False 'Indicates if the current playing item has synced lyrics available
@@ -56,9 +58,9 @@ Public Class Player
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
     Private PicBoxAlbumArtClickTimer As Timer
-    Private AutoNext As Boolean = False 'Indicates if the player will automatically play the next item.
-    Private PausedAt As DateTime? = Nothing
-    Private TotalPausedDuration As TimeSpan = TimeSpan.Zero
+    Private AutoNext As Boolean = False 'Used by Plays Database System to indicate if the player will automatically play the next item.
+    Private PausedAt As DateTime? = Nothing 'Used by Plays Database System to track when the player was paused.
+    Private TotalPausedDuration As TimeSpan = TimeSpan.Zero 'Used by Plays Database System to track total paused duration.
     Private LastLyricsIndex As Integer = -1
     Private TipPlaylistFont As Font = New Font("Segoe UI", 12) 'Font for Playlist Tooltip
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
@@ -107,7 +109,234 @@ Public Class Player
         End Set
     End Property
 
-    'Interface
+    'Visualizer Interface
+    Private Visualizer As Boolean = False 'Indicates if the visualizer is active
+    Private VisualizerHost As VisualizerHostClass
+    Private VisualizerEngine As VisualizerAudioEngine
+    'Private visR, visB As Byte 'Visualizer Colors
+    'Private visV As Single 'Visualizer Volume
+    Friend Interface IVisualizer
+        Sub Start()
+        Sub [Stop]()
+        Sub Update(audioData As Single())
+        Sub Resize(width As Integer, height As Integer)
+        ReadOnly Property DockedControl As Control
+    End Interface
+    Friend Class VisualizerHostClass
+        Private currentVisualizer As IVisualizer
+        Private hostPanel As Panel
+
+        Public Sub New(panel As Panel)
+            hostPanel = panel
+        End Sub
+
+        Public Sub LoadVisualizer(v As IVisualizer)
+            If currentVisualizer IsNot Nothing Then
+                currentVisualizer.Stop()
+                hostPanel.Controls.Clear()
+            End If
+
+            currentVisualizer = v
+            hostPanel.Controls.Add(v.DockedControl)
+            v.DockedControl.Dock = DockStyle.Fill
+            v.Start()
+        End Sub
+        Public Sub FeedAudio(data As Single())
+            currentVisualizer?.Update(data)
+        End Sub
+        Public Sub ResizeHost()
+            If currentVisualizer IsNot Nothing Then
+                currentVisualizer.Resize(hostPanel.Width, hostPanel.Height)
+            End If
+        End Sub
+
+    End Class
+    Friend Class VisualizerAudioEngine
+        Private capture As WasapiLoopbackCapture
+        Private buffer() As Byte
+        Private visualizerHost As VisualizerHostClass
+
+        Public Sub New(host As VisualizerHostClass)
+            visualizerHost = host
+        End Sub
+
+        Public Sub Start()
+            capture = New WasapiLoopbackCapture()
+            AddHandler capture.DataAvailable, AddressOf OnDataAvailable
+            capture.StartRecording()
+        End Sub
+
+        Public Sub [Stop]()
+            If capture IsNot Nothing Then
+                capture.StopRecording()
+                RemoveHandler capture.DataAvailable, AddressOf OnDataAvailable
+                capture.Dispose()
+            End If
+        End Sub
+
+        Private Sub OnDataAvailable(sender As Object, e As WaveInEventArgs)
+            buffer = e.Buffer
+
+            ' Convert to float samples
+            Dim sampleCount = e.BytesRecorded \ 4
+            Dim samples(sampleCount - 1) As Single
+            For i = 0 To sampleCount - 1
+                samples(i) = BitConverter.ToSingle(buffer, i * 4)
+            Next
+
+            ' Apply FFT
+            Dim fftSize = 1024
+            Dim fftBuffer(fftSize - 1) As Complex
+            For i = 0 To fftSize - 1
+                If i < samples.Length Then
+                    fftBuffer(i).X = samples(i)
+                    fftBuffer(i).Y = 0
+                Else
+                    fftBuffer(i).X = 0
+                    fftBuffer(i).Y = 0
+                End If
+            Next
+
+            FastFourierTransform.FFT(True, CInt(Math.Log(fftSize, 2)), fftBuffer)
+
+            ' Extract magnitudes
+            Dim magnitudes(fftSize \ 2 - 1) As Single
+            For i = 0 To magnitudes.Length - 1
+                magnitudes(i) = CSng(Math.Sqrt(fftBuffer(i).X ^ 2 + fftBuffer(i).Y ^ 2))
+            Next
+
+            ' Feed to visualizer
+            visualizerHost.FeedAudio(magnitudes)
+        End Sub
+    End Class
+    Friend Class VisualizerRainbowBar
+        Inherits UserControl
+        Implements IVisualizer
+
+        Private audioData() As Single
+        Private updateTimer As Timer
+        Private lastMagnitudes() As Single
+        Private gain As Single = 100.0F 'You can tweak this later
+        Private hueOffset As Single = 0.0F
+        Private peakValues() As Single
+        Private peakThreshold As Integer = 10 'Pixels above bottom before we show peak
+
+        Public Sub New()
+            Me.DoubleBuffered = True
+            'Me.BackColor = App.CurrentTheme.BackColor
+            updateTimer = New Timer With {.Interval = 33} '~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Me.Size = New Size(width, height)
+        End Sub
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Me.Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+            Me.BackColor = App.CurrentTheme.BackColor
+            MyBase.OnPaint(pe)
+            If audioData Is Nothing OrElse audioData.Length = 0 Then Exit Sub
+
+            Dim g = pe.Graphics
+            Dim barCount = 32
+            Dim barWidth As Single = CSng(Me.Width) / barCount
+            Dim maxHeight = Me.Height
+
+            ' Initialize smoothing buffer if needed
+            If lastMagnitudes Is Nothing OrElse lastMagnitudes.Length <> barCount Then
+                ReDim lastMagnitudes(barCount - 1)
+            End If
+            If peakValues Is Nothing OrElse peakValues.Length <> barCount Then
+                ReDim peakValues(barCount - 1)
+            End If
+
+            ' Threshold to avoid flicker at bottom
+            Dim peakThreshold As Integer = 10 ' pixels above bottom
+
+            For i = 0 To barCount - 1
+                Dim valueIdx = i * audioData.Length \ barCount
+                Dim rawMagnitude = audioData(valueIdx)
+
+                ' Apply gain and clamp
+                Dim boosted = Math.Min(rawMagnitude * gain, 1.0F)
+
+                ' Smooth with previous frame
+                Dim smoothed = (lastMagnitudes(i) * 0.7F) + (boosted * 0.3F)
+                lastMagnitudes(i) = smoothed
+
+                ' Scale to height
+                Dim barHeight = CInt(smoothed * maxHeight)
+                Dim x = CInt(i * barWidth)
+                Dim y = maxHeight - barHeight
+                Dim width = CInt(barWidth) - 2
+
+                ' Draw main bar
+                Dim hue As Single = (CSng(i) / barCount * 360.0F + hueOffset) Mod 360.0F
+                Dim rainbowColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
+                Using brush As New SolidBrush(rainbowColor)
+                    g.FillRectangle(brush, x, y, width, barHeight)
+                End Using
+
+                ' --- Peak bar logic ---
+                Dim currentPeak As Integer = CInt(smoothed * maxHeight)
+
+                ' If bar is higher, update peak immediately
+                If currentPeak > peakValues(i) Then
+                    peakValues(i) = currentPeak
+                Else
+                    ' Otherwise, let peak fall slowly (decay speed = 4-8px per frame)
+                    peakValues(i) = Math.Max(0, peakValues(i) - 4)
+                End If
+
+                ' Only draw peak if above threshold
+                If peakValues(i) > peakThreshold Then
+                    Dim peakY As Integer = maxHeight - CInt(peakValues(i))
+                    g.FillRectangle(Brushes.Red, x, peakY, width, 3)
+                End If
+            Next
+
+            ' Advance hue offset for next frame
+            hueOffset = (hueOffset + 2.0F) Mod 360.0F
+        End Sub
+        Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
+            Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
+            Dim f As Double = hue / 60 - Math.Floor(hue / 60)
+
+            Dim v As Double = value * 255
+            Dim p As Double = v * (1 - saturation)
+            Dim q As Double = v * (1 - f * saturation)
+            Dim t As Double = v * (1 - (1 - f) * saturation)
+
+            Select Case hi
+                Case 0 : Return Color.FromArgb(255, CInt(v), CInt(t), CInt(p))
+                Case 1 : Return Color.FromArgb(255, CInt(q), CInt(v), CInt(p))
+                Case 2 : Return Color.FromArgb(255, CInt(p), CInt(v), CInt(t))
+                Case 3 : Return Color.FromArgb(255, CInt(p), CInt(q), CInt(v))
+                Case 4 : Return Color.FromArgb(255, CInt(t), CInt(p), CInt(v))
+                Case Else : Return Color.FromArgb(255, CInt(v), CInt(p), CInt(q))
+            End Select
+        End Function
+
+    End Class
+
+    'Player Interface
     Private _player As Skye.Contracts.IMediaPlayer
     Public Class VLCPlayer
         Implements IMediaPlayer, IDisposable
@@ -395,6 +624,12 @@ Public Class Player
         AddHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
         AddHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
         _player.Volume = 100
+
+        'For Meter(s)
+        Dim enumerator As New MMDeviceEnumerator()
+        meterNAudioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)
+
+        VisualizerHost = New VisualizerHostClass(PanelVisualizer)
 
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
@@ -1627,14 +1862,15 @@ Public Class Player
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
         If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
-            Try : cLeftMeter = CByte(aDev.AudioMeterInformation.PeakValues(0) * 100)
-            Catch : cLeftMeter = 0
-            End Try
-            Try : cRightMeter = CByte(aDev.AudioMeterInformation.PeakValues(1) * 100)
-            Catch : cRightMeter = 0
-            End Try
-            PEXLeft.Value = cLeftMeter
-            PEXRight.Value = cRightMeter
+            'Try : cLeftMeter = CByte(aDev.AudioMeterInformation.PeakValues(0) * 100)
+            'Catch : cLeftMeter = 0
+            'End Try
+            'Try : cRightMeter = CByte(aDev.AudioMeterInformation.PeakValues(1) * 100)
+            'Catch : cRightMeter = 0
+            'End Try
+            Dim peak As Single = meterNAudioDevice.AudioMeterInformation.MasterPeakValue
+            PEXLeft.Value = CInt(peak * 100)
+            PEXRight.Value = CInt(peak * 100)
         End If
     End Sub
     Private Sub TimerVisualizer_Tick(sender As Object, e As EventArgs) Handles TimerVisualizer.Tick
@@ -2833,6 +3069,7 @@ Public Class Player
                 PicBoxAlbumArt.Visible = False
                 LblMedia.Visible = False
                 PanelVisualizer.Visible = False
+                VisualizerEngine?.Stop()
                 Visualizer = False
                 TimerVisualizer.Stop()
                 VLCViewer.Visible = False
@@ -2857,6 +3094,7 @@ Public Class Player
                     If App.AudioExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Album Art
                         VLCViewer.Visible = False
                         PanelVisualizer.Visible = False
+                        VisualizerEngine?.Stop()
                         RTBLyrics.Visible = False
                         TimerVisualizer.Stop()
                         If tlfile Is Nothing Then
@@ -2886,6 +3124,7 @@ Public Class Player
                         PicBoxAlbumArt.Visible = False
                         RTBLyrics.Visible = False
                         PanelVisualizer.Visible = False
+                        VisualizerEngine?.Stop()
                         TimerVisualizer.Stop()
                         VideoSetSize()
                         VLCViewer.Visible = True
@@ -2896,7 +3135,14 @@ Public Class Player
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
                     RTBLyrics.Visible = False
-                    TimerVisualizer.Start()
+
+                    'TimerVisualizer.Start()
+
+                    'Dim host As New VisualizerHostClass(PanelVisualizer)
+                    VisualizerHost.LoadVisualizer(New VisualizerRainbowBar())
+                    VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
+                    VisualizerEngine.Start()
+
                     PanelVisualizer.Visible = True
                     PanelVisualizer.BringToFront()
                 End If
@@ -2913,6 +3159,7 @@ Public Class Player
             RTBLyrics.Visible = False
             VLCViewer.Visible = False
             PanelVisualizer.Visible = False
+            VisualizerEngine?.Stop()
             TimerVisualizer.Stop()
         End If
     End Sub
