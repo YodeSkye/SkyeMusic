@@ -26,23 +26,14 @@ Public Class Player
         Public Title As String
         Public Path As String
     End Structure
-    Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Private MeterAudioCapture As WasapiLoopbackCapture 'Audio Capture for Meters
     Private MeterPeakLeft, MeterPeakRight, MeterDecayLeft, MeterDecayRight As Single 'Meter Values
-    Private VLCHook As VLCViewerHook 'Hook for VLC Viewer Control
+    Private mMove As Boolean = False 'For Moving the Form
+    Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private Stream As Boolean = False 'True if the current playing item is a stream
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
-    Public Class TimedLyric
-        Public Property Time As TimeSpan
-        Public Property Text As String
-    End Class
-    Private Lyrics As Boolean = False 'Indicates if the lyrics are active
-    Private HasLyrics As Boolean = False 'Indicates if the current playing item has lyrics available
-    Private HasLyricsSynced As Boolean = False 'Indicates if the current playing item has synced lyrics available
-    Private LyricsText As String = String.Empty 'Lyrics text for unsynced lyrics
-    Private LyricsSynced As List(Of TimedLyric) 'Lyrics for synced lyrics
     Private AlbumArtCount As Byte = 0 'Number of album art available
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
     Private TrackBarScale As Int16 = 100 'TrackBar Scale for Position
@@ -51,18 +42,16 @@ Public Class Player
     Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
     Private RandomHistory As New Generic.List(Of String) 'History of played items for shuffle play mode
     Private RandomHistoryIndex As Integer = 0 'Index for the shuffle history
-    Private PlaylistBoldFont As Font 'Bold font for playlist titles
     Private CurrentAccentColor As Color 'Current Windows Accent Color
-    Private mMove As Boolean = False
-    Private mOffset, mPosition As System.Drawing.Point
-    Private PicBoxAlbumArtClickTimer As Timer
     Private AutoNext As Boolean = False 'Used by Plays Database System to indicate if the player will automatically play the next item.
     Private PausedAt As DateTime? = Nothing 'Used by Plays Database System to track when the player was paused.
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero 'Used by Plays Database System to track total paused duration.
-    Private LastLyricsIndex As Integer = -1
+    Private PlaylistBoldFont As Font 'Bold font for playlist titles
     Private TipPlaylistFont As Font = New Font("Segoe UI", 12) 'Font for Playlist Tooltip
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private TipWatcherNotification As Skye.UI.ToolTipEX 'Tooltip for Watcher Notifications
+    Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
+    Friend Queue As New Generic.List(Of String) 'Queue of items to play
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -72,6 +61,18 @@ Public Class Player
     Private PlaylistLastPlayedSort As SortOrder = SortOrder.None
     Private PlaylistFirstPlayedSort As SortOrder = SortOrder.None
     Private PlaylistAddedSort As SortOrder = SortOrder.None
+
+    'Lyrics
+    Public Class TimedLyric
+        Public Property Time As TimeSpan
+        Public Property Text As String
+    End Class
+    Private Lyrics As Boolean = False 'Indicates if the lyrics are active
+    Private HasLyrics As Boolean = False 'Indicates if the current playing item has lyrics available
+    Private HasLyricsSynced As Boolean = False 'Indicates if the current playing item has synced lyrics available
+    Private LyricsText As String = String.Empty 'Lyrics text for unsynced lyrics
+    Private LyricsSynced As List(Of TimedLyric) 'Lyrics for synced lyrics
+    Private LastLyricsIndex As Integer = -1 'Last index used for synced lyrics
 
     'FullScreen
     Private frmFullScreen As Form 'Fullscreen Form
@@ -111,23 +112,27 @@ Public Class Player
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
     Private VisualizerHost As VisualizerHostClass
     Private VisualizerEngine As VisualizerAudioEngine
-    'Private visR, visB As Byte 'Visualizer Colors
-    'Private visV As Single 'Visualizer Volume
     Friend Interface IVisualizer
+
+        ReadOnly Property DockedControl As Control
+
         Sub Start()
         Sub [Stop]()
         Sub Update(audioData As Single())
         Sub Resize(width As Integer, height As Integer)
-        ReadOnly Property DockedControl As Control
+
     End Interface
     Friend Class VisualizerHostClass
         Private currentVisualizer As IVisualizer
         Private hostPanel As Panel
 
+        'Constructor
         Public Sub New(panel As Panel)
             hostPanel = panel
             AddHandler App.ThemeChanged, AddressOf OnThemeChanged
         End Sub
+
+        'Handlers
         Private Sub OnThemeChanged(sender As Object, e As EventArgs)
             'Update background colors when theme changes
             If currentVisualizer IsNot Nothing Then
@@ -144,8 +149,9 @@ Public Class Player
             Player.ToggleMaximized()
         End Sub
 
+        'Methods
         Public Sub LoadVisualizer(v As IVisualizer)
-            ' Stop and clear old visualizer
+            'Stop and clear old visualizer
             If currentVisualizer IsNot Nothing Then
                 Dim oldCtrl As Control = currentVisualizer.DockedControl
                 RemoveHandler oldCtrl.MouseClick, AddressOf Me.OnMouseClick
@@ -160,7 +166,7 @@ Public Class Player
             ctrl.Dock = DockStyle.Fill
             ctrl.BackColor = App.CurrentTheme.BackColor
 
-            ' Attach handlers for double‑click and right‑click
+            'Attach handlers for right-click and double‑click
             AddHandler ctrl.MouseClick, AddressOf Me.OnMouseClick
             AddHandler ctrl.MouseDoubleClick, AddressOf Me.OnMouseDoubleClick
 
@@ -176,20 +182,23 @@ Public Class Player
 
     End Class
     Friend Class VisualizerAudioEngine
+
+        'Declarations
         Private capture As WasapiLoopbackCapture
         Private buffer() As Byte
         Private visualizerHost As VisualizerHostClass
 
+        'Constructor
         Public Sub New(host As VisualizerHostClass)
             visualizerHost = host
         End Sub
 
+        'Methods
         Public Sub Start()
             capture = New WasapiLoopbackCapture()
             AddHandler capture.DataAvailable, AddressOf OnDataAvailable
             capture.StartRecording()
         End Sub
-
         Public Sub [Stop]()
             If capture IsNot Nothing Then
                 capture.StopRecording()
@@ -198,17 +207,18 @@ Public Class Player
             End If
         End Sub
 
+        'Handlers
         Private Sub OnDataAvailable(sender As Object, e As WaveInEventArgs)
             buffer = e.Buffer
 
-            ' Convert to float samples
+            'Convert to float samples
             Dim sampleCount = e.BytesRecorded \ 4
             Dim samples(sampleCount - 1) As Single
             For i = 0 To sampleCount - 1
                 samples(i) = BitConverter.ToSingle(buffer, i * 4)
             Next
 
-            ' Apply FFT
+            'Apply FFT
             Dim fftSize = 1024
             Dim fftBuffer(fftSize - 1) As Complex
             For i = 0 To fftSize - 1
@@ -220,30 +230,32 @@ Public Class Player
                     fftBuffer(i).Y = 0
                 End If
             Next
-
             FastFourierTransform.FFT(True, CInt(Math.Log(fftSize, 2)), fftBuffer)
 
-            ' Extract magnitudes
+            'Extract magnitudes
             Dim magnitudes(fftSize \ 2 - 1) As Single
             For i = 0 To magnitudes.Length - 1
                 magnitudes(i) = CSng(Math.Sqrt(fftBuffer(i).X ^ 2 + fftBuffer(i).Y ^ 2))
             Next
 
-            ' Feed to visualizer
+            'Feed to visualizer
             visualizerHost.FeedAudio(magnitudes)
         End Sub
+
     End Class
     Friend Class VisualizerRainbowBar
         Inherits UserControl
         Implements IVisualizer
 
+        'Declarations
         Private audioData() As Single
         Private updateTimer As Timer
         Private lastMagnitudes() As Single
-        Private gain As Single = 100.0F 'You can tweak this later
         Private hueOffset As Single = 0.0F
         Private peakValues() As Single
+        Private gain As Single = 100.0F 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
 
+        'Constructor
         Public Sub New()
             Me.DoubleBuffered = True
             'Me.BackColor = App.CurrentTheme.BackColor
@@ -251,6 +263,7 @@ Public Class Player
             AddHandler updateTimer.Tick, AddressOf OnTick
         End Sub
 
+        'IVisualizer Implementation
         Public Sub Start() Implements IVisualizer.Start
             updateTimer.Start()
         End Sub
@@ -269,6 +282,7 @@ Public Class Player
             End Get
         End Property
 
+        'Handlers
         Private Sub OnTick(sender As Object, e As EventArgs)
             Me.Invalidate()
         End Sub
@@ -343,6 +357,8 @@ Public Class Player
             ' Advance hue offset for next frame
             hueOffset = (hueOffset + 2.0F) Mod 360.0F
         End Sub
+
+        'Procs
         Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
             Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
             Dim f As Double = hue / 60 - Math.Floor(hue / 60)
@@ -365,7 +381,8 @@ Public Class Player
     End Class
 
     'Player Interface
-    Private _player As Skye.Contracts.IMediaPlayer
+    Private _player As Skye.Contracts.IMediaPlayer 'Media Player Interface
+    Private VLCHook As VLCViewerHook 'Hook for VLC Viewer Control
     Public Class VLCPlayer
         Implements IMediaPlayer, IDisposable
 
@@ -647,6 +664,7 @@ Public Class Player
     End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
+        'Player Engine
         _player = New VLCPlayer(Me)
         VLCViewer.MediaPlayer = CType(_player, VLCPlayer).MediaPlayer
         AddHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
@@ -658,9 +676,11 @@ Public Class Player
         AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
         MeterAudioCapture.StartRecording()
 
+        'For Visualizers
         VisualizerHost = New VisualizerHostClass(PanelVisualizer)
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
 
+        'Initialize Form
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
         PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
@@ -707,13 +727,14 @@ Public Class Player
         LVPlaylist.Columns.Add(header)
         header = Nothing
 
+        'More Form Initialization
         SetAccentColor()
         SetTheme()
         LoadPlaylist()
         ClearPlaylistTitles()
         ShowPlayMode()
 
-        'Set tooltips for buttons
+        'Set ToolTips
         TipPlayer.SetToolTip(BtnPlay, "Play / Pause")
         TipPlayer.SetToolTip(BtnStop, "Stop Playing")
         TipPlayer.SetToolTip(BtnReverse, "Skip Backward")
@@ -723,6 +744,7 @@ Public Class Player
         SetTipPlayer()
         CustomDrawCMToolTip(CMPlaylist)
 
+        'Place the window where it was last time
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
         'If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
@@ -731,6 +753,7 @@ Public Class Player
         If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
 #End If
 
+        'Disable Mouse Wheel support for TrackBar
         AddHandler TrackBarPosition.MouseWheel, AddressOf TrackBarPosition_MouseWheel
 
     End Sub
