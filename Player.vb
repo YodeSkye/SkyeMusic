@@ -108,273 +108,6 @@ Public Class Player
         End Set
     End Property
 
-    'Visualizer Interface
-    Private Visualizer As Boolean = False 'Indicates if the visualizer is active
-    Private VisualizerHost As VisualizerHostClass
-    Private VisualizerEngine As VisualizerAudioEngine
-    Friend Interface IVisualizer
-
-        ReadOnly Property DockedControl As Control
-
-        Sub Start()
-        Sub [Stop]()
-        Sub Update(audioData As Single())
-        Sub Resize(width As Integer, height As Integer)
-
-    End Interface
-    Friend Class VisualizerHostClass
-        Private currentVisualizer As IVisualizer
-        Private hostPanel As Panel
-
-        'Constructor
-        Public Sub New(panel As Panel)
-            hostPanel = panel
-            AddHandler App.ThemeChanged, AddressOf OnThemeChanged
-        End Sub
-
-        'Handlers
-        Private Sub OnThemeChanged(sender As Object, e As EventArgs)
-            'Update background colors when theme changes
-            If currentVisualizer IsNot Nothing Then
-                currentVisualizer.DockedControl.BackColor = App.CurrentTheme.BackColor
-            End If
-            hostPanel.BackColor = App.CurrentTheme.BackColor
-        End Sub
-        Private Sub OnMouseClick(sender As Object, e As MouseEventArgs)
-            If e.Button = MouseButtons.Right Then
-                'implement context menu later
-            End If
-        End Sub
-        Private Sub OnMouseDoubleClick(sender As Object, e As MouseEventArgs)
-            Player.ToggleMaximized()
-        End Sub
-
-        'Methods
-        Public Sub LoadVisualizer(v As IVisualizer)
-            'Stop and clear old visualizer
-            If currentVisualizer IsNot Nothing Then
-                Dim oldCtrl As Control = currentVisualizer.DockedControl
-                RemoveHandler oldCtrl.MouseClick, AddressOf Me.OnMouseClick
-                RemoveHandler oldCtrl.MouseDoubleClick, AddressOf Me.OnMouseDoubleClick
-                currentVisualizer.Stop()
-                hostPanel.Controls.Clear()
-            End If
-
-            currentVisualizer = v
-
-            Dim ctrl As Control = v.DockedControl
-            ctrl.Dock = DockStyle.Fill
-            ctrl.BackColor = App.CurrentTheme.BackColor
-
-            'Attach handlers for right-click and double‑click
-            AddHandler ctrl.MouseClick, AddressOf Me.OnMouseClick
-            AddHandler ctrl.MouseDoubleClick, AddressOf Me.OnMouseDoubleClick
-
-            hostPanel.Controls.Add(ctrl)
-            v.Start()
-        End Sub
-        Public Sub FeedAudio(data As Single())
-            currentVisualizer?.Update(data)
-        End Sub
-        Public Sub ResizeHost()
-            currentVisualizer?.Resize(hostPanel.Width, hostPanel.Height)
-        End Sub
-
-    End Class
-    Friend Class VisualizerAudioEngine
-
-        'Declarations
-        Private capture As WasapiLoopbackCapture
-        Private buffer() As Byte
-        Private visualizerHost As VisualizerHostClass
-
-        'Constructor
-        Public Sub New(host As VisualizerHostClass)
-            visualizerHost = host
-        End Sub
-
-        'Methods
-        Public Sub Start()
-            capture = New WasapiLoopbackCapture()
-            AddHandler capture.DataAvailable, AddressOf OnDataAvailable
-            capture.StartRecording()
-        End Sub
-        Public Sub [Stop]()
-            If capture IsNot Nothing Then
-                capture.StopRecording()
-                RemoveHandler capture.DataAvailable, AddressOf OnDataAvailable
-                capture.Dispose()
-            End If
-        End Sub
-
-        'Handlers
-        Private Sub OnDataAvailable(sender As Object, e As WaveInEventArgs)
-            buffer = e.Buffer
-
-            'Convert to float samples
-            Dim sampleCount = e.BytesRecorded \ 4
-            Dim samples(sampleCount - 1) As Single
-            For i = 0 To sampleCount - 1
-                samples(i) = BitConverter.ToSingle(buffer, i * 4)
-            Next
-
-            'Apply FFT
-            Dim fftSize = 1024
-            Dim fftBuffer(fftSize - 1) As Complex
-            For i = 0 To fftSize - 1
-                If i < samples.Length Then
-                    fftBuffer(i).X = samples(i)
-                    fftBuffer(i).Y = 0
-                Else
-                    fftBuffer(i).X = 0
-                    fftBuffer(i).Y = 0
-                End If
-            Next
-            FastFourierTransform.FFT(True, CInt(Math.Log(fftSize, 2)), fftBuffer)
-
-            'Extract magnitudes
-            Dim magnitudes(fftSize \ 2 - 1) As Single
-            For i = 0 To magnitudes.Length - 1
-                magnitudes(i) = CSng(Math.Sqrt(fftBuffer(i).X ^ 2 + fftBuffer(i).Y ^ 2))
-            Next
-
-            'Feed to visualizer
-            visualizerHost.FeedAudio(magnitudes)
-        End Sub
-
-    End Class
-    Friend Class VisualizerRainbowBar
-        Inherits UserControl
-        Implements IVisualizer
-
-        'Declarations
-        Private updateTimer As Timer
-        Private audioData(), lastMagnitudes(), peakValues() As Single
-        Private hueOffset As Single = 0.0F
-        Private gain As Single = 100.0F 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
-
-        'Constructor
-        Public Sub New()
-            Me.DoubleBuffered = True
-            'Me.BackColor = App.CurrentTheme.BackColor
-            updateTimer = New Timer With {.Interval = 33} '~30 FPS
-            AddHandler updateTimer.Tick, AddressOf OnTick
-        End Sub
-
-        'IVisualizer Implementation
-        Public Sub Start() Implements IVisualizer.Start
-            updateTimer.Start()
-        End Sub
-        Public Sub [Stop]() Implements IVisualizer.Stop
-            updateTimer.Stop()
-        End Sub
-        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
-            audioData = data
-        End Sub
-        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Me.Size = New Size(width, height)
-        End Sub
-        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
-            Get
-                Return Me
-            End Get
-        End Property
-
-        'Handlers
-        Private Sub OnTick(sender As Object, e As EventArgs)
-            Me.Invalidate()
-        End Sub
-        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
-            MyBase.OnPaint(pe)
-            If audioData Is Nothing OrElse audioData.Length = 0 Then Exit Sub
-
-            Dim g = pe.Graphics
-            Dim barCount = 32
-            Dim barWidth As Single = CSng(Me.Width) / barCount
-            Dim maxHeight = Me.Height
-            Dim peakThreshold As Integer = 50 'Pixels above bottom 'Threshold to avoid flicker at bottom
-
-            'Initialize smoothing buffer if needed
-            If lastMagnitudes Is Nothing OrElse lastMagnitudes.Length <> barCount Then
-                ReDim lastMagnitudes(barCount - 1)
-            End If
-            If peakValues Is Nothing OrElse peakValues.Length <> barCount Then
-                ReDim peakValues(barCount - 1)
-            End If
-
-            For i = 0 To barCount - 1
-                Dim valueIdx = i * audioData.Length \ barCount
-                Dim rawMagnitude = audioData(valueIdx)
-
-                'Apply gain and clamp
-                Dim boosted = Math.Min(rawMagnitude * gain, 1.0F)
-
-                'Smooth with previous frame
-                Dim smoothed = (lastMagnitudes(i) * 0.7F) + (boosted * 0.3F)
-                lastMagnitudes(i) = smoothed
-
-                'Scale to height
-                Dim barHeight = CInt(smoothed * maxHeight)
-                Dim x = CInt(i * barWidth)
-                Dim y = maxHeight - barHeight
-                Dim width = CInt(barWidth) - 2
-
-                'Draw main bar
-                Dim hue As Single = (CSng(i) / barCount * 360.0F + hueOffset) Mod 360.0F
-                Dim rainbowColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
-                Using brush As New SolidBrush(rainbowColor)
-                    g.FillRectangle(brush, x, y, width, barHeight)
-                End Using
-
-                'Peak bar logic
-                Dim currentPeak As Integer = CInt(smoothed * maxHeight)
-
-                If currentPeak > peakValues(i) Then
-                    peakValues(i) = currentPeak
-                Else
-                    ' Dynamic decay speed based on panel height
-                    Dim decay As Integer = 7
-                    peakValues(i) = Math.Max(0, peakValues(i) - decay)
-                End If
-
-                'Only draw peak if above threshold
-                If peakValues(i) > peakThreshold Then
-                    Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
-                    Dim thickness As Integer = 6 ' fixed thickness preset
-                    Dim peakColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
-                    Using peakbrush As New SolidBrush(peakColor)
-                        g.FillRectangle(peakbrush, x, peakY, width, thickness)
-                    End Using
-                End If
-
-            Next
-
-            'Advance hue offset for next frame
-            hueOffset = (hueOffset + 2.0F) Mod 360.0F
-        End Sub
-
-        'Procs
-        Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
-            Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
-            Dim f As Double = hue / 60 - Math.Floor(hue / 60)
-
-            Dim v As Double = value * 255
-            Dim p As Double = v * (1 - saturation)
-            Dim q As Double = v * (1 - f * saturation)
-            Dim t As Double = v * (1 - (1 - f) * saturation)
-
-            Select Case hi
-                Case 0 : Return Color.FromArgb(255, CInt(v), CInt(t), CInt(p))
-                Case 1 : Return Color.FromArgb(255, CInt(q), CInt(v), CInt(p))
-                Case 2 : Return Color.FromArgb(255, CInt(p), CInt(v), CInt(t))
-                Case 3 : Return Color.FromArgb(255, CInt(p), CInt(q), CInt(v))
-                Case 4 : Return Color.FromArgb(255, CInt(t), CInt(p), CInt(v))
-                Case Else : Return Color.FromArgb(255, CInt(v), CInt(p), CInt(q))
-            End Select
-        End Function
-
-    End Class
-
     'Player Interface
     Private _player As Skye.Contracts.IMediaPlayer 'Media Player Interface
     Private VLCHook As VLCViewerHook 'Hook for VLC Viewer Control
@@ -610,6 +343,702 @@ Public Class Player
         Return IntPtr.Zero
     End Function
 
+    'Visualizer Interface
+    Private Visualizer As Boolean = False 'Indicates if the visualizer is active
+    Private VisualizerHost As VisualizerHostClass
+    Private VisualizerEngine As VisualizerAudioEngine
+    Friend Interface IVisualizer
+
+        ReadOnly Property Name As String
+        ReadOnly Property DockedControl As Control
+
+        Sub Start()
+        Sub [Stop]()
+        Sub Update(audioData As Single())
+        Sub Resize(width As Integer, height As Integer)
+
+    End Interface
+    Friend Class VisualizerHostClass
+        Private visualizers As Dictionary(Of String, IVisualizer)
+        Private currentVisualizer As IVisualizer
+        Private ownerForm As Player
+        Private hostPanel As Panel
+
+        'Properties
+        Public ReadOnly Property ActiveVisualizerName As String
+            Get
+                Return If(currentVisualizer IsNot Nothing, currentVisualizer.Name, String.Empty)
+            End Get
+        End Property
+
+        'Constructor
+        Public Sub New(owner As Player, panel As Panel)
+            ownerForm = owner
+            hostPanel = panel
+            visualizers = New Dictionary(Of String, IVisualizer)(StringComparer.OrdinalIgnoreCase)
+            AddHandler App.ThemeChanged, AddressOf OnThemeChanged
+        End Sub
+
+        'Handlers
+        Private Sub OnThemeChanged(sender As Object, e As EventArgs)
+            'Update background colors when theme changes
+            If currentVisualizer IsNot Nothing Then
+                currentVisualizer.DockedControl.BackColor = App.CurrentTheme.BackColor
+            End If
+            hostPanel.BackColor = App.CurrentTheme.BackColor
+        End Sub
+        Private Sub OnMouseClick(sender As Object, e As MouseEventArgs)
+            If e.Button = MouseButtons.Right Then ShowVisualizerMenu()
+        End Sub
+        Private Sub OnMouseDoubleClick(sender As Object, e As MouseEventArgs)
+            Player.ToggleMaximized()
+        End Sub
+
+        'Methods
+        Public Sub Register(v As IVisualizer)
+            visualizers(v.Name) = v
+        End Sub
+        Public Sub Activate(name As String)
+            If visualizers.ContainsKey(name) Then
+                LoadVisualizer(visualizers(name))
+            End If
+        End Sub
+        Public Sub LoadVisualizer(v As IVisualizer)
+            'Stop and clear old visualizer
+            If currentVisualizer IsNot Nothing Then
+                Dim oldCtrl As Control = currentVisualizer.DockedControl
+                RemoveHandler oldCtrl.MouseClick, AddressOf Me.OnMouseClick
+                RemoveHandler oldCtrl.MouseDoubleClick, AddressOf Me.OnMouseDoubleClick
+                currentVisualizer.Stop()
+                hostPanel.Controls.Clear()
+            End If
+
+            currentVisualizer = v
+
+            Dim ctrl As Control = v.DockedControl
+            ctrl.Dock = DockStyle.Fill
+            ctrl.BackColor = App.CurrentTheme.BackColor
+
+            'Attach handlers for right-click and double‑click
+            AddHandler ctrl.MouseClick, AddressOf Me.OnMouseClick
+            AddHandler ctrl.MouseDoubleClick, AddressOf Me.OnMouseDoubleClick
+
+            hostPanel.Controls.Add(ctrl)
+            v.Start()
+        End Sub
+        Public Sub FeedAudio(data As Single())
+            currentVisualizer?.Update(data)
+        End Sub
+        Public Sub ResizeHost()
+            currentVisualizer?.Resize(hostPanel.Width, hostPanel.Height)
+        End Sub
+        Private Sub ShowVisualizerMenu()
+            Dim menu As New ContextMenuStrip()
+
+            For Each vizName In visualizers.Keys
+                Dim item As New ToolStripMenuItem(vizName)
+                item.Font = ownerForm.Font
+
+                'Mark the active one with a check
+                If vizName.Equals(Me.ActiveVisualizerName, StringComparison.OrdinalIgnoreCase) Then
+                    item.Checked = True
+                End If
+
+                AddHandler item.Click,
+                    Sub(sender, e)
+                        App.Visualizer = vizName
+                        ownerForm.ShowMedia()
+                    End Sub
+                menu.Items.Add(item)
+            Next
+
+            'Show the menu at mouse position
+            menu.Show(Cursor.Position)
+        End Sub
+
+    End Class
+    Friend Class VisualizerAudioEngine
+
+        'Declarations
+        Private capture As WasapiLoopbackCapture
+        Private buffer() As Byte
+        Private visualizerHost As VisualizerHostClass
+
+        'Constructor
+        Public Sub New(host As VisualizerHostClass)
+            visualizerHost = host
+        End Sub
+
+        'Methods
+        Public Sub Start()
+            capture = New WasapiLoopbackCapture()
+            AddHandler capture.DataAvailable, AddressOf OnDataAvailable
+            capture.StartRecording()
+        End Sub
+        Public Sub [Stop]()
+            If capture IsNot Nothing Then
+                capture.StopRecording()
+                RemoveHandler capture.DataAvailable, AddressOf OnDataAvailable
+                capture.Dispose()
+            End If
+        End Sub
+
+        'Handlers
+        Private Sub OnDataAvailable(sender As Object, e As WaveInEventArgs)
+            buffer = e.Buffer
+
+            'Convert to float samples
+            Dim sampleCount = e.BytesRecorded \ 4
+            Dim samples(sampleCount - 1) As Single
+            For i = 0 To sampleCount - 1
+                samples(i) = BitConverter.ToSingle(buffer, i * 4)
+            Next
+
+            'Apply FFT
+            Dim fftSize = 1024
+            Dim fftBuffer(fftSize - 1) As Complex
+            For i = 0 To fftSize - 1
+                If i < samples.Length Then
+                    fftBuffer(i).X = samples(i)
+                    fftBuffer(i).Y = 0
+                Else
+                    fftBuffer(i).X = 0
+                    fftBuffer(i).Y = 0
+                End If
+            Next
+            FastFourierTransform.FFT(True, CInt(Math.Log(fftSize, 2)), fftBuffer)
+
+            'Extract magnitudes
+            Dim magnitudes(fftSize \ 2 - 1) As Single
+            For i = 0 To magnitudes.Length - 1
+                magnitudes(i) = CSng(Math.Sqrt(fftBuffer(i).X ^ 2 + fftBuffer(i).Y ^ 2))
+            Next
+
+            'Feed to visualizer
+            visualizerHost.FeedAudio(magnitudes)
+        End Sub
+
+    End Class
+    Friend Class VisualizerRainbowBar
+        Inherits UserControl
+        Implements IVisualizer
+
+        'Declarations
+        Private updateTimer As Timer
+        Private audioData(), lastMagnitudes(), peakValues() As Single
+        Private hueOffset As Single = 0.0F
+        Private gain As Single = 100.0F 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
+
+        'Constructor
+        Public Sub New()
+            Me.DoubleBuffered = True
+            'Me.BackColor = App.CurrentTheme.BackColor
+            updateTimer = New Timer With {.Interval = 33} '~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        'IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Rainbow Bar"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Me.Size = New Size(width, height)
+        End Sub
+
+        'Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Me.Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+            MyBase.OnPaint(pe)
+            If audioData Is Nothing OrElse audioData.Length = 0 Then Exit Sub
+
+            Dim g = pe.Graphics
+            Dim barCount = 32
+            Dim barWidth As Single = CSng(Me.Width) / barCount
+            Dim maxHeight = Me.Height
+            Dim peakThreshold As Integer = 50 'Pixels above bottom 'Threshold to avoid flicker at bottom
+
+            'Initialize smoothing buffer if needed
+            If lastMagnitudes Is Nothing OrElse lastMagnitudes.Length <> barCount Then
+                ReDim lastMagnitudes(barCount - 1)
+            End If
+            If peakValues Is Nothing OrElse peakValues.Length <> barCount Then
+                ReDim peakValues(barCount - 1)
+            End If
+
+            For i = 0 To barCount - 1
+                Dim valueIdx = i * audioData.Length \ barCount
+                Dim rawMagnitude = audioData(valueIdx)
+
+                'Apply gain and clamp
+                Dim boosted = Math.Min(rawMagnitude * gain, 1.0F)
+
+                'Smooth with previous frame
+                Dim smoothed = (lastMagnitudes(i) * 0.7F) + (boosted * 0.3F)
+                lastMagnitudes(i) = smoothed
+
+                'Scale to height
+                Dim barHeight = CInt(smoothed * maxHeight)
+                Dim x = CInt(i * barWidth)
+                Dim y = maxHeight - barHeight
+                Dim width = CInt(barWidth) - 2
+
+                'Draw main bar
+                Dim hue As Single = (CSng(i) / barCount * 360.0F + hueOffset) Mod 360.0F
+                Dim rainbowColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
+                Using brush As New SolidBrush(rainbowColor)
+                    g.FillRectangle(brush, x, y, width, barHeight)
+                End Using
+
+                'Peak bar logic
+                Dim currentPeak As Integer = CInt(smoothed * maxHeight)
+
+                If currentPeak > peakValues(i) Then
+                    peakValues(i) = currentPeak
+                Else
+                    ' Dynamic decay speed based on panel height
+                    Dim decay As Integer = 7
+                    peakValues(i) = Math.Max(0, peakValues(i) - decay)
+                End If
+
+                'Only draw peak if above threshold
+                If peakValues(i) > peakThreshold Then
+                    Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
+                    Dim thickness As Integer = 6 ' fixed thickness preset
+                    Dim peakColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
+                    Using peakbrush As New SolidBrush(peakColor)
+                        g.FillRectangle(peakbrush, x, peakY, width, thickness)
+                    End Using
+                End If
+
+            Next
+
+            'Advance hue offset for next frame
+            hueOffset = (hueOffset + 2.0F) Mod 360.0F
+        End Sub
+
+        'Procs
+        Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
+            Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
+            Dim f As Double = hue / 60 - Math.Floor(hue / 60)
+
+            Dim v As Double = value * 255
+            Dim p As Double = v * (1 - saturation)
+            Dim q As Double = v * (1 - f * saturation)
+            Dim t As Double = v * (1 - (1 - f) * saturation)
+
+            Select Case hi
+                Case 0 : Return Color.FromArgb(255, CInt(v), CInt(t), CInt(p))
+                Case 1 : Return Color.FromArgb(255, CInt(q), CInt(v), CInt(p))
+                Case 2 : Return Color.FromArgb(255, CInt(p), CInt(v), CInt(t))
+                Case 3 : Return Color.FromArgb(255, CInt(p), CInt(q), CInt(v))
+                Case 4 : Return Color.FromArgb(255, CInt(t), CInt(p), CInt(v))
+                Case Else : Return Color.FromArgb(255, CInt(v), CInt(p), CInt(q))
+            End Select
+        End Function
+
+    End Class
+    Friend Class VisualizerWaveform
+        Inherits UserControl
+        Implements IVisualizer
+
+        'Declarations
+        Private updateTimer As Timer
+        Private audioData() As Single
+        'Private gain As Single = 5000.0F
+
+        'Constructor
+        Public Sub New()
+            Me.DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        'IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Waveform"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Me.Size = New Size(width, height)
+        End Sub
+
+        'Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Me.Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+            MyBase.OnPaint(pe)
+            If audioData Is Nothing OrElse audioData.Length = 0 Then Exit Sub
+
+            Dim g = pe.Graphics
+            Dim stepX As Single = CSng(Me.Width) / audioData.Length
+
+            'Define how tall you want the waveform region (e.g. 1/3 of control height)
+            Dim usableHeight As Single = Me.Height / 1.0F
+            Dim baselineY As Single = Me.Height - 10   'anchor near bottom, with small margin
+
+            'Find max sample magnitude in this buffer
+            Dim maxSample As Single = audioData.Max(Function(s) Math.Abs(s))
+            If maxSample = 0 Then maxSample = 1
+
+            'Scale so the largest sample fills the usable height
+            Dim scale As Single = usableHeight / maxSample
+
+            Dim pts(audioData.Length - 1) As PointF
+            For i = 0 To audioData.Length - 1
+                Dim sample = audioData(i) * scale
+                pts(i) = New PointF(i * stepX, baselineY - sample)
+            Next
+
+            Using pen As New Pen(App.CurrentTheme.TextColor, 2)
+                g.DrawLines(pen, pts)
+            End Using
+        End Sub
+
+    End Class
+    Friend Class VisualizerTunnel
+        Inherits UserControl
+        Implements IVisualizer
+
+        Private updateTimer As Timer
+        Private audioData() As Single
+        Private particles As List(Of Particle)
+        Private rnd As New Random()
+        Private swirlAngle As Double = 0.0
+
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Hyperspace Tunnel"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+
+        Public Sub New()
+            Me.DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33}
+            AddHandler updateTimer.Tick, AddressOf OnTick
+            particles = New List(Of Particle)()
+            'Initialize particles
+            For i = 0 To 200
+                particles.Add(New Particle(rnd))
+            Next
+        End Sub
+
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Me.Size = New Size(width, height)
+        End Sub
+
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Me.Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+            MyBase.OnPaint(pe)
+            Dim g = pe.Graphics
+            Dim cx = Me.Width / 2
+            Dim cy = Me.Height / 2
+
+            ' --- Audio level for reactivity ---
+            Dim level As Double = 0
+            If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
+                level = audioData.Average(Function(s) Math.Abs(s))
+            End If
+
+            ' --- Swirl angle increment based on audio ---
+            swirlAngle += 0.05 + level * 0.2
+            Dim cosA As Double = Math.Cos(swirlAngle)
+            Dim sinA As Double = Math.Sin(swirlAngle)
+
+            For Each p In particles
+                ' Speed toward viewer based on audio
+                Dim speed = 2 + level * 20
+                p.Z -= speed
+
+                ' Rotate around Z axis for spiral effect
+                Dim rx As Double = p.X * cosA - p.Y * sinA
+                Dim ry As Double = p.X * sinA + p.Y * cosA
+
+                ' Perspective projection
+                Dim scale = (Me.Width / 2) / p.Z
+                Dim x = cx + rx * scale
+                Dim y = cy + ry * scale
+
+                ' Previous position (slightly further back in Z) for streak
+                Dim prevZ = p.Z + speed * 2
+                Dim prevScale = (Me.Width / 2) / prevZ
+                Dim px = cx + rx * prevScale
+                Dim py = cy + ry * prevScale
+
+                ' Color cycling by depth
+                Dim hue = (p.Z * 10) Mod 360
+                Dim color = ColorFromHSV(hue, 1, 1)
+
+                ' Only draw if both ends are inside the control bounds
+                If x >= 0 AndAlso x <= Me.Width AndAlso y >= 0 AndAlso y <= Me.Height AndAlso px >= 0 AndAlso px <= Me.Width AndAlso py >= 0 AndAlso py <= Me.Height Then
+                    Using pen As New Pen(Color.FromArgb(200, color), 2)
+                        g.DrawLine(pen, CSng(px), CSng(py), CSng(x), CSng(y))
+                    End Using
+                End If
+
+                ' Reset particle when it passes viewer
+                If p.Z < 1 Then
+                    p.X = (rnd.NextDouble() * 2 - 1) * 5
+                    p.Y = (rnd.NextDouble() * 2 - 1) * 5
+                    p.Z = rnd.Next(300, 2000)
+                End If
+            Next
+        End Sub
+        Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
+            Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
+            Dim f As Double = hue / 60 - Math.Floor(hue / 60)
+
+            Dim v As Double = value * 255
+            Dim p As Double = v * (1 - saturation)
+            Dim q As Double = v * (1 - f * saturation)
+            Dim t As Double = v * (1 - (1 - f) * saturation)
+
+            Select Case hi
+                Case 0 : Return Color.FromArgb(255, CInt(v), CInt(t), CInt(p))
+                Case 1 : Return Color.FromArgb(255, CInt(q), CInt(v), CInt(p))
+                Case 2 : Return Color.FromArgb(255, CInt(p), CInt(v), CInt(t))
+                Case 3 : Return Color.FromArgb(255, CInt(p), CInt(q), CInt(v))
+                Case 4 : Return Color.FromArgb(255, CInt(t), CInt(p), CInt(v))
+                Case Else : Return Color.FromArgb(255, CInt(v), CInt(p), CInt(q))
+            End Select
+        End Function
+
+        Private Class Particle
+            Public X As Double
+            Public Y As Double
+            Public Z As Double
+
+            Public Sub New(rnd As Random)
+                Reset(rnd)
+            End Sub
+
+            Public Sub Update()
+                Z -= 5 ' speed toward viewer
+            End Sub
+
+            Public Sub Reset(rnd As Random)
+                X = rnd.NextDouble() * 2 - 1
+                Y = rnd.NextDouble() * 2 - 1
+                Z = rnd.Next(50, 200)
+            End Sub
+        End Class
+
+    End Class
+    Friend Class VisualizerFractalCloud
+        Inherits UserControl
+        Implements IVisualizer
+
+        Private updateTimer As Timer
+        Private audioData() As Single
+        Private time As Double = 0
+        Private swirlAngle As Double = 0
+
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Fractal Cloud"
+            End Get
+        End Property
+
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+
+        Public Sub New()
+            Me.DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33}
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Me.Size = New Size(width, height)
+        End Sub
+
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            time += 0.05
+            Me.Invalidate()
+        End Sub
+
+        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+            MyBase.OnPaint(pe)
+            Dim g = pe.Graphics
+            Dim cx = Me.Width / 2
+            Dim cy = Me.Height / 2
+
+            ' --- Audio reactivity ---
+            Dim level As Double = 0
+            If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
+                level = audioData.Average(Function(s) Math.Abs(s))
+            End If
+
+            swirlAngle += 0.01 + level * 0.1
+
+            ' Render to a smaller buffer for speed
+            Dim renderW = Me.Width \ 3
+            Dim renderH = Me.Height \ 3
+            Using bmp As New Bitmap(renderW, renderH)
+                For y = 0 To bmp.Height - 1
+                    For x = 0 To bmp.Width - 1
+                        ' Map buffer coords back to full control coords
+                        Dim fullX = x * Me.Width / renderW
+                        Dim fullY = y * Me.Height / renderH
+                        Dim dx = fullX - cx
+                        Dim dy = fullY - cy
+
+                        Dim angle = Math.Atan2(dy, dx) + swirlAngle
+                        Dim radius = Math.Sqrt(dx * dx + dy * dy)
+
+                        ' Simple "fractal-ish" noise: combine sine waves
+                        Dim v = Math.Sin(radius * 0.02 + time) + Math.Sin(angle * 3 + time * 0.5)
+                        Dim n = (v + 2) / 4.0 ' normalize to 0–1
+
+                        ' Map to color
+                        Dim hue = (n * 360) Mod 360
+                        Dim col = ColorFromHSV(hue, 1, n)
+
+                        bmp.SetPixel(x, y, col)
+                    Next
+                Next
+
+                g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+                g.DrawImage(bmp, 0, 0, Me.Width, Me.Height)
+            End Using
+        End Sub
+        'Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+        '    MyBase.OnPaint(pe)
+        '    Dim g = pe.Graphics
+        '    Dim cx = Me.Width / 2
+        '    Dim cy = Me.Height / 2
+
+        '    ' --- Audio reactivity ---
+        '    Dim level As Double = 0
+        '    Dim bass As Double = 0
+        '    Dim treble As Double = 0
+        '    If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
+        '        level = audioData.Average(Function(s) Math.Abs(s))
+        '        ' crude split: first quarter as "bass", last half as "treble"
+        '        bass = audioData.Take(audioData.Length \ 4).Average(Function(s) Math.Abs(s))
+        '        treble = audioData.Skip(audioData.Length \ 2).Average(Function(s) Math.Abs(s))
+        '    End If
+
+        '    ' swirl + time advance tied to amplitude
+        '    swirlAngle += 0.01 + level * 0.5
+        '    time += 0.05 + level * 0.2
+
+        '    ' Render to a smaller buffer for speed
+        '    Dim renderW = Me.Width \ 3
+        '    Dim renderH = Me.Height \ 3
+        '    Using bmp As New Bitmap(renderW, renderH)
+        '        For y = 0 To bmp.Height - 1
+        '            For x = 0 To bmp.Width - 1
+        '                ' Map buffer coords back to full control coords
+        '                Dim fullX = x * Me.Width / renderW
+        '                Dim fullY = y * Me.Height / renderH
+        '                Dim dx = fullX - cx
+        '                Dim dy = fullY - cy
+
+        '                Dim angle = Math.Atan2(dy, dx) + swirlAngle
+        '                Dim radius = Math.Sqrt(dx * dx + dy * dy)
+
+        '                ' "Fractal-ish" noise: combine sine waves
+        '                Dim v = Math.Sin(radius * 0.02 + time) + Math.Sin(angle * 3 + time * 0.5)
+        '                Dim n = (v + 2) / 4.0 ' normalize to 0–1
+
+        '                ' Map audio bands into color
+        '                Dim hue = ((bass * 500) + (treble * 200) + (n * 360)) Mod 360
+        '                Dim brightness = Math.Min(1.0, level * 50)
+        '                Dim col = ColorFromHSV(hue, 1, brightness)
+
+        '                bmp.SetPixel(x, y, col)
+        '            Next
+        '        Next
+
+        '        g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+        '        g.DrawImage(bmp, 0, 0, Me.Width, Me.Height)
+        '    End Using
+        'End Sub
+        Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
+            Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
+            Dim f As Double = hue / 60 - Math.Floor(hue / 60)
+
+            Dim v As Double = value * 255
+            Dim p As Double = v * (1 - saturation)
+            Dim q As Double = v * (1 - f * saturation)
+            Dim t As Double = v * (1 - (1 - f) * saturation)
+
+            Select Case hi
+                Case 0 : Return Color.FromArgb(255, CInt(v), CInt(t), CInt(p))
+                Case 1 : Return Color.FromArgb(255, CInt(q), CInt(v), CInt(p))
+                Case 2 : Return Color.FromArgb(255, CInt(p), CInt(v), CInt(t))
+                Case 3 : Return Color.FromArgb(255, CInt(p), CInt(q), CInt(v))
+                Case 4 : Return Color.FromArgb(255, CInt(t), CInt(p), CInt(v))
+                Case Else : Return Color.FromArgb(255, CInt(v), CInt(p), CInt(q))
+            End Select
+        End Function
+    End Class
+
     'Form Events                    
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
@@ -672,7 +1101,11 @@ Public Class Player
         MeterAudioCapture.StartRecording()
 
         'For Visualizers
-        VisualizerHost = New VisualizerHostClass(PanelVisualizer)
+        VisualizerHost = New VisualizerHostClass(Me, PanelVisualizer)
+        VisualizerHost.Register(New VisualizerRainbowBar)
+        VisualizerHost.Register(New VisualizerWaveform)
+        VisualizerHost.Register(New VisualizerTunnel)
+        VisualizerHost.Register(New VisualizerFractalCloud)
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
 
         'Initialize Form
@@ -3234,7 +3667,7 @@ Public Class Player
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
                     RTBLyrics.Visible = False
-                    VisualizerHost.LoadVisualizer(New VisualizerRainbowBar())
+                    VisualizerHost.Activate(App.Visualizer)
                     VisualizerEngine?.Start()
                     PanelVisualizer.Visible = True
                     PanelVisualizer.BringToFront()

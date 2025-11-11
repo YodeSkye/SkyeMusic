@@ -790,8 +790,7 @@ Partial Class Player
         ' 
         ' Player
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
-        AutoScaleMode = AutoScaleMode.Font
+        AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(984, 461)
         Controls.Add(PanelVisualizer)
         Controls.Add(RTBLyrics)
@@ -816,6 +815,7 @@ Partial Class Player
         Controls.Add(LblPlaylistCount)
         Controls.Add(TrackBarPosition)
         Controls.Add(LblMedia)
+        Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         ForeColor = SystemColors.HighlightText
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
