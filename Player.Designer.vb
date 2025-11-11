@@ -64,8 +64,9 @@ Partial Class Player
         MIExit = New ToolStripMenuItem()
         MIView = New ToolStripMenuItem()
         MIFullscreen = New ToolStripMenuItem()
-        MIViewQueue = New ToolStripMenuItem()
+        MIVisualizers = New ToolStripMenuItem()
         ToolStripSeparator2 = New ToolStripSeparator()
+        MIViewQueue = New ToolStripMenuItem()
         MIViewHistory = New ToolStripMenuItem()
         ToolStripSeparator5 = New ToolStripSeparator()
         MIOptions = New ToolStripMenuItem()
@@ -344,45 +345,45 @@ Partial Class Player
         ' 
         MIOpen.Image = My.Resources.Resources.ImageOpen16
         MIOpen.Name = "MIOpen"
-        MIOpen.Size = New Size(173, 22)
+        MIOpen.Size = New Size(180, 22)
         MIOpen.Text = "Open"
         ' 
         ' MIOpenURL
         ' 
         MIOpenURL.Image = My.Resources.Resources.ImageGlobe
         MIOpenURL.Name = "MIOpenURL"
-        MIOpenURL.Size = New Size(173, 22)
+        MIOpenURL.Size = New Size(180, 22)
         MIOpenURL.Text = "Open URL"
         ' 
         ' MIOpenPlaylist
         ' 
         MIOpenPlaylist.Image = My.Resources.Resources.ImageImport16
         MIOpenPlaylist.Name = "MIOpenPlaylist"
-        MIOpenPlaylist.Size = New Size(173, 22)
+        MIOpenPlaylist.Size = New Size(180, 22)
         MIOpenPlaylist.Text = "Open Playlist..."
         ' 
         ' MISavePlaylist
         ' 
         MISavePlaylist.Image = My.Resources.Resources.ImageExport16
         MISavePlaylist.Name = "MISavePlaylist"
-        MISavePlaylist.Size = New Size(173, 22)
+        MISavePlaylist.Size = New Size(180, 22)
         MISavePlaylist.Text = "Save Playlist As..."
         ' 
         ' ToolStripSeparator4
         ' 
         ToolStripSeparator4.Name = "ToolStripSeparator4"
-        ToolStripSeparator4.Size = New Size(170, 6)
+        ToolStripSeparator4.Size = New Size(177, 6)
         ' 
         ' MIExit
         ' 
         MIExit.Image = My.Resources.Resources.ImageExit
         MIExit.Name = "MIExit"
-        MIExit.Size = New Size(173, 22)
+        MIExit.Size = New Size(180, 22)
         MIExit.Text = "Exit"
         ' 
         ' MIView
         ' 
-        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIViewQueue, ToolStripSeparator2, MIViewHistory, ToolStripSeparator5, MIOptions})
+        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIVisualizers, ToolStripSeparator2, MIViewQueue, MIViewHistory, ToolStripSeparator5, MIOptions})
         MIView.ForeColor = SystemColors.HighlightText
         MIView.Image = My.Resources.Resources.ImageView
         MIView.Name = "MIView"
@@ -396,17 +397,23 @@ Partial Class Player
         MIFullscreen.Size = New Size(185, 22)
         MIFullscreen.Text = "Full Screen"
         ' 
+        ' MIVisualizers
+        ' 
+        MIVisualizers.Name = "MIVisualizers"
+        MIVisualizers.Size = New Size(185, 22)
+        MIVisualizers.Text = "Visualizer"
+        ' 
+        ' ToolStripSeparator2
+        ' 
+        ToolStripSeparator2.Name = "ToolStripSeparator2"
+        ToolStripSeparator2.Size = New Size(182, 6)
+        ' 
         ' MIViewQueue
         ' 
         MIViewQueue.Image = My.Resources.Resources.ImagePlay
         MIViewQueue.Name = "MIViewQueue"
         MIViewQueue.Size = New Size(185, 22)
         MIViewQueue.Text = "Queue"
-        ' 
-        ' ToolStripSeparator2
-        ' 
-        ToolStripSeparator2.Name = "ToolStripSeparator2"
-        ToolStripSeparator2.Size = New Size(182, 6)
         ' 
         ' MIViewHistory
         ' 
@@ -917,4 +924,5 @@ Partial Class Player
     Friend WithEvents RTBLyrics As Skye.UI.RichTextBox
     Friend WithEvents TipPlayer As Skye.UI.ToolTip
     Friend WithEvents PanelVisualizer As Panel
+    Friend WithEvents MIVisualizers As ToolStripMenuItem
 End Class

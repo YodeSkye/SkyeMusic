@@ -455,7 +455,31 @@ Public Class Player
             'Show the menu at mouse position
             menu.Show(Cursor.Position)
         End Sub
-
+        Public Sub SetVisualizersMenu()
+            Dim menu As New ContextMenuStrip()
+            For Each vizName In visualizers.Keys
+                Dim item As New ToolStripMenuItem(vizName)
+                item.Font = ownerForm.Font
+                AddHandler item.Click,
+                    Sub(sender, e)
+                        App.Visualizer = vizName
+                        ownerForm.VisualizerOn()
+                        ownerForm.ShowMedia()
+                    End Sub
+                menu.Items.Add(item)
+            Next
+            AddHandler menu.Opening,
+                Sub(sender, e)
+                    Dim s As ContextMenuStrip = CType(sender, ContextMenuStrip)
+                    For Each tsmi As ToolStripMenuItem In s.Items
+                        tsmi.Checked = False
+                        If tsmi.Text.Equals(App.Visualizer, StringComparison.OrdinalIgnoreCase) Then
+                            tsmi.Checked = True
+                        End If
+                    Next
+                End Sub
+            ownerForm.MIVisualizers.DropDown = menu
+        End Sub
     End Class
     Friend Class VisualizerAudioEngine
 
@@ -1106,7 +1130,9 @@ Public Class Player
         VisualizerHost.Register(New VisualizerWaveform)
         VisualizerHost.Register(New VisualizerTunnel)
         VisualizerHost.Register(New VisualizerFractalCloud)
+        VisualizerHost.SetVisualizersMenu()
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
+
 
         'Initialize Form
         Text = Application.Info.Title 'Set the form title
@@ -1797,9 +1823,7 @@ Public Class Player
             VisualizerOff()
             ShowMedia()
         Else
-            Visualizer = True
-            LyricsOff()
-            MIVisualizer.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
+            VisualizerOn()
             ShowMedia()
         End If
     End Sub
@@ -1808,9 +1832,7 @@ Public Class Player
             LyricsOff()
             ShowMedia()
         Else
-            Lyrics = True
-            VisualizerOff()
-            MILyrics.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
+            LyricsOn()
             ShowMedia()
         End If
     End Sub
@@ -2480,7 +2502,7 @@ Public Class Player
         End If
     End Sub
 
-    'Functions
+    'Methods
     Private Function IsStream(path As String) As Boolean
         If App.History.FindIndex(Function(p) p.Path = path And p.IsStream = True) >= 0 Then
             Return True
@@ -2553,8 +2575,6 @@ Public Class Player
             Return 0
         End If
     End Function
-
-    'Procedures
     Friend Sub ShowPlayMode()
         Select Case App.PlayMode
             Case PlayModes.None
@@ -2631,7 +2651,6 @@ Public Class Player
         TipWatcherNotification.HideDelay = 1000000
         TipWatcherNotification.ShowDelay = 500
     End Sub
-
     Private Sub ToggleMaximized()
         Select Case WindowState
             Case FormWindowState.Normal, FormWindowState.Minimized
@@ -2639,6 +2658,13 @@ Public Class Player
             Case FormWindowState.Maximized
                 WindowState = FormWindowState.Normal
         End Select
+    End Sub
+    Private Sub VisualizerOn()
+        If Not Visualizer Then
+            Visualizer = True
+            LyricsOff()
+            MIVisualizer.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
+        End If
     End Sub
     Private Sub VisualizerOff()
         If Visualizer Then
@@ -3832,6 +3858,13 @@ Public Class Player
 
         Return String.Join(Environment.NewLine, lines)
     End Function
+    Private Sub LyricsOn()
+        If Not Lyrics Then
+            Lyrics = True
+            VisualizerOff()
+            MILyrics.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
+        End If
+    End Sub
     Private Sub LyricsOff()
         If Lyrics Then
             Lyrics = False
