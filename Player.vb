@@ -388,10 +388,15 @@ Public Class Player
             hostPanel.BackColor = App.CurrentTheme.BackColor
         End Sub
         Private Sub OnMouseClick(sender As Object, e As MouseEventArgs)
-            If e.Button = MouseButtons.Right Then ShowVisualizerMenu()
+            If e.Button = MouseButtons.Right Then
+                ShowVisualizerMenu()
+            Else
+                ownerForm.LVPlaylist.Focus()
+            End If
         End Sub
         Private Sub OnMouseDoubleClick(sender As Object, e As MouseEventArgs)
             Player.ToggleMaximized()
+            ownerForm.LVPlaylist.Focus()
         End Sub
 
         'Methods
@@ -418,10 +423,15 @@ Public Class Player
             Dim ctrl As Control = v.DockedControl
             ctrl.Dock = DockStyle.Fill
             ctrl.BackColor = App.CurrentTheme.BackColor
+            ctrl.TabStop = False
 
-            'Attach handlers for right-click and double‑click
+            'Attach handlers for right-click and double‑click and keydown
             AddHandler ctrl.MouseClick, AddressOf Me.OnMouseClick
             AddHandler ctrl.MouseDoubleClick, AddressOf Me.OnMouseDoubleClick
+            AddHandler ctrl.GotFocus,
+                Sub(s, e)
+                    ownerForm.Focus()
+                End Sub
 
             hostPanel.Controls.Add(ctrl)
             v.Start()
@@ -480,6 +490,7 @@ Public Class Player
                 End Sub
             ownerForm.MIVisualizers.DropDown = menu
         End Sub
+
     End Class
     Friend Class VisualizerAudioEngine
 
@@ -556,7 +567,6 @@ Public Class Player
         'Constructor
         Public Sub New()
             Me.DoubleBuffered = True
-            'Me.BackColor = App.CurrentTheme.BackColor
             updateTimer = New Timer With {.Interval = 33} '~30 FPS
             AddHandler updateTimer.Tick, AddressOf OnTick
         End Sub
@@ -753,6 +763,159 @@ Public Class Player
         End Sub
 
     End Class
+    Friend Class VisualizerFractalCloud
+        Inherits UserControl
+        Implements IVisualizer
+
+        Private updateTimer As Timer
+        Private audioData() As Single
+        Private time As Double = 0
+        Private swirlAngle As Double = 0
+        Private smoothedLevel As Double = 0
+
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Fractal Cloud"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+
+        Public Sub New()
+            Me.DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33}
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Me.Size = New Size(width, height)
+        End Sub
+
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            time += 0.05
+            Me.Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+            MyBase.OnPaint(pe)
+            Dim g = pe.Graphics
+            Dim cx = Me.Width / 2
+            Dim cy = Me.Height / 2
+
+            'Audio reactivity
+            Dim level As Double = 0
+            Dim bass As Double = 0
+            Dim treble As Double = 0
+            If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
+                level = audioData.Max(Function(s) Math.Abs(s))
+                bass = audioData.Take(audioData.Length \ 4).Average(Function(s) Math.Abs(s))
+                treble = audioData.Skip(audioData.Length \ 2).Average(Function(s) Math.Abs(s))
+            End If
+            smoothedLevel = smoothedLevel * 0.8 + level * 0.2
+
+            swirlAngle += 0.01 + smoothedLevel * 2.0
+            time += 0.05 + smoothedLevel * 1.0
+
+            'Render to a smaller buffer for speed
+            Dim renderW = Me.Width \ 3
+            Dim renderH = Me.Height \ 3
+            Using bmp As New Bitmap(renderW, renderH, Imaging.PixelFormat.Format32bppArgb)
+                Dim rect = New Rectangle(0, 0, bmp.Width, bmp.Height)
+                Dim bmpData = bmp.LockBits(rect, Imaging.ImageLockMode.WriteOnly, bmp.PixelFormat)
+                Dim stride = bmpData.Stride
+                Dim ptr = bmpData.Scan0
+                Dim bytes = stride * bmp.Height
+                Dim rgbValues(bytes - 1) As Byte
+
+                'Fill pixel buffer
+                For y = 0 To bmp.Height - 1
+                    For x = 0 To bmp.Width - 1
+                        Dim fullX = x * Me.Width / renderW
+                        Dim fullY = y * Me.Height / renderH
+                        Dim dx = fullX - cx
+                        Dim dy = fullY - cy
+
+                        'Swirl transform
+                        Dim angle = Math.Atan2(dy, dx) + swirlAngle
+                        Dim radius = Math.Sqrt(dx * dx + dy * dy)
+
+                        'Layered sine fields with audio modulation
+                        Dim v1 = Math.Sin(radius * (0.02 + bass * 0.05) + time)
+                        Dim v2 = Math.Sin(angle * (3 + treble * 3) + time * 0.5)
+                        Dim v3 = Math.Sin((radius * 0.05 + angle * 2) + time * 0.3)
+
+                        Dim v = v1 + v2 + v3
+                        Dim n = (v + 3) / 6.0 ' normalize to 0–1
+
+                        'Map audio bands into color
+                        'Normal Palette
+                        Dim hue = (n * 360 + bass * 400 + treble * 200) Mod 360
+                        Dim col = ColorFromHSV(hue, 1, n)
+                        'Firestorm Palette
+                        'Dim hue = 0 + (n * 60)   ' only 0–60° range
+                        'Dim col = ColorFromHSV(hue, 1, n)
+                        'Aurora palette
+                        'Dim hue = 120 + (n * 120)   ' only 120–240° range
+                        'Dim col = ColorFromHSV(hue, 1, n)
+                        ' --- Cosmic Rainbow palette ---
+                        ' Hue sweeps full 0–360 spectrum
+                        'Dim hue = (n * 360 + bass * 300 + treble * 150) Mod 360
+                        '' Saturation driven by bass (more bass = more vivid)
+                        'Dim sat = Math.Min(1.0, 0.5 + bass * 5)
+                        '' Brightness from fractal noise, softened by treble
+                        'Dim val = Math.Min(1.0, n * (1.0 - treble * 0.5))
+                        'Dim col = ColorFromHSV(hue, sat, val)
+
+
+                        'Write pixel into buffer (BGRA order)
+                        Dim offset = y * stride + x * 4
+                        rgbValues(offset) = col.B
+                        rgbValues(offset + 1) = col.G
+                        rgbValues(offset + 2) = col.R
+                        rgbValues(offset + 3) = col.A
+                    Next
+                Next
+
+                'Copy buffer back to bitmap
+                Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes)
+                bmp.UnlockBits(bmpData)
+
+                g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+                g.DrawImage(bmp, 0, 0, Me.Width, Me.Height)
+            End Using
+        End Sub
+
+        Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
+            Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
+            Dim f As Double = hue / 60 - Math.Floor(hue / 60)
+
+            Dim v As Double = value * 255
+            Dim p As Double = v * (1 - saturation)
+            Dim q As Double = v * (1 - f * saturation)
+            Dim t As Double = v * (1 - (1 - f) * saturation)
+
+            Select Case hi
+                Case 0 : Return Color.FromArgb(255, CInt(v), CInt(t), CInt(p))
+                Case 1 : Return Color.FromArgb(255, CInt(q), CInt(v), CInt(p))
+                Case 2 : Return Color.FromArgb(255, CInt(p), CInt(v), CInt(t))
+                Case 3 : Return Color.FromArgb(255, CInt(p), CInt(q), CInt(v))
+                Case 4 : Return Color.FromArgb(255, CInt(t), CInt(p), CInt(v))
+                Case Else : Return Color.FromArgb(255, CInt(v), CInt(p), CInt(q))
+            End Select
+        End Function
+
+    End Class
     Friend Class VisualizerTunnel
         Inherits UserControl
         Implements IVisualizer
@@ -897,171 +1060,6 @@ Public Class Player
         End Class
 
     End Class
-    Friend Class VisualizerFractalCloud
-        Inherits UserControl
-        Implements IVisualizer
-
-        Private updateTimer As Timer
-        Private audioData() As Single
-        Private time As Double = 0
-        Private swirlAngle As Double = 0
-
-        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
-            Get
-                Return "Fractal Cloud"
-            End Get
-        End Property
-
-        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
-            Get
-                Return Me
-            End Get
-        End Property
-
-        Public Sub New()
-            Me.DoubleBuffered = True
-            updateTimer = New Timer With {.Interval = 33}
-            AddHandler updateTimer.Tick, AddressOf OnTick
-        End Sub
-
-        Public Sub Start() Implements IVisualizer.Start
-            updateTimer.Start()
-        End Sub
-
-        Public Sub [Stop]() Implements IVisualizer.Stop
-            updateTimer.Stop()
-        End Sub
-
-        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
-            audioData = data
-        End Sub
-
-        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Me.Size = New Size(width, height)
-        End Sub
-
-        Private Sub OnTick(sender As Object, e As EventArgs)
-            time += 0.05
-            Me.Invalidate()
-        End Sub
-
-        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
-            MyBase.OnPaint(pe)
-            Dim g = pe.Graphics
-            Dim cx = Me.Width / 2
-            Dim cy = Me.Height / 2
-
-            ' --- Audio reactivity ---
-            Dim level As Double = 0
-            If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
-                level = audioData.Average(Function(s) Math.Abs(s))
-            End If
-
-            swirlAngle += 0.01 + level * 0.1
-
-            ' Render to a smaller buffer for speed
-            Dim renderW = Me.Width \ 3
-            Dim renderH = Me.Height \ 3
-            Using bmp As New Bitmap(renderW, renderH)
-                For y = 0 To bmp.Height - 1
-                    For x = 0 To bmp.Width - 1
-                        ' Map buffer coords back to full control coords
-                        Dim fullX = x * Me.Width / renderW
-                        Dim fullY = y * Me.Height / renderH
-                        Dim dx = fullX - cx
-                        Dim dy = fullY - cy
-
-                        Dim angle = Math.Atan2(dy, dx) + swirlAngle
-                        Dim radius = Math.Sqrt(dx * dx + dy * dy)
-
-                        ' Simple "fractal-ish" noise: combine sine waves
-                        Dim v = Math.Sin(radius * 0.02 + time) + Math.Sin(angle * 3 + time * 0.5)
-                        Dim n = (v + 2) / 4.0 ' normalize to 0–1
-
-                        ' Map to color
-                        Dim hue = (n * 360) Mod 360
-                        Dim col = ColorFromHSV(hue, 1, n)
-
-                        bmp.SetPixel(x, y, col)
-                    Next
-                Next
-
-                g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-                g.DrawImage(bmp, 0, 0, Me.Width, Me.Height)
-            End Using
-        End Sub
-        'Protected Overrides Sub OnPaint(pe As PaintEventArgs)
-        '    MyBase.OnPaint(pe)
-        '    Dim g = pe.Graphics
-        '    Dim cx = Me.Width / 2
-        '    Dim cy = Me.Height / 2
-
-        '    ' --- Audio reactivity ---
-        '    Dim level As Double = 0
-        '    Dim bass As Double = 0
-        '    Dim treble As Double = 0
-        '    If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
-        '        level = audioData.Average(Function(s) Math.Abs(s))
-        '        ' crude split: first quarter as "bass", last half as "treble"
-        '        bass = audioData.Take(audioData.Length \ 4).Average(Function(s) Math.Abs(s))
-        '        treble = audioData.Skip(audioData.Length \ 2).Average(Function(s) Math.Abs(s))
-        '    End If
-
-        '    ' swirl + time advance tied to amplitude
-        '    swirlAngle += 0.01 + level * 0.5
-        '    time += 0.05 + level * 0.2
-
-        '    ' Render to a smaller buffer for speed
-        '    Dim renderW = Me.Width \ 3
-        '    Dim renderH = Me.Height \ 3
-        '    Using bmp As New Bitmap(renderW, renderH)
-        '        For y = 0 To bmp.Height - 1
-        '            For x = 0 To bmp.Width - 1
-        '                ' Map buffer coords back to full control coords
-        '                Dim fullX = x * Me.Width / renderW
-        '                Dim fullY = y * Me.Height / renderH
-        '                Dim dx = fullX - cx
-        '                Dim dy = fullY - cy
-
-        '                Dim angle = Math.Atan2(dy, dx) + swirlAngle
-        '                Dim radius = Math.Sqrt(dx * dx + dy * dy)
-
-        '                ' "Fractal-ish" noise: combine sine waves
-        '                Dim v = Math.Sin(radius * 0.02 + time) + Math.Sin(angle * 3 + time * 0.5)
-        '                Dim n = (v + 2) / 4.0 ' normalize to 0–1
-
-        '                ' Map audio bands into color
-        '                Dim hue = ((bass * 500) + (treble * 200) + (n * 360)) Mod 360
-        '                Dim brightness = Math.Min(1.0, level * 50)
-        '                Dim col = ColorFromHSV(hue, 1, brightness)
-
-        '                bmp.SetPixel(x, y, col)
-        '            Next
-        '        Next
-
-        '        g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-        '        g.DrawImage(bmp, 0, 0, Me.Width, Me.Height)
-        '    End Using
-        'End Sub
-        Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
-            Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
-            Dim f As Double = hue / 60 - Math.Floor(hue / 60)
-
-            Dim v As Double = value * 255
-            Dim p As Double = v * (1 - saturation)
-            Dim q As Double = v * (1 - f * saturation)
-            Dim t As Double = v * (1 - (1 - f) * saturation)
-
-            Select Case hi
-                Case 0 : Return Color.FromArgb(255, CInt(v), CInt(t), CInt(p))
-                Case 1 : Return Color.FromArgb(255, CInt(q), CInt(v), CInt(p))
-                Case 2 : Return Color.FromArgb(255, CInt(p), CInt(v), CInt(t))
-                Case 3 : Return Color.FromArgb(255, CInt(p), CInt(q), CInt(v))
-                Case 4 : Return Color.FromArgb(255, CInt(t), CInt(p), CInt(v))
-                Case Else : Return Color.FromArgb(255, CInt(v), CInt(p), CInt(q))
-            End Select
-        End Function
-    End Class
 
     'Form Events                    
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -1128,8 +1126,8 @@ Public Class Player
         VisualizerHost = New VisualizerHostClass(Me, PanelVisualizer)
         VisualizerHost.Register(New VisualizerRainbowBar)
         VisualizerHost.Register(New VisualizerWaveform)
-        VisualizerHost.Register(New VisualizerTunnel)
         VisualizerHost.Register(New VisualizerFractalCloud)
+        VisualizerHost.Register(New VisualizerTunnel)
         VisualizerHost.SetVisualizersMenu()
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
 
