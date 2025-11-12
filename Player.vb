@@ -345,9 +345,30 @@ Public Class Player
 
     'Visualizer Interface
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
-    Private VisualizerHost As VisualizerHostClass
-    Private VisualizerEngine As VisualizerAudioEngine
-    Friend Interface IVisualizer
+    Private VisualizerHost As VisualizerHostClass 'Host for Visualizers
+    Private VisualizerEngine As VisualizerAudioEngine 'Audio Engine for Visualizers
+    Private Sub VisualizerOn() 'Turn on the Visualizer
+        If Not Visualizer Then
+            Visualizer = True
+            LyricsOff()
+            MIVisualizer.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
+        End If
+    End Sub
+    Private Sub VisualizerOff() 'Turn off the Visualizer
+        If Visualizer Then
+            Visualizer = False
+            MIVisualizer.BackColor = Color.Transparent
+        End If
+    End Sub
+    Private Sub ToggleVisualizer() 'Toggle the Visualizer On/Off
+        If Visualizer Then
+            VisualizerOff()
+        Else
+            VisualizerOn()
+        End If
+        ShowMedia()
+    End Sub
+    Friend Interface IVisualizer 'Visualizer Interface
 
         ReadOnly Property Name As String
         ReadOnly Property DockedControl As Control
@@ -358,7 +379,7 @@ Public Class Player
         Sub Resize(width As Integer, height As Integer)
 
     End Interface
-    Friend Class VisualizerHostClass
+    Friend Class VisualizerHostClass 'Host for Visualizers
         Private visualizers As Dictionary(Of String, IVisualizer)
         Private currentVisualizer As IVisualizer
         Private ownerForm As Player
@@ -492,7 +513,7 @@ Public Class Player
         End Sub
 
     End Class
-    Friend Class VisualizerAudioEngine
+    Friend Class VisualizerAudioEngine '
 
         'Declarations
         Private capture As WasapiLoopbackCapture
@@ -769,8 +790,8 @@ Public Class Player
 
         Private updateTimer As Timer
         Private audioData() As Single
-        Private time As Double = 0
         Private swirlAngle As Double = 0
+        Private time As Double = 0
         Private smoothedLevel As Double = 0
 
         Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
@@ -786,7 +807,7 @@ Public Class Player
 
         Public Sub New()
             Me.DoubleBuffered = True
-            updateTimer = New Timer With {.Interval = 33}
+            updateTimer = New Timer With {.Interval = 16} '=60fps
             AddHandler updateTimer.Tick, AddressOf OnTick
         End Sub
 
@@ -804,7 +825,6 @@ Public Class Player
         End Sub
 
         Private Sub OnTick(sender As Object, e As EventArgs)
-            time += 0.05
             Me.Invalidate()
         End Sub
         Protected Overrides Sub OnPaint(pe As PaintEventArgs)
@@ -818,22 +838,24 @@ Public Class Player
             Dim bass As Double = 0
             Dim treble As Double = 0
             If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
-                level = audioData.Max(Function(s) Math.Abs(s))
+                'RMS for smoother energy
+                level = Math.Sqrt(audioData.Average(Function(s) s * s))
                 bass = audioData.Take(audioData.Length \ 4).Average(Function(s) Math.Abs(s))
                 treble = audioData.Skip(audioData.Length \ 2).Average(Function(s) Math.Abs(s))
             End If
 
-            ''too jittery
-            'smoothedLevel = smoothedLevel * 0.8 + level * 0.2
-            ''swirlAngle += 0.01 + smoothedLevel * 2.0
-            'swirlAngle += 0.01 + smoothedLevel * 0.5
-            'time += 0.05 + smoothedLevel * 1.0
+            'Smooth the level
             smoothedLevel = smoothedLevel * 0.9 + level * 0.1
-            swirlAngle += 0.01 + Math.Min(smoothedLevel * 0.5, 0.5)
-            time += 0.03 + smoothedLevel * 0.3
 
+            'Swirl motion: steady baseline + audio modulation
+            swirlAngle += 0.01 + smoothedLevel * 10.0
+            time += 0.02 ' fixed baseline, not audio-driven
 
-            'Render to a smaller buffer for speed
+            'Soft reset to avoid runaway values
+            If swirlAngle > 100000 Then swirlAngle = 0
+            If time > 100000 Then time = 0
+
+            'Render to smaller buffer for speed
             Dim renderW = Me.Width \ 3
             Dim renderH = Me.Height \ 3
             Using bmp As New Bitmap(renderW, renderH, Imaging.PixelFormat.Format32bppArgb)
@@ -852,37 +874,43 @@ Public Class Player
                         Dim dx = fullX - cx
                         Dim dy = fullY - cy
 
-                        'Swirl transform
+                        ' Swirl transform
                         Dim angle = Math.Atan2(dy, dx) + swirlAngle
                         Dim radius = Math.Sqrt(dx * dx + dy * dy)
 
-                        'Layered sine fields with audio modulation
-                        Dim v1 = Math.Sin(radius * (0.02 + bass * 0.05) + time)
-                        Dim v2 = Math.Sin(angle * (3 + treble * 3) + time * 0.5)
+                        ' Stable sine fields (no audio modulation here)
+                        Dim v1 = Math.Sin(radius * 0.02 + time)
+                        Dim v2 = Math.Sin(angle * 3 + time * 0.5)
                         Dim v3 = Math.Sin((radius * 0.05 + angle * 2) + time * 0.3)
 
                         Dim v = v1 + v2 + v3
-                        Dim n = (v + 3) / 6.0 'normalize to 0–1
+                        Dim n = (v + 3) / 6.0 ' normalize to 0–1
 
-                        'Map audio bands into color
-                        'Normal Palette
-                        Dim hue = (n * 360 + bass * 400 + treble * 200) Mod 360
-                        Dim col = ColorFromHSV(hue, 1, n)
-                        'Firestorm Palette
-                        'Dim hue = 0 + (n * 60)   ' only 0–60° range
-                        'Dim col = ColorFromHSV(hue, 1, n)
-                        'Aurora palette
-                        'Dim hue = 120 + (n * 120)   ' only 120–240° range
-                        'Dim col = ColorFromHSV(hue, 1, n)
-                        ' --- Cosmic Rainbow palette ---
-                        ' Hue sweeps full 0–360 spectrum
-                        'Dim hue = (n * 360 + bass * 300 + treble * 150) Mod 360
-                        '' Saturation driven by bass (more bass = more vivid)
-                        'Dim sat = Math.Min(1.0, 0.5 + bass * 5)
-                        '' Brightness from fractal noise, softened by treble
-                        'Dim val = Math.Min(1.0, n * (1.0 - treble * 0.5))
-                        'Dim col = ColorFromHSV(hue, sat, val)
-
+                        'Choose palette mode (could be an Enum or just a string)
+                        Dim paletteMode As String = "Firestorm" 'Normal, "Firestorm", "Aurora", "CosmicRainbow"
+                        Dim hue As Double
+                        Dim sat As Double = 1.0
+                        Dim val As Double = n ' default brightness
+                        Dim col As Color
+                        Select Case paletteMode
+                            Case "Normal"
+                                hue = (n * 360 + bass * 400 + treble * 200) Mod 360
+                                col = ColorFromHSV(hue, sat, val)
+                            Case "Firestorm"
+                                hue = 0 + (n * 60) ' restrict to red–yellow range
+                                col = ColorFromHSV(hue, sat, val)
+                            Case "Aurora"
+                                hue = 120 + (n * 120) ' restrict to green–cyan range
+                                col = ColorFromHSV(hue, sat, val)
+                            Case "CosmicRainbow"
+                                hue = (n * 360 + bass * 400 + treble * 200) Mod 360
+                                sat = Math.Min(1.0, 0.5 + bass * 5) ' bass drives vividness
+                                val = Math.Min(1.0, n * (1.0 - treble * 0.5)) ' treble softens brightness
+                                col = ColorFromHSV(hue, sat, val)
+                            Case Else
+                                hue = (n * 360 + bass * 400 + treble * 200) Mod 360
+                                col = ColorFromHSV(hue, sat, val)
+                        End Select
 
                         'Write pixel into buffer (BGRA order)
                         Dim offset = y * stride + x * 4
@@ -1280,6 +1308,9 @@ Public Class Player
                         e.SuppressKeyPress = True
                     Case Keys.L
                         App.ShowLibrary()
+                        e.SuppressKeyPress = True
+                    Case Keys.V
+                        ToggleVisualizer()
                         e.SuppressKeyPress = True
                 End Select
             End If
@@ -2662,19 +2693,6 @@ Public Class Player
             Case FormWindowState.Maximized
                 WindowState = FormWindowState.Normal
         End Select
-    End Sub
-    Private Sub VisualizerOn()
-        If Not Visualizer Then
-            Visualizer = True
-            LyricsOff()
-            MIVisualizer.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
-        End If
-    End Sub
-    Private Sub VisualizerOff()
-        If Visualizer Then
-            Visualizer = False
-            MIVisualizer.BackColor = Color.Transparent
-        End If
     End Sub
     Friend Sub Suspend() 'Called when the user locks the screen or activates the screen saver
         If App.SuspendOnSessionChange Then
