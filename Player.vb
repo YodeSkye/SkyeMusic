@@ -822,10 +822,16 @@ Public Class Player
                 bass = audioData.Take(audioData.Length \ 4).Average(Function(s) Math.Abs(s))
                 treble = audioData.Skip(audioData.Length \ 2).Average(Function(s) Math.Abs(s))
             End If
-            smoothedLevel = smoothedLevel * 0.8 + level * 0.2
 
-            swirlAngle += 0.01 + smoothedLevel * 2.0
-            time += 0.05 + smoothedLevel * 1.0
+            ''too jittery
+            'smoothedLevel = smoothedLevel * 0.8 + level * 0.2
+            ''swirlAngle += 0.01 + smoothedLevel * 2.0
+            'swirlAngle += 0.01 + smoothedLevel * 0.5
+            'time += 0.05 + smoothedLevel * 1.0
+            smoothedLevel = smoothedLevel * 0.9 + level * 0.1
+            swirlAngle += 0.01 + Math.Min(smoothedLevel * 0.5, 0.5)
+            time += 0.03 + smoothedLevel * 0.3
+
 
             'Render to a smaller buffer for speed
             Dim renderW = Me.Width \ 3
@@ -856,7 +862,7 @@ Public Class Player
                         Dim v3 = Math.Sin((radius * 0.05 + angle * 2) + time * 0.3)
 
                         Dim v = v1 + v2 + v3
-                        Dim n = (v + 3) / 6.0 ' normalize to 0–1
+                        Dim n = (v + 3) / 6.0 'normalize to 0–1
 
                         'Map audio bands into color
                         'Normal Palette
