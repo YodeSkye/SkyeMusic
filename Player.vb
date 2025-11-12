@@ -3726,6 +3726,9 @@ Public Class Player
         End If
 
         If FullScreen Then
+            LyricsOff()
+            VisualizerOff()
+            ShowMedia()
             If frmFullScreen Is Nothing Then
 
                 'Save original parent and bounds
@@ -3754,15 +3757,15 @@ Public Class Player
         Else
             If frmFullScreen IsNot Nothing Then
 
+                'Reparent the VideoView back to original parent
                 If VLCViewer.IsHandleCreated AndAlso Not VLCViewer.IsDisposed Then
                     frmFullScreen.Controls.Remove(VLCViewer)
                     originalParent.Controls.Add(VLCViewer)
                     VLCViewer.Dock = DockStyle.None
                     VLCViewer.Bounds = originalBounds
-                Else
-                    Debug.Print("VLCViewer handle not valid — skipping reparent.")
                 End If
 
+                'Dispose of fullscreen form
                 frmFullScreen.Close()
                 frmFullScreen.Dispose()
                 frmFullScreen = Nothing
