@@ -175,7 +175,6 @@ Namespace My
                 Get
                     Dim kc As New System.Windows.Forms.KeysConverter
                     KeyText = kc.ConvertToString(Key)
-                    kc = Nothing
                 End Get
             End Property
             Sub New(id As Integer, description As String, key As Keys, keycode As Byte, keymod As Byte)
@@ -193,7 +192,7 @@ Namespace My
         Friend FRMHistory As History 'FRMHistory is the history window that displays the playback history and statistics.
         Friend FRMLog As Log 'FRMLog is the log window that displays application logs.
         Friend FRMDevTools As DevTools 'FRMDevTools is the developer tools window that provides debugging and database access features.
-        Private HotKeys As New Collections.Generic.List(Of HotKey) 'HotKeys is a list of hotkeys used in the application for global media control.
+        Private ReadOnly HotKeys As New Collections.Generic.List(Of HotKey) 'HotKeys is a list of hotkeys used in the application for global media control.
         Private HotKeyPlay As New HotKey(0, "Global Play/Pause", Keys.MediaPlayPause, Skye.WinAPI.VK_MEDIA_PLAY_PAUSE, 0) 'HotKeyPlay is a hotkey for global play/pause functionality.
         Private HotKeyStop As New HotKey(1, "Global Stop", Keys.MediaStop, Skye.WinAPI.VK_MEDIA_STOP, 0) 'HotKeyStop is a hotkey for global stop functionality.
         Private HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
@@ -201,13 +200,13 @@ Namespace My
         Friend HistoryTotalPlayedSongsThisSession As UInteger = 0 'Tracks the total number of songs played during the current session.
         Friend HistoryThisSessionStartTime As DateTime = DateTime.Now 'Records the time when the current session started.
         Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
-        Private WithEvents timerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
-        Private WithEvents timerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
-        Private WithEvents timerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
-        Private WithEvents timerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
-        Private Watchers As New List(Of System.IO.FileSystemWatcher) 'Watchers is a set of file system watchers that monitors changes in the library folders.
+        Private WithEvents TimerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
+        Private WithEvents TimerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
+        Private WithEvents TimerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
+        Private WithEvents TimerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
+        Private ReadOnly Watchers As New List(Of System.IO.FileSystemWatcher) 'Watchers is a set of file system watchers that monitors changes in the library folders.
         Private WithEvents WatcherWorkTimer As New Timers.Timer(1000) 'WatcherWorkTimer is a timer that debounces file system watcher events to prevent multiple rapid events from being processed.
-        Private WatcherWorkList As New Collections.Generic.List(Of String) 'WatcherWorkList is a list of files that have been changed, created, deleted, or renamed by the file system watchers.
+        Private ReadOnly WatcherWorkList As New Collections.Generic.List(Of String) 'WatcherWorkList is a list of files that have been changed, created, deleted, or renamed by the file system watchers.
         Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
         Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
         Friend AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
@@ -522,7 +521,7 @@ Namespace My
             End Property
 
             Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
-                Dim items As List(Of Player.PlaylistItemType) = New List(Of Player.PlaylistItemType)
+                Dim items As New List(Of Player.PlaylistItemType)
 
                 'Dictionary to hold grouped entries
                 Dim files As New Dictionary(Of Integer, String)
@@ -796,7 +795,7 @@ Namespace My
         End Class
 
         'Handlers
-        Private Sub timerScreenSaverWatcher_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerScreenSaverWatcher.Tick
+        Private Sub TimerScreenSaverWatcher_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerScreenSaverWatcher.Tick
             Static ssStatus As Boolean
             Skye.WinAPI.SystemParametersInfo(Skye.WinAPI.SPI_GETSCREENSAVERRUNNING, 0, ssStatus, 0)
             Select Case ssStatus
@@ -828,20 +827,20 @@ Namespace My
                     WriteToLog("Screen Unlocked @ " & Now)
             End Select
         End Sub
-        Private Sub watcher_Created(sender As Object, e As FileSystemEventArgs)
+        Private Sub Watcher_Created(sender As Object, e As FileSystemEventArgs)
             QueueWatcherWork(e.FullPath)
             Debug.Print("File Created: " + e.FullPath)
         End Sub
-        Private Sub watcher_Renamed(sender As Object, e As RenamedEventArgs)
+        Private Sub Watcher_Renamed(sender As Object, e As RenamedEventArgs)
             QueueWatcherWork(e.OldFullPath)
             QueueWatcherWork(e.FullPath)
             Debug.Print("File Renamed: " + e.OldFullPath + " to " + e.FullPath)
         End Sub
-        Private Sub watcher_Deleted(sender As Object, e As FileSystemEventArgs)
+        Private Sub Watcher_Deleted(sender As Object, e As FileSystemEventArgs)
             QueueWatcherWork(e.FullPath)
             Debug.Print("File Deleted: " + e.FullPath)
         End Sub
-        Private Sub watcher_Changed(sender As Object, e As FileSystemEventArgs)
+        Private Sub Watcher_Changed(sender As Object, e As FileSystemEventArgs)
             QueueWatcherWork(e.FullPath)
             Debug.Print("File Changed: " + e.FullPath)
         End Sub
@@ -961,8 +960,8 @@ Namespace My
             GenerateHotKeyList()
             RegisterHotKeys()
             SetHistoryAutoSaveTimer()
-            timerScreenSaverWatcher.Interval = 1000
-            timerScreenSaverWatcher.Start()
+            TimerScreenSaverWatcher.Interval = 1000
+            TimerScreenSaverWatcher.Start()
             AddHandler Microsoft.Win32.SystemEvents.SessionSwitch, AddressOf SessionSwitchHandler 'SessionSwitchHandler is a handler for session switch events, sets the ScreenLocked flag, and acts accordingly.
 
             WatcherWorkTimer.AutoReset = False
@@ -1291,10 +1290,10 @@ Namespace My
                     Dim watcher As New FileSystemWatcher(folder)
                     watcher.IncludeSubdirectories = LibrarySearchSubFolders
                     watcher.NotifyFilter = NotifyFilters.FileName Or NotifyFilters.Size Or NotifyFilters.LastWrite
-                    AddHandler watcher.Created, AddressOf watcher_Created
-                    AddHandler watcher.Renamed, AddressOf watcher_Renamed
-                    AddHandler watcher.Deleted, AddressOf watcher_Deleted
-                    AddHandler watcher.Changed, AddressOf watcher_Changed
+                    AddHandler watcher.Created, AddressOf Watcher_Created
+                    AddHandler watcher.Renamed, AddressOf Watcher_Renamed
+                    AddHandler watcher.Deleted, AddressOf Watcher_Deleted
+                    AddHandler watcher.Changed, AddressOf Watcher_Changed
                     Watchers.Add(watcher)
                     watcher.EnableRaisingEvents = True
                     App.WriteToLog("Watching Folder: " & folder)
@@ -2416,15 +2415,15 @@ Namespace My
         End Function
 
         'History Handlers
-        Private Sub timerHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryUpdate.Tick
-            timerHistoryUpdate.Stop()
+        Private Sub TimerHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerHistoryUpdate.Tick
+            TimerHistoryUpdate.Stop()
             UpdateHistory()
         End Sub
-        Private Sub timerRandomHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerRandomHistoryUpdate.Tick
-            timerRandomHistoryUpdate.Stop()
+        Private Sub TimerRandomHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerRandomHistoryUpdate.Tick
+            TimerRandomHistoryUpdate.Stop()
             UpdateRandomHistory()
         End Sub
-        Private Sub timerHistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerHistoryAutoSave.Tick
+        Private Sub TimerHistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerHistoryAutoSave.Tick
             If HistoryChanged Then
                 HistoryChanged = False
                 SaveHistory()
@@ -2526,19 +2525,19 @@ Namespace My
             prunelist = Nothing
         End Sub
         Friend Sub UpdateHistory(songorstream As String)
-            timerHistoryUpdate.Stop()
+            TimerHistoryUpdate.Stop()
             If HistoryUpdateInterval = 0 Then
-                timerHistoryUpdate.Tag = songorstream
+                TimerHistoryUpdate.Tag = songorstream
                 UpdateHistory()
                 Return
             Else
-                timerHistoryUpdate.Interval = HistoryUpdateInterval * 1000
-                timerHistoryUpdate.Tag = songorstream
-                timerHistoryUpdate.Start()
+                TimerHistoryUpdate.Interval = HistoryUpdateInterval * 1000
+                TimerHistoryUpdate.Tag = songorstream
+                TimerHistoryUpdate.Start()
             End If
         End Sub
         Private Sub UpdateHistory()
-            Dim songorstream As String = CStr(timerHistoryUpdate.Tag)
+            Dim songorstream As String = CStr(TimerHistoryUpdate.Tag)
             Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
             If existingindex >= 0 Then
                 Dim existingsong As Song = History(existingindex)
@@ -2559,30 +2558,30 @@ Namespace My
             HistoryChanged = True
         End Sub
         Friend Sub UpdateRandomHistory(songorstream As String)
-            timerRandomHistoryUpdate.Stop()
+            TimerRandomHistoryUpdate.Stop()
             If RandomHistoryUpdateInterval = 0 Then
-                timerRandomHistoryUpdate.Tag = songorstream
+                TimerRandomHistoryUpdate.Tag = songorstream
                 UpdateRandomHistory()
                 Return
             Else
-                timerRandomHistoryUpdate.Interval = RandomHistoryUpdateInterval * 1000
-                timerRandomHistoryUpdate.Tag = songorstream
-                timerRandomHistoryUpdate.Start()
+                TimerRandomHistoryUpdate.Interval = RandomHistoryUpdateInterval * 1000
+                TimerRandomHistoryUpdate.Tag = songorstream
+                TimerRandomHistoryUpdate.Start()
             End If
         End Sub
         Private Sub UpdateRandomHistory()
-            Dim songorstream As String = CStr(timerRandomHistoryUpdate.Tag)
+            Dim songorstream As String = CStr(TimerRandomHistoryUpdate.Tag)
             Player.AddToRandomHistory(songorstream)
         End Sub
         Friend Sub StopHistoryUpdates()
-            timerHistoryUpdate.Stop()
-            timerRandomHistoryUpdate.Stop()
+            TimerHistoryUpdate.Stop()
+            TimerRandomHistoryUpdate.Stop()
             'Debug.Print("History Update Timers Stopped")
         End Sub
         Friend Sub SetHistoryAutoSaveTimer()
-            timerHistoryAutoSave.Stop()
-            timerHistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
-            timerHistoryAutoSave.Start()
+            TimerHistoryAutoSave.Stop()
+            TimerHistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
+            TimerHistoryAutoSave.Start()
             'Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
         End Sub
 

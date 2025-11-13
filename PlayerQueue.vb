@@ -37,7 +37,6 @@ Public Class PlayerQueue
                 mOffset = New Point(-e.X - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 5, -e.Y - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 5)
             End If
         End If
-        cSender = Nothing
     End Sub
     Private Sub PlayerQueue_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove
         If mMove Then
@@ -131,7 +130,7 @@ Public Class PlayerQueue
             Dim lastItemBottom = Math.Min(e.Y, LVQueue.Items(LVQueue.Items.Count - 1).GetBounds(ItemBoundsPortion.Entire).Bottom - 1)
             Dim itemover = LVQueue.GetItemAt(0, lastItemBottom)
             If itemover IsNot Nothing And itemover IsNot QueueItemMove Then
-                Dim insertbefore = True
+                Dim insertbefore As Boolean
                 Dim rc = itemover.GetBounds(ItemBoundsPortion.Entire)
                 If e.Y < rc.Top + rc.Height / 2 Then
                     insertbefore = True
@@ -168,9 +167,8 @@ Public Class PlayerQueue
             Else : e.Effect = DragDropEffects.None
             End If
             files.Clear()
-            files = Nothing
-            filedrop = Nothing
-        Else : e.Effect = DragDropEffects.None
+        Else
+            e.Effect = DragDropEffects.None
         End If
     End Sub
     Private Sub LVQueue_DragDrop(sender As Object, e As DragEventArgs) Handles LVQueue.DragDrop
@@ -201,13 +199,8 @@ Public Class PlayerQueue
                 Next
                 SaveLVToQueue()
                 Player.SetPlaylistCountText()
-                lvi = Nothing
-                clientpoint = Nothing
-                itemover = Nothing
             End If
             files.Clear()
-            files = Nothing
-            filedrop = Nothing
         End If
     End Sub
     Private Sub CMQueue_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMQueue.Opening

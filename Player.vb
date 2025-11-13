@@ -950,7 +950,7 @@ Public Class Player
         End Function
 
     End Class
-    Friend Class VisualizerTunnel
+    Friend Class VisualizerHyperspaceTunnel
         Inherits UserControl
         Implements IVisualizer
 
@@ -1161,7 +1161,7 @@ Public Class Player
         VisualizerHost.Register(New VisualizerRainbowBar)
         VisualizerHost.Register(New VisualizerWaveform)
         VisualizerHost.Register(New VisualizerFractalCloud)
-        VisualizerHost.Register(New VisualizerTunnel)
+        VisualizerHost.Register(New VisualizerHyperspaceTunnel)
         VisualizerHost.SetVisualizersMenu()
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
 
@@ -2572,8 +2572,6 @@ Public Class Player
         posstr = posstr & ":"
         If pos.Seconds < 10 Then posstr = posstr & "0"
         posstr = posstr & pos.Seconds.ToString
-        'posstr = posstr & "."
-        'posstr = posstr & Int(pos.Milliseconds / 100).ToString
         Return posstr
     End Function
     Private Function RandomHistoryFull() As Boolean
@@ -2675,16 +2673,18 @@ Public Class Player
             TipWatcherNotification?.Dispose()
             TipWatcherNotification = Nothing
         End If
-        TipWatcherNotification = New Skye.UI.ToolTipEX(components)
-        TipWatcherNotification.BackColor = App.CurrentTheme.BackColor
-        TipWatcherNotification.ForeColor = App.CurrentTheme.TextColor
-        TipWatcherNotification.BorderColor = App.CurrentTheme.ButtonBackColor
-        TipWatcherNotification.Font = TipPlaylistFont
-        TipWatcherNotification.ShadowAlpha = 200
-        TipWatcherNotification.FadeInRate = 25
-        TipWatcherNotification.FadeOutRate = 25
-        TipWatcherNotification.HideDelay = 1000000
-        TipWatcherNotification.ShowDelay = 500
+
+        TipWatcherNotification = New Skye.UI.ToolTipEX(components) With {
+            .BackColor = App.CurrentTheme.BackColor,
+            .ForeColor = App.CurrentTheme.TextColor,
+            .BorderColor = App.CurrentTheme.ButtonBackColor,
+            .Font = TipPlaylistFont,
+            .ShadowAlpha = 200,
+            .FadeInRate = 25,
+            .FadeOutRate = 25,
+            .HideDelay = 1000000,
+            .ShowDelay = 500
+        }
     End Sub
     Private Sub ToggleMaximized()
         Select Case WindowState
@@ -2752,9 +2752,9 @@ Public Class Player
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim items As New System.Collections.Generic.List(Of PlaylistItemType)
             For Each plitem As ListViewItem In LVPlaylist.Items
-                Dim newitem As New PlaylistItemType
-                newitem.Title = plitem.SubItems(LVPlaylist.Columns("Title").Index).Text
-                newitem.Path = plitem.SubItems(LVPlaylist.Columns("Path").Index).Text
+                Dim newitem As New PlaylistItemType With {
+                    .Title = plitem.SubItems(LVPlaylist.Columns("Title").Index).Text,
+                    .Path = plitem.SubItems(LVPlaylist.Columns("Path").Index).Text}
                 items.Add(newitem)
                 newitem = Nothing
             Next
@@ -2903,10 +2903,10 @@ Public Class Player
         format = Nothing
     End Sub
     Private Sub AddToPlaylistFromFile()
-        Dim ofd As New OpenFileDialog
-        ofd.Title = "Select Media File(s)"
-        ofd.Filter = "All Files|*.*"
-        ofd.Multiselect = True
+        Dim ofd As New OpenFileDialog With {
+            .Title = "Select Media File(s)",
+            .Filter = "All Files|*.*",
+            .Multiselect = True}
         Dim result As DialogResult = ofd.ShowDialog(Me)
         If result = DialogResult.OK AndAlso ofd.FileNames.Length > 0 Then
             Dim lvi As ListViewItem = Nothing
@@ -2944,9 +2944,7 @@ Public Class Player
             lvi = Nothing
         End If
         SetPlaylistCountText()
-        result = Nothing
         ofd.Dispose()
-        ofd = Nothing
     End Sub
     Friend Sub AddToPlaylistFromLibrary(title As String, filename As String)
         Dim lvi As ListViewItem
@@ -3129,16 +3127,18 @@ Public Class Player
             TipPlaylist?.Dispose()
             TipPlaylist = Nothing
         End If
-        TipPlaylist = New Skye.UI.ToolTipEX(components)
-        TipPlaylist.BackColor = App.CurrentTheme.BackColor
-        TipPlaylist.ForeColor = App.CurrentTheme.TextColor
-        TipPlaylist.BorderColor = App.CurrentTheme.ButtonBackColor
-        TipPlaylist.Font = TipPlaylistFont
-        TipPlaylist.ShadowAlpha = 200
-        TipPlaylist.FadeInRate = 0
-        TipPlaylist.FadeOutRate = 0
-        TipPlaylist.HideDelay = 1000000
-        TipPlaylist.ShowDelay = 1000
+
+        TipPlaylist = New Skye.UI.ToolTipEX(components) With {
+            .BackColor = App.CurrentTheme.BackColor,
+            .ForeColor = App.CurrentTheme.TextColor,
+            .BorderColor = App.CurrentTheme.ButtonBackColor,
+            .Font = TipPlaylistFont,
+            .ShadowAlpha = 200,
+            .FadeInRate = 0,
+            .FadeOutRate = 0,
+            .HideDelay = 1000000,
+            .ShowDelay = 1000
+        }
     End Sub
     Friend Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()
@@ -3216,7 +3216,6 @@ Public Class Player
         For Each item As String In removelist
             Queue.Remove(item)
         Next
-        removelist = Nothing
         SetPlaylistCountText()
         App.WriteToLog("Queue Pruned (" + count.ToString + ")")
     End Sub
@@ -3291,10 +3290,7 @@ Public Class Player
                 PlayFile(Queue(0), "PlayQueued")
             End If
             Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
-            If item IsNot Nothing Then
-                EnsurePlaylistItemIsVisible(item.Index)
-                item = Nothing
-            End If
+            If item IsNot Nothing Then EnsurePlaylistItemIsVisible(item.Index)
             Queue.RemoveAt(0)
             SetPlaylistCountText()
             TimerShowMedia.Start()
@@ -3338,7 +3334,6 @@ Public Class Player
                 LVPlaylist.Items.Insert(i, existingitem)
             End If
             EnsurePlaylistItemIsVisible(existingitem.Index)
-            existingitem = Nothing
         End If
         StopPlay()
         PlayFile(filename, "PlayFromLibrary")
@@ -3375,7 +3370,6 @@ Public Class Player
                         End If
                     End If
                     EnsurePlaylistItemIsVisible(newindex)
-                    item = Nothing
                 End If
             Case PlayModes.Random
                 If RandomHistory.Count > 0 Then
@@ -3405,7 +3399,6 @@ Public Class Player
                                 PlayFile(item.SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousRandom")
                             End If
                             EnsurePlaylistItemIsVisible(item.Index)
-                            item = Nothing
                         End If
                     End If
                 End If
@@ -3424,7 +3417,7 @@ Public Class Player
                     PlayQueued()
                 Else
                     If LVPlaylist.Items.Count > 0 Then
-                        Dim item As ListViewItem = Nothing
+                        Dim item As ListViewItem
                         If LVPlaylist.SelectedItems.Count > 0 Then
                             item = LVPlaylist.FindItemWithText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         Else
@@ -3446,7 +3439,6 @@ Public Class Player
                             End If
                         End If
                         EnsurePlaylistItemIsVisible(newindex)
-                        item = Nothing
                         TimerShowMedia.Start()
                     End If
                 End If
@@ -3457,7 +3449,7 @@ Public Class Player
                     If LVPlaylist.Items.Count > 0 Then
                         Dim item As ListViewItem = Nothing
                         If _player.HasMedia Then LVPlaylist.FindItemWithText(_player.Path, True, 0)
-                        Dim newindex As Integer = 0
+                        Dim newindex As Integer
                         If RandomHistoryFull() Then RandomHistory.Clear()
                         If item Is Nothing Then
                             newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
@@ -3476,7 +3468,6 @@ Public Class Player
                             PlayFile(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayNextRandom")
                         End If
                         EnsurePlaylistItemIsVisible(newindex)
-                        item = Nothing
                         TimerShowMedia.Start()
                     End If
                 End If
