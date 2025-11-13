@@ -951,8 +951,8 @@ Namespace My
             VideoExtensionDictionary.Add(".flv", "Flash Video")
 #End Region
 
-            FRMLibrary = New Library
-            FRMLibrary.Opacity = 0 'This is done to initialize the form on startup, but keep it hidden from the user, to prevent null reference errors when the FileSystemWatcher fires and the user hasn't opened the form yet.
+            FRMLibrary = New Library With {
+                .Opacity = 0} 'This is done to initialize the form on startup, but keep it hidden from the user, to prevent null reference errors when the FileSystemWatcher fires and the user hasn't opened the form yet.
             FRMLibrary.Show()
             FRMLibrary.Hide()
             FRMLibrary.Opacity = 1
@@ -1050,7 +1050,7 @@ Namespace My
         End Sub
         Friend Sub SaveOptions()
             Try
-                Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+                Dim starttime As TimeSpan = Computer.Clock.LocalTime.TimeOfDay
                 Dim RegKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegPath, True)
                 Dim RegSubKey As Microsoft.Win32.RegistryKey
                 RegKey.SetValue("PlayerPositionShowElapsed", App.PlayerPositionShowElapsed.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1063,6 +1063,7 @@ Namespace My
                 RegKey.SetValue("PlaylistSearchAction", App.PlaylistSearchAction.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlaylistStatusMessageDisplayTime", App.PlaylistStatusMessageDisplayTime.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("Theme", App.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
                 RegKey.SetValue("SuspendOnSessionChange", App.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SaveWindowMetrics", App.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("RandomHistoryUpdateInterval", App.RandomHistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1141,6 +1142,7 @@ Namespace My
                 Try : App.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Red.ToString).ToString), App.Themes)
                 Catch : App.Theme = App.Themes.Red
                 End Try
+                Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
                 Select Case RegKey.GetValue("SuspendOnSessionChange", "True").ToString
                     Case "False", "0" : App.SuspendOnSessionChange = False
                     Case Else : App.SuspendOnSessionChange = True
@@ -1287,9 +1289,9 @@ Namespace My
             'Set new watchers
             If WatcherEnabled AndAlso LibrarySearchFolders.Count > 0 AndAlso Not forcestop Then
                 For Each folder In LibrarySearchFolders
-                    Dim watcher As New FileSystemWatcher(folder)
-                    watcher.IncludeSubdirectories = LibrarySearchSubFolders
-                    watcher.NotifyFilter = NotifyFilters.FileName Or NotifyFilters.Size Or NotifyFilters.LastWrite
+                    Dim watcher As New FileSystemWatcher(folder) With {
+                        .IncludeSubdirectories = LibrarySearchSubFolders,
+                        .NotifyFilter = NotifyFilters.FileName Or NotifyFilters.Size Or NotifyFilters.LastWrite}
                     AddHandler watcher.Created, AddressOf Watcher_Created
                     AddHandler watcher.Renamed, AddressOf Watcher_Renamed
                     AddHandler watcher.Deleted, AddressOf Watcher_Deleted
@@ -1407,16 +1409,15 @@ Namespace My
         Friend Sub HelperApp1(filename As String)
             If filename IsNot String.Empty Then
                 If IO.File.Exists(filename) Then
-                    Dim pInfo As New Diagnostics.ProcessStartInfo
-                    pInfo.UseShellExecute = False
-                    pInfo.FileName = HelperApp1Path
-                    pInfo.Arguments = """" + filename + """"
+                    Dim pInfo As New ProcessStartInfo With {
+                        .UseShellExecute = False,
+                        .FileName = HelperApp1Path,
+                        .Arguments = """" + filename + """"}
                     Try
                         Diagnostics.Process.Start(pInfo)
                         WriteToLog(HelperApp1Name + " Opened (" + filename + ")")
                     Catch ex As Exception
                         WriteToLog("Cannot Open " + HelperApp1Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
-                    Finally : pInfo = Nothing
                     End Try
                 End If
             End If
@@ -1424,44 +1425,40 @@ Namespace My
         Friend Sub HelperApp2(filename As String)
             If filename IsNot String.Empty Then
                 If IO.File.Exists(filename) Then
-                    Dim pInfo As New Diagnostics.ProcessStartInfo
-                    pInfo.UseShellExecute = False
-                    pInfo.FileName = HelperApp2Path
-                    pInfo.Arguments = """" + filename + """"
+                    Dim pInfo As New Diagnostics.ProcessStartInfo With {
+                        .UseShellExecute = False,
+                        .FileName = HelperApp2Path,
+                        .Arguments = """" + filename + """"}
                     Try
                         Diagnostics.Process.Start(pInfo)
                         WriteToLog(HelperApp2Name + " Opened (" + filename + ")")
                     Catch ex As Exception
                         WriteToLog("Cannot Open " + HelperApp2Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
-                    Finally : pInfo = Nothing
                     End Try
                 End If
             End If
         End Sub
         Friend Sub OpenFileLocation(filename As String)
-            Dim psi As New Diagnostics.ProcessStartInfo("EXPLORER.EXE")
-            psi.Arguments = "/SELECT," + """" + filename + """"
+            Dim psi As New ProcessStartInfo("EXPLORER.EXE") With {
+                .Arguments = "/SELECT," + """" + filename + """"}
             Try
-                Diagnostics.Process.Start(psi)
+                Process.Start(psi)
                 WriteToLog("File Location Opened (" + filename + ")")
             Catch ex As Exception
-                App.WriteToLog("Error Opening File Location (" + filename + ")" + vbCr + ex.Message)
-            Finally
-                psi = Nothing
+                WriteToLog("Error Opening File Location (" + filename + ")" + vbCr + ex.Message)
             End Try
         End Sub
         Friend Sub PlayWithWindows(filename As String)
             If filename IsNot String.Empty Then
                 If IO.File.Exists(filename) Then
-                    Dim pInfo As New Diagnostics.ProcessStartInfo
-                    pInfo.UseShellExecute = True
-                    pInfo.FileName = filename
+                    Dim pInfo As New ProcessStartInfo With {
+                        .UseShellExecute = True,
+                        .FileName = filename}
                     Try
                         Diagnostics.Process.Start(pInfo)
                         WriteToLog("Played In Windows (" + filename + ")")
                     Catch ex As Exception
                         WriteToLog("Cannot Play In Windows (" + pInfo.FileName + ")" + vbCr + ex.Message)
-                    Finally : pInfo = Nothing
                     End Try
                 End If
             End If
@@ -2318,7 +2315,6 @@ Namespace My
                             End If
                         End If
                 End Select
-                tlfile = Nothing
             End If
             If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(filePath)) Then
                 FormatPlaylistTitleCore += PlaylistVideoIdentifier
@@ -2761,45 +2757,11 @@ Namespace My
 
     End Module
 
-    'Friend Class RollingTraceListener
-    '    Inherits TextWriterTraceListener
-
-    '    Private ReadOnly maxSize As Long = 1024 * 1024 ' 1 MB
-    '    Private ReadOnly logPath As String
-
-    '    Public Sub New(path As String)
-    '        MyBase.New(path)
-    '        logPath = path
-    '    End Sub
-
-    '    Public Overrides Sub WriteLine(message As String)
-    '        RotateIfNeeded()
-    '        Dim stamped As String = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} | {message}"
-    '        MyBase.WriteLine(stamped)
-    '        Me.Writer.Flush()
-    '    End Sub
-    '    Private Sub RotateIfNeeded()
-    '        Try
-    '            If File.Exists(logPath) AndAlso New FileInfo(logPath).Length > maxSize Then
-    '                Dim backupPath As String = Path.ChangeExtension(logPath, ".old")
-    '                If File.Exists(backupPath) Then File.Delete(backupPath)
-    '                File.Move(logPath, backupPath)
-    '                'Reset writer to new file
-    '                Me.Writer.Close()
-    '                Me.Writer = New StreamWriter(logPath, append:=False)
-    '            End If
-    '        Catch
-    '            'Fail silently — logging should never crash the app
-    '        End Try
-    '    End Sub
-
-    'End Class
-
     Friend Class ListViewItemStringComparer
         Implements IComparer
 
-        Private col As Integer
-        Private sort As SortOrder
+        Private ReadOnly col As Integer
+        Private ReadOnly sort As SortOrder
 
         Public Sub New(column As Integer, sortorder As SortOrder)
             col = column
@@ -2816,8 +2778,8 @@ Namespace My
     Friend Class ListViewItemNumberComparer
         Implements IComparer
 
-        Private col As Integer
-        Private sort As SortOrder
+        Private ReadOnly col As Integer
+        Private ReadOnly sort As SortOrder
 
         Public Sub New(column As Integer, sortorder As SortOrder)
             col = column
@@ -2848,8 +2810,8 @@ Namespace My
     Friend Class ListViewItemDateComparer
         Implements IComparer
 
-        Private col As Integer
-        Private sort As SortOrder
+        Private ReadOnly col As Integer
+        Private ReadOnly sort As SortOrder
 
         Public Sub New(column As Integer, sortorder As SortOrder)
             col = column
