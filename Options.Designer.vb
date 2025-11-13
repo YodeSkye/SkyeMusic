@@ -78,6 +78,10 @@ Partial Class Options
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         LblRandomHistoryUpdateInterval1 = New Skye.UI.Label()
         LblRandomHistoryUpdateInterval2 = New Skye.UI.Label()
+        TPVisualizers = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        PanelVisualizers = New Panel()
+        CoBoxVisualizers = New ComboBox()
+        LblVisualizers = New Skye.UI.Label()
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         TxtBoxStatusMessageDisplayTime = New TextBox()
         lblStatusMessageDisplayTime1 = New Skye.UI.Label()
@@ -94,6 +98,7 @@ Partial Class Options
         TCOptions.SuspendLayout()
         TPApp.SuspendLayout()
         TPPlayer.SuspendLayout()
+        TPVisualizers.SuspendLayout()
         TPPlaylist.SuspendLayout()
         TPLibrary.SuspendLayout()
         SuspendLayout()
@@ -657,6 +662,7 @@ Partial Class Options
         TCOptions.BeforeTouchSize = New Size(818, 457)
         TCOptions.Controls.Add(TPApp)
         TCOptions.Controls.Add(TPPlayer)
+        TCOptions.Controls.Add(TPVisualizers)
         TCOptions.Controls.Add(TPPlaylist)
         TCOptions.Controls.Add(TPLibrary)
         TCOptions.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -781,6 +787,52 @@ Partial Class Options
         LblRandomHistoryUpdateInterval2.TabIndex = 153
         LblRandomHistoryUpdateInterval2.Text = "Seconds"
         LblRandomHistoryUpdateInterval2.TextAlign = ContentAlignment.MiddleRight
+        ' 
+        ' TPVisualizers
+        ' 
+        TPVisualizers.Controls.Add(PanelVisualizers)
+        TPVisualizers.Controls.Add(CoBoxVisualizers)
+        TPVisualizers.Controls.Add(LblVisualizers)
+        TPVisualizers.Image = Nothing
+        TipOptionsEX.SetImage(TPVisualizers, Nothing)
+        TPVisualizers.ImageSize = New Size(16, 16)
+        TPVisualizers.Location = New Point(1, 42)
+        TPVisualizers.Name = "TPVisualizers"
+        TPVisualizers.ShowCloseButton = True
+        TPVisualizers.Size = New Size(815, 413)
+        TPVisualizers.TabIndex = 5
+        TPVisualizers.Text = " Visualizers "
+        TPVisualizers.ThemesEnabled = False
+        ' 
+        ' PanelVisualizers
+        ' 
+        PanelVisualizers.Dock = DockStyle.Bottom
+        TipOptionsEX.SetImage(PanelVisualizers, Nothing)
+        PanelVisualizers.Location = New Point(0, 72)
+        PanelVisualizers.Name = "PanelVisualizers"
+        PanelVisualizers.Size = New Size(815, 341)
+        PanelVisualizers.TabIndex = 1
+        ' 
+        ' CoBoxVisualizers
+        ' 
+        CoBoxVisualizers.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        CoBoxVisualizers.FormattingEnabled = True
+        TipOptionsEX.SetImage(CoBoxVisualizers, Nothing)
+        CoBoxVisualizers.Location = New Point(13, 29)
+        CoBoxVisualizers.Name = "CoBoxVisualizers"
+        CoBoxVisualizers.Size = New Size(249, 29)
+        CoBoxVisualizers.TabIndex = 0
+        ' 
+        ' LblVisualizers
+        ' 
+        LblVisualizers.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        TipOptionsEX.SetImage(LblVisualizers, Nothing)
+        LblVisualizers.Location = New Point(13, 7)
+        LblVisualizers.Name = "LblVisualizers"
+        LblVisualizers.Size = New Size(249, 23)
+        LblVisualizers.TabIndex = 2
+        LblVisualizers.Text = "Visualizer"
+        LblVisualizers.TextAlign = ContentAlignment.MiddleLeft
         ' 
         ' TPPlaylist
         ' 
@@ -960,6 +1012,7 @@ Partial Class Options
         TPApp.PerformLayout()
         TPPlayer.ResumeLayout(False)
         TPPlayer.PerformLayout()
+        TPVisualizers.ResumeLayout(False)
         TPPlaylist.ResumeLayout(False)
         TPPlaylist.PerformLayout()
         TPLibrary.ResumeLayout(False)
@@ -1031,4 +1084,8 @@ Partial Class Options
     Friend WithEvents lblStatusMessageDisplayTime2 As Skye.UI.Label
     Friend WithEvents TxtBoxStatusMessageDisplayTime As TextBox
     Friend WithEvents lblStatusMessageDisplayTime1 As Skye.UI.Label
+    Friend WithEvents TPVisualizers As Syncfusion.Windows.Forms.Tools.TabPageAdv
+    Friend WithEvents LblVisualizers As Skye.UI.Label
+    Friend WithEvents PanelVisualizers As Panel
+    Friend WithEvents CoBoxVisualizers As ComboBox
 End Class

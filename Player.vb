@@ -345,7 +345,7 @@ Public Class Player
 
     'Visualizer Interface
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
-    Private VisualizerHost As VisualizerHostClass 'Host for Visualizers
+    Friend VisualizerHost As VisualizerHostClass 'Host for Visualizers
     Private VisualizerEngine As VisualizerAudioEngine 'Audio Engine for Visualizers
     Private Sub VisualizerOn() 'Turn on the Visualizer
         If Not Visualizer Then
@@ -511,9 +511,12 @@ Public Class Player
                 End Sub
             ownerForm.MIVisualizers.DropDown = menu
         End Sub
+        Public Function GetVisualizerNames() As List(Of String)
+            Return visualizers.Keys.ToList
+        End Function
 
     End Class
-    Friend Class VisualizerAudioEngine '
+    Private Class VisualizerAudioEngine '
 
         'Declarations
         Private capture As WasapiLoopbackCapture
@@ -575,7 +578,7 @@ Public Class Player
         End Sub
 
     End Class
-    Friend Class VisualizerRainbowBar
+    Private Class VisualizerRainbowBar
         Inherits UserControl
         Implements IVisualizer
 
@@ -710,7 +713,7 @@ Public Class Player
         End Function
 
     End Class
-    Friend Class VisualizerWaveform
+    Private Class VisualizerWaveform
         Inherits UserControl
         Implements IVisualizer
 
@@ -784,7 +787,7 @@ Public Class Player
         End Sub
 
     End Class
-    Friend Class VisualizerFractalCloud
+    Private Class VisualizerFractalCloud
         Inherits UserControl
         Implements IVisualizer
 
@@ -950,7 +953,7 @@ Public Class Player
         End Function
 
     End Class
-    Friend Class VisualizerHyperspaceTunnel
+    Private Class VisualizerHyperspaceTunnel
         Inherits UserControl
         Implements IVisualizer
 
@@ -3625,7 +3628,7 @@ Public Class Player
             End If
         End If
     End Sub
-    Private Sub ShowMedia()
+    Friend Sub ShowMedia()
         If _player.HasMedia Then
             Dim tlfile As TagLib.File
             Try

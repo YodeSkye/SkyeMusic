@@ -39,6 +39,11 @@ Public Class Options
         CoBoxPlayMode.Items.Add("Play Next")
         CoBoxPlayMode.Items.Add("Shuffle")
         CoBoxPlayMode.SelectedIndex = App.PlayMode
+        CoBoxVisualizers.Items.Clear()
+        For Each vis In Player.VisualizerHost.GetVisualizerNames
+            CoBoxVisualizers.Items.Add(vis)
+        Next
+        CoBoxVisualizers.SelectedItem = App.Visualizer
         CoBoxPlaylistDefaultAction.Items.Clear()
         CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Play.ToString)
         CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Queue.ToString)
@@ -128,7 +133,7 @@ Public Class Options
         App.SaveOptions()
         Player.ShowPlayMode()
     End Sub
-    Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, GrBoxTime.MouseDown, LblTitleFormat.MouseDown, LblTitleSeparator.MouseDown, LblVideoIdentifier.MouseDown, LblSongPlayMode.MouseDown, LblDefaultPlaylistAction.MouseDown, LblPlaylistSearchAction.MouseDown, LblTheme.MouseDown, LblHelperApp2Path.MouseDown, LblHelperApp2Name.MouseDown, LblHelperApp1Path.MouseDown, LblHelperApp1Name.MouseDown, TCOptions.MouseDown, TPApp.MouseDown, TPPlayer.MouseDown, TPPlaylist.MouseDown, TPLibrary.MouseDown, LblHistoryAutoSaveInterval1.MouseDown, LblHistoryAutoSaveInterval2.MouseDown, LblLibrarySearchFolders.MouseDown, LblHistoryUpdateInterval1.MouseDown, LblHistoryUpdateInterval2.MouseDown, LblPlaylistFormatting.MouseDown
+    Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, GrBoxTime.MouseDown, LblTitleFormat.MouseDown, LblTitleSeparator.MouseDown, LblVideoIdentifier.MouseDown, LblSongPlayMode.MouseDown, LblDefaultPlaylistAction.MouseDown, LblPlaylistSearchAction.MouseDown, LblTheme.MouseDown, LblHelperApp2Path.MouseDown, LblHelperApp2Name.MouseDown, LblHelperApp1Path.MouseDown, LblHelperApp1Name.MouseDown, TCOptions.MouseDown, TPApp.MouseDown, TPPlayer.MouseDown, TPPlaylist.MouseDown, TPLibrary.MouseDown, LblHistoryAutoSaveInterval1.MouseDown, LblHistoryAutoSaveInterval2.MouseDown, LblLibrarySearchFolders.MouseDown, LblHistoryUpdateInterval1.MouseDown, LblHistoryUpdateInterval2.MouseDown, LblPlaylistFormatting.MouseDown, TPVisualizers.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -143,9 +148,8 @@ Public Class Options
                 mOffset = New Point(-e.X - TCOptions.Left - TPApp.Left - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 9, -e.Y - TCOptions.Top - TPApp.Top - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 9)
             End If
         End If
-        cSender = Nothing
     End Sub
-    Private Sub Options_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, GrBoxTime.MouseMove, LblTitleFormat.MouseMove, LblTitleSeparator.MouseMove, LblVideoIdentifier.MouseMove, LblSongPlayMode.MouseMove, LblDefaultPlaylistAction.MouseMove, LblPlaylistSearchAction.MouseMove, LblTheme.MouseMove, LblHelperApp2Path.MouseMove, LblHelperApp2Name.MouseMove, LblHelperApp1Path.MouseMove, LblHelperApp1Name.MouseMove, TCOptions.MouseMove, TPApp.MouseMove, TPPlayer.MouseMove, TPPlaylist.MouseMove, TPLibrary.MouseMove, LblHistoryAutoSaveInterval1.MouseMove, LblHistoryAutoSaveInterval2.MouseMove, LblLibrarySearchFolders.MouseMove, LblHistoryUpdateInterval1.MouseMove, LblHistoryUpdateInterval2.MouseMove, LblPlaylistFormatting.MouseMove
+    Private Sub Options_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, GrBoxTime.MouseMove, LblTitleFormat.MouseMove, LblTitleSeparator.MouseMove, LblVideoIdentifier.MouseMove, LblSongPlayMode.MouseMove, LblDefaultPlaylistAction.MouseMove, LblPlaylistSearchAction.MouseMove, LblTheme.MouseMove, LblHelperApp2Path.MouseMove, LblHelperApp2Name.MouseMove, LblHelperApp1Path.MouseMove, LblHelperApp1Name.MouseMove, TCOptions.MouseMove, TPApp.MouseMove, TPPlayer.MouseMove, TPPlaylist.MouseMove, TPLibrary.MouseMove, LblHistoryAutoSaveInterval1.MouseMove, LblHistoryAutoSaveInterval2.MouseMove, LblLibrarySearchFolders.MouseMove, LblHistoryUpdateInterval1.MouseMove, LblHistoryUpdateInterval2.MouseMove, LblPlaylistFormatting.MouseMove, TPVisualizers.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -153,7 +157,7 @@ Public Class Options
             Location = mPosition
         End If
     End Sub
-    Private Sub Options_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, GrBoxTime.MouseUp, LblTitleFormat.MouseUp, LblTitleSeparator.MouseUp, LblVideoIdentifier.MouseUp, LblSongPlayMode.MouseUp, LblDefaultPlaylistAction.MouseUp, LblPlaylistSearchAction.MouseUp, LblTheme.MouseUp, LblHelperApp2Path.MouseUp, LblHelperApp2Name.MouseUp, LblHelperApp1Path.MouseUp, LblHelperApp1Name.MouseUp, TCOptions.MouseUp, TPApp.MouseUp, TPPlayer.MouseUp, TPPlaylist.MouseUp, TPLibrary.MouseUp, LblHistoryAutoSaveInterval1.MouseUp, LblHistoryAutoSaveInterval2.MouseUp, LblLibrarySearchFolders.MouseUp, LblHistoryUpdateInterval1.MouseUp, LblHistoryUpdateInterval2.MouseUp, LblPlaylistFormatting.MouseUp
+    Private Sub Options_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, GrBoxTime.MouseUp, LblTitleFormat.MouseUp, LblTitleSeparator.MouseUp, LblVideoIdentifier.MouseUp, LblSongPlayMode.MouseUp, LblDefaultPlaylistAction.MouseUp, LblPlaylistSearchAction.MouseUp, LblTheme.MouseUp, LblHelperApp2Path.MouseUp, LblHelperApp2Name.MouseUp, LblHelperApp1Path.MouseUp, LblHelperApp1Name.MouseUp, TCOptions.MouseUp, TPApp.MouseUp, TPPlayer.MouseUp, TPPlaylist.MouseUp, TPLibrary.MouseUp, LblHistoryAutoSaveInterval1.MouseUp, LblHistoryAutoSaveInterval2.MouseUp, LblLibrarySearchFolders.MouseUp, LblHistoryUpdateInterval1.MouseUp, LblHistoryUpdateInterval2.MouseUp, LblPlaylistFormatting.MouseUp, TPVisualizers.MouseUp
         mMove = False
     End Sub
     Private Sub Options_Move(sender As Object, e As EventArgs) Handles MyBase.Move
@@ -173,6 +177,8 @@ Public Class Options
                 CoBoxTheme.Focus()
             Case "TPPlayer"
                 GrBoxTime.Focus()
+            Case "TPVisualizers"
+                CoBoxVisualizers.Focus()
             Case "TPPlaylist"
                 CoBoxPlaylistTitleFormat.Focus()
             Case "TPLibrary"
@@ -204,7 +210,6 @@ Public Class Options
             Dim fInfo As New IO.FileInfo(App.HelperApp1Path)
             uiFileBrowser.InitialDirectory = fInfo.DirectoryName
             uiFileBrowser.FileName = fInfo.Name
-            fInfo = Nothing
         End If
         Dim r As DialogResult = uiFileBrowser.ShowDialog(Me)
         If r = System.Windows.Forms.DialogResult.OK And Not String.IsNullOrEmpty(uiFileBrowser.FileName) Then
@@ -221,7 +226,6 @@ Public Class Options
             Dim fInfo As New IO.FileInfo(App.HelperApp2Path)
             uiFileBrowser.InitialDirectory = fInfo.DirectoryName
             uiFileBrowser.FileName = fInfo.Name
-            fInfo = Nothing
         End If
         Dim r As DialogResult = uiFileBrowser.ShowDialog(Me)
         If r = System.Windows.Forms.DialogResult.OK And Not String.IsNullOrEmpty(uiFileBrowser.FileName) Then
@@ -243,6 +247,17 @@ Public Class Options
         If App.PlayMode = PlayModes.Random Then Player.RandomHistoryClear()
         Player.SetTipPlayer()
     End Sub
+    Private Sub CoBoxVisualizers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxVisualizers.SelectedIndexChanged
+        App.Visualizer = CoBoxVisualizers.SelectedItem.ToString
+        Player.ShowMedia()
+        PanelVisualizers.Controls.Clear()
+        Select Case App.Visualizer
+            Case "Rainbow Bars"
+            Case "Waveform"
+            Case "Fractal Cloud"
+            Case "Hyperspace Tunnel"
+        End Select
+    End Sub
     Private Sub CoBoxPlaylistDefaultAction_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistDefaultAction.SelectionChangeCommitted
         App.PlaylistDefaultAction = CType(CoBoxPlaylistDefaultAction.SelectedIndex, App.PlaylistActions)
     End Sub
@@ -256,12 +271,8 @@ Public Class Options
         If App.CurrentTheme.IsAccent Then SetAccentColor()
         SetTheme()
         App.InvokeThemeChanged()
-        If App.FRMLog IsNot Nothing Then
-            App.FRMLog.SetColors()
-        End If
-        If App.FRMHistory IsNot Nothing Then
-            App.FRMHistory.SetColors()
-        End If
+        App.FRMLog?.SetColors()
+        App.FRMHistory?.SetColors()
         App.FRMLibrary.SetColors()
         Player.SetColors()
     End Sub
