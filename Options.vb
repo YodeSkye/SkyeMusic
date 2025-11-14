@@ -44,7 +44,6 @@ Public Class Options
             CoBoxVisualizers.Items.Add(vis)
         Next
         CoBoxVisualizers.SelectedItem = App.Visualizer
-        SetVisualizerSettingsPage()
         CoBoxPlaylistDefaultAction.Items.Clear()
         CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Play.ToString)
         CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Queue.ToString)
@@ -180,6 +179,7 @@ Public Class Options
                 GrBoxTime.Focus()
             Case "TPVisualizers"
                 CoBoxVisualizers.Focus()
+                SetVisualizerSettingsPage()
             Case "TPPlaylist"
                 CoBoxPlaylistTitleFormat.Focus()
             Case "TPLibrary"
@@ -573,6 +573,8 @@ Public Class Options
         CoBoxTheme.ForeColor = App.CurrentTheme.TextColor
         CoBoxPlaylistTitleFormat.BackColor = App.CurrentTheme.ControlBackColor
         CoBoxPlaylistTitleFormat.ForeColor = App.CurrentTheme.TextColor
+        CoBoxVisualizers.BackColor = App.CurrentTheme.ControlBackColor
+        CoBoxVisualizers.ForeColor = App.CurrentTheme.TextColor
         TxtBoxPlaylistTitleSeparator.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxPlaylistTitleSeparator.ForeColor = App.CurrentTheme.TextColor
         TxtBoxPlaylistVideoIdentifier.BackColor = App.CurrentTheme.ControlBackColor
@@ -601,6 +603,7 @@ Public Class Options
         LblPlaylistFormatting.ForeColor = forecolor
         LblTitleFormat.ForeColor = forecolor
         LblTitleSeparator.ForeColor = forecolor
+        LblVisualizers.ForeColor = forecolor
         LblVideoIdentifier.ForeColor = forecolor
         lblStatusMessageDisplayTime1.ForeColor = forecolor
         lblStatusMessageDisplayTime2.ForeColor = forecolor

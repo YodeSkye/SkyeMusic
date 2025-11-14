@@ -26,6 +26,19 @@ Partial Class OptionsRainbowBar
         LblBarCount = New Skye.UI.Label()
         TxtBoxBarCount = New TextBox()
         LblGain = New Skye.UI.Label()
+        ChkBoxShowPeaks = New CheckBox()
+        TBPeakDecaySpeed = New Syncfusion.Windows.Forms.Tools.TrackBarEx(1, 20)
+        TBPeakThickness = New Syncfusion.Windows.Forms.Tools.TrackBarEx(1, 20)
+        LblPeakDecaySpeed = New Skye.UI.Label()
+        LblPeakThickness = New Skye.UI.Label()
+        TBPeakThreshold = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 200)
+        LblPeakThreshold = New Skye.UI.Label()
+        LblHueCycleSpeed = New Skye.UI.Label()
+        TBHueCycleSpeed = New Syncfusion.Windows.Forms.Tools.TrackBarEx(1, 200)
+        BtnCalm = New Button()
+        LblPresets = New Skye.UI.Label()
+        BtnEnergetic = New Button()
+        BtnExtreme = New Button()
         SuspendLayout()
         ' 
         ' TBGain
@@ -70,10 +83,163 @@ Partial Class OptionsRainbowBar
         LblGain.Text = "Gain"
         LblGain.TextAlign = ContentAlignment.MiddleCenter
         ' 
+        ' ChkBoxShowPeaks
+        ' 
+        ChkBoxShowPeaks.AutoSize = True
+        ChkBoxShowPeaks.BackColor = Color.Transparent
+        ChkBoxShowPeaks.CheckAlign = ContentAlignment.BottomCenter
+        ChkBoxShowPeaks.FlatStyle = FlatStyle.Flat
+        ChkBoxShowPeaks.Location = New Point(8, 65)
+        ChkBoxShowPeaks.Name = "ChkBoxShowPeaks"
+        ChkBoxShowPeaks.RightToLeft = RightToLeft.Yes
+        ChkBoxShowPeaks.Size = New Size(96, 36)
+        ChkBoxShowPeaks.TabIndex = 4
+        ChkBoxShowPeaks.Text = "Show Peaks"
+        ChkBoxShowPeaks.UseVisualStyleBackColor = False
+        ' 
+        ' TBPeakDecaySpeed
+        ' 
+        TBPeakDecaySpeed.BackColor = Color.Transparent
+        TBPeakDecaySpeed.BeforeTouchSize = New Size(20, 290)
+        TBPeakDecaySpeed.Location = New Point(250, 26)
+        TBPeakDecaySpeed.Name = "TBPeakDecaySpeed"
+        TBPeakDecaySpeed.Orientation = Orientation.Vertical
+        TBPeakDecaySpeed.Size = New Size(20, 290)
+        TBPeakDecaySpeed.TabIndex = 5
+        TBPeakDecaySpeed.Text = "TrackBarEx1"
+        TBPeakDecaySpeed.TimerInterval = 100
+        TBPeakDecaySpeed.Value = 5
+        ' 
+        ' TBPeakThickness
+        ' 
+        TBPeakThickness.BackColor = Color.Transparent
+        TBPeakThickness.BeforeTouchSize = New Size(20, 290)
+        TBPeakThickness.Location = New Point(398, 29)
+        TBPeakThickness.Name = "TBPeakThickness"
+        TBPeakThickness.Orientation = Orientation.Vertical
+        TBPeakThickness.Size = New Size(20, 290)
+        TBPeakThickness.TabIndex = 6
+        TBPeakThickness.Text = "TrackBarEx2"
+        TBPeakThickness.TimerInterval = 100
+        TBPeakThickness.Value = 5
+        ' 
+        ' LblPeakDecaySpeed
+        ' 
+        LblPeakDecaySpeed.Location = New Point(191, 5)
+        LblPeakDecaySpeed.Name = "LblPeakDecaySpeed"
+        LblPeakDecaySpeed.Size = New Size(139, 23)
+        LblPeakDecaySpeed.TabIndex = 7
+        LblPeakDecaySpeed.Text = "Peak Decay Speed"
+        LblPeakDecaySpeed.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LblPeakThickness
+        ' 
+        LblPeakThickness.Location = New Point(349, 5)
+        LblPeakThickness.Name = "LblPeakThickness"
+        LblPeakThickness.Size = New Size(119, 23)
+        LblPeakThickness.TabIndex = 8
+        LblPeakThickness.Text = "Peak Thickness"
+        LblPeakThickness.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' TBPeakThreshold
+        ' 
+        TBPeakThreshold.BackColor = Color.Transparent
+        TBPeakThreshold.BeforeTouchSize = New Size(20, 290)
+        TBPeakThreshold.Location = New Point(541, 26)
+        TBPeakThreshold.Name = "TBPeakThreshold"
+        TBPeakThreshold.Orientation = Orientation.Vertical
+        TBPeakThreshold.Size = New Size(20, 290)
+        TBPeakThreshold.SmallChange = 5
+        TBPeakThreshold.TabIndex = 9
+        TBPeakThreshold.Text = "TrackBarEx2"
+        TBPeakThreshold.TimerInterval = 100
+        TBPeakThreshold.Value = 5
+        ' 
+        ' LblPeakThreshold
+        ' 
+        LblPeakThreshold.Location = New Point(492, 5)
+        LblPeakThreshold.Name = "LblPeakThreshold"
+        LblPeakThreshold.Size = New Size(119, 23)
+        LblPeakThreshold.TabIndex = 10
+        LblPeakThreshold.Text = "Peak Threshold"
+        LblPeakThreshold.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LblHueCycleSpeed
+        ' 
+        LblHueCycleSpeed.Location = New Point(644, 5)
+        LblHueCycleSpeed.Name = "LblHueCycleSpeed"
+        LblHueCycleSpeed.Size = New Size(131, 23)
+        LblHueCycleSpeed.TabIndex = 12
+        LblHueCycleSpeed.Text = "Hue Cycle Speed"
+        LblHueCycleSpeed.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' TBHueCycleSpeed
+        ' 
+        TBHueCycleSpeed.BackColor = Color.Transparent
+        TBHueCycleSpeed.BeforeTouchSize = New Size(20, 290)
+        TBHueCycleSpeed.Location = New Point(699, 29)
+        TBHueCycleSpeed.Name = "TBHueCycleSpeed"
+        TBHueCycleSpeed.Orientation = Orientation.Vertical
+        TBHueCycleSpeed.Size = New Size(20, 290)
+        TBHueCycleSpeed.SmallChange = 5
+        TBHueCycleSpeed.TabIndex = 11
+        TBHueCycleSpeed.Text = "TrackBarEx2"
+        TBHueCycleSpeed.TimerInterval = 100
+        TBHueCycleSpeed.Value = 5
+        ' 
+        ' BtnCalm
+        ' 
+        BtnCalm.Location = New Point(13, 208)
+        BtnCalm.Name = "BtnCalm"
+        BtnCalm.Size = New Size(85, 32)
+        BtnCalm.TabIndex = 13
+        BtnCalm.Text = "Calm"
+        BtnCalm.UseVisualStyleBackColor = True
+        ' 
+        ' LblPresets
+        ' 
+        LblPresets.Location = New Point(13, 182)
+        LblPresets.Name = "LblPresets"
+        LblPresets.Size = New Size(85, 23)
+        LblPresets.TabIndex = 14
+        LblPresets.Text = "Presets"
+        LblPresets.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' BtnEnergetic
+        ' 
+        BtnEnergetic.Location = New Point(13, 246)
+        BtnEnergetic.Name = "BtnEnergetic"
+        BtnEnergetic.Size = New Size(85, 32)
+        BtnEnergetic.TabIndex = 15
+        BtnEnergetic.Text = "Energetic"
+        BtnEnergetic.UseVisualStyleBackColor = True
+        ' 
+        ' BtnExtreme
+        ' 
+        BtnExtreme.Location = New Point(13, 284)
+        BtnExtreme.Name = "BtnExtreme"
+        BtnExtreme.Size = New Size(85, 32)
+        BtnExtreme.TabIndex = 16
+        BtnExtreme.Text = "Extreme"
+        BtnExtreme.UseVisualStyleBackColor = True
+        ' 
         ' OptionsRainbowBar
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(BtnExtreme)
+        Controls.Add(BtnEnergetic)
+        Controls.Add(LblPresets)
+        Controls.Add(BtnCalm)
+        Controls.Add(LblHueCycleSpeed)
+        Controls.Add(TBHueCycleSpeed)
+        Controls.Add(LblPeakThreshold)
+        Controls.Add(TBPeakThreshold)
+        Controls.Add(LblPeakThickness)
+        Controls.Add(LblPeakDecaySpeed)
+        Controls.Add(TBPeakThickness)
+        Controls.Add(TBPeakDecaySpeed)
+        Controls.Add(ChkBoxShowPeaks)
         Controls.Add(TxtBoxBarCount)
         Controls.Add(LblBarCount)
         Controls.Add(TBGain)
@@ -90,5 +256,18 @@ Partial Class OptionsRainbowBar
     Friend WithEvents LblBarCount As Skye.UI.Label
     Friend WithEvents TxtBoxBarCount As TextBox
     Friend WithEvents LblGain As Skye.UI.Label
+    Friend WithEvents ChkBoxShowPeaks As CheckBox
+    Friend WithEvents TBPeakDecaySpeed As Syncfusion.Windows.Forms.Tools.TrackBarEx
+    Friend WithEvents TBPeakThickness As Syncfusion.Windows.Forms.Tools.TrackBarEx
+    Friend WithEvents LblPeakDecaySpeed As Skye.UI.Label
+    Friend WithEvents LblPeakThickness As Skye.UI.Label
+    Friend WithEvents TBPeakThreshold As Syncfusion.Windows.Forms.Tools.TrackBarEx
+    Friend WithEvents LblPeakThreshold As Skye.UI.Label
+    Friend WithEvents LblHueCycleSpeed As Skye.UI.Label
+    Friend WithEvents TBHueCycleSpeed As Syncfusion.Windows.Forms.Tools.TrackBarEx
+    Friend WithEvents BtnCalm As Button
+    Friend WithEvents LblPresets As Skye.UI.Label
+    Friend WithEvents BtnEnergetic As Button
+    Friend WithEvents BtnExtreme As Button
 
 End Class
