@@ -257,8 +257,8 @@ Public Class Options
         PanelVisualizers.Controls.Clear()
         Select Case App.Visualizer
             Case "Rainbow Bar"
-                Dim c As New OptionsRainbowBar
-                c.Dock = DockStyle.Fill
+                Dim c As New OptionsRainbowBar With {
+                    .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
             Case "Waveform"
             Case "Fractal Cloud"

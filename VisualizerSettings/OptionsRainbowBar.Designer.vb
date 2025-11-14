@@ -22,33 +22,73 @@ Partial Class OptionsRainbowBar
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        TrackBarEx1 = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 10)
+        TBGain = New Syncfusion.Windows.Forms.Tools.TrackBarEx(10, 1000)
+        LblBarCount = New Skye.UI.Label()
+        TxtBoxBarCount = New TextBox()
+        LblGain = New Skye.UI.Label()
         SuspendLayout()
         ' 
-        ' TrackBarEx1
+        ' TBGain
         ' 
-        TrackBarEx1.BackColor = Color.Transparent
-        TrackBarEx1.BeforeTouchSize = New Size(20, 250)
-        TrackBarEx1.Location = New Point(202, 49)
-        TrackBarEx1.Name = "TrackBarEx1"
-        TrackBarEx1.Orientation = Orientation.Vertical
-        TrackBarEx1.Size = New Size(20, 250)
-        TrackBarEx1.TabIndex = 0
-        TrackBarEx1.Text = "TrackBarEx1"
-        TrackBarEx1.TimerInterval = 100
-        TrackBarEx1.Value = 5
+        TBGain.BackColor = Color.Transparent
+        TBGain.BeforeTouchSize = New Size(20, 290)
+        TBGain.Location = New Point(141, 26)
+        TBGain.Margin = New Padding(4)
+        TBGain.Name = "TBGain"
+        TBGain.Orientation = Orientation.Vertical
+        TBGain.Size = New Size(20, 290)
+        TBGain.SmallChange = 10
+        TBGain.TabIndex = 0
+        TBGain.TimerInterval = 100
+        TBGain.Value = 10
+        ' 
+        ' LblBarCount
+        ' 
+        LblBarCount.Location = New Point(13, 0)
+        LblBarCount.Margin = New Padding(4, 0, 4, 0)
+        LblBarCount.Name = "LblBarCount"
+        LblBarCount.Size = New Size(85, 32)
+        LblBarCount.TabIndex = 1
+        LblBarCount.Text = "Bar Count"
+        LblBarCount.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' TxtBoxBarCount
+        ' 
+        TxtBoxBarCount.Location = New Point(13, 29)
+        TxtBoxBarCount.Margin = New Padding(4)
+        TxtBoxBarCount.Name = "TxtBoxBarCount"
+        TxtBoxBarCount.Size = New Size(85, 29)
+        TxtBoxBarCount.TabIndex = 2
+        TxtBoxBarCount.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblGain
+        ' 
+        LblGain.Location = New Point(131, 5)
+        LblGain.Name = "LblGain"
+        LblGain.Size = New Size(43, 23)
+        LblGain.TabIndex = 3
+        LblGain.Text = "Gain"
+        LblGain.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' OptionsRainbowBar
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
+        AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        Controls.Add(TrackBarEx1)
+        Controls.Add(TxtBoxBarCount)
+        Controls.Add(LblBarCount)
+        Controls.Add(TBGain)
+        Controls.Add(LblGain)
+        Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Margin = New Padding(4)
         Name = "OptionsRainbowBar"
         Size = New Size(800, 330)
         ResumeLayout(False)
         PerformLayout()
     End Sub
 
-    Friend WithEvents TrackBarEx1 As Syncfusion.Windows.Forms.Tools.TrackBarEx
+    Friend WithEvents TBGain As Syncfusion.Windows.Forms.Tools.TrackBarEx
+    Friend WithEvents LblBarCount As Skye.UI.Label
+    Friend WithEvents TxtBoxBarCount As TextBox
+    Friend WithEvents LblGain As Skye.UI.Label
 
 End Class

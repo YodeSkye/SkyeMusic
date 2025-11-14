@@ -586,7 +586,7 @@ Public Class Player
         Private ReadOnly updateTimer As Timer
         Private audioData(), lastMagnitudes(), peakValues() As Single
         Private hueOffset As Single = 0.0F
-        Private ReadOnly gain As Single = App.Visualizers.RainbowBarGain 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
+        'Private ReadOnly gain As Single = App.Visualizers.RainbowBarGain 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
 
         'Constructor
         Public Sub New()
@@ -646,7 +646,7 @@ Public Class Player
                 Dim rawMagnitude = audioData(valueIdx)
 
                 'Apply gain and clamp
-                Dim boosted = Math.Min(rawMagnitude * gain, 1.0F)
+                Dim boosted = Math.Min(rawMagnitude * App.Visualizers.RainbowBarGain, 1.0F)
 
                 'Smooth with previous frame
                 Dim smoothed = (lastMagnitudes(i) * 0.7F) + (boosted * 0.3F)
