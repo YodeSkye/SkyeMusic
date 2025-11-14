@@ -586,7 +586,7 @@ Public Class Player
         Private updateTimer As Timer
         Private audioData(), lastMagnitudes(), peakValues() As Single
         Private hueOffset As Single = 0.0F
-        Private gain As Single = 100.0F 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
+        Private gain As Single = App.Visualizers.RainbowBarGain 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
 
         'Constructor
         Public Sub New()
@@ -628,10 +628,10 @@ Public Class Player
             If audioData Is Nothing OrElse audioData.Length = 0 Then Exit Sub
 
             Dim g = pe.Graphics
-            Dim barCount = 32
-            Dim barWidth As Single = CSng(Me.Width) / barCount
-            Dim maxHeight = Me.Height
-            Dim peakThreshold As Integer = 50 'Pixels above bottom 'Threshold to avoid flicker at bottom
+            Dim barCount = App.Visualizers.RainbowBarCount
+            Dim barWidth As Single = CSng(Width) / barCount
+            Dim maxHeight = Height
+            'Dim peakThreshold As Integer = App.Visualizers.RainbowBarPeakThreshold 'Pixels above bottom 'Threshold to avoid flicker at bottom
 
             'Initialize smoothing buffer if needed
             If lastMagnitudes Is Nothing OrElse lastMagnitudes.Length <> barCount Then
@@ -671,15 +671,14 @@ Public Class Player
                 If currentPeak > peakValues(i) Then
                     peakValues(i) = currentPeak
                 Else
-                    ' Dynamic decay speed based on panel height
-                    Dim decay As Integer = 7
-                    peakValues(i) = Math.Max(0, peakValues(i) - decay)
+                    'Dynamic decay speed based on panel height
+                    peakValues(i) = Math.Max(0, peakValues(i) - App.Visualizers.RainbowBarPeakDecaySpeed)
                 End If
 
                 'Only draw peak if above threshold
-                If peakValues(i) > peakThreshold Then
+                If App.Visualizers.RainbowBarShowPeaks AndAlso peakValues(i) > App.Visualizers.RainbowBarPeakThreshold Then
                     Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
-                    Dim thickness As Integer = 6 ' fixed thickness preset
+                    Dim thickness As Integer = App.Visualizers.RainbowBarPeakThickness 'fixed thickness preset
                     Dim peakColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
                     Using peakbrush As New SolidBrush(peakColor)
                         g.FillRectangle(peakbrush, x, peakY, width, thickness)
@@ -689,7 +688,7 @@ Public Class Player
             Next
 
             'Advance hue offset for next frame
-            hueOffset = (hueOffset + 2.0F) Mod 360.0F
+            hueOffset = (hueOffset + App.Visualizers.RainbowBarHueCycleSpeed) Mod 360.0F
         End Sub
 
         'Procs
@@ -980,7 +979,7 @@ Public Class Player
             AddHandler updateTimer.Tick, AddressOf OnTick
             particles = New List(Of Particle)()
             'Initialize particles
-            For i = 0 To 200
+            For i = 0 To 1000
                 particles.Add(New Particle(rnd))
             Next
         End Sub
@@ -1004,8 +1003,8 @@ Public Class Player
         Protected Overrides Sub OnPaint(pe As PaintEventArgs)
             MyBase.OnPaint(pe)
             Dim g = pe.Graphics
-            Dim cx = Me.Width / 2
-            Dim cy = Me.Height / 2
+            Dim cx = Width / 2
+            Dim cy = Height / 2
 
             ' --- Audio level for reactivity ---
             Dim level As Double = 0
@@ -1028,22 +1027,21 @@ Public Class Player
                 Dim ry As Double = p.X * sinA + p.Y * cosA
 
                 ' Perspective projection
-                Dim scale = (Me.Width / 2) / p.Z
+                Dim scale = (Width / 2) / p.Z
                 Dim x = cx + rx * scale
                 Dim y = cy + ry * scale
 
                 ' Previous position (slightly further back in Z) for streak
                 Dim prevZ = p.Z + speed * 2
-                Dim prevScale = (Me.Width / 2) / prevZ
+                Dim prevScale = (Width / 2) / prevZ
                 Dim px = cx + rx * prevScale
                 Dim py = cy + ry * prevScale
 
                 ' Color cycling by depth
-                Dim hue = (p.Z * 10) Mod 360
-                Dim color = ColorFromHSV(hue, 1, 1)
+                Dim color = p.Color
 
                 ' Only draw if both ends are inside the control bounds
-                If x >= 0 AndAlso x <= Me.Width AndAlso y >= 0 AndAlso y <= Me.Height AndAlso px >= 0 AndAlso px <= Me.Width AndAlso py >= 0 AndAlso py <= Me.Height Then
+                If x >= 0 AndAlso x <= Width AndAlso y >= 0 AndAlso y <= Height AndAlso px >= 0 AndAlso px <= Width AndAlso py >= 0 AndAlso py <= Height Then
                     Using pen As New Pen(Color.FromArgb(200, color), 2)
                         g.DrawLine(pen, CSng(px), CSng(py), CSng(x), CSng(y))
                     End Using
@@ -1057,7 +1055,7 @@ Public Class Player
                 End If
             Next
         End Sub
-        Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
+        Private Shared Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
             Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
             Dim f As Double = hue / 60 - Math.Floor(hue / 60)
 
@@ -1080,20 +1078,27 @@ Public Class Player
             Public X As Double
             Public Y As Double
             Public Z As Double
+            Public Color As Color
 
             Public Sub New(rnd As Random)
-                Reset(rnd)
+                X = (rnd.NextDouble() * 2 - 1) * 5
+                Y = (rnd.NextDouble() * 2 - 1) * 5
+                Z = rnd.Next(300, 2000) ' start far away
+                Dim hue = rnd.Next(0, 360)
+                Color = ColorFromHSV(hue, 1, 1)
             End Sub
 
             Public Sub Update()
                 Z -= 5 ' speed toward viewer
             End Sub
-
             Public Sub Reset(rnd As Random)
-                X = rnd.NextDouble() * 2 - 1
-                Y = rnd.NextDouble() * 2 - 1
-                Z = rnd.Next(50, 200)
+                X = (rnd.NextDouble() * 2 - 1) * 5
+                Y = (rnd.NextDouble() * 2 - 1) * 5
+                Z = rnd.Next(300, 2000) ' always recycle far away
+                Dim hue = rnd.Next(0, 360)
+                Color = ColorFromHSV(hue, 1, 1)
             End Sub
+
         End Class
 
     End Class

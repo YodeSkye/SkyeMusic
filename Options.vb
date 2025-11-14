@@ -44,6 +44,7 @@ Public Class Options
             CoBoxVisualizers.Items.Add(vis)
         Next
         CoBoxVisualizers.SelectedItem = App.Visualizer
+        SetVisualizerSettingsPage()
         CoBoxPlaylistDefaultAction.Items.Clear()
         CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Play.ToString)
         CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Queue.ToString)
@@ -250,9 +251,15 @@ Public Class Options
     Private Sub CoBoxVisualizers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxVisualizers.SelectedIndexChanged
         App.Visualizer = CoBoxVisualizers.SelectedItem.ToString
         Player.ShowMedia()
+        SetVisualizerSettingsPage()
+    End Sub
+    Private Sub SetVisualizerSettingsPage()
         PanelVisualizers.Controls.Clear()
         Select Case App.Visualizer
-            Case "Rainbow Bars"
+            Case "Rainbow Bar"
+                Dim c As New OptionsRainbowBar
+                c.Dock = DockStyle.Fill
+                PanelVisualizers.Controls.Add(c)
             Case "Waveform"
             Case "Fractal Cloud"
             Case "Hyperspace Tunnel"

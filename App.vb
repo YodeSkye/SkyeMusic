@@ -410,6 +410,19 @@ Namespace My
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
         Friend HistoryTotalPlayedSongs As UInteger = 0 'Tracks the total number of songs played since the history was first created.
 
+        'Visualizer Saved Settings
+        Friend Visualizer As String = "Rainbow Bar" 'The current visualizer used in the application.
+        Friend Visualizers As New VisualizerSettings
+        Public Class VisualizerSettings
+            Public Property RainbowBarCount As Integer = 32 '8-128 'Number of bars to display.
+            Public Property RainbowBarGain As Single = 100.0F '10F-1000F 'Controls bar height sensitivity. Higher gain exaggerates quiet sounds, lower gain keeps bars smaller.
+            Public Property RainbowBarShowPeaks As Boolean = True 'Whether to show peak indicators.
+            Public Property RainbowBarPeakDecaySpeed As Integer = 7 '1-20 'Peak falloff per frame
+            Public Property RainbowBarPeakThickness As Integer = 6 '1-20 'Width of peak indicators
+            Public Property RainbowBarPeakThreshold As Integer = 50 '0-200 'Pixels above bottom 'Threshold to avoid flicker at bottom
+            Public Property RainbowBarHueCycleSpeed As Single = 2.0F '0.1F-20F 'How fast rainbow shifts
+        End Class
+
         'Registry Saved Settings
         Friend PlayerPositionShowElapsed As Boolean = True
         Friend PlayMode As PlayModes = PlayModes.Random
@@ -432,7 +445,6 @@ Namespace My
         Friend WatcherUpdateLibrary As Boolean = False 'Flag that indicates whether to automatically update the library when changes are detected in the file system.
         Friend WatcherUpdatePlaylist As Boolean = False 'Flag that indicates whether to automatically update the playlist when changes are detected in the file system.
         Friend Theme As Themes = Themes.Red 'The current theme of the application.
-        Friend Visualizer As String = "Rainbow Bar" 'The current visualizer used in the application.
         Friend PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend PlayerSize As New Size(-1, -1)
         Friend LibraryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
