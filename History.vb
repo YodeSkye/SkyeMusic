@@ -144,7 +144,6 @@ Public Class History
                 mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
             End If
         End If
-        cSender = Nothing
     End Sub
     Private Sub History_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblMostPlayedSong.MouseMove, LblSessionPlayedSongs.MouseMove, LblTotalDuration.MouseMove, LblTotalPlayedSongs.MouseMove, GrpBoxHistory.MouseMove
         If mMove Then
@@ -906,8 +905,7 @@ Public Class History
                 Dim hourlyCounts = plays.GroupBy(Function(p) p.StartPlayTime.Hour) _
                             .Select(Function(g) New With {
                                 .Hour = g.Key,
-                                .Count = g.Count()
-                            }) _
+                                g.Count()}) _
                             .OrderBy(Function(x) x.Hour)
 
                 ' Create chart
@@ -1052,94 +1050,94 @@ Public Class History
         Select Case CurrentView
             Case HistoryView.MostPlayed, HistoryView.RecentlyPlayed, HistoryView.Favorites
                 'Define 7 Columns
-                header = New ColumnHeader()
-                header.Name = "Title"
-                header.Text = "Title"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "Title",
+                    .Text = "Title",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "Artist"
-                header.Text = "Artist"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "Artist",
+                    .Text = "Artist",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "Album"
-                header.Text = "Album"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "Album",
+                    .Text = "Album",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "Genre"
-                header.Text = "Genre"
-                header.Width = 100
+                header = New ColumnHeader With {
+                    .Name = "Genre",
+                    .Text = "Genre",
+                    .Width = 100}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "PlayCount"
-                header.Text = "Plays"
-                header.Width = 50
+                header = New ColumnHeader With {
+                    .Name = "PlayCount",
+                    .Text = "Plays",
+                    .Width = 50}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "LastPlayed"
-                header.Text = "Last Played"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "LastPlayed",
+                    .Text = "Last Played",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "Path"
-                header.Text = "Path"
-                header.Width = 400
+                header = New ColumnHeader With {
+                    .Name = "Path",
+                    .Text = "Path",
+                    .Width = 400}
                 LVHistory.Columns.Add(header)
             Case HistoryView.MostPlayedArtists
                 'Define 3 Columns
-                header = New ColumnHeader()
-                header.Name = "Artist"
-                header.Text = "Artist"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "Artist",
+                    .Text = "Artist",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "PlayCount"
-                header.Text = "Count"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "PlayCount",
+                    .Text = "Count",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "LastPlayed"
-                header.Text = "Last Played"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "LastPlayed",
+                    .Text = "Last Played",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
             Case HistoryView.RecentlyAddedNotPlayed
                 'Define 7 Columns
-                header = New ColumnHeader()
-                header.Name = "Title"
-                header.Text = "Title"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "Title",
+                    .Text = "Title",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "Artist"
-                header.Text = "Artist"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "Artist",
+                    .Text = "Artist",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "Album"
-                header.Text = "Album"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "Album",
+                    .Text = "Album",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "Genre"
-                header.Text = "Genre"
-                header.Width = 100
+                header = New ColumnHeader With {
+                    .Name = "Genre",
+                    .Text = "Genre",
+                    .Width = 100}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "PlayCount"
-                header.Text = "Plays"
-                header.Width = 50
+                header = New ColumnHeader With {
+                    .Name = "PlayCount",
+                    .Text = "Plays",
+                    .Width = 50}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "Added"
-                header.Text = "Added"
-                header.Width = 200
+                header = New ColumnHeader With {
+                    .Name = "Added",
+                    .Text = "Added",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
-                header = New ColumnHeader()
-                header.Name = "Path"
-                header.Text = "Path"
-                header.Width = 400
+                header = New ColumnHeader With {
+                    .Name = "Path",
+                    .Text = "Path",
+                    .Width = 400}
                 LVHistory.Columns.Add(header)
         End Select
     End Sub

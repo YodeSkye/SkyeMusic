@@ -39,7 +39,6 @@ Public Class About
                 mOffset = New Point(-e.X - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 7, -e.Y - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 7)
             End If
         End If
-        cSender = Nothing
     End Sub
     Private Sub About_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblAbout.MouseMove, LblVersion.MouseMove
         If mMove Then
@@ -81,15 +80,13 @@ Public Class About
         ResetCursor()
     End Sub
     Private Sub LLblMicrosoft_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblMicrosoft.MouseClick
-        Dim pInfo As New Diagnostics.ProcessStartInfo
-        pInfo.UseShellExecute = True
-        pInfo.FileName = App.AttributionMicrosoft
+        Dim pInfo As New Diagnostics.ProcessStartInfo With {
+            .UseShellExecute = True,
+            .FileName = App.AttributionMicrosoft}
         Try
             Diagnostics.Process.Start(pInfo)
         Catch ex As Exception
             WriteToLog("Cannot Open " + App.AttributionMicrosoft + vbCr + ex.Message)
-        Finally
-            pInfo = Nothing
         End Try
     End Sub
     Private Sub LLblSyncFusion_MouseEnter(sender As Object, e As EventArgs) Handles LLblSyncFusion.MouseEnter
@@ -99,27 +96,23 @@ Public Class About
         ResetCursor()
     End Sub
     Private Sub LLblSyncFusion_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSyncFusion.MouseClick
-        Dim pInfo As New Diagnostics.ProcessStartInfo
-        pInfo.UseShellExecute = True
-        pInfo.FileName = App.AttributionSyncFusion
+        Dim pInfo As New Diagnostics.ProcessStartInfo With {
+            .UseShellExecute = True,
+            .FileName = App.AttributionSyncFusion}
         Try
             Diagnostics.Process.Start(pInfo)
         Catch ex As Exception
             WriteToLog("Cannot Open " + App.AttributionSyncFusion + vbCr + ex.Message)
-        Finally
-            pInfo = Nothing
         End Try
     End Sub
     Private Sub LLblTagLibSharp_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblTagLibSharp.MouseClick
-        Dim pInfo As New Diagnostics.ProcessStartInfo
-        pInfo.UseShellExecute = True
-        pInfo.FileName = App.AttributionTagLibSharp
+        Dim pInfo As New Diagnostics.ProcessStartInfo With {
+            .UseShellExecute = True,
+            .FileName = App.AttributionTagLibSharp}
         Try
             Diagnostics.Process.Start(pInfo)
         Catch ex As Exception
             WriteToLog("Cannot Open " + App.AttributionTagLibSharp + vbCr + ex.Message)
-        Finally
-            pInfo = Nothing
         End Try
     End Sub
     Private Sub LLblIcons8_MouseEnter(sender As Object, e As EventArgs) Handles LLblIcons8.MouseEnter
@@ -129,15 +122,13 @@ Public Class About
         ResetCursor()
     End Sub
     Private Sub LLblIcons8_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblIcons8.MouseClick
-        Dim pInfo As New Diagnostics.ProcessStartInfo
-        pInfo.UseShellExecute = True
-        pInfo.FileName = App.AttributionIcons8
+        Dim pInfo As New Diagnostics.ProcessStartInfo With {
+            .UseShellExecute = True,
+            .FileName = App.AttributionIcons8}
         Try
             Diagnostics.Process.Start(pInfo)
         Catch ex As Exception
             WriteToLog("Cannot Open " + App.AttributionIcons8 + vbCr + ex.Message)
-        Finally
-            pInfo = Nothing
         End Try
     End Sub
 

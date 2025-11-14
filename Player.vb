@@ -47,7 +47,7 @@ Public Class Player
     Private PausedAt As DateTime? = Nothing 'Used by Plays Database System to track when the player was paused.
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero 'Used by Plays Database System to track total paused duration.
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
-    Private TipPlaylistFont As Font = New Font("Segoe UI", 12) 'Font for Playlist Tooltip
+    Private TipPlaylistFont As New Font("Segoe UI", 12) 'Font for Playlist Tooltip
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private TipWatcherNotification As Skye.UI.ToolTipEX 'Tooltip for Watcher Notifications
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
@@ -314,8 +314,8 @@ Public Class Player
             Else
                 'First click → start a timer to see if a second one follows
                 lastClick = now
-                clickTimer = New Timer()
-                clickTimer.Interval = SystemInformation.DoubleClickTime
+                clickTimer = New Timer With {
+                    .Interval = SystemInformation.DoubleClickTime}
                 AddHandler clickTimer.Tick,
                 Sub()
                     clickTimer.Stop()
@@ -380,10 +380,10 @@ Public Class Player
 
     End Interface
     Friend Class VisualizerHostClass 'Host for Visualizers
-        Private visualizers As Dictionary(Of String, IVisualizer)
+        Private ReadOnly visualizers As Dictionary(Of String, IVisualizer)
         Private currentVisualizer As IVisualizer
-        Private ownerForm As Player
-        Private hostPanel As Panel
+        Private ReadOnly ownerForm As Player
+        Private ReadOnly hostPanel As Panel
 
         'Properties
         Public ReadOnly Property ActiveVisualizerName As String
@@ -467,8 +467,8 @@ Public Class Player
             Dim menu As New ContextMenuStrip()
 
             For Each vizName In visualizers.Keys
-                Dim item As New ToolStripMenuItem(vizName)
-                item.Font = ownerForm.Font
+                Dim item As New ToolStripMenuItem(vizName) With {
+                    .Font = ownerForm.Font}
 
                 'Mark the active one with a check
                 If vizName.Equals(Me.ActiveVisualizerName, StringComparison.OrdinalIgnoreCase) Then
@@ -489,8 +489,8 @@ Public Class Player
         Public Sub SetVisualizersMenu()
             Dim menu As New ContextMenuStrip()
             For Each vizName In visualizers.Keys
-                Dim item As New ToolStripMenuItem(vizName)
-                item.Font = ownerForm.Font
+                Dim item As New ToolStripMenuItem(vizName) With {
+                    .Font = ownerForm.Font}
                 AddHandler item.Click,
                     Sub(sender, e)
                         App.Visualizer = vizName
@@ -521,7 +521,7 @@ Public Class Player
         'Declarations
         Private capture As WasapiLoopbackCapture
         Private buffer() As Byte
-        Private visualizerHost As VisualizerHostClass
+        Private ReadOnly visualizerHost As VisualizerHostClass
 
         'Constructor
         Public Sub New(host As VisualizerHostClass)
@@ -583,10 +583,10 @@ Public Class Player
         Implements IVisualizer
 
         'Declarations
-        Private updateTimer As Timer
+        Private ReadOnly updateTimer As Timer
         Private audioData(), lastMagnitudes(), peakValues() As Single
         Private hueOffset As Single = 0.0F
-        Private gain As Single = App.Visualizers.RainbowBarGain 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
+        Private ReadOnly gain As Single = App.Visualizers.RainbowBarGain 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
 
         'Constructor
         Public Sub New()
@@ -717,7 +717,7 @@ Public Class Player
         Implements IVisualizer
 
         'Declarations
-        Private updateTimer As Timer
+        Private ReadOnly updateTimer As Timer
         Private audioData() As Single
         'Private gain As Single = 5000.0F
 
@@ -790,7 +790,7 @@ Public Class Player
         Inherits UserControl
         Implements IVisualizer
 
-        Private updateTimer As Timer
+        Private ReadOnly updateTimer As Timer
         Private audioData() As Single
         Private swirlAngle As Double = 0
         Private time As Double = 0
@@ -956,10 +956,10 @@ Public Class Player
         Inherits UserControl
         Implements IVisualizer
 
-        Private updateTimer As Timer
+        Private ReadOnly updateTimer As Timer
         Private audioData() As Single
-        Private particles As List(Of Particle)
-        Private rnd As New Random()
+        Private ReadOnly particles As List(Of Particle)
+        Private ReadOnly rnd As New Random()
         Private swirlAngle As Double = 0.0
 
         Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
@@ -1182,42 +1182,42 @@ Public Class Player
 
         'Initialize Listview
         Dim header As ColumnHeader
-        header = New ColumnHeader()
-        header.Name = "Title"
-        header.Text = "Title"
-        header.Width = 300
+        header = New ColumnHeader With {
+            .Name = "Title",
+            .Text = "Title",
+            .Width = 300}
         LVPlaylist.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Path"
-        header.Text = "Path"
-        header.Width = 550
+        header = New ColumnHeader With {
+            .Name = "Path",
+            .Text = "Path",
+            .Width = 550}
         LVPlaylist.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Rating"
-        header.Text = "Rating"
-        header.Width = 70
-        header.TextAlign = HorizontalAlignment.Center
+        header = New ColumnHeader With {
+            .Name = "Rating",
+            .Text = "Rating",
+            .Width = 70,
+            .TextAlign = HorizontalAlignment.Center}
         LVPlaylist.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "PlayCount"
-        header.Text = "Plays"
-        header.Width = 60
-        header.TextAlign = HorizontalAlignment.Center
+        header = New ColumnHeader With {
+            .Name = "PlayCount",
+            .Text = "Plays",
+            .Width = 60,
+            .TextAlign = HorizontalAlignment.Center}
         LVPlaylist.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "LastPlayed"
-        header.Text = "Last Played"
-        header.Width = 180
+        header = New ColumnHeader With {
+            .Name = "LastPlayed",
+            .Text = "Last Played",
+            .Width = 180}
         LVPlaylist.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "FirstPlayed"
-        header.Text = "First Played"
-        header.Width = 180
+        header = New ColumnHeader With {
+            .Name = "FirstPlayed",
+            .Text = "First Played",
+            .Width = 180}
         LVPlaylist.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Added"
-        header.Text = "Added"
-        header.Width = 180
+        header = New ColumnHeader With {
+            .Name = "Added",
+            .Text = "Added",
+            .Width = 180}
         LVPlaylist.Columns.Add(header)
         header = Nothing
 
@@ -1343,7 +1343,6 @@ Public Class Player
                 mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
             End If
         End If
-        cSender = Nothing
     End Sub
     Private Sub Player_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, MenuPlayer.MouseMove, LblPlaylistCount.MouseMove, LblDuration.MouseMove, PEXLeft.MouseMove, PEXRight.MouseMove
         If mMove Then
@@ -1629,7 +1628,7 @@ Public Class Player
             If itemover IsNot Nothing And itemover IsNot PlaylistItemMove Then
                 LVPlaylist.ListViewItemSorter = Nothing
                 ClearPlaylistTitles()
-                Dim insertbefore = True
+                Dim insertbefore As Boolean
                 Dim rc = itemover.GetBounds(ItemBoundsPortion.Entire)
                 If e.Y < rc.Top + rc.Height / 2 Then
                     insertbefore = True
@@ -2039,9 +2038,8 @@ Public Class Player
         LVPlaylist.Items.Clear()
     End Sub
     Private Sub CMIEditTitle_Click(sender As Object, e As EventArgs) Handles CMIEditTitle.Click
-        Dim frmEditTitle As New PlayerEditTitle
-        Dim uriresult As Uri = Nothing
-        frmEditTitle.NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text
+        Dim frmEditTitle As New PlayerEditTitle With {
+            .NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text}
         frmEditTitle.ShowDialog(Me)
         If frmEditTitle.DialogResult = DialogResult.OK Then
             If frmEditTitle.NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text Then
@@ -2064,8 +2062,6 @@ Public Class Player
                 item.EnsureVisible()
             End If
         Catch
-        Finally
-            item = Nothing
         End Try
     End Sub
     Private Sub CMIRating5Stars_Click(sender As Object, e As EventArgs) Handles CMIRating5Stars.Click
@@ -2167,8 +2163,8 @@ Public Class Player
             Case MouseButtons.Left
                 'Start a timer for single-click
                 If PicBoxAlbumArtClickTimer Is Nothing Then
-                    PicBoxAlbumArtClickTimer = New Timer()
-                    PicBoxAlbumArtClickTimer.Interval = SystemInformation.DoubleClickTime
+                    PicBoxAlbumArtClickTimer = New Timer With {
+                        .Interval = SystemInformation.DoubleClickTime}
                     AddHandler PicBoxAlbumArtClickTimer.Tick,
                         Sub()
                             PicBoxAlbumArtClickTimer?.Stop()
@@ -2557,14 +2553,14 @@ Public Class Player
         Dim dur As TimeSpan = TimeSpan.FromSeconds(duration)
         Dim durstr As String = ""
         If dur.Hours > 0 Then
-            durstr = durstr & dur.Hours.ToString
-            durstr = durstr & ":"
+            durstr &= dur.Hours.ToString
+            durstr &= ":"
         End If
-        If dur.Minutes < 10 Then durstr = durstr & "0"
-        durstr = durstr & dur.Minutes.ToString
-        durstr = durstr & ":"
-        If dur.Seconds < 10 Then durstr = durstr & "0"
-        durstr = durstr & dur.Seconds.ToString
+        If dur.Minutes < 10 Then durstr &= "0"
+        durstr &= dur.Minutes.ToString
+        durstr &= ":"
+        If dur.Seconds < 10 Then durstr &= "0"
+        durstr &= dur.Seconds.ToString
         Return durstr
     End Function
     Private Function FormatPosition(position As Double) As String
@@ -2572,14 +2568,14 @@ Public Class Player
         Dim posstr As String = ""
         If Not My.App.PlayerPositionShowElapsed Then posstr = "-"
         If pos.Hours > 0 Then
-            posstr = posstr & pos.Hours.ToString
-            posstr = posstr & ":"
+            posstr &= pos.Hours.ToString
+            posstr &= ":"
         End If
-        If pos.Minutes < 10 Then posstr = posstr & "0"
-        posstr = posstr & pos.Minutes.ToString
-        posstr = posstr & ":"
-        If pos.Seconds < 10 Then posstr = posstr & "0"
-        posstr = posstr & pos.Seconds.ToString
+        If pos.Minutes < 10 Then posstr &= "0"
+        posstr &= pos.Minutes.ToString
+        posstr &= ":"
+        If pos.Seconds < 10 Then posstr &= "0"
+        posstr &= pos.Seconds.ToString
         Return posstr
     End Function
     Private Function RandomHistoryFull() As Boolean

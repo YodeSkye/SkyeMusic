@@ -36,7 +36,6 @@ Public Class Help
                 mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
             End If
         End If
-        cSender = Nothing
     End Sub
     Private Sub Help_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove
         If mMove Then

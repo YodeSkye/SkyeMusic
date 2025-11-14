@@ -8,15 +8,15 @@ Public Class DevTools
     Private lastHistorySortAscending As Boolean = True
     Private DeleteHistoryConfirm As Boolean = False
     Private DeletePlaysConfirm As Boolean = False
-    Private WithEvents timerDeleteHistory As New Timer
-    Private WithEvents timerDeletePlays As New Timer
+    Private WithEvents TimerDeleteHistory As New Timer
+    Private WithEvents TimerDeletePlays As New Timer
     Private TipDevTools As Skye.UI.ToolTipEX
 
     'Form Events
     Private Sub DevTools_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = My.Application.Info.Title & " " & Text
-        timerDeleteHistory.Interval = 5000
-        timerDeletePlays.Interval = 5000
+        TimerDeleteHistory.Interval = 5000
+        TimerDeletePlays.Interval = 5000
         GetHistoryData()
         GetPlaysData()
     End Sub
@@ -105,10 +105,10 @@ Public Class DevTools
     End Sub
 
     'Handlers
-    Private Sub timerDeleteHistory_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerDeleteHistory.Tick
+    Private Sub TimerDeleteHistory_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerDeleteHistory.Tick
         SetDeleteHistoryConfirm()
     End Sub
-    Private Sub timerDeletePlays_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerDeletePlays.Tick
+    Private Sub TimerDeletePlays_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerDeletePlays.Tick
         SetDeletePlaysConfirm()
     End Sub
 
@@ -128,7 +128,7 @@ Public Class DevTools
     End Sub
     Private Sub SetDeleteHistoryConfirm(Optional forcereset As Boolean = False)
         If DeleteHistoryConfirm Or forcereset Then
-            timerDeleteHistory.Stop()
+            TimerDeleteHistory.Stop()
             DeleteHistoryConfirm = False
             BtnHistoryDeleteSelected.ResetBackColor()
             If TipDevTools IsNot Nothing Then TipDevTools.HideTooltip()
@@ -139,12 +139,12 @@ Public Class DevTools
             TipDevTools.HideDelay = 5000
             TipDevTools.ForeColor = Color.Red
             TipDevTools.ShowTooltipAtCursor("Are You Sure?")
-            timerDeleteHistory.Start()
+            TimerDeleteHistory.Start()
         End If
     End Sub
     Private Sub SetDeletePlaysConfirm(Optional forcereset As Boolean = False)
         If DeletePlaysConfirm Or forcereset Then
-            timerDeletePlays.Stop()
+            TimerDeletePlays.Stop()
             DeletePlaysConfirm = False
             BtnPlaysDeleteSelected.ResetBackColor()
             If TipDevTools IsNot Nothing Then TipDevTools.HideTooltip()
@@ -155,12 +155,12 @@ Public Class DevTools
             TipDevTools.HideDelay = 5000
             TipDevTools.ForeColor = Color.Red
             TipDevTools.ShowTooltipAtCursor("Are You Sure?")
-            timerDeletePlays.Start()
+            TimerDeletePlays.Start()
         End If
     End Sub
     Private Sub SetToolTip()
-        TipDevTools = New Skye.UI.ToolTipEX
-        TipDevTools.Font = New Font("Segoe UI", 14, FontStyle.Bold)
+        TipDevTools = New Skye.UI.ToolTipEX With {
+            .Font = New Font("Segoe UI", 14, FontStyle.Bold)}
     End Sub
 End Class
 
