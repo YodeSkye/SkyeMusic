@@ -75,65 +75,65 @@ Public Class Library
 
         'Define 12 Columns
         Dim header As ColumnHeader
-        header = New ColumnHeader()
-        header.Name = "Artist"
-        header.Text = "Artist"
-        header.Width = 200
+        header = New ColumnHeader With {
+            .Name = "Artist",
+            .Text = "Artist",
+            .Width = 200}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Title"
-        header.Text = "Title"
-        header.Width = 200
+        header = New ColumnHeader With {
+            .Name = "Title",
+            .Text = "Title",
+            .Width = 200}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Album"
-        header.Text = "Album"
-        header.Width = 200
+        header = New ColumnHeader With {
+            .Name = "Album",
+            .Text = "Album",
+            .Width = 200}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Genre"
-        header.Text = "Genre"
-        header.Width = 100
+        header = New ColumnHeader With {
+            .Name = "Genre",
+            .Text = "Genre",
+            .Width = 100}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Year"
-        header.Text = "Year"
-        header.Width = 50
+        header = New ColumnHeader With {
+            .Name = "Year",
+            .Text = "Year",
+            .Width = 50}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Track"
-        header.Text = "T"
-        header.Width = 25
+        header = New ColumnHeader With {
+            .Name = "Track",
+            .Text = "T",
+            .Width = 25}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Tracks"
-        header.Text = "Ts"
-        header.Width = 25
+        header = New ColumnHeader With {
+            .Name = "Tracks",
+            .Text = "Ts",
+            .Width = 25}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Duration"
-        header.Text = "Duration"
-        header.Width = 67
+        header = New ColumnHeader With {
+            .Name = "Duration",
+            .Text = "Duration",
+            .Width = 67}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "AV"
-        header.Text = "AV"
-        header.Width = 27
+        header = New ColumnHeader With {
+            .Name = "AV",
+            .Text = "AV",
+            .Width = 27}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Artists"
-        header.Text = "Contributing Artists"
-        header.Width = 200
+        header = New ColumnHeader With {
+            .Name = "Artists",
+            .Text = "Contributing Artists",
+            .Width = 200}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "Comments"
-        header.Text = "Comments"
-        header.Width = 200
+        header = New ColumnHeader With {
+            .Name = "Comments",
+            .Text = "Comments",
+            .Width = 200}
         LVLibrary.Columns.Add(header)
-        header = New ColumnHeader()
-        header.Name = "FilePath"
-        header.Text = "File Path"
-        header.Width = 200
+        header = New ColumnHeader With {
+            .Name = "FilePath",
+            .Text = "File Path",
+            .Width = 200}
         LVLibrary.Columns.Add(header)
         header = Nothing
 
@@ -182,7 +182,6 @@ Public Class Library
                 mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
             End If
         End If
-        cSender = Nothing
     End Sub
     Private Sub Library_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblLibraryCounts.MouseMove, LblExtTitle.MouseMove, LblExtFileInfo.MouseMove, LblExtProperties.MouseMove, LblExtType.MouseMove, GrpBoxGroupBy.MouseMove, PicBoxAlbumArt.MouseMove
         If mMove Then
@@ -233,7 +232,6 @@ Public Class Library
         e.Graphics.DrawLine(SystemPens.ControlDark, (b.X + 1), b.Bottom, b.Right, b.Bottom)
         e.Graphics.DrawLine(SystemPens.ControlDark, b.Right, (b.Y + 1), b.Right, b.Bottom)
         'Draw Text
-        b = e.Bounds
         Dim width As Integer = TextRenderer.MeasureText(" ", e.Font).Width
         b = Rectangle.Inflate(e.Bounds, -2, 0)
         TextRenderer.DrawText(e.Graphics, e.Header.Text, e.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.VerticalCenter)
@@ -661,8 +659,8 @@ Public Class Library
             Case MouseButtons.Left
                 'Start a timer for single-click
                 If PicBoxAlbumArtClickTimer Is Nothing Then
-                    PicBoxAlbumArtClickTimer = New Timer()
-                    PicBoxAlbumArtClickTimer.Interval = SystemInformation.DoubleClickTime
+                    PicBoxAlbumArtClickTimer = New Timer With {
+                        .Interval = SystemInformation.DoubleClickTime}
                     AddHandler PicBoxAlbumArtClickTimer.Tick,
                         Sub()
                             PicBoxAlbumArtClickTimer?.Stop()
@@ -1067,19 +1065,19 @@ Public Class Library
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim items As New Collections.Generic.List(Of LibraryItemType)
             For Each libraryitem As ListViewItem In LVLibrary.Items
-                Dim newitem As New LibraryItemType
-                newitem.Artist = libraryitem.SubItems(LVLibrary.Columns("Artist").Index).Text
-                newitem.Title = libraryitem.SubItems(LVLibrary.Columns("Title").Index).Text
-                newitem.Album = libraryitem.SubItems(LVLibrary.Columns("Album").Index).Text
-                newitem.Genre = libraryitem.SubItems(LVLibrary.Columns("Genre").Index).Text
-                newitem.Year = libraryitem.SubItems(LVLibrary.Columns("Year").Index).Text
-                newitem.Track = libraryitem.SubItems(LVLibrary.Columns("Track").Index).Text
-                newitem.Tracks = libraryitem.SubItems(LVLibrary.Columns("Tracks").Index).Text
-                newitem.Duration = libraryitem.SubItems(LVLibrary.Columns("Duration").Index).Text
-                newitem.AV = libraryitem.SubItems(LVLibrary.Columns("AV").Index).Text
-                newitem.Artists = libraryitem.SubItems(LVLibrary.Columns("Artists").Index).Text
-                newitem.Comments = libraryitem.SubItems(LVLibrary.Columns("Comments").Index).Text
-                newitem.FilePath = libraryitem.SubItems(LVLibrary.Columns("FilePath").Index).Text
+                Dim newitem As New LibraryItemType With {
+                    .Artist = libraryitem.SubItems(LVLibrary.Columns("Artist").Index).Text,
+                    .Title = libraryitem.SubItems(LVLibrary.Columns("Title").Index).Text,
+                    .Album = libraryitem.SubItems(LVLibrary.Columns("Album").Index).Text,
+                    .Genre = libraryitem.SubItems(LVLibrary.Columns("Genre").Index).Text,
+                    .Year = libraryitem.SubItems(LVLibrary.Columns("Year").Index).Text,
+                    .Track = libraryitem.SubItems(LVLibrary.Columns("Track").Index).Text,
+                    .Tracks = libraryitem.SubItems(LVLibrary.Columns("Tracks").Index).Text,
+                    .Duration = libraryitem.SubItems(LVLibrary.Columns("Duration").Index).Text,
+                    .AV = libraryitem.SubItems(LVLibrary.Columns("AV").Index).Text,
+                    .Artists = libraryitem.SubItems(LVLibrary.Columns("Artists").Index).Text,
+                    .Comments = libraryitem.SubItems(LVLibrary.Columns("Comments").Index).Text,
+                    .FilePath = libraryitem.SubItems(LVLibrary.Columns("FilePath").Index).Text}
                 If libraryitem.ImageKey = "AlbumArt" Then
                     newitem.HasAlbumArt = True
                 Else
@@ -1184,9 +1182,8 @@ Public Class Library
                         PicBoxAlbumArt.Visible = False
                     End Try
                     ms.Dispose()
-                    ms = Nothing
                 End If
-                tlfile = Nothing
+                tlfile.Dispose()
             End If
         Else
             PicBoxAlbumArt.Visible = False
@@ -1275,9 +1272,9 @@ Public Class Library
                     pGroup = String.Empty
             End Select
             If GetLibraryGroupIndex(pGroup) = -1 Then
-                aGroup = New LibraryGroup
-                aGroup.Name = pGroup
-                aGroup.Index = CShort(LibraryGroups.Count)
+                aGroup = New LibraryGroup With {
+                    .Name = pGroup,
+                    .Index = CShort(LibraryGroups.Count)}
                 LibraryGroups.Add(aGroup)
             End If
 
