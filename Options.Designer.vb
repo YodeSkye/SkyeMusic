@@ -816,6 +816,8 @@ Partial Class Options
         ' CoBoxVisualizers
         ' 
         CoBoxVisualizers.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        CoBoxVisualizers.DropDownStyle = ComboBoxStyle.DropDownList
+        CoBoxVisualizers.FlatStyle = FlatStyle.Flat
         CoBoxVisualizers.FormattingEnabled = True
         TipOptionsEX.SetImage(CoBoxVisualizers, Nothing)
         CoBoxVisualizers.Location = New Point(13, 29)

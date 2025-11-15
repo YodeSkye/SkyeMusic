@@ -1147,6 +1147,10 @@ Namespace My
                 RegSubKey.SetValue("RainbowBarPeakThreshold", Visualizers.RainbowBarPeakThreshold.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("RainbowBarHueCycleSpeed", Visualizers.RainbowBarHueCycleSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("WaveformFill", Visualizers.WaveformFill.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("FractalCloudPalette", Visualizers.FractalCloudPalette.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("FractalCloudSwirlSpeedBase", Visualizers.FractalCloudSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("FractalCloudSwirlSpeedAudioFactor", Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("FractalCloudTimeIncrement", Visualizers.FractalCloudTimeIncrement.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.Close()
 
                 RegKey.Flush()
@@ -1284,8 +1288,13 @@ Namespace My
                     Case "True", "1" : Visualizers.WaveformFill = True
                     Case Else : Visualizers.WaveformFill = False
                 End Select
+                Try : Visualizers.FractalCloudPalette = CType([Enum].Parse(GetType(VisualizerSettings.FractalCloudPalettes), RegSubKey.GetValue("FractalCloudPalette", VisualizerSettings.FractalCloudPalettes.Normal.ToString).ToString), VisualizerSettings.FractalCloudPalettes)
+                Catch : App.PlaylistTitleFormat = App.PlaylistTitleFormats.ArtistSong
+                End Try
+                Visualizers.FractalCloudSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedBase", 0.01F.ToString)))
+                Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedAudioFactor", 10.0F.ToString)))
+                Visualizers.FractalCloudTimeIncrement = CDbl(Val(RegSubKey.GetValue("FractalCloudTimeIncrement", 0.02F.ToString)))
                 RegSubKey.Close()
-
                 RegSubKey.Dispose()
                 RegKey.Close()
                 RegKey.Dispose()

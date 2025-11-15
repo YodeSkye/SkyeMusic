@@ -253,24 +253,6 @@ Public Class Options
         Player.ShowMedia()
         SetVisualizerSettingsPage()
     End Sub
-    Private Sub SetVisualizerSettingsPage()
-        PanelVisualizers.Controls.Clear()
-        Select Case App.Visualizer
-            Case "Rainbow Bar"
-                Dim c As New OptionsRainbowBar With {
-                    .Dock = DockStyle.Fill}
-                PanelVisualizers.Controls.Add(c)
-            Case "Waveform"
-                Dim c As New OptionsWaveform With {
-                    .Dock = DockStyle.Fill}
-                PanelVisualizers.Controls.Add(c)
-            Case "Fractal Cloud"
-                Dim c As New OptionsFractalCloud With {
-                    .Dock = DockStyle.Fill}
-                PanelVisualizers.Controls.Add(c)
-            Case "Hyperspace Tunnel"
-        End Select
-    End Sub
     Private Sub CoBoxPlaylistDefaultAction_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistDefaultAction.SelectionChangeCommitted
         App.PlaylistDefaultAction = CType(CoBoxPlaylistDefaultAction.SelectedIndex, App.PlaylistActions)
     End Sub
@@ -525,6 +507,24 @@ Public Class Options
         BtnHistoryPrune.Text = BtnHistoryPrune.Text.TrimEnd(App.TrimEndSearch) + " (" + App.History.Count.ToString + ")"
         BtnHistoryPrune.Enabled = (App.History.Count > 0)
         BtnHistorySaveNow.Enabled = (App.History.Count > 0)
+    End Sub
+    Private Sub SetVisualizerSettingsPage()
+        PanelVisualizers.Controls.Clear()
+        Select Case App.Visualizer
+            Case "Rainbow Bar"
+                Dim c As New OptionsRainbowBar With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
+            Case "Waveform"
+                Dim c As New OptionsWaveform With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
+            Case "Fractal Cloud"
+                Dim c As New OptionsFractalCloud With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
+            Case "Hyperspace Tunnel"
+        End Select
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
