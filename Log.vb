@@ -9,7 +9,7 @@ Public Class Log
     Private CurrentAccentColor As Color 'Current Windows Accent Color
     Private LogSearchTitle As String
     Private DeleteLogConfirm As Boolean = False
-    Private WithEvents timerDeleteLog As New Timer
+    Private WithEvents TimerDeleteLog As New Timer
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -27,7 +27,7 @@ Public Class Log
     Private Sub Log_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = My.Application.Info.Title + " Log"
         LogSearchTitle = TxBxSearch.Text
-        timerDeleteLog.Interval = 5000
+        TimerDeleteLog.Interval = 5000
         SetAccentColor()
         SetTheme()
 #If DEBUG Then
@@ -53,7 +53,6 @@ Public Class Log
                 mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
             End If
         End If
-        cSender = Nothing
     End Sub
     Private Sub Log_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LBLLogInfo.MouseMove
         If mMove Then
@@ -132,8 +131,8 @@ Public Class Log
                 TxBxSearch.ForeColor = App.CurrentTheme.TextColor
             End If
             ResetRTBLogFind()
-            ElseIf Not TxBxSearch.Text = LogSearchTitle AndAlso TxBxSearch.Text.Length > 4 AndAlso IsHandleCreated Then
-                Debug.Print("Searching Log...")
+        ElseIf Not TxBxSearch.Text = LogSearchTitle AndAlso TxBxSearch.Text.Length > 4 AndAlso IsHandleCreated Then
+            Debug.Print("Searching Log...")
             LblStatus.Visible = True
             LblStatus.Refresh()
             Dim foundindex As Integer
@@ -150,9 +149,9 @@ Public Class Log
                     TxBxSearch.ForeColor = App.CurrentTheme.TextColor
                 End If
                 RTBLog.Select(foundindex, 0)
-                    RTBLog.ScrollToCaret()
-                End If
-                Do Until foundindex < 0
+                RTBLog.ScrollToCaret()
+            End If
+            Do Until foundindex < 0
                 'Highlight Current Match
                 RTBLog.SelectionStart = foundindex
                 RTBLog.SelectionLength = TxBxSearch.Text.Length
@@ -170,7 +169,7 @@ Public Class Log
     End Sub
 
     'Handlers
-    Private Sub timerDeleteLog_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles timerDeleteLog.Tick
+    Private Sub TimerDeleteLog_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerDeleteLog.Tick
         SetDeleteLogConfirm()
     End Sub
 
@@ -194,7 +193,7 @@ Public Class Log
     End Sub
     Private Sub SetDeleteLogConfirm(Optional forcereset As Boolean = False)
         If DeleteLogConfirm Or forcereset Then
-            timerDeleteLog.Stop()
+            TimerDeleteLog.Stop()
             DeleteLogConfirm = False
             Me.BTNDeleteLog.BackColor = App.CurrentTheme.ButtonBackColor
             TipLog.Hide(BTNDeleteLog)
@@ -202,7 +201,7 @@ Public Class Log
             DeleteLogConfirm = True
             Me.BTNDeleteLog.BackColor = Color.Red
             TipLog.Show("Are You Sure?", Me, PointToClient(MousePosition))
-            timerDeleteLog.Start()
+            TimerDeleteLog.Start()
         End If
     End Sub
     Private Sub CheckMove(ByRef location As Point)

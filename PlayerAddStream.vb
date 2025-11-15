@@ -39,7 +39,6 @@ Public Class PlayerAddStream
                 mOffset = New Point(-e.X - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 5, -e.Y - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 5)
             End If
         End If
-        cSender = Nothing
     End Sub
     Private Sub Options_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblStreamTitle.MouseMove, LblStreamPath.MouseMove
         If mMove Then
