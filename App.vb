@@ -106,12 +106,6 @@ Namespace My
             End Function
 
         End Class
-        <Serializable>
-        Public Class HistoryData
-            Public Property SchemaVersion As Integer = 1
-            Public Property History As List(Of Song)
-            Public Property TotalPlayedSongs As UInteger
-        End Class
         Public Class SongView 'Wrapper for your serialized Song History data to provide easy access to metadata and present on Stats form
             Public Property Data As Song   'The original serialized Song History data
 
@@ -409,6 +403,12 @@ Namespace My
         'XML Saved History
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
         Friend HistoryTotalPlayedSongs As UInteger = 0 'Tracks the total number of songs played since the history was first created.
+        <Serializable>
+        Public Class HistoryData
+            Public Property SchemaVersion As Integer = 1
+            Public Property History As List(Of Song)
+            Public Property TotalPlayedSongs As UInteger
+        End Class
 
         'Visualizer Saved Settings
         Friend Visualizer As String = "Rainbow Bar" 'The current visualizer used in the application.
@@ -1057,8 +1057,12 @@ Namespace My
                 Dim starttime As TimeSpan = Computer.Clock.LocalTime.TimeOfDay
                 Dim RegKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegPath, True)
                 Dim RegSubKey As Microsoft.Win32.RegistryKey
+
+                ' Player Settings
                 RegKey.SetValue("PlayerPositionShowElapsed", App.PlayerPositionShowElapsed.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayMode", App.PlayMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+
+                ' Playlist Settings
                 RegKey.SetValue("PlaylistTitleFormat", App.PlaylistTitleFormat.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlaylistTitleRemoveSpaces", App.PlaylistTitleRemoveSpaces.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlaylistTitleSeparator", App.PlaylistTitleSeparator, Microsoft.Win32.RegistryValueKind.String)
@@ -1066,14 +1070,27 @@ Namespace My
                 RegKey.SetValue("PlaylistDefaultAction", App.PlaylistDefaultAction.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlaylistSearchAction", App.PlaylistSearchAction.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlaylistStatusMessageDisplayTime", App.PlaylistStatusMessageDisplayTime.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("Theme", App.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
-                RegKey.SetValue("SuspendOnSessionChange", App.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("SaveWindowMetrics", App.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
+
+                ' Library Settings
+                RegKey.SetValue("LibrarySearchSubFolders", LibrarySearchSubFolders.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("WatcherEnabled", WatcherEnabled.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("WatcherUpdateLibrary", WatcherUpdateLibrary.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("WatcherUpdatePlaylist", WatcherUpdatePlaylist.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey = RegKey.OpenSubKey("LibraryWatchFolders", True)
+                For Each s As String In RegSubKey.GetValueNames : RegSubKey.DeleteValue(s) : Next
+                For Each s As String In LibrarySearchFolders : RegSubKey.SetValue("Folder" + Str(LibrarySearchFolders.IndexOf(s) + 1).Trim, s, Microsoft.Win32.RegistryValueKind.String) : Next
+                RegSubKey.Close()
+
+                ' History Settings
                 RegKey.SetValue("RandomHistoryUpdateInterval", App.RandomHistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HistoryUpdateInterval", App.HistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HistoryAutoSaveInterval", App.HistoryAutoSaveInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HistoryViewMaxRecords", App.HistoryViewMaxRecords.ToString, Microsoft.Win32.RegistryValueKind.String)
+
+                ' General App Settings
+                RegKey.SetValue("Theme", App.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("SuspendOnSessionChange", App.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("SaveWindowMetrics", App.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationX", App.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationY", App.PlayerLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerSizeX", App.PlayerSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1095,14 +1112,19 @@ Namespace My
                 RegKey.SetValue("HelperApp2Name", App.HelperApp2Name, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HelperApp2Path", App.HelperApp2Path, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("ChangeLogLastVersionShown", App.ChangeLogLastVersionShown, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey = RegKey.OpenSubKey("LibraryWatchFolders", True)
-                For Each s As String In RegSubKey.GetValueNames : RegSubKey.DeleteValue(s) : Next
-                For Each s As String In LibrarySearchFolders : RegSubKey.SetValue("Folder" + Str(LibrarySearchFolders.IndexOf(s) + 1).Trim, s, Microsoft.Win32.RegistryValueKind.String) : Next
+
+                ' Visualizer Settings
+                RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
+                RegSubKey = RegKey.OpenSubKey("Visualizers", True)
+                RegSubKey.SetValue("RainbowBarCount", Visualizers.RainbowBarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("RainbowBarGain", Visualizers.RainbowBarGain.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("RainbowBarShowPeaks", Visualizers.RainbowBarShowPeaks.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("RainbowBarPeakDecaySpeed", Visualizers.RainbowBarPeakDecaySpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("RainbowBarPeakThickness", Visualizers.RainbowBarPeakThickness.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("RainbowBarPeakThreshold", Visualizers.RainbowBarPeakThreshold.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("RainbowBarHueCycleSpeed", Visualizers.RainbowBarHueCycleSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.Close()
-                RegKey.SetValue("LibrarySearchSubFolders", LibrarySearchSubFolders.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("WatcherEnabled", WatcherEnabled.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("WatcherUpdateLibrary", WatcherUpdateLibrary.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("WatcherUpdatePlaylist", WatcherUpdatePlaylist.ToString, Microsoft.Win32.RegistryValueKind.String)
+
                 RegKey.Flush()
                 RegSubKey.Dispose()
                 RegKey.Close()
@@ -1117,6 +1139,8 @@ Namespace My
                 Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
                 Dim RegKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegPath)
                 Dim RegSubKey As Microsoft.Win32.RegistryKey
+
+                ' Player Settings
                 Select Case RegKey.GetValue("PlayerPositionShowElapsed", "True").ToString
                     Case "False", "0" : PlayerPositionShowElapsed = False
                     Case Else : PlayerPositionShowElapsed = True
@@ -1124,6 +1148,8 @@ Namespace My
                 Try : App.PlayMode = CType([Enum].Parse(GetType(App.PlayModes), RegKey.GetValue("PlayMode", App.PlayModes.Random.ToString).ToString), PlayModes)
                 Catch : App.PlayMode = App.PlayModes.Random
                 End Try
+
+                ' Playlist Settings
                 Try : App.PlaylistTitleFormat = CType([Enum].Parse(GetType(App.PlaylistTitleFormats), RegKey.GetValue("PlaylistTitleFormat", App.PlaylistTitleFormats.ArtistSong.ToString).ToString), PlaylistTitleFormats)
                 Catch : App.PlaylistTitleFormat = App.PlaylistTitleFormats.ArtistSong
                 End Try
@@ -1143,18 +1169,30 @@ Namespace My
                 If PlaylistStatusMessageDisplayTime > 60 Then
                     PlaylistStatusMessageDisplayTime = 60 'Limit the value to a maximum of 60 seconds
                 End If
-                Try : App.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Red.ToString).ToString), App.Themes)
-                Catch : App.Theme = App.Themes.Red
-                End Try
-                Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
-                Select Case RegKey.GetValue("SuspendOnSessionChange", "True").ToString
-                    Case "False", "0" : App.SuspendOnSessionChange = False
-                    Case Else : App.SuspendOnSessionChange = True
+
+                ' Library Settings
+                LibrarySearchFolders.Clear()
+                Select Case RegKey.GetValue("LibrarySearchSubFolders", "True").ToString
+                    Case "False", "0" : LibrarySearchSubFolders = False
+                    Case Else : LibrarySearchSubFolders = True
                 End Select
-                Select Case RegKey.GetValue("SaveWindowMetrics", "False").ToString
-                    Case "True", "1" : App.SaveWindowMetrics = True
-                    Case Else : App.SaveWindowMetrics = False
+                Select Case RegKey.GetValue("WatcherEnabled", "False").ToString
+                    Case "True", "1" : WatcherEnabled = True
+                    Case Else : WatcherEnabled = False
                 End Select
+                Select Case RegKey.GetValue("WatcherUpdateLibrary", "False").ToString
+                    Case "True", "1" : WatcherUpdateLibrary = True
+                    Case Else : WatcherUpdateLibrary = False
+                End Select
+                Select Case RegKey.GetValue("WatcherUpdatePlaylist", "False").ToString
+                    Case "True", "1" : WatcherUpdatePlaylist = True
+                    Case Else : WatcherUpdatePlaylist = False
+                End Select
+                RegSubKey = RegKey.CreateSubKey("LibraryWatchFolders")
+                For Each s As String In RegSubKey.GetValueNames : LibrarySearchFolders.Add(RegSubKey.GetValue(s).ToString) : Next
+                RegSubKey.Close()
+
+                ' History Settings
                 RandomHistoryUpdateInterval = CByte(Val(RegKey.GetValue("RandomHistoryUpdateInterval", 5.ToString)))
                 If RandomHistoryUpdateInterval > 60 Then
                     RandomHistoryUpdateInterval = 60 'Limit the interval to a maximum of 60 seconds
@@ -1170,6 +1208,19 @@ Namespace My
                     HistoryAutoSaveInterval = 1440 'Limit the interval to a maximum of 1440 minutes (24 hours)
                 End If
                 HistoryViewMaxRecords = CUShort(Val(RegKey.GetValue("HistoryViewMaxRecords", 25.ToString)))
+
+                ' General App Settings
+                Try : App.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Red.ToString).ToString), App.Themes)
+                Catch : App.Theme = App.Themes.Red
+                End Try
+                Select Case RegKey.GetValue("SuspendOnSessionChange", "True").ToString
+                    Case "False", "0" : App.SuspendOnSessionChange = False
+                    Case Else : App.SuspendOnSessionChange = True
+                End Select
+                Select Case RegKey.GetValue("SaveWindowMetrics", "False").ToString
+                    Case "True", "1" : App.SaveWindowMetrics = True
+                    Case Else : App.SaveWindowMetrics = False
+                End Select
                 App.PlayerLocation.X = CInt(Val(RegKey.GetValue("PlayerLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
                 App.PlayerLocation.Y = CInt(Val(RegKey.GetValue("PlayerLocationY", (-1).ToString)))
                 App.PlayerSize.Width = CInt(Val(RegKey.GetValue("PlayerSizeX", (-1).ToString)))
@@ -1191,26 +1242,22 @@ Namespace My
                 App.HelperApp2Name = RegKey.GetValue("HelperApp2Name", "MP3Tag").ToString
                 App.HelperApp2Path = RegKey.GetValue("HelperApp2Path", "C:\Program Files\Mp3tag\Mp3tag.exe").ToString
                 App.ChangeLogLastVersionShown = RegKey.GetValue("ChangeLogLastVersionShown", String.Empty).ToString
-                LibrarySearchFolders.Clear()
-                RegSubKey = RegKey.CreateSubKey("LibraryWatchFolders")
-                For Each s As String In RegSubKey.GetValueNames : LibrarySearchFolders.Add(RegSubKey.GetValue(s).ToString) : Next
+
+                ' Visualizer Settings
+                Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
+                RegSubKey = RegKey.CreateSubKey("Visualizers")
+                Visualizers.RainbowBarCount = CInt(Val(RegSubKey.GetValue("RainbowBarCount", 32.ToString)))
+                Visualizers.RainbowBarGain = CSng(Val(RegSubKey.GetValue("RainbowBarGain", 100.0F.ToString)))
+                Select Case RegSubKey.GetValue("RainbowBarShowPeaks", "True").ToString
+                    Case "False", "0" : Visualizers.RainbowBarShowPeaks = False
+                    Case Else : Visualizers.RainbowBarShowPeaks = True
+                End Select
+                Visualizers.RainbowBarPeakDecaySpeed = CInt(Val(RegSubKey.GetValue("RainbowBarPeakDecaySpeed", 7.ToString)))
+                Visualizers.RainbowBarPeakThickness = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThickness", 6.ToString)))
+                Visualizers.RainbowBarPeakThreshold = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThreshold", 50.ToString)))
+                Visualizers.RainbowBarHueCycleSpeed = CSng(Val(RegSubKey.GetValue("RainbowBarHueCycleSpeed", 2.0F.ToString)))
                 RegSubKey.Close()
-                Select Case RegKey.GetValue("LibrarySearchSubFolders", "True").ToString
-                    Case "False", "0" : LibrarySearchSubFolders = False
-                    Case Else : LibrarySearchSubFolders = True
-                End Select
-                Select Case RegKey.GetValue("WatcherEnabled", "False").ToString
-                    Case "True", "1" : WatcherEnabled = True
-                    Case Else : WatcherEnabled = False
-                End Select
-                Select Case RegKey.GetValue("WatcherUpdateLibrary", "False").ToString
-                    Case "True", "1" : WatcherUpdateLibrary = True
-                    Case Else : WatcherUpdateLibrary = False
-                End Select
-                Select Case RegKey.GetValue("WatcherUpdatePlaylist", "False").ToString
-                    Case "True", "1" : WatcherUpdatePlaylist = True
-                    Case Else : WatcherUpdatePlaylist = False
-                End Select
+
                 RegSubKey.Dispose()
                 RegKey.Close()
                 RegKey.Dispose()
