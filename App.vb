@@ -427,6 +427,18 @@ Namespace My
             ' Waveform Visualizer Settings
             Public Property WaveformFill As Boolean = False 'Whether to fill underneath the waveform.
 
+            ' Fractal Cloud Visualizer Settings
+            Public Enum FractalCloudPalettes
+                Normal
+                Firestorm
+                Aurora
+                CosmicRainbow
+            End Enum
+            Public Property FractalCloudPalette As FractalCloudPalettes = FractalCloudPalettes.Normal 'The color palette used for the fractal cloud visualizer.
+            Public Property FractalCloudSwirlSpeedBase As Double = 0.01F ' 0.001F-0.050F Base speed of swirl rotation.
+            Public Property FractalCloudSwirlSpeedAudioFactor As Double = 10.0F ' 1-30 How much audio affects swirl speed.
+            Public Property FractalCloudTimeIncrement As Double = 0.02F ' 0.005F-0.100F Increment for fractal time variable. Animation Speed.
+
         End Class
 
         ' Registry Saved Settings

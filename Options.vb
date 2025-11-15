@@ -265,6 +265,9 @@ Public Class Options
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
             Case "Fractal Cloud"
+                Dim c As New OptionsFractalCloud With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
             Case "Hyperspace Tunnel"
         End Select
     End Sub

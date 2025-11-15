@@ -863,8 +863,8 @@ Public Class Player
             smoothedLevel = smoothedLevel * 0.9 + level * 0.1
 
             'Swirl motion: steady baseline + audio modulation
-            swirlAngle += 0.01 + smoothedLevel * 10.0
-            time += 0.02 ' fixed baseline, not audio-driven
+            swirlAngle += App.Visualizers.FractalCloudSwirlSpeedBase + smoothedLevel * App.Visualizers.FractalCloudSwirlSpeedAudioFactor
+            time += App.Visualizers.FractalCloudTimeIncrement ' fixed baseline, not audio-driven
 
             'Soft reset to avoid runaway values
             If swirlAngle > 100000 Then swirlAngle = 0
@@ -907,17 +907,17 @@ Public Class Player
                         Dim sat As Double = 1.0
                         Dim val As Double = n ' default brightness
                         Dim col As Color
-                        Select Case paletteMode
-                            Case "Normal"
+                        Select Case App.Visualizers.FractalCloudPalette
+                            Case App.VisualizerSettings.FractalCloudPalettes.Normal
                                 hue = (n * 360 + bass * 400 + treble * 200) Mod 360
                                 col = ColorFromHSV(hue, sat, val)
-                            Case "Firestorm"
+                            Case App.VisualizerSettings.FractalCloudPalettes.Firestorm
                                 hue = 0 + (n * 60) ' restrict to red–yellow range
                                 col = ColorFromHSV(hue, sat, val)
-                            Case "Aurora"
+                            Case App.VisualizerSettings.FractalCloudPalettes.Aurora
                                 hue = 120 + (n * 120) ' restrict to green–cyan range
                                 col = ColorFromHSV(hue, sat, val)
-                            Case "CosmicRainbow"
+                            Case App.VisualizerSettings.FractalCloudPalettes.CosmicRainbow
                                 hue = (n * 360 + bass * 400 + treble * 200) Mod 360
                                 sat = Math.Min(1.0, 0.5 + bass * 5) ' bass drives vividness
                                 val = Math.Min(1.0, n * (1.0 - treble * 0.5)) ' treble softens brightness
