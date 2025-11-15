@@ -22,6 +22,7 @@ Partial Class OptionsRainbowBar
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        components = New ComponentModel.Container()
         TBGain = New Syncfusion.Windows.Forms.Tools.TrackBarEx(10, 1000)
         LblBarCount = New Skye.UI.Label()
         TxtBoxBarCount = New TextBox()
@@ -39,6 +40,7 @@ Partial Class OptionsRainbowBar
         LblPresets = New Skye.UI.Label()
         BtnEnergetic = New Button()
         BtnExtreme = New Button()
+        TipRainbowBar = New Skye.UI.ToolTip(components)
         SuspendLayout()
         ' 
         ' TBGain
@@ -53,6 +55,8 @@ Partial Class OptionsRainbowBar
         TBGain.SmallChange = 10
         TBGain.TabIndex = 0
         TBGain.TimerInterval = 100
+        TipRainbowBar.SetToolTip(TBGain, "Controls Bar Height Sensitivity. Higher gain exaggerates quiet sounds, lower gain keeps bars smaller.")
+        TipRainbowBar.SetToolTipImage(TBGain, Nothing)
         TBGain.Value = 10
         ' 
         ' LblBarCount
@@ -64,6 +68,7 @@ Partial Class OptionsRainbowBar
         LblBarCount.TabIndex = 1
         LblBarCount.Text = "Bar Count"
         LblBarCount.TextAlign = ContentAlignment.MiddleCenter
+        TipRainbowBar.SetToolTipImage(LblBarCount, Nothing)
         ' 
         ' TxtBoxBarCount
         ' 
@@ -73,6 +78,8 @@ Partial Class OptionsRainbowBar
         TxtBoxBarCount.Size = New Size(85, 29)
         TxtBoxBarCount.TabIndex = 2
         TxtBoxBarCount.TextAlign = HorizontalAlignment.Center
+        TipRainbowBar.SetToolTip(TxtBoxBarCount, "Number of Bars to Display.")
+        TipRainbowBar.SetToolTipImage(TxtBoxBarCount, Nothing)
         ' 
         ' LblGain
         ' 
@@ -82,6 +89,7 @@ Partial Class OptionsRainbowBar
         LblGain.TabIndex = 3
         LblGain.Text = "Gain"
         LblGain.TextAlign = ContentAlignment.MiddleCenter
+        TipRainbowBar.SetToolTipImage(LblGain, Nothing)
         ' 
         ' ChkBoxShowPeaks
         ' 
@@ -95,6 +103,8 @@ Partial Class OptionsRainbowBar
         ChkBoxShowPeaks.Size = New Size(96, 36)
         ChkBoxShowPeaks.TabIndex = 4
         ChkBoxShowPeaks.Text = "Show Peaks"
+        TipRainbowBar.SetToolTip(ChkBoxShowPeaks, "Show Peak Indicators")
+        TipRainbowBar.SetToolTipImage(ChkBoxShowPeaks, Nothing)
         ChkBoxShowPeaks.UseVisualStyleBackColor = False
         ' 
         ' TBPeakDecaySpeed
@@ -108,6 +118,8 @@ Partial Class OptionsRainbowBar
         TBPeakDecaySpeed.TabIndex = 5
         TBPeakDecaySpeed.Text = "TrackBarEx1"
         TBPeakDecaySpeed.TimerInterval = 100
+        TipRainbowBar.SetToolTip(TBPeakDecaySpeed, "Peak falloff per frame in pixels.")
+        TipRainbowBar.SetToolTipImage(TBPeakDecaySpeed, Nothing)
         TBPeakDecaySpeed.Value = 5
         ' 
         ' TBPeakThickness
@@ -121,6 +133,8 @@ Partial Class OptionsRainbowBar
         TBPeakThickness.TabIndex = 6
         TBPeakThickness.Text = "TrackBarEx2"
         TBPeakThickness.TimerInterval = 100
+        TipRainbowBar.SetToolTip(TBPeakThickness, "Width of Peak Indicators.")
+        TipRainbowBar.SetToolTipImage(TBPeakThickness, Nothing)
         TBPeakThickness.Value = 5
         ' 
         ' LblPeakDecaySpeed
@@ -131,6 +145,7 @@ Partial Class OptionsRainbowBar
         LblPeakDecaySpeed.TabIndex = 7
         LblPeakDecaySpeed.Text = "Peak Decay Speed"
         LblPeakDecaySpeed.TextAlign = ContentAlignment.MiddleCenter
+        TipRainbowBar.SetToolTipImage(LblPeakDecaySpeed, Nothing)
         ' 
         ' LblPeakThickness
         ' 
@@ -140,6 +155,7 @@ Partial Class OptionsRainbowBar
         LblPeakThickness.TabIndex = 8
         LblPeakThickness.Text = "Peak Thickness"
         LblPeakThickness.TextAlign = ContentAlignment.MiddleCenter
+        TipRainbowBar.SetToolTipImage(LblPeakThickness, Nothing)
         ' 
         ' TBPeakThreshold
         ' 
@@ -153,6 +169,8 @@ Partial Class OptionsRainbowBar
         TBPeakThreshold.TabIndex = 9
         TBPeakThreshold.Text = "TrackBarEx2"
         TBPeakThreshold.TimerInterval = 100
+        TipRainbowBar.SetToolTip(TBPeakThreshold, "Pixels Above Bottom, to avoid flicker along bottom.")
+        TipRainbowBar.SetToolTipImage(TBPeakThreshold, Nothing)
         TBPeakThreshold.Value = 5
         ' 
         ' LblPeakThreshold
@@ -163,6 +181,7 @@ Partial Class OptionsRainbowBar
         LblPeakThreshold.TabIndex = 10
         LblPeakThreshold.Text = "Peak Threshold"
         LblPeakThreshold.TextAlign = ContentAlignment.MiddleCenter
+        TipRainbowBar.SetToolTipImage(LblPeakThreshold, Nothing)
         ' 
         ' LblHueCycleSpeed
         ' 
@@ -172,6 +191,7 @@ Partial Class OptionsRainbowBar
         LblHueCycleSpeed.TabIndex = 12
         LblHueCycleSpeed.Text = "Hue Cycle Speed"
         LblHueCycleSpeed.TextAlign = ContentAlignment.MiddleCenter
+        TipRainbowBar.SetToolTipImage(LblHueCycleSpeed, Nothing)
         ' 
         ' TBHueCycleSpeed
         ' 
@@ -185,6 +205,8 @@ Partial Class OptionsRainbowBar
         TBHueCycleSpeed.TabIndex = 11
         TBHueCycleSpeed.Text = "TrackBarEx2"
         TBHueCycleSpeed.TimerInterval = 100
+        TipRainbowBar.SetToolTip(TBHueCycleSpeed, "How Fast the Rainbow Shifts.")
+        TipRainbowBar.SetToolTipImage(TBHueCycleSpeed, Nothing)
         TBHueCycleSpeed.Value = 5
         ' 
         ' BtnCalm
@@ -194,6 +216,7 @@ Partial Class OptionsRainbowBar
         BtnCalm.Size = New Size(85, 32)
         BtnCalm.TabIndex = 13
         BtnCalm.Text = "Calm"
+        TipRainbowBar.SetToolTipImage(BtnCalm, Nothing)
         BtnCalm.UseVisualStyleBackColor = True
         ' 
         ' LblPresets
@@ -204,6 +227,7 @@ Partial Class OptionsRainbowBar
         LblPresets.TabIndex = 14
         LblPresets.Text = "Presets"
         LblPresets.TextAlign = ContentAlignment.MiddleCenter
+        TipRainbowBar.SetToolTipImage(LblPresets, Nothing)
         ' 
         ' BtnEnergetic
         ' 
@@ -212,6 +236,7 @@ Partial Class OptionsRainbowBar
         BtnEnergetic.Size = New Size(85, 32)
         BtnEnergetic.TabIndex = 15
         BtnEnergetic.Text = "Energetic"
+        TipRainbowBar.SetToolTipImage(BtnEnergetic, Nothing)
         BtnEnergetic.UseVisualStyleBackColor = True
         ' 
         ' BtnExtreme
@@ -221,7 +246,13 @@ Partial Class OptionsRainbowBar
         BtnExtreme.Size = New Size(85, 32)
         BtnExtreme.TabIndex = 16
         BtnExtreme.Text = "Extreme"
+        TipRainbowBar.SetToolTipImage(BtnExtreme, Nothing)
         BtnExtreme.UseVisualStyleBackColor = True
+        ' 
+        ' TipRainbowBar
+        ' 
+        TipRainbowBar.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipRainbowBar.OwnerDraw = True
         ' 
         ' OptionsRainbowBar
         ' 
@@ -248,6 +279,7 @@ Partial Class OptionsRainbowBar
         Margin = New Padding(4)
         Name = "OptionsRainbowBar"
         Size = New Size(800, 330)
+        TipRainbowBar.SetToolTipImage(Me, Nothing)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -269,5 +301,6 @@ Partial Class OptionsRainbowBar
     Friend WithEvents LblPresets As Skye.UI.Label
     Friend WithEvents BtnEnergetic As Button
     Friend WithEvents BtnExtreme As Button
+    Friend WithEvents TipRainbowBar As Skye.UI.ToolTip
 
 End Class

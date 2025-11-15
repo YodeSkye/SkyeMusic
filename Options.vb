@@ -261,6 +261,9 @@ Public Class Options
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
             Case "Waveform"
+                Dim c As New OptionsWaveform With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
             Case "Fractal Cloud"
             Case "Hyperspace Tunnel"
         End Select

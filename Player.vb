@@ -719,7 +719,6 @@ Public Class Player
         'Declarations
         Private ReadOnly updateTimer As Timer
         Private audioData() As Single
-        'Private gain As Single = 5000.0F
 
         'Constructor
         Public Sub New()
@@ -763,28 +762,42 @@ Public Class Player
             Dim g = pe.Graphics
             Dim stepX As Single = CSng(Me.Width) / audioData.Length
 
-            'Define how tall you want the waveform region (e.g. 1/3 of control height)
             Dim usableHeight As Single = Me.Height / 1.0F
-            Dim baselineY As Single = Me.Height - 10   'anchor near bottom, with small margin
+            Dim baselineY As Single
+            If App.Visualizers.WaveformFill Then
+                baselineY = Me.Height
+            Else
+                baselineY = Me.Height - 10   ' anchor near bottom
+            End If
 
-            'Find max sample magnitude in this buffer
             Dim maxSample As Single = audioData.Max(Function(s) Math.Abs(s))
             If maxSample = 0 Then maxSample = 1
-
-            'Scale so the largest sample fills the usable height
             Dim scale As Single = usableHeight / maxSample
 
+            ' Build waveform points
             Dim pts(audioData.Length - 1) As PointF
             For i = 0 To audioData.Length - 1
                 Dim sample = audioData(i) * scale
-                pts(i) = New PointF(i * stepX, baselineY - sample)
+                Dim y = baselineY - sample
+                pts(i) = New PointF(i * stepX, y)
             Next
 
+            If App.Visualizers.WaveformFill Then
+                ' Build polygon: waveform points + baseline back to start
+                Dim poly(pts.Length + 1) As PointF
+                Array.Copy(pts, poly, pts.Length)
+                poly(pts.Length) = New PointF(pts(pts.Length - 1).X, baselineY)
+                poly(pts.Length + 1) = New PointF(pts(0).X, baselineY)
+                Using brush As New SolidBrush(Color.FromArgb(128, App.CurrentTheme.TextColor))
+                    g.FillPolygon(brush, poly)
+                End Using
+            End If
+
+            ' Always draw the line on top
             Using pen As New Pen(App.CurrentTheme.TextColor, 2)
                 g.DrawLines(pen, pts)
             End Using
         End Sub
-
     End Class
     Private Class VisualizerFractalCloud
         Inherits UserControl

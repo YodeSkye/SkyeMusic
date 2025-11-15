@@ -414,6 +414,8 @@ Namespace My
         Friend Visualizer As String = "Rainbow Bar" 'The current visualizer used in the application.
         Friend Visualizers As New VisualizerSettings
         Public Class VisualizerSettings
+
+            ' Rainbow Bar Visualizer Settings
             Public Property RainbowBarCount As Integer = 32 '8-128 'Number of bars to display.
             Public Property RainbowBarGain As Single = 100.0F '10F-1000F 'Controls bar height sensitivity. Higher gain exaggerates quiet sounds, lower gain keeps bars smaller.
             Public Property RainbowBarShowPeaks As Boolean = True 'Whether to show peak indicators.
@@ -421,11 +423,17 @@ Namespace My
             Public Property RainbowBarPeakThickness As Integer = 6 '1-20 'Width of peak indicators
             Public Property RainbowBarPeakThreshold As Integer = 50 '0-200 'Pixels above bottom 'Threshold to avoid flicker at bottom
             Public Property RainbowBarHueCycleSpeed As Single = 2.0F '0.1F-20F 'How fast rainbow shifts
+
+            ' Waveform Visualizer Settings
+            Public Property WaveformFill As Boolean = False 'Whether to fill underneath the waveform.
+
         End Class
 
-        'Registry Saved Settings
+        ' Registry Saved Settings
+        ' Player
         Friend PlayerPositionShowElapsed As Boolean = True
         Friend PlayMode As PlayModes = PlayModes.Random
+        ' Playlist
         Friend PlaylistTitleFormat As PlaylistTitleFormats = PlaylistTitleFormats.ArtistSong
         Friend PlaylistTitleRemoveSpaces As Boolean = False
         Friend PlaylistTitleSeparator As String = " "
@@ -433,17 +441,20 @@ Namespace My
         Friend PlaylistDefaultAction As PlaylistActions = PlaylistActions.Play
         Friend PlaylistSearchAction As PlaylistActions = PlaylistActions.Play
         Friend PlaylistStatusMessageDisplayTime As Byte = 8 '0 - 60, 0 = Don't display status messages.
+        ' Library
         Friend LibrarySearchFolders As New Collections.Generic.List(Of String)
         Friend LibrarySearchSubFolders As Boolean = True
-        Friend SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
-        Friend SaveWindowMetrics As Boolean = False 'Flag that indicates whether to save and restore window positions and sizes.
+        Friend WatcherEnabled As Boolean = False 'Flag that indicates whether to watch for changes in the library folders.
+        Friend WatcherUpdateLibrary As Boolean = False 'Flag that indicates whether to automatically update the library when changes are detected in the file system.
+        Friend WatcherUpdatePlaylist As Boolean = False 'Flag that indicates whether to automatically update the playlist when changes are detected in the file system.
+        ' History
         Friend RandomHistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to add the currently playing song to the shuffle play history.
         Friend HistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to update the play count of the currently playing song.
         Friend HistoryAutoSaveInterval As UShort = 5 '1-1440 'Interval in minutes to automatically save the history.
         Friend HistoryViewMaxRecords As UShort = 25 'Maximum number of records to display in the history view.
-        Friend WatcherEnabled As Boolean = False 'Flag that indicates whether to watch for changes in the library folders.
-        Friend WatcherUpdateLibrary As Boolean = False 'Flag that indicates whether to automatically update the library when changes are detected in the file system.
-        Friend WatcherUpdatePlaylist As Boolean = False 'Flag that indicates whether to automatically update the playlist when changes are detected in the file system.
+        ' App
+        Friend SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
+        Friend SaveWindowMetrics As Boolean = False 'Flag that indicates whether to save and restore window positions and sizes.
         Friend Theme As Themes = Themes.Red 'The current theme of the application.
         Friend PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend PlayerSize As New Size(-1, -1)
@@ -1123,6 +1134,7 @@ Namespace My
                 RegSubKey.SetValue("RainbowBarPeakThickness", Visualizers.RainbowBarPeakThickness.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("RainbowBarPeakThreshold", Visualizers.RainbowBarPeakThreshold.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("RainbowBarHueCycleSpeed", Visualizers.RainbowBarHueCycleSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("WaveformFill", Visualizers.WaveformFill.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.Close()
 
                 RegKey.Flush()
@@ -1256,6 +1268,10 @@ Namespace My
                 Visualizers.RainbowBarPeakThickness = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThickness", 6.ToString)))
                 Visualizers.RainbowBarPeakThreshold = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThreshold", 50.ToString)))
                 Visualizers.RainbowBarHueCycleSpeed = CSng(Val(RegSubKey.GetValue("RainbowBarHueCycleSpeed", 2.0F.ToString)))
+                Select Case RegSubKey.GetValue("WaveformFill", "False").ToString
+                    Case "True", "1" : Visualizers.WaveformFill = True
+                    Case Else : Visualizers.WaveformFill = False
+                End Select
                 RegSubKey.Close()
 
                 RegSubKey.Dispose()

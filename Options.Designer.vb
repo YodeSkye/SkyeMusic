@@ -822,6 +822,7 @@ Partial Class Options
         CoBoxVisualizers.Name = "CoBoxVisualizers"
         CoBoxVisualizers.Size = New Size(249, 29)
         CoBoxVisualizers.TabIndex = 0
+        TipOptionsEX.SetText(CoBoxVisualizers, "Choose a Visualizer.")
         ' 
         ' LblVisualizers
         ' 

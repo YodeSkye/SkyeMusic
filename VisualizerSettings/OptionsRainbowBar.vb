@@ -1,6 +1,7 @@
 ﻿
 Public Class OptionsRainbowBar
 
+    ' Declarations
     Private IsInitializing As Boolean = True
 
     ' Form Events
@@ -156,6 +157,10 @@ Public Class OptionsRainbowBar
         BtnEnergetic.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnExtreme.BackColor = App.CurrentTheme.ButtonBackColor
         BtnExtreme.ForeColor = App.CurrentTheme.ButtonTextColor
+        TipRainbowBar.BackColor = App.CurrentTheme.BackColor
+        TipRainbowBar.ForeColor = App.CurrentTheme.TextColor
+        TipRainbowBar.BorderColor = App.CurrentTheme.ButtonBackColor
+        ResumeLayout()
     End Sub
 
 End Class
