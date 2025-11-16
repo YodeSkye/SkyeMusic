@@ -514,6 +514,10 @@ Public Class Player
         Public Function GetVisualizerNames() As List(Of String)
             Return visualizers.Keys.ToList
         End Function
+        Public Sub SetHyperspaceTunnelParticleCount(count As Integer)
+            Dim tunnel = TryCast(visualizers("Hyperspace Tunnel"), VisualizerHyperspaceTunnel)
+            tunnel?.SetParticleCount(count)
+        End Sub
 
     End Class
     Private Class VisualizerAudioEngine '
@@ -965,7 +969,7 @@ Public Class Player
         End Function
 
     End Class
-    Private Class VisualizerHyperspaceTunnel
+    Friend Class VisualizerHyperspaceTunnel
         Inherits UserControl
         Implements IVisualizer
 
@@ -992,9 +996,7 @@ Public Class Player
             AddHandler updateTimer.Tick, AddressOf OnTick
             particles = New List(Of Particle)()
             'Initialize particles
-            For i = 0 To 1000
-                particles.Add(New Particle(rnd))
-            Next
+            SetParticleCount(App.Visualizers.HyperspaceTunnelParticleCount)
         End Sub
 
         Public Sub Start() Implements IVisualizer.Start
@@ -1011,7 +1013,7 @@ Public Class Player
         End Sub
 
         Private Sub OnTick(sender As Object, e As EventArgs)
-            Me.Invalidate()
+            Invalidate()
         End Sub
         Protected Overrides Sub OnPaint(pe As PaintEventArgs)
             MyBase.OnPaint(pe)
@@ -1026,13 +1028,13 @@ Public Class Player
             End If
 
             ' --- Swirl angle increment based on audio ---
-            swirlAngle += 0.05 + level * 0.2
+            swirlAngle += App.Visualizers.HyperspaceTunnelSwirlSpeedBase + level * App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor
             Dim cosA As Double = Math.Cos(swirlAngle)
             Dim sinA As Double = Math.Sin(swirlAngle)
 
             For Each p In particles
                 ' Speed toward viewer based on audio
-                Dim speed = 2 + level * 20
+                Dim speed = App.Visualizers.HyperspaceTunnelParticleSpeedBase + level * App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor
                 p.Z -= speed
 
                 ' Rotate around Z axis for spiral effect
@@ -1086,6 +1088,12 @@ Public Class Player
                 Case Else : Return Color.FromArgb(255, CInt(v), CInt(p), CInt(q))
             End Select
         End Function
+        Public Sub SetParticleCount(count As Integer)
+            particles.Clear()
+            For i = 0 To count - 1
+                particles.Add(New Particle(rnd))
+            Next
+        End Sub
 
         Private Class Particle
             Public X As Double

@@ -439,6 +439,12 @@ Namespace My
             Public Property FractalCloudSwirlSpeedAudioFactor As Double = 10.0F ' 1-30 How much audio affects swirl speed.
             Public Property FractalCloudTimeIncrement As Double = 0.02F ' 0.005F-0.100F Increment for fractal time variable. Animation Speed.
 
+            ' Hyperspace Tunnel Visualizer Settings
+            Public Property HyperspaceTunnelParticleCount As Integer = 1000 '100-5000 Number of particles in the tunnel.
+            Public Property HyperspaceTunnelSwirlSpeedBase As Double = 0.05F ' 0.01F-0.20F Base speed of swirl rotation.
+            Public Property HyperspaceTunnelSwirlSpeedAudioFactor As Double = 0.2F ' 0.05F-1.00F How much audio affects swirl speed.
+            Public Property HyperspaceTunnelParticleSpeedBase As Double = 2.0F ' 1.0F-5.0F Base speed of swirl rotation.
+            Public Property HyperspaceTunnelParticleSpeedAudioFactor As Double = 20.0F ' 5-50 How much audio affects swirl speed.
         End Class
 
         ' Registry Saved Settings

@@ -524,6 +524,9 @@ Public Class Options
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
             Case "Hyperspace Tunnel"
+                Dim c As New OptionsHyperspaceTunnel With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
         End Select
     End Sub
     Private Sub CheckMove(ByRef location As Point)
