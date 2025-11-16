@@ -27,16 +27,31 @@ Public Class OptionsHyperspaceTunnel
         TxtBoxParticleCount.Text = App.Visualizers.HyperspaceTunnelParticleCount.ToString
         Player.VisualizerHost.SetHyperspaceTunnelParticleCount(App.Visualizers.HyperspaceTunnelParticleCount)
     End Sub
+    Private Sub TBSwirlSpeedBase_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedBase.ValueChanged
+        If IsInitializing Then Exit Sub
+        App.Visualizers.HyperspaceTunnelSwirlSpeedBase = CDbl(TBSwirlSpeedBase.Value / 100)
+    End Sub
+    Private Sub TBSwirlSpeedAudioFactor_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedAudioFactor.ValueChanged
+        If IsInitializing Then Exit Sub
+        App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor = CDbl(TBSwirlSpeedAudioFactor.Value / 100)
+    End Sub
+    Private Sub TBParticleSpeedBase_ValueChanged(sender As Object, e As EventArgs) Handles TBParticleSpeedBase.ValueChanged
+        If IsInitializing Then Exit Sub
+        App.Visualizers.HyperspaceTunnelParticleSpeedBase = CDbl(TBParticleSpeedBase.Value / 10)
+    End Sub
+    Private Sub TBParticleSpeedAudioFactor_ValueChanged(sender As Object, e As EventArgs) Handles TBParticleSpeedAudioFactor.ValueChanged
+        If IsInitializing Then Exit Sub
+        App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor = CDbl(TBParticleSpeedAudioFactor.Value)
+    End Sub
+
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
         TxtBoxParticleCount.Text = App.Visualizers.HyperspaceTunnelParticleCount.ToString
-        'ChkBoxShowPeaks.Checked = App.Visualizers.RainbowBarShowPeaks
-        'TBGain.Value = CInt(App.Visualizers.RainbowBarGain)
-        'TBPeakDecaySpeed.Value = App.Visualizers.RainbowBarPeakDecaySpeed
-        'TBPeakThickness.Value = App.Visualizers.RainbowBarPeakThickness
-        'TBPeakThreshold.Value = App.Visualizers.RainbowBarPeakThreshold
-        'TBHueCycleSpeed.Value = CInt(App.Visualizers.RainbowBarHueCycleSpeed * 10)
+        TBSwirlSpeedBase.Value = CInt(App.Visualizers.HyperspaceTunnelSwirlSpeedBase * 100)
+        TBSwirlSpeedAudioFactor.Value = CInt(App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor * 100)
+        TBParticleSpeedBase.Value = CInt(App.Visualizers.HyperspaceTunnelParticleSpeedBase * 10)
+        TBParticleSpeedAudioFactor.Value = CInt(App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor)
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor()
@@ -56,11 +71,26 @@ Public Class OptionsHyperspaceTunnel
         Else
             forecolor = App.CurrentTheme.TextColor
         End If
-        'TBGain.ButtonColor = App.CurrentTheme.ButtonBackColor
-        'TBGain.HighlightedButtonColor = App.CurrentTheme.TextColor
-        'TBGain.PushedButtonEndColor = App.CurrentTheme.TextColor
-        'TBGain.TrackBarGradientStart = App.CurrentTheme.BackColor
-        'TBGain.TrackBarGradientEnd = App.CurrentTheme.TextColor
+        TBSwirlSpeedBase.ButtonColor = App.CurrentTheme.ButtonBackColor
+        TBSwirlSpeedBase.HighlightedButtonColor = App.CurrentTheme.TextColor
+        TBSwirlSpeedBase.PushedButtonEndColor = App.CurrentTheme.TextColor
+        TBSwirlSpeedBase.TrackBarGradientStart = App.CurrentTheme.BackColor
+        TBSwirlSpeedBase.TrackBarGradientEnd = App.CurrentTheme.TextColor
+        TBSwirlSpeedAudioFactor.ButtonColor = App.CurrentTheme.ButtonBackColor
+        TBSwirlSpeedAudioFactor.HighlightedButtonColor = App.CurrentTheme.TextColor
+        TBSwirlSpeedAudioFactor.PushedButtonEndColor = App.CurrentTheme.TextColor
+        TBSwirlSpeedAudioFactor.TrackBarGradientStart = App.CurrentTheme.BackColor
+        TBSwirlSpeedAudioFactor.TrackBarGradientEnd = App.CurrentTheme.TextColor
+        TBParticleSpeedBase.ButtonColor = App.CurrentTheme.ButtonBackColor
+        TBParticleSpeedBase.HighlightedButtonColor = App.CurrentTheme.TextColor
+        TBParticleSpeedBase.PushedButtonEndColor = App.CurrentTheme.TextColor
+        TBParticleSpeedBase.TrackBarGradientStart = App.CurrentTheme.BackColor
+        TBParticleSpeedBase.TrackBarGradientEnd = App.CurrentTheme.TextColor
+        TBParticleSpeedAudioFactor.ButtonColor = App.CurrentTheme.ButtonBackColor
+        TBParticleSpeedAudioFactor.HighlightedButtonColor = App.CurrentTheme.TextColor
+        TBParticleSpeedAudioFactor.PushedButtonEndColor = App.CurrentTheme.TextColor
+        TBParticleSpeedAudioFactor.TrackBarGradientStart = App.CurrentTheme.BackColor
+        TBParticleSpeedAudioFactor.TrackBarGradientEnd = App.CurrentTheme.TextColor
         LblParticleCount.ForeColor = forecolor
         LblSwirlSpeedBase.ForeColor = forecolor
         LblSwirlSpeedAudioFactor.ForeColor = forecolor

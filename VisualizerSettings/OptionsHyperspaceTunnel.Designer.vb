@@ -24,14 +24,14 @@ Partial Class OptionsHyperspaceTunnel
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
         LblParticleSpeedAudioFactor = New Skye.UI.Label()
-        TBParticleSpeedAudioFactor = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 200)
+        TBParticleSpeedAudioFactor = New Syncfusion.Windows.Forms.Tools.TrackBarEx(5, 50)
         LblParticleSpeedBase = New Skye.UI.Label()
         LblSwirlSpeedAudioFactor = New Skye.UI.Label()
-        TBParticleSpeedBase = New Syncfusion.Windows.Forms.Tools.TrackBarEx(1, 20)
-        TBSwirlSpeedAudioFactor = New Syncfusion.Windows.Forms.Tools.TrackBarEx(1, 20)
+        TBParticleSpeedBase = New Syncfusion.Windows.Forms.Tools.TrackBarEx(10, 50)
+        TBSwirlSpeedAudioFactor = New Syncfusion.Windows.Forms.Tools.TrackBarEx(5, 100)
         TxtBoxParticleCount = New TextBox()
         LblParticleCount = New Skye.UI.Label()
-        TBSwirlSpeedBase = New Syncfusion.Windows.Forms.Tools.TrackBarEx(10, 1000)
+        TBSwirlSpeedBase = New Syncfusion.Windows.Forms.Tools.TrackBarEx(1, 20)
         LblSwirlSpeedBase = New Skye.UI.Label()
         TipHyperspaceTunnel = New Skye.UI.ToolTip(components)
         SuspendLayout()
@@ -53,11 +53,12 @@ Partial Class OptionsHyperspaceTunnel
         TBParticleSpeedAudioFactor.Location = New Point(687, 32)
         TBParticleSpeedAudioFactor.Name = "TBParticleSpeedAudioFactor"
         TBParticleSpeedAudioFactor.Orientation = Orientation.Vertical
+        TBParticleSpeedAudioFactor.ShowFocusRect = False
         TBParticleSpeedAudioFactor.Size = New Size(20, 290)
-        TBParticleSpeedAudioFactor.SmallChange = 5
         TBParticleSpeedAudioFactor.TabIndex = 19
         TBParticleSpeedAudioFactor.Text = "TrackBarEx2"
         TBParticleSpeedAudioFactor.TimerInterval = 100
+        TipHyperspaceTunnel.SetToolTip(TBParticleSpeedAudioFactor, "How Much Audio Affects the Particle Speed.")
         TipHyperspaceTunnel.SetToolTipImage(TBParticleSpeedAudioFactor, Nothing)
         TBParticleSpeedAudioFactor.Value = 5
         ' 
@@ -88,12 +89,14 @@ Partial Class OptionsHyperspaceTunnel
         TBParticleSpeedBase.Location = New Point(508, 35)
         TBParticleSpeedBase.Name = "TBParticleSpeedBase"
         TBParticleSpeedBase.Orientation = Orientation.Vertical
+        TBParticleSpeedBase.ShowFocusRect = False
         TBParticleSpeedBase.Size = New Size(20, 290)
         TBParticleSpeedBase.TabIndex = 16
         TBParticleSpeedBase.Text = "TrackBarEx2"
         TBParticleSpeedBase.TimerInterval = 100
+        TipHyperspaceTunnel.SetToolTip(TBParticleSpeedBase, "Base Speed of Particles Coming At You.")
         TipHyperspaceTunnel.SetToolTipImage(TBParticleSpeedBase, Nothing)
-        TBParticleSpeedBase.Value = 5
+        TBParticleSpeedBase.Value = 10
         ' 
         ' TBSwirlSpeedAudioFactor
         ' 
@@ -102,10 +105,12 @@ Partial Class OptionsHyperspaceTunnel
         TBSwirlSpeedAudioFactor.Location = New Point(339, 32)
         TBSwirlSpeedAudioFactor.Name = "TBSwirlSpeedAudioFactor"
         TBSwirlSpeedAudioFactor.Orientation = Orientation.Vertical
+        TBSwirlSpeedAudioFactor.ShowFocusRect = False
         TBSwirlSpeedAudioFactor.Size = New Size(20, 290)
         TBSwirlSpeedAudioFactor.TabIndex = 15
         TBSwirlSpeedAudioFactor.Text = "TrackBarEx1"
         TBSwirlSpeedAudioFactor.TimerInterval = 100
+        TipHyperspaceTunnel.SetToolTip(TBSwirlSpeedAudioFactor, "How Much Audio Affects the Swirl Speed.")
         TipHyperspaceTunnel.SetToolTipImage(TBSwirlSpeedAudioFactor, Nothing)
         TBSwirlSpeedAudioFactor.Value = 5
         ' 
@@ -117,6 +122,7 @@ Partial Class OptionsHyperspaceTunnel
         TxtBoxParticleCount.Size = New Size(109, 29)
         TxtBoxParticleCount.TabIndex = 13
         TxtBoxParticleCount.TextAlign = HorizontalAlignment.Center
+        TipHyperspaceTunnel.SetToolTip(TxtBoxParticleCount, "Number of Particles in the Tunnel.")
         TipHyperspaceTunnel.SetToolTipImage(TxtBoxParticleCount, Nothing)
         ' 
         ' LblParticleCount
@@ -138,10 +144,11 @@ Partial Class OptionsHyperspaceTunnel
         TBSwirlSpeedBase.Margin = New Padding(4)
         TBSwirlSpeedBase.Name = "TBSwirlSpeedBase"
         TBSwirlSpeedBase.Orientation = Orientation.Vertical
+        TBSwirlSpeedBase.ShowFocusRect = False
         TBSwirlSpeedBase.Size = New Size(20, 290)
-        TBSwirlSpeedBase.SmallChange = 10
         TBSwirlSpeedBase.TabIndex = 11
         TBSwirlSpeedBase.TimerInterval = 100
+        TipHyperspaceTunnel.SetToolTip(TBSwirlSpeedBase, "Base Speed of Swirl Rotation")
         TipHyperspaceTunnel.SetToolTipImage(TBSwirlSpeedBase, Nothing)
         TBSwirlSpeedBase.Value = 10
         ' 

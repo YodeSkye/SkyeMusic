@@ -1021,14 +1021,15 @@ Public Class Player
             Dim cx = Width / 2
             Dim cy = Height / 2
 
-            ' --- Audio level for reactivity ---
+            ' Audio level for reactivity
             Dim level As Double = 0
             If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
-                level = audioData.Average(Function(s) Math.Abs(s))
+                level = Math.Sqrt(audioData.Average(Function(s) s * s)) ' RMS
+                level = Math.Min(level * 10, 1.0) ' Scale and clamp here
             End If
 
-            ' --- Swirl angle increment based on audio ---
-            swirlAngle += App.Visualizers.HyperspaceTunnelSwirlSpeedBase + level * App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor
+            ' Swirl angle increment based on audio
+            swirlAngle += App.Visualizers.HyperspaceTunnelSwirlSpeedBase + (level * App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor)
             Dim cosA As Double = Math.Cos(swirlAngle)
             Dim sinA As Double = Math.Sin(swirlAngle)
 

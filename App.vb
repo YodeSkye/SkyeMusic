@@ -443,8 +443,9 @@ Namespace My
             Public Property HyperspaceTunnelParticleCount As Integer = 1000 '100-5000 Number of particles in the tunnel.
             Public Property HyperspaceTunnelSwirlSpeedBase As Double = 0.05F ' 0.01F-0.20F Base speed of swirl rotation.
             Public Property HyperspaceTunnelSwirlSpeedAudioFactor As Double = 0.2F ' 0.05F-1.00F How much audio affects swirl speed.
-            Public Property HyperspaceTunnelParticleSpeedBase As Double = 2.0F ' 1.0F-5.0F Base speed of swirl rotation.
-            Public Property HyperspaceTunnelParticleSpeedAudioFactor As Double = 20.0F ' 5-50 How much audio affects swirl speed.
+            Public Property HyperspaceTunnelParticleSpeedBase As Double = 2.0F ' 1.0F-5.0F Base speed of particles coming at you.
+            Public Property HyperspaceTunnelParticleSpeedAudioFactor As Double = 20.0F ' 5-50 How much audio affects particle speed.
+
         End Class
 
         ' Registry Saved Settings
@@ -1157,6 +1158,11 @@ Namespace My
                 RegSubKey.SetValue("FractalCloudSwirlSpeedBase", Visualizers.FractalCloudSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("FractalCloudSwirlSpeedAudioFactor", Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("FractalCloudTimeIncrement", Visualizers.FractalCloudTimeIncrement.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("HyperspaceTunnelParticleCount", Visualizers.HyperspaceTunnelParticleCount.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedBase", Visualizers.HyperspaceTunnelSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedAudioFactor", Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("HyperspaceTunnelParticleSpeedBase", Visualizers.HyperspaceTunnelParticleSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("HyperspaceTunnelParticleSpeedAudioFactor", Visualizers.HyperspaceTunnelParticleSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.Close()
 
                 RegKey.Flush()
@@ -1300,7 +1306,13 @@ Namespace My
                 Visualizers.FractalCloudSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedBase", 0.01F.ToString)))
                 Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedAudioFactor", 10.0F.ToString)))
                 Visualizers.FractalCloudTimeIncrement = CDbl(Val(RegSubKey.GetValue("FractalCloudTimeIncrement", 0.02F.ToString)))
+                Visualizers.HyperspaceTunnelParticleCount = CInt(Val(RegSubKey.GetValue("HyperspaceTunnelParticleCount", 1000.ToString)))
+                Visualizers.HyperspaceTunnelSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedBase", 0.05F.ToString)))
+                Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedAudioFactor", 0.2F.ToString)))
+                Visualizers.HyperspaceTunnelParticleSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedBase", 2.0F.ToString)))
+                Visualizers.HyperspaceTunnelParticleSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedAudioFactor", 20.0F.ToString)))
                 RegSubKey.Close()
+
                 RegSubKey.Dispose()
                 RegKey.Close()
                 RegKey.Dispose()

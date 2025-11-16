@@ -51,6 +51,7 @@ Partial Class OptionsFractalCloud
         TBTimeIncrement.Location = New Point(699, 28)
         TBTimeIncrement.Name = "TBTimeIncrement"
         TBTimeIncrement.Orientation = Orientation.Vertical
+        TBTimeIncrement.ShowFocusRect = False
         TBTimeIncrement.Size = New Size(20, 290)
         TBTimeIncrement.TabIndex = 12
         TBTimeIncrement.Text = "TrackBarEx2"
@@ -66,6 +67,7 @@ Partial Class OptionsFractalCloud
         TBSwirlSpeedAudioFactor.Location = New Point(526, 25)
         TBSwirlSpeedAudioFactor.Name = "TBSwirlSpeedAudioFactor"
         TBSwirlSpeedAudioFactor.Orientation = Orientation.Vertical
+        TBSwirlSpeedAudioFactor.ShowFocusRect = False
         TBSwirlSpeedAudioFactor.Size = New Size(20, 290)
         TBSwirlSpeedAudioFactor.TabIndex = 11
         TBSwirlSpeedAudioFactor.Text = "TrackBarEx1"
@@ -82,6 +84,7 @@ Partial Class OptionsFractalCloud
         TBSwirlSpeedBase.Margin = New Padding(4)
         TBSwirlSpeedBase.Name = "TBSwirlSpeedBase"
         TBSwirlSpeedBase.Orientation = Orientation.Vertical
+        TBSwirlSpeedBase.ShowFocusRect = False
         TBSwirlSpeedBase.Size = New Size(20, 290)
         TBSwirlSpeedBase.TabIndex = 9
         TBSwirlSpeedBase.TimerInterval = 100

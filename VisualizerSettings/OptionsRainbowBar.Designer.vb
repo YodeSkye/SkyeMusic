@@ -51,6 +51,7 @@ Partial Class OptionsRainbowBar
         TBGain.Margin = New Padding(4)
         TBGain.Name = "TBGain"
         TBGain.Orientation = Orientation.Vertical
+        TBGain.ShowFocusRect = False
         TBGain.Size = New Size(20, 290)
         TBGain.SmallChange = 10
         TBGain.TabIndex = 0
@@ -114,6 +115,7 @@ Partial Class OptionsRainbowBar
         TBPeakDecaySpeed.Location = New Point(250, 26)
         TBPeakDecaySpeed.Name = "TBPeakDecaySpeed"
         TBPeakDecaySpeed.Orientation = Orientation.Vertical
+        TBPeakDecaySpeed.ShowFocusRect = False
         TBPeakDecaySpeed.Size = New Size(20, 290)
         TBPeakDecaySpeed.TabIndex = 5
         TBPeakDecaySpeed.Text = "TrackBarEx1"
@@ -129,6 +131,7 @@ Partial Class OptionsRainbowBar
         TBPeakThickness.Location = New Point(398, 29)
         TBPeakThickness.Name = "TBPeakThickness"
         TBPeakThickness.Orientation = Orientation.Vertical
+        TBPeakThickness.ShowFocusRect = False
         TBPeakThickness.Size = New Size(20, 290)
         TBPeakThickness.TabIndex = 6
         TBPeakThickness.Text = "TrackBarEx2"
@@ -164,6 +167,7 @@ Partial Class OptionsRainbowBar
         TBPeakThreshold.Location = New Point(541, 26)
         TBPeakThreshold.Name = "TBPeakThreshold"
         TBPeakThreshold.Orientation = Orientation.Vertical
+        TBPeakThreshold.ShowFocusRect = False
         TBPeakThreshold.Size = New Size(20, 290)
         TBPeakThreshold.SmallChange = 5
         TBPeakThreshold.TabIndex = 9
@@ -200,6 +204,7 @@ Partial Class OptionsRainbowBar
         TBHueCycleSpeed.Location = New Point(699, 29)
         TBHueCycleSpeed.Name = "TBHueCycleSpeed"
         TBHueCycleSpeed.Orientation = Orientation.Vertical
+        TBHueCycleSpeed.ShowFocusRect = False
         TBHueCycleSpeed.Size = New Size(20, 290)
         TBHueCycleSpeed.SmallChange = 5
         TBHueCycleSpeed.TabIndex = 11
