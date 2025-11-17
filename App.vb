@@ -159,6 +159,32 @@ Namespace My
             End Sub
 
         End Class
+        Friend ExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
+        Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
+        Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
+        Friend FRMLibrary As Library 'FRMLibrary is the main library window that displays the media library.
+        Friend FRMHistory As History 'FRMHistory is the history window that displays the playback history and statistics.
+        Friend FRMLog As Log 'FRMLog is the log window that displays application logs.
+        Friend FRMDevTools As DevTools 'FRMDevTools is the developer tools window that provides debugging and database access features.
+        Private WithEvents TimerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
+        Private WithEvents TimerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
+        Private WithEvents TimerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
+        Private WithEvents TimerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
+        Private ReadOnly Watchers As New List(Of System.IO.FileSystemWatcher) 'Watchers is a set of file system watchers that monitors changes in the library folders.
+        Private WithEvents WatcherWorkTimer As New Timers.Timer(1000) 'WatcherWorkTimer is a timer that debounces file system watcher events to prevent multiple rapid events from being processed.
+        Private ReadOnly WatcherWorkList As New Collections.Generic.List(Of String) 'WatcherWorkList is a list of files that have been changed, created, deleted, or renamed by the file system watchers.
+        Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
+        Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
+        Friend ReadOnly HistoryThisSessionStartTime As DateTime = DateTime.Now 'Records the time when the current session started.
+        Friend ReadOnly AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
+        Friend ReadOnly AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
+        Friend ReadOnly TrimEndSearch() As Char = {CChar(" "), CChar("("), CChar(")"), CChar("0"), CChar("1"), CChar("2"), CChar("3"), CChar("4"), CChar("5"), CChar("6"), CChar("7"), CChar("8"), CChar("9")} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
+        Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
+        Friend ReadOnly AttributionSyncFusion As String = "https://www.syncfusion.com/" 'AttributionSyncFusion is the URL for Syncfusion, which provides UI controls and libraries used in the application.
+        Friend ReadOnly AttributionTagLibSharp As String = "https://github.com/mono/taglib-sharp" 'AttributionTagLibSharp is the URL for TagLib# library, which is used for reading and writing metadata in media files.
+        Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/" 'AttributionIcons8 is the URL for Icons8, which provides icons used in the application.
+
+        'HotKeys
         Private Structure HotKey
             Public WinID As Integer
             Public Description As String
@@ -179,37 +205,11 @@ Namespace My
                 Me.KeyMod = keymod
             End Sub
         End Structure
-        Friend ExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
-        Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
-        Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
-        Friend FRMLibrary As Library 'FRMLibrary is the main library window that displays the media library.
-        Friend FRMHistory As History 'FRMHistory is the history window that displays the playback history and statistics.
-        Friend FRMLog As Log 'FRMLog is the log window that displays application logs.
-        Friend FRMDevTools As DevTools 'FRMDevTools is the developer tools window that provides debugging and database access features.
         Private ReadOnly HotKeys As New Collections.Generic.List(Of HotKey) 'HotKeys is a list of hotkeys used in the application for global media control.
-        Private HotKeyPlay As New HotKey(0, "Global Play/Pause", Keys.MediaPlayPause, Skye.WinAPI.VK_MEDIA_PLAY_PAUSE, 0) 'HotKeyPlay is a hotkey for global play/pause functionality.
-        Private HotKeyStop As New HotKey(1, "Global Stop", Keys.MediaStop, Skye.WinAPI.VK_MEDIA_STOP, 0) 'HotKeyStop is a hotkey for global stop functionality.
-        Private HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
-        Private HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
-        Friend HistoryTotalPlayedSongsThisSession As UInteger = 0 'Tracks the total number of songs played during the current session.
-        Friend HistoryThisSessionStartTime As DateTime = DateTime.Now 'Records the time when the current session started.
-        Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
-        Private WithEvents TimerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
-        Private WithEvents TimerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
-        Private WithEvents TimerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
-        Private WithEvents TimerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
-        Private ReadOnly Watchers As New List(Of System.IO.FileSystemWatcher) 'Watchers is a set of file system watchers that monitors changes in the library folders.
-        Private WithEvents WatcherWorkTimer As New Timers.Timer(1000) 'WatcherWorkTimer is a timer that debounces file system watcher events to prevent multiple rapid events from being processed.
-        Private ReadOnly WatcherWorkList As New Collections.Generic.List(Of String) 'WatcherWorkList is a list of files that have been changed, created, deleted, or renamed by the file system watchers.
-        Private ScreenSaverActive As Boolean = False 'ScreenSaverActive is a flag that indicates whether the screensaver is currently active.
-        Private ScreenLocked As Boolean = False 'ScreenLocked is a flag that indicates whether the screen is currently locked.
-        Friend AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
-        Friend AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
-        Friend ReadOnly TrimEndSearch() As Char = {CChar(" "), CChar("("), CChar(")"), CChar("0"), CChar("1"), CChar("2"), CChar("3"), CChar("4"), CChar("5"), CChar("6"), CChar("7"), CChar("8"), CChar("9")} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
-        Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
-        Friend ReadOnly AttributionSyncFusion As String = "https://www.syncfusion.com/" 'AttributionSyncFusion is the URL for Syncfusion, which provides UI controls and libraries used in the application.
-        Friend ReadOnly AttributionTagLibSharp As String = "https://github.com/mono/taglib-sharp" 'AttributionTagLibSharp is the URL for TagLib# library, which is used for reading and writing metadata in media files.
-        Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/" 'AttributionIcons8 is the URL for Icons8, which provides icons used in the application.
+        Private ReadOnly HotKeyPlay As New HotKey(0, "Global Play/Pause", Keys.MediaPlayPause, Skye.WinAPI.VK_MEDIA_PLAY_PAUSE, 0) 'HotKeyPlay is a hotkey for global play/pause functionality.
+        Private ReadOnly HotKeyStop As New HotKey(1, "Global Stop", Keys.MediaStop, Skye.WinAPI.VK_MEDIA_STOP, 0) 'HotKeyStop is a hotkey for global stop functionality.
+        Private ReadOnly HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
+        Private ReadOnly HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
 
         'Paths
         Friend ReadOnly UserPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" 'UserPath is the base path for user-specific files.
@@ -403,6 +403,7 @@ Namespace My
         'XML Saved History
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
         Friend HistoryTotalPlayedSongs As UInteger = 0 'Tracks the total number of songs played since the history was first created.
+        Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
         <Serializable>
         Public Class HistoryData
             Public Property SchemaVersion As Integer = 1
@@ -445,6 +446,12 @@ Namespace My
             Public Property HyperspaceTunnelSwirlSpeedAudioFactor As Double = 0.2F ' 0.05F-1.00F How much audio affects swirl speed.
             Public Property HyperspaceTunnelParticleSpeedBase As Double = 2.0F ' 1.0F-5.0F Base speed of particles coming at you.
             Public Property HyperspaceTunnelParticleSpeedAudioFactor As Double = 20.0F ' 5-50 How much audio affects particle speed.
+
+            ' Star Field Visualizer Settings
+            Public Property StarFieldStarCount As Integer = 750 ' 100-2000 Number of stars in the field.
+            Public Property StarFieldBaseSpeed As Single = 2.0F ' 1.0F-5.0F Minimum star movement speed.
+            Public Property StarFieldAudioSpeedFactor As Integer = 10 ' 0-100 How much audio level boosts star speed.
+            Public Property StarFieldMaxStarSize As Integer = 6 ' 2-12 Maximum size of stars.
 
         End Class
 
@@ -1163,6 +1170,10 @@ Namespace My
                 RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedAudioFactor", Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("HyperspaceTunnelParticleSpeedBase", Visualizers.HyperspaceTunnelParticleSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("HyperspaceTunnelParticleSpeedAudioFactor", Visualizers.HyperspaceTunnelParticleSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("StarFieldStarCount", Visualizers.StarFieldStarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("StarFieldBaseSpeed", Visualizers.StarFieldBaseSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("StarFieldAudioSpeedFactor", Visualizers.StarFieldAudioSpeedFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("StarFieldMaxStarSize", Visualizers.StarFieldMaxStarSize.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.Close()
 
                 RegKey.Flush()
@@ -1311,6 +1322,10 @@ Namespace My
                 Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedAudioFactor", 0.2F.ToString)))
                 Visualizers.HyperspaceTunnelParticleSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedBase", 2.0F.ToString)))
                 Visualizers.HyperspaceTunnelParticleSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedAudioFactor", 20.0F.ToString)))
+                Visualizers.StarFieldStarCount = CInt(Val(RegSubKey.GetValue("StarFieldStarCount", 750.ToString)))
+                Visualizers.StarFieldBaseSpeed = CSng(Val(RegSubKey.GetValue("StarFieldBaseSpeed", 2.0F.ToString)))
+                Visualizers.StarFieldAudioSpeedFactor = CInt(Val(RegSubKey.GetValue("StarFieldAudioSpeedFactor", 10.ToString)))
+                Visualizers.StarFieldMaxStarSize = CInt(Val(RegSubKey.GetValue("StarFieldMaxStarSize", 6.ToString)))
                 RegSubKey.Close()
 
                 RegSubKey.Dispose()
@@ -2653,7 +2668,6 @@ Namespace My
             Else
                 'Debug.Print("Song not found in history: " + songorstream)
             End If
-            HistoryTotalPlayedSongsThisSession += CUInt(1)
             HistoryTotalPlayedSongs += CUInt(1)
             'Debug.Print("Total Play Count = " & HistoryTotalPlayedSongs.ToString & ", " & HistoryTotalPlayedSongsThisSession & " this Session")
             App.SongPlayData.IsValid = True

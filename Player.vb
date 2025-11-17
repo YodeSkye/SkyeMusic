@@ -1,5 +1,6 @@
 ﻿
 Imports System.Drawing.Drawing2D
+Imports System.Formats
 Imports System.IO
 Imports System.Runtime.CompilerServices
 Imports System.Runtime.InteropServices
@@ -517,6 +518,10 @@ Public Class Player
         Public Sub SetHyperspaceTunnelParticleCount(count As Integer)
             Dim tunnel = TryCast(visualizers("Hyperspace Tunnel"), VisualizerHyperspaceTunnel)
             tunnel?.SetParticleCount(count)
+        End Sub
+        Public Sub SetStarFieldStarCount(count As Integer)
+            Dim tunnel = TryCast(visualizers("Star Field"), VisualizerStarField)
+            tunnel?.SetStarCount(count)
         End Sub
 
     End Class
@@ -1124,6 +1129,126 @@ Public Class Player
         End Class
 
     End Class
+    Private Class VisualizerStarField
+        Inherits UserControl
+        Implements IVisualizer
+
+        ' Declarations
+        Private ReadOnly updateTimer As Timer
+        Private audioData() As Single
+        Private ReadOnly rnd As New Random()
+        Private stars As New List(Of Star)
+        Private Structure Star ' Star structure
+            Public X As Double
+            Public Y As Double
+            Public Z As Double
+            Public Size As Integer
+            Public Color As Color
+        End Structure
+
+        ' Constructor
+        Public Sub New()
+            DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        ' IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Star Field"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Size = New Size(width, height)
+        End Sub
+
+        ' Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+            BackColor = Color.Black
+            MyBase.OnPaint(pe)
+            Dim g = pe.Graphics
+            Dim cx = Width / 2
+            Dim cy = Height / 2
+
+            ' Audio level for reactivity
+            Dim level As Double = 0
+            If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
+                level = Math.Sqrt(audioData.Average(Function(s) s * s)) * 10
+            End If
+
+            ' Initialize stars if needed
+            If stars.Count = 0 Then SetStarCount(App.Visualizers.StarFieldStarCount)
+
+            ' Update and draw stars
+            For i = 0 To stars.Count - 1
+                Dim s = stars(i)
+                ' Move star forward based on audio
+                'settings here for base speed + audio level influence
+                Dim speed = App.Visualizers.StarFieldBaseSpeed + level * App.Visualizers.StarFieldAudioSpeedFactor
+                s.Z -= speed
+
+                ' Reset if too close
+                If s.Z < 1 Then
+                    s.X = (rnd.NextDouble() * 2 - 1) * Width / 2
+                    s.Y = (rnd.NextDouble() * 2 - 1) * Height / 2
+                    s.Z = rnd.Next(500, 1000)
+                    s.Size = rnd.Next(1, 4)
+                End If
+
+                ' Perspective projection
+                Dim scale = 500 / s.Z
+                Dim x = cx + s.X * scale
+                Dim y = cy + s.Y * scale
+                Dim size = Math.Min(s.Size * scale, App.Visualizers.StarFieldMaxStarSize)
+
+                ' Only draw if visible
+                If x >= 0 AndAlso x <= Width AndAlso y >= 0 AndAlso y <= Height Then
+                    Using brush As New SolidBrush(s.Color)
+                        g.FillEllipse(brush, CSng(x), CSng(y), CSng(size), CSng(size))
+                    End Using
+                End If
+
+                stars(i) = s
+            Next
+        End Sub
+
+        ' Methods
+        Public Sub SetStarCount(count As Integer)
+            ' Clamp to safe range
+            count = Math.Max(100, Math.Min(2000, count))
+
+            ' Rebuild star list
+            stars.Clear()
+            For i = 0 To count - 1
+                stars.Add(New Star With {
+            .X = (rnd.NextDouble() * 2 - 1) * Width / 2,
+            .Y = (rnd.NextDouble() * 2 - 1) * Height / 2,
+            .Z = rnd.Next(500, 1000),
+            .Size = rnd.Next(1, 4),
+            .Color = Color.White})
+            Next
+
+        End Sub
+
+    End Class
 
     'Form Events                    
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -1192,6 +1317,7 @@ Public Class Player
         VisualizerHost.Register(New VisualizerWaveform)
         VisualizerHost.Register(New VisualizerFractalCloud)
         VisualizerHost.Register(New VisualizerHyperspaceTunnel)
+        VisualizerHost.Register(New VisualizerStarField)
         VisualizerHost.SetVisualizersMenu()
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
 

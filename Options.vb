@@ -527,6 +527,10 @@ Public Class Options
                 Dim c As New OptionsHyperspaceTunnel With {
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
+            Case "Star Field"
+                Dim c As New OptionsStarField With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
         End Select
     End Sub
     Private Sub CheckMove(ByRef location As Point)
