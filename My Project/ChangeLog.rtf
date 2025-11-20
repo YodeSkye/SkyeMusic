@@ -16,8 +16,8 @@ New Features\par
 \'a3\'ab\f0\lang9  Created a hidden DevTools form for viewing the raw History and Plays databases.\par
 \cf1\b\fs28\par
 \cf2\fs24 Improvements\par
-\cf0\b0\f2\u10003?\f3\lang1033  Refactored to Visual Studio 2026. This involved some minor tweaking and style improvements. Still running on .NET 9.0. Planning to upgrade to .NET 10.0 in the coming months.\f2\lang9\par
-\u10003?\f3\lang1033  Refactored Visualizer system. Created a panel to dock the Visualizer Host. Removed old timer and picturebox system.\f4\lang9\par
+\cf0\b0\f2\u10003?\f3\lang1033  Refactored to Visual Studio 2026. This involved some minor tweaking and style improvements. Still running on .NET 9.0. Planning to upgrade to .NET 10.0 in the coming months.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Refactored Visualizer system. Created a panel to dock the Visualizer Host. Removed old timer and picturebox system.\f4\lang9\par
 \f2\u10003?\f3\lang1033  \f0 Refactored Meters to use NAudio instead of CoreAudio. Meters run at a 20fps rate with smooth drop offs.\cf2\b\lang9\par
 \cf0\b0\f2\u10003?\f3\lang1033  Refactored tooltips throughout the app to overcome ToolTipEX's deficiencies. In some cases this meant strictly controlling ToolTipEX's life-cycle, in other cases completely swapping to another component. This should solve the disappearing tooltips issue.\f4\lang9\par
 \f2\u10003?\f3\lang1033  Improved History & Statistics loading and data logic.\par
@@ -25,7 +25,8 @@ New Features\par
 \f2\u10003?\f0  Began implementing a new tooltip system to avoid ToolTipEX implementation problems.\par
 \cf1\b\fs28\par
 \cf2\fs24 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  Removed Core Audio because of conflicts with NAudio, which is needed for new Visualizer system.\f4\lang9\par
+\cf0\b0\f2\u10005?\f3\lang1033  Fixed potential crashing during History loading caused by concurrent background updates to history data.\f2\lang9\par
+\u10005?\f3\lang1033  Removed Core Audio because of conflicts with NAudio, which is needed for new Visualizer system.\f4\lang9\par
 \f2\u10005?\f3\lang1033  Fixed various bugs in History & Statistics.\f4\lang9\par
 \f2\u10005? \f3\lang1033 Fixed lyrics display error when loading plain text or metadata lyrics and published hotfix.\cf1\b\f0\fs28\lang9\par
 \par
