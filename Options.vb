@@ -515,6 +515,10 @@ Public Class Options
                 Dim c As New OptionsRainbowBar With {
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
+            Case "Classic Spectrum Analyzer"
+                Dim c As New OptionsClassicSpectrumAnalyzer With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
             Case "Waveform"
                 Dim c As New OptionsWaveform With {
                     .Dock = DockStyle.Fill}

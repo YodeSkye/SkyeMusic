@@ -425,6 +425,19 @@ Namespace My
             Public Property RainbowBarPeakThreshold As Integer = 50 '0-200 'Pixels above bottom 'Threshold to avoid flicker at bottom
             Public Property RainbowBarHueCycleSpeed As Single = 2.0F '0.1F-20F 'How fast rainbow shifts
 
+            ' Classic Spectrum Analyzer
+            Public Enum BandMappingModes
+                Linear
+                Logarithmic
+            End Enum
+            Public Property ClassicSpectrumAnalyzerBarCount As Integer = 64 ' 16-96
+            Public Property ClassicSpectrumAnalyzerGain As Single = 3.2F ' 1.0F-9.9F Gain multiplier for audio data.
+            Public Property ClassicSpectrumAnalyzerSmoothing As Single = 0.7F ' 0.0 - 0.95F Weight for previous frame vs new frame. 0 = instant response, 0.95 = very sluggish.
+            Public Property ClassicSpectrumAnalyzerShowPeaks As Boolean = True
+            Public Property ClassicSpectrumAnalyzerPeakDecay As Integer = 2 ' 1-10 px per frame
+            Public Property ClassicSpectrumAnalyzerPeakHoldFrames As Integer = 10 '0-60 How long peaks “stick” before decaying. At 30 FPS, 30 = ~1 second.
+            Public Property ClassicSpectrumAnalyzerBandMappingMode As BandMappingModes = BandMappingModes.Linear
+
             ' Waveform Visualizer Settings
             Public Property WaveformFill As Boolean = False 'Whether to fill underneath the waveform.
 
@@ -1160,6 +1173,13 @@ Namespace My
                 RegSubKey.SetValue("RainbowBarPeakThickness", Visualizers.RainbowBarPeakThickness.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("RainbowBarPeakThreshold", Visualizers.RainbowBarPeakThreshold.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("RainbowBarHueCycleSpeed", Visualizers.RainbowBarHueCycleSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ClassicSpectrumAnalyzerBarCount", Visualizers.ClassicSpectrumAnalyzerBarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ClassicSpectrumAnalyzerGain", Visualizers.ClassicSpectrumAnalyzerGain.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ClassicSpectrumAnalyzerSmoothing", Visualizers.ClassicSpectrumAnalyzerSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ClassicSpectrumAnalyzerShowPeaks", Visualizers.ClassicSpectrumAnalyzerShowPeaks.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakDecay", Visualizers.ClassicSpectrumAnalyzerPeakDecay.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakHoldFrames", Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ClassicSpectrumAnalyzerBandMappingMode", App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("WaveformFill", Visualizers.WaveformFill.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("FractalCloudPalette", Visualizers.FractalCloudPalette.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("FractalCloudSwirlSpeedBase", Visualizers.FractalCloudSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1307,12 +1327,24 @@ Namespace My
                 Visualizers.RainbowBarPeakThickness = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThickness", 6.ToString)))
                 Visualizers.RainbowBarPeakThreshold = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThreshold", 50.ToString)))
                 Visualizers.RainbowBarHueCycleSpeed = CSng(Val(RegSubKey.GetValue("RainbowBarHueCycleSpeed", 2.0F.ToString)))
+                Visualizers.ClassicSpectrumAnalyzerBarCount = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerBarCount", 64.ToString)))
+                Visualizers.ClassicSpectrumAnalyzerGain = CSng(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerGain", 3.2F.ToString)))
+                Visualizers.ClassicSpectrumAnalyzerSmoothing = CSng(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerSmoothing", 0.7F.ToString)))
+                Select Case RegSubKey.GetValue("ClassicSpectrumAnalyzerShowPeaks", "True").ToString
+                    Case "False", "0" : Visualizers.ClassicSpectrumAnalyzerShowPeaks = False
+                    Case Else : Visualizers.ClassicSpectrumAnalyzerShowPeaks = True
+                End Select
+                Visualizers.ClassicSpectrumAnalyzerPeakDecay = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerPeakDecay", 2.ToString)))
+                Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerPeakHoldFrames", 10.ToString)))
+                Try : Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType([Enum].Parse(GetType(VisualizerSettings.BandMappingModes), RegSubKey.GetValue("ClassicSpectrumAnalyzerBandMappingMode", VisualizerSettings.BandMappingModes.Linear.ToString).ToString), VisualizerSettings.BandMappingModes)
+                Catch : App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = VisualizerSettings.BandMappingModes.Linear
+                End Try
                 Select Case RegSubKey.GetValue("WaveformFill", "False").ToString
                     Case "True", "1" : Visualizers.WaveformFill = True
                     Case Else : Visualizers.WaveformFill = False
                 End Select
                 Try : Visualizers.FractalCloudPalette = CType([Enum].Parse(GetType(VisualizerSettings.FractalCloudPalettes), RegSubKey.GetValue("FractalCloudPalette", VisualizerSettings.FractalCloudPalettes.Normal.ToString).ToString), VisualizerSettings.FractalCloudPalettes)
-                Catch : App.PlaylistTitleFormat = App.PlaylistTitleFormats.ArtistSong
+                Catch : App.Visualizers.FractalCloudPalette = VisualizerSettings.FractalCloudPalettes.Normal
                 End Try
                 Visualizers.FractalCloudSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedBase", 0.01F.ToString)))
                 Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedAudioFactor", 10.0F.ToString)))

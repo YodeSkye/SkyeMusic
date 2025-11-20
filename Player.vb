@@ -1,19 +1,12 @@
 ﻿
-Imports System.Drawing.Drawing2D
-Imports System.Formats
 Imports System.IO
-Imports System.Runtime.CompilerServices
-Imports System.Runtime.InteropServices
 Imports System.Text
 Imports LibVLCSharp.Shared
-Imports LibVLCSharp.WinForms
-Imports NAudio.CoreAudioApi
 Imports NAudio.Dsp
 Imports NAudio.Wave
 Imports Skye
 Imports Skye.Contracts
 Imports SkyeMusic.My
-Imports Syncfusion.Windows.Forms.Tools
 
 Public Class Player
 
@@ -721,6 +714,241 @@ Public Class Player
         End Function
 
     End Class
+    Private Class VisualizerClassicSpectrumAnalyzer
+        Inherits UserControl
+        Implements IVisualizer
+
+        ' Timer and buffers
+        Private ReadOnly updateTimer As Timer
+        Private audioData() As Single
+        Private rollingBuffer() As Single
+        Private rollingIndex As Integer = 0
+
+        ' FFT config
+        Private ReadOnly fftSize As Integer = 1024    ' power of 2 (512/1024/2048)
+        Private ReadOnly fftBins As Integer = fftSize \ 2
+
+        ' Rendering buffers
+        Private spectrumMagnitudes() As Single        ' per-bin magnitudes
+        Private barMagnitudes() As Single             ' mapped to barCount
+        Private lastBars() As Single                  ' smoothing
+        Private peakValues() As Single
+        Private peakHold() As Integer
+
+        Public Sub New()
+            DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        ' IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Classic Spectrum Analyzer"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            If rollingBuffer Is Nothing OrElse rollingBuffer.Length <> fftSize Then
+                ReDim rollingBuffer(fftSize - 1)
+            End If
+
+            For Each sample In data
+                rollingBuffer(rollingIndex) = sample
+                rollingIndex = (rollingIndex + 1) Mod fftSize
+            Next
+
+            ' Copy buffer to audioData for FFT
+            audioData = CType(rollingBuffer.Clone(), Single())
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Size = New Size(width, height)
+        End Sub
+
+        ' Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+            MyBase.OnPaint(pe)
+            If audioData Is Nothing OrElse audioData.Length < fftSize Then Exit Sub
+            Dim g = pe.Graphics
+
+            ' Ensure buffers
+            If spectrumMagnitudes Is Nothing OrElse spectrumMagnitudes.Length <> fftBins Then
+                ReDim spectrumMagnitudes(fftBins - 1)
+            End If
+            If barMagnitudes Is Nothing OrElse barMagnitudes.Length <> App.Visualizers.ClassicSpectrumAnalyzerBarCount Then
+                ReDim barMagnitudes(App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1)
+                ReDim lastBars(App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1)
+                ReDim peakValues(App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1)
+                ReDim peakHold(App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1)
+            End If
+
+            ' 1) Compute per-bin magnitudes from latest fftSize samples
+            ComputeSpectrum(audioData, fftSize, spectrumMagnitudes)
+
+            ' 2) Map bins -> bars (logarithmic bands for better low-end resolution)
+            Select Case App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode
+                Case App.VisualizerSettings.BandMappingModes.Linear
+                    MapBinsToBarsLinear(spectrumMagnitudes, barMagnitudes)
+                Case App.VisualizerSettings.BandMappingModes.Logarithmic
+                    MapBinsToBarsLogarithmic(spectrumMagnitudes, barMagnitudes)
+            End Select
+
+            ' 3) Draw bars with smoothing, gain, peaks
+            Dim barWidth As Single = CSng(Width) / App.Visualizers.ClassicSpectrumAnalyzerBarCount
+            Dim maxHeight As Integer = Height
+
+            For i = 0 To App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1
+                ' Gain + clamp
+                Dim boosted As Single = Math.Min(barMagnitudes(i) * App.Visualizers.ClassicSpectrumAnalyzerGain, 1.0F)
+
+                ' Smooth
+                Dim smoothed As Single = (lastBars(i) * App.Visualizers.ClassicSpectrumAnalyzerSmoothing) + (boosted * (1.0F - App.Visualizers.ClassicSpectrumAnalyzerSmoothing))
+                lastBars(i) = smoothed
+
+                ' Height
+                Dim barHeight As Integer = CInt(smoothed * maxHeight)
+                Dim x As Integer = CInt(i * barWidth)
+                Dim y As Integer = maxHeight - barHeight
+                Dim width As Integer = Math.Max(1, CInt(barWidth) - 2)
+
+                ' Classic color (choose any solid or subtle gradient)
+                Using brush As New SolidBrush(App.CurrentTheme.TextColor)
+                    g.FillRectangle(brush, x, y, width, barHeight)
+                End Using
+
+                ' Peaks
+                If App.Visualizers.ClassicSpectrumAnalyzerShowPeaks Then
+                    Dim currentPeak As Integer = barHeight
+                    If currentPeak > peakValues(i) Then
+                        ' New higher peak: set it and reset hold counter
+                        peakValues(i) = currentPeak
+                        peakHold(i) = App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames
+                    Else
+                        If peakHold(i) > 0 Then
+                            ' Still holding: decrement counter, keep peak stuck
+                            peakHold(i) -= 1
+                        Else
+                            ' No hold left: start decaying
+                            peakValues(i) = Math.Max(0, peakValues(i) - App.Visualizers.ClassicSpectrumAnalyzerPeakDecay)
+                        End If
+                    End If
+                    If peakValues(i) > 2 Then
+                        Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
+                        Using pBrush As New SolidBrush(App.CurrentTheme.ButtonTextColor)
+                            g.FillRectangle(pBrush, x, peakY, width, 2)
+                        End Using
+                    End If
+                End If
+            Next
+        End Sub
+
+        ' Methods
+        Private Sub ComputeSpectrum(samples() As Single, size As Integer, ByRef mags() As Single)
+            ' Compute FFT magnitudes from time-domain samples
+            ' Window the latest fftSize samples (Hann window)
+            Dim startIdx As Integer = samples.Length - size
+            If startIdx < 0 Then startIdx = 0
+
+            Dim data(size - 1) As Complex
+            For n = 0 To size - 1
+                Dim s As Single = samples(startIdx + n)
+                Dim w As Single = Hann(n, size)
+                data(n).X = s * w   ' real
+                data(n).Y = 0.0F    ' imag
+            Next
+
+            ' NAudio FFT: m = log2(size)
+            Dim m As Integer = CInt(Math.Log(size, 2))
+            FastFourierTransform.FFT(True, m, data)
+
+            ' Convert complex bins to magnitudes (use first half: 0..Nyquist)
+            Dim half As Integer = size \ 2
+            For i = 0 To half - 1
+                Dim re As Single = data(i).X
+                Dim im As Single = data(i).Y
+                Dim mag As Single = CSng(Math.Sqrt(re * re + im * im))
+
+                ' Optional: compress dynamic range (log-ish)
+                mags(i) = Compress(mag)
+            Next
+        End Sub
+        Private Sub MapBinsToBarsLinear(bins() As Single, ByRef bars() As Single)
+            ' Linear bin -> bar mapping (simple averaging)
+            Dim barCount As Integer = bars.Length
+            Dim binsPerBar As Double = bins.Length / CDbl(barCount)
+
+            For b = 0 To barCount - 1
+                Dim startBin As Integer = CInt(Math.Floor(b * binsPerBar))
+                Dim endBin As Integer = CInt(Math.Floor((b + 1) * binsPerBar))
+                If endBin <= startBin Then endBin = startBin + 1
+                If endBin > bins.Length Then endBin = bins.Length
+
+                Dim sum As Double = 0
+                Dim count As Integer = endBin - startBin
+                For i = startBin To endBin - 1
+                    sum += bins(i)
+                Next
+                Dim avg As Single = CSng(sum / Math.Max(1, count))
+
+                ' Normalize roughly into 0..1 (tune scaling here)
+                bars(b) = Math.Min(avg * 3.0F, 1.0F)
+            Next
+        End Sub
+        Private Sub MapBinsToBarsLogarithmic(bins() As Single, ByRef bars() As Single)
+            Dim barCount As Integer = bars.Length
+            Dim nyquist As Double = 22050.0 ' assuming 44.1 kHz sample rate
+            Dim binResolution As Double = nyquist / bins.Length
+
+            For b = 0 To barCount - 1
+                ' Logarithmic frequency step: from ~20 Hz to Nyquist
+                Dim fLow As Double = 20.0 * Math.Pow(nyquist / 20.0, b / CDbl(barCount))
+                Dim fHigh As Double = 20.0 * Math.Pow(nyquist / 20.0, (b + 1) / CDbl(barCount))
+
+                ' Convert frequencies to bin indices
+                Dim startBin As Integer = CInt(Math.Floor(fLow / binResolution))
+                Dim endBin As Integer = CInt(Math.Floor(fHigh / binResolution))
+                If endBin <= startBin Then endBin = startBin + 1
+                If endBin > bins.Length Then endBin = bins.Length
+
+                ' Average magnitudes in this band
+                Dim sum As Double = 0
+                Dim count As Integer = endBin - startBin
+                For i = startBin To endBin - 1
+                    sum += bins(i)
+                Next
+                Dim avg As Single = CSng(sum / Math.Max(1, count))
+
+                ' Normalize roughly into 0..1 (tune scaling here)
+                bars(b) = Math.Min(avg * 3.0F, 1.0F)
+            Next
+        End Sub
+        Private Function Hann(index As Integer, length As Integer) As Single
+            ' Hann window: w[n] = 0.5 * (1 - cos(2πn / (N - 1))), for n = 0..N-1
+            If length <= 1 Then Return 1.0F
+            Dim ratio As Double = (2.0 * Math.PI * index) / (length - 1)
+            Dim w As Double = 0.5 * (1.0 - Math.Cos(ratio))
+            Return CSng(w)
+        End Function
+        Private Function Compress(x As Single) As Single
+            ' Gentle compression to keep levels readable
+            ' Map raw magnitude to a friendlier 0..1 curve (sqrt is simple and effective)
+            Return CSng(Math.Sqrt(Math.Min(1.0F, Math.Max(0.0F, x))))
+        End Function
+
+    End Class
     Private Class VisualizerWaveform
         Inherits UserControl
         Implements IVisualizer
@@ -807,6 +1035,7 @@ Public Class Player
                 g.DrawLines(pen, pts)
             End Using
         End Sub
+
     End Class
     Private Class VisualizerFractalCloud
         Inherits UserControl
@@ -1137,7 +1366,7 @@ Public Class Player
         Private ReadOnly updateTimer As Timer
         Private audioData() As Single
         Private ReadOnly rnd As New Random()
-        Private stars As New List(Of Star)
+        Private ReadOnly stars As New List(Of Star)
         Private Structure Star ' Star structure
             Public X As Double
             Public Y As Double
@@ -1314,6 +1543,7 @@ Public Class Player
         'For Visualizers
         VisualizerHost = New VisualizerHostClass(Me, PanelVisualizer)
         VisualizerHost.Register(New VisualizerRainbowBar)
+        VisualizerHost.Register(New VisualizerClassicSpectrumAnalyzer)
         VisualizerHost.Register(New VisualizerWaveform)
         VisualizerHost.Register(New VisualizerFractalCloud)
         VisualizerHost.Register(New VisualizerHyperspaceTunnel)

@@ -34,6 +34,12 @@ Public Class OptionsFractalCloud
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
+        CoBoxPalette.Items.Clear()
+        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Normal)
+        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Firestorm)
+        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Aurora)
+        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.CosmicRainbow)
+        CoBoxPalette.SelectedItem = App.Visualizers.FractalCloudPalette
         TBSwirlSpeedBase.Value = CInt(App.Visualizers.FractalCloudSwirlSpeedBase * 1000)
         TBSwirlSpeedAudioFactor.Value = CInt(App.Visualizers.FractalCloudSwirlSpeedAudioFactor)
         TBTimeIncrement.Value = CInt(App.Visualizers.FractalCloudTimeIncrement * 1000)
@@ -56,12 +62,6 @@ Public Class OptionsFractalCloud
         Else
             forecolor = App.CurrentTheme.TextColor
         End If
-        CoBoxPalette.Items.Clear()
-        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Normal)
-        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Firestorm)
-        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Aurora)
-        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.CosmicRainbow)
-        CoBoxPalette.SelectedItem = App.Visualizers.FractalCloudPalette
         TBSwirlSpeedBase.ButtonColor = App.CurrentTheme.ButtonBackColor
         TBSwirlSpeedBase.HighlightedButtonColor = App.CurrentTheme.TextColor
         TBSwirlSpeedBase.PushedButtonEndColor = App.CurrentTheme.TextColor
