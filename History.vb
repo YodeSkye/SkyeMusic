@@ -77,7 +77,6 @@ Public Class History
         PanelLoading.Dock = DockStyle.Fill
         PanelLoading.BringToFront()
         PBLoading.Minimum = 0
-        PBLoading.Maximum = App.History.Count
         PBLoading.Value = 0
         PBLoading.DrawingColor = App.CurrentTheme.BackColor
         PBLoading.ForeColor = App.CurrentTheme.TextColor
@@ -306,9 +305,11 @@ Public Class History
     Private Function GetData() As List(Of App.SongView)
         Dim list As New List(Of App.SongView)
 
-        For Each s As App.Song In App.History
+        Dim snapshot As List(Of App.Song) = App.GetHistorySnapshot
+        PBLoading.Maximum = snapshot.Count
+        For Each s As App.Song In snapshot
             list.Add(New App.SongView(s))
-            PBLoading.Value += 1
+            Try : PBLoading.Value += 1 : Catch : End Try
             Application.DoEvents()
         Next
 

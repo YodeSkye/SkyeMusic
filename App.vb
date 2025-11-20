@@ -2732,6 +2732,12 @@ Namespace My
             TimerHistoryAutoSave.Start()
             'Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
         End Sub
+        Friend Function GetHistorySnapshot() As List(Of Song)
+            SyncLock History
+                Return History.ToList()
+            End SyncLock
+        End Function
+
 
         'Database Methods
         Private Sub LoadPlayHistoryDatabase()
