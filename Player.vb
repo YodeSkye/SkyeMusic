@@ -369,7 +369,8 @@ Public Class Player
 
         Sub Start()
         Sub [Stop]()
-        Sub Update(audioData As Single())
+        Sub Update(audioData As Single()) ' for FFT magnitudes
+        Sub UpdateWaveform(audioSamples As Single()) ' for raw waveform
         Sub Resize(width As Integer, height As Integer)
 
     End Interface
@@ -454,6 +455,9 @@ Public Class Player
         Public Sub FeedAudio(data As Single())
             currentVisualizer?.Update(data)
         End Sub
+        Public Sub FeedWaveform(samples As Single())
+            currentVisualizer?.UpdateWaveform(samples)
+        End Sub
         Public Sub ResizeHost()
             currentVisualizer?.Resize(hostPanel.Width, hostPanel.Height)
         End Sub
@@ -518,7 +522,7 @@ Public Class Player
         End Sub
 
     End Class
-    Private Class VisualizerAudioEngine '
+    Private Class VisualizerAudioEngine
 
         'Declarations
         Private capture As WasapiLoopbackCapture
@@ -545,17 +549,53 @@ Public Class Player
         End Sub
 
         'Handlers
+        'Private Sub OnDataAvailable(sender As Object, e As WaveInEventArgs)
+        '    buffer = e.Buffer
+
+        '    'Convert to float samples
+        '    Dim sampleCount = e.BytesRecorded \ 4
+        '    Dim samples(sampleCount - 1) As Single
+        '    For i = 0 To sampleCount - 1
+        '        samples(i) = BitConverter.ToSingle(buffer, i * 4)
+        '    Next
+
+        '    'Apply FFT
+        '    Dim fftSize = 1024
+        '    Dim fftBuffer(fftSize - 1) As Complex
+        '    For i = 0 To fftSize - 1
+        '        If i < samples.Length Then
+        '            fftBuffer(i).X = samples(i)
+        '            fftBuffer(i).Y = 0
+        '        Else
+        '            fftBuffer(i).X = 0
+        '            fftBuffer(i).Y = 0
+        '        End If
+        '    Next
+        '    FastFourierTransform.FFT(True, CInt(Math.Log(fftSize, 2)), fftBuffer)
+
+        '    'Extract magnitudes
+        '    Dim magnitudes(fftSize \ 2 - 1) As Single
+        '    For i = 0 To magnitudes.Length - 1
+        '        magnitudes(i) = CSng(Math.Sqrt(fftBuffer(i).X ^ 2 + fftBuffer(i).Y ^ 2))
+        '    Next
+
+        '    'Feed to visualizer
+        '    visualizerHost.FeedAudio(magnitudes)
+        'End Sub
         Private Sub OnDataAvailable(sender As Object, e As WaveInEventArgs)
             buffer = e.Buffer
 
-            'Convert to float samples
+            ' Convert to float samples
             Dim sampleCount = e.BytesRecorded \ 4
             Dim samples(sampleCount - 1) As Single
             For i = 0 To sampleCount - 1
                 samples(i) = BitConverter.ToSingle(buffer, i * 4)
             Next
 
-            'Apply FFT
+            ' Feed raw waveform to oscilloscope
+            visualizerHost.FeedWaveform(samples)
+
+            ' Apply FFT
             Dim fftSize = 1024
             Dim fftBuffer(fftSize - 1) As Complex
             For i = 0 To fftSize - 1
@@ -569,16 +609,15 @@ Public Class Player
             Next
             FastFourierTransform.FFT(True, CInt(Math.Log(fftSize, 2)), fftBuffer)
 
-            'Extract magnitudes
+            ' Extract magnitudes
             Dim magnitudes(fftSize \ 2 - 1) As Single
             For i = 0 To magnitudes.Length - 1
                 magnitudes(i) = CSng(Math.Sqrt(fftBuffer(i).X ^ 2 + fftBuffer(i).Y ^ 2))
             Next
 
-            'Feed to visualizer
+            ' Feed spectrum to analyzers
             visualizerHost.FeedAudio(magnitudes)
         End Sub
-
     End Class
     Private Class VisualizerRainbowBar
         Inherits UserControl
@@ -616,6 +655,9 @@ Public Class Player
         End Sub
         Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
             audioData = data
+        End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
             Me.Size = New Size(width, height)
@@ -771,6 +813,9 @@ Public Class Player
             ' Copy buffer to audioData for FFT
             audioData = CType(rollingBuffer.Clone(), Single())
         End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
+        End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
             Size = New Size(width, height)
         End Sub
@@ -800,9 +845,9 @@ Public Class Player
 
             ' 2) Map bins -> bars (logarithmic bands for better low-end resolution)
             Select Case App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode
-                Case App.VisualizerSettings.BandMappingModes.Linear
+                Case App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear
                     MapBinsToBarsLinear(spectrumMagnitudes, barMagnitudes)
-                Case App.VisualizerSettings.BandMappingModes.Logarithmic
+                Case App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Logarithmic
                     MapBinsToBarsLogarithmic(spectrumMagnitudes, barMagnitudes)
             End Select
 
@@ -953,18 +998,18 @@ Public Class Player
         Inherits UserControl
         Implements IVisualizer
 
-        'Declarations
+        ' Declarations
         Private ReadOnly updateTimer As Timer
         Private audioData() As Single
 
-        'Constructor
+        ' Constructor
         Public Sub New()
             Me.DoubleBuffered = True
             updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
             AddHandler updateTimer.Tick, AddressOf OnTick
         End Sub
 
-        'IVisualizer Implementation
+        ' IVisualizer Implementation
         Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
             Get
                 Return "Waveform"
@@ -984,11 +1029,14 @@ Public Class Player
         Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
             audioData = data
         End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
+        End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
             Me.Size = New Size(width, height)
         End Sub
 
-        'Handlers
+        ' Handlers
         Private Sub OnTick(sender As Object, e As EventArgs)
             Me.Invalidate()
         End Sub
@@ -1037,6 +1085,199 @@ Public Class Player
         End Sub
 
     End Class
+    Private Class VisualizerOscilloscope
+        Inherits UserControl
+        Implements IVisualizer
+
+        ' Declarations
+        Private ReadOnly updateTimer As Timer
+
+        Private waveform() As Single
+        Private lastWaveform() As Single
+        Private waveformRight() As Single
+        Private lastWaveformRight() As Single
+        Private glowBuffer As Bitmap
+        Private glowGraphics As Graphics
+
+        ' Constructor
+        Public Sub New()
+            Me.DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        ' IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Oscilloscope"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            ' Not Implemented
+        End Sub
+        Public Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            UpdateWave(samples)
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Size = New Size(width, height)
+
+            ' Recreate glow buffer
+            If glowBuffer IsNot Nothing Then glowBuffer.Dispose()
+            If glowGraphics IsNot Nothing Then glowGraphics.Dispose()
+
+            glowBuffer = New Bitmap(width, height)
+            glowGraphics = Graphics.FromImage(glowBuffer)
+            glowGraphics.Clear(App.CurrentTheme.BackColor)
+        End Sub
+
+        ' Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Me.Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(e As PaintEventArgs)
+            ' Snapshot waveform once
+            Dim localLeft() As Single
+            Dim localRight() As Single = Nothing
+
+            SyncLock Me
+                If waveform Is Nothing OrElse waveform.Length < 2 Then Exit Sub
+                localLeft = CType(waveform.Clone(), Single())
+                If App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth AndAlso waveformRight IsNot Nothing Then
+                    localRight = CType(waveformRight.Clone(), Single())
+                End If
+            End SyncLock
+
+            Dim midY = Me.Height \ 2
+            Dim stepX = Me.Width / CSng(localLeft.Length - 1)
+
+            ' If glow is disabled, draw directly to screen
+            If Not App.Visualizers.OscilloscopeEnableGlow Then
+                Dim g = e.Graphics
+                g.Clear(App.CurrentTheme.BackColor)
+
+                Using penLeft As New Pen(App.CurrentTheme.TextColor, App.Visualizers.OscilloscopeLineWidth)
+                    For i = 1 To localLeft.Length - 1
+                        Dim x1 = (i - 1) * stepX
+                        Dim y1 = midY - (localLeft(i - 1) * midY * 0.9F)
+                        Dim x2 = i * stepX
+                        Dim y2 = midY - (localLeft(i) * midY * 0.9F)
+                        g.DrawLine(penLeft, x1, y1, x2, y2)
+                    Next
+                End Using
+
+                If App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth AndAlso localRight IsNot Nothing Then
+                    Using penRight As New Pen(App.CurrentTheme.TextColor, App.Visualizers.OscilloscopeLineWidth)
+                        For i = 1 To localRight.Length - 1
+                            Dim x1 = (i - 1) * stepX
+                            Dim y1 = midY + (localRight(i - 1) * midY * 0.9F)
+                            Dim x2 = i * stepX
+                            Dim y2 = midY + (localRight(i) * midY * 0.9F)
+                            g.DrawLine(penRight, x1, y1, x2, y2)
+                        Next
+                    End Using
+                End If
+
+                Exit Sub
+            End If
+
+            ' Ensure glow buffer matches control size
+            If glowBuffer Is Nothing OrElse glowBuffer.Width <> Me.Width OrElse glowBuffer.Height <> Me.Height Then
+                If glowBuffer IsNot Nothing Then glowBuffer.Dispose()
+                If glowGraphics IsNot Nothing Then glowGraphics.Dispose()
+                glowBuffer = New Bitmap(Me.Width, Me.Height)
+                glowGraphics = Graphics.FromImage(glowBuffer)
+                glowGraphics.Clear(App.CurrentTheme.BackColor)
+            End If
+
+            ' Fade previous frame
+            Dim fadeBrush As New SolidBrush(Color.FromArgb(App.Visualizers.OscilloscopeFadeAlpha, App.CurrentTheme.BackColor))
+            glowGraphics.FillRectangle(fadeBrush, Me.ClientRectangle)
+
+            ' Draw left channel to glow buffer
+            Using penLeft As New Pen(App.CurrentTheme.TextColor, App.Visualizers.OscilloscopeLineWidth)
+                For i = 1 To localLeft.Length - 1
+                    Dim x1 = (i - 1) * stepX
+                    Dim y1 = midY - (localLeft(i - 1) * midY * 0.9F)
+                    Dim x2 = i * stepX
+                    Dim y2 = midY - (localLeft(i) * midY * 0.9F)
+                    glowGraphics.DrawLine(penLeft, x1, y1, x2, y2)
+                Next
+            End Using
+
+            ' Draw right channel if StereoBoth
+            If App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth AndAlso localRight IsNot Nothing Then
+                Using penRight As New Pen(App.CurrentTheme.TextColor, App.Visualizers.OscilloscopeLineWidth)
+                    For i = 1 To localRight.Length - 1
+                        Dim x1 = (i - 1) * stepX
+                        Dim y1 = midY + (localRight(i - 1) * midY * 0.9F)
+                        Dim x2 = i * stepX
+                        Dim y2 = midY + (localRight(i) * midY * 0.9F)
+                        glowGraphics.DrawLine(penRight, x1, y1, x2, y2)
+                    Next
+                End Using
+            End If
+
+            ' Blit glow buffer to screen
+            e.Graphics.DrawImageUnscaled(glowBuffer, 0, 0)
+        End Sub
+
+        ' Methods
+        Public Sub UpdateWave(samples() As Single)
+            SyncLock Me
+                Dim sampleCount = samples.Length \ 2
+
+                ' Resize buffers if needed
+                If waveform Is Nothing OrElse waveform.Length <> sampleCount Then
+                    ReDim waveform(sampleCount - 1)
+                    ReDim lastWaveform(sampleCount - 1)
+                    ReDim waveformRight(sampleCount - 1)
+                    ReDim lastWaveformRight(sampleCount - 1)
+                End If
+
+                For i = 0 To sampleCount - 1
+                    Dim left = samples(i * 2)
+                    Dim right = samples(i * 2 + 1)
+
+                    Select Case App.Visualizers.OscilloscopeChannelMode
+                        Case App.VisualizerSettings.OscilloscopeChannelModes.Mono
+                            Dim mixed = (left + right) / 2.0F
+                            waveform(i) = Smooth(i, mixed)
+                        Case App.VisualizerSettings.OscilloscopeChannelModes.StereoLeft
+                            waveform(i) = Smooth(i, left)
+                        Case App.VisualizerSettings.OscilloscopeChannelModes.StereoRight
+                            waveform(i) = Smooth(i, right)
+                        Case App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth
+                            waveform(i) = Smooth(i, left)
+                            waveformRight(i) = SmoothRight(i, right)
+                    End Select
+                Next
+            End SyncLock
+        End Sub
+        Private Function Smooth(i As Integer, sample As Single) As Single
+            Dim boosted = Math.Max(-1.0F, Math.Min(sample * App.Visualizers.OscilloscopeGain, 1.0F))
+            Dim smoothed = (lastWaveform(i) * App.Visualizers.OscilloscopeSmoothing) + (boosted * (1.0F - App.Visualizers.OscilloscopeSmoothing))
+            lastWaveform(i) = smoothed
+            Return smoothed
+        End Function
+        Private Function SmoothRight(i As Integer, sample As Single) As Single
+            Dim boosted = Math.Max(-1.0F, Math.Min(sample * App.Visualizers.OscilloscopeGain, 1.0F))
+            Dim smoothed = (lastWaveformRight(i) * App.Visualizers.OscilloscopeSmoothing) + (boosted * (1.0F - App.Visualizers.OscilloscopeSmoothing))
+            lastWaveformRight(i) = smoothed
+            Return smoothed
+        End Function
+
+    End Class
     Private Class VisualizerFractalCloud
         Inherits UserControl
         Implements IVisualizer
@@ -1072,6 +1313,9 @@ Public Class Player
         End Sub
         Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
             audioData = data
+        End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
             Me.Size = New Size(width, height)
@@ -1242,6 +1486,9 @@ Public Class Player
         Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
             audioData = data
         End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
+        End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
             Me.Size = New Size(width, height)
         End Sub
@@ -1402,6 +1649,9 @@ Public Class Player
         Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
             audioData = data
         End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
+        End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
             Size = New Size(width, height)
         End Sub
@@ -1545,6 +1795,7 @@ Public Class Player
         VisualizerHost.Register(New VisualizerRainbowBar)
         VisualizerHost.Register(New VisualizerClassicSpectrumAnalyzer)
         VisualizerHost.Register(New VisualizerWaveform)
+        VisualizerHost.Register(New VisualizerOscilloscope)
         VisualizerHost.Register(New VisualizerFractalCloud)
         VisualizerHost.Register(New VisualizerHyperspaceTunnel)
         VisualizerHost.Register(New VisualizerStarField)

@@ -523,6 +523,10 @@ Public Class Options
                 Dim c As New OptionsWaveform With {
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
+            Case "Oscilloscope"
+                Dim c As New OptionsOscilloscope With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
             Case "Fractal Cloud"
                 Dim c As New OptionsFractalCloud With {
                     .Dock = DockStyle.Fill}

@@ -426,7 +426,7 @@ Namespace My
             Public Property RainbowBarHueCycleSpeed As Single = 2.0F '0.1F-20F 'How fast rainbow shifts
 
             ' Classic Spectrum Analyzer
-            Public Enum BandMappingModes
+            Public Enum ClassicSpectrumAnalyzerBandMappingModes
                 Linear
                 Logarithmic
             End Enum
@@ -436,10 +436,24 @@ Namespace My
             Public Property ClassicSpectrumAnalyzerShowPeaks As Boolean = True
             Public Property ClassicSpectrumAnalyzerPeakDecay As Integer = 2 ' 1-10 px per frame
             Public Property ClassicSpectrumAnalyzerPeakHoldFrames As Integer = 10 '0-60 How long peaks “stick” before decaying. At 30 FPS, 30 = ~1 second.
-            Public Property ClassicSpectrumAnalyzerBandMappingMode As BandMappingModes = BandMappingModes.Linear
+            Public Property ClassicSpectrumAnalyzerBandMappingMode As ClassicSpectrumAnalyzerBandMappingModes = ClassicSpectrumAnalyzerBandMappingModes.Linear
 
             ' Waveform Visualizer Settings
             Public Property WaveformFill As Boolean = False 'Whether to fill underneath the waveform.
+
+            ' Oscilloscope Visualizer Settings
+            Public Enum OscilloscopeChannelModes
+                Mono
+                StereoLeft
+                StereoRight
+                StereoBoth
+            End Enum
+            Public Property OscilloscopeChannelMode As OscilloscopeChannelModes = OscilloscopeChannelModes.Mono ' Channel mode for the oscilloscope.
+            Public Property OscilloscopeGain As Single = 1.0F ' 0.1F - 8.0F *10 Gain multiplier for the oscilloscope data.
+            Public Property OscilloscopeSmoothing As Single = 0.3F ' 0.0F - 1.0F *100 Smoothing factor for the oscilloscope data. 0 = no smoothing, 1 = maximum smoothing.
+            Public Property OscilloscopeLineWidth As Single = 1.5F ' 0.5F - 10.0F *10 Width of the oscilloscope line.
+            Public Property OscilloscopeEnableGlow As Boolean = False ' Whether to enable glow effect on the oscilloscope line.
+            Public Property OscilloscopeFadeAlpha As Integer = 48 ' 16 - 128 Alpha value for the glow effect. Higher values = less after glow.
 
             ' Fractal Cloud Visualizer Settings
             Public Enum FractalCloudPalettes
@@ -1181,6 +1195,12 @@ Namespace My
                 RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakHoldFrames", Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("ClassicSpectrumAnalyzerBandMappingMode", App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("WaveformFill", Visualizers.WaveformFill.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("OscilloscopeChannelMode", App.Visualizers.OscilloscopeChannelMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("OscilloscopeGain", Visualizers.OscilloscopeGain.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("OscilloscopeSmoothing", Visualizers.OscilloscopeSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("OscilloscopeLineWidth", Visualizers.OscilloscopeLineWidth.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("OscilloscopeEnableGlow", Visualizers.OscilloscopeEnableGlow.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("OscilloscopeFadeAlpha", Visualizers.OscilloscopeFadeAlpha.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("FractalCloudPalette", Visualizers.FractalCloudPalette.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("FractalCloudSwirlSpeedBase", Visualizers.FractalCloudSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("FractalCloudSwirlSpeedAudioFactor", Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1336,13 +1356,24 @@ Namespace My
                 End Select
                 Visualizers.ClassicSpectrumAnalyzerPeakDecay = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerPeakDecay", 2.ToString)))
                 Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerPeakHoldFrames", 10.ToString)))
-                Try : Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType([Enum].Parse(GetType(VisualizerSettings.BandMappingModes), RegSubKey.GetValue("ClassicSpectrumAnalyzerBandMappingMode", VisualizerSettings.BandMappingModes.Linear.ToString).ToString), VisualizerSettings.BandMappingModes)
-                Catch : App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = VisualizerSettings.BandMappingModes.Linear
+                Try : Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType([Enum].Parse(GetType(VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes), RegSubKey.GetValue("ClassicSpectrumAnalyzerBandMappingMode", VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear.ToString).ToString), VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes)
+                Catch : App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear
                 End Try
                 Select Case RegSubKey.GetValue("WaveformFill", "False").ToString
                     Case "True", "1" : Visualizers.WaveformFill = True
                     Case Else : Visualizers.WaveformFill = False
                 End Select
+                Try : Visualizers.OscilloscopeChannelMode = CType([Enum].Parse(GetType(VisualizerSettings.OscilloscopeChannelModes), RegSubKey.GetValue("OscilloscopeChannelMode", VisualizerSettings.OscilloscopeChannelModes.Mono.ToString).ToString), VisualizerSettings.OscilloscopeChannelModes)
+                Catch : App.Visualizers.OscilloscopeChannelMode = VisualizerSettings.OscilloscopeChannelModes.Mono
+                End Try
+                Visualizers.OscilloscopeGain = CSng(Val(RegSubKey.GetValue("OscilloscopeGain", 1.0F.ToString)))
+                Visualizers.OscilloscopeSmoothing = CSng(Val(RegSubKey.GetValue("OscilloscopeSmoothing", 0.3F.ToString)))
+                Visualizers.OscilloscopeLineWidth = CSng(Val(RegSubKey.GetValue("OscilloscopeLineWidth", 1.5F.ToString)))
+                Select Case RegSubKey.GetValue("OscilloscopeEnableGlow", "False").ToString
+                    Case "True", "1" : Visualizers.OscilloscopeEnableGlow = True
+                    Case Else : Visualizers.OscilloscopeEnableGlow = False
+                End Select
+                Visualizers.OscilloscopeFadeAlpha = CInt(Val(RegSubKey.GetValue("OscilloscopeFadeAlpha", 48.ToString)))
                 Try : Visualizers.FractalCloudPalette = CType([Enum].Parse(GetType(VisualizerSettings.FractalCloudPalettes), RegSubKey.GetValue("FractalCloudPalette", VisualizerSettings.FractalCloudPalettes.Normal.ToString).ToString), VisualizerSettings.FractalCloudPalettes)
                 Catch : App.Visualizers.FractalCloudPalette = VisualizerSettings.FractalCloudPalettes.Normal
                 End Try

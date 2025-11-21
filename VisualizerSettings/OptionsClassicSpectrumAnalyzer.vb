@@ -1,6 +1,4 @@
 ﻿
-Imports System.Drawing.Imaging
-
 Public Class OptionsClassicSpectrumAnalyzer
 
     ' Declarations
@@ -36,7 +34,7 @@ Public Class OptionsClassicSpectrumAnalyzer
         App.Visualizers.ClassicSpectrumAnalyzerShowPeaks = ChkBoxShowPeaks.Checked
     End Sub
     Private Sub CoBoxBandMappingMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxBandMappingMode.SelectedIndexChanged
-        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType(CoBoxBandMappingMode.SelectedIndex, App.VisualizerSettings.BandMappingModes)
+        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType(CoBoxBandMappingMode.SelectedIndex, App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes)
     End Sub
     Private Sub TBGain_ValueChanged(sender As Object, e As EventArgs) Handles TBGain.ValueChanged
         If IsInitializing Then Exit Sub
@@ -61,7 +59,7 @@ Public Class OptionsClassicSpectrumAnalyzer
         App.Visualizers.ClassicSpectrumAnalyzerShowPeaks = True
         App.Visualizers.ClassicSpectrumAnalyzerPeakDecay = 2
         App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames = 20
-        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.BandMappingModes.Logarithmic
+        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Logarithmic
         ShowSettings()
     End Sub
     Private Sub BtnAmbientFlow_Click(sender As Object, e As EventArgs) Handles BtnAmbientFlow.Click
@@ -71,7 +69,7 @@ Public Class OptionsClassicSpectrumAnalyzer
         App.Visualizers.ClassicSpectrumAnalyzerShowPeaks = True
         App.Visualizers.ClassicSpectrumAnalyzerPeakDecay = 1
         App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames = 30
-        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.BandMappingModes.Logarithmic
+        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Logarithmic
         ShowSettings()
     End Sub
     Private Sub BtnLiveDJ_Click(sender As Object, e As EventArgs) Handles BtnLiveDJ.Click
@@ -81,7 +79,7 @@ Public Class OptionsClassicSpectrumAnalyzer
         App.Visualizers.ClassicSpectrumAnalyzerShowPeaks = True
         App.Visualizers.ClassicSpectrumAnalyzerPeakDecay = 4
         App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames = 10
-        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.BandMappingModes.Linear
+        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear
         ShowSettings()
     End Sub
     Private Sub BtnRetroArcade_Click(sender As Object, e As EventArgs) Handles BtnRetroArcade.Click
@@ -91,7 +89,7 @@ Public Class OptionsClassicSpectrumAnalyzer
         App.Visualizers.ClassicSpectrumAnalyzerShowPeaks = True
         App.Visualizers.ClassicSpectrumAnalyzerPeakDecay = 2
         App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames = 25
-        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.BandMappingModes.Logarithmic
+        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Logarithmic
         ShowSettings()
     End Sub
     Private Sub BtnTechnicalAnalyzer_Click(sender As Object, e As EventArgs) Handles BtnTechnicalAnalyzer.Click
@@ -101,7 +99,7 @@ Public Class OptionsClassicSpectrumAnalyzer
         App.Visualizers.ClassicSpectrumAnalyzerShowPeaks = True
         App.Visualizers.ClassicSpectrumAnalyzerPeakDecay = 5
         App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames = 0
-        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.BandMappingModes.Linear
+        App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear
         ShowSettings()
     End Sub
 
@@ -111,8 +109,8 @@ Public Class OptionsClassicSpectrumAnalyzer
         TxtBoxBarCount.Text = App.Visualizers.ClassicSpectrumAnalyzerBarCount.ToString()
         ChkBoxShowPeaks.Checked = App.Visualizers.ClassicSpectrumAnalyzerShowPeaks
         CoBoxBandMappingMode.Items.Clear()
-        CoBoxBandMappingMode.Items.Add(App.VisualizerSettings.BandMappingModes.Linear)
-        CoBoxBandMappingMode.Items.Add(App.VisualizerSettings.BandMappingModes.Logarithmic)
+        CoBoxBandMappingMode.Items.Add(App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear)
+        CoBoxBandMappingMode.Items.Add(App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Logarithmic)
         CoBoxBandMappingMode.SelectedItem = App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode
         TBGain.Value = CInt(App.Visualizers.ClassicSpectrumAnalyzerGain * 10)
         TBSmoothing.Value = CInt(App.Visualizers.ClassicSpectrumAnalyzerSmoothing * 100)
