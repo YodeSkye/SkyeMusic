@@ -519,6 +519,10 @@ Public Class Options
                 Dim c As New OptionsClassicSpectrumAnalyzer With {
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
+            Case "Circular Spectrum"
+                Dim c As New OptionsCircularSpectrum With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
             Case "Waveform"
                 Dim c As New OptionsWaveform With {
                     .Dock = DockStyle.Fill}

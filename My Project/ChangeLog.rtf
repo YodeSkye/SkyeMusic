@@ -1,11 +1,15 @@
-{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset0 Segoe UI Symbol;}{\f4\fnil Segoe UI Symbol;}{\f5\fnil Segoe UI;}{\f6\fnil\fcharset1 Cambria Math;}}
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil\fcharset1 Cambria Math;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont6\mwrapIndent1440 }\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 Skye Music v1.1 What's New\par
 \cf0\b0\fs24 Released ?? 2025\par
 \cf2\b\par
 New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  Added settings for all new visualizers. Complete with sliders to set configurable variables in the visualizers. Saves with the other settings to the Windows Registry.\f1\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Circular Spectrum Visualizer, a spoke\f2\_\f0 style frequency display radiating bars around a central ring, with configurable gain, smoothing, and weighting modes.\f1\par
+\'a3\'ab\f0  Added Oscilloscope Visualizer, technical lines blazing across the screen, with stereo mode and glow trails.\f1\par
+\'a3\'ab\f0  Added Classic Spectrum Analyzer Visualizer, made to feel like the classic Winamp spectrum bars.\par
+\f1\'a3\'ab\f0  Added Star Field Visualizer, a gentle flow of stars set to music.\f1\par
+\'a3\'ab\f0  Added settings for all new visualizers. Complete with sliders to set configurable variables in the visualizers. Saves with the other settings to the Windows Registry.\f1\par
 \'a3\'ab\f0  Added Hyperspace Tunnel Visualizer. Colorful streaks coming at you.\par
 \f1\'a3\'ab\f0  Added Fractal Cloud Visualizer. A Swirling mutating cloud.\par
 \f1\'a3\'ab\f0  Added Waveform Visualizer. Oscilloscope style.\f1\par
@@ -16,60 +20,60 @@ New Features\par
 \'a3\'ab\f0\lang9  Created a hidden DevTools form for viewing the raw History and Plays databases.\par
 \cf1\b\fs28\par
 \cf2\fs24 Improvements\par
-\cf0\b0\f2\u10003?\f3\lang1033  Refactored to Visual Studio 2026. This involved some minor tweaking and style improvements. Still running on .NET 9.0. Planning to upgrade to .NET 10.0 in the coming months.\f4\lang9\par
-\f2\u10003?\f3\lang1033  Refactored Visualizer system. Created a panel to dock the Visualizer Host. Removed old timer and picturebox system.\f4\lang9\par
-\f2\u10003?\f3\lang1033  \f0 Refactored Meters to use NAudio instead of CoreAudio. Meters run at a 20fps rate with smooth drop offs.\cf2\b\lang9\par
-\cf0\b0\f2\u10003?\f3\lang1033  Refactored tooltips throughout the app to overcome ToolTipEX's deficiencies. In some cases this meant strictly controlling ToolTipEX's life-cycle, in other cases completely swapping to another component. This should solve the disappearing tooltips issue.\f4\lang9\par
-\f2\u10003?\f3\lang1033  Improved History & Statistics loading and data logic.\par
-\f2\lang9\u10003?\f3\lang1033  Improved History & Statistics UI\f4\lang9\par
-\f2\u10003?\f0  Began implementing a new tooltip system to avoid ToolTipEX implementation problems.\par
+\cf0\b0\f3\u10003?\f4\lang1033  Refactored to Visual Studio 2026. This involved some minor tweaking and style improvements. Still running on .NET 9.0. Planning to upgrade to .NET 10.0 in the coming months.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Refactored Visualizer system. Created a panel to dock the Visualizer Host. Removed old timer and picturebox system.\f5\lang9\par
+\f3\u10003?\f4\lang1033  \f0 Refactored Meters to use NAudio instead of CoreAudio. Meters run at a 20fps rate with smooth drop offs.\cf2\b\lang9\par
+\cf0\b0\f3\u10003?\f4\lang1033  Refactored tooltips throughout the app to overcome ToolTipEX's deficiencies. In some cases this meant strictly controlling ToolTipEX's life-cycle, in other cases completely swapping to another component. This should solve the disappearing tooltips issue.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Improved History & Statistics loading and data logic.\par
+\f3\lang9\u10003?\f4\lang1033  Improved History & Statistics UI\f5\lang9\par
+\f3\u10003?\f0  Began implementing a new tooltip system to avoid ToolTipEX implementation problems.\par
 \cf1\b\fs28\par
 \cf2\fs24 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  Fixed potential crashing during History loading caused by concurrent background updates to history data.\f2\lang9\par
-\u10005?\f3\lang1033  Removed Core Audio because of conflicts with NAudio, which is needed for new Visualizer system.\f4\lang9\par
-\f2\u10005?\f3\lang1033  Fixed various bugs in History & Statistics.\f4\lang9\par
-\f2\u10005? \f3\lang1033 Fixed lyrics display error when loading plain text or metadata lyrics and published hotfix.\cf1\b\f0\fs28\lang9\par
+\cf0\b0\f3\u10005?\f4\lang1033  Fixed potential crashing during History loading caused by concurrent background updates to history data.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Removed Core Audio because of conflicts with NAudio, which is needed for new Visualizer system.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed various bugs in History & Statistics.\f5\lang9\par
+\f3\u10005? \f4\lang1033 Fixed lyrics display error when loading plain text or metadata lyrics and published hotfix.\cf1\b\f0\fs28\lang9\par
 \par
 \fs24 Skye Music v1.0 What's New\par
-This upgrade marks a major milestone in SkyeMusic\f5\rquote\f0 s playback architecture \f5\emdash  smoother, smarter, and built to last.\par
+This upgrade marks a major milestone in SkyeMusic\f2\rquote\f0 s playback architecture \f2\emdash  smoother, smarter, and built to last.\par
 \cf0\b0\f0 Released November 2025\cf1\b\fs28\par
 \par
 \cf2\fs24 New Features\par
 \cf0\b0\f1\lang1033\'a3\'ab\f0\lang9 Implemented a Plays Database using SQLite to track the actual plays per track and their duration.\par
-\f1\lang1033\'a3\'ab\f0\lang9 Full synced lyrics view with RichTextBox display. Current lyric line now bolded in real time with smooth switching between album\f5\_art view (single line) and full\_lyrics view\f0\lang1033 . Requires a matching '.LRC' file alongside the audio file for synced audio.\lang9\par
+\f1\lang1033\'a3\'ab\f0\lang9 Full synced lyrics view with RichTextBox display. Current lyric line now bolded in real time with smooth switching between album\f2\_art view (single line) and full\_lyrics view\f0\lang1033 . Requires a matching '.LRC' file alongside the audio file for synced audio.\lang9\par
 \f1\lang1033\'a3\'ab\f0\lang9 History & Statistics page\par
   \f6\u8594?\f0  \lang9 Added play stats: most played song, total songs, total duration\par
-  \f6\u8594?\f0  \lang9 Added 7\f5\_column list view (Title, Artist, Album, Genre, Plays, Last Played, Path)\par
-  \f6\u8594?\f0  \f5\lang9 Added multiple views: Most Played, Recently Played, Favorites\par
-  \f6\u8594?\f0  \f5\lang9 Added integrated charts: Genre Pie, Genre Polar, Genre Pareto, Artist Bar, Artist Word Cloud\par
-  \f6\u8594?\f0  \f5\lang9 Applied theme\_aware styling to charts and list view\par
-  \f6\u8594?\f0  \f5\lang9 Added context menu actions: Queue selected, Add selected to playlist\par
+  \f6\u8594?\f0  \lang9 Added 7\f2\_column list view (Title, Artist, Album, Genre, Plays, Last Played, Path)\par
+  \f6\u8594?\f0  \f2\lang9 Added multiple views: Most Played, Recently Played, Favorites\par
+  \f6\u8594?\f0  \f2\lang9 Added integrated charts: Genre Pie, Genre Polar, Genre Pareto, Artist Bar, Artist Word Cloud\par
+  \f6\u8594?\f0  \f2\lang9 Applied theme\_aware styling to charts and list view\par
+  \f6\u8594?\f0  \f2\lang9 Added context menu actions: Queue selected, Add selected to playlist\par
 \f1\lang1033\'a3\'ab\f0\lang9 A Text Label has been added where the Album Art button was located. This may be used in the future for song information or a lyrics display.\par
 \f1\lang1033\'a3\'ab\f0\lang9 Full VLC Integration. Replaced legacy Windows Media Player(WMP) with modern LibVLC backend for improved format support and performance.\par
-\f1\lang1033\'a3\'ab\f0\lang9 Custom Fullscreen Mode. Implemented fullscreen support from scratch, tailored for VLC\f5\rquote\f0 s rendering model.\par
+\f1\lang1033\'a3\'ab\f0\lang9 Custom Fullscreen Mode. Implemented fullscreen support from scratch, tailored for VLC\f2\rquote\f0 s rendering model.\par
 \cf2\b\par
 Improvements\par
-\cf0\b0\f2\u10003?\f0  Refactored Plays Database PlayTrigger logic:\par
+\cf0\b0\f3\u10003?\f0  Refactored Plays Database PlayTrigger logic:\par
     \f6\u8594?\f0  Defaulted to Manual unless AutoTrigger flag is set\par
     \f6\u8594?\f0  Simplified intent tracking across playback paths\par
     \f6\u8594?\f0  Logging now includes accurate trigger context\par
     \f6\u8594?\f0  This change makes play history smarter without complicating playback flow.\lang9\par
-\f2\u10003?\f0  \lang1033 Lyrics support includes '.LRC' files, plain text files, and metadata from the song file itself.\par
-\f2\lang9\u10003?\f0  \lang1033 Cycle through Album Art simply by left-clicking the Art. The Album Art button has been removed.\par
-\f2\lang9\u10003?\f0  Audio Playback Update. Improved stability by aligning with system audio settings. Tip: For best results, set your playback device to 16\f5\_bit, 44.1 kHz (CD Quality).\f0\lang1033  \f5\lang9 This matches most music files and avoids unnecessary resampling that can cause static.\f0\par
-\f2\u10003?\f0  Hook Reliability. Improved timing and resilience of mouse hook attachment to VLC\f5\rquote\f0 s native window.\par
-\f2\u10003?\f0  Playback Lifecycle Management. Smoothed transitions between playback states to prevent UI hangs and race conditions.\par
-\f2\u10003?\f0  FullScreen Usage and Stability Overhaul. Added keyboard shortcuts and uniform click events to fullscreen functionality. Increased stability and reliability of fullscreen mode.\par
+\f3\u10003?\f0  \lang1033 Lyrics support includes '.LRC' files, plain text files, and metadata from the song file itself.\par
+\f3\lang9\u10003?\f0  \lang1033 Cycle through Album Art simply by left-clicking the Art. The Album Art button has been removed.\par
+\f3\lang9\u10003?\f0  Audio Playback Update. Improved stability by aligning with system audio settings. Tip: For best results, set your playback device to 16\f2\_bit, 44.1 kHz (CD Quality).\f0\lang1033  \f2\lang9 This matches most music files and avoids unnecessary resampling that can cause static.\f0\par
+\f3\u10003?\f0  Hook Reliability. Improved timing and resilience of mouse hook attachment to VLC\f2\rquote\f0 s native window.\par
+\f3\u10003?\f0  Playback Lifecycle Management. Smoothed transitions between playback states to prevent UI hangs and race conditions.\par
+\f3\u10003?\f0  FullScreen Usage and Stability Overhaul. Added keyboard shortcuts and uniform click events to fullscreen functionality. Increased stability and reliability of fullscreen mode.\par
 \cf2\b\par
 Fixes\par
-\cf0\b0\f2\u10005? \f3\lang1033 Fixed lyrics sync problem in Lyrics View.\f4\lang9\par
-\f2\u10005? Fixed repeat mode bug\f3\lang1033 , \f4\lang9 playback now restarts correctly at end of song\par
-\f2\u10005?\f0  Fixed RichTextBox cursor flicker by subclassing and overriding WM_SETCURSOR\par
-\f2\u10005?\f0  MPEG playback timing issue stabilized. A\f5 dded a startup timer to safely grab video dimensions and toggle mute, eliminating divide\_by\_zero and silent playback quirks.\f0\par
-\f2\u10005?\f0  Fixed errors when loading history and statistics page and user interacts by clicking a button or closing prematurely.\par
-\f2\u10005?\f0  Ensured all UI updates are safely marshaled to the main thread\par
-\f2\u10005?\f0  Various FullScreen Lifecylce and Stability fixes.\par
-\f2\u10005?\f0  File System Watcher now updates Playlist Count when removing files.\par
+\cf0\b0\f3\u10005? \f4\lang1033 Fixed lyrics sync problem in Lyrics View.\f5\lang9\par
+\f3\u10005? Fixed repeat mode bug\f4\lang1033 , \f5\lang9 playback now restarts correctly at end of song\par
+\f3\u10005?\f0  Fixed RichTextBox cursor flicker by subclassing and overriding WM_SETCURSOR\par
+\f3\u10005?\f0  MPEG playback timing issue stabilized. A\f2 dded a startup timer to safely grab video dimensions and toggle mute, eliminating divide\_by\_zero and silent playback quirks.\f0\par
+\f3\u10005?\f0  Fixed errors when loading history and statistics page and user interacts by clicking a button or closing prematurely.\par
+\f3\u10005?\f0  Ensured all UI updates are safely marshaled to the main thread\par
+\f3\u10005?\f0  Various FullScreen Lifecylce and Stability fixes.\par
+\f3\u10005?\f0  File System Watcher now updates Playlist Count when removing files.\par
 \cf1\b\par
 Skye Music v0.8\par
 \cf0\b0 Released October 2025\par
@@ -83,14 +87,14 @@ Skye Music v0.8\par
 \f1\lang1033\'a3\'ab\f0\lang9 Status Messages. These will provide the user with valuable information about actions performed and provide feedback for automated processes. They will appear under the Playlist and disappear automatically. A new setting was added to the Playlist section to control how long they appear or if they appear at all.\par
 \par
 \cf2\b Improvements\par
-\cf0\b0\f2\u10003?\f0  History saving upgraded with Schema versioning for easier future updates, while maintaining backward compatibility.\par
-\f2\u10003?\f0  Centralized Import Logic. Shared method now powers both dialog and drag & drop workflows.\par
-\f2\u10003?\f0  Cleaner Diagnostics. WriteToLog now tracks media vs playlist drops.\par
-\f2\u10003?\f0  Laid the foundation for transition to VLC Media Player as the media engine for Skye Music.\par
+\cf0\b0\f3\u10003?\f0  History saving upgraded with Schema versioning for easier future updates, while maintaining backward compatibility.\par
+\f3\u10003?\f0  Centralized Import Logic. Shared method now powers both dialog and drag & drop workflows.\par
+\f3\u10003?\f0  Cleaner Diagnostics. WriteToLog now tracks media vs playlist drops.\par
+\f3\u10003?\f0  Laid the foundation for transition to VLC Media Player as the media engine for Skye Music.\par
 \par
 \cf2\b Fixes\par
-\cf0\b0\f2\u10005?\f0  Tooltip lifecycle stabilized.\par
-\f2\u10005?\f0  Normalized web URLs for consistency and future VLC support by removing ending "/" characters. Windows Media Player adds this character automatically.\par
+\cf0\b0\f3\u10005?\f0  Tooltip lifecycle stabilized.\par
+\f3\u10005?\f0  Normalized web URLs for consistency and future VLC support by removing ending "/" characters. Windows Media Player adds this character automatically.\par
 \par
 \cf1\b\fs28 Thank you for using Skye Music!\cf0\b0\fs24\par
 }

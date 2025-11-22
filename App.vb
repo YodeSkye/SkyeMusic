@@ -438,6 +438,23 @@ Namespace My
             Public Property ClassicSpectrumAnalyzerPeakHoldFrames As Integer = 10 '0-60 How long peaks “stick” before decaying. At 30 FPS, 30 = ~1 second.
             Public Property ClassicSpectrumAnalyzerBandMappingMode As ClassicSpectrumAnalyzerBandMappingModes = ClassicSpectrumAnalyzerBandMappingModes.Linear
 
+            ' Circular Spectrum Visualizer Settings
+            Public Enum CircularSpectrumWeightingModes
+                Balanced
+                BassHeavy
+                TrebleBright
+                Raw
+                Warm
+                VShape
+                MidFocus
+            End Enum
+            Public Property CircularSpectrumWeightingMode As CircularSpectrumWeightingModes = CircularSpectrumWeightingModes.Raw ' Frequency emphasis curve
+            Public Property CircularSpectrumGain As Single = 6.0F ' 1.0F - 30.0F *10 Gain Factor for magnitudes
+            Public Property CircularSpectrumSmoothing As Single = 0.3F ' 0.0F - 1.0F *100 Blend Factor for smoothing (0 = no smoothing, 1 = max smoothing)
+            Public Property CircularSpectrumLineWidth As Integer = 1 ' 1 - 5 Thickness of each spoke line
+            Public Property CircularSpectrumRadiusFactor As Single = 0.3F ' 0.1F - 0.5F *10 ' Proportion of control size used as base radius
+            Public Property CircularSpectrumFill As Boolean = False ' Whether to fill the area under the spectrum
+
             ' Waveform Visualizer Settings
             Public Property WaveformFill As Boolean = False 'Whether to fill underneath the waveform.
 
@@ -1194,6 +1211,12 @@ Namespace My
                 RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakDecay", Visualizers.ClassicSpectrumAnalyzerPeakDecay.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakHoldFrames", Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("ClassicSpectrumAnalyzerBandMappingMode", App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("CircularSpectrumWeightingMode", App.Visualizers.CircularSpectrumWeightingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("CircularSpectrumGain", Visualizers.CircularSpectrumGain.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("CircularSpectrumSmoothing", Visualizers.CircularSpectrumSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("CircularSpectrumLineWidth", Visualizers.CircularSpectrumLineWidth.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("CircularSpectrumRadiusFactor", Visualizers.CircularSpectrumRadiusFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("CircularSpectrumFill", Visualizers.CircularSpectrumFill.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("WaveformFill", Visualizers.WaveformFill.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("OscilloscopeChannelMode", App.Visualizers.OscilloscopeChannelMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("OscilloscopeGain", Visualizers.OscilloscopeGain.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1359,6 +1382,17 @@ Namespace My
                 Try : Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType([Enum].Parse(GetType(VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes), RegSubKey.GetValue("ClassicSpectrumAnalyzerBandMappingMode", VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear.ToString).ToString), VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes)
                 Catch : App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear
                 End Try
+                Try : Visualizers.CircularSpectrumWeightingMode = CType([Enum].Parse(GetType(VisualizerSettings.CircularSpectrumWeightingModes), RegSubKey.GetValue("CircularSpectrumWeightingMode", VisualizerSettings.CircularSpectrumWeightingModes.Raw.ToString).ToString), VisualizerSettings.CircularSpectrumWeightingModes)
+                Catch : App.Visualizers.CircularSpectrumWeightingMode = VisualizerSettings.CircularSpectrumWeightingModes.Raw
+                End Try
+                Visualizers.CircularSpectrumGain = CSng(Val(RegSubKey.GetValue("CircularSpectrumGain", 6.0F.ToString)))
+                Visualizers.CircularSpectrumSmoothing = CSng(Val(RegSubKey.GetValue("CircularSpectrumSmoothing", 0.3F.ToString)))
+                Visualizers.CircularSpectrumLineWidth = CInt(Val(RegSubKey.GetValue("CircularSpectrumLineWidth", 1.ToString)))
+                Visualizers.CircularSpectrumRadiusFactor = CSng(Val(RegSubKey.GetValue("CircularSpectrumRadiusFactor", 0.3F.ToString)))
+                Select Case RegSubKey.GetValue("CircularSpectrumFill", "False").ToString
+                    Case "True", "1" : Visualizers.CircularSpectrumFill = True
+                    Case Else : Visualizers.CircularSpectrumFill = False
+                End Select
                 Select Case RegSubKey.GetValue("WaveformFill", "False").ToString
                     Case "True", "1" : Visualizers.WaveformFill = True
                     Case Else : Visualizers.WaveformFill = False

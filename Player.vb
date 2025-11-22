@@ -994,6 +994,174 @@ Public Class Player
         End Function
 
     End Class
+    Private Class VisualizerCircularSpectrum
+        Inherits UserControl
+        Implements IVisualizer
+
+        ' Timer and buffers
+        Private ReadOnly updateTimer As Timer
+        Private audioData() As Single
+        Private smoothedBins() As Single
+
+        Public Sub New()
+            DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        ' IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Circular Spectrum"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Size = New Size(width, height)
+        End Sub
+
+        ' Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(e As PaintEventArgs)
+            MyBase.OnPaint(e)
+
+            ' Snapshot FFT bins
+            Dim bins() As Single
+            SyncLock Me
+                If audioData Is Nothing OrElse audioData.Length < 2 Then Exit Sub
+                bins = CType(audioData.Clone(), Single())
+            End SyncLock
+
+            ' Use only first half of FFT (unique frequencies)
+            Dim barCount As Integer = bins.Length \ 2
+            If barCount < 2 Then Exit Sub
+
+            ' Normalize magnitudes to 0–1
+            Dim maxVal As Single = bins.Take(barCount).Max()
+            If maxVal > 0 Then
+                For i As Integer = 0 To barCount - 1
+                    bins(i) /= maxVal
+                Next
+            End If
+
+            ' Apply frequency weighting based on preset
+            Dim sampleRate As Integer = 44100
+            For i As Integer = 0 To barCount - 1
+                Dim freq As Double = (i * sampleRate) / (2.0 * barCount)
+                Dim weight As Single = 1.0F
+                Select Case App.Visualizers.CircularSpectrumWeightingMode
+                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.Balanced
+                        If freq < 200 Then weight = 0.5F
+                        If freq >= 200 AndAlso freq < 2000 Then weight = 1.0F
+                        If freq >= 2000 AndAlso freq < 8000 Then weight = 1.0F
+                        If freq >= 8000 Then weight = 0.7F
+                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.BassHeavy
+                        If freq < 200 Then weight = 1.2F
+                        If freq >= 200 AndAlso freq < 2000 Then weight = 1.0F
+                        If freq >= 2000 Then weight = 0.8F
+                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.TrebleBright
+                        If freq < 200 Then weight = 0.4F
+                        If freq >= 2000 Then weight = 1.3F
+                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.Raw
+                        weight = 1.0F
+                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.Warm
+                        If freq < 200 Then weight = 1.1F
+                        If freq >= 2000 Then weight = 0.8F
+                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.VShape
+                        If freq < 200 Then weight = 1.2F
+                        If freq >= 500 AndAlso freq < 2000 Then weight = 0.8F
+                        If freq >= 2000 Then weight = 1.2F
+                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.MidFocus
+                        If freq >= 500 AndAlso freq < 2000 Then weight = 1.3F
+                        If freq < 200 OrElse freq >= 8000 Then weight = 0.6F
+                    Case Else
+                        weight = 1.0F
+                End Select
+                bins(i) = bins(i) * weight
+            Next
+
+            ' Initialize smoothed buffer if needed
+            If smoothedBins Is Nothing OrElse smoothedBins.Length <> barCount Then
+                ReDim smoothedBins(barCount - 1)
+            End If
+
+            ' Apply smoothing
+            For i As Integer = 0 To barCount - 1
+                smoothedBins(i) = (App.Visualizers.CircularSpectrumSmoothing * bins(i)) + ((1 - App.Visualizers.CircularSpectrumSmoothing) * smoothedBins(i))
+            Next
+
+            ' Center of control
+            Dim cx As Single = Me.Width / 2.0F
+            Dim cy As Single = Me.Height / 2.0F
+            Dim radiusBase As Single = Math.Min(cx, cy) * App.Visualizers.CircularSpectrumRadiusFactor
+            Dim angleStep As Single = 360.0F / barCount
+
+            ' Collect inner and outer points
+            Dim innerPoints As New List(Of PointF)
+            Dim outerPoints As New List(Of PointF)
+
+            For i As Integer = 0 To barCount - 1
+                Dim angleRad As Single = CSng((i * angleStep) * Math.PI / 180.0F)
+                Dim barLength As Single = CSng(Math.Log(1 + smoothedBins(i) * App.Visualizers.CircularSpectrumGain) * radiusBase)
+
+                ' Inner circle point
+                innerPoints.Add(New PointF(
+                    CSng(cx + Math.Cos(angleRad) * radiusBase),
+                    CSng(cy + Math.Sin(angleRad) * radiusBase)))
+
+                ' Outer tip point
+                outerPoints.Add(New PointF(
+                    CSng(cx + Math.Cos(angleRad) * (radiusBase + barLength)),
+                    CSng(cy + Math.Sin(angleRad) * (radiusBase + barLength))))
+            Next
+
+            ' Style
+            e.Graphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+
+            If App.Visualizers.CircularSpectrumFill Then
+                ' Build band polygon: outer points clockwise, inner points reversed
+                Dim bandPoints As New List(Of PointF)(outerPoints)
+                innerPoints.Reverse()
+                bandPoints.AddRange(innerPoints)
+
+                ' Fill the band
+                Using brush As New SolidBrush(App.CurrentTheme.TextColor)
+                    e.Graphics.FillPolygon(brush, bandPoints.ToArray())
+                End Using
+
+                ' Optional outline
+                Using pen As New Pen(App.CurrentTheme.TextColor, App.Visualizers.CircularSpectrumLineWidth)
+                    e.Graphics.DrawPolygon(pen, bandPoints.ToArray())
+                End Using
+            Else
+                ' Original spoke style
+                Using pen As New Pen(App.CurrentTheme.TextColor, App.Visualizers.CircularSpectrumLineWidth)
+                    For i As Integer = 0 To barCount - 1
+                        e.Graphics.DrawLine(pen, innerPoints(i), outerPoints(i))
+                    Next
+                End Using
+            End If
+        End Sub
+
+    End Class
     Private Class VisualizerWaveform
         Inherits UserControl
         Implements IVisualizer
@@ -1794,6 +1962,7 @@ Public Class Player
         VisualizerHost = New VisualizerHostClass(Me, PanelVisualizer)
         VisualizerHost.Register(New VisualizerRainbowBar)
         VisualizerHost.Register(New VisualizerClassicSpectrumAnalyzer)
+        VisualizerHost.Register(New VisualizerCircularSpectrum)
         VisualizerHost.Register(New VisualizerWaveform)
         VisualizerHost.Register(New VisualizerOscilloscope)
         VisualizerHost.Register(New VisualizerFractalCloud)
