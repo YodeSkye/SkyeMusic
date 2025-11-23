@@ -497,6 +497,69 @@ Namespace My
             Public Property StarFieldAudioSpeedFactor As Integer = 10 ' 0-100 How much audio level boosts star speed.
             Public Property StarFieldMaxStarSize As Integer = 6 ' 2-12 Maximum size of stars.
 
+            'Particle Nebula Visualizer Settings
+            Public Enum ParticleNebulaPalettePresets ' Enum of available palettes
+                Cosmic
+                Firestorm
+                Oceanic
+                Aurora
+                MonochromeGlow
+            End Enum
+            Public Structure ParticleNebulaPalette ' Structure to hold colors
+                Public BassColor As Color
+                Public MidColor As Color
+                Public TrebleColor As Color
+            End Structure
+            Public Function ParticleNebulaGetPalette(preset As ParticleNebulaPalettePresets) As ParticleNebulaPalette ' Helper to get palette colors from preset
+                Select Case preset
+                    Case ParticleNebulaPalettePresets.Cosmic
+                        Return New ParticleNebulaPalette With {
+                            .BassColor = Color.FromArgb(180, 200, 50, 200),
+                            .MidColor = Color.FromArgb(180, 50, 200, 255),
+                            .TrebleColor = Color.FromArgb(200, 255, 255, 180)}
+                    Case ParticleNebulaPalettePresets.Firestorm
+                        Return New ParticleNebulaPalette With {
+                            .BassColor = Color.DarkRed,
+                            .MidColor = Color.Orange,
+                            .TrebleColor = Color.White}
+                    Case ParticleNebulaPalettePresets.Oceanic
+                        Return New ParticleNebulaPalette With {
+                            .BassColor = Color.Navy,
+                            .MidColor = Color.Teal,
+                            .TrebleColor = Color.Aqua}
+                    Case ParticleNebulaPalettePresets.Aurora
+                        Return New ParticleNebulaPalette With {
+                            .BassColor = Color.Green,
+                            .MidColor = Color.Magenta,
+                            .TrebleColor = Color.Violet}
+                    Case ParticleNebulaPalettePresets.MonochromeGlow
+                        Return New ParticleNebulaPalette With {
+                            .BassColor = Color.DarkGray,
+                            .MidColor = Color.Silver,
+                            .TrebleColor = Color.White}
+                    Case Else
+                        Return New ParticleNebulaPalette With {
+                            .BassColor = Color.Gray,
+                            .MidColor = Color.LightGray,
+                            .TrebleColor = Color.White}
+                End Select
+            End Function
+            Public ParticleNebulaActivePalette As ParticleNebulaPalette = ParticleNebulaGetPalette(ParticleNebulaPalettePresets.Cosmic)
+            Public Property ParticleNebulaSpawnMultiplier As Single = 2.0F ' 0.5 – 10.0 *10 ' Nebula Density. Higher = More Particles.
+            Public Property ParticleNebulaVelocityScale As Integer = 50 ' 10 - 200 *1 ' Speed of Particle Movement.
+            Public Property ParticleNebulaSizeScale As Integer = 20 ' 5 – 50 *1 ' Size of Particles. Higher = Bigger Particles.
+            Public Property ParticleNebulaFadeRate As Single = 0.005F '0.001 – 0.02 *10000 ' How Quickly Particles Fade Out.
+            Public Property ParticleNebulaSwirlStrength As Single = 0.15F ' 0.0 – 0.5 *100 ' How Strongly Particles Swirl.
+            Public Property ParticleNebulaSwirlBias As Single = 0.0F '-1 - 1 0-2*100-1 ' Directional Bias. -1 = mostly CCW, 0 = Balanced, +1 = mostly CW
+            Public Property ParticleNebulaActivePalettePreset As ParticleNebulaPalettePresets = ParticleNebulaPalettePresets.Cosmic ' Selected Color Palette.
+            Public Property ParticleNebulaRainbowColors As Boolean = False ' Use Rainbow Coloring Instead of Palette.
+            Public Property ParticleNebulaShowTrails As Boolean = False ' Whether to Draw Particle Trails.
+            Public Property ParticleNebulaFadeTrails As Boolean = False ' Whether Trail Segments Fade Out.
+            Public Property ParticleNebulaTrailAlpha As Single = 0.5F ' 0.1 – 1.0 *100 ' Brightness of Trail Segments.
+            Public Property ParticleNebulaShowBloom As Boolean = False ' Whether to Draw Bloom Effect.
+            Public Property ParticleNebulaBloomIntensity As Single = 0.5F ' 0.1 – 2.0 *10 ' Bloom Brightness Multiplier.
+            Public Property ParticleNebulaBloomRadius As Integer = 2 ' 1 – 5 *1 ' How Many Extra Bloom Rings to Draw.
+
         End Class
 
         ' Registry Saved Settings
@@ -1237,6 +1300,20 @@ Namespace My
                 RegSubKey.SetValue("StarFieldBaseSpeed", Visualizers.StarFieldBaseSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("StarFieldAudioSpeedFactor", Visualizers.StarFieldAudioSpeedFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("StarFieldMaxStarSize", Visualizers.StarFieldMaxStarSize.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaActivePalettePreset", App.Visualizers.ParticleNebulaActivePalettePreset.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaBloomIntensity", App.Visualizers.ParticleNebulaBloomIntensity.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaBloomRadius", App.Visualizers.ParticleNebulaBloomRadius.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaFadeRate", App.Visualizers.ParticleNebulaFadeRate.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaFadeTrails", App.Visualizers.ParticleNebulaFadeTrails.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaRainbowColors", App.Visualizers.ParticleNebulaRainbowColors.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaShowBloom", App.Visualizers.ParticleNebulaShowBloom.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaShowTrails", App.Visualizers.ParticleNebulaShowTrails.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaSizeScale", App.Visualizers.ParticleNebulaSizeScale.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaSpawnMultiplier", App.Visualizers.ParticleNebulaSpawnMultiplier.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaSwirlBias", App.Visualizers.ParticleNebulaSwirlBias.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaSwirlStrength", App.Visualizers.ParticleNebulaSwirlStrength.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaTrailAlpha", App.Visualizers.ParticleNebulaTrailAlpha.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("ParticleNebulaVelocityScale", App.Visualizers.ParticleNebulaVelocityScale.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.Close()
 
                 RegKey.Flush()
@@ -1423,6 +1500,34 @@ Namespace My
                 Visualizers.StarFieldBaseSpeed = CSng(Val(RegSubKey.GetValue("StarFieldBaseSpeed", 2.0F.ToString)))
                 Visualizers.StarFieldAudioSpeedFactor = CInt(Val(RegSubKey.GetValue("StarFieldAudioSpeedFactor", 10.ToString)))
                 Visualizers.StarFieldMaxStarSize = CInt(Val(RegSubKey.GetValue("StarFieldMaxStarSize", 6.ToString)))
+                Try : Visualizers.ParticleNebulaActivePalettePreset = CType([Enum].Parse(GetType(VisualizerSettings.ParticleNebulaPalettePresets), RegSubKey.GetValue("ParticleNebulaActivePalettePreset", VisualizerSettings.ParticleNebulaPalettePresets.Cosmic.ToString).ToString), VisualizerSettings.ParticleNebulaPalettePresets)
+                Catch : App.Visualizers.ParticleNebulaActivePalettePreset = VisualizerSettings.ParticleNebulaPalettePresets.Cosmic
+                End Try
+                Visualizers.ParticleNebulaBloomIntensity = CSng(Val(RegSubKey.GetValue("ParticleNebulaBloomIntensity", 0.5F.ToString)))
+                Visualizers.ParticleNebulaBloomRadius = CInt(Val(RegSubKey.GetValue("ParticleNebulaBloomRadius", 2.ToString)))
+                Visualizers.ParticleNebulaFadeRate = CSng(Val(RegSubKey.GetValue("ParticleNebulaFadeRate", 0.005F.ToString)))
+                Select Case RegSubKey.GetValue("ParticleNebulaFadeTrails", "False").ToString
+                    Case "True", "1" : Visualizers.ParticleNebulaFadeTrails = True
+                    Case Else : Visualizers.ParticleNebulaFadeTrails = False
+                End Select
+                Select Case RegSubKey.GetValue("ParticleNebulaRainbowColors", "False").ToString
+                    Case "True", "1" : Visualizers.ParticleNebulaRainbowColors = True
+                    Case Else : Visualizers.ParticleNebulaRainbowColors = False
+                End Select
+                Select Case RegSubKey.GetValue("ParticleNebulaShowBloom", "False").ToString
+                    Case "True", "1" : Visualizers.ParticleNebulaShowBloom = True
+                    Case Else : Visualizers.ParticleNebulaShowBloom = False
+                End Select
+                Select Case RegSubKey.GetValue("ParticleNebulaShowTrails", "False").ToString
+                    Case "True", "1" : Visualizers.ParticleNebulaShowTrails = True
+                    Case Else : Visualizers.ParticleNebulaShowTrails = False
+                End Select
+                Visualizers.ParticleNebulaSizeScale = CInt(Val(RegSubKey.GetValue("ParticleNebulaSizeScale", 20.ToString)))
+                Visualizers.ParticleNebulaSpawnMultiplier = CSng(Val(RegSubKey.GetValue("ParticleNebulaSpawnMultiplier", 2.0F.ToString)))
+                Visualizers.ParticleNebulaSwirlBias = CSng(Val(RegSubKey.GetValue("ParticleNebulaSwirlBias", 0.0F.ToString)))
+                Visualizers.ParticleNebulaSwirlStrength = CSng(Val(RegSubKey.GetValue("ParticleNebulaSwirlStrength", 0.15F.ToString)))
+                Visualizers.ParticleNebulaTrailAlpha = CSng(Val(RegSubKey.GetValue("ParticleNebulaTrailAlpha", 0.5F.ToString)))
+                Visualizers.ParticleNebulaVelocityScale = CInt(Val(RegSubKey.GetValue("ParticleNebulaVelocityScale", 50.ToString)))
                 RegSubKey.Close()
 
                 RegSubKey.Dispose()
@@ -2802,7 +2907,6 @@ Namespace My
                 Return History.ToList()
             End SyncLock
         End Function
-
 
         'Database Methods
         Private Sub LoadPlayHistoryDatabase()

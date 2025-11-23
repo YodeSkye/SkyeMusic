@@ -543,6 +543,10 @@ Public Class Options
                 Dim c As New OptionsStarField With {
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
+            Case "Particle Nebula"
+                Dim c As New OptionsParticleNebula With {
+                    .Dock = DockStyle.Fill}
+                PanelVisualizers.Controls.Add(c)
         End Select
     End Sub
     Private Sub CheckMove(ByRef location As Point)

@@ -7,6 +7,7 @@ Imports NAudio.Wave
 Imports Skye
 Imports Skye.Contracts
 Imports SkyeMusic.My
+Imports Syncfusion.Windows.Forms.Tools
 
 Public Class Player
 
@@ -660,7 +661,6 @@ Public Class Player
             ' Not Implemented
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Me.Size = New Size(width, height)
         End Sub
 
         'Handlers
@@ -817,7 +817,6 @@ Public Class Player
             ' Not Implemented
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Size = New Size(width, height)
         End Sub
 
         ' Handlers
@@ -1033,7 +1032,6 @@ Public Class Player
             ' Not Implemented
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Size = New Size(width, height)
         End Sub
 
         ' Handlers
@@ -1201,7 +1199,6 @@ Public Class Player
             ' Not Implemented
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Me.Size = New Size(width, height)
         End Sub
 
         ' Handlers
@@ -1298,8 +1295,6 @@ Public Class Player
             UpdateWave(samples)
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Size = New Size(width, height)
-
             ' Recreate glow buffer
             If glowBuffer IsNot Nothing Then glowBuffer.Dispose()
             If glowGraphics IsNot Nothing Then glowGraphics.Dispose()
@@ -1486,7 +1481,6 @@ Public Class Player
             ' Not Implemented
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Me.Size = New Size(width, height)
         End Sub
 
         Private Sub OnTick(sender As Object, e As EventArgs)
@@ -1658,7 +1652,6 @@ Public Class Player
             ' Not Implemented
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Me.Size = New Size(width, height)
         End Sub
 
         Private Sub OnTick(sender As Object, e As EventArgs)
@@ -1821,7 +1814,6 @@ Public Class Player
             ' Not Implemented
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            Size = New Size(width, height)
         End Sub
 
         ' Handlers
@@ -1896,6 +1888,229 @@ Public Class Player
         End Sub
 
     End Class
+    Private Class VisualizerParticleNebula
+        Inherits UserControl
+        Implements IVisualizer
+
+        Private ReadOnly updateTimer As Timer
+        Private audioData() As Single
+        Private ReadOnly particles As New List(Of Particle)
+        Private ReadOnly rand As New Random()
+        Private oldCenter As PointF
+
+        Private Class Particle
+            Public Property Position As PointF
+            Public Property Velocity As PointF
+            Public Property AngularVelocity As Single
+            Public Property Size As Single
+            Public Property Color As Color
+            Public Property Life As Single ' 0–1, fades out
+            Public Property Trail As New Queue(Of PointF)
+
+            Public Sub Update()
+                ' Apply angular drift
+                Dim cosA As Single = CSng(Math.Cos(AngularVelocity))
+                Dim sinA As Single = CSng(Math.Sin(AngularVelocity))
+
+                Dim vx As Single = Velocity.X * cosA - Velocity.Y * sinA
+                Dim vy As Single = Velocity.X * sinA + Velocity.Y * cosA
+                Velocity = New PointF(vx, vy)
+
+                ' Move particle
+                Position = New PointF(Position.X + Velocity.X, Position.Y + Velocity.Y)
+
+                ' Record trail
+                Trail.Enqueue(Position)
+                If Trail.Count > 10 Then
+                    Trail.Dequeue()
+                End If
+
+                ' Fade life
+                Life -= App.Visualizers.ParticleNebulaFadeRate
+                If Life < 0 Then Life = 0
+            End Sub
+
+        End Class
+
+        ' Constructor
+        Public Sub New()
+            DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        ' IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Particle Nebula"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            oldCenter = New PointF(CSng(Width / 2), CSng(Height / 2))
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+
+            ' Apply logarithmic scaling to FFT magnitudes
+            Dim scaled(data.Length - 1) As Single
+            For i As Integer = 0 To data.Length - 1
+                ' Avoid log(0) by adding 1
+                scaled(i) = CSng(Math.Log(1 + data(i)) / Math.Log(2))
+            Next
+
+            audioData = scaled
+        End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            Dim newCenter As New PointF(CSng(width / 2), CSng(height / 2))
+            Dim dx As Single = newCenter.X - oldCenter.X
+            Dim dy As Single = newCenter.Y - oldCenter.Y
+
+            For Each p In particles
+                p.Position = New PointF(p.Position.X + dx, p.Position.Y + dy)
+            Next
+
+            oldCenter = newCenter
+        End Sub
+
+        ' Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(e As PaintEventArgs)
+            MyBase.OnPaint(e)
+            e.Graphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+
+            ' Spawn new particles
+            SpawnParticles()
+
+            ' Update + draw particles
+            For i As Integer = particles.Count - 1 To 0 Step -1
+                Dim p = particles(i)
+                p.Update()
+
+                If p.Life <= 0 Then
+                    particles.RemoveAt(i)
+                Else
+                    Dim alpha As Integer = CInt(p.Life * 255)
+                    Using brush As New SolidBrush(Color.FromArgb(alpha, p.Color))
+                        e.Graphics.FillEllipse(brush,
+                                       p.Position.X - p.Size / 2,
+                                       p.Position.Y - p.Size / 2,
+                                       p.Size, p.Size)
+                    End Using
+                End If
+
+                If App.Visualizers.ParticleNebulaShowBloom Then
+                    For r As Integer = 1 To App.Visualizers.ParticleNebulaBloomRadius
+                        ' Fade alpha outward
+                        Dim rawAlpha As Single = p.Life * 255 * App.Visualizers.ParticleNebulaBloomIntensity / r
+                        Dim alphaBloom As Integer = Math.Min(255, Math.Max(0, CInt(rawAlpha)))
+                        Dim sizeBloom As Single = p.Size + (r * 4) ' expand halo outward
+                        Using bloomBrush As New SolidBrush(Color.FromArgb(alphaBloom, p.Color))
+                            e.Graphics.FillEllipse(bloomBrush, p.Position.X - sizeBloom / 2, p.Position.Y - sizeBloom / 2, sizeBloom, sizeBloom)
+                        End Using
+                    Next
+                End If
+
+                If App.Visualizers.ParticleNebulaShowTrails AndAlso p.Trail.Count > 1 Then
+                    Dim trailPoints() As PointF = p.Trail.ToArray()
+
+                    If App.Visualizers.ParticleNebulaFadeTrails Then
+                        ' Gradient fade along trail
+                        For i2 As Integer = 1 To trailPoints.Length - 1
+                            Dim fadeFactor As Double = i2 / trailPoints.Length
+                            Dim alphaTrail As Integer = CInt(p.Life * 255 * fadeFactor * App.Visualizers.ParticleNebulaTrailAlpha)
+
+                            Using segPen As New Pen(Color.FromArgb(alphaTrail, p.Color), p.Size / 2)
+                                e.Graphics.DrawLine(segPen, trailPoints(i2 - 1), trailPoints(i2))
+                            End Using
+                        Next
+                    Else
+                        ' Solid streak with one alpha
+                        Dim alphaTrail As Integer = CInt(p.Life * 255 * App.Visualizers.ParticleNebulaTrailAlpha)
+                        Using trailPen As New Pen(Color.FromArgb(alphaTrail, p.Color), p.Size / 2)
+                            e.Graphics.DrawLines(trailPen, trailPoints)
+                        End Using
+                    End If
+                End If
+
+            Next
+        End Sub
+
+        ' Methods
+        Private Sub SpawnParticles()
+            If audioData Is Nothing OrElse audioData.Length < 2 Then Exit Sub
+
+            Dim barCount As Integer = audioData.Length \ 2
+            Dim sampleRate As Integer = 44100
+
+            For i As Integer = 0 To barCount - 1
+                Dim magnitude As Single = audioData(i)
+                Dim freq As Double = (i * sampleRate) / (2.0 * barCount)
+                Dim maxFreq As Double = sampleRate / 2.0
+
+                ' Spawn probability based on magnitude
+                If rand.NextDouble() < magnitude * App.Visualizers.ParticleNebulaSpawnMultiplier Then
+                    Dim angle As Double = rand.NextDouble() * 2 * Math.PI
+                    Dim speed As Single = Math.Max(1.0F, magnitude * App.Visualizers.ParticleNebulaVelocityScale)
+                    Dim p As New Particle With {
+                        .Position = New PointF(CSng(Width / 2), CSng(Height / 2)),
+                        .Velocity = New PointF(CSng(Math.Cos(angle) * speed), CSng(Math.Sin(angle) * speed)),
+                        .AngularVelocity = CSng(((rand.NextDouble() - 0.5) + App.Visualizers.ParticleNebulaSwirlBias) * App.Visualizers.ParticleNebulaSwirlStrength),
+                        .Size = CSng(2 + magnitude * App.Visualizers.ParticleNebulaSizeScale),
+                        .Color = GetColorForFrequency(freq, maxFreq),
+                        .Life = 1.0F}
+                    particles.Add(p)
+                End If
+            Next
+        End Sub
+        Private Function GetColorForFrequency(freq As Double, maxFreq As Double) As Color
+            If App.Visualizers.ParticleNebulaRainbowColors Then
+                ' Map frequency to hue (0–360)
+                Dim hue As Double = (freq / maxFreq) * 360.0
+                Return ColorFromHSV(hue, 1.0, 1.0)
+            Else
+                ' Default cosmic gradient
+                If freq < 200 Then
+                    Return App.Visualizers.ParticleNebulaActivePalette.BassColor
+                ElseIf freq < 2000 Then
+                    Return App.Visualizers.ParticleNebulaActivePalette.MidColor
+                Else
+                    Return App.Visualizers.ParticleNebulaActivePalette.TrebleColor
+                End If
+            End If
+        End Function
+        Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
+            Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
+            Dim f As Double = hue / 60 - Math.Floor(hue / 60)
+
+            Dim v As Integer = CInt(value * 255)
+            Dim p As Integer = CInt(v * (1 - saturation))
+            Dim q As Integer = CInt(v * (1 - f * saturation))
+            Dim t As Integer = CInt(v * (1 - (1 - f) * saturation))
+
+            Select Case hi
+                Case 0 : Return Color.FromArgb(255, v, t, p)
+                Case 1 : Return Color.FromArgb(255, q, v, p)
+                Case 2 : Return Color.FromArgb(255, p, v, t)
+                Case 3 : Return Color.FromArgb(255, p, q, v)
+                Case 4 : Return Color.FromArgb(255, t, p, v)
+                Case Else : Return Color.FromArgb(255, v, p, q)
+            End Select
+        End Function
+
+    End Class
 
     'Form Events                    
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -1968,6 +2183,7 @@ Public Class Player
         VisualizerHost.Register(New VisualizerFractalCloud)
         VisualizerHost.Register(New VisualizerHyperspaceTunnel)
         VisualizerHost.Register(New VisualizerStarField)
+        VisualizerHost.Register(New VisualizerParticleNebula)
         VisualizerHost.SetVisualizersMenu()
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
 
@@ -2553,6 +2769,9 @@ Public Class Player
     End Sub
     Private Sub PanelMedia_DoubleClick(sender As Object, e As EventArgs) Handles PanelMedia.DoubleClick
         ToggleMaximized()
+    End Sub
+    Private Sub PanelVisualizer_Resize(sender As Object, e As EventArgs) Handles PanelVisualizer.Resize
+        VisualizerHost?.ResizeHost()
     End Sub
     Private Sub MenuPlayer_DoubleClick(sender As Object, e As EventArgs) Handles MenuPlayer.DoubleClick
         'Debug.Print(MenuPlayer.PointToClient(MousePosition).ToString)

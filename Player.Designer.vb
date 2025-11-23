@@ -345,40 +345,40 @@ Partial Class Player
         ' 
         MIOpen.Image = My.Resources.Resources.ImageOpen16
         MIOpen.Name = "MIOpen"
-        MIOpen.Size = New Size(180, 22)
+        MIOpen.Size = New Size(173, 22)
         MIOpen.Text = "Open"
         ' 
         ' MIOpenURL
         ' 
         MIOpenURL.Image = My.Resources.Resources.ImageGlobe
         MIOpenURL.Name = "MIOpenURL"
-        MIOpenURL.Size = New Size(180, 22)
+        MIOpenURL.Size = New Size(173, 22)
         MIOpenURL.Text = "Open URL"
         ' 
         ' MIOpenPlaylist
         ' 
         MIOpenPlaylist.Image = My.Resources.Resources.ImageImport16
         MIOpenPlaylist.Name = "MIOpenPlaylist"
-        MIOpenPlaylist.Size = New Size(180, 22)
+        MIOpenPlaylist.Size = New Size(173, 22)
         MIOpenPlaylist.Text = "Open Playlist..."
         ' 
         ' MISavePlaylist
         ' 
         MISavePlaylist.Image = My.Resources.Resources.ImageExport16
         MISavePlaylist.Name = "MISavePlaylist"
-        MISavePlaylist.Size = New Size(180, 22)
+        MISavePlaylist.Size = New Size(173, 22)
         MISavePlaylist.Text = "Save Playlist As..."
         ' 
         ' ToolStripSeparator4
         ' 
         ToolStripSeparator4.Name = "ToolStripSeparator4"
-        ToolStripSeparator4.Size = New Size(177, 6)
+        ToolStripSeparator4.Size = New Size(170, 6)
         ' 
         ' MIExit
         ' 
         MIExit.Image = My.Resources.Resources.ImageExit
         MIExit.Name = "MIExit"
-        MIExit.Size = New Size(180, 22)
+        MIExit.Size = New Size(173, 22)
         MIExit.Text = "Exit"
         ' 
         ' MIView
