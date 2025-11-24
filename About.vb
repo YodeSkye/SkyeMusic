@@ -68,10 +68,12 @@ Public Class About
         App.ShowChangeLog()
     End Sub
     Private Sub LblVersion_DoubleClick(sender As Object, e As EventArgs) Handles LblVersion.DoubleClick
-        Dim classname As String = Space(256)
-        Skye.WinAPI.GetClassName(Player.Handle, classname, 255)
-        My.Computer.Clipboard.SetText(classname.TrimEnd(Chr(0), CChar(" "))) 'Remove null terminator & trailing spaces from class name
-        Debug.Print(classname.TrimEnd(Chr(0), CChar(" ")))
+        Dim classname As New System.Text.StringBuilder(256)
+        Dim length As Integer = Skye.WinAPI.GetClassName(Player.Handle, classname, classname.Capacity)
+        If length > 0 Then
+            My.Computer.Clipboard.SetText(classname.ToString.TrimEnd(Chr(0), CChar(" "))) 'Remove null terminator & trailing spaces from class name
+            Debug.Print(classname.ToString.TrimEnd(Chr(0), CChar(" ")))
+        End If
     End Sub
     Private Sub LLblMicrosoft_MouseEnter(sender As Object, e As EventArgs) Handles LLblMicrosoft.MouseEnter
         Cursor = Cursors.Hand
