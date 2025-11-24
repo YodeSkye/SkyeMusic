@@ -1295,6 +1295,11 @@ Public Class Player
             UpdateWave(samples)
         End Sub
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            ' Prevent invalid bitmap sizes
+            If width <= 0 OrElse height <= 0 Then
+                Exit Sub
+            End If
+
             ' Recreate glow buffer
             If glowBuffer IsNot Nothing Then glowBuffer.Dispose()
             If glowGraphics IsNot Nothing Then glowGraphics.Dispose()
