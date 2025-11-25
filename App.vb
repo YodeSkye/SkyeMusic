@@ -2792,7 +2792,7 @@ Namespace My
                     .LastPlayed = Nothing,
                     .Rating = 0}
                 History.Add(newsong)
-                'Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
+                Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
             End If
             HistoryChanged = True
         End Sub

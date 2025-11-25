@@ -889,13 +889,17 @@ Public Class Library
                     If File.Exists(path) Then
                         Dim lvi As ListViewItem = CreateLibraryItem(path)
                         If WatcherUpdateLibrary Then
+                            App.AddToHistoryFromLibrary(path)
                             If existinglibraryindex > -1 Then
                                 LVLibrary.Items.Insert(existinglibraryindex, lvi)
                             Else
                                 LVLibrary.Items.Add(lvi)
                             End If
                         End If
-                        If WatcherUpdatePlaylist Then AddToPlaylist(lvi)
+                        If WatcherUpdatePlaylist Then
+                            App.AddToHistoryFromPlaylist(path)
+                            AddToPlaylist(lvi)
+                        End If
                     End If
                 End If
 
@@ -999,8 +1003,6 @@ Public Class Library
         If App.LibrarySearchFolders.Count > 0 Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim files As New Collections.Generic.List(Of String)
-            'Dim tlfile As TagLib.File
-            'Dim item As New ListViewItem()
             Dim col As New Collections.Generic.List(Of ListViewItem)
             LblStatus.Text = "Searching your Folders for Media Files..."
             LblStatus.Visible = True
@@ -1022,7 +1024,6 @@ Public Class Library
                 For Each file As String In files
                     If ExtensionDictionary.ContainsKey(IO.Path.GetExtension(file).ToLower) Then
                         col.Add(CreateLibraryItem(file))
-                        Debug.Print(col.Count.ToString)
                         AddToHistoryFromLibrary(file)
                     End If
                 Next
@@ -1030,8 +1031,6 @@ Public Class Library
             Next
             LVLibrary.Items.AddRange(col.Where(Function(i) i IsNot Nothing).ToArray())
             col.Clear()
-            'item = Nothing
-            'tlfile = Nothing
             LVLibrary.EndUpdate()
             LblStatus.Visible = False
             ShowAlbumArt()
