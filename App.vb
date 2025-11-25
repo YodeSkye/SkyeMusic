@@ -1,7 +1,8 @@
 ﻿
-Imports System.IO
 Imports System.Data.SQLite
+Imports System.IO
 Imports Microsoft.Win32
+Imports SkyeMusic.My.App
 
 Namespace My
 
@@ -65,9 +66,15 @@ Namespace My
             MegaBytes
             GigaBytes
         End Enum
+        Public Enum MediaSourceTypes
+            File
+            Stream
+            AudioCD
+        End Enum
         Public Class Song
 
             Public Property Path As String 'Path to the media.
+            Public Property SourceType As MediaSourceTypes = MediaSourceTypes.File
             Public Property InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
             Public Property IsStream As Boolean 'IsStream indicates whether the song is a stream.
             Public Property PlayCount As UShort 'PlayCount is the number of times the song has been played.
@@ -78,7 +85,7 @@ Namespace My
 
             Public Overrides Function ToString() As String
                 Dim s As String = String.Empty
-                If IsStream Then s += "Stream, "
+                If SourceType = MediaSourceTypes.Stream Then s += "Stream, "
                 If Rating > 0 Then s += New String("★"c, Rating) + ", "
                 s += PlayCount.ToString()
                 If PlayCount = 1 Then
@@ -91,7 +98,7 @@ Namespace My
             End Function
             Public Function ToStringFull() As String
                 Dim s As String = String.Empty
-                If IsStream Then s += "Stream, "
+                If SourceType = MediaSourceTypes.Stream Then s += "Stream, "
                 If Rating > 0 Then s += New String("★"c, Rating) + ", "
                 s += PlayCount.ToString()
                 If PlayCount = 1 Then
@@ -406,7 +413,7 @@ Namespace My
         Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
         <Serializable>
         Public Class HistoryData
-            Public Property SchemaVersion As Integer = 1
+            Public Property SchemaVersion As Integer = 2
             Public Property History As List(Of Song)
             Public Property TotalPlayedSongs As UInteger
         End Class
@@ -1162,7 +1169,21 @@ Namespace My
                             Case 1
                                 History = If(data.History, New List(Of Song))
                                 HistoryTotalPlayedSongs = data.TotalPlayedSongs
-                                'Future versions can be handled here
+
+                                ' 🔑 Conversion step: map old flags into SourceType
+                                For Each s In History
+                                    If s.IsStream Then
+                                        s.SourceType = MediaSourceTypes.Stream
+                                    Else
+                                        s.SourceType = MediaSourceTypes.File
+                                    End If
+                                Next
+
+                                ' bump schema version so it won’t run again
+                                data.SchemaVersion = 2
+                            Case 2
+                                History = If(data.History, New List(Of Song))
+                                HistoryTotalPlayedSongs = data.TotalPlayedSongs
                             Case Else
                                 History = If(data.History, New List(Of Song))
                                 HistoryTotalPlayedSongs = data.TotalPlayedSongs
@@ -2758,12 +2779,16 @@ Namespace My
                 Dim newsong As New Song With {
                     .Path = songorstream,
                     .InLibrary = False,
-                    .IsStream = stream,
                     .PlayCount = 0,
                     .Added = DateTime.Now,
                     .FirstPlayed = Nothing,
                     .LastPlayed = Nothing,
                     .Rating = 0}
+                If stream Then
+                    newsong.SourceType = MediaSourceTypes.Stream
+                Else
+                    newsong.SourceType = MediaSourceTypes.File
+                End If
                 History.Add(newsong)
                 HistoryChanged = True
                 Debug.Print("Added " + songorstream + " to history")
@@ -2785,7 +2810,7 @@ Namespace My
                 Dim newsong As New Song With {
                     .Path = songorstream,
                     .InLibrary = True,
-                    .IsStream = False,
+                    .SourceType = MediaSourceTypes.File,
                     .PlayCount = 0,
                     .Added = DateTime.Now,
                     .FirstPlayed = Nothing,
@@ -2813,7 +2838,7 @@ Namespace My
             Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
 
             'Find songs with invalid file types
-            Dim invalidfiletypelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not ExtensionDictionary.ContainsKey(IO.Path.GetExtension(p.Path).ToLower()) AndAlso Not p.IsStream)
+            Dim invalidfiletypelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not ExtensionDictionary.ContainsKey(IO.Path.GetExtension(p.Path).ToLower()) AndAlso Not p.SourceType = MediaSourceTypes.Stream)
             Debug.Print("Pruning History InvalidsOnly..." + invalidfiletypelist.Count.ToString + " items found so far...")
             For Each s As Song In invalidfiletypelist
                 History.Remove(s)
@@ -2824,10 +2849,10 @@ Namespace My
             Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
 
             'Find streams that are not in the playlist
-            Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.IsStream)
+            Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.SourceType = MediaSourceTypes.Stream)
             Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
             For Each s As Song In streamlist
-                If s.IsStream AndAlso Player.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
+                If s.SourceType = MediaSourceTypes.Stream AndAlso Player.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
                     Debug.Print(s.Path + " found in playlist")
                     prunelist.Remove(s)
                 End If

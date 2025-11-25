@@ -62,7 +62,7 @@ Partial Class DevTools
         DGVPlays.Margin = New Padding(4)
         DGVPlays.Name = "DGVPlays"
         DGVPlays.ReadOnly = True
-        DGVPlays.Size = New Size(1021, 543)
+        DGVPlays.Size = New Size(1021, 537)
         DGVPlays.TabIndex = 0
         ' 
         ' PanelPlaysControls
@@ -71,7 +71,7 @@ Partial Class DevTools
         PanelPlaysControls.Controls.Add(BtnPlaysDeleteSelected)
         PanelPlaysControls.Controls.Add(LblPlaysCounts)
         PanelPlaysControls.Dock = DockStyle.Bottom
-        PanelPlaysControls.Location = New Point(0, 543)
+        PanelPlaysControls.Location = New Point(0, 537)
         PanelPlaysControls.Margin = New Padding(4)
         PanelPlaysControls.Name = "PanelPlaysControls"
         PanelPlaysControls.Size = New Size(1021, 59)
@@ -116,7 +116,7 @@ Partial Class DevTools
         PanelDGVPlays.Dock = DockStyle.Fill
         PanelDGVPlays.Location = New Point(0, 0)
         PanelDGVPlays.Name = "PanelDGVPlays"
-        PanelDGVPlays.Size = New Size(1021, 602)
+        PanelDGVPlays.Size = New Size(1021, 596)
         PanelDGVPlays.TabIndex = 2
         ' 
         ' TCDevTools
@@ -216,9 +216,9 @@ Partial Class DevTools
         ' TPPlays
         ' 
         TPPlays.Controls.Add(PanelDGVPlays)
-        TPPlays.Location = New Point(4, 24)
+        TPPlays.Location = New Point(4, 30)
         TPPlays.Name = "TPPlays"
-        TPPlays.Size = New Size(1021, 602)
+        TPPlays.Size = New Size(1021, 596)
         TPPlays.TabIndex = 1
         TPPlays.Text = "Plays"
         TPPlays.UseVisualStyleBackColor = True

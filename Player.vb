@@ -26,7 +26,7 @@ Public Class Player
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
-    Private Stream As Boolean = False 'True if the current playing item is a stream
+    Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private AlbumArtCount As Byte = 0 'Number of album art available
@@ -3405,13 +3405,13 @@ Public Class Player
         LVPlaylist.Focus()
     End Sub
     Private Sub BtnReverseMouseDown(sender As Object, e As MouseEventArgs) Handles BtnReverse.MouseDown
-        If Not Stream Then
+        If Not CurrentMediaType = App.MediaSourceTypes.Stream Then
             UpdatePosition(False, 10)
             LVPlaylist.Focus()
         End If
     End Sub
     Private Sub BtnForwardMouseDown(sender As Object, e As MouseEventArgs) Handles BtnForward.MouseDown
-        If Not Stream Then
+        If Not CurrentMediaType = App.MediaSourceTypes.Stream Then
             UpdatePosition(True, 10)
             LVPlaylist.Focus()
         End If
@@ -3659,7 +3659,7 @@ Public Class Player
 
     'Methods
     Private Function IsStream(path As String) As Boolean
-        If App.History.FindIndex(Function(p) p.Path = path And p.IsStream = True) >= 0 Then
+        If App.History.FindIndex(Function(p) p.Path = path And p.SourceType = App.MediaSourceTypes.Stream) >= 0 Then
             Return True
         Else
             Return False
@@ -4371,7 +4371,7 @@ Public Class Player
     End Sub
     Private Sub PlayStream(url As String)
         If Not String.IsNullOrEmpty(url) Then
-            Stream = True
+            CurrentMediaType = App.MediaSourceTypes.Stream
             Try
                 _player.Play(New Uri(url))
                 '''OnPlay()
@@ -4386,7 +4386,7 @@ Public Class Player
     End Sub
     Private Sub PlayFile(path As String, source As String)
         If Not String.IsNullOrEmpty(path) Then
-            Stream = False
+            CurrentMediaType = App.MediaSourceTypes.File
             Try
                 _player.Play(path)
                 '''OnPlay()
@@ -4423,7 +4423,7 @@ Public Class Player
             If IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                 PlayStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
             Else
-                Stream = False
+                'Stream = False
                 PlayFile(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayFromPlaylist")
             End If
         End If
@@ -4459,7 +4459,7 @@ Public Class Player
         PlayFile(filename, "PlayFromLibrary")
     End Sub
     Friend Sub PlayPrevious()
-        Stream = False
+        'Stream = False
         StopPlay()
         LyricsOff()
         Select Case App.PlayMode
@@ -4525,7 +4525,7 @@ Public Class Player
         End Select
     End Sub
     Friend Sub PlayNext()
-        Stream = False
+        'Stream = False
         StopPlay()
         LyricsOff()
         Select Case App.PlayMode
@@ -4615,13 +4615,13 @@ Public Class Player
 
         BtnPlay.Image = App.CurrentTheme.PlayerPause
         TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
-        If Not TrackBarPosition.Enabled AndAlso Not Stream Then TrackBarPosition.Enabled = True
+        If Not TrackBarPosition.Enabled AndAlso Not CurrentMediaType = App.MediaSourceTypes.Stream Then TrackBarPosition.Enabled = True
         LblDuration.Text = FormatDuration(_player.Duration)
         ShowPosition()
         HasLyrics = False
         HasLyricsSynced = False
         Try
-            If Stream Then
+            If CurrentMediaType = App.MediaSourceTypes.Stream Then
                 Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path.TrimEnd("/"c), True, 0).Text + " @ " + _player.Path.TrimEnd("/"c)
             Else
                 Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path, True, 0).Text + " @ " + _player.Path
@@ -4684,13 +4684,13 @@ Public Class Player
             If My.App.PlayerPositionShowElapsed Then
                 LblPosition.Text = FormatPosition(_player.Position)
             Else
-                If Stream Then
+                If CurrentMediaType = App.MediaSourceTypes.Stream Then
                     LblPosition.Text = "00:00"
                 Else
                     LblPosition.Text = FormatPosition(_player.Duration - _player.Position)
                 End If
             End If
-            If Not Stream Then TrackBarPosition.Value = CInt(_player.Position * TrackBarScale)
+            If Not CurrentMediaType = App.MediaSourceTypes.Stream Then TrackBarPosition.Value = CInt(_player.Position * TrackBarScale)
         Catch
             TrackBarPosition.Value = 0
             LblPosition.Text = "00:00"
@@ -4749,7 +4749,7 @@ Public Class Player
         If _player.HasMedia Then
             Dim tlfile As TagLib.File
             Try
-                If Stream Then
+                If CurrentMediaType = App.MediaSourceTypes.Stream Then
                     tlfile = Nothing
                 Else
                     tlfile = TagLib.File.Create(_player.Path)
@@ -4758,7 +4758,7 @@ Public Class Player
                 WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + _player.Path + Chr(13) + ex.Message)
                 tlfile = Nothing
             End Try
-            If Lyrics AndAlso Not Stream Then 'Show Lyrics
+            If Lyrics AndAlso Not CurrentMediaType = App.MediaSourceTypes.Stream Then 'Show Lyrics
                 Debug.Print("Showing Lyrics...")
                 PicBoxAlbumArt.Visible = False
                 LblMedia.Visible = False
@@ -4821,7 +4821,7 @@ Public Class Player
                         VLCViewer.Visible = True
                     End If
                 End If
-                If Visualizer OrElse (Not VLCViewer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse Stream Then 'Show Visualizer
+                If Visualizer OrElse (Not VLCViewer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse CurrentMediaType = App.MediaSourceTypes.Stream Then 'Show Visualizer
                     Debug.Print("Showing Visualizer...")
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
