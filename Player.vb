@@ -2116,6 +2116,99 @@ Public Class Player
         End Function
 
     End Class
+    Private Class VisualizerFractalJulia
+        Inherits UserControl
+        Implements IVisualizer
+
+        Private ReadOnly updateTimer As Timer
+        Private audioData() As Single
+
+        ' Settings
+
+        ' Constructor
+        Public Sub New()
+            DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        ' IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Fractal Julia"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            ' Not Implemented
+        End Sub
+
+        ' Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(e As PaintEventArgs)
+            MyBase.OnPaint(e)
+            If audioData Is Nothing OrElse audioData.Length = 0 Then Return
+
+            Dim g As Graphics = e.Graphics
+            Dim bmp As New Bitmap(ClientSize.Width, ClientSize.Height)
+
+            Dim bass As Double = If(audioData.Length > 2, audioData(2), 0)
+            Dim mid As Double = If(audioData.Length > 10, audioData(10), 0)
+            Dim treble As Double = If(audioData.Length > 30, audioData(30), 0)
+
+            ' Julia constant evolves with audio
+            Dim cx As Double = -0.7 + bass * 0.5
+            Dim cy As Double = 0.27015 + mid * 0.5
+
+            For px As Integer = 0 To bmp.Width - 1
+                For py As Integer = 0 To bmp.Height - 1
+                    Dim x As Double = 1.5 * (px - bmp.Width / 2) / (0.5 * bmp.Width)
+                    Dim y As Double = (py - bmp.Height / 2) / (0.5 * bmp.Height)
+
+                    Dim zx As Double = x
+                    Dim zy As Double = y
+                    Dim iter As Integer = 0
+                    Dim maxIter As Integer = 100
+
+                    While zx * zx + zy * zy < 4 AndAlso iter < maxIter
+                        Dim tmp As Double = zx * zx - zy * zy + cx
+                        zy = 2.0 * zx * zy + cy
+                        zx = tmp
+                        iter += 1
+                    End While
+
+                    Dim col As Color = Color.FromArgb(255,
+                                              (iter * 9 + CInt(treble * 255)) Mod 255,
+                                              (iter * 7) Mod 255,
+                                              (iter * 5) Mod 255)
+                    bmp.SetPixel(px, py, col)
+                Next
+            Next
+
+            g.DrawImage(bmp, 0, 0)
+        End Sub
+
+        ' Methods
+
+    End Class
 
     'Form Events                    
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -2189,15 +2282,16 @@ Public Class Player
         VisualizerHost.Register(New VisualizerHyperspaceTunnel)
         VisualizerHost.Register(New VisualizerStarField)
         VisualizerHost.Register(New VisualizerParticleNebula)
+        VisualizerHost.Register(New VisualizerFractalJulia)
         VisualizerHost.SetVisualizersMenu()
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
-
 
         'Initialize Form
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
         PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
         TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
+        'AddHandler LblMedia.CustomDraw, AddressOf LblMedia_Paint
 
         'Initialize Listview
         Dim header As ColumnHeader

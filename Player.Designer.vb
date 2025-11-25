@@ -552,12 +552,12 @@ Partial Class Player
         PEXLeft.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         PEXLeft.BackColor = Color.Transparent
         PEXLeft.DrawingColor = Color.DodgerBlue
-        PEXLeft.DrawingColorMode = Skye.UI.ProgressEX.colorDrawModes.Smooth
+        PEXLeft.DrawingColorMode = Skye.UI.ProgressEX.ColorDrawModes.Smooth
         PEXLeft.Location = New Point(12, 352)
         PEXLeft.MaximumSize = New Size(Integer.MaxValue, 40)
         PEXLeft.MinimumSize = New Size(50, 5)
         PEXLeft.Name = "PEXLeft"
-        PEXLeft.PercentageMode = Skye.UI.ProgressEX.percentageDrawModes.None
+        PEXLeft.PercentageMode = Skye.UI.ProgressEX.PercentageDrawModes.None
         PEXLeft.Size = New Size(385, 5)
         PEXLeft.Step = 1
         PEXLeft.TabIndex = 17
@@ -569,12 +569,12 @@ Partial Class Player
         PEXRight.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         PEXRight.BackColor = Color.Transparent
         PEXRight.DrawingColor = Color.DodgerBlue
-        PEXRight.DrawingColorMode = Skye.UI.ProgressEX.colorDrawModes.Smooth
+        PEXRight.DrawingColorMode = Skye.UI.ProgressEX.ColorDrawModes.Smooth
         PEXRight.Location = New Point(12, 389)
         PEXRight.MaximumSize = New Size(Integer.MaxValue, 40)
         PEXRight.MinimumSize = New Size(50, 5)
         PEXRight.Name = "PEXRight"
-        PEXRight.PercentageMode = Skye.UI.ProgressEX.percentageDrawModes.None
+        PEXRight.PercentageMode = Skye.UI.ProgressEX.PercentageDrawModes.None
         PEXRight.Size = New Size(385, 5)
         PEXRight.Step = 1
         PEXRight.TabIndex = 18
@@ -745,7 +745,6 @@ Partial Class Player
         ' LblMedia
         ' 
         LblMedia.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        LblMedia.AutoEllipsis = True
         LblMedia.BackColor = Color.Transparent
         LblMedia.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblMedia.ForeColor = SystemColors.WindowText
