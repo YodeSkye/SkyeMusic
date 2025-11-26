@@ -1752,53 +1752,6 @@ Public Class Player
         End Sub
 
     End Class
-    Private Class VisualizerFractalIFS
-        Inherits UserControl
-        Implements IVisualizer
-
-        Private ReadOnly updateTimer As Timer
-        Private audioData() As Single
-
-        ' Constructor
-        Public Sub New()
-            DoubleBuffered = True
-            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
-            AddHandler updateTimer.Tick, AddressOf OnTick
-        End Sub
-
-        ' IVisualizer Implementation
-        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
-            Get
-                Return "IFS Fractal"
-            End Get
-        End Property
-        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
-            Get
-                Return Me
-            End Get
-        End Property
-        Public Sub Start() Implements IVisualizer.Start
-            updateTimer.Start()
-        End Sub
-        Public Sub [Stop]() Implements IVisualizer.Stop
-            updateTimer.Stop()
-        End Sub
-        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
-            audioData = data
-        End Sub
-        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
-            ' Not Implemented
-        End Sub
-        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            ' Not Implemented
-        End Sub
-
-        ' Handlers
-        Private Sub OnTick(sender As Object, e As EventArgs)
-            Invalidate()
-        End Sub
-
-    End Class
     Friend Class VisualizerHyperspaceTunnel
         Inherits UserControl
         Implements IVisualizer
@@ -2372,7 +2325,6 @@ Public Class Player
         VisualizerHost.Register(New VisualizerOscilloscope)
         VisualizerHost.Register(New VisualizerFractalCloud)
         VisualizerHost.Register(New VisualizerFractalJulia)
-        VisualizerHost.Register(New VisualizerFractalIFS)
         VisualizerHost.Register(New VisualizerHyperspaceTunnel)
         VisualizerHost.Register(New VisualizerStarField)
         VisualizerHost.Register(New VisualizerParticleNebula)
