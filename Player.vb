@@ -1628,7 +1628,7 @@ Public Class Player
         Private ReadOnly BassInfluence As Single = 0.5F '0.0 - 25.0 '*10 'How much the low‑frequency audio band shifts the real part (cx). Strong bass makes the fractal “wobble” horizontally.
         Private ReadOnly BaseCY As Single = 0.27015F '-1.0 to +1.0 '+1 *100 'The fixed imaginary part of the Julia constant. This sets the fractal’s vertical symmetry and complexity.
         Private ReadOnly MidInfluence As Single = 2.5F '0.0F - 25.0F '*10 'How much the mid‑frequency audio band shifts the imaginary part (cy). Strong mids make the fractal “stretch” vertically.
-        Private ReadOnly MaxIterations As Integer = 150 '10-500 '*1 'Controls fractal detail: higher values = sharper, slower; lower values = simpler, faster.
+        Private ReadOnly MaxIterations As Integer = 100 '10-250 '*1 'Controls fractal detail: higher values = sharper, slower; lower values = simpler, faster.
         'Preset Name   | Base CX | Base CY | Bass Influence | Mid Influence | MaxIterations | Color Style
         '--------------|---------|---------|----------------|---------------|---------------|-------------------------------
         'Calm Ocean    | -0.7    | 0.27015 | 0.2            | 0.5           | 50            | Blue‑green gradient, treble adds sparkle
@@ -1751,7 +1751,52 @@ Public Class Player
             e.Graphics.DrawImage(bmp, New Rectangle(0, 0, ClientSize.Width, ClientSize.Height))
         End Sub
 
-        ' Methods
+    End Class
+    Private Class VisualizerFractalIFS
+        Inherits UserControl
+        Implements IVisualizer
+
+        Private ReadOnly updateTimer As Timer
+        Private audioData() As Single
+
+        ' Constructor
+        Public Sub New()
+            DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        ' IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "IFS Fractal"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            ' Not Implemented
+        End Sub
+
+        ' Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Invalidate()
+        End Sub
 
     End Class
     Friend Class VisualizerHyperspaceTunnel
@@ -2326,10 +2371,11 @@ Public Class Player
         VisualizerHost.Register(New VisualizerWaveform)
         VisualizerHost.Register(New VisualizerOscilloscope)
         VisualizerHost.Register(New VisualizerFractalCloud)
+        VisualizerHost.Register(New VisualizerFractalJulia)
+        VisualizerHost.Register(New VisualizerFractalIFS)
         VisualizerHost.Register(New VisualizerHyperspaceTunnel)
         VisualizerHost.Register(New VisualizerStarField)
         VisualizerHost.Register(New VisualizerParticleNebula)
-        VisualizerHost.Register(New VisualizerFractalJulia)
         VisualizerHost.SetVisualizersMenu()
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
 
