@@ -1616,6 +1616,144 @@ Public Class Player
         End Function
 
     End Class
+    Private Class VisualizerFractalJulia
+        Inherits UserControl
+        Implements IVisualizer
+
+        Private ReadOnly updateTimer As Timer
+        Private audioData() As Single
+
+        ' Settings
+        Private ReadOnly BaseCX As Single = -0.7F '-1.0 to +1.0 '+1 *100 'The fixed real part of the Julia constant. This anchors the fractal’s overall shape.
+        Private ReadOnly BassInfluence As Single = 0.5F '0.0 - 25.0 '*10 'How much the low‑frequency audio band shifts the real part (cx). Strong bass makes the fractal “wobble” horizontally.
+        Private ReadOnly BaseCY As Single = 0.27015F '-1.0 to +1.0 '+1 *100 'The fixed imaginary part of the Julia constant. This sets the fractal’s vertical symmetry and complexity.
+        Private ReadOnly MidInfluence As Single = 2.5F '0.0F - 25.0F '*10 'How much the mid‑frequency audio band shifts the imaginary part (cy). Strong mids make the fractal “stretch” vertically.
+        Private ReadOnly MaxIterations As Integer = 150 '10-500 '*1 'Controls fractal detail: higher values = sharper, slower; lower values = simpler, faster.
+        'Preset Name   | Base CX | Base CY | Bass Influence | Mid Influence | MaxIterations | Color Style
+        '--------------|---------|---------|----------------|---------------|---------------|-------------------------------
+        'Calm Ocean    | -0.7    | 0.27015 | 0.2            | 0.5           | 50            | Blue‑green gradient, treble adds sparkle
+        'Firestorm     | -0.5    | 0.3     | 0.5            | 2.0           | 150           | Red‑orange palette, treble boosts brightness
+        'Crystal Grid  | 0.355   | 0.355   | 0.1            | 0.1           | 250           | Cyan/purple hues, treble rotates hue
+        'Bassquake     | -0.8    | 0.156   | 1.0            | 0.2           | 100           | Dark background, bass drives horizontal wobble
+        'Treble Pulse  | -0.7    | 0.2     | 0.2            | 0.2           | 75            | Neutral fractal, treble cycles rainbow colors
+        'Galaxy Bloom  | -0.4    | 0.6     | 0.3            | 1.5           | 200           | Starfield‑Like palette, treble adds shimmer
+        'Coral Reef    | 0.285   | 0.01    | 0.4            | 0.8           | 120           | Organic coral shapes, warm pastel colors
+
+        ' Constructor
+        Public Sub New()
+            DoubleBuffered = True
+            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
+            AddHandler updateTimer.Tick, AddressOf OnTick
+        End Sub
+
+        ' IVisualizer Implementation
+        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
+            Get
+                Return "Julia Fractal"
+            End Get
+        End Property
+        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
+            Get
+                Return Me
+            End Get
+        End Property
+        Public Sub Start() Implements IVisualizer.Start
+            updateTimer.Start()
+        End Sub
+        Public Sub [Stop]() Implements IVisualizer.Stop
+            updateTimer.Stop()
+        End Sub
+        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
+            audioData = data
+        End Sub
+        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
+            ' Not Implemented
+        End Sub
+        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
+            ' Not Implemented
+        End Sub
+
+        ' Handlers
+        Private Sub OnTick(sender As Object, e As EventArgs)
+            Invalidate()
+        End Sub
+        Protected Overrides Sub OnPaint(e As PaintEventArgs)
+            MyBase.OnPaint(e)
+
+            ' Bail if no audio
+            If audioData Is Nothing OrElse audioData.Length = 0 Then
+                e.Graphics.Clear(App.CurrentTheme.BackColor)
+                Return
+            End If
+
+            ' Target resolution: 1/3 of 1920x1080
+            Dim targetW As Integer = 640
+            Dim targetH As Integer = 360
+
+            ' Create reduced-resolution bitmap
+            Dim bmp As New Bitmap(targetW, targetH, Imaging.PixelFormat.Format32bppArgb)
+
+            ' Lock bits for fast pixel access
+            Dim rect As New Rectangle(0, 0, bmp.Width, bmp.Height)
+            Dim bmpData As Imaging.BitmapData = bmp.LockBits(rect, Imaging.ImageLockMode.WriteOnly, bmp.PixelFormat)
+
+            Dim stride As Integer = bmpData.Stride
+            Dim ptr As IntPtr = bmpData.Scan0
+            Dim bytes As Integer = stride * bmp.Height
+            Dim rgbValues(bytes - 1) As Byte
+
+            ' Audio bands
+            Dim bass As Double = If(audioData.Length > 2, audioData(2), 0)
+            Dim mid As Double = If(audioData.Length > 10, audioData(10), 0)
+            Dim treble As Double = If(audioData.Length > 30, audioData(30), 0)
+
+            ' Julia constant evolves with audio
+            Dim cx As Double = BaseCX + bass * BassInfluence
+            Dim cy As Double = BaseCY + mid * MidInfluence
+
+            ' Fill pixel buffer
+            For py As Integer = 0 To targetH - 1
+                Dim rowOffset As Integer = py * stride
+                For px As Integer = 0 To targetW - 1
+                    Dim x As Double = 1.5 * (px - targetW / 2) / (0.5 * targetW)
+                    Dim y As Double = (py - targetH / 2) / (0.5 * targetH)
+
+                    Dim zx As Double = x
+                    Dim zy As Double = y
+                    Dim iter As Integer = 0
+
+                    While zx * zx + zy * zy < 4 AndAlso iter < MaxIterations
+                        Dim tmp As Double = zx * zx - zy * zy + cx
+                        zy = 2.0 * zx * zy + cy
+                        zx = tmp
+                        iter += 1
+                    End While
+
+                    ' Color mapping
+                    Dim r As Byte = CByte((iter * 9 + CInt(treble * 255)) Mod 255)
+                    Dim gCol As Byte = CByte((iter * 7 + CInt(treble * 128)) Mod 255)
+                    Dim b As Byte = CByte((iter * 5 + CInt(treble * 64)) Mod 255)
+
+                    Dim idx As Integer = rowOffset + (px * 4)
+                    rgbValues(idx) = b
+                    rgbValues(idx + 1) = gCol
+                    rgbValues(idx + 2) = r
+                    rgbValues(idx + 3) = 255 ' alpha
+                Next
+            Next
+
+            ' Copy buffer back to bitmap
+            Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes)
+            bmp.UnlockBits(bmpData)
+
+            ' Draw scaled to full control size
+            e.Graphics.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+            e.Graphics.DrawImage(bmp, New Rectangle(0, 0, ClientSize.Width, ClientSize.Height))
+        End Sub
+
+        ' Methods
+
+    End Class
     Friend Class VisualizerHyperspaceTunnel
         Inherits UserControl
         Implements IVisualizer
@@ -2116,144 +2254,6 @@ Public Class Player
                 Case Else : Return Color.FromArgb(255, v, p, q)
             End Select
         End Function
-
-    End Class
-    Private Class VisualizerFractalJulia
-        Inherits UserControl
-        Implements IVisualizer
-
-        Private ReadOnly updateTimer As Timer
-        Private audioData() As Single
-
-        ' Settings
-        Private ReadOnly BaseCX As Single = -0.7F '-1.0 to +1.0 '+1 *100 'The fixed real part of the Julia constant. This anchors the fractal’s overall shape.
-        Private ReadOnly BassInfluence As Single = 0.5F '0.0 - 25.0 '*10 'How much the low‑frequency audio band shifts the real part (cx). Strong bass makes the fractal “wobble” horizontally.
-        Private ReadOnly BaseCY As Single = 0.27015F '-1.0 to +1.0 '+1 *100 'The fixed imaginary part of the Julia constant. This sets the fractal’s vertical symmetry and complexity.
-        Private ReadOnly MidInfluence As Single = 2.5F '0.0F - 25.0F '*10 'How much the mid‑frequency audio band shifts the imaginary part (cy). Strong mids make the fractal “stretch” vertically.
-        Private ReadOnly MaxIterations As Integer = 150 '10-500 '*1 'Controls fractal detail: higher values = sharper, slower; lower values = simpler, faster.
-        'Preset Name   | Base CX | Base CY | Bass Influence | Mid Influence | MaxIterations | Color Style
-        '--------------|---------|---------|----------------|---------------|---------------|-------------------------------
-        'Calm Ocean    | -0.7    | 0.27015 | 0.2            | 0.5           | 50            | Blue‑green gradient, treble adds sparkle
-        'Firestorm     | -0.5    | 0.3     | 0.5            | 2.0           | 150           | Red‑orange palette, treble boosts brightness
-        'Crystal Grid  | 0.355   | 0.355   | 0.1            | 0.1           | 250           | Cyan/purple hues, treble rotates hue
-        'Bassquake     | -0.8    | 0.156   | 1.0            | 0.2           | 100           | Dark background, bass drives horizontal wobble
-        'Treble Pulse  | -0.7    | 0.2     | 0.2            | 0.2           | 75            | Neutral fractal, treble cycles rainbow colors
-        'Galaxy Bloom  | -0.4    | 0.6     | 0.3            | 1.5           | 200           | Starfield‑Like palette, treble adds shimmer
-        'Coral Reef    | 0.285   | 0.01    | 0.4            | 0.8           | 120           | Organic coral shapes, warm pastel colors
-
-        ' Constructor
-        Public Sub New()
-            DoubleBuffered = True
-            updateTimer = New Timer With {.Interval = 33} ' ~30 FPS
-            AddHandler updateTimer.Tick, AddressOf OnTick
-        End Sub
-
-        ' IVisualizer Implementation
-        Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
-            Get
-                Return "Fractal Julia"
-            End Get
-        End Property
-        Public ReadOnly Property DockedControl As Control Implements IVisualizer.DockedControl
-            Get
-                Return Me
-            End Get
-        End Property
-        Public Sub Start() Implements IVisualizer.Start
-            updateTimer.Start()
-        End Sub
-        Public Sub [Stop]() Implements IVisualizer.Stop
-            updateTimer.Stop()
-        End Sub
-        Public Overloads Sub Update(data As Single()) Implements IVisualizer.Update
-            audioData = data
-        End Sub
-        Public Overloads Sub UpdateWaveform(samples As Single()) Implements IVisualizer.UpdateWaveform
-            ' Not Implemented
-        End Sub
-        Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
-            ' Not Implemented
-        End Sub
-
-        ' Handlers
-        Private Sub OnTick(sender As Object, e As EventArgs)
-            Invalidate()
-        End Sub
-        Protected Overrides Sub OnPaint(e As PaintEventArgs)
-            MyBase.OnPaint(e)
-
-            ' Bail if no audio
-            If audioData Is Nothing OrElse audioData.Length = 0 Then
-                e.Graphics.Clear(App.CurrentTheme.BackColor)
-                Return
-            End If
-
-            ' Target resolution: 1/3 of 1920x1080
-            Dim targetW As Integer = 640
-            Dim targetH As Integer = 360
-
-            ' Create reduced-resolution bitmap
-            Dim bmp As New Bitmap(targetW, targetH, Imaging.PixelFormat.Format32bppArgb)
-
-            ' Lock bits for fast pixel access
-            Dim rect As New Rectangle(0, 0, bmp.Width, bmp.Height)
-            Dim bmpData As Imaging.BitmapData = bmp.LockBits(rect, Imaging.ImageLockMode.WriteOnly, bmp.PixelFormat)
-
-            Dim stride As Integer = bmpData.Stride
-            Dim ptr As IntPtr = bmpData.Scan0
-            Dim bytes As Integer = stride * bmp.Height
-            Dim rgbValues(bytes - 1) As Byte
-
-            ' Audio bands
-            Dim bass As Double = If(audioData.Length > 2, audioData(2), 0)
-            Dim mid As Double = If(audioData.Length > 10, audioData(10), 0)
-            Dim treble As Double = If(audioData.Length > 30, audioData(30), 0)
-
-            ' Julia constant evolves with audio
-            Dim cx As Double = BaseCX + bass * BassInfluence
-            Dim cy As Double = BaseCY + mid * MidInfluence
-
-            ' Fill pixel buffer
-            For py As Integer = 0 To targetH - 1
-                Dim rowOffset As Integer = py * stride
-                For px As Integer = 0 To targetW - 1
-                    Dim x As Double = 1.5 * (px - targetW / 2) / (0.5 * targetW)
-                    Dim y As Double = (py - targetH / 2) / (0.5 * targetH)
-
-                    Dim zx As Double = x
-                    Dim zy As Double = y
-                    Dim iter As Integer = 0
-
-                    While zx * zx + zy * zy < 4 AndAlso iter < MaxIterations
-                        Dim tmp As Double = zx * zx - zy * zy + cx
-                        zy = 2.0 * zx * zy + cy
-                        zx = tmp
-                        iter += 1
-                    End While
-
-                    ' Color mapping
-                    Dim r As Byte = CByte((iter * 9 + CInt(treble * 255)) Mod 255)
-                    Dim gCol As Byte = CByte((iter * 7 + CInt(treble * 128)) Mod 255)
-                    Dim b As Byte = CByte((iter * 5 + CInt(treble * 64)) Mod 255)
-
-                    Dim idx As Integer = rowOffset + (px * 4)
-                    rgbValues(idx) = b
-                    rgbValues(idx + 1) = gCol
-                    rgbValues(idx + 2) = r
-                    rgbValues(idx + 3) = 255 ' alpha
-                Next
-            Next
-
-            ' Copy buffer back to bitmap
-            Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes)
-            bmp.UnlockBits(bmpData)
-
-            ' Draw scaled to full control size
-            e.Graphics.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-            e.Graphics.DrawImage(bmp, New Rectangle(0, 0, ClientSize.Width, ClientSize.Height))
-        End Sub
-
-        ' Methods
 
     End Class
 
