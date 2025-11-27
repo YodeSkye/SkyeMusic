@@ -16,7 +16,7 @@ Public Class History
         MostPlayed
         MostPlayedArtists
         RecentlyPlayed
-        RecentlyAddedNotPlayed
+        ForgottenSongs
         Favorites
     End Enum
     Private CurrentView As HistoryView = HistoryView.MostPlayed
@@ -243,8 +243,8 @@ Public Class History
         CurrentView = HistoryView.RecentlyPlayed
         PutViewData()
     End Sub
-    Private Sub RadBtnRecentlyAddedNotPlayed_Click(sender As Object, e As EventArgs) Handles RadBtnRecentlyAddedNotPlayed.Click
-        CurrentView = HistoryView.RecentlyAddedNotPlayed
+    Private Sub RadBtnForgottenSongs_Click(sender As Object, e As EventArgs) Handles RadBtnForgottenSongs.Click
+        CurrentView = HistoryView.ForgottenSongs
         PutViewData()
     End Sub
     Private Sub RadBtnFavorites_Click(sender As Object, e As EventArgs) Handles RadBtnFavorites.Click
@@ -427,12 +427,12 @@ Public Class History
                 LVHistory.Columns(4).TextAlign = HorizontalAlignment.Center
                 LVHistory.EndUpdate()
                 ShowCounts()
-            Case HistoryView.RecentlyAddedNotPlayed
+            Case HistoryView.ForgottenSongs
                 ConfigureColumns()
 
-                ' Filter: songs never played, sorted by Added date (newest first)
-                sortedViews = views.Where(Function(v) v.Data.PlayCount = 0) _
-                                   .OrderByDescending(Function(v) v.Data.Added)
+                ' Filter: songs never played OR not played in the last year, sorted by Added date (newest first)
+                sortedViews = views.Where(Function(v) v.Data.PlayCount = 0 OrElse v.Data.LastPlayed <= DateTime.Now.AddYears(-1)) _
+                                   .OrderBy(Function(v) v.Data.Added)
 
                 If CurrentViewMaxRecords > 0 Then
                     sortedViews = sortedViews.Take(CurrentViewMaxRecords)
@@ -449,7 +449,8 @@ Public Class History
                     lvi.SubItems.Add(v.Album)
                     lvi.SubItems.Add(v.Genre)
                     lvi.SubItems.Add(v.Data.PlayCount.ToString("N0"))
-                    lvi.SubItems.Add(v.Data.Added.ToString("g")) ' show Added date instead of LastPlayed
+                    lvi.SubItems.Add(If(v.Data.LastPlayed = DateTime.MinValue, "Never", v.Data.LastPlayed.ToString("g")))
+                    lvi.SubItems.Add(v.Data.Added.ToString("g"))
                     lvi.SubItems.Add(v.Data.Path)
                     LVHistory.Items.Add(lvi)
                 Next
@@ -1103,7 +1104,7 @@ Public Class History
                     .Text = "Last Played",
                     .Width = 200}
                 LVHistory.Columns.Add(header)
-            Case HistoryView.RecentlyAddedNotPlayed
+            Case HistoryView.ForgottenSongs
                 'Define 7 Columns
                 header = New ColumnHeader With {
                     .Name = "Title",
@@ -1129,6 +1130,11 @@ Public Class History
                     .Name = "PlayCount",
                     .Text = "Plays",
                     .Width = 50}
+                LVHistory.Columns.Add(header)
+                header = New ColumnHeader With {
+                    .Name = "LastPlayed",
+                    .Text = "Last Played",
+                    .Width = 200}
                 LVHistory.Columns.Add(header)
                 header = New ColumnHeader With {
                     .Name = "Added",
@@ -1189,8 +1195,8 @@ Public Class History
         RadBtnMostPlayedArtists.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnRecentlyPlayed.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnRecentlyPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
-        RadBtnRecentlyAddedNotPlayed.BackColor = App.CurrentTheme.ButtonBackColor
-        RadBtnRecentlyAddedNotPlayed.ForeColor = App.CurrentTheme.ButtonTextColor
+        RadBtnForgottenSongs.BackColor = App.CurrentTheme.ButtonBackColor
+        RadBtnForgottenSongs.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnFavorites.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnFavorites.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGenres.BackColor = App.CurrentTheme.ButtonBackColor

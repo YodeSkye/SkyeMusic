@@ -40,6 +40,7 @@ Partial Class History
         CMIAddToPlaylist = New ToolStripMenuItem()
         CMIAddAllToPlaylist = New ToolStripMenuItem()
         GrpBoxHistory = New GroupBox()
+        RadBtnForgottenSongs = New RadioButton()
         RadBtnMostPlayedArtists = New RadioButton()
         BtnCharts = New Button()
         RadBtnFavorites = New RadioButton()
@@ -62,7 +63,6 @@ Partial Class History
         PanelCharts = New Panel()
         TxtBoxSessionPlayedDuration = New TextBox()
         LblSessionPlayedDuration = New Skye.UI.Label()
-        RadBtnRecentlyAddedNotPlayed = New RadioButton()
         CMHistoryView.SuspendLayout()
         GrpBoxHistory.SuspendLayout()
         GrpBoxCharts.SuspendLayout()
@@ -235,7 +235,7 @@ Partial Class History
         ' 
         GrpBoxHistory.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         GrpBoxHistory.BackColor = Color.Transparent
-        GrpBoxHistory.Controls.Add(RadBtnRecentlyAddedNotPlayed)
+        GrpBoxHistory.Controls.Add(RadBtnForgottenSongs)
         GrpBoxHistory.Controls.Add(RadBtnMostPlayedArtists)
         GrpBoxHistory.Controls.Add(BtnCharts)
         GrpBoxHistory.Controls.Add(RadBtnFavorites)
@@ -248,6 +248,16 @@ Partial Class History
         GrpBoxHistory.Size = New Size(190, 426)
         GrpBoxHistory.TabIndex = 0
         GrpBoxHistory.TabStop = False
+        ' 
+        ' RadBtnForgottenSongs
+        ' 
+        RadBtnForgottenSongs.Location = New Point(7, 112)
+        RadBtnForgottenSongs.Name = "RadBtnForgottenSongs"
+        RadBtnForgottenSongs.Size = New Size(176, 32)
+        RadBtnForgottenSongs.TabIndex = 8
+        RadBtnForgottenSongs.Text = "Forgotten Songs"
+        RadBtnForgottenSongs.TextAlign = ContentAlignment.MiddleCenter
+        RadBtnForgottenSongs.UseVisualStyleBackColor = True
         ' 
         ' RadBtnMostPlayedArtists
         ' 
@@ -487,16 +497,6 @@ Partial Class History
         LblSessionPlayedDuration.Text = "Total Duration"
         LblSessionPlayedDuration.TextAlign = ContentAlignment.MiddleRight
         ' 
-        ' RadBtnRecentlyAddedNotPlayed
-        ' 
-        RadBtnRecentlyAddedNotPlayed.Location = New Point(7, 112)
-        RadBtnRecentlyAddedNotPlayed.Name = "RadBtnRecentlyAddedNotPlayed"
-        RadBtnRecentlyAddedNotPlayed.Size = New Size(176, 32)
-        RadBtnRecentlyAddedNotPlayed.TabIndex = 8
-        RadBtnRecentlyAddedNotPlayed.Text = "Added Not Played"
-        RadBtnRecentlyAddedNotPlayed.TextAlign = ContentAlignment.MiddleCenter
-        RadBtnRecentlyAddedNotPlayed.UseVisualStyleBackColor = True
-        ' 
         ' History
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
@@ -574,5 +574,5 @@ Partial Class History
     Friend WithEvents CMIAddAllToPlaylist As ToolStripMenuItem
     Friend WithEvents RadBtnPeakHours As RadioButton
     Friend WithEvents RadBtnRatingVsPlays As RadioButton
-    Friend WithEvents RadBtnRecentlyAddedNotPlayed As RadioButton
+    Friend WithEvents RadBtnForgottenSongs As RadioButton
 End Class
