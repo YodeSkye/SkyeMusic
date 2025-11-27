@@ -73,15 +73,18 @@ Namespace My
         End Enum
         Public Class Song
 
-            Public Property Path As String 'Path to the media.
-            Public Property SourceType As MediaSourceTypes = MediaSourceTypes.File
-            Public Property InLibrary As Boolean 'InLibrary indicates whether the song is part of the library.
-            Public Property IsStream As Boolean 'IsStream indicates whether the song is a stream.
-            Public Property PlayCount As UShort 'PlayCount is the number of times the song has been played.
-            Public Property Added As DateTime 'DateAdded is the date and time when the song was added to the History.
-            Public Property FirstPlayed As DateTime 'FirstPlayed is the date and time when the song was first played.
-            Public Property LastPlayed As DateTime 'LastPlayed is the date and time when the song was last played.
-            Public Property Rating As Byte 'Rating is the rating of the song, from 0 to 5.
+            Public Property Path As String ' Path to the media.
+            Public Property SourceType As MediaSourceTypes = MediaSourceTypes.File ' SourceType indicates the type of media (File, Stream, AudioCD).
+            Public Property InLibrary As Boolean ' InLibrary indicates whether the song is part of the library.
+            ''' <summary>
+            ''' Deprecated. No Longer Used.
+            ''' </summary>
+            Public Property IsStream As Boolean ' Deprecated. No Longer Used. ' IsStream indicates whether the song is a stream.
+            Public Property PlayCount As UShort ' PlayCount is the number of times the song has been played.
+            Public Property Added As DateTime ' DateAdded is the date and time when the song was added to the History.
+            Public Property FirstPlayed As DateTime ' FirstPlayed is the date and time when the song was first played.
+            Public Property LastPlayed As DateTime ' LastPlayed is the date and time when the song was last played.
+            Public Property Rating As Byte ' Rating is the rating of the song, from 0 to 5.
 
             Public Overrides Function ToString() As String
                 Dim s As String = String.Empty
@@ -490,6 +493,13 @@ Namespace My
             Public Property FractalCloudSwirlSpeedBase As Double = 0.01F ' 0.001F-0.050F Base speed of swirl rotation.
             Public Property FractalCloudSwirlSpeedAudioFactor As Double = 10.0F ' 1-30 How much audio affects swirl speed.
             Public Property FractalCloudTimeIncrement As Double = 0.02F ' 0.005F-0.100F Increment for fractal time variable. Animation Speed.
+
+            'Julia Fractal Visualizer Settings
+            Public Property JuliaFractalBaseCX As Single = -0.7F '-1.0 to +1.0 '+1 *100 'The fixed real part of the Julia constant. This anchors the fractal’s overall shape.
+            Public Property JuliaFractalBassInfluence As Single = 0.5F '0.0 - 25.0 '*10 'How much the low‑frequency audio band shifts the real part (cx). Strong bass makes the fractal “wobble” horizontally.
+            Public Property JuliaFractalBaseCY As Single = 0.27015F '-1.0 to +1.0 '+1 *100 'The fixed imaginary part of the Julia constant. This sets the fractal’s vertical symmetry and complexity.
+            Public Property JuliaFractalMidInfluence As Single = 2.5F '0.0F - 25.0F '*10 'How much the mid‑frequency audio band shifts the imaginary part (cy). Strong mids make the fractal “stretch” vertically.
+            Public Property JuliaFractalMaxIterations As Integer = 100 '10-250 '*1 'Controls fractal detail: higher values = sharper, slower; lower values = simpler, faster.
 
             ' Hyperspace Tunnel Visualizer Settings
             Public Property HyperspaceTunnelParticleCount As Integer = 1000 '100-5000 Number of particles in the tunnel.
@@ -1312,6 +1322,11 @@ Namespace My
                 RegSubKey.SetValue("FractalCloudSwirlSpeedBase", Visualizers.FractalCloudSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("FractalCloudSwirlSpeedAudioFactor", Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("FractalCloudTimeIncrement", Visualizers.FractalCloudTimeIncrement.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("JuliaFractalBaseCX", Visualizers.JuliaFractalBaseCX.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("JuliaFractalBassInfluence", Visualizers.JuliaFractalBassInfluence.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("JuliaFractalBaseCY", Visualizers.JuliaFractalBaseCY.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("JuliaFractalMidInfluence", Visualizers.JuliaFractalMidInfluence.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegSubKey.SetValue("JuliaFractalMaxIterations", Visualizers.JuliaFractalMaxIterations.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("HyperspaceTunnelParticleCount", Visualizers.HyperspaceTunnelParticleCount.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedBase", Visualizers.HyperspaceTunnelSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedAudioFactor", Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1512,6 +1527,11 @@ Namespace My
                 Visualizers.FractalCloudSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedBase", 0.01F.ToString)))
                 Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedAudioFactor", 10.0F.ToString)))
                 Visualizers.FractalCloudTimeIncrement = CDbl(Val(RegSubKey.GetValue("FractalCloudTimeIncrement", 0.02F.ToString)))
+                Visualizers.JuliaFractalBaseCX = CSng(Val(RegSubKey.GetValue("JuliaFractalBaseCX", (-0.7F).ToString)))
+                Visualizers.JuliaFractalBassInfluence = CSng(Val(RegSubKey.GetValue("JuliaFractalBassInfluence", 0.5F.ToString)))
+                Visualizers.JuliaFractalBaseCY = CSng(Val(RegSubKey.GetValue("JuliaFractalBaseCY", 0.27015F.ToString)))
+                Visualizers.JuliaFractalMidInfluence = CSng(Val(RegSubKey.GetValue("JuliaFractalMidInfluence", 2.5F.ToString)))
+                Visualizers.JuliaFractalMaxIterations = CInt(Val(RegSubKey.GetValue("JuliaFractalMaxIterations", 100.ToString)))
                 Visualizers.HyperspaceTunnelParticleCount = CInt(Val(RegSubKey.GetValue("HyperspaceTunnelParticleCount", 1000.ToString)))
                 Visualizers.HyperspaceTunnelSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedBase", 0.05F.ToString)))
                 Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedAudioFactor", 0.2F.ToString)))

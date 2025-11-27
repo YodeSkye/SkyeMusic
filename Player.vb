@@ -1623,22 +1623,6 @@ Public Class Player
         Private ReadOnly updateTimer As Timer
         Private audioData() As Single
 
-        ' Settings
-        Private ReadOnly BaseCX As Single = -0.7F '-1.0 to +1.0 '+1 *100 'The fixed real part of the Julia constant. This anchors the fractal’s overall shape.
-        Private ReadOnly BassInfluence As Single = 0.5F '0.0 - 25.0 '*10 'How much the low‑frequency audio band shifts the real part (cx). Strong bass makes the fractal “wobble” horizontally.
-        Private ReadOnly BaseCY As Single = 0.27015F '-1.0 to +1.0 '+1 *100 'The fixed imaginary part of the Julia constant. This sets the fractal’s vertical symmetry and complexity.
-        Private ReadOnly MidInfluence As Single = 2.5F '0.0F - 25.0F '*10 'How much the mid‑frequency audio band shifts the imaginary part (cy). Strong mids make the fractal “stretch” vertically.
-        Private ReadOnly MaxIterations As Integer = 100 '10-250 '*1 'Controls fractal detail: higher values = sharper, slower; lower values = simpler, faster.
-        'Preset Name   | Base CX | Base CY | Bass Influence | Mid Influence | MaxIterations | Color Style
-        '--------------|---------|---------|----------------|---------------|---------------|-------------------------------
-        'Calm Ocean    | -0.7    | 0.27015 | 0.2            | 0.5           | 50            | Blue‑green gradient, treble adds sparkle
-        'Firestorm     | -0.5    | 0.3     | 0.5            | 2.0           | 150           | Red‑orange palette, treble boosts brightness
-        'Crystal Grid  | 0.355   | 0.355   | 0.1            | 0.1           | 250           | Cyan/purple hues, treble rotates hue
-        'Bassquake     | -0.8    | 0.156   | 1.0            | 0.2           | 100           | Dark background, bass drives horizontal wobble
-        'Treble Pulse  | -0.7    | 0.2     | 0.2            | 0.2           | 75            | Neutral fractal, treble cycles rainbow colors
-        'Galaxy Bloom  | -0.4    | 0.6     | 0.3            | 1.5           | 200           | Starfield‑Like palette, treble adds shimmer
-        'Coral Reef    | 0.285   | 0.01    | 0.4            | 0.8           | 120           | Organic coral shapes, warm pastel colors
-
         ' Constructor
         Public Sub New()
             DoubleBuffered = True
@@ -1708,8 +1692,8 @@ Public Class Player
             Dim treble As Double = If(audioData.Length > 30, audioData(30), 0)
 
             ' Julia constant evolves with audio
-            Dim cx As Double = BaseCX + bass * BassInfluence
-            Dim cy As Double = BaseCY + mid * MidInfluence
+            Dim cx As Double = App.Visualizers.JuliaFractalBaseCX + bass * App.Visualizers.JuliaFractalBassInfluence
+            Dim cy As Double = App.Visualizers.JuliaFractalBaseCY + mid * App.Visualizers.JuliaFractalMidInfluence
 
             ' Fill pixel buffer
             For py As Integer = 0 To targetH - 1
@@ -1722,7 +1706,7 @@ Public Class Player
                     Dim zy As Double = y
                     Dim iter As Integer = 0
 
-                    While zx * zx + zy * zy < 4 AndAlso iter < MaxIterations
+                    While zx * zx + zy * zy < 4 AndAlso iter < App.Visualizers.JuliaFractalMaxIterations
                         Dim tmp As Double = zx * zx - zy * zy + cx
                         zy = 2.0 * zx * zy + cy
                         zx = tmp
