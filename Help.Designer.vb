@@ -24,7 +24,7 @@ Partial Class Help
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Help))
         BtnOK = New Button()
-        RTxBxHelp = New RichTextBox()
+        RTxBxHelp = New Skye.UI.RichTextBox()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -40,14 +40,13 @@ Partial Class Help
         ' RTxBxHelp
         ' 
         RTxBxHelp.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        RTxBxHelp.BackColor = SystemColors.Window
         RTxBxHelp.Location = New Point(12, 12)
         RTxBxHelp.Name = "RTxBxHelp"
         RTxBxHelp.ReadOnly = True
         RTxBxHelp.ShortcutsEnabled = False
         RTxBxHelp.ShowSelectionMargin = True
         RTxBxHelp.Size = New Size(776, 345)
-        RTxBxHelp.TabIndex = 2
+        RTxBxHelp.TabIndex = 3
         RTxBxHelp.Text = ""
         ' 
         ' Help
@@ -67,5 +66,5 @@ Partial Class Help
     End Sub
 
     Friend WithEvents BtnOK As Button
-    Friend WithEvents RTxBxHelp As RichTextBox
+    Friend WithEvents RTxBxHelp As Skye.UI.RichTextBox
 End Class

@@ -24,7 +24,6 @@ Partial Class Log
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Log))
-        RTBLog = New RichTextBox()
         RTBCMLog = New Skye.UI.RichTextBoxContextMenu()
         BTNOK = New Button()
         BTNDeleteLog = New Button()
@@ -33,22 +32,8 @@ Partial Class Log
         TxBxSearch = New TextBox()
         LblStatus = New Skye.UI.Label()
         TipLog = New Skye.UI.ToolTip(components)
+        RTBLog = New Skye.UI.RichTextBox()
         SuspendLayout()
-        ' 
-        ' RTBLog
-        ' 
-        RTBLog.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        RTBLog.ContextMenuStrip = RTBCMLog
-        RTBLog.Font = New Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        RTBLog.Location = New Point(12, 32)
-        RTBLog.Name = "RTBLog"
-        RTBLog.ReadOnly = True
-        RTBLog.ShortcutsEnabled = False
-        RTBLog.Size = New Size(776, 317)
-        RTBLog.TabIndex = 0
-        RTBLog.Text = ""
-        TipLog.SetToolTipImage(RTBLog, Nothing)
-        RTBLog.WordWrap = False
         ' 
         ' RTBCMLog
         ' 
@@ -138,18 +123,34 @@ Partial Class Log
         TipLog.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipLog.OwnerDraw = True
         ' 
+        ' RTBLog
+        ' 
+        RTBLog.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        RTBLog.BackColor = SystemColors.Control
+        RTBLog.ContextMenuStrip = RTBCMLog
+        RTBLog.Font = New Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        RTBLog.Location = New Point(12, 32)
+        RTBLog.Name = "RTBLog"
+        RTBLog.ReadOnly = True
+        RTBLog.ShortcutsEnabled = False
+        RTBLog.Size = New Size(776, 317)
+        RTBLog.TabIndex = 8
+        RTBLog.Text = ""
+        TipLog.SetToolTipImage(RTBLog, Nothing)
+        RTBLog.WordWrap = False
+        ' 
         ' Log
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(800, 459)
+        Controls.Add(RTBLog)
         Controls.Add(LblStatus)
         Controls.Add(TxBxSearch)
         Controls.Add(LBLLogInfo)
         Controls.Add(BTNRefreshLog)
         Controls.Add(BTNDeleteLog)
         Controls.Add(BTNOK)
-        Controls.Add(RTBLog)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
         MinimumSize = New Size(400, 300)
@@ -159,8 +160,6 @@ Partial Class Log
         ResumeLayout(False)
         PerformLayout()
     End Sub
-
-    Friend WithEvents RTBLog As RichTextBox
     Friend WithEvents BTNOK As Button
     Friend WithEvents BTNDeleteLog As Button
     Friend WithEvents BTNRefreshLog As Button
@@ -169,4 +168,5 @@ Partial Class Log
     Friend WithEvents TxBxSearch As TextBox
     Friend WithEvents LblStatus As Skye.UI.Label
     Friend WithEvents TipLog As Skye.UI.ToolTip
+    Friend WithEvents RTBLog As Skye.UI.RichTextBox
 End Class
