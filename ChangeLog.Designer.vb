@@ -24,7 +24,7 @@ Partial Class ChangeLog
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ChangeLog))
         BtnOK = New Button()
-        RTBoxChangeLog = New RichTextBox()
+        RTBoxChangeLog = New Skye.UI.RichTextBox()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -42,10 +42,11 @@ Partial Class ChangeLog
         RTBoxChangeLog.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         RTBoxChangeLog.Location = New Point(12, 12)
         RTBoxChangeLog.Name = "RTBoxChangeLog"
+        RTBoxChangeLog.ReadOnly = True
         RTBoxChangeLog.ShortcutsEnabled = False
         RTBoxChangeLog.ShowSelectionMargin = True
         RTBoxChangeLog.Size = New Size(776, 356)
-        RTBoxChangeLog.TabIndex = 3
+        RTBoxChangeLog.TabIndex = 4
         RTBoxChangeLog.Text = ""
         ' 
         ' ChangeLog
@@ -64,5 +65,5 @@ Partial Class ChangeLog
     End Sub
 
     Friend WithEvents BtnOK As Button
-    Friend WithEvents RTBoxChangeLog As RichTextBox
+    Friend WithEvents RTBoxChangeLog As Skye.UI.RichTextBox
 End Class
