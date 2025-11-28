@@ -1,5 +1,8 @@
 ﻿
+Imports Microsoft.Win32
+
 Public Class OptionsParticleNebula
+    Implements App.IAccentable
 
     ' Declarations
     Private IsInitializing As Boolean = True
@@ -107,7 +110,7 @@ Public Class OptionsParticleNebula
         TBVelocityScale.Value = App.Visualizers.ParticleNebulaVelocityScale
         IsInitializing = False
     End Sub
-    Private Sub SetAccentColor()
+    Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor
         Static c As Color
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then

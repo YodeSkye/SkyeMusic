@@ -1,5 +1,6 @@
 ﻿
 Public Class OptionsCircularSpectrum
+    Implements App.IAccentable
 
     ' Declarations
     Private IsInitializing As Boolean = True
@@ -103,7 +104,7 @@ Public Class OptionsCircularSpectrum
         TBRadiusFactor.Value = CInt(App.Visualizers.CircularSpectrumRadiusFactor * 10)
         IsInitializing = False
     End Sub
-    Private Sub SetAccentColor()
+    Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor
         Static c As Color
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then

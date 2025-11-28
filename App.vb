@@ -8,7 +8,7 @@ Namespace My
 
     Public Module App
 
-        'Declarations
+        ' Declarations
         Friend Enum PlaylistTitleFormats 'When modifying, update Options form.
             UseFilename
             Song
@@ -621,6 +621,9 @@ Namespace My
         Friend ChangeLogLastVersionShown As String = String.Empty
 
         'Interfaces
+        Friend Interface IAccentable
+            Sub SetAccentColor()
+        End Interface
         Friend Interface IPlaylistIOFormat
             ReadOnly Property Name As String
             ReadOnly Property FileExtension As String

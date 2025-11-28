@@ -16,6 +16,7 @@ Public Class Options
             Select Case m.Msg
                 Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
                     SetAccentColor()
+                    ApplyAccentForCurrentVisualizerSettingsPanel()
             End Select
         Catch ex As Exception
             App.WriteToLog("Options WndProc Handler Error" + Chr(13) + ex.ToString)
@@ -575,6 +576,14 @@ Public Class Options
         End If
         ResumeLayout()
         Debug.Print("Options Accent Color Set")
+    End Sub
+    Private Sub ApplyAccentForCurrentVisualizerSettingsPanel()
+        If PanelVisualizers.Controls.Count = 0 Then Exit Sub
+
+        Dim current = PanelVisualizers.Controls(0)
+        Dim accentable = TryCast(current, IAccentable)
+        accentable?.SetAccentColor()
+
     End Sub
     Private Sub SetTheme()
         Static forecolor As Color
