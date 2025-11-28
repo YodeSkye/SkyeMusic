@@ -1,5 +1,6 @@
 ﻿
 Public Class OptionsClassicSpectrumAnalyzer
+    Implements App.IAccentable
 
     ' Declarations
     Private IsInitializing As Boolean = True
@@ -118,7 +119,7 @@ Public Class OptionsClassicSpectrumAnalyzer
         TBPeakHoldFrames.Value = CInt(App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames)
         IsInitializing = False
     End Sub
-    Private Sub SetAccentColor()
+    Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor
         Static c As Color
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
@@ -139,6 +140,8 @@ Public Class OptionsClassicSpectrumAnalyzer
         ChkBoxShowPeaks.ForeColor = forecolor
         CoBoxBandMappingMode.BackColor = App.CurrentTheme.ControlBackColor
         CoBoxBandMappingMode.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxBarCount.BackColor = App.CurrentTheme.BackColor
+        TxtBoxBarCount.ForeColor = App.CurrentTheme.TextColor
         TBGain.ButtonColor = App.CurrentTheme.ButtonBackColor
         TBGain.HighlightedButtonColor = App.CurrentTheme.TextColor
         TBGain.PushedButtonEndColor = App.CurrentTheme.TextColor

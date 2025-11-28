@@ -1,5 +1,6 @@
 ﻿
 Public Class OptionsHyperspaceTunnel
+    Implements App.IAccentable
 
     ' Declarations
     Private IsInitializing As Boolean = True
@@ -54,7 +55,7 @@ Public Class OptionsHyperspaceTunnel
         TBParticleSpeedAudioFactor.Value = CInt(App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor)
         IsInitializing = False
     End Sub
-    Private Sub SetAccentColor()
+    Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor
         Static c As Color
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
