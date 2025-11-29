@@ -1036,7 +1036,7 @@ Namespace My
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
 
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
+            Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense()
             LibVLCSharp.Shared.Core.Initialize() 'Initialize LibVLCSharp
 

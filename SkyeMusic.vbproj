@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows7.0</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <StartupObject>SkyeMusic.My.MyApplication</StartupObject>
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
@@ -117,7 +117,6 @@
     <PackageReference Include="SkyeLibrary" Version="1.3.12" />
     <PackageReference Include="Syncfusion.Tools.Windows" Version="31.2.15" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.0" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
     <PackageReference Include="WinForms.DataVisualization" Version="1.10.0" />

@@ -118,22 +118,8 @@ End Using
 
 ---
 
-### 6. System.Text.Encoding.CodePages
 
-Adds support for legacy code page encodings (e.g., Windows-1252, Shift-JIS).
-
-```powershell
-Install-Package System.Text.Encoding.CodePages
-```
-
-**Usage Tip:**
-```vbnet
-Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
-```
-
----
-
-### 7. Syncfusion.Tools.Windows
+### 6. Syncfusion.Tools.Windows
 
 Provides advanced WinForms UI components like Ribbon, Docking Manager, and TreeView. It 's free for individual developers and small businesses. To get a license, visit their website [Syncfusion Community License](https://www.syncfusion.com/products/communitylicense).
 
@@ -143,7 +129,7 @@ Install-Package Syncfusion.Tools.Windows
 
 ---
 
-### 8. WinForms.DataVisualization
+### 7. WinForms.DataVisualization
 
 Provides the **System.Windows.Forms.DataVisualization.Charting** namespace, which includes chart controls (Pie, Bar, Radar, Pareto, etc.) used in the **History & Statistics** page.
 
@@ -166,7 +152,7 @@ chart.Series.Add(series)
 
 ---
 
-### 9. WordCloudSharp
+### 8. WordCloudSharp
 
 Provides word cloud generation for visualizing artist frequency in SkyeMusic. Used in the **Artist Word Cloud** chart view.
 
