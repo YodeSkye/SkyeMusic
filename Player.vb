@@ -1,6 +1,7 @@
 ﻿
 Imports System.IO
 Imports System.Runtime.InteropServices.JavaScript.JSType
+Imports System.Security.Policy
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
@@ -3694,6 +3695,13 @@ Public Class Player
             Return False
         End If
     End Function
+    Private Function IsAudioCD(path As String) As Boolean
+        If App.History.FindIndex(Function(p) p.Path = path And p.SourceType = App.MediaSourceTypes.AudioCD) >= 0 Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
     Private Function FormatDuration(duration As Double) As String
         Dim dur As TimeSpan = TimeSpan.FromSeconds(duration)
         Dim durstr As String = ""
@@ -4373,6 +4381,21 @@ Public Class Player
         'Debug.Print(path + " Removed From Queue")
         SetPlaylistCountText()
     End Sub
+    Private Sub PlayQueued()
+        If Queue.Count > 0 Then
+            StopPlay()
+            If IsStream(Queue(0)) Then
+                PlayStream(Queue(0))
+            Else
+                PlayFile(Queue(0), "PlayQueued")
+            End If
+            Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
+            If item IsNot Nothing Then EnsurePlaylistItemIsVisible(item.Index)
+            Queue.RemoveAt(0)
+            SetPlaylistCountText()
+            TimerShowMedia.Start()
+        End If
+    End Sub
 
     'Player
     Friend Sub TogglePlay()
@@ -4428,21 +4451,6 @@ Public Class Player
             Catch
                 App.WriteToLog("Cannot Play File, Invalid Path: " + path + " (" + source + ")")
             End Try
-        End If
-    End Sub
-    Private Sub PlayQueued()
-        If Queue.Count > 0 Then
-            StopPlay()
-            If IsStream(Queue(0)) Then
-                PlayStream(Queue(0))
-            Else
-                PlayFile(Queue(0), "PlayQueued")
-            End If
-            Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
-            If item IsNot Nothing Then EnsurePlaylistItemIsVisible(item.Index)
-            Queue.RemoveAt(0)
-            SetPlaylistCountText()
-            TimerShowMedia.Start()
         End If
     End Sub
     Private Sub PlayFromPlaylist()
@@ -4650,12 +4658,15 @@ Public Class Player
         HasLyrics = False
         HasLyricsSynced = False
         Try
-            If CurrentMediaType = App.MediaSourceTypes.Stream Then
-                Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path.TrimEnd("/"c), True, 0).Text + " @ " + _player.Path.TrimEnd("/"c)
-            Else
-                Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path, True, 0).Text + " @ " + _player.Path
-                LoadLyrics(_player.Path)
-            End If
+            Select Case CurrentMediaType
+                Case App.MediaSourceTypes.AudioCD
+                    ' not implemented
+                Case App.MediaSourceTypes.Stream
+                    Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path.TrimEnd("/"c), True, 0).Text + " @ " + _player.Path.TrimEnd("/"c)
+                Case App.MediaSourceTypes.File
+                    Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path, True, 0).Text + " @ " + _player.Path
+                    LoadLyrics(_player.Path)
+            End Select
         Catch ex As Exception
             Text = My.Application.Info.Title + " - " + _player.Path
         End Try
