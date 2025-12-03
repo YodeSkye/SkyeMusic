@@ -612,6 +612,25 @@ Public Class Library
             g.CollapsedState = ListViewGroupCollapsedState.Expanded
         Next
     End Sub
+    Private Sub CMIEditTag_Click(sender As Object, e As EventArgs) Handles CMIEditTag.Click
+        If LVLibrary.SelectedItems.Count > 0 Then
+            Dim paths As New List(Of String)
+            For Each item As ListViewItem In LVLibrary.SelectedItems
+                Dim fp As String = item.SubItems(LVLibrary.Columns("FilePath").Index).Text
+                paths.Add(fp)
+            Next
+            Dim pathArray As String() = paths.ToArray()
+
+            Dim FrmTE As New TagEditor(pathArray)
+            Dim result = FrmTE.ShowDialog(Me)
+            If result = DialogResult.OK Then
+                RadBtnGroupByNone.Checked = True
+                SearchFolders()
+                LVLibrary.Focus()
+            End If
+
+        End If
+    End Sub
     Private Sub CMIHelperApp1Click(sender As Object, e As EventArgs) Handles CMIHelperApp1.Click
         If LVLibrary.SelectedItems.Count > 0 Then App.HelperApp1(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
