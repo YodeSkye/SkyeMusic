@@ -36,6 +36,8 @@ Partial Class Library
         CMICollapseGroup = New ToolStripMenuItem()
         CMIExpandAllGroups = New ToolStripMenuItem()
         CMISeparatorGroupBy = New ToolStripSeparator()
+        CMIEditTag = New ToolStripMenuItem()
+        CMISeparatorEditTag = New ToolStripSeparator()
         CMIHelperApp1 = New ToolStripMenuItem()
         CMIHelperApp2 = New ToolStripMenuItem()
         CMIOpenLocation = New ToolStripMenuItem()
@@ -64,8 +66,6 @@ Partial Class Library
         LVLibrary = New ListView()
         LblHistory = New Skye.UI.Label()
         TipLibrary = New Skye.UI.ToolTip(components)
-        CMIEditTag = New ToolStripMenuItem()
-        ToolStripSeparator4 = New ToolStripSeparator()
         CMLibrary.SuspendLayout()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         GrpBoxGroupBy.SuspendLayout()
@@ -74,7 +74,7 @@ Partial Class Library
         ' CMLibrary
         ' 
         CMLibrary.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIEditTag, ToolStripSeparator4, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
+        CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIEditTag, CMISeparatorEditTag, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMLibrary.Name = "CMLibrary"
         CMLibrary.Size = New Size(229, 446)
         TipLibrary.SetToolTipImage(CMLibrary, Nothing)
@@ -149,6 +149,18 @@ Partial Class Library
         ' 
         CMISeparatorGroupBy.Name = "CMISeparatorGroupBy"
         CMISeparatorGroupBy.Size = New Size(225, 6)
+        ' 
+        ' CMIEditTag
+        ' 
+        CMIEditTag.Image = My.Resources.Resources.ImageEdit16
+        CMIEditTag.Name = "CMIEditTag"
+        CMIEditTag.Size = New Size(228, 26)
+        CMIEditTag.Text = "Edit Tags"
+        ' 
+        ' CMISeparatorEditTag
+        ' 
+        CMISeparatorEditTag.Name = "CMISeparatorEditTag"
+        CMISeparatorEditTag.Size = New Size(225, 6)
         ' 
         ' CMIHelperApp1
         ' 
@@ -467,18 +479,6 @@ Partial Class Library
         TipLibrary.InitialDelay = 500
         TipLibrary.OwnerDraw = True
         ' 
-        ' CMIEditTag
-        ' 
-        CMIEditTag.Image = My.Resources.Resources.ImageEdit16
-        CMIEditTag.Name = "CMIEditTag"
-        CMIEditTag.Size = New Size(228, 26)
-        CMIEditTag.Text = "Edit Tags"
-        ' 
-        ' ToolStripSeparator4
-        ' 
-        ToolStripSeparator4.Name = "ToolStripSeparator4"
-        ToolStripSeparator4.Size = New Size(225, 6)
-        ' 
         ' Library
         ' 
         AutoScaleDimensions = New SizeF(7F, 17F)
@@ -553,5 +553,5 @@ Partial Class Library
     Friend WithEvents RadBtnGroupByType As RadioButton
     Friend WithEvents TipLibrary As Skye.UI.ToolTip
     Friend WithEvents CMIEditTag As ToolStripMenuItem
-    Friend WithEvents ToolStripSeparator4 As ToolStripSeparator
+    Friend WithEvents CMISeparatorEditTag As ToolStripSeparator
 End Class

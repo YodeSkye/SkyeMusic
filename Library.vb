@@ -432,6 +432,8 @@ Public Class Library
             CMICopyTitle.ToolTipText = String.Empty
             CMICopyFileName.ToolTipText = String.Empty
             CMICopyFilePath.ToolTipText = String.Empty
+            CMIEditTag.Visible = False
+            CMISeparatorEditTag.Visible = False
             CMIHelperApp1.Visible = False
             CMIHelperApp2.Visible = False
             CMIPlay.Enabled = False
@@ -448,6 +450,13 @@ Public Class Library
             CMICopyTitle.ToolTipText = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             CMICopyFileName.ToolTipText = IO.Path.GetFileNameWithoutExtension(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
             CMICopyFilePath.ToolTipText = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text
+            CMIEditTag.Visible = True
+            CMISeparatorEditTag.Visible = True
+            If LVLibrary.SelectedItems.Count = 1 Then
+                CMIEditTag.Text = "Edit Tag"
+            Else
+                CMIEditTag.Text = "Edit Tags " & "(" & LVLibrary.SelectedItems.Count.ToString & ")"
+            End If
             CMIPlayWithWindows.Enabled = True
             CMIAddGroupToPlaylist.Enabled = True
             CMICollapseGroup.Enabled = True
@@ -619,9 +628,8 @@ Public Class Library
                 Dim fp As String = item.SubItems(LVLibrary.Columns("FilePath").Index).Text
                 paths.Add(fp)
             Next
-            Dim pathArray As String() = paths.ToArray()
 
-            Dim FrmTE As New TagEditor(pathArray)
+            Dim FrmTE As New TagEditor(paths)
             Dim result = FrmTE.ShowDialog(Me)
             If result = DialogResult.OK Then
                 RadBtnGroupByNone.Checked = True
