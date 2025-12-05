@@ -50,6 +50,9 @@ Partial Class TagEditor
         BtnTracksKeepOriginal = New Button()
         BtnCommentsKeepOriginal = New Button()
         TxtBoxGenre = New TextBox()
+        BtnTrackKeepOriginal = New Button()
+        TxtBoxTrack = New TextBox()
+        LblTrack = New Skye.UI.Label()
         TipStatus = New Skye.UI.ToolTipEX(components)
         SuspendLayout()
         ' 
@@ -145,7 +148,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnSave, Nothing)
         BtnSave.Image = My.Resources.Resources.ImageSave32
         TipInfo.SetImage(BtnSave, Nothing)
-        BtnSave.Location = New Point(12, 323)
+        BtnSave.Location = New Point(12, 370)
         BtnSave.Name = "BtnSave"
         BtnSave.Size = New Size(48, 48)
         BtnSave.TabIndex = 5000
@@ -159,7 +162,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnOK, Nothing)
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipInfo.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(366, 307)
+        BtnOK.Location = New Point(377, 354)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 5100
@@ -248,7 +251,7 @@ Partial Class TagEditor
         TxtBoxComments.ContextMenuStrip = CMBasic
         TipStatus.SetImage(TxtBoxComments, Nothing)
         TipInfo.SetImage(TxtBoxComments, Nothing)
-        TxtBoxComments.Location = New Point(12, 263)
+        TxtBoxComments.Location = New Point(12, 309)
         TxtBoxComments.Name = "TxtBoxComments"
         TxtBoxComments.ShortcutsEnabled = False
         TxtBoxComments.Size = New Size(380, 29)
@@ -261,7 +264,7 @@ Partial Class TagEditor
         TxtBoxTracks.ContextMenuStrip = CMBasic
         TipStatus.SetImage(TxtBoxTracks, Nothing)
         TipInfo.SetImage(TxtBoxTracks, Nothing)
-        TxtBoxTracks.Location = New Point(242, 216)
+        TxtBoxTracks.Location = New Point(242, 263)
         TxtBoxTracks.Name = "TxtBoxTracks"
         TxtBoxTracks.ShortcutsEnabled = False
         TxtBoxTracks.Size = New Size(150, 29)
@@ -298,7 +301,7 @@ Partial Class TagEditor
         ' 
         TipStatus.SetImage(LblTracks, Nothing)
         TipInfo.SetImage(LblTracks, Nothing)
-        LblTracks.Location = New Point(242, 197)
+        LblTracks.Location = New Point(242, 244)
         LblTracks.Name = "LblTracks"
         LblTracks.Size = New Size(100, 23)
         LblTracks.TabIndex = 5104
@@ -310,7 +313,7 @@ Partial Class TagEditor
         ' 
         TipStatus.SetImage(LblComments, Nothing)
         TipInfo.SetImage(LblComments, Nothing)
-        LblComments.Location = New Point(12, 244)
+        LblComments.Location = New Point(12, 290)
         LblComments.Name = "LblComments"
         LblComments.Size = New Size(100, 23)
         LblComments.TabIndex = 5105
@@ -354,7 +357,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnTracksKeepOriginal, Nothing)
         BtnTracksKeepOriginal.Image = My.Resources.Resources.ImageUndo
         TipInfo.SetImage(BtnTracksKeepOriginal, Nothing)
-        BtnTracksKeepOriginal.Location = New Point(392, 214)
+        BtnTracksKeepOriginal.Location = New Point(393, 261)
         BtnTracksKeepOriginal.Name = "BtnTracksKeepOriginal"
         BtnTracksKeepOriginal.Size = New Size(32, 32)
         BtnTracksKeepOriginal.TabIndex = 5111
@@ -369,7 +372,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnCommentsKeepOriginal, Nothing)
         BtnCommentsKeepOriginal.Image = My.Resources.Resources.ImageUndo
         TipInfo.SetImage(BtnCommentsKeepOriginal, Nothing)
-        BtnCommentsKeepOriginal.Location = New Point(393, 261)
+        BtnCommentsKeepOriginal.Location = New Point(393, 307)
         BtnCommentsKeepOriginal.Name = "BtnCommentsKeepOriginal"
         BtnCommentsKeepOriginal.Size = New Size(32, 32)
         BtnCommentsKeepOriginal.TabIndex = 5112
@@ -391,6 +394,46 @@ Partial Class TagEditor
         TipInfo.SetText(TxtBoxGenre, Nothing)
         TipStatus.SetText(TxtBoxGenre, Nothing)
         ' 
+        ' BtnTrackKeepOriginal
+        ' 
+        BtnTrackKeepOriginal.Enabled = False
+        TipStatus.SetImage(BtnTrackKeepOriginal, Nothing)
+        BtnTrackKeepOriginal.Image = My.Resources.Resources.ImageUndo
+        TipInfo.SetImage(BtnTrackKeepOriginal, Nothing)
+        BtnTrackKeepOriginal.Location = New Point(162, 261)
+        BtnTrackKeepOriginal.Name = "BtnTrackKeepOriginal"
+        BtnTrackKeepOriginal.Size = New Size(32, 32)
+        BtnTrackKeepOriginal.TabIndex = 5116
+        BtnTrackKeepOriginal.TabStop = False
+        TipInfo.SetText(BtnTrackKeepOriginal, "Undo")
+        TipStatus.SetText(BtnTrackKeepOriginal, Nothing)
+        BtnTrackKeepOriginal.UseVisualStyleBackColor = True
+        ' 
+        ' TxtBoxTrack
+        ' 
+        TxtBoxTrack.ContextMenuStrip = CMBasic
+        TipStatus.SetImage(TxtBoxTrack, Nothing)
+        TipInfo.SetImage(TxtBoxTrack, Nothing)
+        TxtBoxTrack.Location = New Point(12, 263)
+        TxtBoxTrack.Name = "TxtBoxTrack"
+        TxtBoxTrack.ShortcutsEnabled = False
+        TxtBoxTrack.Size = New Size(150, 29)
+        TxtBoxTrack.TabIndex = 5115
+        TipInfo.SetText(TxtBoxTrack, Nothing)
+        TipStatus.SetText(TxtBoxTrack, Nothing)
+        ' 
+        ' LblTrack
+        ' 
+        TipStatus.SetImage(LblTrack, Nothing)
+        TipInfo.SetImage(LblTrack, Nothing)
+        LblTrack.Location = New Point(12, 244)
+        LblTrack.Name = "LblTrack"
+        LblTrack.Size = New Size(100, 23)
+        LblTrack.TabIndex = 5114
+        TipInfo.SetText(LblTrack, Nothing)
+        LblTrack.Text = "Track #"
+        TipStatus.SetText(LblTrack, Nothing)
+        ' 
         ' TipStatus
         ' 
         TipStatus.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -400,7 +443,9 @@ Partial Class TagEditor
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(797, 383)
+        ClientSize = New Size(819, 430)
+        Controls.Add(BtnTrackKeepOriginal)
+        Controls.Add(TxtBoxTrack)
         Controls.Add(TxtBoxGenre)
         Controls.Add(BtnCommentsKeepOriginal)
         Controls.Add(BtnTracksKeepOriginal)
@@ -425,6 +470,7 @@ Partial Class TagEditor
         Controls.Add(LblYear)
         Controls.Add(LblTracks)
         Controls.Add(LblComments)
+        Controls.Add(LblTrack)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.FixedDialog
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -469,4 +515,7 @@ Partial Class TagEditor
     Friend WithEvents BtnTracksKeepOriginal As Button
     Friend WithEvents BtnCommentsKeepOriginal As Button
     Friend WithEvents TxtBoxGenre As TextBox
+    Friend WithEvents BtnTrackKeepOriginal As Button
+    Friend WithEvents TxtBoxTrack As TextBox
+    Friend WithEvents LblTrack As Skye.UI.Label
 End Class

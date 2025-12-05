@@ -17,13 +17,14 @@ Public Class TagEditor
         End Set
     End Property
     Dim multiMessage As String = "< Keep Original >"
-    Dim oArtist As String = String.Empty
-    Dim oTitle As String = String.Empty
-    Dim oAlbum As String = String.Empty
-    Dim oGenre As String = String.Empty
-    Dim oYear As String = String.Empty
-    Dim oTracks As String = String.Empty
-    Dim oComments As String = String.Empty
+    Dim oArtist As String = Nothing
+    Dim oTitle As String = Nothing
+    Dim oAlbum As String = Nothing
+    Dim oGenre As String = Nothing
+    Dim oYear As String = Nothing
+    Dim oTrack As String = Nothing
+    Dim oTracks As String = Nothing
+    Dim oComments As String = Nothing
 
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -91,7 +92,7 @@ Public Class TagEditor
     End Sub
 
     ' Control Events
-    Private Sub TxtBox_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtBoxAlbum.KeyUp, TxtBoxArtist.KeyUp, TxtBoxTitle.KeyUp, TxtBoxYear.KeyUp, TxtBoxTracks.KeyUp, TxtBoxComments.KeyUp, TxtBoxGenre.KeyUp
+    Private Sub TxtBox_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtBoxAlbum.KeyUp, TxtBoxArtist.KeyUp, TxtBoxTitle.KeyUp, TxtBoxYear.KeyUp, TxtBoxTracks.KeyUp, TxtBoxComments.KeyUp, TxtBoxGenre.KeyUp, TxtBoxTrack.KeyUp
         Select Case e.KeyCode
             Case Keys.Enter
                 e.Handled = True
@@ -123,17 +124,69 @@ Public Class TagEditor
                         LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Regular)
                     End If
                     BtnAlbumKeepOriginal.Enabled = HasChanged
+                ElseIf tb Is TxtBoxGenre Then
+                    If HasChanged Then
+                        LblGenre.Font = New Font(LblGenre.Font, FontStyle.Bold)
+                    Else
+                        LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
+                    End If
+                    BtnGenreKeepOriginal.Enabled = HasChanged
+                ElseIf tb Is TxtBoxYear Then
+                    If HasChanged Then
+                        LblYear.Font = New Font(LblYear.Font, FontStyle.Bold)
+                    Else
+                        LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
+                    End If
+                    BtnYearKeepOriginal.Enabled = HasChanged
+                ElseIf tb Is TxtBoxTrack Then
+                    If HasChanged Then
+                        LblTrack.Font = New Font(LblTrack.Font, FontStyle.Bold)
+                    Else
+                        LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
+                    End If
+                    BtnTrackKeepOriginal.Enabled = HasChanged
+                ElseIf tb Is TxtBoxTracks Then
+                    If HasChanged Then
+                        LblTracks.Font = New Font(LblTracks.Font, FontStyle.Bold)
+                    Else
+                        LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
+                    End If
+                    BtnTracksKeepOriginal.Enabled = HasChanged
+                ElseIf tb Is TxtBoxComments Then
+                    If HasChanged Then
+                        LblComments.Font = New Font(LblComments.Font, FontStyle.Bold)
+                    Else
+                        LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
+                    End If
+                    BtnCommentsKeepOriginal.Enabled = HasChanged
                 End If
         End Select
     End Sub
-    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxAlbum.PreviewKeyDown, TxtBoxTitle.PreviewKeyDown, TxtBoxArtist.PreviewKeyDown, TxtBoxYear.PreviewKeyDown, TxtBoxTracks.PreviewKeyDown, TxtBoxComments.PreviewKeyDown, TxtBoxGenre.PreviewKeyDown
+    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxAlbum.PreviewKeyDown, TxtBoxTitle.PreviewKeyDown, TxtBoxArtist.PreviewKeyDown, TxtBoxYear.PreviewKeyDown, TxtBoxTracks.PreviewKeyDown, TxtBoxComments.PreviewKeyDown, TxtBoxGenre.PreviewKeyDown, TxtBoxTrack.PreviewKeyDown
         CMBasic.ShortcutKeys(TryCast(sender, TextBox), e)
     End Sub
-    Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxYear.KeyPress, TxtBoxTracks.KeyPress
+    Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxYear.KeyPress, TxtBoxTracks.KeyPress, TxtBoxTrack.KeyPress
         If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
+    End Sub
+    Private Sub TxtBoxNumbersOnly_TextChanged(sender As Object, e As EventArgs) Handles TxtBoxTrack.TextChanged, TxtBoxYear.TextChanged, TxtBoxTracks.TextChanged
+        Dim s = TryCast(sender, TextBox)
+        If s Is Nothing OrElse s.Text = multiMessage Then Exit Sub
+        Dim result As UInteger
+        If UInteger.TryParse(s.Text, result) Then
+            s.ForeColor = App.CurrentTheme.TextColor
+        Else
+            s.ForeColor = Color.Red
+        End If
     End Sub
     Private Sub CoBoxGenre_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxGenre.SelectedIndexChanged
         TxtBoxGenre.Text = CoBoxGenre.SelectedItem.ToString
+        HasChanged = SetSave()
+        If HasChanged Then
+            LblGenre.Font = New Font(LblGenre.Font, FontStyle.Bold)
+        Else
+            LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
+        End If
+        BtnGenreKeepOriginal.Enabled = HasChanged
     End Sub
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
         If HasChanged Then SaveTags()
@@ -165,6 +218,46 @@ Public Class TagEditor
         TxtBoxAlbum.Focus()
         TxtBoxAlbum.SelectAll()
     End Sub
+    Private Sub BtnGenreKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnGenreKeepOriginal.Click
+        TxtBoxGenre.Text = oGenre
+        LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
+        BtnGenreKeepOriginal.Enabled = False
+        HasChanged = SetSave()
+        TxtBoxGenre.Focus()
+        TxtBoxGenre.SelectAll()
+    End Sub
+    Private Sub BtnYearKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnYearKeepOriginal.Click
+        TxtBoxYear.Text = oYear
+        LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
+        BtnYearKeepOriginal.Enabled = False
+        HasChanged = SetSave()
+        TxtBoxYear.Focus()
+        TxtBoxYear.SelectAll()
+    End Sub
+    Private Sub BtnTrackKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnTrackKeepOriginal.Click
+        TxtBoxTrack.Text = oTrack
+        LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
+        BtnTrackKeepOriginal.Enabled = False
+        HasChanged = SetSave()
+        TxtBoxTrack.Focus()
+        TxtBoxTrack.SelectAll()
+    End Sub
+    Private Sub BtnTracksKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnTracksKeepOriginal.Click
+        TxtBoxTracks.Text = oTracks
+        LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
+        BtnTracksKeepOriginal.Enabled = False
+        HasChanged = SetSave()
+        TxtBoxTracks.Focus()
+        TxtBoxTracks.SelectAll()
+    End Sub
+    Private Sub BtnCommentsKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnCommentsKeepOriginal.Click
+        TxtBoxComments.Text = oComments
+        LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
+        BtnCommentsKeepOriginal.Enabled = False
+        HasChanged = SetSave()
+        TxtBoxComments.Focus()
+        TxtBoxComments.SelectAll()
+    End Sub
 
     ' Methods
     Private Sub GetTags()
@@ -182,58 +275,74 @@ Public Class TagEditor
                 End Try
                 If tlfile IsNot Nothing Then
                     ' Artist
-                    If String.IsNullOrWhiteSpace(oArtist) Then
-                        oArtist = tlfile.Tag.FirstPerformer
+                    Dim artist As String = If(String.IsNullOrWhiteSpace(tlfile.Tag.FirstPerformer), String.Empty, tlfile.Tag.FirstPerformer)
+                    If oArtist Is Nothing Then
+                        oArtist = artist
                     Else
-                        If Not String.Equals(oArtist, tlfile.Tag.FirstPerformer, StringComparison.Ordinal) Then
+                        If Not String.Equals(oArtist, artist, StringComparison.Ordinal) Then
                             oArtist = multiMessage
                         End If
                     End If
                     ' Title
-                    If String.IsNullOrWhiteSpace(oTitle) Then
-                        oTitle = tlfile.Tag.Title
+                    Dim title As String = If(String.IsNullOrWhiteSpace(tlfile.Tag.Title), String.Empty, tlfile.Tag.Title)
+                    If oTitle Is Nothing Then
+                        oTitle = title
                     Else
-                        If Not String.Equals(oTitle, tlfile.Tag.Title, StringComparison.Ordinal) Then
+                        If Not String.Equals(oTitle, title, StringComparison.Ordinal) Then
                             oTitle = multiMessage
                         End If
                     End If
                     ' Album
-                    If String.IsNullOrWhiteSpace(oAlbum) Then
-                        oAlbum = tlfile.Tag.Album
+                    Dim album As String = If(String.IsNullOrWhiteSpace(tlfile.Tag.Album), String.Empty, tlfile.Tag.Album)
+                    If oAlbum Is Nothing Then
+                        oAlbum = album
                     Else
-                        If Not String.Equals(oAlbum, tlfile.Tag.Album, StringComparison.Ordinal) Then
+                        If Not String.Equals(oAlbum, album, StringComparison.Ordinal) Then
                             oAlbum = multiMessage
                         End If
                     End If
                     ' Genre
-                    If String.IsNullOrWhiteSpace(oGenre) Then
-                        oGenre = tlfile.Tag.FirstGenre
+                    Dim genre As String = If(String.IsNullOrWhiteSpace(tlfile.Tag.FirstGenre), String.Empty, tlfile.Tag.FirstGenre)
+                    If oGenre Is Nothing Then
+                        oGenre = genre
                     Else
-                        If Not String.Equals(oGenre, tlfile.Tag.FirstGenre, StringComparison.Ordinal) Then
+                        If Not String.Equals(oGenre, genre, StringComparison.Ordinal) Then
                             oGenre = multiMessage
                         End If
                     End If
                     ' Year
-                    If String.IsNullOrWhiteSpace(oYear) Then
-                        oYear = tlfile.Tag.Year.ToString
+                    Dim year As String = If(tlfile.Tag.Year = 0, String.Empty, tlfile.Tag.Year.ToString)
+                    If oYear Is Nothing Then
+                        oYear = year
                     Else
-                        If Not String.Equals(oYear, tlfile.Tag.Year.ToString, StringComparison.Ordinal) Then
+                        If Not String.Equals(oYear, year, StringComparison.Ordinal) Then
                             oYear = multiMessage
                         End If
                     End If
-                    ' Tracks
-                    If String.IsNullOrWhiteSpace(oTracks) Then
-                        oTracks = tlfile.Tag.TrackCount.ToString
+                    ' Track
+                    Dim track As String = If(tlfile.Tag.Track = 0, String.Empty, tlfile.Tag.Track.ToString)
+                    If oTrack Is Nothing Then
+                        oTrack = track
                     Else
-                        If Not String.Equals(oTracks, tlfile.Tag.TrackCount.ToString, StringComparison.Ordinal) Then
+                        If Not String.Equals(oTrack, track, StringComparison.Ordinal) Then
+                            oTrack = multiMessage
+                        End If
+                    End If
+                    ' Tracks
+                    Dim tracks As String = If(tlfile.Tag.TrackCount = 0, String.Empty, tlfile.Tag.TrackCount.ToString)
+                    If oTracks Is Nothing Then
+                        oTracks = tracks
+                    Else
+                        If Not String.Equals(oTracks, tracks, StringComparison.Ordinal) Then
                             oTracks = multiMessage
                         End If
                     End If
                     ' Comments
-                    If String.IsNullOrWhiteSpace(oComments) Then
-                        oComments = tlfile.Tag.Comment
+                    Dim comments As String = If(String.IsNullOrWhiteSpace(tlfile.Tag.Comment), String.Empty, tlfile.Tag.Comment)
+                    If oComments Is Nothing Then
+                        oComments = comments
                     Else
-                        If Not String.Equals(oComments, tlfile.Tag.Comment, StringComparison.Ordinal) Then
+                        If Not String.Equals(oComments, comments, StringComparison.Ordinal) Then
                             oComments = multiMessage
                         End If
                     End If
@@ -249,6 +358,7 @@ Public Class TagEditor
                 TxtBoxAlbum.Text = oAlbum
                 TxtBoxGenre.Text = oGenre
                 TxtBoxYear.Text = oYear
+                TxtBoxTrack.Text = oTrack
                 TxtBoxTracks.Text = oTracks
                 TxtBoxComments.Text = oComments
                 If _paths.Count = 1 Then
@@ -285,6 +395,43 @@ Public Class TagEditor
                     If TxtBoxAlbum.Text <> multiMessage AndAlso oAlbum <> TxtBoxAlbum.Text Then
                         tlfile.Tag.Album = TxtBoxAlbum.Text
                     End If
+                    If TxtBoxGenre.Text <> multiMessage AndAlso oGenre <> TxtBoxGenre.Text Then
+                        If tlfile.Tag.Genres IsNot Nothing AndAlso tlfile.Tag.Genres.Count > 1 Then
+                            Dim existingGenres As String() = tlfile.Tag.Genres
+                            Dim newGenres As New List(Of String) From {
+                                TxtBoxGenre.Text}
+                            For i As Integer = 1 To existingGenres.Length - 1
+                                newGenres.Add(existingGenres(i))
+                            Next
+                            tlfile.Tag.Genres = newGenres.ToArray()
+                        Else
+                            tlfile.Tag.Genres = New String() {TxtBoxGenre.Text}
+                        End If
+                    End If
+                    If TxtBoxYear.Text <> multiMessage AndAlso oYear <> TxtBoxYear.Text Then
+                        If TxtBoxYear.Text = String.Empty Then
+                            tlfile.Tag.Year = 0
+                        Else
+                            tlfile.Tag.Year = Convert.ToUInt32(TxtBoxYear.Text)
+                        End If
+                    End If
+                    If TxtBoxTrack.Text <> multiMessage AndAlso oTrack <> TxtBoxTrack.Text Then
+                        If TxtBoxTrack.Text = String.Empty Then
+                            tlfile.Tag.Track = 0
+                        Else
+                            tlfile.Tag.Track = Convert.ToUInt32(TxtBoxTrack.Text)
+                        End If
+                    End If
+                    If TxtBoxTracks.Text <> multiMessage AndAlso oTracks <> TxtBoxTracks.Text Then
+                        If TxtBoxTracks.Text = String.Empty Then
+                            tlfile.Tag.TrackCount = 0
+                        Else
+                            tlfile.Tag.TrackCount = Convert.ToUInt32(TxtBoxTracks.Text)
+                        End If
+                    End If
+                    If TxtBoxComments.Text <> multiMessage AndAlso oComments <> TxtBoxComments.Text Then
+                        tlfile.Tag.Comment = TxtBoxComments.Text
+                    End If
                     tlfile.Save()
                 End Using
             Catch ex As Exception
@@ -297,14 +444,26 @@ Public Class TagEditor
         LblArtist.Font = New Font(LblArtist.Font, FontStyle.Regular)
         LblTitle.Font = New Font(LblTitle.Font, FontStyle.Regular)
         LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Regular)
+        LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
+        LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
+        LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
+        LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
+        LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
         btnArtistKeepOriginal.Enabled = False
         BtnTitleKeepOriginal.Enabled = False
         BtnAlbumKeepOriginal.Enabled = False
+        BtnGenreKeepOriginal.Enabled = False
+        BtnYearKeepOriginal.Enabled = False
+        BtnTrackKeepOriginal.Enabled = False
+        BtnTracksKeepOriginal.Enabled = False
+        BtnCommentsKeepOriginal.Enabled = False
 
         TipStatus.ShowTooltipAtCursor("Tag" & If(_paths.Count > 1, "s", String.Empty) & " Saved Successfully", My.Resources.ImageOK)
     End Sub
     Private Function SetSave() As Boolean
-        If oArtist = TxtBoxArtist.Text AndAlso oTitle = TxtBoxTitle.Text AndAlso oAlbum = TxtBoxAlbum.Text Then
+        If oArtist = TxtBoxArtist.Text AndAlso oTitle = TxtBoxTitle.Text AndAlso oAlbum = TxtBoxAlbum.Text _
+            AndAlso oGenre = TxtBoxGenre.Text AndAlso oYear = TxtBoxYear.Text _
+            AndAlso oTrack = TxtBoxTrack.Text AndAlso oTracks = TxtBoxTracks.Text AndAlso oComments = TxtBoxComments.Text Then
             Return False
         Else
             Return True
@@ -334,6 +493,7 @@ Public Class TagEditor
             LbLAlbum.ForeColor = App.CurrentTheme.AccentTextColor
             LblGenre.ForeColor = App.CurrentTheme.AccentTextColor
             LblYear.ForeColor = App.CurrentTheme.AccentTextColor
+            LblTrack.ForeColor = App.CurrentTheme.AccentTextColor
             LblTracks.ForeColor = App.CurrentTheme.AccentTextColor
             LblComments.ForeColor = App.CurrentTheme.AccentTextColor
         Else
@@ -343,6 +503,7 @@ Public Class TagEditor
             LbLAlbum.ForeColor = App.CurrentTheme.TextColor
             LblGenre.ForeColor = App.CurrentTheme.TextColor
             LblYear.ForeColor = App.CurrentTheme.TextColor
+            LblTrack.ForeColor = App.CurrentTheme.TextColor
             LblTracks.ForeColor = App.CurrentTheme.TextColor
             LblComments.ForeColor = App.CurrentTheme.TextColor
         End If
@@ -358,6 +519,8 @@ Public Class TagEditor
         CoBoxGenre.ForeColor = App.CurrentTheme.TextColor
         TxtBoxYear.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxYear.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxTrack.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxTrack.ForeColor = App.CurrentTheme.TextColor
         TxtBoxTracks.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxTracks.ForeColor = App.CurrentTheme.TextColor
         TxtBoxComments.BackColor = App.CurrentTheme.ControlBackColor
@@ -376,6 +539,8 @@ Public Class TagEditor
         BtnGenreKeepOriginal.ForeColor = App.CurrentTheme.TextColor
         BtnYearKeepOriginal.BackColor = App.CurrentTheme.ButtonBackColor
         BtnYearKeepOriginal.ForeColor = App.CurrentTheme.TextColor
+        BtnTrackKeepOriginal.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnTrackKeepOriginal.ForeColor = App.CurrentTheme.TextColor
         BtnTracksKeepOriginal.BackColor = App.CurrentTheme.ButtonBackColor
         BtnTracksKeepOriginal.ForeColor = App.CurrentTheme.TextColor
         BtnCommentsKeepOriginal.BackColor = App.CurrentTheme.ButtonBackColor
