@@ -7,15 +7,6 @@ Public Class TagEditor
     Private _paths As List(Of String)
     Private _haschanged As Boolean = False
     Private _libraryneedsupdated As Boolean = False
-    Private Property HasChanged As Boolean
-        Get
-            Return _haschanged
-        End Get
-        Set(value As Boolean)
-            _haschanged = value
-            BtnSave.Enabled = value
-        End Set
-    End Property
     Dim multiMessage As String = "< Keep Original >"
     Dim oArtist As String = Nothing
     Dim oTitle As String = Nothing
@@ -25,6 +16,15 @@ Public Class TagEditor
     Dim oTrack As String = Nothing
     Dim oTracks As String = Nothing
     Dim oComments As String = Nothing
+    Private Property HasChanged As Boolean
+        Get
+            Return _haschanged
+        End Get
+        Set(value As Boolean)
+            _haschanged = value
+            BtnSave.Enabled = value
+        End Set
+    End Property
 
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -92,6 +92,12 @@ Public Class TagEditor
     End Sub
 
     ' Control Events
+    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxArtist.KeyDown, TxtBoxAlbum.KeyDown, TxtBoxTitle.KeyDown, TxtBoxYear.KeyDown, TxtBoxTracks.KeyDown, TxtBoxComments.KeyDown, TxtBoxGenre.KeyDown, TxtBoxTrack.KeyDown
+        Dim s = TryCast(sender, TextBox)
+        If s IsNot Nothing Then
+            If s.Text = multiMessage Then s.Clear()
+        End If
+    End Sub
     Private Sub TxtBox_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtBoxAlbum.KeyUp, TxtBoxArtist.KeyUp, TxtBoxTitle.KeyUp, TxtBoxYear.KeyUp, TxtBoxTracks.KeyUp, TxtBoxComments.KeyUp, TxtBoxGenre.KeyUp, TxtBoxTrack.KeyUp
         Select Case e.KeyCode
             Case Keys.Enter
@@ -172,10 +178,12 @@ Public Class TagEditor
         Dim s = TryCast(sender, TextBox)
         If s Is Nothing OrElse s.Text = multiMessage Then Exit Sub
         Dim result As UInteger
-        If UInteger.TryParse(s.Text, result) Then
-            s.ForeColor = App.CurrentTheme.TextColor
-        Else
-            s.ForeColor = Color.Red
+        If Not s.Text = multiMessage Then
+            If UInteger.TryParse(s.Text, result) Then
+                s.ForeColor = App.CurrentTheme.TextColor
+            Else
+                s.ForeColor = Color.Red
+            End If
         End If
     End Sub
     Private Sub CoBoxGenre_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxGenre.SelectedIndexChanged
@@ -228,6 +236,7 @@ Public Class TagEditor
     End Sub
     Private Sub BtnYearKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnYearKeepOriginal.Click
         TxtBoxYear.Text = oYear
+        TxtBoxYear.ForeColor = App.CurrentTheme.TextColor
         LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
         BtnYearKeepOriginal.Enabled = False
         HasChanged = SetSave()
@@ -236,6 +245,7 @@ Public Class TagEditor
     End Sub
     Private Sub BtnTrackKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnTrackKeepOriginal.Click
         TxtBoxTrack.Text = oTrack
+        TxtBoxTrack.ForeColor = App.CurrentTheme.TextColor
         LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
         BtnTrackKeepOriginal.Enabled = False
         HasChanged = SetSave()
@@ -244,6 +254,7 @@ Public Class TagEditor
     End Sub
     Private Sub BtnTracksKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnTracksKeepOriginal.Click
         TxtBoxTracks.Text = oTracks
+        TxtBoxTracks.ForeColor = App.CurrentTheme.TextColor
         LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
         BtnTracksKeepOriginal.Enabled = False
         HasChanged = SetSave()
