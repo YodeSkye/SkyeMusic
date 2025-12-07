@@ -1,12 +1,16 @@
 ﻿
+Imports System.IO
+Imports Syncfusion
+
 Public Class TagEditor
 
     ' Declarations
     Private mMove As Boolean = False
-    Private mOffset, mPosition As Drawing.Point
+    Private mOffset, mPosition As System.Drawing.Point
     Private _paths As List(Of String)
     Private _haschanged As Boolean = False
     Private _libraryneedsupdated As Boolean = False
+    Private artindex As Integer = 0
     Dim multiMessage As String = "< Keep Original >"
     Dim oArtist As String = Nothing
     Dim oTitle As String = Nothing
@@ -16,6 +20,8 @@ Public Class TagEditor
     Dim oTrack As String = Nothing
     Dim oTracks As String = Nothing
     Dim oComments As String = Nothing
+    Dim oArt As New List(Of TagLib.IPicture)
+    Dim nArt As New List(Of TagLib.IPicture)
     Private Property HasChanged As Boolean
         Get
             Return _haschanged
@@ -40,11 +46,9 @@ Public Class TagEditor
         End Try
     End Sub
     Public Sub New(paths As List(Of String))
-
-        ' This call is required by the designer.
         InitializeComponent()
 
-        ' Add any initialization after the InitializeComponent() call.
+        ' Initialize Locals
         _paths = paths
         Text = My.Application.Info.Title & " " & Text
         SetAccentColor()
@@ -55,6 +59,11 @@ Public Class TagEditor
         For Each s As String In TagLib.Genres.Video
             If Not CoBoxGenre.Items.Contains(s) Then CoBoxGenre.Items.Add(s)
         Next
+        For Each name As String In [Enum].GetNames(Of TagLib.PictureType)()
+            CoBoxArtType.Items.Add(name)
+        Next
+        CoBoxArtType.ContextMenuStrip = New ContextMenuStrip() ' Disable right-click context menu
+
     End Sub
     Private Sub TagEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         GetTags()
@@ -189,12 +198,22 @@ Public Class TagEditor
     Private Sub CoBoxGenre_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxGenre.SelectedIndexChanged
         TxtBoxGenre.Text = CoBoxGenre.SelectedItem.ToString
         HasChanged = SetSave()
+
         If HasChanged Then
             LblGenre.Font = New Font(LblGenre.Font, FontStyle.Bold)
         Else
             LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
         End If
         BtnGenreKeepOriginal.Enabled = HasChanged
+    End Sub
+    Private Sub CoBoxArtType_KeyDown(sender As Object, e As KeyEventArgs) Handles CoBoxArtType.KeyDown
+        If e.KeyCode = Keys.Delete Then
+            e.SuppressKeyPress = True   ' stops the delete action
+            e.Handled = True
+        End If
+    End Sub
+    Private Sub CoBoxArtType_KeyPress(sender As Object, e As KeyPressEventArgs) Handles CoBoxArtType.KeyPress
+        e.Handled = True
     End Sub
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
         If HasChanged Then SaveTags()
@@ -254,7 +273,7 @@ Public Class TagEditor
     End Sub
     Private Sub BtnTracksKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnTracksKeepOriginal.Click
         TxtBoxTracks.Text = oTracks
-        TxtBoxTracks.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxTracks.ForeColor = CurrentTheme.TextColor
         LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
         BtnTracksKeepOriginal.Enabled = False
         HasChanged = SetSave()
@@ -268,6 +287,12 @@ Public Class TagEditor
         HasChanged = SetSave()
         TxtBoxComments.Focus()
         TxtBoxComments.SelectAll()
+    End Sub
+    Private Sub BtnArtLeft_Click(sender As Object, e As EventArgs) Handles BtnArtLeft.Click
+
+    End Sub
+    Private Sub BtnArtRight_Click(sender As Object, e As EventArgs) Handles BtnArtRight.Click
+
     End Sub
 
     ' Methods
@@ -357,6 +382,39 @@ Public Class TagEditor
                             oComments = multiMessage
                         End If
                     End If
+
+                    If _paths.Count = 1 Then
+                        ' Single file → just show all its pictures
+                        Dim pics = tlfile.Tag.Pictures
+                        Dim images As New List(Of Image)
+
+                        For Each pic In pics
+                            Using ms As New MemoryStream(pic.Data.Data)
+                                images.Add(Image.FromStream(ms))
+                            End Using
+                            oArt.Add(pic)
+                        Next
+
+                        nArt = oArt
+                        ShowImages()
+                    Else
+                        '    ' Multiple files → run aggregation
+                        '    Dim images As List(Of Image) = AggregatePictures(_paths, multiMessage)
+
+                        '    If images.Count = 0 Then
+                        '        ' Mixed or no art → show placeholder
+                        '        If conflict Then
+                        '            PictureBoxArt.Image = My.Resources.MixedIcon
+                        '        Else
+                        '            PictureBoxArt.Image = My.Resources.NoArtIcon
+                        '        End If
+                        '    Else
+                        '        ' Show first image, enable navigation
+                        '        PictureBoxArt.Image = images(0)
+                        '        ShowImages(images)
+                        '    End If
+                    End If
+
                 End If
                 tlfile.Dispose()
             Next
@@ -480,6 +538,61 @@ Public Class TagEditor
             Return True
         End If
     End Function
+    Private Sub ShowImages()
+        Dim Image As Image
+        If artindex >= nArt.Count - 1 Then artindex = 0
+
+        Using ms As New MemoryStream(nArt(artindex).Data.Data)
+            Image = Image.FromStream(ms)
+        End Using
+        PicBoxArt.Image = Image
+        TxtBoxArtDescription.Text = nArt(artindex).Description
+        CoBoxArtType.SelectedItem = nArt(artindex).Type.ToString
+
+        BtnArtLeft.Enabled = Not artindex = 0
+        BtnArtRight.Enabled = Not artindex >= nArt.Count - 1
+    End Sub
+    Private Function AggregatePictures(paths As IEnumerable(Of String), multiMessage As String) As List(Of TagLib.IPicture)
+        Dim basePics As List(Of TagLib.IPicture) = Nothing
+        Dim conflict As Boolean = False
+
+        For Each path In paths
+            Try
+                Using tlfile As TagLib.File = TagLib.File.Create(path)
+                    Dim pics = tlfile.Tag.Pictures.ToList()
+
+                    If basePics Is Nothing Then
+                        ' First file’s pictures become the baseline
+                        basePics = pics
+                    Else
+                        ' Compare count first
+                        If pics.Count <> basePics.Count Then
+                            conflict = True
+                        Else
+                            ' Compare each picture’s raw data
+                            For i As Integer = 0 To pics.Count - 1
+                                If Not pics(i).Data.Data.SequenceEqual(basePics(i).Data.Data) Then
+                                    conflict = True
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                    End If
+                End Using
+            Catch ex As Exception
+                WriteToLog("TagLib Error while reading pictures in AggregatePictures: " & path & vbCrLf & ex.Message)
+            End Try
+        Next
+
+        ' Decide what to return
+        Dim result As New List(Of Image)
+        If conflict OrElse basePics Is Nothing Then
+            ' Mixed or no art → return empty list (or placeholder)
+            Return New List(Of TagLib.IPicture)
+        Else
+            Return basePics
+        End If
+    End Function
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
@@ -507,6 +620,8 @@ Public Class TagEditor
             LblTrack.ForeColor = App.CurrentTheme.AccentTextColor
             LblTracks.ForeColor = App.CurrentTheme.AccentTextColor
             LblComments.ForeColor = App.CurrentTheme.AccentTextColor
+            LblArtDescription.ForeColor = App.CurrentTheme.AccentTextColor
+            LblArtType.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
             LblArtist.ForeColor = App.CurrentTheme.TextColor
@@ -517,6 +632,8 @@ Public Class TagEditor
             LblTrack.ForeColor = App.CurrentTheme.TextColor
             LblTracks.ForeColor = App.CurrentTheme.TextColor
             LblComments.ForeColor = App.CurrentTheme.TextColor
+            LblArtDescription.ForeColor = App.CurrentTheme.TextColor
+            LblArtType.ForeColor = App.CurrentTheme.TextColor
         End If
         TxtBoxArtist.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxArtist.ForeColor = App.CurrentTheme.TextColor
@@ -536,6 +653,10 @@ Public Class TagEditor
         TxtBoxTracks.ForeColor = App.CurrentTheme.TextColor
         TxtBoxComments.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxComments.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxArtDescription.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxArtDescription.ForeColor = App.CurrentTheme.TextColor
+        CoBoxArtType.BackColor = App.CurrentTheme.ControlBackColor
+        CoBoxArtType.ForeColor = App.CurrentTheme.TextColor
         BtnOK.BackColor = App.CurrentTheme.ButtonBackColor
         BtnOK.ForeColor = App.CurrentTheme.TextColor
         BtnSave.BackColor = App.CurrentTheme.ButtonBackColor
@@ -556,6 +677,16 @@ Public Class TagEditor
         BtnTracksKeepOriginal.ForeColor = App.CurrentTheme.TextColor
         BtnCommentsKeepOriginal.BackColor = App.CurrentTheme.ButtonBackColor
         BtnCommentsKeepOriginal.ForeColor = App.CurrentTheme.TextColor
+        BtnArtNew.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnArtNew.ForeColor = App.CurrentTheme.TextColor
+        BtnArtRemove.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnArtRemove.ForeColor = App.CurrentTheme.TextColor
+        BtnArtLeft.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnArtLeft.ForeColor = App.CurrentTheme.TextColor
+        BtnArtRight.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnArtRight.ForeColor = App.CurrentTheme.TextColor
+        BtnArtKeepOriginal.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnArtKeepOriginal.ForeColor = App.CurrentTheme.TextColor
         TipInfo.BackColor = App.CurrentTheme.BackColor
         TipInfo.ForeColor = App.CurrentTheme.TextColor
         TipInfo.BorderColor = App.CurrentTheme.ButtonBackColor

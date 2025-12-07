@@ -53,7 +53,18 @@ Partial Class TagEditor
         BtnTrackKeepOriginal = New Button()
         TxtBoxTrack = New TextBox()
         LblTrack = New Skye.UI.Label()
+        TxtBoxArtDescription = New TextBox()
+        LblArtDescription = New Skye.UI.Label()
+        CoBoxArtType = New ComboBox()
+        LblArtType = New Skye.UI.Label()
+        PicBoxArt = New PictureBox()
+        BtnArtRight = New Button()
+        BtnArtLeft = New Button()
+        BtnArtKeepOriginal = New Button()
+        BtnArtRemove = New Button()
+        BtnArtNew = New Button()
         TipStatus = New Skye.UI.ToolTipEX(components)
+        CType(PicBoxArt, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' TxtBoxArtist
@@ -148,7 +159,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnSave, Nothing)
         BtnSave.Image = My.Resources.Resources.ImageSave32
         TipInfo.SetImage(BtnSave, Nothing)
-        BtnSave.Location = New Point(12, 370)
+        BtnSave.Location = New Point(12, 466)
         BtnSave.Name = "BtnSave"
         BtnSave.Size = New Size(48, 48)
         BtnSave.TabIndex = 5000
@@ -162,7 +173,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnOK, Nothing)
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipInfo.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(377, 354)
+        BtnOK.Location = New Point(202, 450)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 5100
@@ -434,6 +445,153 @@ Partial Class TagEditor
         LblTrack.Text = "Track #"
         TipStatus.SetText(LblTrack, Nothing)
         ' 
+        ' TxtBoxArtDescription
+        ' 
+        TxtBoxArtDescription.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        TxtBoxArtDescription.ContextMenuStrip = CMBasic
+        TipStatus.SetImage(TxtBoxArtDescription, Nothing)
+        TipInfo.SetImage(TxtBoxArtDescription, Nothing)
+        TxtBoxArtDescription.Location = New Point(445, 28)
+        TxtBoxArtDescription.Name = "TxtBoxArtDescription"
+        TxtBoxArtDescription.ShortcutsEnabled = False
+        TxtBoxArtDescription.Size = New Size(200, 29)
+        TxtBoxArtDescription.TabIndex = 5118
+        TipInfo.SetText(TxtBoxArtDescription, Nothing)
+        TipStatus.SetText(TxtBoxArtDescription, Nothing)
+        ' 
+        ' LblArtDescription
+        ' 
+        LblArtDescription.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        TipStatus.SetImage(LblArtDescription, Nothing)
+        TipInfo.SetImage(LblArtDescription, Nothing)
+        LblArtDescription.Location = New Point(445, 9)
+        LblArtDescription.Name = "LblArtDescription"
+        LblArtDescription.Size = New Size(100, 23)
+        LblArtDescription.TabIndex = 5117
+        TipInfo.SetText(LblArtDescription, Nothing)
+        LblArtDescription.Text = "Description"
+        TipStatus.SetText(LblArtDescription, Nothing)
+        ' 
+        ' CoBoxArtType
+        ' 
+        CoBoxArtType.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        CoBoxArtType.FormattingEnabled = True
+        TipInfo.SetImage(CoBoxArtType, Nothing)
+        TipStatus.SetImage(CoBoxArtType, Nothing)
+        CoBoxArtType.Location = New Point(651, 28)
+        CoBoxArtType.Name = "CoBoxArtType"
+        CoBoxArtType.Size = New Size(170, 29)
+        CoBoxArtType.Sorted = True
+        CoBoxArtType.TabIndex = 5119
+        TipInfo.SetText(CoBoxArtType, Nothing)
+        TipStatus.SetText(CoBoxArtType, Nothing)
+        ' 
+        ' LblArtType
+        ' 
+        LblArtType.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        TipStatus.SetImage(LblArtType, Nothing)
+        TipInfo.SetImage(LblArtType, Nothing)
+        LblArtType.Location = New Point(651, 9)
+        LblArtType.Name = "LblArtType"
+        LblArtType.Size = New Size(100, 23)
+        LblArtType.TabIndex = 5120
+        TipInfo.SetText(LblArtType, Nothing)
+        LblArtType.Text = "Genre"
+        TipStatus.SetText(LblArtType, Nothing)
+        ' 
+        ' PicBoxArt
+        ' 
+        PicBoxArt.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        PicBoxArt.BorderStyle = BorderStyle.Fixed3D
+        TipStatus.SetImage(PicBoxArt, Nothing)
+        TipInfo.SetImage(PicBoxArt, Nothing)
+        PicBoxArt.Location = New Point(446, 58)
+        PicBoxArt.Name = "PicBoxArt"
+        PicBoxArt.Size = New Size(375, 375)
+        PicBoxArt.SizeMode = PictureBoxSizeMode.Zoom
+        PicBoxArt.TabIndex = 5121
+        PicBoxArt.TabStop = False
+        TipStatus.SetText(PicBoxArt, Nothing)
+        TipInfo.SetText(PicBoxArt, Nothing)
+        ' 
+        ' BtnArtRight
+        ' 
+        BtnArtRight.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        BtnArtRight.Enabled = False
+        TipStatus.SetImage(BtnArtRight, Nothing)
+        BtnArtRight.Image = My.Resources.Resources.ImageMoveRight
+        TipInfo.SetImage(BtnArtRight, Nothing)
+        BtnArtRight.Location = New Point(630, 433)
+        BtnArtRight.Name = "BtnArtRight"
+        BtnArtRight.Size = New Size(32, 32)
+        BtnArtRight.TabIndex = 5123
+        BtnArtRight.TabStop = False
+        TipInfo.SetText(BtnArtRight, "Undo")
+        TipStatus.SetText(BtnArtRight, Nothing)
+        BtnArtRight.UseVisualStyleBackColor = True
+        ' 
+        ' BtnArtLeft
+        ' 
+        BtnArtLeft.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        BtnArtLeft.Enabled = False
+        TipStatus.SetImage(BtnArtLeft, Nothing)
+        BtnArtLeft.Image = My.Resources.Resources.ImageMoveLeft
+        TipInfo.SetImage(BtnArtLeft, Nothing)
+        BtnArtLeft.Location = New Point(599, 433)
+        BtnArtLeft.Name = "BtnArtLeft"
+        BtnArtLeft.Size = New Size(32, 32)
+        BtnArtLeft.TabIndex = 5122
+        BtnArtLeft.TabStop = False
+        TipInfo.SetText(BtnArtLeft, "Undo")
+        TipStatus.SetText(BtnArtLeft, Nothing)
+        BtnArtLeft.UseVisualStyleBackColor = True
+        ' 
+        ' BtnArtKeepOriginal
+        ' 
+        BtnArtKeepOriginal.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        BtnArtKeepOriginal.Enabled = False
+        TipStatus.SetImage(BtnArtKeepOriginal, Nothing)
+        BtnArtKeepOriginal.Image = My.Resources.Resources.ImageUndo
+        TipInfo.SetImage(BtnArtKeepOriginal, Nothing)
+        BtnArtKeepOriginal.Location = New Point(790, 433)
+        BtnArtKeepOriginal.Name = "BtnArtKeepOriginal"
+        BtnArtKeepOriginal.Size = New Size(32, 32)
+        BtnArtKeepOriginal.TabIndex = 5124
+        BtnArtKeepOriginal.TabStop = False
+        TipInfo.SetText(BtnArtKeepOriginal, "Undo")
+        TipStatus.SetText(BtnArtKeepOriginal, Nothing)
+        BtnArtKeepOriginal.UseVisualStyleBackColor = True
+        ' 
+        ' BtnArtRemove
+        ' 
+        BtnArtRemove.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        BtnArtRemove.Enabled = False
+        TipStatus.SetImage(BtnArtRemove, Nothing)
+        TipInfo.SetImage(BtnArtRemove, Nothing)
+        BtnArtRemove.Location = New Point(475, 433)
+        BtnArtRemove.Name = "BtnArtRemove"
+        BtnArtRemove.Size = New Size(32, 32)
+        BtnArtRemove.TabIndex = 5126
+        BtnArtRemove.TabStop = False
+        TipInfo.SetText(BtnArtRemove, "Undo")
+        TipStatus.SetText(BtnArtRemove, Nothing)
+        BtnArtRemove.UseVisualStyleBackColor = True
+        ' 
+        ' BtnArtNew
+        ' 
+        BtnArtNew.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        BtnArtNew.Enabled = False
+        TipStatus.SetImage(BtnArtNew, Nothing)
+        TipInfo.SetImage(BtnArtNew, Nothing)
+        BtnArtNew.Location = New Point(444, 433)
+        BtnArtNew.Name = "BtnArtNew"
+        BtnArtNew.Size = New Size(32, 32)
+        BtnArtNew.TabIndex = 5125
+        BtnArtNew.TabStop = False
+        TipInfo.SetText(BtnArtNew, "Undo")
+        TipStatus.SetText(BtnArtNew, Nothing)
+        BtnArtNew.UseVisualStyleBackColor = True
+        ' 
         ' TipStatus
         ' 
         TipStatus.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -443,7 +601,17 @@ Partial Class TagEditor
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(819, 430)
+        ClientSize = New Size(833, 526)
+        Controls.Add(BtnArtRemove)
+        Controls.Add(BtnArtNew)
+        Controls.Add(BtnArtKeepOriginal)
+        Controls.Add(BtnArtRight)
+        Controls.Add(BtnArtLeft)
+        Controls.Add(PicBoxArt)
+        Controls.Add(CoBoxArtType)
+        Controls.Add(LblArtType)
+        Controls.Add(TxtBoxArtDescription)
+        Controls.Add(LblArtDescription)
         Controls.Add(BtnTrackKeepOriginal)
         Controls.Add(TxtBoxTrack)
         Controls.Add(TxtBoxGenre)
@@ -484,6 +652,7 @@ Partial Class TagEditor
         TipInfo.SetText(Me, Nothing)
         TipStatus.SetText(Me, Nothing)
         Text = "Tag Editor"
+        CType(PicBoxArt, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -518,4 +687,14 @@ Partial Class TagEditor
     Friend WithEvents BtnTrackKeepOriginal As Button
     Friend WithEvents TxtBoxTrack As TextBox
     Friend WithEvents LblTrack As Skye.UI.Label
+    Friend WithEvents TxtBoxArtDescription As TextBox
+    Friend WithEvents LblArtDescription As Skye.UI.Label
+    Friend WithEvents CoBoxArtType As ComboBox
+    Friend WithEvents LblArtType As Skye.UI.Label
+    Friend WithEvents PicBoxArt As PictureBox
+    Friend WithEvents BtnArtRight As Button
+    Friend WithEvents BtnArtLeft As Button
+    Friend WithEvents BtnArtKeepOriginal As Button
+    Friend WithEvents BtnArtRemove As Button
+    Friend WithEvents BtnArtNew As Button
 End Class
