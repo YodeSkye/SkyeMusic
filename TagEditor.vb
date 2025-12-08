@@ -11,6 +11,7 @@ Public Class TagEditor
     Private _haschanged As Boolean = False
     Private _libraryneedsupdated As Boolean = False
     Private artindex As Integer = 0
+    Dim aggregateconflict As Boolean = False
     Dim multiMessage As String = "< Keep Original >"
     Dim oArtist As String = Nothing
     Dim oTitle As String = Nothing
@@ -289,10 +290,35 @@ Public Class TagEditor
         TxtBoxComments.SelectAll()
     End Sub
     Private Sub BtnArtLeft_Click(sender As Object, e As EventArgs) Handles BtnArtLeft.Click
-
+        artindex -= 1
+        If artindex < 0 Then artindex = 0
+        ShowImages()
     End Sub
     Private Sub BtnArtRight_Click(sender As Object, e As EventArgs) Handles BtnArtRight.Click
+        artindex += 1
+        If artindex > nArt.Count - 1 Then artindex = nArt.Count - 1
+        ShowImages()
+    End Sub
+    Private Sub BtnArtNewFromClipboard_Click(sender As Object, e As EventArgs) Handles BtnArtNewFromClipboard.Click
 
+    End Sub
+    Private Sub BtnArtNewFromFile_Click(sender As Object, e As EventArgs) Handles BtnArtNewFromFile.Click
+
+    End Sub
+    Private Sub BtnArtRemove_Click(sender As Object, e As EventArgs) Handles BtnArtRemove.Click
+        If nArt.Count > 0 Then
+            nArt.RemoveAt(artindex)
+            ShowImages()
+            BtnArtKeepOriginal.Enabled = True
+            HasChanged = SetSave()
+        End If
+    End Sub
+    Private Sub BtnArtKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnArtKeepOriginal.Click
+        nArt = oArt.ToList
+        artindex = 0
+        ShowImages()
+        BtnArtKeepOriginal.Enabled = False
+        HasChanged = SetSave()
     End Sub
 
     ' Methods
@@ -382,7 +408,9 @@ Public Class TagEditor
                             oComments = multiMessage
                         End If
                     End If
-
+                    ' Artwork
+                    oArt.Clear()
+                    aggregateconflict = False
                     If _paths.Count = 1 Then
                         ' Single file → just show all its pictures
                         Dim pics = tlfile.Tag.Pictures
@@ -395,30 +423,17 @@ Public Class TagEditor
                             oArt.Add(pic)
                         Next
 
-                        nArt = oArt
-                        ShowImages()
                     Else
-                        '    ' Multiple files → run aggregation
-                        '    Dim images As List(Of Image) = AggregatePictures(_paths, multiMessage)
-
-                        '    If images.Count = 0 Then
-                        '        ' Mixed or no art → show placeholder
-                        '        If conflict Then
-                        '            PictureBoxArt.Image = My.Resources.MixedIcon
-                        '        Else
-                        '            PictureBoxArt.Image = My.Resources.NoArtIcon
-                        '        End If
-                        '    Else
-                        '        ' Show first image, enable navigation
-                        '        PictureBoxArt.Image = images(0)
-                        '        ShowImages(images)
-                        '    End If
+                        ' Multiple files → run aggregation
+                        Dim pics As List(Of TagLib.IPicture) = AggregatePictures(_paths, multiMessage)
+                        If pics.Count > 0 Then oArt = pics
                     End If
-
+                    nArt = oArt.ToList
+                    tlfile.Dispose()
                 End If
-                tlfile.Dispose()
             Next
             _paths = _paths.Except(removelist).ToList
+
             If _paths.Count = 0 Then
                 Close()
             Else
@@ -430,6 +445,7 @@ Public Class TagEditor
                 TxtBoxTrack.Text = oTrack
                 TxtBoxTracks.Text = oTracks
                 TxtBoxComments.Text = oComments
+                ShowImages()
                 If _paths.Count = 1 Then
                     Text &= " - " & IO.Path.GetFileNameWithoutExtension(_paths(0))
                 Else
@@ -508,6 +524,7 @@ Public Class TagEditor
             End Try
         Next
         _libraryneedsupdated = True
+
         ' Reset state
         HasChanged = False
         LblArtist.Font = New Font(LblArtist.Font, FontStyle.Regular)
@@ -532,29 +549,75 @@ Public Class TagEditor
     Private Function SetSave() As Boolean
         If oArtist = TxtBoxArtist.Text AndAlso oTitle = TxtBoxTitle.Text AndAlso oAlbum = TxtBoxAlbum.Text _
             AndAlso oGenre = TxtBoxGenre.Text AndAlso oYear = TxtBoxYear.Text _
-            AndAlso oTrack = TxtBoxTrack.Text AndAlso oTracks = TxtBoxTracks.Text AndAlso oComments = TxtBoxComments.Text Then
+            AndAlso oTrack = TxtBoxTrack.Text AndAlso oTracks = TxtBoxTracks.Text AndAlso oComments = TxtBoxComments.Text _
+            AndAlso PicturesEqual(nArt, oArt) Then
             Return False
         Else
             Return True
         End If
     End Function
+    Private Function PicturesEqual(listA As List(Of TagLib.IPicture),
+                               listB As List(Of TagLib.IPicture)) As Boolean
+        ' First check count
+        If listA.Count <> listB.Count Then Return False
+
+        ' Compare each picture's raw data
+        For i As Integer = 0 To listA.Count - 1
+            Dim picA = listA(i)
+            Dim picB = listB(i)
+
+            ' Compare type
+            If picA.Type <> picB.Type Then Return False
+
+            ' Compare description (null-safe)
+            Dim descA As String = If(picA.Description, String.Empty)
+            Dim descB As String = If(picB.Description, String.Empty)
+            If Not descA.Equals(descB, StringComparison.Ordinal) Then Return False
+
+            ' Compare lengths first for speed
+            If picA.Data.Count <> picB.Data.Count Then Return False
+
+            ' Compare actual bytes
+            If Not picA.Data.Data.SequenceEqual(picB.Data.Data) Then
+                Return False
+            End If
+        Next
+
+        Return True
+    End Function
     Private Sub ShowImages()
-        Dim Image As Image
-        If artindex >= nArt.Count - 1 Then artindex = 0
+        If nArt.Count = 0 Then
+            If aggregateconflict Then
+                ' Mixed Images
+                PicBoxArt.Image = My.Resources.ImageMixedImages
+            Else
+                ' No Images at all
+                PicBoxArt.Image = My.Resources.ImageNoImages
+            End If
+            TxtBoxArtDescription.Enabled = False
+            CoBoxArtType.Enabled = False
+            BtnArtRemove.Enabled = False
+        Else
+            Dim Image As Image
+            If artindex > nArt.Count - 1 Then artindex = 0
+            'Debug.Print("Showing Art Index: " & artindex.ToString & " of " & nArt.Count.ToString)
 
-        Using ms As New MemoryStream(nArt(artindex).Data.Data)
-            Image = Image.FromStream(ms)
-        End Using
-        PicBoxArt.Image = Image
-        TxtBoxArtDescription.Text = nArt(artindex).Description
-        CoBoxArtType.SelectedItem = nArt(artindex).Type.ToString
+            Using ms As New MemoryStream(nArt(artindex).Data.Data)
+                Image = Image.FromStream(ms)
+            End Using
+            PicBoxArt.Image = Image
+            TxtBoxArtDescription.Text = nArt(artindex).Description
+            CoBoxArtType.SelectedItem = nArt(artindex).Type.ToString
 
-        BtnArtLeft.Enabled = Not artindex = 0
-        BtnArtRight.Enabled = Not artindex >= nArt.Count - 1
+            BtnArtLeft.Enabled = Not artindex = 0
+            BtnArtRight.Enabled = Not artindex >= nArt.Count - 1
+            BtnArtRemove.Enabled = True
+            TxtBoxArtDescription.Enabled = True
+            CoBoxArtType.Enabled = True
+        End If
     End Sub
     Private Function AggregatePictures(paths As IEnumerable(Of String), multiMessage As String) As List(Of TagLib.IPicture)
         Dim basePics As List(Of TagLib.IPicture) = Nothing
-        Dim conflict As Boolean = False
 
         For Each path In paths
             Try
@@ -567,12 +630,12 @@ Public Class TagEditor
                     Else
                         ' Compare count first
                         If pics.Count <> basePics.Count Then
-                            conflict = True
+                            aggregateconflict = True
                         Else
                             ' Compare each picture’s raw data
                             For i As Integer = 0 To pics.Count - 1
                                 If Not pics(i).Data.Data.SequenceEqual(basePics(i).Data.Data) Then
-                                    conflict = True
+                                    aggregateconflict = True
                                     Exit For
                                 End If
                             Next
@@ -586,7 +649,7 @@ Public Class TagEditor
 
         ' Decide what to return
         Dim result As New List(Of Image)
-        If conflict OrElse basePics Is Nothing Then
+        If aggregateconflict OrElse basePics Is Nothing Then
             ' Mixed or no art → return empty list (or placeholder)
             Return New List(Of TagLib.IPicture)
         Else
@@ -677,8 +740,10 @@ Public Class TagEditor
         BtnTracksKeepOriginal.ForeColor = App.CurrentTheme.TextColor
         BtnCommentsKeepOriginal.BackColor = App.CurrentTheme.ButtonBackColor
         BtnCommentsKeepOriginal.ForeColor = App.CurrentTheme.TextColor
-        BtnArtNew.BackColor = App.CurrentTheme.ButtonBackColor
-        BtnArtNew.ForeColor = App.CurrentTheme.TextColor
+        BtnArtNewFromClipboard.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnArtNewFromClipboard.ForeColor = App.CurrentTheme.TextColor
+        BtnArtNewFromFile.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnArtNewFromFile.ForeColor = App.CurrentTheme.TextColor
         BtnArtRemove.BackColor = App.CurrentTheme.ButtonBackColor
         BtnArtRemove.ForeColor = App.CurrentTheme.TextColor
         BtnArtLeft.BackColor = App.CurrentTheme.ButtonBackColor

@@ -62,7 +62,8 @@ Partial Class TagEditor
         BtnArtLeft = New Button()
         BtnArtKeepOriginal = New Button()
         BtnArtRemove = New Button()
-        BtnArtNew = New Button()
+        BtnArtNewFromClipboard = New Button()
+        BtnArtNewFromFile = New Button()
         TipStatus = New Skye.UI.ToolTipEX(components)
         CType(PicBoxArt, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
@@ -521,12 +522,12 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnArtRight, Nothing)
         BtnArtRight.Image = My.Resources.Resources.ImageMoveRight
         TipInfo.SetImage(BtnArtRight, Nothing)
-        BtnArtRight.Location = New Point(630, 433)
+        BtnArtRight.Location = New Point(642, 433)
         BtnArtRight.Name = "BtnArtRight"
         BtnArtRight.Size = New Size(32, 32)
         BtnArtRight.TabIndex = 5123
         BtnArtRight.TabStop = False
-        TipInfo.SetText(BtnArtRight, "Undo")
+        TipInfo.SetText(BtnArtRight, "Next Image")
         TipStatus.SetText(BtnArtRight, Nothing)
         BtnArtRight.UseVisualStyleBackColor = True
         ' 
@@ -537,12 +538,12 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnArtLeft, Nothing)
         BtnArtLeft.Image = My.Resources.Resources.ImageMoveLeft
         TipInfo.SetImage(BtnArtLeft, Nothing)
-        BtnArtLeft.Location = New Point(599, 433)
+        BtnArtLeft.Location = New Point(611, 433)
         BtnArtLeft.Name = "BtnArtLeft"
         BtnArtLeft.Size = New Size(32, 32)
         BtnArtLeft.TabIndex = 5122
         BtnArtLeft.TabStop = False
-        TipInfo.SetText(BtnArtLeft, "Undo")
+        TipInfo.SetText(BtnArtLeft, "Previous Image")
         TipStatus.SetText(BtnArtLeft, Nothing)
         BtnArtLeft.UseVisualStyleBackColor = True
         ' 
@@ -567,30 +568,46 @@ Partial Class TagEditor
         BtnArtRemove.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         BtnArtRemove.Enabled = False
         TipStatus.SetImage(BtnArtRemove, Nothing)
+        BtnArtRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         TipInfo.SetImage(BtnArtRemove, Nothing)
-        BtnArtRemove.Location = New Point(475, 433)
+        BtnArtRemove.Location = New Point(511, 433)
         BtnArtRemove.Name = "BtnArtRemove"
         BtnArtRemove.Size = New Size(32, 32)
         BtnArtRemove.TabIndex = 5126
         BtnArtRemove.TabStop = False
-        TipInfo.SetText(BtnArtRemove, "Undo")
+        TipInfo.SetText(BtnArtRemove, "Remove Image")
         TipStatus.SetText(BtnArtRemove, Nothing)
         BtnArtRemove.UseVisualStyleBackColor = True
         ' 
-        ' BtnArtNew
+        ' BtnArtNewFromClipboard
         ' 
-        BtnArtNew.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        BtnArtNew.Enabled = False
-        TipStatus.SetImage(BtnArtNew, Nothing)
-        TipInfo.SetImage(BtnArtNew, Nothing)
-        BtnArtNew.Location = New Point(444, 433)
-        BtnArtNew.Name = "BtnArtNew"
-        BtnArtNew.Size = New Size(32, 32)
-        BtnArtNew.TabIndex = 5125
-        BtnArtNew.TabStop = False
-        TipInfo.SetText(BtnArtNew, "Undo")
-        TipStatus.SetText(BtnArtNew, Nothing)
-        BtnArtNew.UseVisualStyleBackColor = True
+        BtnArtNewFromClipboard.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        TipStatus.SetImage(BtnArtNewFromClipboard, Nothing)
+        BtnArtNewFromClipboard.Image = My.Resources.Resources.ImageEditPaste16
+        TipInfo.SetImage(BtnArtNewFromClipboard, Nothing)
+        BtnArtNewFromClipboard.Location = New Point(444, 433)
+        BtnArtNewFromClipboard.Name = "BtnArtNewFromClipboard"
+        BtnArtNewFromClipboard.Size = New Size(32, 32)
+        BtnArtNewFromClipboard.TabIndex = 5125
+        BtnArtNewFromClipboard.TabStop = False
+        TipInfo.SetText(BtnArtNewFromClipboard, "Add Image From Clipboard")
+        TipStatus.SetText(BtnArtNewFromClipboard, Nothing)
+        BtnArtNewFromClipboard.UseVisualStyleBackColor = True
+        ' 
+        ' BtnArtNewFromFile
+        ' 
+        BtnArtNewFromFile.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        TipStatus.SetImage(BtnArtNewFromFile, Nothing)
+        BtnArtNewFromFile.Image = My.Resources.Resources.ImageGetPath16
+        TipInfo.SetImage(BtnArtNewFromFile, Nothing)
+        BtnArtNewFromFile.Location = New Point(475, 433)
+        BtnArtNewFromFile.Name = "BtnArtNewFromFile"
+        BtnArtNewFromFile.Size = New Size(32, 32)
+        BtnArtNewFromFile.TabIndex = 5127
+        BtnArtNewFromFile.TabStop = False
+        TipInfo.SetText(BtnArtNewFromFile, "Add Image From File")
+        TipStatus.SetText(BtnArtNewFromFile, Nothing)
+        BtnArtNewFromFile.UseVisualStyleBackColor = True
         ' 
         ' TipStatus
         ' 
@@ -602,8 +619,9 @@ Partial Class TagEditor
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(833, 526)
+        Controls.Add(BtnArtNewFromFile)
         Controls.Add(BtnArtRemove)
-        Controls.Add(BtnArtNew)
+        Controls.Add(BtnArtNewFromClipboard)
         Controls.Add(BtnArtKeepOriginal)
         Controls.Add(BtnArtRight)
         Controls.Add(BtnArtLeft)
@@ -696,5 +714,6 @@ Partial Class TagEditor
     Friend WithEvents BtnArtLeft As Button
     Friend WithEvents BtnArtKeepOriginal As Button
     Friend WithEvents BtnArtRemove As Button
-    Friend WithEvents BtnArtNew As Button
+    Friend WithEvents BtnArtNewFromClipboard As Button
+    Friend WithEvents BtnArtNewFromFile As Button
 End Class
