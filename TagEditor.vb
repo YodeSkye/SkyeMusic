@@ -1,6 +1,5 @@
 ﻿
 Imports System.IO
-Imports Syncfusion
 
 Public Class TagEditor
 
@@ -60,9 +59,7 @@ Public Class TagEditor
         For Each s As String In TagLib.Genres.Video
             If Not CoBoxGenre.Items.Contains(s) Then CoBoxGenre.Items.Add(s)
         Next
-        For Each name As String In [Enum].GetNames(Of TagLib.PictureType)()
-            CoBoxArtType.Items.Add(name)
-        Next
+        CoBoxArtType.DataSource = [Enum].GetValues(GetType(TagLib.PictureType))
         CoBoxArtType.ContextMenuStrip = New ContextMenuStrip() ' Disable right-click context menu
 
     End Sub
@@ -103,7 +100,7 @@ Public Class TagEditor
 
     ' Control Events
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxArtist.KeyDown, TxtBoxAlbum.KeyDown, TxtBoxTitle.KeyDown, TxtBoxYear.KeyDown, TxtBoxTracks.KeyDown, TxtBoxComments.KeyDown, TxtBoxGenre.KeyDown, TxtBoxTrack.KeyDown
-        Dim s = TryCast(sender, TextBox)
+        Dim s = TryCast(sender, System.Windows.Forms.TextBox)
         If s IsNot Nothing Then
             If s.Text = multiMessage Then s.Clear()
         End If
@@ -112,73 +109,71 @@ Public Class TagEditor
         Select Case e.KeyCode
             Case Keys.Enter
                 e.Handled = True
-                Dim tb = TryCast(sender, TextBox)
+                Dim tb = TryCast(sender, System.Windows.Forms.TextBox)
                 If tb IsNot Nothing Then tb.SelectAll()
             Case Keys.Tab
                 e.Handled = True
             Case Else
                 HasChanged = SetSave()
-                Dim tb = TryCast(sender, TextBox)
-                If tb Is TxtBoxArtist Then
-                    If HasChanged Then
-                        LblArtist.Font = New Font(LblArtist.Font, FontStyle.Bold)
-                    Else
-                        LblArtist.Font = New Font(LblArtist.Font, FontStyle.Regular)
-                    End If
-                    btnArtistKeepOriginal.Enabled = HasChanged
-                ElseIf tb Is TxtBoxTitle Then
-                    If HasChanged Then
-                        LblTitle.Font = New Font(LblTitle.Font, FontStyle.Bold)
-                    Else
-                        LblTitle.Font = New Font(LblTitle.Font, FontStyle.Regular)
-                    End If
-                    BtnTitleKeepOriginal.Enabled = HasChanged
-                ElseIf tb Is TxtBoxAlbum Then
-                    If HasChanged Then
-                        LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Bold)
-                    Else
-                        LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Regular)
-                    End If
-                    BtnAlbumKeepOriginal.Enabled = HasChanged
-                ElseIf tb Is TxtBoxGenre Then
-                    If HasChanged Then
-                        LblGenre.Font = New Font(LblGenre.Font, FontStyle.Bold)
-                    Else
-                        LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
-                    End If
-                    BtnGenreKeepOriginal.Enabled = HasChanged
-                ElseIf tb Is TxtBoxYear Then
-                    If HasChanged Then
-                        LblYear.Font = New Font(LblYear.Font, FontStyle.Bold)
-                    Else
-                        LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
-                    End If
-                    BtnYearKeepOriginal.Enabled = HasChanged
-                ElseIf tb Is TxtBoxTrack Then
-                    If HasChanged Then
-                        LblTrack.Font = New Font(LblTrack.Font, FontStyle.Bold)
-                    Else
-                        LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
-                    End If
-                    BtnTrackKeepOriginal.Enabled = HasChanged
-                ElseIf tb Is TxtBoxTracks Then
-                    If HasChanged Then
-                        LblTracks.Font = New Font(LblTracks.Font, FontStyle.Bold)
-                    Else
-                        LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
-                    End If
-                    BtnTracksKeepOriginal.Enabled = HasChanged
-                ElseIf tb Is TxtBoxComments Then
-                    If HasChanged Then
-                        LblComments.Font = New Font(LblComments.Font, FontStyle.Bold)
-                    Else
-                        LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
-                    End If
-                    BtnCommentsKeepOriginal.Enabled = HasChanged
+                If oArtist = TxtBoxArtist.Text Then
+                    LblArtist.Font = New Font(LblArtist.Font, FontStyle.Regular)
+                    btnArtistKeepOriginal.Enabled = False
+                Else
+                    LblArtist.Font = New Font(LblArtist.Font, FontStyle.Bold)
+                    btnArtistKeepOriginal.Enabled = True
+                End If
+                If oTitle = TxtBoxTitle.Text Then
+                    LblTitle.Font = New Font(LblTitle.Font, FontStyle.Regular)
+                    BtnTitleKeepOriginal.Enabled = False
+                Else
+                    LblTitle.Font = New Font(LblTitle.Font, FontStyle.Bold)
+                    BtnTitleKeepOriginal.Enabled = True
+                End If
+                If oAlbum = TxtBoxAlbum.Text Then
+                    LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Regular)
+                    BtnAlbumKeepOriginal.Enabled = False
+                Else
+                    LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Bold)
+                    BtnAlbumKeepOriginal.Enabled = True
+                End If
+                If oGenre = TxtBoxGenre.Text Then
+                    LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
+                    BtnGenreKeepOriginal.Enabled = False
+                Else
+                    LblGenre.Font = New Font(LblGenre.Font, FontStyle.Bold)
+                    BtnGenreKeepOriginal.Enabled = True
+                End If
+                If oYear = TxtBoxYear.Text Then
+                    LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
+                    BtnYearKeepOriginal.Enabled = False
+                Else
+                    LblYear.Font = New Font(LblYear.Font, FontStyle.Bold)
+                    BtnYearKeepOriginal.Enabled = True
+                End If
+                If oTrack = TxtBoxTrack.Text Then
+                    LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
+                    BtnTrackKeepOriginal.Enabled = False
+                Else
+                    LblTrack.Font = New Font(LblTrack.Font, FontStyle.Bold)
+                    BtnTrackKeepOriginal.Enabled = True
+                End If
+                If oTracks = TxtBoxTracks.Text Then
+                    LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
+                    BtnTracksKeepOriginal.Enabled = False
+                Else
+                    LblTracks.Font = New Font(LblTracks.Font, FontStyle.Bold)
+                    BtnTracksKeepOriginal.Enabled = True
+                End If
+                If oComments = TxtBoxComments.Text Then
+                    LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
+                    BtnCommentsKeepOriginal.Enabled = False
+                Else
+                    LblComments.Font = New Font(LblComments.Font, FontStyle.Bold)
+                    BtnCommentsKeepOriginal.Enabled = True
                 End If
         End Select
     End Sub
-    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxAlbum.PreviewKeyDown, TxtBoxTitle.PreviewKeyDown, TxtBoxArtist.PreviewKeyDown, TxtBoxYear.PreviewKeyDown, TxtBoxTracks.PreviewKeyDown, TxtBoxComments.PreviewKeyDown, TxtBoxGenre.PreviewKeyDown, TxtBoxTrack.PreviewKeyDown
+    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxAlbum.PreviewKeyDown, TxtBoxTitle.PreviewKeyDown, TxtBoxArtist.PreviewKeyDown, TxtBoxYear.PreviewKeyDown, TxtBoxTracks.PreviewKeyDown, TxtBoxComments.PreviewKeyDown, TxtBoxGenre.PreviewKeyDown, TxtBoxTrack.PreviewKeyDown, TxtBoxArtDescription.PreviewKeyDown
         CMBasic.ShortcutKeys(TryCast(sender, TextBox), e)
     End Sub
     Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxYear.KeyPress, TxtBoxTracks.KeyPress, TxtBoxTrack.KeyPress
@@ -194,6 +189,20 @@ Public Class TagEditor
             Else
                 s.ForeColor = Color.Red
             End If
+        End If
+    End Sub
+    Private Sub TxtBoxArtDescription_TextChanged(sender As Object, e As EventArgs) Handles TxtBoxArtDescription.TextChanged
+        If artindex >= 0 AndAlso artindex < nArt.Count Then
+            nArt(artindex).Description = TxtBoxArtDescription.Text
+            HasChanged = SetSave()
+            BtnArtKeepOriginal.Enabled = Not PicturesEqual(nArt, oArt)
+        End If
+    End Sub
+    Private Sub CoBoxArtType_SelectedValueChanged(sender As Object, e As EventArgs) Handles CoBoxArtType.SelectedValueChanged
+        If artindex >= 0 AndAlso artindex < nArt.Count Then
+            nArt(artindex).Type = CType(CoBoxArtType.SelectedItem, TagLib.PictureType)
+            HasChanged = SetSave()
+            BtnArtKeepOriginal.Enabled = Not PicturesEqual(nArt, oArt)
         End If
     End Sub
     Private Sub CoBoxGenre_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxGenre.SelectedIndexChanged
@@ -217,7 +226,11 @@ Public Class TagEditor
         e.Handled = True
     End Sub
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
-        If HasChanged Then SaveTags()
+        If HasChanged Then
+            TipInfo.ShowTooltip(BtnSave)
+            TipInfo.HideTooltip()
+            SaveTags()
+        End If
     End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
@@ -300,9 +313,61 @@ Public Class TagEditor
         ShowImages()
     End Sub
     Private Sub BtnArtNewFromClipboard_Click(sender As Object, e As EventArgs) Handles BtnArtNewFromClipboard.Click
+        If My.Computer.Clipboard.ContainsImage Then
+            Dim img As System.Drawing.Image = Clipboard.GetImage()
 
+            ' Convert to byte array
+            Using ms As New MemoryStream()
+                ' Save as JPEG or PNG depending on your preference
+                img.Save(ms, Imaging.ImageFormat.Jpeg)
+                Dim bytes As Byte() = ms.ToArray()
+
+                ' Wrap in TagLib.Picture
+                Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes))
+                pic.Description = Nothing
+                pic.Type = TagLib.PictureType.Other
+
+                ' Add to your list
+                nArt.Insert(artindex, pic)
+            End Using
+            ShowImages()
+        Else
+            TipStatus.ShowTooltipAtCursor("No Image Found on Clipboard", SystemIcons.Error.ToBitmap)
+        End If
     End Sub
     Private Sub BtnArtNewFromFile_Click(sender As Object, e As EventArgs) Handles BtnArtNewFromFile.Click
+        Using ofd As New OpenFileDialog()
+            ofd.Title = "Select an Image File"
+            ofd.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp;*.gif"
+            If ofd.ShowDialog() = DialogResult.OK Then
+                Try
+                    Dim img As System.Drawing.Image = System.Drawing.Image.FromFile(ofd.FileName)
+
+                    ' Convert to byte array
+                    Using ms As New MemoryStream()
+
+                        ' Save as JPEG or PNG depending on your preference
+                        img.Save(ms, Imaging.ImageFormat.Jpeg)
+                        Dim bytes As Byte() = ms.ToArray()
+
+                        ' Wrap in TagLib.Picture
+                        Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes))
+                        pic.Description = Nothing
+                        pic.Type = TagLib.PictureType.Other
+
+                        ' Add to your list
+                        nArt.Insert(artindex, pic)
+                    End Using
+
+                    ShowImages()
+                Catch ex As Exception
+                    TipStatus.ShowTooltipAtCursor("Error loading image: " & ex.Message, SystemIcons.Error.ToBitmap)
+                End Try
+            End If
+
+        End Using
+    End Sub
+    Private Sub BtnArtNewFromOnline_Click(sender As Object, e As EventArgs) Handles BtnArtNewFromOnline.Click
 
     End Sub
     Private Sub BtnArtRemove_Click(sender As Object, e As EventArgs) Handles BtnArtRemove.Click
@@ -314,7 +379,7 @@ Public Class TagEditor
         End If
     End Sub
     Private Sub BtnArtKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnArtKeepOriginal.Click
-        nArt = oArt.ToList
+        nArt = ClonePictures(oArt)
         artindex = 0
         ShowImages()
         BtnArtKeepOriginal.Enabled = False
@@ -428,7 +493,7 @@ Public Class TagEditor
                         Dim pics As List(Of TagLib.IPicture) = AggregatePictures(_paths, multiMessage)
                         If pics.Count > 0 Then oArt = pics
                     End If
-                    nArt = oArt.ToList
+                    nArt = ClonePictures(oArt)
                     tlfile.Dispose()
                 End If
             Next
@@ -517,34 +582,41 @@ Public Class TagEditor
                     If TxtBoxComments.Text <> multiMessage AndAlso oComments <> TxtBoxComments.Text Then
                         tlfile.Tag.Comment = TxtBoxComments.Text
                     End If
+                    If Not PicturesEqual(nArt, oArt) Then tlfile.Tag.Pictures = nArt.ToArray()
                     tlfile.Save()
                 End Using
-            Catch ex As Exception
-                WriteToLog("TagLib Error while Saving Tag, Cannot write to file: " + path + Chr(13) + ex.Message)
+                _libraryneedsupdated = True
+                ' Reset state
+                HasChanged = False
+                LblArtist.Font = New Font(LblArtist.Font, FontStyle.Regular)
+                LblTitle.Font = New Font(LblTitle.Font, FontStyle.Regular)
+                LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Regular)
+                LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
+                LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
+                LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
+                LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
+                LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
+                btnArtistKeepOriginal.Enabled = False
+                BtnTitleKeepOriginal.Enabled = False
+                BtnAlbumKeepOriginal.Enabled = False
+                BtnGenreKeepOriginal.Enabled = False
+                BtnYearKeepOriginal.Enabled = False
+                BtnTrackKeepOriginal.Enabled = False
+                BtnTracksKeepOriginal.Enabled = False
+                BtnCommentsKeepOriginal.Enabled = False
+                btnArtistKeepOriginal.Enabled = False
+                TipStatus.ShowTooltipAtCursor("Tag" & If(_paths.Count > 1, "s", String.Empty) & " Saved Successfully", My.Resources.ImageOK)
+            Catch ioEx As IO.IOException ' File is locked or in use
+                WriteToLog("File In Use, Cannot Save Tag: " & path & vbCrLf & ioEx.Message)
+                TipStatus.ShowTooltipAtCursor("File is currently in use and tag cannot be saved: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
+            Catch unauthEx As UnauthorizedAccessException ' No permission or locked
+                WriteToLog("Access Denied While Saving Tag: " & path & vbCrLf & unauthEx.Message)
+                TipStatus.ShowTooltipAtCursor("Access denied, cannot save tag: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
+            Catch ex As Exception ' Generic fallback
+                WriteToLog("TagLib Error While Saving Tag, Cannot Write To File: " & path & vbCrLf & ex.Message)
+                TipStatus.ShowTooltipAtCursor("Unexpected error saving tag: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
             End Try
         Next
-        _libraryneedsupdated = True
-
-        ' Reset state
-        HasChanged = False
-        LblArtist.Font = New Font(LblArtist.Font, FontStyle.Regular)
-        LblTitle.Font = New Font(LblTitle.Font, FontStyle.Regular)
-        LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Regular)
-        LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
-        LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
-        LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
-        LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
-        LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
-        btnArtistKeepOriginal.Enabled = False
-        BtnTitleKeepOriginal.Enabled = False
-        BtnAlbumKeepOriginal.Enabled = False
-        BtnGenreKeepOriginal.Enabled = False
-        BtnYearKeepOriginal.Enabled = False
-        BtnTrackKeepOriginal.Enabled = False
-        BtnTracksKeepOriginal.Enabled = False
-        BtnCommentsKeepOriginal.Enabled = False
-
-        TipStatus.ShowTooltipAtCursor("Tag" & If(_paths.Count > 1, "s", String.Empty) & " Saved Successfully", My.Resources.ImageOK)
     End Sub
     Private Function SetSave() As Boolean
         If oArtist = TxtBoxArtist.Text AndAlso oTitle = TxtBoxTitle.Text AndAlso oAlbum = TxtBoxAlbum.Text _
@@ -566,13 +638,11 @@ Public Class TagEditor
             Dim picA = listA(i)
             Dim picB = listB(i)
 
-            ' Compare type
+            ' Compare type if relevant
             If picA.Type <> picB.Type Then Return False
 
-            ' Compare description (null-safe)
-            Dim descA As String = If(picA.Description, String.Empty)
-            Dim descB As String = If(picB.Description, String.Empty)
-            If Not descA.Equals(descB, StringComparison.Ordinal) Then Return False
+            ' Compare description directly (Nothing vs "")
+            If picA.Description <> picB.Description Then Return False
 
             ' Compare lengths first for speed
             If picA.Data.Count <> picB.Data.Count Then Return False
@@ -607,7 +677,7 @@ Public Class TagEditor
             End Using
             PicBoxArt.Image = Image
             TxtBoxArtDescription.Text = nArt(artindex).Description
-            CoBoxArtType.SelectedItem = nArt(artindex).Type.ToString
+            CoBoxArtType.SelectedItem = nArt(artindex).Type
 
             BtnArtLeft.Enabled = Not artindex = 0
             BtnArtRight.Enabled = Not artindex >= nArt.Count - 1
@@ -632,8 +702,21 @@ Public Class TagEditor
                         If pics.Count <> basePics.Count Then
                             aggregateconflict = True
                         Else
+                            ' Compare type
+
                             ' Compare each picture’s raw data
                             For i As Integer = 0 To pics.Count - 1
+                                If pics(i).Type <> basePics(i).Type Then
+                                    aggregateconflict = True
+                                    Exit For
+                                End If
+
+                                ' Compare description (Nothing vs "" counts as different)
+                                If pics(i).Description <> basePics(i).Description Then
+                                    aggregateconflict = True
+                                    Exit For
+                                End If
+
                                 If Not pics(i).Data.Data.SequenceEqual(basePics(i).Data.Data) Then
                                     aggregateconflict = True
                                     Exit For
@@ -648,13 +731,22 @@ Public Class TagEditor
         Next
 
         ' Decide what to return
-        Dim result As New List(Of Image)
         If aggregateconflict OrElse basePics Is Nothing Then
             ' Mixed or no art → return empty list (or placeholder)
             Return New List(Of TagLib.IPicture)
         Else
             Return basePics
         End If
+    End Function
+    Private Function ClonePictures(src As List(Of TagLib.IPicture)) As List(Of TagLib.IPicture)
+        Dim result As New List(Of TagLib.IPicture)
+        For Each pic In src
+            Dim clone As New TagLib.Picture(pic.Data)
+            clone.Type = pic.Type
+            clone.Description = pic.Description
+            result.Add(clone)
+        Next
+        Return result
     End Function
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
@@ -683,8 +775,7 @@ Public Class TagEditor
             LblTrack.ForeColor = App.CurrentTheme.AccentTextColor
             LblTracks.ForeColor = App.CurrentTheme.AccentTextColor
             LblComments.ForeColor = App.CurrentTheme.AccentTextColor
-            LblArtDescription.ForeColor = App.CurrentTheme.AccentTextColor
-            LblArtType.ForeColor = App.CurrentTheme.AccentTextColor
+            LblArt.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
             LblArtist.ForeColor = App.CurrentTheme.TextColor
@@ -695,8 +786,7 @@ Public Class TagEditor
             LblTrack.ForeColor = App.CurrentTheme.TextColor
             LblTracks.ForeColor = App.CurrentTheme.TextColor
             LblComments.ForeColor = App.CurrentTheme.TextColor
-            LblArtDescription.ForeColor = App.CurrentTheme.TextColor
-            LblArtType.ForeColor = App.CurrentTheme.TextColor
+            LblArt.ForeColor = App.CurrentTheme.TextColor
         End If
         TxtBoxArtist.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxArtist.ForeColor = App.CurrentTheme.TextColor
@@ -744,6 +834,8 @@ Public Class TagEditor
         BtnArtNewFromClipboard.ForeColor = App.CurrentTheme.TextColor
         BtnArtNewFromFile.BackColor = App.CurrentTheme.ButtonBackColor
         BtnArtNewFromFile.ForeColor = App.CurrentTheme.TextColor
+        BtnArtNewFromOnline.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnArtNewFromOnline.ForeColor = App.CurrentTheme.TextColor
         BtnArtRemove.BackColor = App.CurrentTheme.ButtonBackColor
         BtnArtRemove.ForeColor = App.CurrentTheme.TextColor
         BtnArtLeft.BackColor = App.CurrentTheme.ButtonBackColor

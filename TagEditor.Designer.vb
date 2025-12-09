@@ -54,9 +54,7 @@ Partial Class TagEditor
         TxtBoxTrack = New TextBox()
         LblTrack = New Skye.UI.Label()
         TxtBoxArtDescription = New TextBox()
-        LblArtDescription = New Skye.UI.Label()
         CoBoxArtType = New ComboBox()
-        LblArtType = New Skye.UI.Label()
         PicBoxArt = New PictureBox()
         BtnArtRight = New Button()
         BtnArtLeft = New Button()
@@ -64,6 +62,8 @@ Partial Class TagEditor
         BtnArtRemove = New Button()
         BtnArtNewFromClipboard = New Button()
         BtnArtNewFromFile = New Button()
+        BtnArtNewFromOnline = New Button()
+        LblArt = New Skye.UI.Label()
         TipStatus = New Skye.UI.ToolTipEX(components)
         CType(PicBoxArt, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
@@ -242,7 +242,8 @@ Partial Class TagEditor
         CoBoxGenre.Name = "CoBoxGenre"
         CoBoxGenre.Size = New Size(380, 29)
         CoBoxGenre.Sorted = True
-        CoBoxGenre.TabIndex = 5101
+        CoBoxGenre.TabIndex = 5300
+        CoBoxGenre.TabStop = False
         TipInfo.SetText(CoBoxGenre, Nothing)
         TipStatus.SetText(CoBoxGenre, Nothing)
         ' 
@@ -267,7 +268,7 @@ Partial Class TagEditor
         TxtBoxComments.Name = "TxtBoxComments"
         TxtBoxComments.ShortcutsEnabled = False
         TxtBoxComments.Size = New Size(380, 29)
-        TxtBoxComments.TabIndex = 5108
+        TxtBoxComments.TabIndex = 800
         TipInfo.SetText(TxtBoxComments, Nothing)
         TipStatus.SetText(TxtBoxComments, Nothing)
         ' 
@@ -280,7 +281,7 @@ Partial Class TagEditor
         TxtBoxTracks.Name = "TxtBoxTracks"
         TxtBoxTracks.ShortcutsEnabled = False
         TxtBoxTracks.Size = New Size(150, 29)
-        TxtBoxTracks.TabIndex = 5107
+        TxtBoxTracks.TabIndex = 700
         TipInfo.SetText(TxtBoxTracks, Nothing)
         TipStatus.SetText(TxtBoxTracks, Nothing)
         ' 
@@ -293,7 +294,7 @@ Partial Class TagEditor
         TxtBoxYear.Name = "TxtBoxYear"
         TxtBoxYear.ShortcutsEnabled = False
         TxtBoxYear.Size = New Size(150, 29)
-        TxtBoxYear.TabIndex = 5106
+        TxtBoxYear.TabIndex = 500
         TipInfo.SetText(TxtBoxYear, Nothing)
         TipStatus.SetText(TxtBoxYear, Nothing)
         ' 
@@ -402,7 +403,7 @@ Partial Class TagEditor
         TxtBoxGenre.Name = "TxtBoxGenre"
         TxtBoxGenre.ShortcutsEnabled = False
         TxtBoxGenre.Size = New Size(363, 29)
-        TxtBoxGenre.TabIndex = 5113
+        TxtBoxGenre.TabIndex = 400
         TipInfo.SetText(TxtBoxGenre, Nothing)
         TipStatus.SetText(TxtBoxGenre, Nothing)
         ' 
@@ -430,7 +431,7 @@ Partial Class TagEditor
         TxtBoxTrack.Name = "TxtBoxTrack"
         TxtBoxTrack.ShortcutsEnabled = False
         TxtBoxTrack.Size = New Size(150, 29)
-        TxtBoxTrack.TabIndex = 5115
+        TxtBoxTrack.TabIndex = 600
         TipInfo.SetText(TxtBoxTrack, Nothing)
         TipStatus.SetText(TxtBoxTrack, Nothing)
         ' 
@@ -456,22 +457,10 @@ Partial Class TagEditor
         TxtBoxArtDescription.Name = "TxtBoxArtDescription"
         TxtBoxArtDescription.ShortcutsEnabled = False
         TxtBoxArtDescription.Size = New Size(200, 29)
-        TxtBoxArtDescription.TabIndex = 5118
-        TipInfo.SetText(TxtBoxArtDescription, Nothing)
+        TxtBoxArtDescription.TabIndex = 5500
+        TxtBoxArtDescription.TabStop = False
+        TipInfo.SetText(TxtBoxArtDescription, "Description of Artwork")
         TipStatus.SetText(TxtBoxArtDescription, Nothing)
-        ' 
-        ' LblArtDescription
-        ' 
-        LblArtDescription.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        TipStatus.SetImage(LblArtDescription, Nothing)
-        TipInfo.SetImage(LblArtDescription, Nothing)
-        LblArtDescription.Location = New Point(445, 9)
-        LblArtDescription.Name = "LblArtDescription"
-        LblArtDescription.Size = New Size(100, 23)
-        LblArtDescription.TabIndex = 5117
-        TipInfo.SetText(LblArtDescription, Nothing)
-        LblArtDescription.Text = "Description"
-        TipStatus.SetText(LblArtDescription, Nothing)
         ' 
         ' CoBoxArtType
         ' 
@@ -483,22 +472,10 @@ Partial Class TagEditor
         CoBoxArtType.Name = "CoBoxArtType"
         CoBoxArtType.Size = New Size(170, 29)
         CoBoxArtType.Sorted = True
-        CoBoxArtType.TabIndex = 5119
-        TipInfo.SetText(CoBoxArtType, Nothing)
+        CoBoxArtType.TabIndex = 5555
+        CoBoxArtType.TabStop = False
+        TipInfo.SetText(CoBoxArtType, "Type of Artwork")
         TipStatus.SetText(CoBoxArtType, Nothing)
-        ' 
-        ' LblArtType
-        ' 
-        LblArtType.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        TipStatus.SetImage(LblArtType, Nothing)
-        TipInfo.SetImage(LblArtType, Nothing)
-        LblArtType.Location = New Point(651, 9)
-        LblArtType.Name = "LblArtType"
-        LblArtType.Size = New Size(100, 23)
-        LblArtType.TabIndex = 5120
-        TipInfo.SetText(LblArtType, Nothing)
-        LblArtType.Text = "Genre"
-        TipStatus.SetText(LblArtType, Nothing)
         ' 
         ' PicBoxArt
         ' 
@@ -522,7 +499,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnArtRight, Nothing)
         BtnArtRight.Image = My.Resources.Resources.ImageMoveRight
         TipInfo.SetImage(BtnArtRight, Nothing)
-        BtnArtRight.Location = New Point(642, 433)
+        BtnArtRight.Location = New Point(679, 433)
         BtnArtRight.Name = "BtnArtRight"
         BtnArtRight.Size = New Size(32, 32)
         BtnArtRight.TabIndex = 5123
@@ -538,7 +515,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnArtLeft, Nothing)
         BtnArtLeft.Image = My.Resources.Resources.ImageMoveLeft
         TipInfo.SetImage(BtnArtLeft, Nothing)
-        BtnArtLeft.Location = New Point(611, 433)
+        BtnArtLeft.Location = New Point(648, 433)
         BtnArtLeft.Name = "BtnArtLeft"
         BtnArtLeft.Size = New Size(32, 32)
         BtnArtLeft.TabIndex = 5122
@@ -570,7 +547,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnArtRemove, Nothing)
         BtnArtRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         TipInfo.SetImage(BtnArtRemove, Nothing)
-        BtnArtRemove.Location = New Point(511, 433)
+        BtnArtRemove.Location = New Point(543, 433)
         BtnArtRemove.Name = "BtnArtRemove"
         BtnArtRemove.Size = New Size(32, 32)
         BtnArtRemove.TabIndex = 5126
@@ -609,6 +586,33 @@ Partial Class TagEditor
         TipStatus.SetText(BtnArtNewFromFile, Nothing)
         BtnArtNewFromFile.UseVisualStyleBackColor = True
         ' 
+        ' BtnArtNewFromOnline
+        ' 
+        BtnArtNewFromOnline.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        TipStatus.SetImage(BtnArtNewFromOnline, Nothing)
+        BtnArtNewFromOnline.Image = My.Resources.Resources.ImageOnline16
+        TipInfo.SetImage(BtnArtNewFromOnline, Nothing)
+        BtnArtNewFromOnline.Location = New Point(506, 433)
+        BtnArtNewFromOnline.Name = "BtnArtNewFromOnline"
+        BtnArtNewFromOnline.Size = New Size(32, 32)
+        BtnArtNewFromOnline.TabIndex = 5128
+        BtnArtNewFromOnline.TabStop = False
+        TipInfo.SetText(BtnArtNewFromOnline, "Add Image From File")
+        TipStatus.SetText(BtnArtNewFromOnline, Nothing)
+        BtnArtNewFromOnline.UseVisualStyleBackColor = True
+        ' 
+        ' LblArt
+        ' 
+        TipStatus.SetImage(LblArt, Nothing)
+        TipInfo.SetImage(LblArt, Nothing)
+        LblArt.Location = New Point(446, 9)
+        LblArt.Name = "LblArt"
+        LblArt.Size = New Size(375, 23)
+        LblArt.TabIndex = 5556
+        TipInfo.SetText(LblArt, Nothing)
+        LblArt.Text = "Artwork"
+        TipStatus.SetText(LblArt, Nothing)
+        ' 
         ' TipStatus
         ' 
         TipStatus.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -619,6 +623,7 @@ Partial Class TagEditor
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(833, 526)
+        Controls.Add(BtnArtNewFromOnline)
         Controls.Add(BtnArtNewFromFile)
         Controls.Add(BtnArtRemove)
         Controls.Add(BtnArtNewFromClipboard)
@@ -627,9 +632,7 @@ Partial Class TagEditor
         Controls.Add(BtnArtLeft)
         Controls.Add(PicBoxArt)
         Controls.Add(CoBoxArtType)
-        Controls.Add(LblArtType)
         Controls.Add(TxtBoxArtDescription)
-        Controls.Add(LblArtDescription)
         Controls.Add(BtnTrackKeepOriginal)
         Controls.Add(TxtBoxTrack)
         Controls.Add(TxtBoxGenre)
@@ -657,6 +660,7 @@ Partial Class TagEditor
         Controls.Add(LblTracks)
         Controls.Add(LblComments)
         Controls.Add(LblTrack)
+        Controls.Add(LblArt)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.FixedDialog
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -706,9 +710,7 @@ Partial Class TagEditor
     Friend WithEvents TxtBoxTrack As TextBox
     Friend WithEvents LblTrack As Skye.UI.Label
     Friend WithEvents TxtBoxArtDescription As TextBox
-    Friend WithEvents LblArtDescription As Skye.UI.Label
     Friend WithEvents CoBoxArtType As ComboBox
-    Friend WithEvents LblArtType As Skye.UI.Label
     Friend WithEvents PicBoxArt As PictureBox
     Friend WithEvents BtnArtRight As Button
     Friend WithEvents BtnArtLeft As Button
@@ -716,4 +718,6 @@ Partial Class TagEditor
     Friend WithEvents BtnArtRemove As Button
     Friend WithEvents BtnArtNewFromClipboard As Button
     Friend WithEvents BtnArtNewFromFile As Button
+    Friend WithEvents BtnArtNewFromOnline As Button
+    Friend WithEvents LblArt As Skye.UI.Label
 End Class
