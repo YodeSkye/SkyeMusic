@@ -1,5 +1,4 @@
-﻿
-Imports System.IO
+﻿Imports System.IO
 
 Public Class TagEditor
 
@@ -10,18 +9,19 @@ Public Class TagEditor
     Private _haschanged As Boolean = False
     Private _libraryneedsupdated As Boolean = False
     Private artindex As Integer = 0
-    Dim aggregateconflict As Boolean = False
-    Dim multiMessage As String = "< Keep Original >"
-    Dim oArtist As String = Nothing
-    Dim oTitle As String = Nothing
-    Dim oAlbum As String = Nothing
-    Dim oGenre As String = Nothing
-    Dim oYear As String = Nothing
-    Dim oTrack As String = Nothing
-    Dim oTracks As String = Nothing
-    Dim oComments As String = Nothing
-    Dim oArt As New List(Of TagLib.IPicture)
-    Dim nArt As New List(Of TagLib.IPicture)
+    Private aggregateconflict As Boolean = False
+    Private oText As String
+    Private multiMessage As String = "< Keep Original >"
+    Private oArtist As String
+    Private oTitle As String
+    Private oAlbum As String
+    Private oGenre As String
+    Private oYear As String
+    Private oTrack As String
+    Private oTracks As String
+    Private oComments As String
+    Private oArt As New List(Of TagLib.IPicture)
+    Private nArt As New List(Of TagLib.IPicture)
     Private Property HasChanged As Boolean
         Get
             Return _haschanged
@@ -51,6 +51,7 @@ Public Class TagEditor
         ' Initialize Locals
         _paths = paths
         Text = My.Application.Info.Title & " " & Text
+        oText = Text
         SetAccentColor()
         SetTheme()
         For Each s As String In TagLib.Genres.Audio
@@ -195,14 +196,26 @@ Public Class TagEditor
         If artindex >= 0 AndAlso artindex < nArt.Count Then
             nArt(artindex).Description = TxtBoxArtDescription.Text
             HasChanged = SetSave()
-            BtnArtKeepOriginal.Enabled = Not PicturesEqual(nArt, oArt)
+            If PicturesEqual(nArt, oArt) Then
+                BtnArtKeepOriginal.Enabled = False
+                LblArt.Font = New Font(LblArtist.Font, FontStyle.Regular)
+            Else
+                BtnArtKeepOriginal.Enabled = True
+                LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
+            End If
         End If
     End Sub
     Private Sub CoBoxArtType_SelectedValueChanged(sender As Object, e As EventArgs) Handles CoBoxArtType.SelectedValueChanged
         If artindex >= 0 AndAlso artindex < nArt.Count Then
             nArt(artindex).Type = CType(CoBoxArtType.SelectedItem, TagLib.PictureType)
             HasChanged = SetSave()
-            BtnArtKeepOriginal.Enabled = Not PicturesEqual(nArt, oArt)
+            If PicturesEqual(nArt, oArt) Then
+                BtnArtKeepOriginal.Enabled = False
+                LblArt.Font = New Font(LblArtist.Font, FontStyle.Regular)
+            Else
+                BtnArtKeepOriginal.Enabled = True
+                LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
+            End If
         End If
     End Sub
     Private Sub CoBoxGenre_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxGenre.SelectedIndexChanged
@@ -391,6 +404,14 @@ Public Class TagEditor
         If _paths.Count > 0 Then
             Dim tlfile As TagLib.File = Nothing
             Dim removelist As New List(Of String)
+            oArtist = Nothing
+            oTitle = Nothing
+            oAlbum = Nothing
+            oGenre = Nothing
+            oYear = Nothing
+            oTrack = Nothing
+            oTracks = Nothing
+            oComments = Nothing
 
             For Each path In _paths
                 Try
@@ -512,9 +533,9 @@ Public Class TagEditor
                 TxtBoxComments.Text = oComments
                 ShowImages()
                 If _paths.Count = 1 Then
-                    Text &= " - " & IO.Path.GetFileNameWithoutExtension(_paths(0))
+                    Text = oText & " - " & IO.Path.GetFileNameWithoutExtension(_paths(0))
                 Else
-                    Text &= " < Multiple Songs > (" & _paths.Count.ToString & ")"
+                    Text = oText & " < Multiple Songs > (" & _paths.Count.ToString & ")"
                 End If
             End If
 
@@ -522,6 +543,9 @@ Public Class TagEditor
     End Sub
     Private Sub SaveTags()
         If Not HasChanged Then Exit Sub
+
+        Dim failedPaths As New List(Of String)
+        Dim savedCount As Integer = 0
 
         For Each path In _paths
             Try
@@ -585,38 +609,55 @@ Public Class TagEditor
                     If Not PicturesEqual(nArt, oArt) Then tlfile.Tag.Pictures = nArt.ToArray()
                     tlfile.Save()
                 End Using
-                _libraryneedsupdated = True
-                ' Reset state
-                HasChanged = False
-                LblArtist.Font = New Font(LblArtist.Font, FontStyle.Regular)
-                LblTitle.Font = New Font(LblTitle.Font, FontStyle.Regular)
-                LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Regular)
-                LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
-                LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
-                LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
-                LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
-                LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
-                btnArtistKeepOriginal.Enabled = False
-                BtnTitleKeepOriginal.Enabled = False
-                BtnAlbumKeepOriginal.Enabled = False
-                BtnGenreKeepOriginal.Enabled = False
-                BtnYearKeepOriginal.Enabled = False
-                BtnTrackKeepOriginal.Enabled = False
-                BtnTracksKeepOriginal.Enabled = False
-                BtnCommentsKeepOriginal.Enabled = False
-                btnArtistKeepOriginal.Enabled = False
-                TipStatus.ShowTooltipAtCursor("Tag" & If(_paths.Count > 1, "s", String.Empty) & " Saved Successfully", My.Resources.ImageOK)
+
+                savedCount += 1
             Catch ioEx As IO.IOException ' File is locked or in use
+                failedPaths.Add(path)
                 WriteToLog("File In Use, Cannot Save Tag: " & path & vbCrLf & ioEx.Message)
-                TipStatus.ShowTooltipAtCursor("File is currently in use and tag cannot be saved: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
+                'TipStatus.ShowTooltipAtCursor("File is currently in use and tag cannot be saved: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
             Catch unauthEx As UnauthorizedAccessException ' No permission or locked
+                failedPaths.Add(path)
                 WriteToLog("Access Denied While Saving Tag: " & path & vbCrLf & unauthEx.Message)
-                TipStatus.ShowTooltipAtCursor("Access denied, cannot save tag: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
+                'TipStatus.ShowTooltipAtCursor("Access denied, cannot save tag: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
             Catch ex As Exception ' Generic fallback
+                failedPaths.Add(path)
                 WriteToLog("TagLib Error While Saving Tag, Cannot Write To File: " & path & vbCrLf & ex.Message)
-                TipStatus.ShowTooltipAtCursor("Unexpected error saving tag: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
+                'TipStatus.ShowTooltipAtCursor("Unexpected error saving tag: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
             End Try
         Next
+
+        ' Only update library and reset UI if at least one successful save
+        If failedPaths.Count = 0 Then
+            If Not App.WatcherUpdateLibrary Then _libraryneedsupdated = True
+
+            ' Reset state once after all attempts
+            HasChanged = False
+            LblArtist.Font = New Font(LblArtist.Font, FontStyle.Regular)
+            LblTitle.Font = New Font(LblTitle.Font, FontStyle.Regular)
+            LbLAlbum.Font = New Font(LbLAlbum.Font, FontStyle.Regular)
+            LblGenre.Font = New Font(LblGenre.Font, FontStyle.Regular)
+            LblYear.Font = New Font(LblYear.Font, FontStyle.Regular)
+            LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
+            LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
+            LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
+            btnArtistKeepOriginal.Enabled = False
+            BtnTitleKeepOriginal.Enabled = False
+            BtnAlbumKeepOriginal.Enabled = False
+            BtnGenreKeepOriginal.Enabled = False
+            BtnYearKeepOriginal.Enabled = False
+            BtnTrackKeepOriginal.Enabled = False
+            BtnTracksKeepOriginal.Enabled = False
+            BtnCommentsKeepOriginal.Enabled = False
+            btnArtistKeepOriginal.Enabled = False
+
+            GetTags()
+            TipStatus.ShowTooltipAtCursor("Tag" & If(savedCount > 1, "s", String.Empty) & " Saved Successfully (" & savedCount.ToString() & ")", My.Resources.ImageOK)
+        Else
+            Dim message As String = If(failedPaths.Count = 1,
+                                       "1 file failed to save. Check log.",
+                                       failedPaths.Count.ToString() & " files failed to save. Check log.")
+            TipStatus.ShowTooltipAtCursor(message, SystemIcons.Error.ToBitmap)
+        End If
     End Sub
     Private Function SetSave() As Boolean
         If oArtist = TxtBoxArtist.Text AndAlso oTitle = TxtBoxTitle.Text AndAlso oAlbum = TxtBoxAlbum.Text _
