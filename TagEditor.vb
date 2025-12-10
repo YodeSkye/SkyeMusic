@@ -325,15 +325,15 @@ Public Class TagEditor
         If artindex > nArt.Count - 1 Then artindex = nArt.Count - 1
         ShowImages()
     End Sub
-    Private Sub BtnArtNewFromClipboard_Click(sender As Object, e As EventArgs) Handles BtnArtNewFromClipboard.Click
-        If My.Computer.Clipboard.ContainsImage Then
-            Dim img As System.Drawing.Image = Clipboard.GetImage()
+    Private Sub BtnArtNewFromClipboard_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnArtNewFromClipboard.MouseDown
+        If Computer.Clipboard.ContainsImage Then
+            Dim img = Clipboard.GetImage
 
             ' Convert to byte array
-            Using ms As New MemoryStream()
+            Using ms As New MemoryStream
                 ' Save as JPEG or PNG depending on your preference
                 img.Save(ms, Imaging.ImageFormat.Jpeg)
-                Dim bytes As Byte() = ms.ToArray()
+                Dim bytes = ms.ToArray
 
                 ' Wrap in TagLib.Picture
                 Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes))
@@ -341,27 +341,42 @@ Public Class TagEditor
                 pic.Type = TagLib.PictureType.Other
 
                 ' Add to your list
-                nArt.Insert(artindex, pic)
+                If e.Button = MouseButtons.Right Then
+                    nArt.Add(pic)
+                Else
+                    nArt.Insert(artindex, pic)
+                End If
             End Using
             ShowImages()
+            TipInfo.HideTooltip()
+            TipStatus.ShowTooltipAtCursor("Image Added From Clipboard", SystemIcons.Information.ToBitmap)
+
+            If PicturesEqual(nArt, oArt) Then
+                BtnArtKeepOriginal.Enabled = False
+                LblArt.Font = New Font(LblArtist.Font, FontStyle.Regular)
+            Else
+                BtnArtKeepOriginal.Enabled = True
+                LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
+            End If
         Else
+            TipInfo.HideTooltip()
             TipStatus.ShowTooltipAtCursor("No Image Found on Clipboard", SystemIcons.Error.ToBitmap)
         End If
     End Sub
-    Private Sub BtnArtNewFromFile_Click(sender As Object, e As EventArgs) Handles BtnArtNewFromFile.Click
-        Using ofd As New OpenFileDialog()
+    Private Sub BtnArtNewFromFile_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnArtNewFromFile.MouseDown
+        Using ofd As New OpenFileDialog
             ofd.Title = "Select an Image File"
             ofd.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp;*.gif"
-            If ofd.ShowDialog() = DialogResult.OK Then
+            If ofd.ShowDialog = DialogResult.OK Then
                 Try
-                    Dim img As System.Drawing.Image = System.Drawing.Image.FromFile(ofd.FileName)
+                    Dim img = Image.FromFile(ofd.FileName)
 
                     ' Convert to byte array
-                    Using ms As New MemoryStream()
+                    Using ms As New MemoryStream
 
                         ' Save as JPEG or PNG depending on your preference
                         img.Save(ms, Imaging.ImageFormat.Jpeg)
-                        Dim bytes As Byte() = ms.ToArray()
+                        Dim bytes = ms.ToArray
 
                         ' Wrap in TagLib.Picture
                         Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes))
@@ -369,26 +384,55 @@ Public Class TagEditor
                         pic.Type = TagLib.PictureType.Other
 
                         ' Add to your list
-                        nArt.Insert(artindex, pic)
+                        If e.Button = MouseButtons.Right Then
+                            nArt.Add(pic)
+                        Else
+                            nArt.Insert(artindex, pic)
+                        End If
                     End Using
-
                     ShowImages()
+                    TipInfo.HideTooltip()
+                    TipStatus.ShowTooltipAtCursor("Image File Added", SystemIcons.Information.ToBitmap)
+
+                    If PicturesEqual(nArt, oArt) Then
+                        BtnArtKeepOriginal.Enabled = False
+                        LblArt.Font = New Font(LblArtist.Font, FontStyle.Regular)
+                    Else
+                        BtnArtKeepOriginal.Enabled = True
+                        LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
+                    End If
                 Catch ex As Exception
-                    TipStatus.ShowTooltipAtCursor("Error loading image: " & ex.Message, SystemIcons.Error.ToBitmap)
+                    TipInfo.HideTooltip()
+                    App.WriteToLog("Tag Editor Error Loading Image From File: " & ex.Message)
+                    TipStatus.ShowTooltipAtCursor("Error loading image from file.", SystemIcons.Error.ToBitmap)
                 End Try
             End If
-
         End Using
     End Sub
-    Private Sub BtnArtNewFromOnline_Click(sender As Object, e As EventArgs) Handles BtnArtNewFromOnline.Click
+    Private Sub BtnArtNewFromOnline_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnArtNewFromOnline.MouseDown
 
+        ShowImages()
+
+        If PicturesEqual(nArt, oArt) Then
+            BtnArtKeepOriginal.Enabled = False
+            LblArt.Font = New Font(LblArtist.Font, FontStyle.Regular)
+        Else
+            BtnArtKeepOriginal.Enabled = True
+            LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
+        End If
     End Sub
     Private Sub BtnArtRemove_Click(sender As Object, e As EventArgs) Handles BtnArtRemove.Click
         If nArt.Count > 0 Then
             nArt.RemoveAt(artindex)
             ShowImages()
-            BtnArtKeepOriginal.Enabled = True
             HasChanged = SetSave()
+        End If
+        If PicturesEqual(nArt, oArt) Then
+            BtnArtKeepOriginal.Enabled = False
+            LblArt.Font = New Font(LblArtist.Font, FontStyle.Regular)
+        Else
+            BtnArtKeepOriginal.Enabled = True
+            LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
         End If
     End Sub
     Private Sub BtnArtKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnArtKeepOriginal.Click
@@ -397,6 +441,73 @@ Public Class TagEditor
         ShowImages()
         BtnArtKeepOriginal.Enabled = False
         HasChanged = SetSave()
+    End Sub
+    Private Sub PicBoxArt_DragEnter(sender As Object, e As DragEventArgs) Handles MyBase.DragEnter
+        ' Check if the drag data contains file paths
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            Dim files = CType(e.Data.GetData(DataFormats.FileDrop), String())
+            ' Check if at least one file is an image
+            Dim hasImage = False
+            For Each file In files
+                Dim ext = Path.GetExtension(file).ToLowerInvariant
+                If ext = ".jpg" OrElse ext = ".jpeg" OrElse ext = ".png" OrElse ext = ".bmp" OrElse ext = ".gif" Then
+                    hasImage = True
+                    Exit For
+                End If
+            Next
+            If hasImage Then
+                e.Effect = DragDropEffects.Copy
+            Else
+                e.Effect = DragDropEffects.None
+            End If
+        Else
+            e.Effect = DragDropEffects.None
+        End If
+    End Sub
+    Private Sub PicBoxArt_DragDrop(sender As Object, e As DragEventArgs) Handles MyBase.DragDrop
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            Dim files = CType(e.Data.GetData(DataFormats.FileDrop), String())
+            Dim addedCount = 0
+
+            For Each file In files
+                Dim ext = Path.GetExtension(file).ToLowerInvariant
+                If ext = ".jpg" OrElse ext = ".jpeg" OrElse ext = ".png" OrElse ext = ".bmp" OrElse ext = ".gif" Then
+                    Try
+                        Dim img = Image.FromFile(file)
+
+                        ' Convert to byte array
+                        Using ms As New MemoryStream
+                            img.Save(ms, Imaging.ImageFormat.Jpeg)
+                            Dim bytes = ms.ToArray
+
+                            ' Wrap in TagLib.Picture
+                            Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes))
+                            pic.Description = Nothing
+                            pic.Type = TagLib.PictureType.Other
+
+                            ' Add to list at current index
+                            nArt.Insert(artindex, pic)
+                            addedCount += 1
+                        End Using
+                    Catch ex As Exception
+                        WriteToLog("Tag Editor Error loading image from drag and drop: " & file & vbCrLf & ex.Message)
+                    End Try
+                End If
+            Next
+
+            If addedCount > 0 Then
+                ShowImages()
+                HasChanged = SetSave()
+                If PicturesEqual(nArt, oArt) Then
+                    BtnArtKeepOriginal.Enabled = False
+                    LblArt.Font = New Font(LblArtist.Font, FontStyle.Regular)
+                Else
+                    BtnArtKeepOriginal.Enabled = True
+                    LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
+                End If
+                TipStatus.ShowTooltipAtCursor(If(addedCount = 1, "Image added", addedCount.ToString & " images added"), Resources.ImageOK)
+            End If
+        End If
     End Sub
 
     ' Methods

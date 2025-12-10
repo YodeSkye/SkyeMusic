@@ -567,7 +567,7 @@ Partial Class TagEditor
         BtnArtNewFromClipboard.Size = New Size(32, 32)
         BtnArtNewFromClipboard.TabIndex = 5125
         BtnArtNewFromClipboard.TabStop = False
-        TipInfo.SetText(BtnArtNewFromClipboard, "Add Image From Clipboard")
+        TipInfo.SetText(BtnArtNewFromClipboard, "Add Image From Clipboard" & vbCrLf & "LeftClick = Insert At Current Image" & vbCrLf & "RightClick = Insert Last")
         TipStatus.SetText(BtnArtNewFromClipboard, Nothing)
         BtnArtNewFromClipboard.UseVisualStyleBackColor = True
         ' 
@@ -582,7 +582,7 @@ Partial Class TagEditor
         BtnArtNewFromFile.Size = New Size(32, 32)
         BtnArtNewFromFile.TabIndex = 5127
         BtnArtNewFromFile.TabStop = False
-        TipInfo.SetText(BtnArtNewFromFile, "Add Image From File")
+        TipInfo.SetText(BtnArtNewFromFile, "Add Image From File" & vbCrLf & "LeftClick = Insert At Current Image" & vbCrLf & "RightClick = Insert Last")
         TipStatus.SetText(BtnArtNewFromFile, Nothing)
         BtnArtNewFromFile.UseVisualStyleBackColor = True
         ' 
@@ -597,7 +597,7 @@ Partial Class TagEditor
         BtnArtNewFromOnline.Size = New Size(32, 32)
         BtnArtNewFromOnline.TabIndex = 5128
         BtnArtNewFromOnline.TabStop = False
-        TipInfo.SetText(BtnArtNewFromOnline, "Add Image From File")
+        TipInfo.SetText(BtnArtNewFromOnline, "Add Image From Online" & vbCrLf & "LeftClick = Insert At Current Image" & vbCrLf & "RightClick = Insert Last")
         TipStatus.SetText(BtnArtNewFromOnline, Nothing)
         BtnArtNewFromOnline.UseVisualStyleBackColor = True
         ' 
@@ -620,6 +620,7 @@ Partial Class TagEditor
         ' 
         ' TagEditor
         ' 
+        AllowDrop = True
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(833, 526)
