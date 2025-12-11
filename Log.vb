@@ -39,8 +39,8 @@ Public Class Log
 #End If
     End Sub
     Private Sub Log_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
-        App.FRMLog.Dispose()
-        App.FRMLog = Nothing
+        App.FrmLog.Dispose()
+        App.FrmLog = Nothing
     End Sub
     Private Sub Log_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LBLLogInfo.MouseDown
         Dim cSender As Control

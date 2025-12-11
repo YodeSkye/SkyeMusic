@@ -2,7 +2,6 @@
 Imports System.Data.SQLite
 Imports System.IO
 Imports Microsoft.Win32
-Imports SkyeMusic.My.App
 
 Namespace My
 
@@ -172,10 +171,11 @@ Namespace My
         Friend ExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
         Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
         Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
-        Friend FRMLibrary As Library 'FRMLibrary is the main library window that displays the media library.
-        Friend FRMHistory As History 'FRMHistory is the history window that displays the playback history and statistics.
-        Friend FRMLog As Log 'FRMLog is the log window that displays application logs.
-        Friend FRMDevTools As DevTools 'FRMDevTools is the developer tools window that provides debugging and database access features.
+        Friend FrmLibrary As Library 'FrmLibrary is the main library window that displays the media library.
+        Friend FrmHistory As History 'FrmHistory is the history window that displays the playback history and statistics.
+        Friend FrmTagEditor As TagEditor 'FrmTagEditor is the tag editor window that allows users to edit metadata tags of media files.
+        Friend FrmLog As Log 'FrmLog is the log window that displays the application log.
+        Friend FrmDevTools As DevTools 'FrmDevTools is the developer tools window that provides debugging and database access features.
         Private WithEvents TimerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
         Private WithEvents TimerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
         Private WithEvents TimerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
@@ -1119,11 +1119,11 @@ Namespace My
             VideoExtensionDictionary.Add(".flv", "Flash Video")
 #End Region
 
-            FRMLibrary = New Library With {
+            FrmLibrary = New Library With {
                 .Opacity = 0} 'This is done to initialize the form on startup, but keep it hidden from the user, to prevent null reference errors when the FileSystemWatcher fires and the user hasn't opened the form yet.
-            FRMLibrary.Show()
-            FRMLibrary.Hide()
-            FRMLibrary.Opacity = 1
+            FrmLibrary.Show()
+            FrmLibrary.Hide()
+            FrmLibrary.Opacity = 1
 
             GenerateHotKeyList()
             RegisterHotKeys()
@@ -1138,9 +1138,9 @@ Namespace My
         End Sub
         Friend Sub Finalize()
             UnRegisterHotKeys()
-            If FRMLog IsNot Nothing AndAlso FRMLog.Visible Then FRMLog.Close()
-            If FRMLibrary.Visible Then FRMLibrary.Close()
-            FRMLibrary.Dispose()
+            If FrmLog IsNot Nothing AndAlso FrmLog.Visible Then FrmLog.Close()
+            If FrmLibrary.Visible Then FrmLibrary.Close()
+            FrmLibrary.Dispose()
             SaveHistory()
             SaveOptions()
             SetWatchers(True) 'Dispose watchers
@@ -1684,37 +1684,37 @@ Namespace My
 
         End Sub
         Private Sub WatcherDoWork(paths As List(Of String))
-            If FRMLibrary.InvokeRequired Then
-                FRMLibrary.Invoke(Sub() FRMLibrary.DoWatcherWork(paths))
+            If FrmLibrary.InvokeRequired Then
+                FrmLibrary.Invoke(Sub() FrmLibrary.DoWatcherWork(paths))
             Else
-                FRMLibrary.DoWatcherWork(paths)
+                FrmLibrary.DoWatcherWork(paths)
             End If
         End Sub
         Friend Sub ShowDevTools()
-            If FRMDevTools Is Nothing OrElse FRMDevTools.IsDisposed Then
-                FRMDevTools = New DevTools
-                FRMDevTools.Show()
+            If FrmDevTools Is Nothing OrElse FrmDevTools.IsDisposed Then
+                FrmDevTools = New DevTools
+                FrmDevTools.Show()
             Else
-                If FRMDevTools.WindowState = FormWindowState.Minimized Then
-                    FRMDevTools.WindowState = FormWindowState.Normal
-                ElseIf FRMDevTools.Visible Then
-                    FRMDevTools.BringToFront()
+                If FrmDevTools.WindowState = FormWindowState.Minimized Then
+                    FrmDevTools.WindowState = FormWindowState.Normal
+                ElseIf FrmDevTools.Visible Then
+                    FrmDevTools.BringToFront()
                 Else
-                    FRMDevTools.Show()
+                    FrmDevTools.Show()
                 End If
             End If
         End Sub
         Friend Sub ShowHistory()
-            If FRMHistory Is Nothing OrElse FRMHistory.IsDisposed Then
-                FRMHistory = New History
-                FRMHistory.Show()
+            If FrmHistory Is Nothing OrElse FrmHistory.IsDisposed Then
+                FrmHistory = New History
+                FrmHistory.Show()
             Else
-                If FRMHistory.WindowState = FormWindowState.Minimized Then
-                    FRMHistory.WindowState = FormWindowState.Normal
-                ElseIf FRMHistory.Visible Then
-                    FRMHistory.BringToFront()
+                If FrmHistory.WindowState = FormWindowState.Minimized Then
+                    FrmHistory.WindowState = FormWindowState.Normal
+                ElseIf FrmHistory.Visible Then
+                    FrmHistory.BringToFront()
                 Else
-                    FRMHistory.Show()
+                    FrmHistory.Show()
                 End If
             End If
         End Sub
@@ -1722,46 +1722,46 @@ Namespace My
             Options.ShowDialog()
         End Sub
         Friend Sub ShowLibrary()
-            If FRMLibrary.WindowState = FormWindowState.Minimized Then
-                FRMLibrary.WindowState = FormWindowState.Normal
-            ElseIf FRMLibrary.Visible Then
-                FRMLibrary.BringToFront()
+            If FrmLibrary.WindowState = FormWindowState.Minimized Then
+                FrmLibrary.WindowState = FormWindowState.Normal
+            ElseIf FrmLibrary.Visible Then
+                FrmLibrary.BringToFront()
             Else
-                FRMLibrary.Show()
+                FrmLibrary.Show()
             End If
         End Sub
         Friend Sub ShowHelp()
             Help.ShowDialog()
         End Sub
         Friend Sub ShowLog(Optional refresh As Boolean = False)
-            If refresh AndAlso FRMLog IsNot Nothing Then
-                FRMLog.BringToFront()
-                FRMLog.Focus()
+            If refresh AndAlso FrmLog IsNot Nothing Then
+                FrmLog.BringToFront()
+                FrmLog.Focus()
             Else
-                FRMLog = New Log
-                FRMLog.Show()
+                FrmLog = New Log
+                FrmLog.Show()
             End If
             Dim logtext As String = String.Empty
             Dim lines As Integer = 0
-            FRMLog.RTBLog.Clear()
+            FrmLog.RTBLog.Clear()
             Try
                 logtext = IO.File.ReadAllText(LogPath)
             Catch
             Finally
             End Try
-            FRMLog.RTBLog.AppendText(logtext)
-            FRMLog.LBLLogInfo.Text = LogPath
-            If FRMLog.RTBLog.Lines.Count > 0 AndAlso FRMLog.RTBLog.Lines(0).Length > 0 Then lines = FRMLog.RTBLog.GetLineFromCharIndex(FRMLog.RTBLog.Text.Length)
-            FRMLog.LBLLogInfo.Text += " (" + lines.ToString + IIf(lines = 1, " Line", " Lines").ToString + ")"
+            FrmLog.RTBLog.AppendText(logtext)
+            FrmLog.LBLLogInfo.Text = LogPath
+            If FrmLog.RTBLog.Lines.Count > 0 AndAlso FrmLog.RTBLog.Lines(0).Length > 0 Then lines = FrmLog.RTBLog.GetLineFromCharIndex(FrmLog.RTBLog.Text.Length)
+            FrmLog.LBLLogInfo.Text += " (" + lines.ToString + IIf(lines = 1, " Line", " Lines").ToString + ")"
             If lines > 0 Then
-                FRMLog.BTNDeleteLog.Visible = True
-                FRMLog.BTNRefreshLog.Visible = True
-                FRMLog.RTBLog.ScrollToCaret()
+                FrmLog.BTNDeleteLog.Visible = True
+                FrmLog.BTNRefreshLog.Visible = True
+                FrmLog.RTBLog.ScrollToCaret()
             Else
-                FRMLog.BTNDeleteLog.Visible = False
+                FrmLog.BTNDeleteLog.Visible = False
             End If
             'FRMLog.RTBLog.ReadOnly = True
-            FRMLog.BTNOK.Select()
+            FrmLog.BTNOK.Select()
         End Sub
         Friend Sub DeleteLog()
             If IO.File.Exists(LogPath) Then IO.File.Delete(LogPath)
@@ -2693,7 +2693,7 @@ Namespace My
         ''' <param name="item">Library listview item type</param>
         ''' <returns></returns>
         Friend Function FormatPlaylistTitle(item As ListViewItem) As String
-            Return FormatPlaylistTitleCore(item.SubItems(FRMLibrary.LVLibrary.Columns("FilePath").Index).Text)
+            Return FormatPlaylistTitleCore(item.SubItems(FrmLibrary.LVLibrary.Columns("FilePath").Index).Text)
         End Function
         ''' <summary>
         ''' Called from Player with a raw filename

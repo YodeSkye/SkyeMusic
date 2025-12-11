@@ -629,8 +629,8 @@ Public Class Library
                 paths.Add(fp)
             Next
 
-            Dim FrmTE As New TagEditor(paths)
-            Dim result = FrmTE.ShowDialog(Me)
+            App.FrmTagEditor = New TagEditor(paths)
+            Dim result = App.FrmTagEditor.ShowDialog(Me)
             If result = DialogResult.OK Then
                 RadBtnGroupByNone.Checked = True
                 SearchFolders()

@@ -129,8 +129,8 @@ Public Class History
             App.HistoryViewMaxRecords = CUShort(CurrentViewMaxRecords)
             App.SaveOptions()
         End If
-        App.FRMHistory.Dispose()
-        App.FRMHistory = Nothing
+        App.FrmHistory.Dispose()
+        App.FrmHistory = Nothing
     End Sub
     Private Sub History_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblMostPlayedSong.MouseDown, LblSessionPlayedSongs.MouseDown, LblTotalDuration.MouseDown, LblTotalPlayedSongs.MouseDown, GrpBoxHistory.MouseDown
         Dim cSender As Control

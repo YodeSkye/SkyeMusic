@@ -679,8 +679,6 @@ Partial Class TagEditor
         ResumeLayout(False)
         PerformLayout()
     End Sub
-
-    Friend WithEvents TxtBoxArtist As TextBox
     Friend WithEvents LblArtist As Skye.UI.Label
     Friend WithEvents TxtBoxTitle As TextBox
     Friend WithEvents LblTitle As Skye.UI.Label
@@ -721,4 +719,5 @@ Partial Class TagEditor
     Friend WithEvents BtnArtNewFromFile As Button
     Friend WithEvents BtnArtNewFromOnline As Button
     Friend WithEvents LblArt As Skye.UI.Label
+    Friend WithEvents TxtBoxArtist As TextBox
 End Class

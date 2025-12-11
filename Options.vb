@@ -267,9 +267,9 @@ Public Class Options
         If App.CurrentTheme.IsAccent Then SetAccentColor()
         SetTheme()
         App.InvokeThemeChanged()
-        App.FRMLog?.SetColors()
-        App.FRMHistory?.SetColors()
-        App.FRMLibrary.SetColors()
+        App.FrmLog?.SetColors()
+        App.FrmHistory?.SetColors()
+        App.FrmLibrary.SetColors()
         Player.SetColors()
     End Sub
     Private Sub CoBoxPlaylistTitleFormat_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistTitleFormat.SelectionChangeCommitted

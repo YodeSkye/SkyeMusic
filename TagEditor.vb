@@ -31,6 +31,16 @@ Public Class TagEditor
             BtnSave.Enabled = value
         End Set
     End Property
+    Friend ReadOnly Property ArtistText As String
+        Get
+            Return TxtBoxArtist.Text.Trim()
+        End Get
+    End Property
+    Friend ReadOnly Property AlbumText As String
+        Get
+            Return TxtBoxAlbum.Text.Trim()
+        End Get
+    End Property
 
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -248,7 +258,7 @@ Public Class TagEditor
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
-    Private Sub btnArtistKeepOriginal_Click(sender As Object, e As EventArgs) Handles btnArtistKeepOriginal.Click
+    Private Sub BtnArtistKeepOriginal_Click(sender As Object, e As EventArgs) Handles btnArtistKeepOriginal.Click
         TxtBoxArtist.Text = oArtist
         LblArtist.Font = New Font(LblArtist.Font, FontStyle.Regular)
         btnArtistKeepOriginal.Enabled = False
@@ -336,9 +346,9 @@ Public Class TagEditor
                 Dim bytes = ms.ToArray
 
                 ' Wrap in TagLib.Picture
-                Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes))
-                pic.Description = Nothing
-                pic.Type = TagLib.PictureType.Other
+                Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes)) With {
+                    .Description = Nothing,
+                    .Type = TagLib.PictureType.Other}
 
                 ' Add to your list
                 If e.Button = MouseButtons.Right Then
@@ -379,9 +389,9 @@ Public Class TagEditor
                         Dim bytes = ms.ToArray
 
                         ' Wrap in TagLib.Picture
-                        Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes))
-                        pic.Description = Nothing
-                        pic.Type = TagLib.PictureType.Other
+                        Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes)) With {
+                            .Description = Nothing,
+                            .Type = TagLib.PictureType.Other}
 
                         ' Add to your list
                         If e.Button = MouseButtons.Right Then
@@ -410,15 +420,27 @@ Public Class TagEditor
         End Using
     End Sub
     Private Sub BtnArtNewFromOnline_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnArtNewFromOnline.MouseDown
-
-        ShowImages()
-
-        If PicturesEqual(nArt, oArt) Then
-            BtnArtKeepOriginal.Enabled = False
-            LblArt.Font = New Font(LblArtist.Font, FontStyle.Regular)
-        Else
-            BtnArtKeepOriginal.Enabled = True
-            LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
+        Dim newpic As TagLib.IPicture = Nothing
+        Dim FrmTagEditorOnline As New TagEditorOnline
+        FrmTagEditorOnline.ShowDialog()
+        If FrmTagEditorOnline.DialogResult = DialogResult.OK Then
+            newpic = FrmTagEditorOnline.NewPic
+        End If
+        FrmTagEditorOnline.Dispose()
+        If newpic IsNot Nothing Then
+            If e.Button = MouseButtons.Right Then
+                nArt.Add(newpic)
+            Else
+                nArt.Insert(artindex, newpic)
+            End If
+            ShowImages()
+            If PicturesEqual(nArt, oArt) Then
+                BtnArtKeepOriginal.Enabled = False
+                LblArt.Font = New Font(LblArtist.Font, FontStyle.Regular)
+            Else
+                BtnArtKeepOriginal.Enabled = True
+                LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
+            End If
         End If
     End Sub
     Private Sub BtnArtRemove_Click(sender As Object, e As EventArgs) Handles BtnArtRemove.Click
@@ -481,9 +503,9 @@ Public Class TagEditor
                             Dim bytes = ms.ToArray
 
                             ' Wrap in TagLib.Picture
-                            Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes))
-                            pic.Description = Nothing
-                            pic.Type = TagLib.PictureType.Other
+                            Dim pic As New TagLib.Picture(New TagLib.ByteVector(bytes)) With {
+                                .Description = Nothing,
+                                .Type = TagLib.PictureType.Other}
 
                             ' Add to list at current index
                             nArt.Insert(artindex, pic)
@@ -513,7 +535,7 @@ Public Class TagEditor
     ' Methods
     Private Sub GetTags()
         If _paths.Count > 0 Then
-            Dim tlfile As TagLib.File = Nothing
+            Dim tlfile As TagLib.File
             Dim removelist As New List(Of String)
             oArtist = Nothing
             oTitle = Nothing
@@ -893,9 +915,9 @@ Public Class TagEditor
     Private Function ClonePictures(src As List(Of TagLib.IPicture)) As List(Of TagLib.IPicture)
         Dim result As New List(Of TagLib.IPicture)
         For Each pic In src
-            Dim clone As New TagLib.Picture(pic.Data)
-            clone.Type = pic.Type
-            clone.Description = pic.Description
+            Dim clone As New TagLib.Picture(pic.Data) With {
+                .Type = pic.Type,
+                .Description = pic.Description}
             result.Add(clone)
         Next
         Return result

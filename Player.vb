@@ -3064,7 +3064,7 @@ Public Class Player
         ShowHelp()
     End Sub
     Private Sub MIShowLogClick(sender As Object, e As EventArgs) Handles MIShowLog.Click
-        If App.FRMLog Is Nothing Then
+        If App.FrmLog Is Nothing Then
             ShowLog()
         Else
             ShowLog(True)
@@ -3261,7 +3261,7 @@ Public Class Player
         End If
     End Sub
     Private Sub CMIViewInLibraryClick(sender As Object, e As EventArgs) Handles CMIViewInLibrary.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then App.FRMLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then App.FrmLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
     Private Sub CMIHelperApp1Click(sender As Object, e As EventArgs) Handles CMIHelperApp1.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.HelperApp1(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
