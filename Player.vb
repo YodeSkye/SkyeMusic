@@ -627,20 +627,20 @@ Public Class Player
         Inherits UserControl
         Implements IVisualizer
 
-        'Declarations
+        ' Declarations
         Private ReadOnly updateTimer As Timer
         Private audioData(), lastMagnitudes(), peakValues() As Single
+        Private peakHold() As Integer
         Private hueOffset As Single = 0.0F
-        'Private ReadOnly gain As Single = App.Visualizers.RainbowBarGain 'Gain multiplier for audio data. Adjust as needed. Higher values = taller bars.
 
-        'Constructor
+        ' Constructor
         Public Sub New()
             Me.DoubleBuffered = True
             updateTimer = New Timer With {.Interval = 33} '~30 FPS
             AddHandler updateTimer.Tick, AddressOf OnTick
         End Sub
 
-        'IVisualizer Implementation
+        ' IVisualizer Implementation
         Public Overloads ReadOnly Property Name As String Implements IVisualizer.Name
             Get
                 Return "Rainbow Bar"
@@ -666,7 +666,7 @@ Public Class Player
         Public Shadows Sub Resize(width As Integer, height As Integer) Implements IVisualizer.Resize
         End Sub
 
-        'Handlers
+        ' Handlers
         Private Sub OnTick(sender As Object, e As EventArgs)
             Me.Invalidate()
         End Sub
@@ -678,67 +678,77 @@ Public Class Player
             Dim barCount = App.Visualizers.RainbowBarCount
             Dim barWidth As Single = CSng(Width) / barCount
             Dim maxHeight = Height
-            'Dim peakThreshold As Integer = App.Visualizers.RainbowBarPeakThreshold 'Pixels above bottom 'Threshold to avoid flicker at bottom
 
-            'Initialize smoothing buffer if needed
+            ' Initialize smoothing buffer if needed
             If lastMagnitudes Is Nothing OrElse lastMagnitudes.Length <> barCount Then
                 ReDim lastMagnitudes(barCount - 1)
             End If
             If peakValues Is Nothing OrElse peakValues.Length <> barCount Then
                 ReDim peakValues(barCount - 1)
             End If
+            If peakHold Is Nothing OrElse peakHold.Length <> barCount Then
+                ReDim peakHold(barCount - 1)
+            End If
 
             For i = 0 To barCount - 1
                 Dim valueIdx = i * audioData.Length \ barCount
                 Dim rawMagnitude = audioData(valueIdx)
 
-                'Apply gain and clamp
+                ' Apply gain and clamp
                 Dim boosted = Math.Min(rawMagnitude * App.Visualizers.RainbowBarGain, 1.0F)
 
-                'Smooth with previous frame
+                ' Smooth with previous frame
                 Dim smoothed = (lastMagnitudes(i) * 0.7F) + (boosted * 0.3F)
                 lastMagnitudes(i) = smoothed
 
-                'Scale to height
+                ' Scale to height
                 Dim barHeight = CInt(smoothed * maxHeight)
                 Dim x = CInt(i * barWidth)
                 Dim y = maxHeight - barHeight
                 Dim width = CInt(barWidth) - 2
 
-                'Draw main bar
+                ' Draw main bar
                 Dim hue As Single = (CSng(i) / barCount * 360.0F + hueOffset) Mod 360.0F
                 Dim rainbowColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
                 Using brush As New SolidBrush(rainbowColor)
                     g.FillRectangle(brush, x, y, width, barHeight)
                 End Using
 
-                'Peak bar logic
-                Dim currentPeak As Integer = CInt(smoothed * maxHeight)
+                ' Peak bar logic
+                If App.Visualizers.RainbowBarShowPeaks Then
+                    Dim currentPeak As Integer = CInt(smoothed * maxHeight)
 
-                If currentPeak > peakValues(i) Then
-                    peakValues(i) = currentPeak
-                Else
-                    'Dynamic decay speed based on panel height
-                    peakValues(i) = Math.Max(0, peakValues(i) - App.Visualizers.RainbowBarPeakDecaySpeed)
-                End If
+                    If currentPeak > peakValues(i) Then
+                        peakValues(i) = currentPeak
+                        peakHold(i) = App.Visualizers.RainbowBarPeakHoldFrames
+                    Else
+                        If peakHold(i) > 0 Then
+                            ' Still holding: decrement counter, keep peak stuck
+                            peakHold(i) -= 1
+                        Else
+                            ' No hold left: start decaying
+                            peakValues(i) = Math.Max(0, peakValues(i) - App.Visualizers.RainbowBarPeakDecaySpeed)
+                        End If
+                    End If
 
-                'Only draw peak if above threshold
-                If App.Visualizers.RainbowBarShowPeaks AndAlso peakValues(i) > App.Visualizers.RainbowBarPeakThreshold Then
-                    Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
-                    Dim thickness As Integer = App.Visualizers.RainbowBarPeakThickness 'fixed thickness preset
-                    Dim peakColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
-                    Using peakbrush As New SolidBrush(peakColor)
-                        g.FillRectangle(peakbrush, x, peakY, width, thickness)
-                    End Using
+                    ' Only draw peak if above threshold
+                    If peakValues(i) > App.Visualizers.RainbowBarPeakThreshold Then
+                        Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
+                        Dim thickness As Integer = App.Visualizers.RainbowBarPeakThickness 'fixed thickness preset
+                        Dim peakColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
+                        Using peakbrush As New SolidBrush(peakColor)
+                            g.FillRectangle(peakbrush, x, peakY, width, thickness)
+                        End Using
+                    End If
                 End If
 
             Next
 
-            'Advance hue offset for next frame
+            ' Advance hue offset for next frame
             hueOffset = (hueOffset + App.Visualizers.RainbowBarHueCycleSpeed) Mod 360.0F
         End Sub
 
-        'Procs
+        ' Methods
         Private Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
             Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
             Dim f As Double = hue / 60 - Math.Floor(hue / 60)
