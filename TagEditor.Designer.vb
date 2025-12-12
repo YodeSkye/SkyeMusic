@@ -160,7 +160,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnSave, Nothing)
         BtnSave.Image = My.Resources.Resources.ImageSave32
         TipInfo.SetImage(BtnSave, Nothing)
-        BtnSave.Location = New Point(12, 466)
+        BtnSave.Location = New Point(12, 415)
         BtnSave.Name = "BtnSave"
         BtnSave.Size = New Size(48, 48)
         BtnSave.TabIndex = 5000
@@ -174,7 +174,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnOK, Nothing)
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipInfo.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(202, 450)
+        BtnOK.Location = New Point(190, 399)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 5100
@@ -490,7 +490,7 @@ Partial Class TagEditor
         PicBoxArt.TabIndex = 5121
         PicBoxArt.TabStop = False
         TipStatus.SetText(PicBoxArt, Nothing)
-        TipInfo.SetText(PicBoxArt, Nothing)
+        TipInfo.SetText(PicBoxArt, "Size")
         ' 
         ' BtnArtRight
         ' 
@@ -623,7 +623,7 @@ Partial Class TagEditor
         AllowDrop = True
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(833, 526)
+        ClientSize = New Size(833, 474)
         Controls.Add(BtnArtNewFromOnline)
         Controls.Add(BtnArtNewFromFile)
         Controls.Add(BtnArtRemove)

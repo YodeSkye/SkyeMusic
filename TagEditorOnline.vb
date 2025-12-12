@@ -2,6 +2,7 @@
 Imports System.ComponentModel
 Imports System.Drawing.Imaging
 Imports System.IO
+Imports System.Net.NetworkInformation
 Imports System.Threading
 Imports MetaBrainz.MusicBrainz.Interfaces
 Imports MetaBrainz.MusicBrainz.Interfaces.Entities
@@ -19,7 +20,6 @@ Public Class TagEditorOnline
     Private MBImageBack As MetaBrainz.MusicBrainz.CoverArt.CoverArtImage = Nothing
     Private query As String = String.Empty
     Private selectedpic As TagLib.IPicture = Nothing
-    <DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)>
     Friend ReadOnly Property NewPic As TagLib.IPicture
         Get
             Return selectedpic
@@ -29,21 +29,31 @@ Public Class TagEditorOnline
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
-            If m.Msg = Skye.WinAPI.WM_SYSCOMMAND AndAlso m.WParam.ToInt32 = Skye.WinAPI.SC_CLOSE Then
-                DialogResult = DialogResult.Cancel
-            End If
+            Select Case m.Msg
+                Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                    SetAccentColor()
+                Case Skye.WinAPI.WM_SYSCOMMAND
+                    If m.WParam.ToInt32 = Skye.WinAPI.SC_CLOSE Then
+                        DialogResult = DialogResult.Cancel
+                    End If
+            End Select
         Catch ex As Exception
             My.App.WriteToLog("SelectOnlineImage WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
     End Sub
+    Private Sub Frm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Text = My.Application.Info.Title & " " & Text
+        SetAccentColor()
+        SetTheme()
+    End Sub
     Private Sub Frm_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         query = BuildQuery(App.FrmTagEditor.ArtistText, App.FrmTagEditor.AlbumText)
         TxtBoxSearchPhrase.Text = query
         Search()
     End Sub
-    Private Sub SelectOnlineImage_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+    Private Sub Frm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         MBImageFront?.Dispose()
         MBImageBack?.Dispose()
         MBArt?.Dispose()
@@ -203,7 +213,7 @@ Public Class TagEditorOnline
             'Update status label
             LblSearchPhrase.Text = "Search Phrase:"
             LblSearchPhrase.Font = New Font(LblSearchPhrase.Font, FontStyle.Regular)
-            LblSearchPhrase.ForeColor = Color.Black
+            SetTheme()
 
         Catch ex As Exception
             Debug.WriteLine("Search Error: " & ex.Message)
@@ -236,6 +246,40 @@ Public Class TagEditorOnline
         If location.Y + Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Height + App.AdjustScreenBoundsDialogWindow
         If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
         If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
+    End Sub
+    Private Sub SetAccentColor()
+        Static c As Color
+        SuspendLayout()
+        If App.CurrentTheme.IsAccent Then
+            c = App.GetAccentColor()
+            BackColor = c
+        End If
+        ResumeLayout()
+        'Debug.Print("Tag Editor Accent Color Set")
+    End Sub
+    Private Sub SetTheme()
+        SuspendLayout()
+        If App.CurrentTheme.IsAccent Then
+            LblSearchPhrase.ForeColor = App.CurrentTheme.AccentTextColor
+            LblDimFront.ForeColor = App.CurrentTheme.AccentTextColor
+            LblDimBack.ForeColor = App.CurrentTheme.AccentTextColor
+        Else
+            BackColor = App.CurrentTheme.BackColor
+            LblSearchPhrase.ForeColor = App.CurrentTheme.TextColor
+            LblDimFront.ForeColor = App.CurrentTheme.TextColor
+            LblDimBack.ForeColor = App.CurrentTheme.TextColor
+        End If
+        TxtBoxSearchPhrase.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxSearchPhrase.ForeColor = App.CurrentTheme.TextColor
+        LVIDs.BackColor = App.CurrentTheme.ControlBackColor
+        LVIDs.ForeColor = App.CurrentTheme.TextColor
+        BtnOK.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnOK.ForeColor = App.CurrentTheme.TextColor
+        tipInfo.BackColor = App.CurrentTheme.BackColor
+        tipInfo.ForeColor = App.CurrentTheme.TextColor
+        tipInfo.BorderColor = App.CurrentTheme.ButtonBackColor
+        ResumeLayout()
+        'Debug.Print("Tag Editor Theme Set")
     End Sub
 
 End Class

@@ -48,11 +48,11 @@ Partial Class TagEditorOnline
         LVIDs.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold)
         LVIDs.HeaderStyle = ColumnHeaderStyle.None
         tipInfo.SetImage(LVIDs, Nothing)
-        LVIDs.Location = New Point(12, 49)
+        LVIDs.Location = New Point(12, 57)
         LVIDs.Name = "LVIDs"
         LVIDs.Size = New Size(388, 208)
         LVIDs.TabIndex = 0
-        tipInfo.SetText(LVIDs, Nothing)
+        tipInfo.SetText(LVIDs, "Select a MusicBrainz ID")
         LVIDs.UseCompatibleStateImageBehavior = False
         LVIDs.View = View.Details
         ' 
@@ -66,7 +66,7 @@ Partial Class TagEditorOnline
         PicBoxArt.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         PicBoxArt.BorderStyle = BorderStyle.Fixed3D
         tipInfo.SetImage(PicBoxArt, Nothing)
-        PicBoxArt.Location = New Point(12, 345)
+        PicBoxArt.Location = New Point(12, 271)
         PicBoxArt.Name = "PicBoxArt"
         PicBoxArt.Size = New Size(600, 600)
         PicBoxArt.SizeMode = PictureBoxSizeMode.Zoom
@@ -79,18 +79,18 @@ Partial Class TagEditorOnline
         BtnOK.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         BtnOK.Image = My.Resources.Resources.ImageOK
         tipInfo.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(548, 194)
+        BtnOK.Location = New Point(548, 201)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 30
-        tipInfo.SetText(BtnOK, "Insert Image as Art")
+        tipInfo.SetText(BtnOK, "Insert Image as Artwork")
         BtnOK.UseVisualStyleBackColor = True
         ' 
         ' PicBoxBackThumb
         ' 
         PicBoxBackThumb.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         tipInfo.SetImage(PicBoxBackThumb, Nothing)
-        PicBoxBackThumb.Location = New Point(512, 12)
+        PicBoxBackThumb.Location = New Point(512, 57)
         PicBoxBackThumb.Name = "PicBoxBackThumb"
         PicBoxBackThumb.Size = New Size(100, 113)
         PicBoxBackThumb.SizeMode = PictureBoxSizeMode.Zoom
@@ -102,7 +102,7 @@ Partial Class TagEditorOnline
         ' 
         PicBoxFrontThumb.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         tipInfo.SetImage(PicBoxFrontThumb, Nothing)
-        PicBoxFrontThumb.Location = New Point(406, 14)
+        PicBoxFrontThumb.Location = New Point(406, 57)
         PicBoxFrontThumb.Name = "PicBoxFrontThumb"
         PicBoxFrontThumb.Size = New Size(100, 113)
         PicBoxFrontThumb.SizeMode = PictureBoxSizeMode.Zoom
@@ -116,7 +116,7 @@ Partial Class TagEditorOnline
         LblStatus.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblStatus.ForeColor = Color.Red
         tipInfo.SetImage(LblStatus, Nothing)
-        LblStatus.Location = New Point(406, 140)
+        LblStatus.Location = New Point(406, 38)
         LblStatus.Name = "LblStatus"
         LblStatus.Size = New Size(206, 19)
         LblStatus.TabIndex = 8
@@ -130,9 +130,9 @@ Partial Class TagEditorOnline
         TxtBoxSearchPhrase.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         TxtBoxSearchPhrase.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold)
         tipInfo.SetImage(TxtBoxSearchPhrase, Nothing)
-        TxtBoxSearchPhrase.Location = New Point(107, 14)
+        TxtBoxSearchPhrase.Location = New Point(12, 26)
         TxtBoxSearchPhrase.Name = "TxtBoxSearchPhrase"
-        TxtBoxSearchPhrase.Size = New Size(293, 25)
+        TxtBoxSearchPhrase.Size = New Size(388, 25)
         TxtBoxSearchPhrase.TabIndex = 100
         tipInfo.SetText(TxtBoxSearchPhrase, Nothing)
         ' 
@@ -141,7 +141,7 @@ Partial Class TagEditorOnline
         LblDimFront.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         LblDimFront.Font = New Font("Segoe UI", 9.75F)
         tipInfo.SetImage(LblDimFront, Nothing)
-        LblDimFront.Location = New Point(406, 126)
+        LblDimFront.Location = New Point(406, 168)
         LblDimFront.Name = "LblDimFront"
         LblDimFront.Size = New Size(100, 23)
         LblDimFront.TabIndex = 101
@@ -154,7 +154,7 @@ Partial Class TagEditorOnline
         LblDimBack.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         LblDimBack.Font = New Font("Segoe UI", 9.75F)
         tipInfo.SetImage(LblDimBack, Nothing)
-        LblDimBack.Location = New Point(512, 125)
+        LblDimBack.Location = New Point(512, 168)
         LblDimBack.Name = "LblDimBack"
         LblDimBack.Size = New Size(100, 23)
         LblDimBack.TabIndex = 102
@@ -166,9 +166,9 @@ Partial Class TagEditorOnline
         ' 
         LblSearchPhrase.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         tipInfo.SetImage(LblSearchPhrase, Nothing)
-        LblSearchPhrase.Location = New Point(14, 15)
+        LblSearchPhrase.Location = New Point(12, 5)
         LblSearchPhrase.Name = "LblSearchPhrase"
-        LblSearchPhrase.Size = New Size(94, 26)
+        LblSearchPhrase.Size = New Size(390, 26)
         LblSearchPhrase.TabIndex = 103
         LblSearchPhrase.Text = "Search Phrase:"
         tipInfo.SetText(LblSearchPhrase, Nothing)
@@ -188,8 +188,7 @@ Partial Class TagEditorOnline
         ' 
         AutoScaleDimensions = New SizeF(7F, 17F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(624, 957)
-        Controls.Add(LblStatus)
+        ClientSize = New Size(624, 881)
         Controls.Add(TxtBoxSearchPhrase)
         Controls.Add(PicBoxFrontThumb)
         Controls.Add(PicBoxBackThumb)
@@ -199,14 +198,16 @@ Partial Class TagEditorOnline
         Controls.Add(LblDimFront)
         Controls.Add(LblDimBack)
         Controls.Add(LblSearchPhrase)
+        Controls.Add(LblStatus)
         Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        FormBorderStyle = FormBorderStyle.Fixed3D
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         tipInfo.SetImage(Me, Nothing)
         MinimumSize = New Size(500, 561)
         Name = "TagEditorOnline"
-        StartPosition = FormStartPosition.CenterScreen
+        StartPosition = FormStartPosition.CenterParent
         tipInfo.SetText(Me, Nothing)
-        Text = "Select Image from MusicBrainz"
+        Text = "MusicBrainz Cover Art"
         CType(PicBoxArt, ComponentModel.ISupportInitialize).EndInit()
         CType(PicBoxBackThumb, ComponentModel.ISupportInitialize).EndInit()
         CType(PicBoxFrontThumb, ComponentModel.ISupportInitialize).EndInit()

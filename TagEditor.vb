@@ -834,9 +834,11 @@ Public Class TagEditor
             If aggregateconflict Then
                 ' Mixed Images
                 PicBoxArt.Image = My.Resources.ImageMixedImages
+                TipInfo.SetText(PicBoxArt, "Mixed Artwork")
             Else
                 ' No Images at all
                 PicBoxArt.Image = My.Resources.ImageNoImages
+                TipInfo.SetText(PicBoxArt, "No Artwork")
             End If
             TxtBoxArtDescription.Enabled = False
             CoBoxArtType.Enabled = False
@@ -852,6 +854,7 @@ Public Class TagEditor
             PicBoxArt.Image = Image
             TxtBoxArtDescription.Text = nArt(artindex).Description
             CoBoxArtType.SelectedItem = nArt(artindex).Type
+            TipInfo.SetText(PicBoxArt, Skye.Common.FormatFileSize(nArt(artindex).Data.Count, Skye.Common.FormatFileSizeUnits.KiloBytes).ToString)
 
             BtnArtLeft.Enabled = Not artindex = 0
             BtnArtRight.Enabled = Not artindex >= nArt.Count - 1
