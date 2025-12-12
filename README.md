@@ -179,6 +179,26 @@ PictureBox1.Image = bmp
 
 ---
 
+### 9. MetaBrainz.MusicBrainz
+
+A .NET client for the MusicBrainz API, used for fetching additional metadata about music tracks and artists.
+
+```powershell
+Install-Package MetaBrainz.MusicBrainz
+```
+
+---
+
+### 10. MetaBrainz.MusicBrainz.CoverArt
+
+A .NET client for fetching cover art from the MusicBrainz Cover Art Archive.
+
+```powershell
+Install-Package MetaBrainz.MusicBrainz.CoverArt
+```
+
+---
+
 ## 🧩 Required Licensing
 
 ### 🔑 Syncfusion License Key Setup
