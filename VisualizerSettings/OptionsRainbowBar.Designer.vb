@@ -41,6 +41,8 @@ Partial Class OptionsRainbowBar
         BtnEnergetic = New Button()
         BtnExtreme = New Button()
         TipRainbowBar = New Skye.UI.ToolTip(components)
+        LblPeakHoldFrames = New Skye.UI.Label()
+        TBPeakHoldFrames = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 60)
         SuspendLayout()
         ' 
         ' TBGain
@@ -112,7 +114,7 @@ Partial Class OptionsRainbowBar
         ' 
         TBPeakDecaySpeed.BackColor = Color.Transparent
         TBPeakDecaySpeed.BeforeTouchSize = New Size(20, 290)
-        TBPeakDecaySpeed.Location = New Point(250, 26)
+        TBPeakDecaySpeed.Location = New Point(228, 26)
         TBPeakDecaySpeed.Name = "TBPeakDecaySpeed"
         TBPeakDecaySpeed.Orientation = Orientation.Vertical
         TBPeakDecaySpeed.ShowFocusRect = False
@@ -128,7 +130,7 @@ Partial Class OptionsRainbowBar
         ' 
         TBPeakThickness.BackColor = Color.Transparent
         TBPeakThickness.BeforeTouchSize = New Size(20, 290)
-        TBPeakThickness.Location = New Point(398, 29)
+        TBPeakThickness.Location = New Point(350, 29)
         TBPeakThickness.Name = "TBPeakThickness"
         TBPeakThickness.Orientation = Orientation.Vertical
         TBPeakThickness.ShowFocusRect = False
@@ -142,7 +144,7 @@ Partial Class OptionsRainbowBar
         ' 
         ' LblPeakDecaySpeed
         ' 
-        LblPeakDecaySpeed.Location = New Point(191, 5)
+        LblPeakDecaySpeed.Location = New Point(169, 5)
         LblPeakDecaySpeed.Name = "LblPeakDecaySpeed"
         LblPeakDecaySpeed.Size = New Size(139, 23)
         LblPeakDecaySpeed.TabIndex = 7
@@ -152,7 +154,7 @@ Partial Class OptionsRainbowBar
         ' 
         ' LblPeakThickness
         ' 
-        LblPeakThickness.Location = New Point(349, 5)
+        LblPeakThickness.Location = New Point(301, 5)
         LblPeakThickness.Name = "LblPeakThickness"
         LblPeakThickness.Size = New Size(119, 23)
         LblPeakThickness.TabIndex = 8
@@ -164,7 +166,7 @@ Partial Class OptionsRainbowBar
         ' 
         TBPeakThreshold.BackColor = Color.Transparent
         TBPeakThreshold.BeforeTouchSize = New Size(20, 290)
-        TBPeakThreshold.Location = New Point(541, 26)
+        TBPeakThreshold.Location = New Point(463, 26)
         TBPeakThreshold.Name = "TBPeakThreshold"
         TBPeakThreshold.Orientation = Orientation.Vertical
         TBPeakThreshold.ShowFocusRect = False
@@ -179,7 +181,7 @@ Partial Class OptionsRainbowBar
         ' 
         ' LblPeakThreshold
         ' 
-        LblPeakThreshold.Location = New Point(492, 5)
+        LblPeakThreshold.Location = New Point(414, 5)
         LblPeakThreshold.Name = "LblPeakThreshold"
         LblPeakThreshold.Size = New Size(119, 23)
         LblPeakThreshold.TabIndex = 10
@@ -189,7 +191,7 @@ Partial Class OptionsRainbowBar
         ' 
         ' LblHueCycleSpeed
         ' 
-        LblHueCycleSpeed.Location = New Point(644, 5)
+        LblHueCycleSpeed.Location = New Point(664, 5)
         LblHueCycleSpeed.Name = "LblHueCycleSpeed"
         LblHueCycleSpeed.Size = New Size(131, 23)
         LblHueCycleSpeed.TabIndex = 12
@@ -201,7 +203,7 @@ Partial Class OptionsRainbowBar
         ' 
         TBHueCycleSpeed.BackColor = Color.Transparent
         TBHueCycleSpeed.BeforeTouchSize = New Size(20, 290)
-        TBHueCycleSpeed.Location = New Point(699, 29)
+        TBHueCycleSpeed.Location = New Point(719, 29)
         TBHueCycleSpeed.Name = "TBHueCycleSpeed"
         TBHueCycleSpeed.Orientation = Orientation.Vertical
         TBHueCycleSpeed.ShowFocusRect = False
@@ -259,10 +261,38 @@ Partial Class OptionsRainbowBar
         TipRainbowBar.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipRainbowBar.OwnerDraw = True
         ' 
+        ' LblPeakHoldFrames
+        ' 
+        LblPeakHoldFrames.Location = New Point(530, 5)
+        LblPeakHoldFrames.Name = "LblPeakHoldFrames"
+        LblPeakHoldFrames.Size = New Size(137, 23)
+        LblPeakHoldFrames.TabIndex = 18
+        LblPeakHoldFrames.Text = "Peak Hold Frames"
+        LblPeakHoldFrames.TextAlign = ContentAlignment.MiddleCenter
+        TipRainbowBar.SetToolTipImage(LblPeakHoldFrames, Nothing)
+        ' 
+        ' TBPeakHoldFrames
+        ' 
+        TBPeakHoldFrames.BackColor = Color.Transparent
+        TBPeakHoldFrames.BeforeTouchSize = New Size(20, 290)
+        TBPeakHoldFrames.Location = New Point(588, 26)
+        TBPeakHoldFrames.Name = "TBPeakHoldFrames"
+        TBPeakHoldFrames.Orientation = Orientation.Vertical
+        TBPeakHoldFrames.ShowFocusRect = False
+        TBPeakHoldFrames.Size = New Size(20, 290)
+        TBPeakHoldFrames.TabIndex = 17
+        TBPeakHoldFrames.Text = "TrackBarEx2"
+        TBPeakHoldFrames.TimerInterval = 100
+        TipRainbowBar.SetToolTip(TBPeakHoldFrames, "How long peaks " & ChrW(8220) & "stick" & ChrW(8221) & " before decaying." & vbCrLf & "At 30 FPS, 30 = ~1 second.")
+        TipRainbowBar.SetToolTipImage(TBPeakHoldFrames, Nothing)
+        TBPeakHoldFrames.Value = 5
+        ' 
         ' OptionsRainbowBar
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(LblPeakHoldFrames)
+        Controls.Add(TBPeakHoldFrames)
         Controls.Add(BtnExtreme)
         Controls.Add(BtnEnergetic)
         Controls.Add(LblPresets)
@@ -307,5 +337,7 @@ Partial Class OptionsRainbowBar
     Friend WithEvents BtnEnergetic As Button
     Friend WithEvents BtnExtreme As Button
     Friend WithEvents TipRainbowBar As Skye.UI.ToolTip
+    Friend WithEvents LblPeakHoldFrames As Skye.UI.Label
+    Friend WithEvents TBPeakHoldFrames As Syncfusion.Windows.Forms.Tools.TrackBarEx
 
 End Class

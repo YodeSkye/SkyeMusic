@@ -101,6 +101,7 @@ Partial Class OptionsClassicSpectrumAnalyzer
         TBGain.TabIndex = 1
         TBGain.TabStop = False
         TBGain.TimerInterval = 100
+        TipClassicSpectrumAnalyzer.SetToolTip(TBGain, "Gain multiplier for audio data.")
         TipClassicSpectrumAnalyzer.SetToolTipImage(TBGain, Nothing)
         TBGain.Value = 10
         ' 
@@ -125,6 +126,7 @@ Partial Class OptionsClassicSpectrumAnalyzer
         ChkBoxShowPeaks.TabIndex = 35
         ChkBoxShowPeaks.Text = " Show Peaks"
         ChkBoxShowPeaks.TextAlign = ContentAlignment.MiddleCenter
+        TipClassicSpectrumAnalyzer.SetToolTip(ChkBoxShowPeaks, "Show Peak Values on Graph.")
         TipClassicSpectrumAnalyzer.SetToolTipImage(ChkBoxShowPeaks, Nothing)
         ChkBoxShowPeaks.UseVisualStyleBackColor = False
         ' 
@@ -182,6 +184,7 @@ Partial Class OptionsClassicSpectrumAnalyzer
         TBSmoothing.TabIndex = 2
         TBSmoothing.TabStop = False
         TBSmoothing.TimerInterval = 100
+        TipClassicSpectrumAnalyzer.SetToolTip(TBSmoothing, "Weight for previous frame vs new frame." & vbCrLf & "0 = instant response, 0.95 = very sluggish.")
         TipClassicSpectrumAnalyzer.SetToolTipImage(TBSmoothing, Nothing)
         TBSmoothing.Value = 10
         ' 
@@ -209,6 +212,7 @@ Partial Class OptionsClassicSpectrumAnalyzer
         TBPeakDecay.TabIndex = 3
         TBPeakDecay.TabStop = False
         TBPeakDecay.TimerInterval = 100
+        TipClassicSpectrumAnalyzer.SetToolTip(TBPeakDecay, "Pixels per frame.")
         TipClassicSpectrumAnalyzer.SetToolTipImage(TBPeakDecay, Nothing)
         TBPeakDecay.Value = 10
         ' 
@@ -236,6 +240,7 @@ Partial Class OptionsClassicSpectrumAnalyzer
         TBPeakHoldFrames.TabIndex = 4
         TBPeakHoldFrames.TabStop = False
         TBPeakHoldFrames.TimerInterval = 100
+        TipClassicSpectrumAnalyzer.SetToolTip(TBPeakHoldFrames, "How long peaks " & ChrW(8220) & "stick" & ChrW(8221) & " before decaying." & vbCrLf & "At 30 FPS, 30 = ~1 second.")
         TipClassicSpectrumAnalyzer.SetToolTipImage(TBPeakHoldFrames, Nothing)
         TBPeakHoldFrames.Value = 10
         ' 
@@ -267,6 +272,7 @@ Partial Class OptionsClassicSpectrumAnalyzer
         CoBoxBandMappingMode.Name = "CoBoxBandMappingMode"
         CoBoxBandMappingMode.Size = New Size(249, 29)
         CoBoxBandMappingMode.TabIndex = 46
+        TipClassicSpectrumAnalyzer.SetToolTip(CoBoxBandMappingMode, "Method used for mapping audio data to bars.")
         TipClassicSpectrumAnalyzer.SetToolTipImage(CoBoxBandMappingMode, Nothing)
         ' 
         ' TipClassicSpectrumAnalyzer

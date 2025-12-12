@@ -433,8 +433,8 @@ Namespace My
             Public Property RainbowBarPeakDecaySpeed As Integer = 7 '1-20 'Peak falloff per frame
             Public Property RainbowBarPeakThickness As Integer = 6 '1-20 'Width of peak indicators
             Public Property RainbowBarPeakThreshold As Integer = 50 '0-200 'Pixels above bottom 'Threshold to avoid flicker at bottom
-            Public Property RainbowBarHueCycleSpeed As Single = 2.0F '0.1F-20F 'How fast rainbow shifts
             Public Property RainbowBarPeakHoldFrames As Integer = 10 '0-60 How long peaks “stick” before decaying. At 30 FPS, 30 = ~1 second.
+            Public Property RainbowBarHueCycleSpeed As Single = 2.0F '0.1F-20F 'How fast rainbow shifts
 
             ' Classic Spectrum Analyzer
             Public Enum ClassicSpectrumAnalyzerBandMappingModes

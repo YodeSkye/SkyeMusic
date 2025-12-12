@@ -50,7 +50,11 @@ Public Class OptionsRainbowBar
     End Sub
     Private Sub TBPeakThreshold_ValueChanged(sender As Object, e As EventArgs) Handles TBPeakThreshold.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.RainbowBarPeakThreshold = TBPeakThreshold.Value
+        Visualizers.RainbowBarPeakThreshold = TBPeakThreshold.Value
+    End Sub
+    Private Sub TBPeakHoldFrames_ValueChanged(sender As Object, e As EventArgs) Handles TBPeakHoldFrames.ValueChanged
+        If IsInitializing Then Exit Sub
+        Visualizers.RainbowBarPeakHoldFrames = TBPeakHoldFrames.Value
     End Sub
     Private Sub TBHueCycleSpeed_ValueChanged(sender As Object, e As EventArgs) Handles TBHueCycleSpeed.ValueChanged
         If IsInitializing Then Exit Sub
@@ -63,6 +67,7 @@ Public Class OptionsRainbowBar
         App.Visualizers.RainbowBarPeakDecaySpeed = 5
         App.Visualizers.RainbowBarPeakThickness = 4
         App.Visualizers.RainbowBarPeakThreshold = 60
+        App.Visualizers.RainbowBarPeakHoldFrames = 30
         App.Visualizers.RainbowBarHueCycleSpeed = 0.5F
         ShowSettings()
     End Sub
@@ -73,6 +78,7 @@ Public Class OptionsRainbowBar
         App.Visualizers.RainbowBarPeakDecaySpeed = 7
         App.Visualizers.RainbowBarPeakThickness = 6
         App.Visualizers.RainbowBarPeakThreshold = 50
+        App.Visualizers.RainbowBarPeakHoldFrames = 20
         App.Visualizers.RainbowBarHueCycleSpeed = 2.0F
         ShowSettings()
     End Sub
@@ -83,6 +89,7 @@ Public Class OptionsRainbowBar
         App.Visualizers.RainbowBarPeakDecaySpeed = 10
         App.Visualizers.RainbowBarPeakThickness = 8
         App.Visualizers.RainbowBarPeakThreshold = 40
+        App.Visualizers.RainbowBarPeakHoldFrames = 10
         App.Visualizers.RainbowBarHueCycleSpeed = 5.0F
         ShowSettings()
     End Sub
@@ -96,6 +103,7 @@ Public Class OptionsRainbowBar
         TBPeakDecaySpeed.Value = App.Visualizers.RainbowBarPeakDecaySpeed
         TBPeakThickness.Value = App.Visualizers.RainbowBarPeakThickness
         TBPeakThreshold.Value = App.Visualizers.RainbowBarPeakThreshold
+        TBPeakHoldFrames.Value = App.Visualizers.RainbowBarPeakHoldFrames
         TBHueCycleSpeed.Value = CInt(App.Visualizers.RainbowBarHueCycleSpeed * 10)
         IsInitializing = False
     End Sub
@@ -137,6 +145,11 @@ Public Class OptionsRainbowBar
         TBPeakThreshold.PushedButtonEndColor = App.CurrentTheme.TextColor
         TBPeakThreshold.TrackBarGradientStart = App.CurrentTheme.BackColor
         TBPeakThreshold.TrackBarGradientEnd = App.CurrentTheme.TextColor
+        TBPeakHoldFrames.ButtonColor = App.CurrentTheme.ButtonBackColor
+        TBPeakHoldFrames.HighlightedButtonColor = App.CurrentTheme.TextColor
+        TBPeakHoldFrames.PushedButtonEndColor = App.CurrentTheme.TextColor
+        TBPeakHoldFrames.TrackBarGradientStart = App.CurrentTheme.BackColor
+        TBPeakHoldFrames.TrackBarGradientEnd = App.CurrentTheme.TextColor
         TBHueCycleSpeed.ButtonColor = App.CurrentTheme.ButtonBackColor
         TBHueCycleSpeed.HighlightedButtonColor = App.CurrentTheme.TextColor
         TBHueCycleSpeed.PushedButtonEndColor = App.CurrentTheme.TextColor
@@ -148,6 +161,7 @@ Public Class OptionsRainbowBar
         LblPeakDecaySpeed.ForeColor = forecolor
         LblPeakThickness.ForeColor = forecolor
         LblPeakThreshold.ForeColor = forecolor
+        LblPeakHoldFrames.ForeColor = forecolor
         LblPresets.ForeColor = forecolor
         ChkBoxShowPeaks.ForeColor = forecolor
         TxtBoxBarCount.BackColor = App.CurrentTheme.BackColor

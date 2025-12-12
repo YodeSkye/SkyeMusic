@@ -792,6 +792,40 @@ Public Class TagEditor
             TipStatus.ShowTooltipAtCursor(message, SystemIcons.Error.ToBitmap)
         End If
     End Sub
+    Private Sub ShowImages()
+        If nArt.Count = 0 Then
+            If aggregateconflict Then
+                ' Mixed Images
+                PicBoxArt.Image = My.Resources.ImageMixedImages
+                TipInfo.SetText(PicBoxArt, "Mixed Artwork")
+            Else
+                ' No Images at all
+                PicBoxArt.Image = My.Resources.ImageNoImages
+                TipInfo.SetText(PicBoxArt, "No Artwork")
+            End If
+            TxtBoxArtDescription.Enabled = False
+            CoBoxArtType.Enabled = False
+            BtnArtRemove.Enabled = False
+        Else
+            Dim Image As Image
+            If artindex > nArt.Count - 1 Then artindex = 0
+            'Debug.Print("Showing Art Index: " & artindex.ToString & " of " & nArt.Count.ToString)
+
+            Using ms As New MemoryStream(nArt(artindex).Data.Data)
+                Image = Image.FromStream(ms)
+            End Using
+            PicBoxArt.Image = Image
+            TxtBoxArtDescription.Text = nArt(artindex).Description
+            CoBoxArtType.SelectedItem = nArt(artindex).Type
+            TipInfo.SetText(PicBoxArt, Image.Width.ToString & "x" & Image.Height.ToString & vbCr & Skye.Common.FormatFileSize(nArt(artindex).Data.Count, Skye.Common.FormatFileSizeUnits.Auto).ToString)
+
+            BtnArtLeft.Enabled = Not artindex = 0
+            BtnArtRight.Enabled = Not artindex >= nArt.Count - 1
+            BtnArtRemove.Enabled = True
+            TxtBoxArtDescription.Enabled = True
+            CoBoxArtType.Enabled = True
+        End If
+    End Sub
     Private Function SetSave() As Boolean
         If oArtist = TxtBoxArtist.Text AndAlso oTitle = TxtBoxTitle.Text AndAlso oAlbum = TxtBoxAlbum.Text _
             AndAlso oGenre = TxtBoxGenre.Text AndAlso oYear = TxtBoxYear.Text _
@@ -829,40 +863,6 @@ Public Class TagEditor
 
         Return True
     End Function
-    Private Sub ShowImages()
-        If nArt.Count = 0 Then
-            If aggregateconflict Then
-                ' Mixed Images
-                PicBoxArt.Image = My.Resources.ImageMixedImages
-                TipInfo.SetText(PicBoxArt, "Mixed Artwork")
-            Else
-                ' No Images at all
-                PicBoxArt.Image = My.Resources.ImageNoImages
-                TipInfo.SetText(PicBoxArt, "No Artwork")
-            End If
-            TxtBoxArtDescription.Enabled = False
-            CoBoxArtType.Enabled = False
-            BtnArtRemove.Enabled = False
-        Else
-            Dim Image As Image
-            If artindex > nArt.Count - 1 Then artindex = 0
-            'Debug.Print("Showing Art Index: " & artindex.ToString & " of " & nArt.Count.ToString)
-
-            Using ms As New MemoryStream(nArt(artindex).Data.Data)
-                Image = Image.FromStream(ms)
-            End Using
-            PicBoxArt.Image = Image
-            TxtBoxArtDescription.Text = nArt(artindex).Description
-            CoBoxArtType.SelectedItem = nArt(artindex).Type
-            TipInfo.SetText(PicBoxArt, Skye.Common.FormatFileSize(nArt(artindex).Data.Count, Skye.Common.FormatFileSizeUnits.KiloBytes).ToString)
-
-            BtnArtLeft.Enabled = Not artindex = 0
-            BtnArtRight.Enabled = Not artindex >= nArt.Count - 1
-            BtnArtRemove.Enabled = True
-            TxtBoxArtDescription.Enabled = True
-            CoBoxArtType.Enabled = True
-        End If
-    End Sub
     Private Function AggregatePictures(paths As IEnumerable(Of String), multiMessage As String) As List(Of TagLib.IPicture)
         Dim basePics As List(Of TagLib.IPicture) = Nothing
 
