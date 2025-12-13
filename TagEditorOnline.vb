@@ -1,8 +1,6 @@
 ﻿
-Imports System.ComponentModel
 Imports System.Drawing.Imaging
 Imports System.IO
-Imports System.Net.NetworkInformation
 Imports System.Threading
 Imports MetaBrainz.MusicBrainz.Interfaces
 Imports MetaBrainz.MusicBrainz.Interfaces.Entities
@@ -38,7 +36,7 @@ Public Class TagEditorOnline
                     End If
             End Select
         Catch ex As Exception
-            My.App.WriteToLog("SelectOnlineImage WndProc Handler Error" + Chr(13) + ex.ToString)
+            My.App.WriteToLog("TagEditorOnline WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
@@ -162,6 +160,32 @@ Public Class TagEditorOnline
             End Using
         End If
     End Sub
+    Private Sub BtnSaveImage_Click(sender As Object, e As EventArgs) Handles BtnSaveImage.Click
+        Dim frmSave As New TagEditorOnlineSave
+        frmSave.PicBoxThumb.Image = PicBoxArt.Image
+        frmSave.ShowDialog()
+        If frmSave.DialogResult = DialogResult.OK Then
+            If Not String.IsNullOrWhiteSpace(frmSave.GetFilename) Then
+                If PicBoxArt.Image IsNot Nothing Then
+                    Dim ext As String = Path.GetExtension(frmSave.GetFilename).ToLowerInvariant()
+                    Try
+                        Select Case ext
+                            Case ".jpg", ".jpeg"
+                                PicBoxArt.Image.Save(frmSave.GetFilename, ImageFormat.Jpeg)
+                            Case ".png"
+                                PicBoxArt.Image.Save(frmSave.GetFilename, ImageFormat.Png)
+                            Case ".bmp"
+                                PicBoxArt.Image.Save(frmSave.GetFilename, ImageFormat.Bmp)
+                        End Select
+                        App.WriteToLog("Saved online cover art to " + frmSave.GetFilename)
+                    Catch ex As Exception
+                        App.WriteToLog("Error saving online cover art to " + frmSave.GetFilename + vbCr + ex.Message)
+                    End Try
+                End If
+            End If
+        End If
+        frmSave.Dispose()
+    End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         DialogResult = DialogResult.OK
         Close()
@@ -273,6 +297,8 @@ Public Class TagEditorOnline
         TxtBoxSearchPhrase.ForeColor = App.CurrentTheme.TextColor
         LVIDs.BackColor = App.CurrentTheme.ControlBackColor
         LVIDs.ForeColor = App.CurrentTheme.TextColor
+        BtnSaveImage.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnSaveImage.ForeColor = App.CurrentTheme.TextColor
         BtnOK.BackColor = App.CurrentTheme.ButtonBackColor
         BtnOK.ForeColor = App.CurrentTheme.TextColor
         tipInfo.BackColor = App.CurrentTheme.BackColor

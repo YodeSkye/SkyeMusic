@@ -443,6 +443,55 @@ Public Class TagEditor
             End If
         End If
     End Sub
+    Private Sub BtnExport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnArtExport.MouseDown
+        Select Case e.Button
+            Case MouseButtons.Left
+                If artindex >= 0 AndAlso artindex < nArt.Count Then
+                    Dim img As Image
+                    Using ms As New MemoryStream(nArt(artindex).Data.Data)
+                        img = Image.FromStream(ms)
+                    End Using
+                    Clipboard.SetImage(img)
+                    img.Dispose()
+                    TipStatus.ShowTooltipAtCursor("Image Copied To Clipboard", SystemIcons.Information.ToBitmap)
+                End If
+            Case MouseButtons.Right
+                If artindex >= 0 AndAlso artindex < nArt.Count Then
+                    Using sfd As New SaveFileDialog
+                        sfd.Title = "Export Artwork Image"
+                        sfd.Filter = "JPEG Image|*.jpg;*.jpeg|PNG Image|*.png|Bitmap Image|*.bmp|GIF Image|*.gif"
+                        sfd.FileName = "artwork"
+                        If sfd.ShowDialog = DialogResult.OK Then
+                            Try
+                                Dim img As Image
+                                Using ms As New MemoryStream(nArt(artindex).Data.Data)
+                                    ' Create a copy of the image to break the stream dependency
+                                    Using tempImg = Image.FromStream(ms)
+                                        img = New Bitmap(tempImg)
+                                    End Using
+                                End Using
+                                Using img
+                                    Select Case Path.GetExtension(sfd.FileName).ToLowerInvariant
+                                        Case ".jpg", ".jpeg"
+                                            img.Save(sfd.FileName, Imaging.ImageFormat.Jpeg)
+                                        Case ".png"
+                                            img.Save(sfd.FileName, Imaging.ImageFormat.Png)
+                                        Case ".bmp"
+                                            img.Save(sfd.FileName, Imaging.ImageFormat.Bmp)
+                                        Case ".gif"
+                                            img.Save(sfd.FileName, Imaging.ImageFormat.Gif)
+                                    End Select
+                                End Using
+                                TipStatus.ShowTooltipAtCursor("Image Exported Successfully", SystemIcons.Information.ToBitmap)
+                            Catch ex As Exception
+                                App.WriteToLog("Tag Editor Error Exporting Artwork Image: " & ex.Message)
+                                TipStatus.ShowTooltipAtCursor("Error Exporting Image", SystemIcons.Error.ToBitmap)
+                            End Try
+                        End If
+                    End Using
+                End If
+        End Select
+    End Sub
     Private Sub BtnArtRemove_Click(sender As Object, e As EventArgs) Handles BtnArtRemove.Click
         If nArt.Count > 0 Then
             nArt.RemoveAt(artindex)
@@ -1013,6 +1062,8 @@ Public Class TagEditor
         BtnArtNewFromFile.ForeColor = App.CurrentTheme.TextColor
         BtnArtNewFromOnline.BackColor = App.CurrentTheme.ButtonBackColor
         BtnArtNewFromOnline.ForeColor = App.CurrentTheme.TextColor
+        BtnArtExport.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnArtExport.ForeColor = App.CurrentTheme.TextColor
         BtnArtRemove.BackColor = App.CurrentTheme.ButtonBackColor
         BtnArtRemove.ForeColor = App.CurrentTheme.TextColor
         BtnArtLeft.BackColor = App.CurrentTheme.ButtonBackColor

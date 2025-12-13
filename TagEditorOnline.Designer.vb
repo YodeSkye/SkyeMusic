@@ -36,6 +36,7 @@ Partial Class TagEditorOnline
         LblDimBack = New Skye.UI.Label()
         LblSearchPhrase = New Skye.UI.Label()
         tipInfo = New Skye.UI.ToolTipEX(components)
+        BtnSaveImage = New Button()
         CType(PicBoxArt, ComponentModel.ISupportInitialize).BeginInit()
         CType(PicBoxBackThumb, ComponentModel.ISupportInitialize).BeginInit()
         CType(PicBoxFrontThumb, ComponentModel.ISupportInitialize).BeginInit()
@@ -184,11 +185,24 @@ Partial Class TagEditorOnline
         tipInfo.ShowBorder = False
         tipInfo.ShowDelay = 100
         ' 
+        ' BtnSaveImage
+        ' 
+        BtnSaveImage.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        BtnSaveImage.Image = My.Resources.Resources.ImageSave32
+        tipInfo.SetImage(BtnSaveImage, Nothing)
+        BtnSaveImage.Location = New Point(406, 217)
+        BtnSaveImage.Name = "BtnSaveImage"
+        BtnSaveImage.Size = New Size(48, 48)
+        BtnSaveImage.TabIndex = 104
+        tipInfo.SetText(BtnSaveImage, "Save Selected Image To File")
+        BtnSaveImage.UseVisualStyleBackColor = True
+        ' 
         ' TagEditorOnline
         ' 
         AutoScaleDimensions = New SizeF(7F, 17F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(624, 881)
+        Controls.Add(BtnSaveImage)
         Controls.Add(TxtBoxSearchPhrase)
         Controls.Add(PicBoxFrontThumb)
         Controls.Add(PicBoxBackThumb)
@@ -227,4 +241,5 @@ Partial Class TagEditorOnline
     Friend WithEvents LblDimBack As Skye.UI.Label
     Friend WithEvents LblSearchPhrase As Skye.UI.Label
     Friend WithEvents tipInfo As Skye.UI.ToolTipEX
+    Friend WithEvents BtnSaveImage As Button
 End Class

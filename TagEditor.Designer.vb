@@ -64,6 +64,7 @@ Partial Class TagEditor
         BtnArtNewFromFile = New Button()
         BtnArtNewFromOnline = New Button()
         LblArt = New Skye.UI.Label()
+        BtnArtExport = New Button()
         TipStatus = New Skye.UI.ToolTipEX(components)
         CType(PicBoxArt, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
@@ -547,7 +548,7 @@ Partial Class TagEditor
         TipStatus.SetImage(BtnArtRemove, Nothing)
         BtnArtRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         TipInfo.SetImage(BtnArtRemove, Nothing)
-        BtnArtRemove.Location = New Point(543, 433)
+        BtnArtRemove.Location = New Point(582, 433)
         BtnArtRemove.Name = "BtnArtRemove"
         BtnArtRemove.Size = New Size(32, 32)
         BtnArtRemove.TabIndex = 5126
@@ -613,6 +614,21 @@ Partial Class TagEditor
         LblArt.Text = "Artwork"
         TipStatus.SetText(LblArt, Nothing)
         ' 
+        ' BtnArtExport
+        ' 
+        BtnArtExport.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        TipStatus.SetImage(BtnArtExport, Nothing)
+        BtnArtExport.Image = My.Resources.Resources.ImageExport16
+        TipInfo.SetImage(BtnArtExport, Nothing)
+        BtnArtExport.Location = New Point(544, 433)
+        BtnArtExport.Name = "BtnArtExport"
+        BtnArtExport.Size = New Size(32, 32)
+        BtnArtExport.TabIndex = 5557
+        BtnArtExport.TabStop = False
+        TipInfo.SetText(BtnArtExport, "Export Image" & vbCrLf & "LeftClick = Copy To Clipboard" & vbCrLf & "RightClick = Save To File")
+        TipStatus.SetText(BtnArtExport, Nothing)
+        BtnArtExport.UseVisualStyleBackColor = True
+        ' 
         ' TipStatus
         ' 
         TipStatus.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -624,6 +640,7 @@ Partial Class TagEditor
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(833, 474)
+        Controls.Add(BtnArtExport)
         Controls.Add(BtnArtNewFromOnline)
         Controls.Add(BtnArtNewFromFile)
         Controls.Add(BtnArtRemove)
@@ -720,4 +737,5 @@ Partial Class TagEditor
     Friend WithEvents BtnArtNewFromOnline As Button
     Friend WithEvents LblArt As Skye.UI.Label
     Friend WithEvents TxtBoxArtist As TextBox
+    Friend WithEvents BtnArtExport As Button
 End Class

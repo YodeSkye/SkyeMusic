@@ -1,6 +1,5 @@
 ﻿
 Imports System.IO
-Imports SkyeMusic.My
 
 Public Class Library
 
