@@ -22,6 +22,7 @@ Public Class TagEditor
     Private oComments As String
     Private oArt As New List(Of TagLib.IPicture)
     Private nArt As New List(Of TagLib.IPicture)
+    Private oLyrics As String
     Private Property HasChanged As Boolean
         Get
             Return _haschanged
@@ -110,13 +111,13 @@ Public Class TagEditor
     End Sub
 
     ' Control Events
-    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxArtist.KeyDown, TxtBoxAlbum.KeyDown, TxtBoxTitle.KeyDown, TxtBoxYear.KeyDown, TxtBoxTracks.KeyDown, TxtBoxComments.KeyDown, TxtBoxGenre.KeyDown, TxtBoxTrack.KeyDown
+    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxArtist.KeyDown, TxtBoxAlbum.KeyDown, TxtBoxTitle.KeyDown, TxtBoxYear.KeyDown, TxtBoxTracks.KeyDown, TxtBoxComments.KeyDown, TxtBoxGenre.KeyDown, TxtBoxTrack.KeyDown, TxtBoxLyrics.KeyDown
         Dim s = TryCast(sender, System.Windows.Forms.TextBox)
         If s IsNot Nothing Then
             If s.Text = multiMessage Then s.Clear()
         End If
     End Sub
-    Private Sub TxtBox_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtBoxAlbum.KeyUp, TxtBoxArtist.KeyUp, TxtBoxTitle.KeyUp, TxtBoxYear.KeyUp, TxtBoxTracks.KeyUp, TxtBoxComments.KeyUp, TxtBoxGenre.KeyUp, TxtBoxTrack.KeyUp
+    Private Sub TxtBox_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtBoxAlbum.KeyUp, TxtBoxArtist.KeyUp, TxtBoxTitle.KeyUp, TxtBoxYear.KeyUp, TxtBoxTracks.KeyUp, TxtBoxComments.KeyUp, TxtBoxGenre.KeyUp, TxtBoxTrack.KeyUp, TxtBoxLyrics.KeyUp
         Select Case e.KeyCode
             Case Keys.Enter
                 e.Handled = True
@@ -182,9 +183,16 @@ Public Class TagEditor
                     LblComments.Font = New Font(LblComments.Font, FontStyle.Bold)
                     BtnCommentsKeepOriginal.Enabled = True
                 End If
+                If oLyrics = TxtBoxLyrics.Text Then
+                    LblLyrics.Font = New Font(LblLyrics.Font, FontStyle.Regular)
+                    BtnLyricsKeepOriginal.Enabled = False
+                Else
+                    LblLyrics.Font = New Font(LblLyrics.Font, FontStyle.Bold)
+                    BtnLyricsKeepOriginal.Enabled = True
+                End If
         End Select
     End Sub
-    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxAlbum.PreviewKeyDown, TxtBoxTitle.PreviewKeyDown, TxtBoxArtist.PreviewKeyDown, TxtBoxYear.PreviewKeyDown, TxtBoxTracks.PreviewKeyDown, TxtBoxComments.PreviewKeyDown, TxtBoxGenre.PreviewKeyDown, TxtBoxTrack.PreviewKeyDown, TxtBoxArtDescription.PreviewKeyDown
+    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxAlbum.PreviewKeyDown, TxtBoxTitle.PreviewKeyDown, TxtBoxArtist.PreviewKeyDown, TxtBoxYear.PreviewKeyDown, TxtBoxTracks.PreviewKeyDown, TxtBoxComments.PreviewKeyDown, TxtBoxGenre.PreviewKeyDown, TxtBoxTrack.PreviewKeyDown, TxtBoxArtDescription.PreviewKeyDown, TxtBoxLyrics.PreviewKeyDown
         CMBasic.ShortcutKeys(TryCast(sender, TextBox), e)
     End Sub
     Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxYear.KeyPress, TxtBoxTracks.KeyPress, TxtBoxTrack.KeyPress
@@ -324,6 +332,14 @@ Public Class TagEditor
         HasChanged = SetSave()
         TxtBoxComments.Focus()
         TxtBoxComments.SelectAll()
+    End Sub
+    Private Sub BtnLyricsKeepOriginal_Click(sender As Object, e As EventArgs) Handles BtnLyricsKeepOriginal.Click
+        TxtBoxLyrics.Text = oLyrics
+        LblLyrics.Font = New Font(LblLyrics.Font, FontStyle.Regular)
+        BtnLyricsKeepOriginal.Enabled = False
+        HasChanged = SetSave()
+        TxtBoxLyrics.Focus()
+        TxtBoxLyrics.SelectAll()
     End Sub
     Private Sub BtnArtLeft_Click(sender As Object, e As EventArgs) Handles BtnArtLeft.Click
         artindex -= 1
@@ -594,6 +610,7 @@ Public Class TagEditor
             oTrack = Nothing
             oTracks = Nothing
             oComments = Nothing
+            oLyrics = Nothing
 
             For Each path In _paths
                 Try
@@ -697,6 +714,15 @@ Public Class TagEditor
                         If pics.Count > 0 Then oArt = pics
                     End If
                     nArt = ClonePictures(oArt)
+                    ' Lyrics
+                    Dim lyrics As String = If(String.IsNullOrWhiteSpace(tlfile.Tag.Lyrics), String.Empty, tlfile.Tag.Lyrics)
+                    If oLyrics Is Nothing Then
+                        oLyrics = lyrics
+                    Else
+                        If Not String.Equals(oLyrics, lyrics, StringComparison.Ordinal) Then
+                            oLyrics = multiMessage
+                        End If
+                    End If
                     tlfile.Dispose()
                 End If
             Next
@@ -713,6 +739,7 @@ Public Class TagEditor
                 TxtBoxTrack.Text = oTrack
                 TxtBoxTracks.Text = oTracks
                 TxtBoxComments.Text = oComments
+                TxtBoxLyrics.Text = oLyrics
                 ShowImages()
                 If _paths.Count = 1 Then
                     Text = oText & " - " & IO.Path.GetFileNameWithoutExtension(_paths(0))
@@ -789,6 +816,9 @@ Public Class TagEditor
                         tlfile.Tag.Comment = TxtBoxComments.Text
                     End If
                     If Not PicturesEqual(nArt, oArt) Then tlfile.Tag.Pictures = nArt.ToArray()
+                    If TxtBoxLyrics.Text <> multiMessage AndAlso oLyrics <> TxtBoxLyrics.Text Then
+                        tlfile.Tag.Lyrics = TxtBoxLyrics.Text
+                    End If
                     tlfile.Save()
                 End Using
 
@@ -822,6 +852,7 @@ Public Class TagEditor
             LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
             LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
             LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
+            LblLyrics.Font = New Font(LblLyrics.Font, FontStyle.Regular)
             btnArtistKeepOriginal.Enabled = False
             BtnTitleKeepOriginal.Enabled = False
             BtnAlbumKeepOriginal.Enabled = False
@@ -830,6 +861,7 @@ Public Class TagEditor
             BtnTrackKeepOriginal.Enabled = False
             BtnTracksKeepOriginal.Enabled = False
             BtnCommentsKeepOriginal.Enabled = False
+            BtnLyricsKeepOriginal.Enabled = False
             btnArtistKeepOriginal.Enabled = False
 
             GetTags()
@@ -854,6 +886,7 @@ Public Class TagEditor
             End If
             TxtBoxArtDescription.Enabled = False
             CoBoxArtType.Enabled = False
+            BtnArtExport.Enabled = False
             BtnArtRemove.Enabled = False
         Else
             Dim Image As Image
@@ -870,6 +903,7 @@ Public Class TagEditor
 
             BtnArtLeft.Enabled = Not artindex = 0
             BtnArtRight.Enabled = Not artindex >= nArt.Count - 1
+            BtnArtExport.Enabled = True
             BtnArtRemove.Enabled = True
             TxtBoxArtDescription.Enabled = True
             CoBoxArtType.Enabled = True
@@ -877,8 +911,8 @@ Public Class TagEditor
     End Sub
     Private Function SetSave() As Boolean
         If oArtist = TxtBoxArtist.Text AndAlso oTitle = TxtBoxTitle.Text AndAlso oAlbum = TxtBoxAlbum.Text _
-            AndAlso oGenre = TxtBoxGenre.Text AndAlso oYear = TxtBoxYear.Text _
-            AndAlso oTrack = TxtBoxTrack.Text AndAlso oTracks = TxtBoxTracks.Text AndAlso oComments = TxtBoxComments.Text _
+            AndAlso oGenre = TxtBoxGenre.Text AndAlso oYear = TxtBoxYear.Text AndAlso oTrack = TxtBoxTrack.Text _
+            AndAlso oTracks = TxtBoxTracks.Text AndAlso oComments = TxtBoxComments.Text AndAlso oLyrics = TxtBoxLyrics.Text _
             AndAlso PicturesEqual(nArt, oArt) Then
             Return False
         Else
@@ -986,6 +1020,8 @@ Public Class TagEditor
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             BackColor = c
+            ChkBoxHasPlainTextFile.BackColor = c
+            ChkBoxHasSyncedLyricsFile.BackColor = c
         End If
         ResumeLayout()
         'Debug.Print("Tag Editor Accent Color Set")
@@ -1002,6 +1038,7 @@ Public Class TagEditor
             LblTracks.ForeColor = App.CurrentTheme.AccentTextColor
             LblComments.ForeColor = App.CurrentTheme.AccentTextColor
             LblArt.ForeColor = App.CurrentTheme.AccentTextColor
+            LblLyrics.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
             LblArtist.ForeColor = App.CurrentTheme.TextColor
@@ -1013,6 +1050,7 @@ Public Class TagEditor
             LblTracks.ForeColor = App.CurrentTheme.TextColor
             LblComments.ForeColor = App.CurrentTheme.TextColor
             LblArt.ForeColor = App.CurrentTheme.TextColor
+            LblLyrics.ForeColor = App.CurrentTheme.TextColor
         End If
         TxtBoxArtist.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxArtist.ForeColor = App.CurrentTheme.TextColor
@@ -1036,6 +1074,10 @@ Public Class TagEditor
         TxtBoxArtDescription.ForeColor = App.CurrentTheme.TextColor
         CoBoxArtType.BackColor = App.CurrentTheme.ControlBackColor
         CoBoxArtType.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxLyrics.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxLyrics.ForeColor = App.CurrentTheme.TextColor
+        ChkBoxHasPlainTextFile.ForeColor = App.CurrentTheme.ButtonTextColor
+        ChkBoxHasSyncedLyricsFile.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnOK.BackColor = App.CurrentTheme.ButtonBackColor
         BtnOK.ForeColor = App.CurrentTheme.TextColor
         BtnSave.BackColor = App.CurrentTheme.ButtonBackColor
@@ -1072,6 +1114,8 @@ Public Class TagEditor
         BtnArtRight.ForeColor = App.CurrentTheme.TextColor
         BtnArtKeepOriginal.BackColor = App.CurrentTheme.ButtonBackColor
         BtnArtKeepOriginal.ForeColor = App.CurrentTheme.TextColor
+        BtnLyricsKeepOriginal.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnLyricsKeepOriginal.ForeColor = App.CurrentTheme.ButtonTextColor
         TipInfo.BackColor = App.CurrentTheme.BackColor
         TipInfo.ForeColor = App.CurrentTheme.TextColor
         TipInfo.BorderColor = App.CurrentTheme.ButtonBackColor

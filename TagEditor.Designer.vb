@@ -65,6 +65,11 @@ Partial Class TagEditor
         BtnArtNewFromOnline = New Button()
         LblArt = New Skye.UI.Label()
         BtnArtExport = New Button()
+        TxtBoxLyrics = New TextBox()
+        LblLyrics = New Skye.UI.Label()
+        ChkBoxHasSyncedLyricsFile = New CheckBox()
+        ChkBoxHasPlainTextFile = New CheckBox()
+        BtnLyricsKeepOriginal = New Button()
         TipStatus = New Skye.UI.ToolTipEX(components)
         CType(PicBoxArt, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
@@ -171,7 +176,7 @@ Partial Class TagEditor
         ' 
         ' BtnOK
         ' 
-        BtnOK.Anchor = AnchorStyles.Bottom
+        BtnOK.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         TipStatus.SetImage(BtnOK, Nothing)
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipInfo.SetImage(BtnOK, Nothing)
@@ -450,11 +455,10 @@ Partial Class TagEditor
         ' 
         ' TxtBoxArtDescription
         ' 
-        TxtBoxArtDescription.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TxtBoxArtDescription.ContextMenuStrip = CMBasic
         TipStatus.SetImage(TxtBoxArtDescription, Nothing)
         TipInfo.SetImage(TxtBoxArtDescription, Nothing)
-        TxtBoxArtDescription.Location = New Point(445, 28)
+        TxtBoxArtDescription.Location = New Point(437, 28)
         TxtBoxArtDescription.Name = "TxtBoxArtDescription"
         TxtBoxArtDescription.ShortcutsEnabled = False
         TxtBoxArtDescription.Size = New Size(200, 29)
@@ -465,11 +469,10 @@ Partial Class TagEditor
         ' 
         ' CoBoxArtType
         ' 
-        CoBoxArtType.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         CoBoxArtType.FormattingEnabled = True
         TipInfo.SetImage(CoBoxArtType, Nothing)
         TipStatus.SetImage(CoBoxArtType, Nothing)
-        CoBoxArtType.Location = New Point(651, 28)
+        CoBoxArtType.Location = New Point(643, 28)
         CoBoxArtType.Name = "CoBoxArtType"
         CoBoxArtType.Size = New Size(170, 29)
         CoBoxArtType.Sorted = True
@@ -480,11 +483,10 @@ Partial Class TagEditor
         ' 
         ' PicBoxArt
         ' 
-        PicBoxArt.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         PicBoxArt.BorderStyle = BorderStyle.Fixed3D
         TipStatus.SetImage(PicBoxArt, Nothing)
         TipInfo.SetImage(PicBoxArt, Nothing)
-        PicBoxArt.Location = New Point(446, 58)
+        PicBoxArt.Location = New Point(438, 58)
         PicBoxArt.Name = "PicBoxArt"
         PicBoxArt.Size = New Size(375, 375)
         PicBoxArt.SizeMode = PictureBoxSizeMode.Zoom
@@ -495,12 +497,11 @@ Partial Class TagEditor
         ' 
         ' BtnArtRight
         ' 
-        BtnArtRight.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         BtnArtRight.Enabled = False
         TipStatus.SetImage(BtnArtRight, Nothing)
         BtnArtRight.Image = My.Resources.Resources.ImageMoveRight
         TipInfo.SetImage(BtnArtRight, Nothing)
-        BtnArtRight.Location = New Point(679, 433)
+        BtnArtRight.Location = New Point(671, 433)
         BtnArtRight.Name = "BtnArtRight"
         BtnArtRight.Size = New Size(32, 32)
         BtnArtRight.TabIndex = 5123
@@ -511,12 +512,11 @@ Partial Class TagEditor
         ' 
         ' BtnArtLeft
         ' 
-        BtnArtLeft.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         BtnArtLeft.Enabled = False
         TipStatus.SetImage(BtnArtLeft, Nothing)
         BtnArtLeft.Image = My.Resources.Resources.ImageMoveLeft
         TipInfo.SetImage(BtnArtLeft, Nothing)
-        BtnArtLeft.Location = New Point(648, 433)
+        BtnArtLeft.Location = New Point(640, 433)
         BtnArtLeft.Name = "BtnArtLeft"
         BtnArtLeft.Size = New Size(32, 32)
         BtnArtLeft.TabIndex = 5122
@@ -527,12 +527,11 @@ Partial Class TagEditor
         ' 
         ' BtnArtKeepOriginal
         ' 
-        BtnArtKeepOriginal.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         BtnArtKeepOriginal.Enabled = False
         TipStatus.SetImage(BtnArtKeepOriginal, Nothing)
         BtnArtKeepOriginal.Image = My.Resources.Resources.ImageUndo
         TipInfo.SetImage(BtnArtKeepOriginal, Nothing)
-        BtnArtKeepOriginal.Location = New Point(790, 433)
+        BtnArtKeepOriginal.Location = New Point(782, 433)
         BtnArtKeepOriginal.Name = "BtnArtKeepOriginal"
         BtnArtKeepOriginal.Size = New Size(32, 32)
         BtnArtKeepOriginal.TabIndex = 5124
@@ -543,12 +542,11 @@ Partial Class TagEditor
         ' 
         ' BtnArtRemove
         ' 
-        BtnArtRemove.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         BtnArtRemove.Enabled = False
         TipStatus.SetImage(BtnArtRemove, Nothing)
         BtnArtRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         TipInfo.SetImage(BtnArtRemove, Nothing)
-        BtnArtRemove.Location = New Point(582, 433)
+        BtnArtRemove.Location = New Point(574, 433)
         BtnArtRemove.Name = "BtnArtRemove"
         BtnArtRemove.Size = New Size(32, 32)
         BtnArtRemove.TabIndex = 5126
@@ -559,11 +557,10 @@ Partial Class TagEditor
         ' 
         ' BtnArtNewFromClipboard
         ' 
-        BtnArtNewFromClipboard.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TipStatus.SetImage(BtnArtNewFromClipboard, Nothing)
         BtnArtNewFromClipboard.Image = My.Resources.Resources.ImageEditPaste16
         TipInfo.SetImage(BtnArtNewFromClipboard, Nothing)
-        BtnArtNewFromClipboard.Location = New Point(444, 433)
+        BtnArtNewFromClipboard.Location = New Point(436, 433)
         BtnArtNewFromClipboard.Name = "BtnArtNewFromClipboard"
         BtnArtNewFromClipboard.Size = New Size(32, 32)
         BtnArtNewFromClipboard.TabIndex = 5125
@@ -574,11 +571,10 @@ Partial Class TagEditor
         ' 
         ' BtnArtNewFromFile
         ' 
-        BtnArtNewFromFile.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TipStatus.SetImage(BtnArtNewFromFile, Nothing)
         BtnArtNewFromFile.Image = My.Resources.Resources.ImageGetPath16
         TipInfo.SetImage(BtnArtNewFromFile, Nothing)
-        BtnArtNewFromFile.Location = New Point(475, 433)
+        BtnArtNewFromFile.Location = New Point(467, 433)
         BtnArtNewFromFile.Name = "BtnArtNewFromFile"
         BtnArtNewFromFile.Size = New Size(32, 32)
         BtnArtNewFromFile.TabIndex = 5127
@@ -589,11 +585,10 @@ Partial Class TagEditor
         ' 
         ' BtnArtNewFromOnline
         ' 
-        BtnArtNewFromOnline.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TipStatus.SetImage(BtnArtNewFromOnline, Nothing)
         BtnArtNewFromOnline.Image = My.Resources.Resources.ImageOnline16
         TipInfo.SetImage(BtnArtNewFromOnline, Nothing)
-        BtnArtNewFromOnline.Location = New Point(506, 433)
+        BtnArtNewFromOnline.Location = New Point(498, 433)
         BtnArtNewFromOnline.Name = "BtnArtNewFromOnline"
         BtnArtNewFromOnline.Size = New Size(32, 32)
         BtnArtNewFromOnline.TabIndex = 5128
@@ -606,7 +601,7 @@ Partial Class TagEditor
         ' 
         TipStatus.SetImage(LblArt, Nothing)
         TipInfo.SetImage(LblArt, Nothing)
-        LblArt.Location = New Point(446, 9)
+        LblArt.Location = New Point(438, 9)
         LblArt.Name = "LblArt"
         LblArt.Size = New Size(375, 23)
         LblArt.TabIndex = 5556
@@ -616,11 +611,10 @@ Partial Class TagEditor
         ' 
         ' BtnArtExport
         ' 
-        BtnArtExport.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TipStatus.SetImage(BtnArtExport, Nothing)
         BtnArtExport.Image = My.Resources.Resources.ImageExport16
         TipInfo.SetImage(BtnArtExport, Nothing)
-        BtnArtExport.Location = New Point(544, 433)
+        BtnArtExport.Location = New Point(536, 433)
         BtnArtExport.Name = "BtnArtExport"
         BtnArtExport.Size = New Size(32, 32)
         BtnArtExport.TabIndex = 5557
@@ -628,6 +622,88 @@ Partial Class TagEditor
         TipInfo.SetText(BtnArtExport, "Export Image" & vbCrLf & "LeftClick = Copy To Clipboard" & vbCrLf & "RightClick = Save To File")
         TipStatus.SetText(BtnArtExport, Nothing)
         BtnArtExport.UseVisualStyleBackColor = True
+        ' 
+        ' TxtBoxLyrics
+        ' 
+        TxtBoxLyrics.ContextMenuStrip = CMBasic
+        TipStatus.SetImage(TxtBoxLyrics, Nothing)
+        TipInfo.SetImage(TxtBoxLyrics, Nothing)
+        TxtBoxLyrics.Location = New Point(827, 28)
+        TxtBoxLyrics.Multiline = True
+        TxtBoxLyrics.Name = "TxtBoxLyrics"
+        TxtBoxLyrics.ScrollBars = ScrollBars.Both
+        TxtBoxLyrics.ShortcutsEnabled = False
+        TxtBoxLyrics.Size = New Size(375, 405)
+        TxtBoxLyrics.TabIndex = 6000
+        TxtBoxLyrics.TabStop = False
+        TipInfo.SetText(TxtBoxLyrics, Nothing)
+        TipStatus.SetText(TxtBoxLyrics, Nothing)
+        TxtBoxLyrics.WordWrap = False
+        ' 
+        ' LblLyrics
+        ' 
+        TipStatus.SetImage(LblLyrics, Nothing)
+        TipInfo.SetImage(LblLyrics, Nothing)
+        LblLyrics.Location = New Point(827, 9)
+        LblLyrics.Name = "LblLyrics"
+        LblLyrics.Size = New Size(375, 23)
+        LblLyrics.TabIndex = 5559
+        TipInfo.SetText(LblLyrics, Nothing)
+        LblLyrics.Text = "Lyrics"
+        TipStatus.SetText(LblLyrics, Nothing)
+        ' 
+        ' ChkBoxHasSyncedLyricsFile
+        ' 
+        ChkBoxHasSyncedLyricsFile.AutoSize = True
+        ChkBoxHasSyncedLyricsFile.Checked = True
+        ChkBoxHasSyncedLyricsFile.CheckState = CheckState.Indeterminate
+        ChkBoxHasSyncedLyricsFile.Enabled = False
+        TipInfo.SetImage(ChkBoxHasSyncedLyricsFile, Nothing)
+        TipStatus.SetImage(ChkBoxHasSyncedLyricsFile, Nothing)
+        ChkBoxHasSyncedLyricsFile.Location = New Point(832, 437)
+        ChkBoxHasSyncedLyricsFile.Name = "ChkBoxHasSyncedLyricsFile"
+        ChkBoxHasSyncedLyricsFile.Size = New Size(180, 25)
+        ChkBoxHasSyncedLyricsFile.TabIndex = 6010
+        ChkBoxHasSyncedLyricsFile.TabStop = False
+        TipStatus.SetText(ChkBoxHasSyncedLyricsFile, Nothing)
+        TipInfo.SetText(ChkBoxHasSyncedLyricsFile, Nothing)
+        ChkBoxHasSyncedLyricsFile.Text = "Has Synced Lyrics File"
+        ChkBoxHasSyncedLyricsFile.ThreeState = True
+        ChkBoxHasSyncedLyricsFile.UseVisualStyleBackColor = True
+        ' 
+        ' ChkBoxHasPlainTextFile
+        ' 
+        ChkBoxHasPlainTextFile.AutoSize = True
+        ChkBoxHasPlainTextFile.Checked = True
+        ChkBoxHasPlainTextFile.CheckState = CheckState.Indeterminate
+        ChkBoxHasPlainTextFile.Enabled = False
+        TipInfo.SetImage(ChkBoxHasPlainTextFile, Nothing)
+        TipStatus.SetImage(ChkBoxHasPlainTextFile, Nothing)
+        ChkBoxHasPlainTextFile.Location = New Point(1015, 437)
+        ChkBoxHasPlainTextFile.Name = "ChkBoxHasPlainTextFile"
+        ChkBoxHasPlainTextFile.Size = New Size(151, 25)
+        ChkBoxHasPlainTextFile.TabIndex = 6020
+        ChkBoxHasPlainTextFile.TabStop = False
+        TipStatus.SetText(ChkBoxHasPlainTextFile, Nothing)
+        TipInfo.SetText(ChkBoxHasPlainTextFile, Nothing)
+        ChkBoxHasPlainTextFile.Text = "Has Plain Text File"
+        ChkBoxHasPlainTextFile.ThreeState = True
+        ChkBoxHasPlainTextFile.UseVisualStyleBackColor = True
+        ' 
+        ' BtnLyricsKeepOriginal
+        ' 
+        BtnLyricsKeepOriginal.Enabled = False
+        TipStatus.SetImage(BtnLyricsKeepOriginal, Nothing)
+        BtnLyricsKeepOriginal.Image = My.Resources.Resources.ImageUndo
+        TipInfo.SetImage(BtnLyricsKeepOriginal, Nothing)
+        BtnLyricsKeepOriginal.Location = New Point(1170, 433)
+        BtnLyricsKeepOriginal.Name = "BtnLyricsKeepOriginal"
+        BtnLyricsKeepOriginal.Size = New Size(32, 32)
+        BtnLyricsKeepOriginal.TabIndex = 6030
+        BtnLyricsKeepOriginal.TabStop = False
+        TipInfo.SetText(BtnLyricsKeepOriginal, "Undo")
+        TipStatus.SetText(BtnLyricsKeepOriginal, Nothing)
+        BtnLyricsKeepOriginal.UseVisualStyleBackColor = True
         ' 
         ' TipStatus
         ' 
@@ -639,7 +715,11 @@ Partial Class TagEditor
         AllowDrop = True
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(833, 474)
+        ClientSize = New Size(1214, 474)
+        Controls.Add(BtnLyricsKeepOriginal)
+        Controls.Add(ChkBoxHasPlainTextFile)
+        Controls.Add(ChkBoxHasSyncedLyricsFile)
+        Controls.Add(TxtBoxLyrics)
         Controls.Add(BtnArtExport)
         Controls.Add(BtnArtNewFromOnline)
         Controls.Add(BtnArtNewFromFile)
@@ -679,6 +759,7 @@ Partial Class TagEditor
         Controls.Add(LblComments)
         Controls.Add(LblTrack)
         Controls.Add(LblArt)
+        Controls.Add(LblLyrics)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.FixedDialog
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -738,4 +819,9 @@ Partial Class TagEditor
     Friend WithEvents LblArt As Skye.UI.Label
     Friend WithEvents TxtBoxArtist As TextBox
     Friend WithEvents BtnArtExport As Button
+    Friend WithEvents TxtBoxLyrics As TextBox
+    Friend WithEvents LblLyrics As Skye.UI.Label
+    Friend WithEvents ChkBoxHasSyncedLyricsFile As CheckBox
+    Friend WithEvents ChkBoxHasPlainTextFile As CheckBox
+    Friend WithEvents BtnLyricsKeepOriginal As Button
 End Class
