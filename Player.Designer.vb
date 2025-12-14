@@ -104,6 +104,7 @@ Partial Class Player
         TimerLyrics = New Timer(components)
         TipPlayer = New Skye.UI.ToolTip(components)
         PanelVisualizer = New Panel()
+        CMIEditTag = New ToolStripMenuItem()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -127,9 +128,9 @@ Partial Class Player
         ' CMPlaylist
         ' 
         CMPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
+        CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, CMIEditTag, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMPlaylist.Name = "CMPlaylist"
-        CMPlaylist.Size = New Size(217, 444)
+        CMPlaylist.Size = New Size(217, 492)
         TipPlayer.SetToolTipImage(CMPlaylist, Nothing)
         ' 
         ' CMIPlay
@@ -211,7 +212,6 @@ Partial Class Player
         CMRatings.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMRatings.Items.AddRange(New ToolStripItem() {CMIRating5Stars, CMIRating4Stars, CMIRating3Stars, CMIRating2Stars, CMIRating1Star})
         CMRatings.Name = "CMRatings"
-        CMRatings.OwnerItem = CMIRating
         CMRatings.ShowImageMargin = False
         CMRatings.Size = New Size(121, 134)
         TipPlayer.SetToolTipImage(CMRatings, Nothing)
@@ -794,6 +794,13 @@ Partial Class Player
         PanelVisualizer.TabIndex = 40
         TipPlayer.SetToolTipImage(PanelVisualizer, Nothing)
         ' 
+        ' CMIEditTag
+        ' 
+        CMIEditTag.Image = My.Resources.Resources.ImageEdit16
+        CMIEditTag.Name = "CMIEditTag"
+        CMIEditTag.Size = New Size(216, 26)
+        CMIEditTag.Text = "Edit Tag"
+        ' 
         ' Player
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -924,4 +931,5 @@ Partial Class Player
     Friend WithEvents TipPlayer As Skye.UI.ToolTip
     Friend WithEvents PanelVisualizer As Panel
     Friend WithEvents MIVisualizers As ToolStripMenuItem
+    Friend WithEvents CMIEditTag As ToolStripMenuItem
 End Class

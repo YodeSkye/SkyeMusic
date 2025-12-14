@@ -23,6 +23,8 @@ Public Class TagEditor
     Private oArt As New List(Of TagLib.IPicture)
     Private nArt As New List(Of TagLib.IPicture)
     Private oLyrics As String
+    Private LyricsFileCountLRC As Integer
+    Private LyricsFileCountTXT As Integer
     Private Property HasChanged As Boolean
         Get
             Return _haschanged
@@ -611,6 +613,8 @@ Public Class TagEditor
             oTracks = Nothing
             oComments = Nothing
             oLyrics = Nothing
+            LyricsFileCountLRC = 0
+            LyricsFileCountTXT = 0
 
             For Each path In _paths
                 Try
@@ -621,6 +625,7 @@ Public Class TagEditor
                     tlfile = Nothing
                 End Try
                 If tlfile IsNot Nothing Then
+
                     ' Artist
                     Dim artist As String = If(String.IsNullOrWhiteSpace(tlfile.Tag.FirstPerformer), String.Empty, tlfile.Tag.FirstPerformer)
                     If oArtist Is Nothing Then
@@ -723,6 +728,27 @@ Public Class TagEditor
                             oLyrics = multiMessage
                         End If
                     End If
+
+                    ' Check for Lyric Files
+                    Dim lrcPath = IO.Path.ChangeExtension(path, ".lrc")
+                    Dim txtPath = IO.Path.ChangeExtension(path, ".txt")
+                    If IO.File.Exists(lrcPath) Then LyricsFileCountLRC += 1
+                    If IO.File.Exists(txtPath) Then LyricsFileCountTXT += 1
+                    If LyricsFileCountLRC = 0 Then
+                        ChkBoxHasSyncedLyricsFile.CheckState = CheckState.Unchecked
+                    ElseIf LyricsFileCountLRC = _paths.Count Then
+                        ChkBoxHasSyncedLyricsFile.CheckState = CheckState.Checked
+                    Else
+                        ChkBoxHasSyncedLyricsFile.CheckState = CheckState.Indeterminate
+                    End If
+                    If LyricsFileCountTXT = 0 Then
+                        ChkBoxHasPlainTextFile.CheckState = CheckState.Unchecked
+                    ElseIf LyricsFileCountTXT = _paths.Count Then
+                        ChkBoxHasPlainTextFile.CheckState = CheckState.Checked
+                    Else
+                        ChkBoxHasPlainTextFile.CheckState = CheckState.Indeterminate
+                    End If
+
                     tlfile.Dispose()
                 End If
             Next

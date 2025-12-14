@@ -3112,6 +3112,8 @@ Public Class Player
             CMIEditTitle.Enabled = False
             CMIRating.Enabled = False
             CMIViewInLibrary.Enabled = False
+            CMIEditTag.Enabled = False
+            CMIEditTag.Text = "Edit Tag"
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
             CMICopyTitle.ToolTipText = String.Empty
             CMICopyFileName.ToolTipText = String.Empty
@@ -3128,6 +3130,12 @@ Public Class Player
             CMIEditTitle.Enabled = True
             CMIRating.Enabled = True
             CMIViewInLibrary.Enabled = True
+            CMIEditTag.Enabled = True
+            If LVPlaylist.SelectedItems.Count = 1 Then
+                CMIEditTag.Text = "Edit Tag"
+            Else
+                CMIEditTag.Text = "Edit Tags " & "(" & LVPlaylist.SelectedItems.Count.ToString & ")"
+            End If
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
             CMIPlaylistRemove.Text += " (" + LVPlaylist.SelectedItems.Count.ToString + ")"
             CMICopyTitle.ToolTipText = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text
@@ -3272,6 +3280,9 @@ Public Class Player
     End Sub
     Private Sub CMIViewInLibraryClick(sender As Object, e As EventArgs) Handles CMIViewInLibrary.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.FrmLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+    End Sub
+    Private Sub CMIEditTag_Click(sender As Object, e As EventArgs) Handles CMIEditTag.Click
+
     End Sub
     Private Sub CMIHelperApp1Click(sender As Object, e As EventArgs) Handles CMIHelperApp1.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.HelperApp1(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)

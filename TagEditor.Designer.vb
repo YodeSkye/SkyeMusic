@@ -654,10 +654,10 @@ Partial Class TagEditor
         ' 
         ' ChkBoxHasSyncedLyricsFile
         ' 
+        ChkBoxHasSyncedLyricsFile.AutoCheck = False
         ChkBoxHasSyncedLyricsFile.AutoSize = True
         ChkBoxHasSyncedLyricsFile.Checked = True
         ChkBoxHasSyncedLyricsFile.CheckState = CheckState.Indeterminate
-        ChkBoxHasSyncedLyricsFile.Enabled = False
         TipInfo.SetImage(ChkBoxHasSyncedLyricsFile, Nothing)
         TipStatus.SetImage(ChkBoxHasSyncedLyricsFile, Nothing)
         ChkBoxHasSyncedLyricsFile.Location = New Point(832, 437)
@@ -673,10 +673,10 @@ Partial Class TagEditor
         ' 
         ' ChkBoxHasPlainTextFile
         ' 
+        ChkBoxHasPlainTextFile.AutoCheck = False
         ChkBoxHasPlainTextFile.AutoSize = True
         ChkBoxHasPlainTextFile.Checked = True
         ChkBoxHasPlainTextFile.CheckState = CheckState.Indeterminate
-        ChkBoxHasPlainTextFile.Enabled = False
         TipInfo.SetImage(ChkBoxHasPlainTextFile, Nothing)
         TipStatus.SetImage(ChkBoxHasPlainTextFile, Nothing)
         ChkBoxHasPlainTextFile.Location = New Point(1015, 437)
