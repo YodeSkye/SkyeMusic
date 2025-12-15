@@ -847,20 +847,16 @@ Public Class TagEditor
                     End If
                     tlfile.Save()
                 End Using
-
                 savedCount += 1
             Catch ioEx As IO.IOException ' File is locked or in use
                 failedPaths.Add(path)
                 WriteToLog("File In Use, Cannot Save Tag: " & path & vbCrLf & ioEx.Message)
-                'TipStatus.ShowTooltipAtCursor("File is currently in use and tag cannot be saved: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
             Catch unauthEx As UnauthorizedAccessException ' No permission or locked
                 failedPaths.Add(path)
                 WriteToLog("Access Denied While Saving Tag: " & path & vbCrLf & unauthEx.Message)
-                'TipStatus.ShowTooltipAtCursor("Access denied, cannot save tag: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
             Catch ex As Exception ' Generic fallback
                 failedPaths.Add(path)
                 WriteToLog("TagLib Error While Saving Tag, Cannot Write To File: " & path & vbCrLf & ex.Message)
-                'TipStatus.ShowTooltipAtCursor("Unexpected error saving tag: " & IO.Path.GetFileName(path), SystemIcons.Error.ToBitmap)
             End Try
         Next
 
@@ -878,6 +874,7 @@ Public Class TagEditor
             LblTrack.Font = New Font(LblTrack.Font, FontStyle.Regular)
             LblTracks.Font = New Font(LblTracks.Font, FontStyle.Regular)
             LblComments.Font = New Font(LblComments.Font, FontStyle.Regular)
+            LblArt.Font = New Font(LblArt.Font, FontStyle.Regular)
             LblLyrics.Font = New Font(LblLyrics.Font, FontStyle.Regular)
             btnArtistKeepOriginal.Enabled = False
             BtnTitleKeepOriginal.Enabled = False
@@ -887,16 +884,14 @@ Public Class TagEditor
             BtnTrackKeepOriginal.Enabled = False
             BtnTracksKeepOriginal.Enabled = False
             BtnCommentsKeepOriginal.Enabled = False
+            BtnArtKeepOriginal.Enabled = False
             BtnLyricsKeepOriginal.Enabled = False
-            btnArtistKeepOriginal.Enabled = False
 
             GetTags()
             TipStatus.ShowTooltipAtCursor("Tag" & If(savedCount > 1, "s", String.Empty) & " Saved Successfully (" & savedCount.ToString() & ")", My.Resources.ImageOK)
         Else
-            Dim message As String = If(failedPaths.Count = 1,
-                                       "1 file failed to save. Check log.",
-                                       failedPaths.Count.ToString() & " files failed to save. Check log.")
-            TipStatus.ShowTooltipAtCursor(message, SystemIcons.Error.ToBitmap)
+            Dim errormessage As String = If(failedPaths.Count = 1, "1 file failed to save. Check log.", failedPaths.Count.ToString() & " files failed to save. Check log.")
+            TipStatus.ShowTooltipAtCursor(errormessage, SystemIcons.Error.ToBitmap)
         End If
     End Sub
     Private Sub ShowImages()
