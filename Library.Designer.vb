@@ -49,7 +49,7 @@ Partial Class Library
         BtnOK = New Button()
         TxbxLibrarySearch = New TextBox()
         LBXLibrarySearch = New ListBox()
-        PicBoxAlbumArt = New PictureBox()
+        PicBoxAlbumArt = New System.Windows.Forms.PictureBox()
         RadBtnGroupByGenre = New RadioButton()
         GrpBoxGroupBy = New GroupBox()
         RadBtnGroupByType = New RadioButton()
@@ -516,7 +516,7 @@ Partial Class Library
     Friend WithEvents BtnOK As Button
     Friend WithEvents TxbxLibrarySearch As TextBox
     Friend WithEvents LBXLibrarySearch As ListBox
-    Friend WithEvents PicBoxAlbumArt As PictureBox
+    Friend WithEvents PicBoxAlbumArt As System.Windows.Forms.PictureBox
     Friend WithEvents CMLibrary As ContextMenuStrip
     Friend WithEvents CMIHelperApp1 As ToolStripMenuItem
     Friend WithEvents CMIAddToPlaylist As ToolStripMenuItem

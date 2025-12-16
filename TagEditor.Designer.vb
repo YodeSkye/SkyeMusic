@@ -55,7 +55,7 @@ Partial Class TagEditor
         LblTrack = New Skye.UI.Label()
         TxtBoxArtDescription = New TextBox()
         CoBoxArtType = New ComboBox()
-        PicBoxArt = New PictureBox()
+        PicBoxArt = New System.Windows.Forms.PictureBox()
         BtnArtRight = New Button()
         BtnArtLeft = New Button()
         BtnArtKeepOriginal = New Button()
@@ -808,7 +808,7 @@ Partial Class TagEditor
     Friend WithEvents LblTrack As Skye.UI.Label
     Friend WithEvents TxtBoxArtDescription As TextBox
     Friend WithEvents CoBoxArtType As ComboBox
-    Friend WithEvents PicBoxArt As PictureBox
+    Friend WithEvents PicBoxArt As System.Windows.Forms.PictureBox
     Friend WithEvents BtnArtRight As Button
     Friend WithEvents BtnArtLeft As Button
     Friend WithEvents BtnArtKeepOriginal As Button

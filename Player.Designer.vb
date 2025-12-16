@@ -85,7 +85,7 @@ Partial Class Player
         BtnNext = New Button()
         PEXLeft = New Skye.UI.ProgressEX()
         PEXRight = New Skye.UI.ProgressEX()
-        PicBoxAlbumArt = New PictureBox()
+        PicBoxAlbumArt = New System.Windows.Forms.PictureBox()
         TxtBoxPlaylistSearch = New TextBox()
         ListBoxPlaylistSearch = New ListBox()
         PanelMedia = New Panel()
@@ -870,7 +870,7 @@ Partial Class Player
     Friend WithEvents BtnNext As Button
     Friend WithEvents PEXLeft As Skye.UI.ProgressEX
     Friend WithEvents PEXRight As Skye.UI.ProgressEX
-    Friend WithEvents PicBoxAlbumArt As PictureBox
+    Friend WithEvents PicBoxAlbumArt As System.Windows.Forms.PictureBox
     Friend WithEvents TxtBoxPlaylistSearch As TextBox
     Friend WithEvents ListBoxPlaylistSearch As ListBox
     Friend WithEvents PanelMedia As Panel

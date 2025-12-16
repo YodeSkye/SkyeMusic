@@ -806,7 +806,7 @@ Public Class History
                 Dim bmp As Image = wc.Draw(words, frequencies)
 
                 ' Show in a PictureBox
-                Dim pb As New PictureBox With {
+                Dim pb As New System.Windows.Forms.PictureBox With {
                     .Dock = DockStyle.Fill,
                     .Image = bmp,
                     .SizeMode = PictureBoxSizeMode.Zoom,

@@ -56,6 +56,7 @@ Public Class Library
     Private LibraryGroupBy As LibraryGroupMode = LibraryGroupMode.None
     Private LibraryGroups As New Collections.Generic.List(Of LibraryGroup)
     Private IsTextBoxLibrarySearch As Boolean = False
+    Private FrmArtViewer As ArtViewer
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -702,14 +703,8 @@ Public Class Library
                 End If
             Case MouseButtons.Right
                 If PicBoxAlbumArt.Visible Then
-                    PicBoxAlbumArtStartLocation = PicBoxAlbumArt.Location
-                    If Me.Width > PicBoxAlbumArtSuperSize.Width AndAlso Me.Height > PicBoxAlbumArtSuperSize.Height Then
-                        PicBoxAlbumArt.Top = PicBoxAlbumArt.Bottom - PicBoxAlbumArtSuperSize.Height
-                        PicBoxAlbumArt.Size = PicBoxAlbumArtSuperSize
-                    Else
-                        PicBoxAlbumArt.Top = PicBoxAlbumArt.Bottom - PicBoxAlbumArtLargeSize.Height
-                        PicBoxAlbumArt.Size = PicBoxAlbumArtLargeSize
-                    End If
+                    FrmArtViewer = New ArtViewer(PicBoxAlbumArt.Image, MousePosition)
+                    FrmArtViewer.Show()
                 End If
         End Select
     End Sub
@@ -718,10 +713,7 @@ Public Class Library
             Case MouseButtons.Left
                 Library_MouseUp(sender, e)
             Case MouseButtons.Right
-                If PicBoxAlbumArt.Visible Then
-                    PicBoxAlbumArt.Size = PicBoxAlbumArtSmallSize
-                    PicBoxAlbumArt.Location = PicBoxAlbumArtStartLocation
-                End If
+                FrmArtViewer?.Close()
         End Select
     End Sub
     Private Sub PicBoxAlbumArt_DoubleClick(sender As Object, e As EventArgs) Handles PicBoxAlbumArt.DoubleClick

@@ -26,10 +26,10 @@ Partial Class TagEditorOnline
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(TagEditorOnline))
         LVIDs = New ListView()
         ColumnHeader1 = New ColumnHeader()
-        PicBoxArt = New PictureBox()
+        PicBoxArt = New System.Windows.Forms.PictureBox()
         BtnOK = New Button()
-        PicBoxBackThumb = New PictureBox()
-        PicBoxFrontThumb = New PictureBox()
+        PicBoxBackThumb = New System.Windows.Forms.PictureBox()
+        PicBoxFrontThumb = New System.Windows.Forms.PictureBox()
         LblStatus = New Label()
         TxtBoxSearchPhrase = New TextBox()
         LblDimFront = New Skye.UI.Label()
@@ -230,11 +230,11 @@ Partial Class TagEditorOnline
     End Sub
 
     Friend WithEvents LVIDs As ListView
-    Friend WithEvents PicBoxArt As PictureBox
+    Friend WithEvents PicBoxArt As System.Windows.Forms.PictureBox
     Friend WithEvents BtnOK As Button
     Friend WithEvents ColumnHeader1 As ColumnHeader
-    Friend WithEvents PicBoxBackThumb As PictureBox
-    Friend WithEvents PicBoxFrontThumb As PictureBox
+    Friend WithEvents PicBoxBackThumb As System.Windows.Forms.PictureBox
+    Friend WithEvents PicBoxFrontThumb As System.Windows.Forms.PictureBox
     Friend WithEvents LblStatus As Label
     Friend WithEvents TxtBoxSearchPhrase As TextBox
     Friend WithEvents LblDimFront As Skye.UI.Label

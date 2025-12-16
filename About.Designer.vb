@@ -39,7 +39,7 @@ Partial Class About
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
         TipAbout.SetImage(BtnOK, Nothing)
-        BtnOK.Image = My.Resources.Resources.ImageOK
+        BtnOK.Image = My.Resources.ImageOK
         BtnOK.Location = New Point(160, 385)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
