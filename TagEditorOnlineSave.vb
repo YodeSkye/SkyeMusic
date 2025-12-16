@@ -2,6 +2,7 @@
 Public Class TagEditorOnlineSave
 
     ' Declarations
+    Private FrmArtViewer As ArtViewer
     Private _filename As String = String.Empty
     Friend ReadOnly Property GetFilename As String
         Get
@@ -62,6 +63,17 @@ Public Class TagEditorOnlineSave
         Else
             DialogResult = DialogResult.OK
             Close()
+        End If
+    End Sub
+    Private Sub PicBoxThumb_MouseDown(sender As Object, e As MouseEventArgs) Handles PicBoxThumb.MouseDown
+        If e.Button = MouseButtons.Right Then
+            FrmArtViewer = New ArtViewer(PicBoxThumb.Image, MousePosition) With {.Owner = Me}
+            FrmArtViewer.Show()
+        End If
+    End Sub
+    Private Sub PicBoxThumb_MouseUp(sender As Object, e As MouseEventArgs) Handles PicBoxThumb.MouseUp
+        If e.Button = MouseButtons.Right Then
+            FrmArtViewer?.Close()
         End If
     End Sub
 

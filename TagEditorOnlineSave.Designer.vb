@@ -33,7 +33,7 @@ Partial Class TagEditorOnlineSave
         BtnSave = New Button()
         LblFilename = New Skye.UI.Label()
         LblLocation = New Skye.UI.Label()
-        PicBoxThumb = New System.Windows.Forms.PictureBox()
+        PicBoxThumb = New PictureBox()
         tipInfo = New Skye.UI.ToolTipEX(components)
         GroupBox1.SuspendLayout()
         CType(PicBoxThumb, ComponentModel.ISupportInitialize).BeginInit()

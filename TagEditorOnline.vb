@@ -11,6 +11,7 @@ Public Class TagEditorOnline
     'Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private FrmArtViewer As ArtViewer
     Private NetClient As New System.Net.Http.HttpClient
     Private MBQuery As New MetaBrainz.MusicBrainz.Query(NetClient)
     Private MBArt As New MetaBrainz.MusicBrainz.CoverArt.CoverArt(NetClient)
@@ -59,16 +60,24 @@ Public Class TagEditorOnline
         NetClient?.Dispose()
     End Sub
     Private Sub Frm_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxArt.MouseDown, PicBoxFrontThumb.MouseDown, PicBoxBackThumb.MouseDown, LblDimBack.MouseDown, LblStatus.MouseDown
-        Dim cSender As Control
-        If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
-            mMove = True
-            cSender = DirectCast(sender, Control)
-            If cSender Is PicBoxArt OrElse cSender Is PicBoxFrontThumb OrElse cSender Is PicBoxBackThumb OrElse cSender Is LblDimFront OrElse cSender Is LblDimBack OrElse cSender Is LblStatus Then
-                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
-            Else
-                mOffset = New Point(-e.X - SystemInformation.FrameBorderSize.Width - 4, -e.Y - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
-            End If
-        End If
+        Select Case e.Button
+            Case MouseButtons.Left
+                If WindowState = FormWindowState.Normal Then
+                    mMove = True
+                    Dim cSender = DirectCast(sender, Control)
+                    If cSender Is PicBoxArt OrElse cSender Is PicBoxFrontThumb OrElse cSender Is PicBoxBackThumb OrElse cSender Is LblDimFront OrElse cSender Is LblDimBack OrElse cSender Is LblStatus Then
+                        mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+                    Else
+                        mOffset = New Point(-e.X - SystemInformation.FrameBorderSize.Width - 4, -e.Y - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+                    End If
+                End If
+            Case MouseButtons.Right
+                Dim cSender = TryCast(sender, PictureBox)
+                If cSender IsNot Nothing Then
+                    FrmArtViewer = New ArtViewer(cSender.Image, MousePosition) With {.Owner = Me}
+                    FrmArtViewer.Show()
+                End If
+        End Select
     End Sub
     Private Sub Frm_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxArt.MouseMove, PicBoxFrontThumb.MouseMove, PicBoxBackThumb.MouseMove, LblDimBack.MouseMove, LblStatus.MouseMove
         If mMove Then
@@ -80,6 +89,9 @@ Public Class TagEditorOnline
     End Sub
     Private Sub Frm_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxArt.MouseUp, PicBoxFrontThumb.MouseUp, PicBoxBackThumb.MouseUp, LblDimBack.MouseUp, LblStatus.MouseUp
         mMove = False
+        If e.Button = MouseButtons.Right Then
+            FrmArtViewer?.Close()
+        End If
     End Sub
     Private Sub Frm_Move(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Move
         If Not mMove AndAlso Me.WindowState = FormWindowState.Normal Then CheckMove(Me.Location)
