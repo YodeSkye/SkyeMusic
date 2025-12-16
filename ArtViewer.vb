@@ -61,6 +61,7 @@ Public Class ArtViewer
             FadeOutTimer.Dispose()
             FadeOutTimer = Nothing
         End If
+        Dispose()
     End Sub
 
     ' Control Events
@@ -81,9 +82,9 @@ Public Class ArtViewer
         If Opacity > 0 Then
             Opacity -= 0.1
         Else
-            FadeOutTimer.Stop()
+            FadeOutTimer?.Stop()
             RemoveHandler FadeOutTimer.Tick, AddressOf FadeOutStep
-            FadeOutTimer.Dispose()
+            FadeOutTimer?.Dispose()
             FadeOutTimer = Nothing
             Dispose()
         End If
