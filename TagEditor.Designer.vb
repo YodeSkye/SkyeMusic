@@ -55,7 +55,7 @@ Partial Class TagEditor
         LblTrack = New Skye.UI.Label()
         TxtBoxArtDescription = New TextBox()
         CoBoxArtType = New ComboBox()
-        PicBoxArt = New System.Windows.Forms.PictureBox()
+        PicBoxArt = New PictureBox()
         BtnArtRight = New Button()
         BtnArtLeft = New Button()
         BtnArtKeepOriginal = New Button()

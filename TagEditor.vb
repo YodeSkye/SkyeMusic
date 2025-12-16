@@ -5,6 +5,7 @@ Public Class TagEditor
     ' Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As System.Drawing.Point
+    Private FrmArtViewer As ArtViewer
     Private _paths As List(Of String)
     Private _haschanged As Boolean = False
     Private _libraryneedsupdated As Boolean = False
@@ -596,6 +597,17 @@ Public Class TagEditor
                 End If
                 TipStatus.ShowTooltipAtCursor(If(addedCount = 1, "Image added", addedCount.ToString & " images added"), Resources.ImageOK)
             End If
+        End If
+    End Sub
+    Private Sub PicBoxArt_MouseDown(sender As Object, e As MouseEventArgs) Handles PicBoxArt.MouseDown
+        If e.Button = MouseButtons.Right Then
+            FrmArtViewer = New ArtViewer(PicBoxArt.Image, MousePosition) With {.Owner = Me}
+            FrmArtViewer.Show()
+        End If
+    End Sub
+    Private Sub PicBoxArt_MouseUp(sender As Object, e As MouseEventArgs) Handles PicBoxArt.MouseUp
+        If e.Button = MouseButtons.Right Then
+            FrmArtViewer?.Close()
         End If
     End Sub
 
