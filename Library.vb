@@ -703,7 +703,7 @@ Public Class Library
                 End If
             Case MouseButtons.Right
                 If PicBoxAlbumArt.Visible Then
-                    FrmArtViewer = New ArtViewer(PicBoxAlbumArt.Image, MousePosition)
+                    FrmArtViewer = New ArtViewer(PicBoxAlbumArt.Image, MousePosition) With {.Owner = Me}
                     FrmArtViewer.Show()
                 End If
         End Select

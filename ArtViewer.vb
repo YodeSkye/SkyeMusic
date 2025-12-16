@@ -8,6 +8,7 @@ Public Class ArtViewer
     ' Form Events
     Public Sub New(img As Image, Optional loc As Point = Nothing)
         InitializeComponent()
+        Text = My.Application.Info.Title & " Art Viewer"
         Opacity = 0
         If img IsNot Nothing Then
             PicBox.Image = img
@@ -34,9 +35,6 @@ Public Class ArtViewer
             Location = New Point(newX, newY)
         End If
     End Sub
-    Private Sub ArtViewer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Skye.WinAPI.HideFormInTaskSwitcher(Handle)
-    End Sub
     Private Sub ArtViewer_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         FadeInTimer = New Timer With {.Interval = 20}
         AddHandler FadeInTimer.Tick, AddressOf FadeInStep
@@ -47,12 +45,21 @@ Public Class ArtViewer
             FadeInTimer.Stop()
             RemoveHandler FadeInTimer.Tick, AddressOf FadeInStep
             FadeInTimer.Dispose()
+            FadeInTimer = Nothing
         End If
         If Opacity > 0 Then
             e.Cancel = True
             FadeOutTimer = New Timer With {.Interval = 20}
             AddHandler FadeOutTimer.Tick, AddressOf FadeOutStep
             FadeOutTimer.Start()
+        End If
+    End Sub
+    Private Sub ArtViewer_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+        If FadeOutTimer IsNot Nothing Then
+            FadeOutTimer.Stop()
+            RemoveHandler FadeOutTimer.Tick, AddressOf FadeOutStep
+            FadeOutTimer.Dispose()
+            FadeOutTimer = Nothing
         End If
     End Sub
 
@@ -77,11 +84,12 @@ Public Class ArtViewer
             FadeOutTimer.Stop()
             RemoveHandler FadeOutTimer.Tick, AddressOf FadeOutStep
             FadeOutTimer.Dispose()
-            Close()
+            FadeOutTimer = Nothing
+            Dispose()
         End If
     End Sub
-
-    Private Sub ArtViewer_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
-        Dispose()
+    Private Sub PicBox_MouseDown(sender As Object, e As MouseEventArgs) Handles PicBox.MouseDown
+        Close()
     End Sub
+
 End Class
