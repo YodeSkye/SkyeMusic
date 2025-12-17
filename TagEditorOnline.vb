@@ -73,7 +73,7 @@ Public Class TagEditorOnline
                 End If
             Case MouseButtons.Right
                 Dim cSender = TryCast(sender, PictureBox)
-                If cSender IsNot Nothing Then
+                If cSender IsNot Nothing AndAlso cSender.Image IsNot Nothing Then
                     FrmArtViewer = New ArtViewer(cSender.Image, MousePosition) With {.Owner = Me}
                     FrmArtViewer.Show()
                 End If
