@@ -3282,7 +3282,7 @@ Public Class Player
         If LVPlaylist.SelectedItems.Count > 0 Then App.FrmLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
     Private Sub CMIEditTag_Click(sender As Object, e As EventArgs) Handles CMIEditTag.Click
-
+        EditTags()
     End Sub
     Private Sub CMIHelperApp1Click(sender As Object, e As EventArgs) Handles CMIHelperApp1.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.HelperApp1(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
@@ -3709,6 +3709,13 @@ Public Class Player
     End Sub
 
     'Methods
+    Private Function IsFile(path As String) As Boolean
+        If App.History.FindIndex(Function(p) p.Path = path And p.SourceType = App.MediaSourceTypes.File) >= 0 Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
     Private Function IsStream(path As String) As Boolean
         If App.History.FindIndex(Function(p) p.Path = path And p.SourceType = App.MediaSourceTypes.Stream) >= 0 Then
             Return True
@@ -3786,6 +3793,23 @@ Public Class Player
             Return 0
         End If
     End Function
+    Private Sub EditTags()
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            Dim paths As New List(Of String)
+            For Each lvi As ListViewItem In LVPlaylist.SelectedItems
+                Dim path As String = lvi.SubItems(LVPlaylist.Columns("Path").Index).Text
+                If IsFile(path) Then paths.Add(path)
+            Next
+            If paths.Count > 0 Then
+                App.FrmTagEditor = New TagEditor(paths.ToList)
+                Dim result = App.FrmTagEditor.ShowDialog(Me)
+                If result = DialogResult.OK AndAlso Not App.WatcherUpdatePlaylist Then
+
+                    LVPlaylist.Focus()
+                End If
+            End If
+        End If
+    End Sub
     Friend Sub ShowPlayMode()
         Select Case App.PlayMode
             Case PlayModes.None
