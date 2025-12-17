@@ -9,6 +9,7 @@ Public Class TagEditor
     Private _paths As List(Of String)
     Private _haschanged As Boolean = False
     Private _libraryneedsupdated As Boolean = False
+    Private _playlistneedsupdated As Boolean = False
     Private artindex As Integer = 0
     Private aggregateconflict As Boolean = False
     Private oText As String
@@ -82,7 +83,13 @@ Public Class TagEditor
         GetTags()
     End Sub
     Private Sub TagEditor_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        If _libraryneedsupdated Then DialogResult = DialogResult.OK
+        If ParentForm Is Library And _libraryneedsupdated Then
+            DialogResult = DialogResult.OK
+        ElseIf ParentForm Is Player And _playlistneedsupdated Then
+            DialogResult = DialogResult.OK
+        Else
+            DialogResult = DialogResult.Cancel
+        End If
     End Sub
     Private Sub TagEditor_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
         Dim cSender As Control
@@ -875,6 +882,7 @@ Public Class TagEditor
         ' Only update library and reset UI if at least one successful save
         If failedPaths.Count = 0 Then
             If Not App.WatcherUpdateLibrary Then _libraryneedsupdated = True
+            If Not App.WatcherUpdatePlaylist Then _playlistneedsupdated = True
 
             ' Reset state once after all attempts
             HasChanged = False
