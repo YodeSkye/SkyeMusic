@@ -3804,7 +3804,9 @@ Public Class Player
                 App.FrmTagEditor = New TagEditor(paths.ToList)
                 Dim result = App.FrmTagEditor.ShowDialog(Me)
                 If result = DialogResult.OK AndAlso Not App.WatcherUpdatePlaylist Then
-
+                    For Each path In paths
+                        AddToPlaylistFromPath(path)
+                    Next
                     LVPlaylist.Focus()
                 End If
             End If
@@ -4148,6 +4150,26 @@ Public Class Player
         SetPlaylistCountText()
         ofd.Dispose()
     End Sub
+    Private Sub AddToPlaylistFromPath(path As String)
+        Dim lvi As ListViewItem
+        If LVPlaylist.Items.Count > 0 Then
+            lvi = LVPlaylist.FindItemWithText(path, True, 0)
+            If lvi IsNot Nothing Then LVPlaylist.Items.Remove(lvi)
+        End If
+        lvi = CreateListviewItem()
+        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(path)
+        lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = path
+        GetHistory(lvi, path)
+        ClearPlaylistTitles()
+        LVPlaylist.ListViewItemSorter = Nothing
+        If LVPlaylist.SelectedItems.Count = 0 Then
+            LVPlaylist.Items.Add(lvi)
+        Else
+            LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
+        End If
+        SetPlaylistCountText()
+        lvi = Nothing
+    End Sub
     Friend Sub AddToPlaylistFromLibrary(title As String, filename As String)
         Dim lvi As ListViewItem
         If LVPlaylist.Items.Count > 0 Then
@@ -4168,7 +4190,7 @@ Public Class Player
         SetPlaylistCountText()
         lvi = Nothing
     End Sub
-    Friend Sub AddToPlaylist(items As List(Of String))
+    Friend Sub AddToPlaylistFromHistory(items As List(Of String))
         Dim addedcount As Integer = 0
         LVPlaylist.BeginUpdate()
         For Each item As String In items

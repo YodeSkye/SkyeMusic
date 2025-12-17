@@ -1026,7 +1026,7 @@ Public Class History
             For Each lvi As ListViewItem In addlist
                 paths.Add(lvi.SubItems(pathindex).Text)
             Next
-            Player.AddToPlaylist(paths)
+            Player.AddToPlaylistFromHistory(paths)
         End If
     End Sub
     Private Sub SetShowAll()
