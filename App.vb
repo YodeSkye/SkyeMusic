@@ -977,12 +977,12 @@ Namespace My
         ' Control Events
         Private Sub NIApp_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
             Dim miPlayer As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlayer"), ToolStripMenuItem)
-            Dim miLibrary As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MILibrary"), ToolStripMenuItem)
             If Player.WindowState = FormWindowState.Minimized Then
                 miPlayer.Checked = False
             Else
                 miPlayer.Checked = True
             End If
+            Dim miLibrary As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MILibrary"), ToolStripMenuItem)
             If FrmLibrary.Visible Then
                 miLibrary.Checked = True
             Else
@@ -1002,6 +1002,12 @@ Namespace My
                 Case MouseButtons.Left
                     Player.TogglePlayer()
                 Case MouseButtons.Right
+                    Select Case Player.WindowState
+                        Case FormWindowState.Normal, FormWindowState.Maximized
+                            Player.BringToFront()
+                        Case FormWindowState.Minimized
+                            Player.TogglePlayer()
+                    End Select
             End Select
         End Sub
         Private Sub NIApp_MILibrary_MouseDown(sender As Object, e As MouseEventArgs)
@@ -1016,14 +1022,14 @@ Namespace My
                     ShowLibrary()
             End Select
         End Sub
-        Private Sub NIApp_Settings_MouseDown(sender As Object, e As MouseEventArgs)
+        Private Sub NIApp_MISettings_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
                     ShowOptions(True)
                 Case MouseButtons.Right
             End Select
         End Sub
-        Private Sub NIApp_Exit_MouseDown(sender As Object, e As MouseEventArgs)
+        Private Sub NIApp_MIExit_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
                     Player.ExitApp()
@@ -1188,24 +1194,26 @@ Namespace My
 
             ' Notify Icon
             NIApp.Icon = My.Resources.IconSkyeMusicRed
+            NIApp.Text = My.Application.Info.Title
             AddHandler NIApp.MouseClick, AddressOf NIApp_MouseClick
             Dim cm As New ContextMenuStrip()
             Dim cmi As ToolStripMenuItem
-            cmi = New ToolStripMenuItem("Player", My.Resources.ImagePlay)
-            cmi.Name = "NIApp_MIPlayer"
+            cmi = New ToolStripMenuItem("Player", My.Resources.ImagePlay) With {
+                .Name = "NIApp_MIPlayer",
+                .ToolTipText = "Left-Click = Toggle Player" & vbCr & "Right-Click = Show Player"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPlayer_MouseDown
             cm.Items.Add(cmi)
-            cmi = New ToolStripMenuItem("Library", My.Resources.ImageLibrary16)
-            cmi.Name = "NIApp_MILibrary"
-            cmi.ToolTipText = "Right-Click = Show Library"
+            cmi = New ToolStripMenuItem("Library", My.Resources.ImageLibrary16) With {
+                .Name = "NIApp_MILibrary",
+                .ToolTipText = "Left-Click = Toggle Library" & vbCr & "Right-Click = Show Library"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MILibrary_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
             cmi = New ToolStripMenuItem("Options", My.Resources.ImageSettings16)
-            AddHandler cmi.MouseDown, AddressOf NIApp_Settings_MouseDown
+            AddHandler cmi.MouseDown, AddressOf NIApp_MISettings_MouseDown
             cm.Items.Add(cmi)
             cmi = New ToolStripMenuItem("Exit " & My.Application.Info.Title, My.Resources.ImageExit)
-            AddHandler cmi.MouseDown, AddressOf NIApp_Exit_MouseDown
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIExit_MouseDown
             cm.Items.Add(cmi)
             AddHandler cm.Opening, AddressOf NIApp_Opening
             NIApp.ContextMenuStrip = cm

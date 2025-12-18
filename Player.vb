@@ -1,16 +1,12 @@
 ﻿
 Imports System.IO
-Imports System.Runtime.InteropServices.JavaScript.JSType
-Imports System.Security.Policy
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
-Imports NAudio.FileFormats
 Imports NAudio.Wave
 Imports Skye
 Imports Skye.Contracts
 Imports SkyeMusic.My
-Imports Syncfusion.Windows.Forms.Tools
 
 Public Class Player
 
@@ -2331,7 +2327,6 @@ Public Class Player
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
         PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
         TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
-        'AddHandler LblMedia.CustomDraw, AddressOf LblMedia_Paint
 
         'Initialize Listview
         Dim header As ColumnHeader
@@ -4750,14 +4745,21 @@ Public Class Player
                 Case App.MediaSourceTypes.AudioCD
                     ' not implemented
                 Case App.MediaSourceTypes.Stream
-                    Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path.TrimEnd("/"c), True, 0).Text + " @ " + _player.Path.TrimEnd("/"c)
+                    Dim path As String = _player.Path.TrimEnd("/"c)
+                    Dim lvi = LVPlaylist.FindItemWithText(path, True, 0)
+                    Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
+                    App.NIApp.Text = My.Application.Info.Title + " - " + lvi.Text
                 Case App.MediaSourceTypes.File
-                    Text = My.Application.Info.Title + " - " + LVPlaylist.FindItemWithText(_player.Path, True, 0).Text + " @ " + _player.Path
+                    Dim lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+                    Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
+                    App.NIApp.Text = My.Application.Info.Title + " - " + lvi.Text
                     LoadLyrics(_player.Path)
             End Select
-        Catch ex As Exception
+        Catch
             Text = My.Application.Info.Title + " - " + _player.Path
+            App.NIApp.Text = Text
         End Try
+
         TimerShowMedia.Start()
     End Sub
     Private Sub OnPause()
