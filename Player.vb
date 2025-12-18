@@ -2516,8 +2516,16 @@ Public Class Player
     End Sub
     Private Sub Player_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         If Visible AndAlso WindowState = FormWindowState.Normal Then
-            App.PlayerSize = Me.Size
+            App.PlayerSize = Size
         End If
+        Select Case WindowState
+            Case FormWindowState.Minimized
+                If App.ShowTrayIcon AndAlso App.MinimizeToTray Then
+                    ShowInTaskbar = False
+                End If
+            Case FormWindowState.Normal, FormWindowState.Maximized
+                ShowInTaskbar = True
+        End Select
     End Sub
     Private Sub Player_Deactivate(sender As Object, e As EventArgs) Handles MyBase.Deactivate
         ResetTxtBoxPlaylistSearch()
@@ -3793,6 +3801,19 @@ Public Class Player
             Return 0
         End If
     End Function
+    Friend Sub TogglePlayer()
+        Static lastState As FormWindowState
+        Select Case WindowState
+            Case FormWindowState.Normal, FormWindowState.Maximized
+                lastState = WindowState
+                WindowState = FormWindowState.Minimized
+            Case FormWindowState.Minimized
+                WindowState = lastState
+        End Select
+    End Sub
+    Friend Sub ExitApp()
+        Close()
+    End Sub
     Private Sub EditTags()
         If LVPlaylist.SelectedItems.Count > 0 Then
             Dim paths As New List(Of String)

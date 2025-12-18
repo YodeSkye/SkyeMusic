@@ -176,6 +176,7 @@ Namespace My
         Friend FrmTagEditor As TagEditor 'FrmTagEditor is the tag editor window that allows users to edit metadata tags of media files.
         Friend FrmLog As Log 'FrmLog is the log window that displays the application log.
         Friend FrmDevTools As DevTools 'FrmDevTools is the developer tools window that provides debugging and database access features.
+        Friend NIApp As New NotifyIcon 'NIApp is the system tray icon for the application.
         Private WithEvents TimerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
         Private WithEvents TimerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
         Private WithEvents TimerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
@@ -620,6 +621,8 @@ Namespace My
         Friend HelperApp2Name As String = String.Empty
         Friend HelperApp2Path As String = String.Empty
         Friend ChangeLogLastVersionShown As String = String.Empty
+        Friend ShowTrayIcon As Boolean = True
+        Friend MinimizeToTray As Boolean = True
 
         'Interfaces
         Friend Interface IAccentable
@@ -971,6 +974,63 @@ Namespace My
             End Function
         End Class
 
+        ' Control Events
+        Private Sub NIApp_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
+            Dim miPlayer As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlayer"), ToolStripMenuItem)
+            Dim miLibrary As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MILibrary"), ToolStripMenuItem)
+            If Player.WindowState = FormWindowState.Minimized Then
+                miPlayer.Checked = False
+            Else
+                miPlayer.Checked = True
+            End If
+            If FrmLibrary.Visible Then
+                miLibrary.Checked = True
+            Else
+                miLibrary.Checked = False
+            End If
+        End Sub
+        Private Sub NIApp_MouseClick(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                    Player.TogglePlayer()
+                Case MouseButtons.Right
+                    NIApp.ContextMenuStrip.Show(Cursor.Position)
+            End Select
+        End Sub
+        Private Sub NIApp_MIPlayer_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                    Player.TogglePlayer()
+                Case MouseButtons.Right
+            End Select
+        End Sub
+        Private Sub NIApp_MILibrary_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                    If FrmLibrary.Visible Then
+                        HideLibrary()
+                    Else
+                        ShowLibrary()
+                    End If
+                Case MouseButtons.Right
+                    ShowLibrary()
+            End Select
+        End Sub
+        Private Sub NIApp_Settings_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                    ShowOptions(True)
+                Case MouseButtons.Right
+            End Select
+        End Sub
+        Private Sub NIApp_Exit_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                    Player.ExitApp()
+                Case MouseButtons.Right
+            End Select
+        End Sub
+
         'Handlers
         Private Sub TimerScreenSaverWatcher_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerScreenSaverWatcher.Tick
             Static ssStatus As Boolean
@@ -1047,7 +1107,7 @@ Namespace My
             LoadHistory()
             LoadPlayHistoryDatabase()
 
-            'Setup Dictionaries
+            ' Setup Dictionaries
 #Region "            Audio Types"
             ExtensionDictionary.Add(".aa", "")
             AudioExtensionDictionary.Add(".aa", "")
@@ -1125,6 +1185,31 @@ Namespace My
             FrmLibrary.Show()
             FrmLibrary.Hide()
             FrmLibrary.Opacity = 1
+
+            ' Notify Icon
+            NIApp.Icon = My.Resources.IconSkyeMusicRed
+            AddHandler NIApp.MouseClick, AddressOf NIApp_MouseClick
+            Dim cm As New ContextMenuStrip()
+            Dim cmi As ToolStripMenuItem
+            cmi = New ToolStripMenuItem("Player", My.Resources.ImagePlay)
+            cmi.Name = "NIApp_MIPlayer"
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIPlayer_MouseDown
+            cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("Library", My.Resources.ImageLibrary16)
+            cmi.Name = "NIApp_MILibrary"
+            cmi.ToolTipText = "Right-Click = Show Library"
+            AddHandler cmi.MouseDown, AddressOf NIApp_MILibrary_MouseDown
+            cm.Items.Add(cmi)
+            cm.Items.Add(New ToolStripSeparator())
+            cmi = New ToolStripMenuItem("Options", My.Resources.ImageSettings16)
+            AddHandler cmi.MouseDown, AddressOf NIApp_Settings_MouseDown
+            cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("Exit " & My.Application.Info.Title, My.Resources.ImageExit)
+            AddHandler cmi.MouseDown, AddressOf NIApp_Exit_MouseDown
+            cm.Items.Add(cmi)
+            AddHandler cm.Opening, AddressOf NIApp_Opening
+            NIApp.ContextMenuStrip = cm
+            If ShowTrayIcon Then NIApp.Visible = True
 
             GenerateHotKeyList()
             RegisterHotKeys()
@@ -1719,7 +1804,12 @@ Namespace My
                 End If
             End If
         End Sub
-        Friend Sub ShowOptions()
+        Friend Sub ShowOptions(Optional showcentered As Boolean = False)
+            If showcentered Then
+                Options.StartPosition = FormStartPosition.CenterScreen
+            Else
+                Options.StartPosition = FormStartPosition.CenterParent
+            End If
             Options.ShowDialog()
         End Sub
         Friend Sub ShowLibrary()
@@ -1729,6 +1819,11 @@ Namespace My
                 FrmLibrary.BringToFront()
             Else
                 FrmLibrary.Show()
+            End If
+        End Sub
+        Private Sub HideLibrary()
+            If FrmLibrary IsNot Nothing AndAlso Not FrmLibrary.IsDisposed Then
+                FrmLibrary.Hide()
             End If
         End Sub
         Friend Sub ShowHelp()
