@@ -978,6 +978,32 @@ Namespace My
 
         ' Control Events
         Private Sub NIApp_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
+            Dim miPlay As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlay"), ToolStripMenuItem)
+            Select Case Player.PlayState
+                Case Player.PlayStates.Playing
+                    miPlay.Text = "Pause"
+                    miPlay.Image = ResizeImage(CurrentTheme.PlayerPause, 16)
+                Case Player.PlayStates.Paused, Player.PlayStates.Stopped
+                    miPlay.Text = "Play"
+                    miPlay.Image = ResizeImage(CurrentTheme.PlayerPlay, 16)
+            End Select
+            Dim miStop As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIStop"), ToolStripMenuItem)
+            miStop.Image = ResizeImage(CurrentTheme.PlayerStop, 16)
+            Dim miPrevious As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPrevious"), ToolStripMenuItem)
+            miPrevious.Image = ResizeImage(CurrentTheme.PlayerPrevious, 16)
+            Dim miNext As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MINext"), ToolStripMenuItem)
+            miNext.Image = ResizeImage(CurrentTheme.PlayerNext, 16)
+            Select Case PlayMode
+                Case App.PlayModes.None, PlayModes.Repeat
+                    miPrevious.ToolTipText = String.Empty
+                    miNext.ToolTipText = String.Empty
+                Case App.PlayModes.Linear
+                    miPrevious.ToolTipText = "Previous Song In Playlist"
+                    miNext.ToolTipText = "Next Song In Playlist"
+                Case App.PlayModes.Random
+                    miPrevious.ToolTipText = "Previous Song Played"
+                    miNext.ToolTipText = "Next Random Song"
+            End Select
             Dim miPlayer As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlayer"), ToolStripMenuItem)
             If Player.WindowState = FormWindowState.Minimized Then
                 miPlayer.Checked = False
@@ -1011,6 +1037,30 @@ Namespace My
                 ' Handle Double-Click
                 Debug.Print("TrayIcon Double-Click")
             End If
+        End Sub
+        Private Sub NIApp_MIPlay_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                Case MouseButtons.Right
+            End Select
+        End Sub
+        Private Sub NIApp_MIStop_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                Case MouseButtons.Right
+            End Select
+        End Sub
+        Private Sub NIApp_MIPrevious_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                Case MouseButtons.Right
+            End Select
+        End Sub
+        Private Sub NIApp_MINext_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                Case MouseButtons.Right
+            End Select
         End Sub
         Private Sub NIApp_MIPlayer_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
@@ -1235,7 +1285,20 @@ Namespace My
             AddHandler NIApp.MouseDoubleClick, AddressOf NIApp_MouseDoubleClick
             Dim cm As New ContextMenuStrip()
             Dim cmi As ToolStripMenuItem
-            cmi = New ToolStripMenuItem("Player", My.Resources.ImagePlay) With {
+            cmi = New ToolStripMenuItem With {.Name = "NIApp_MIPlay"}
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIPlay_MouseDown
+            cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("Stop") With {.Name = "NIApp_MIStop"}
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIStop_MouseDown
+            cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("Previous") With {.Name = "NIApp_MIPrevious"}
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIPrevious_MouseDown
+            cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("Next") With {.Name = "NIApp_MINext"}
+            AddHandler cmi.MouseDown, AddressOf NIApp_MINext_MouseDown
+            cm.Items.Add(cmi)
+            cm.Items.Add(New ToolStripSeparator())
+            cmi = New ToolStripMenuItem("Player", ResizeImage(My.Resources.ImagePlay, 16)) With {
                 .Name = "NIApp_MIPlayer",
                 .ToolTipText = "Left-Click = Toggle Player" & vbCr & "Right-Click = Show Player"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPlayer_MouseDown
@@ -2937,6 +3000,16 @@ Namespace My
                 Case Else
                     Return RedTheme
             End Select
+        End Function
+        Private Function ResizeImage(src As Image, size As Integer) As Image
+            Dim bmp As New Bitmap(size, size)
+            Using g = Graphics.FromImage(bmp)
+                g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+                g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+                g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+                g.DrawImage(src, New Rectangle(0, 0, size, size))
+            End Using
+            Return bmp
         End Function
 
         'History Handlers

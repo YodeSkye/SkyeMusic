@@ -11,7 +11,7 @@ Imports SkyeMusic.My
 Public Class Player
 
     'Declarations
-    Private Enum PlayStates
+    Friend Enum PlayStates
         Playing
         Paused
         Stopped
@@ -24,7 +24,7 @@ Public Class Player
     Private MeterPeakLeft, MeterPeakRight, MeterDecayLeft, MeterDecayRight As Single 'Meter Values
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
-    Private PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
+    Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
     Private Mute As Boolean = False 'True if the player is muted
     Private IsFocused As Boolean = True 'Indicates if the player is focused
