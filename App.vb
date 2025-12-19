@@ -177,6 +177,8 @@ Namespace My
         Friend FrmLog As Log 'FrmLog is the log window that displays the application log.
         Friend FrmDevTools As DevTools 'FrmDevTools is the developer tools window that provides debugging and database access features.
         Friend NIApp As New NotifyIcon 'NIApp is the system tray icon for the application.
+        Private pendingSingleClick As Boolean = False
+        Private WithEvents NIAppClickTimer As Timer
         Private WithEvents TimerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
         Private WithEvents TimerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
         Private WithEvents TimerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
@@ -983,19 +985,32 @@ Namespace My
                 miPlayer.Checked = True
             End If
             Dim miLibrary As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MILibrary"), ToolStripMenuItem)
-            If FrmLibrary.Visible Then
+            If FrmLibrary?.Visible Then
                 miLibrary.Checked = True
             Else
                 miLibrary.Checked = False
             End If
+            Dim miHistory As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIHistory"), ToolStripMenuItem)
+            If FrmHistory?.Visible Then
+                miHistory.Checked = True
+            Else
+                miHistory.Checked = False
+            End If
         End Sub
         Private Sub NIApp_MouseClick(sender As Object, e As MouseEventArgs)
-            Select Case e.Button
-                Case MouseButtons.Left
-                    Player.TogglePlayer()
-                Case MouseButtons.Right
-                    NIApp.ContextMenuStrip.Show(Cursor.Position)
-            End Select
+            If e.Button = MouseButtons.Left Then
+                pendingSingleClick = True
+                NIAppClickTimer.Start()
+            End If
+        End Sub
+        Private Sub NIApp_MouseDoubleClick(sender As Object, e As MouseEventArgs)
+            If e.Button = MouseButtons.Left Then
+                pendingSingleClick = False
+                NIAppClickTimer.Stop()
+
+                ' Handle Double-Click
+                Debug.Print("TrayIcon Double-Click")
+            End If
         End Sub
         Private Sub NIApp_MIPlayer_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
@@ -1022,6 +1037,18 @@ Namespace My
                     ShowLibrary()
             End Select
         End Sub
+        Private Sub NIApp_MIHistory_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                    If FrmHistory?.Visible Then
+                        HideHistory()
+                    Else
+                        ShowHistory()
+                    End If
+                Case MouseButtons.Right
+                    ShowHistory()
+            End Select
+        End Sub
         Private Sub NIApp_MISettings_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
@@ -1038,6 +1065,15 @@ Namespace My
         End Sub
 
         'Handlers
+        Private Sub NIAppClickTimer_Tick(sender As Object, e As EventArgs) Handles NIAppClickTimer.Tick
+            NIAppClickTimer.Stop()
+            If pendingSingleClick Then
+                pendingSingleClick = False
+
+                ' Handle Single-Click
+                Player.TogglePlayer()
+            End If
+        End Sub
         Private Sub TimerScreenSaverWatcher_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerScreenSaverWatcher.Tick
             Static ssStatus As Boolean
             Skye.WinAPI.SystemParametersInfo(Skye.WinAPI.SPI_GETSCREENSAVERRUNNING, 0, ssStatus, 0)
@@ -1196,6 +1232,7 @@ Namespace My
             NIApp.Icon = My.Resources.IconSkyeMusicRed
             NIApp.Text = My.Application.Info.Title
             AddHandler NIApp.MouseClick, AddressOf NIApp_MouseClick
+            AddHandler NIApp.MouseDoubleClick, AddressOf NIApp_MouseDoubleClick
             Dim cm As New ContextMenuStrip()
             Dim cmi As ToolStripMenuItem
             cmi = New ToolStripMenuItem("Player", My.Resources.ImagePlay) With {
@@ -1208,6 +1245,11 @@ Namespace My
                 .ToolTipText = "Left-Click = Toggle Library" & vbCr & "Right-Click = Show Library"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MILibrary_MouseDown
             cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("History", My.Resources.ImageHistory) With {
+                .Name = "NIApp_MIHistory",
+                .ToolTipText = "Left-Click = Toggle History" & vbCr & "Right-Click = Show History"}
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIHistory_MouseDown
+            cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
             cmi = New ToolStripMenuItem("Options", My.Resources.ImageSettings16)
             AddHandler cmi.MouseDown, AddressOf NIApp_MISettings_MouseDown
@@ -1217,7 +1259,7 @@ Namespace My
             cm.Items.Add(cmi)
             AddHandler cm.Opening, AddressOf NIApp_Opening
             NIApp.ContextMenuStrip = cm
-            If ShowTrayIcon Then NIApp.Visible = True
+            SetNIApp()
 
             GenerateHotKeyList()
             RegisterHotKeys()
@@ -1784,6 +1826,17 @@ Namespace My
                 FrmLibrary.DoWatcherWork(paths)
             End If
         End Sub
+        Friend Sub SetNIApp()
+            If ShowTrayIcon Then
+                NIAppClickTimer = New Timer() With {.Interval = SystemInformation.DoubleClickTime}
+                NIApp.Visible = True
+            Else
+                NIApp.Visible = False
+                NIAppClickTimer?.Stop()
+                NIAppClickTimer?.Dispose()
+                NIAppClickTimer = Nothing
+            End If
+        End Sub
         Friend Sub ShowDevTools()
             If FrmDevTools Is Nothing OrElse FrmDevTools.IsDisposed Then
                 FrmDevTools = New DevTools
@@ -1810,6 +1863,11 @@ Namespace My
                 Else
                     FrmHistory.Show()
                 End If
+            End If
+        End Sub
+        Private Sub HideHistory()
+            If FrmHistory IsNot Nothing AndAlso Not FrmHistory.IsDisposed Then
+                FrmHistory.Close()
             End If
         End Sub
         Friend Sub ShowOptions(Optional showcentered As Boolean = False)
