@@ -531,4 +531,16 @@ Skye Music v0.8\par
   <data name="IconSkyeMusicRed" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>IconSkyeMusicRed.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageAttributionVLCSharp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionVLCSharp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionNAudio" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionNAudio.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionSQLite" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionSQLite.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionMusicBrainz" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionMusicBrainz.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

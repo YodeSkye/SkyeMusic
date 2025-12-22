@@ -26,6 +26,8 @@ Public Class About
         Text = "About " + My.Application.Info.Title
         LblAbout.Text = My.Application.Info.Description
         LblVersion.Text = "v" + My.Application.Info.Version.Major.ToString + "." + My.Application.Info.Version.Minor.ToString + "." + My.Application.Info.Version.Build.ToString
+        LLblVLCSharp.Image = App.ResizeImage(My.Resources.ImageAttributionVLCSharp, 16)
+        LLblNAudio.Image = App.ResizeImage(My.Resources.ImageAttributionNAudio, 16)
         BtnOK.Select()
     End Sub
     Private Sub About_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblAbout.MouseDown, LblVersion.MouseDown
@@ -82,14 +84,34 @@ Public Class About
         ResetCursor()
     End Sub
     Private Sub LLblMicrosoft_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblMicrosoft.MouseClick
-        Dim pInfo As New Diagnostics.ProcessStartInfo With {
-            .UseShellExecute = True,
-            .FileName = App.AttributionMicrosoft}
-        Try
-            Diagnostics.Process.Start(pInfo)
-        Catch ex As Exception
-            WriteToLog("Cannot Open " + App.AttributionMicrosoft + vbCr + ex.Message)
-        End Try
+        OpenLink(App.AttributionMicrosoft)
+    End Sub
+    Private Sub LLblVLCSharp_MouseEnter(sender As Object, e As EventArgs) Handles LLblVLCSharp.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LLblVLCSharp_MouseLeave(sender As Object, e As EventArgs) Handles LLblVLCSharp.MouseLeave
+        ResetCursor()
+    End Sub
+    Private Sub LLblVLCSharp_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblVLCSharp.MouseClick
+        OpenLink(App.AttributionVLC)
+    End Sub
+    Private Sub LLblNAudio_MouseEnter(sender As Object, e As EventArgs) Handles LLblNAudio.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LLblNAudio_MouseLeave(sender As Object, e As EventArgs) Handles LLblNAudio.MouseLeave
+        ResetCursor()
+    End Sub
+    Private Sub LLblNAudio_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblNAudio.MouseClick
+        OpenLink(App.AttributionNAudio)
+    End Sub
+    Private Sub LLblSQLite_MouseEnter(sender As Object, e As EventArgs) Handles LLblSQLite.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LLblSQLite_MouseLeave(sender As Object, e As EventArgs) Handles LLblSQLite.MouseLeave
+        ResetCursor()
+    End Sub
+    Private Sub LLblSQLite_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSQLite.MouseClick
+        OpenLink(App.AttributionSQLite)
     End Sub
     Private Sub LLblSyncFusion_MouseEnter(sender As Object, e As EventArgs) Handles LLblSyncFusion.MouseEnter
         Cursor = Cursors.Hand
@@ -98,24 +120,19 @@ Public Class About
         ResetCursor()
     End Sub
     Private Sub LLblSyncFusion_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSyncFusion.MouseClick
-        Dim pInfo As New Diagnostics.ProcessStartInfo With {
-            .UseShellExecute = True,
-            .FileName = App.AttributionSyncFusion}
-        Try
-            Diagnostics.Process.Start(pInfo)
-        Catch ex As Exception
-            WriteToLog("Cannot Open " + App.AttributionSyncFusion + vbCr + ex.Message)
-        End Try
+        OpenLink(App.AttributionSyncFusion)
     End Sub
     Private Sub LLblTagLibSharp_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblTagLibSharp.MouseClick
-        Dim pInfo As New Diagnostics.ProcessStartInfo With {
-            .UseShellExecute = True,
-            .FileName = App.AttributionTagLibSharp}
-        Try
-            Diagnostics.Process.Start(pInfo)
-        Catch ex As Exception
-            WriteToLog("Cannot Open " + App.AttributionTagLibSharp + vbCr + ex.Message)
-        End Try
+        OpenLink(App.AttributionTagLibSharp)
+    End Sub
+    Private Sub LLblMusicBrainz_MouseEnter(sender As Object, e As EventArgs) Handles LLblMusicBrainz.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LLblMusicBrainz_MouseLeave(sender As Object, e As EventArgs) Handles LLblMusicBrainz.MouseLeave
+        ResetCursor()
+    End Sub
+    Private Sub LLblMusicBrainz_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblMusicBrainz.MouseClick
+        OpenLink(App.AttributionMusicBrainz)
     End Sub
     Private Sub LLblIcons8_MouseEnter(sender As Object, e As EventArgs) Handles LLblIcons8.MouseEnter
         Cursor = Cursors.Hand
@@ -124,17 +141,20 @@ Public Class About
         ResetCursor()
     End Sub
     Private Sub LLblIcons8_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblIcons8.MouseClick
-        Dim pInfo As New Diagnostics.ProcessStartInfo With {
-            .UseShellExecute = True,
-            .FileName = App.AttributionIcons8}
-        Try
-            Diagnostics.Process.Start(pInfo)
-        Catch ex As Exception
-            WriteToLog("Cannot Open " + App.AttributionIcons8 + vbCr + ex.Message)
-        End Try
+        OpenLink(App.AttributionIcons8)
     End Sub
 
     'Procedures
+    Public Sub OpenLink(target As String)
+        Dim pInfo As New Diagnostics.ProcessStartInfo With {
+        .UseShellExecute = True,
+        .FileName = target}
+        Try
+            Diagnostics.Process.Start(pInfo)
+        Catch ex As Exception
+            WriteToLog("Cannot Open " & target & vbCr & ex.Message)
+        End Try
+    End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
@@ -157,6 +177,8 @@ Public Class About
             LblAbout.ForeColor = App.CurrentTheme.AccentTextColor
             LblVersion.ForeColor = App.CurrentTheme.AccentTextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.AccentTextColor
+            LLblVLCSharp.LinkColor = App.CurrentTheme.AccentTextColor
+            LLblNAudio.LinkColor = App.CurrentTheme.AccentTextColor
             LLblSyncFusion.LinkColor = App.CurrentTheme.AccentTextColor
             LLblTagLibSharp.LinkColor = App.CurrentTheme.AccentTextColor
             LLblIcons8.LinkColor = App.CurrentTheme.AccentTextColor
@@ -165,11 +187,15 @@ Public Class About
             LblAbout.ForeColor = App.CurrentTheme.TextColor
             LblVersion.ForeColor = App.CurrentTheme.TextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.TextColor
+            LLblVLCSharp.LinkColor = App.CurrentTheme.TextColor
+            LLblNAudio.LinkColor = App.CurrentTheme.TextColor
             LLblSyncFusion.LinkColor = App.CurrentTheme.TextColor
             LLblTagLibSharp.LinkColor = App.CurrentTheme.TextColor
             LLblIcons8.LinkColor = App.CurrentTheme.TextColor
         End If
         LLblMicrosoft.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
+        LLblVLCSharp.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
+        LLblNAudio.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblSyncFusion.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblTagLibSharp.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblIcons8.ActiveLinkColor = App.CurrentTheme.ButtonBackColor

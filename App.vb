@@ -193,8 +193,12 @@ Namespace My
         Friend ReadOnly AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
         Friend ReadOnly TrimEndSearch() As Char = {CChar(" "), CChar("("), CChar(")"), CChar("0"), CChar("1"), CChar("2"), CChar("3"), CChar("4"), CChar("5"), CChar("6"), CChar("7"), CChar("8"), CChar("9")} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
         Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
+        Friend ReadOnly AttributionVLC As String = "https://docs.videolan.me/libvlcsharp/" 'AttributionVLC is the URL for VLCSharp, which provides media playback capabilities in the application.
+        Friend ReadOnly AttributionNAudio As String = "https://github.com/naudio/NAudio" 'AttributionNAudio is the URL for NAudio, which provides audio processing capabilities in the application.
+        Friend ReadOnly AttributionSQLite As String = "https://www.sqlite.org/index.html" 'AttributionSQLite is the URL for SQLite, which provides database functionality in the application.
         Friend ReadOnly AttributionSyncFusion As String = "https://www.syncfusion.com/" 'AttributionSyncFusion is the URL for Syncfusion, which provides UI controls and libraries used in the application.
         Friend ReadOnly AttributionTagLibSharp As String = "https://github.com/mono/taglib-sharp" 'AttributionTagLibSharp is the URL for TagLib# library, which is used for reading and writing metadata in media files.
+        Friend ReadOnly AttributionMusicBrainz As String = "https://musicbrainz.org/doc/MusicBrainz_API" 'AttributionMusicBrainz is the URL for MusicBrainz API, which provides music metadata services used in the application.
         Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/" 'AttributionIcons8 is the URL for Icons8, which provides icons used in the application.
 
         'HotKeys
@@ -1290,15 +1294,19 @@ Namespace My
             Dim cm As New ContextMenuStrip()
             Dim cmi As ToolStripMenuItem
             cmi = New ToolStripMenuItem With {.Name = "NIApp_MIPlay"}
+            cmi.BackColor = Color.LightGray
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPlay_MouseDown
             cm.Items.Add(cmi)
             cmi = New ToolStripMenuItem("Stop") With {.Name = "NIApp_MIStop"}
+            cmi.BackColor = Color.LightGray
             AddHandler cmi.MouseDown, AddressOf NIApp_MIStop_MouseDown
             cm.Items.Add(cmi)
             cmi = New ToolStripMenuItem("Previous") With {.Name = "NIApp_MIPrevious"}
+            cmi.BackColor = Color.LightGray
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPrevious_MouseDown
             cm.Items.Add(cmi)
             cmi = New ToolStripMenuItem("Next") With {.Name = "NIApp_MINext"}
+            cmi.BackColor = Color.LightGray
             AddHandler cmi.MouseDown, AddressOf NIApp_MINext_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
@@ -3015,7 +3023,7 @@ Namespace My
                     Return RedTheme
             End Select
         End Function
-        Private Function ResizeImage(src As Image, size As Integer) As Image
+        Friend Function ResizeImage(src As Image, size As Integer) As Image
             Dim bmp As New Bitmap(size, size)
             Using g = Graphics.FromImage(bmp)
                 g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic

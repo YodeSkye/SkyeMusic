@@ -33,13 +33,17 @@ Partial Class About
         LblVersion = New Skye.UI.Label()
         BtnChangeLog = New Button()
         TipAbout = New Skye.UI.ToolTipEX(components)
+        LLblVLCSharp = New LinkLabel()
+        LLblNAudio = New LinkLabel()
+        LLblSQLite = New LinkLabel()
+        LLblMusicBrainz = New LinkLabel()
         SuspendLayout()
         ' 
         ' BtnOK
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
+        BtnOK.Image = My.Resources.Resources.ImageOK
         TipAbout.SetImage(BtnOK, Nothing)
-        BtnOK.Image = My.Resources.ImageOK
         BtnOK.Location = New Point(160, 385)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -55,9 +59,10 @@ Partial Class About
         TipAbout.SetImage(LblAbout, Nothing)
         LblAbout.Location = New Point(12, 9)
         LblAbout.Name = "LblAbout"
-        LblAbout.Size = New Size(360, 203)
+        LblAbout.Size = New Size(360, 166)
         LblAbout.TabIndex = 2
         LblAbout.Text = "About"
+        TipAbout.SetText(LblAbout, Nothing)
         LblAbout.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' LLblMicrosoft
@@ -68,12 +73,13 @@ Partial Class About
         LLblMicrosoft.Image = My.Resources.Resources.ImageAttributionMicrosoft16
         LLblMicrosoft.ImageAlign = ContentAlignment.MiddleLeft
         LLblMicrosoft.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblMicrosoft.Location = New Point(12, 259)
+        LLblMicrosoft.Location = New Point(12, 205)
         LLblMicrosoft.Name = "LLblMicrosoft"
         LLblMicrosoft.Size = New Size(94, 23)
         LLblMicrosoft.TabIndex = 3
         LLblMicrosoft.TabStop = True
         LLblMicrosoft.Text = "Microsoft"
+        TipAbout.SetText(LLblMicrosoft, Nothing)
         LLblMicrosoft.TextAlign = ContentAlignment.TopRight
         ' 
         ' LLblSyncFusion
@@ -83,10 +89,11 @@ Partial Class About
         TipAbout.SetImage(LLblSyncFusion, Nothing)
         LLblSyncFusion.Image = My.Resources.Resources.ImageAttributionSyncFusion24
         LLblSyncFusion.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSyncFusion.Location = New Point(115, 258)
+        LLblSyncFusion.Location = New Point(218, 237)
         LLblSyncFusion.Name = "LLblSyncFusion"
         LLblSyncFusion.Size = New Size(107, 23)
         LLblSyncFusion.TabIndex = 4
+        TipAbout.SetText(LLblSyncFusion, Nothing)
         LLblSyncFusion.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' LLblIcons8
@@ -97,12 +104,13 @@ Partial Class About
         LLblIcons8.Image = My.Resources.Resources.ImageAttributionIcons816
         LLblIcons8.ImageAlign = ContentAlignment.MiddleLeft
         LLblIcons8.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblIcons8.Location = New Point(302, 260)
+        LLblIcons8.Location = New Point(288, 277)
         LLblIcons8.Name = "LLblIcons8"
         LLblIcons8.Size = New Size(70, 23)
         LLblIcons8.TabIndex = 7
         LLblIcons8.TabStop = True
         LLblIcons8.Text = "Icons8"
+        TipAbout.SetText(LLblIcons8, Nothing)
         LLblIcons8.TextAlign = ContentAlignment.TopRight
         ' 
         ' LLblTagLibSharp
@@ -112,30 +120,32 @@ Partial Class About
         TipAbout.SetImage(LLblTagLibSharp, Nothing)
         LLblTagLibSharp.ImageAlign = ContentAlignment.MiddleLeft
         LLblTagLibSharp.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblTagLibSharp.Location = New Point(227, 260)
+        LLblTagLibSharp.Location = New Point(27, 276)
         LLblTagLibSharp.Name = "LLblTagLibSharp"
         LLblTagLibSharp.Size = New Size(67, 23)
         LLblTagLibSharp.TabIndex = 6
         LLblTagLibSharp.TabStop = True
         LLblTagLibSharp.Text = "TagLib#"
+        TipAbout.SetText(LLblTagLibSharp, Nothing)
         LLblTagLibSharp.TextAlign = ContentAlignment.TopCenter
         ' 
         ' LblVersion
         ' 
         LblVersion.Font = New Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LblVersion, Nothing)
-        LblVersion.Location = New Point(12, 347)
+        LblVersion.Location = New Point(12, 328)
         LblVersion.Name = "LblVersion"
         LblVersion.Size = New Size(360, 23)
         LblVersion.TabIndex = 7
-        LblVersion.Text = "Labelcsy1"
+        LblVersion.Text = "Version"
+        TipAbout.SetText(LblVersion, Nothing)
         LblVersion.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' BtnChangeLog
         ' 
         BtnChangeLog.Anchor = AnchorStyles.Bottom
-        TipAbout.SetImage(BtnChangeLog, Nothing)
         BtnChangeLog.Image = My.Resources.Resources.ImageChangeLog32
+        TipAbout.SetImage(BtnChangeLog, Nothing)
         BtnChangeLog.Location = New Point(324, 401)
         BtnChangeLog.Name = "BtnChangeLog"
         BtnChangeLog.Size = New Size(48, 48)
@@ -152,11 +162,75 @@ Partial Class About
         TipAbout.ShadowAlpha = 200
         TipAbout.ShowDelay = 1000
         ' 
+        ' LLblVLCSharp
+        ' 
+        LLblVLCSharp.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblVLCSharp.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAbout.SetImage(LLblVLCSharp, Nothing)
+        LLblVLCSharp.ImageAlign = ContentAlignment.MiddleLeft
+        LLblVLCSharp.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblVLCSharp.Location = New Point(149, 205)
+        LLblVLCSharp.Name = "LLblVLCSharp"
+        LLblVLCSharp.Size = New Size(96, 23)
+        LLblVLCSharp.TabIndex = 101
+        LLblVLCSharp.TabStop = True
+        LLblVLCSharp.Text = "VLCSharp"
+        TipAbout.SetText(LLblVLCSharp, Nothing)
+        LLblVLCSharp.TextAlign = ContentAlignment.TopRight
+        ' 
+        ' LLblNAudio
+        ' 
+        LLblNAudio.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblNAudio.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAbout.SetImage(LLblNAudio, Nothing)
+        LLblNAudio.ImageAlign = ContentAlignment.MiddleLeft
+        LLblNAudio.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblNAudio.Location = New Point(293, 205)
+        LLblNAudio.Name = "LLblNAudio"
+        LLblNAudio.Size = New Size(79, 23)
+        LLblNAudio.TabIndex = 102
+        LLblNAudio.TabStop = True
+        LLblNAudio.Text = "NAudio"
+        TipAbout.SetText(LLblNAudio, Nothing)
+        LLblNAudio.TextAlign = ContentAlignment.TopRight
+        ' 
+        ' LLblSQLite
+        ' 
+        LLblSQLite.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblSQLite.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAbout.SetImage(LLblSQLite, Nothing)
+        LLblSQLite.Image = My.Resources.Resources.ImageAttributionSQLite
+        LLblSQLite.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblSQLite.Location = New Point(97, 235)
+        LLblSQLite.Name = "LLblSQLite"
+        LLblSQLite.Size = New Size(79, 27)
+        LLblSQLite.TabIndex = 103
+        TipAbout.SetText(LLblSQLite, Nothing)
+        LLblSQLite.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LLblMusicBrainz
+        ' 
+        LLblMusicBrainz.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblMusicBrainz.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAbout.SetImage(LLblMusicBrainz, Nothing)
+        LLblMusicBrainz.Image = My.Resources.Resources.ImageAttributionMusicBrainz
+        LLblMusicBrainz.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblMusicBrainz.Location = New Point(122, 269)
+        LLblMusicBrainz.Name = "LLblMusicBrainz"
+        LLblMusicBrainz.Size = New Size(138, 38)
+        LLblMusicBrainz.TabIndex = 104
+        TipAbout.SetText(LLblMusicBrainz, Nothing)
+        LLblMusicBrainz.TextAlign = ContentAlignment.MiddleCenter
+        ' 
         ' About
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(384, 461)
+        Controls.Add(LLblMusicBrainz)
+        Controls.Add(LLblSQLite)
+        Controls.Add(LLblNAudio)
+        Controls.Add(LLblVLCSharp)
         Controls.Add(BtnChangeLog)
         Controls.Add(LblVersion)
         Controls.Add(LLblTagLibSharp)
@@ -174,6 +248,7 @@ Partial Class About
         Name = "About"
         ShowInTaskbar = False
         StartPosition = FormStartPosition.CenterParent
+        TipAbout.SetText(Me, Nothing)
         ResumeLayout(False)
     End Sub
 
@@ -186,4 +261,8 @@ Partial Class About
     Friend WithEvents LblVersion As Skye.UI.Label
     Friend WithEvents BtnChangeLog As Button
     Friend WithEvents TipAbout As Skye.UI.ToolTipEX
+    Friend WithEvents LLblVLCSharp As LinkLabel
+    Friend WithEvents LLblNAudio As LinkLabel
+    Friend WithEvents LLblSQLite As LinkLabel
+    Friend WithEvents LLblMusicBrainz As LinkLabel
 End Class
