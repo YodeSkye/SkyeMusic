@@ -4,13 +4,13 @@ Imports SkyeMusic.My
 
 Public Class Options
 
-    'Declarations
+    ' Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
     Private UIFolderBrowser As New FolderBrowserDialog
     Private uiFileBrowser As New OpenFileDialog
 
-    'Form Events
+    ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
@@ -110,6 +110,8 @@ Public Class Options
         CkBoxWatchFoldersUpdatePlaylist.Checked = App.WatcherUpdatePlaylist
         CkBoxSaveWindowMetrics.Checked = App.SaveWindowMetrics
         CkBoxSuspendOnSessionChange.Checked = App.SuspendOnSessionChange
+        CkBoxShowTrayIcon.Checked = App.ShowTrayIcon
+        CkBoxMinimizeToTray.Checked = App.MinimizeToTray
         TxtBoxHelperApp1Name.Text = App.HelperApp1Name
         TxtBoxHelperApp1Path.Text = App.HelperApp1Path
         If File.Exists(App.HelperApp1Path) Then
@@ -170,7 +172,7 @@ Public Class Options
         If e.KeyData = Keys.Escape Then Close()
     End Sub
 
-    'Control Events
+    ' Control Events
     Private Sub TCOptions_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TCOptions.SelectedIndexChanged
         Debug.Print(TCOptions.SelectedTab.Name)
         Select Case TCOptions.SelectedTab.Name
@@ -425,10 +427,17 @@ Public Class Options
         App.WatcherUpdatePlaylist = Not App.WatcherUpdatePlaylist
     End Sub
     Private Sub CkBoxSaveWindowMetricsClick(sender As Object, e As EventArgs) Handles CkBoxSaveWindowMetrics.Click
-        App.SaveWindowMetrics = Not App.SaveWindowMetrics
+        SaveWindowMetrics = Not SaveWindowMetrics
     End Sub
     Private Sub CkBoxSuspendOnSessionChange_Click(sender As Object, e As EventArgs) Handles CkBoxSuspendOnSessionChange.Click
-        App.SuspendOnSessionChange = Not App.SuspendOnSessionChange
+        SuspendOnSessionChange = Not SuspendOnSessionChange
+    End Sub
+    Private Sub CkBoxShowTrayIcon_Click(sender As Object, e As EventArgs) Handles CkBoxShowTrayIcon.Click
+        App.ShowTrayIcon = Not App.ShowTrayIcon
+        App.SetNIApp()
+    End Sub
+    Private Sub CkBoxMinimizeToTray_Click(sender As Object, e As EventArgs) Handles CkBoxMinimizeToTray.Click
+        App.MinimizeToTray = Not App.MinimizeToTray
     End Sub
     Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
         If e.Alt Then
@@ -478,7 +487,7 @@ Public Class Options
         LibrarySearchFoldersRemove()
     End Sub
 
-    'Procedures
+    ' Methods
     Private Sub LibrarySearchFoldersAdd()
         Dim r As DialogResult = UIFolderBrowser.ShowDialog(Me)
         If r = DialogResult.OK And Not UIFolderBrowser.SelectedPath = String.Empty And Not LBLibrarySearchFolders.Items.Contains(UIFolderBrowser.SelectedPath) Then
@@ -572,6 +581,8 @@ Public Class Options
             CkBoxWatchFolders.BackColor = c
             CkBoxWatchFoldersUpdateLibrary.BackColor = c
             CkBoxWatchFoldersUpdatePlaylist.BackColor = c
+            CkBoxShowTrayIcon.BackColor = c
+            CkBoxMinimizeToTray.BackColor = c
             TCOptions.TabPanelBackColor = c
         End If
         ResumeLayout()
@@ -598,6 +609,8 @@ Public Class Options
             CkBoxWatchFolders.BackColor = App.CurrentTheme.BackColor
             CkBoxWatchFoldersUpdateLibrary.BackColor = App.CurrentTheme.BackColor
             CkBoxWatchFoldersUpdatePlaylist.BackColor = App.CurrentTheme.BackColor
+            CkBoxShowTrayIcon.BackColor = App.CurrentTheme.BackColor
+            CkBoxMinimizeToTray.BackColor = App.CurrentTheme.BackColor
             TCOptions.TabPanelBackColor = App.CurrentTheme.BackColor
             forecolor = App.CurrentTheme.TextColor
         End If
@@ -650,6 +663,8 @@ Public Class Options
         lblStatusMessageDisplayTime1.ForeColor = forecolor
         lblStatusMessageDisplayTime2.ForeColor = forecolor
         CkBoxSaveWindowMetrics.ForeColor = forecolor
+        CkBoxShowTrayIcon.ForeColor = forecolor
+        CkBoxMinimizeToTray.ForeColor = forecolor
         CkBoxSuspendOnSessionChange.ForeColor = forecolor
         CkBoxLibrarySearchSubFolders.ForeColor = forecolor
         CkBoxWatchFolders.ForeColor = forecolor

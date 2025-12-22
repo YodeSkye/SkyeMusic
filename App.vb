@@ -623,8 +623,8 @@ Namespace My
         Friend HelperApp2Name As String = String.Empty
         Friend HelperApp2Path As String = String.Empty
         Friend ChangeLogLastVersionShown As String = String.Empty
-        Friend ShowTrayIcon As Boolean = True
-        Friend MinimizeToTray As Boolean = True
+        Friend ShowTrayIcon As Boolean = False
+        Friend MinimizeToTray As Boolean = False
 
         'Interfaces
         Friend Interface IAccentable
@@ -1041,24 +1041,28 @@ Namespace My
         Private Sub NIApp_MIPlay_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
+                    Player.TogglePlay()
                 Case MouseButtons.Right
             End Select
         End Sub
         Private Sub NIApp_MIStop_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
+                    Player.StopPlay()
                 Case MouseButtons.Right
             End Select
         End Sub
         Private Sub NIApp_MIPrevious_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
+                    Player.PlayPrevious()
                 Case MouseButtons.Right
             End Select
         End Sub
         Private Sub NIApp_MINext_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
+                    Player.PlayNext()
                 Case MouseButtons.Right
             End Select
         End Sub
@@ -1466,6 +1470,8 @@ Namespace My
 
                 ' General App Settings
                 RegKey.SetValue("Theme", App.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("ShowTrayIcon", App.ShowTrayIcon.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("MinimizeToTray", App.MinimizeToTray.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SuspendOnSessionChange", App.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("SaveWindowMetrics", App.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayerLocationX", App.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1642,6 +1648,14 @@ Namespace My
                 Try : App.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Red.ToString).ToString), App.Themes)
                 Catch : App.Theme = App.Themes.Red
                 End Try
+                Select Case RegKey.GetValue("ShowTrayIcon", "False").ToString
+                    Case "True", "1" : App.ShowTrayIcon = True
+                    Case Else : App.ShowTrayIcon = False
+                End Select
+                Select Case RegKey.GetValue("MinimizeToTray", "False").ToString
+                    Case "True", "1" : App.MinimizeToTray = True
+                    Case Else : App.MinimizeToTray = False
+                End Select
                 Select Case RegKey.GetValue("SuspendOnSessionChange", "True").ToString
                     Case "False", "0" : App.SuspendOnSessionChange = False
                     Case Else : App.SuspendOnSessionChange = True

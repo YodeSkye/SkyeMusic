@@ -72,6 +72,8 @@ Partial Class Options
         LblHistoryAutoSaveInterval2 = New Skye.UI.Label()
         TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        CkBoxShowTrayIcon = New CheckBox()
+        CkBoxMinimizeToTray = New CheckBox()
         LblHelperApp2Path = New Skye.UI.Label()
         LblHelperApp2Name = New Skye.UI.Label()
         LblHelperApp1Path = New Skye.UI.Label()
@@ -106,8 +108,8 @@ Partial Class Options
         ' BtnOK
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
-        TipOptionsEX.SetImage(BtnOK, Nothing)
         BtnOK.Image = My.Resources.Resources.ImageOK
+        TipOptionsEX.SetImage(BtnOK, Nothing)
         BtnOK.Location = New Point(389, 483)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -203,6 +205,7 @@ Partial Class Options
         TipOptionsEX.SetImage(CMTxtBox, Nothing)
         CMTxtBox.Name = "CMTxtBox"
         CMTxtBox.Size = New Size(149, 176)
+        TipOptionsEX.SetText(CMTxtBox, Nothing)
         ' 
         ' CkBoxPlaylistRemoveSpaces
         ' 
@@ -214,8 +217,8 @@ Partial Class Options
         CkBoxPlaylistRemoveSpaces.Name = "CkBoxPlaylistRemoveSpaces"
         CkBoxPlaylistRemoveSpaces.Size = New Size(135, 25)
         CkBoxPlaylistRemoveSpaces.TabIndex = 14
-        CkBoxPlaylistRemoveSpaces.Text = "Remove Spaces"
         TipOptionsEX.SetText(CkBoxPlaylistRemoveSpaces, "Select to remove spaces from each element of the song title.")
+        CkBoxPlaylistRemoveSpaces.Text = "Remove Spaces"
         CkBoxPlaylistRemoveSpaces.UseVisualStyleBackColor = True
         ' 
         ' TxtBoxPlaylistVideoIdentifier
@@ -239,6 +242,7 @@ Partial Class Options
         LblTitleFormat.Size = New Size(93, 21)
         LblTitleFormat.TabIndex = 132
         LblTitleFormat.Text = "Title Format"
+        TipOptionsEX.SetText(LblTitleFormat, Nothing)
         ' 
         ' LblTitleSeparator
         ' 
@@ -249,6 +253,7 @@ Partial Class Options
         LblTitleSeparator.Size = New Size(111, 21)
         LblTitleSeparator.TabIndex = 132
         LblTitleSeparator.Text = "Title Separator"
+        TipOptionsEX.SetText(LblTitleSeparator, Nothing)
         ' 
         ' LblVideoIdentifier
         ' 
@@ -259,11 +264,12 @@ Partial Class Options
         LblVideoIdentifier.Size = New Size(116, 21)
         LblVideoIdentifier.TabIndex = 133
         LblVideoIdentifier.Text = "Video Identifier"
+        TipOptionsEX.SetText(LblVideoIdentifier, Nothing)
         ' 
         ' BtnLibrarySearchFoldersAdd
         ' 
-        TipOptionsEX.SetImage(BtnLibrarySearchFoldersAdd, Nothing)
         BtnLibrarySearchFoldersAdd.Image = My.Resources.Resources.ImageAdd16
+        TipOptionsEX.SetImage(BtnLibrarySearchFoldersAdd, Nothing)
         BtnLibrarySearchFoldersAdd.Location = New Point(643, 147)
         BtnLibrarySearchFoldersAdd.Name = "BtnLibrarySearchFoldersAdd"
         BtnLibrarySearchFoldersAdd.Size = New Size(32, 31)
@@ -282,8 +288,8 @@ Partial Class Options
         CkBoxLibrarySearchSubFolders.Name = "CkBoxLibrarySearchSubFolders"
         CkBoxLibrarySearchSubFolders.Size = New Size(161, 25)
         CkBoxLibrarySearchSubFolders.TabIndex = 81
-        CkBoxLibrarySearchSubFolders.Text = "Search Sub-Folders"
         TipOptionsEX.SetText(CkBoxLibrarySearchSubFolders, "Check this to search all sub-folders of the  folders in your list. Un-Check it to only search the folders listed.")
+        CkBoxLibrarySearchSubFolders.Text = "Search Sub-Folders"
         CkBoxLibrarySearchSubFolders.UseVisualStyleBackColor = False
         ' 
         ' LBLibrarySearchFolders
@@ -307,6 +313,7 @@ Partial Class Options
         CMLibrarySearchFolders.Items.AddRange(New ToolStripItem() {CMILibrarySearchFoldersAdd, CMILibrarySearchFoldersRemove})
         CMLibrarySearchFolders.Name = "CMLibrarySearchFolders"
         CMLibrarySearchFolders.Size = New Size(165, 48)
+        TipOptionsEX.SetText(CMLibrarySearchFolders, Nothing)
         ' 
         ' CMILibrarySearchFoldersAdd
         ' 
@@ -332,8 +339,8 @@ Partial Class Options
         CkBoxSaveWindowMetrics.Name = "CkBoxSaveWindowMetrics"
         CkBoxSaveWindowMetrics.Size = New Size(176, 25)
         CkBoxSaveWindowMetrics.TabIndex = 20
-        CkBoxSaveWindowMetrics.Text = "Save Window Metrics"
         TipOptionsEX.SetText(CkBoxSaveWindowMetrics, "Auto save window sizes and locations.")
+        CkBoxSaveWindowMetrics.Text = "Save Window Metrics"
         CkBoxSaveWindowMetrics.UseVisualStyleBackColor = True
         ' 
         ' CkBoxSuspendOnSessionChange
@@ -346,14 +353,14 @@ Partial Class Options
         CkBoxSuspendOnSessionChange.Name = "CkBoxSuspendOnSessionChange"
         CkBoxSuspendOnSessionChange.Size = New Size(234, 25)
         CkBoxSuspendOnSessionChange.TabIndex = 22
-        CkBoxSuspendOnSessionChange.Text = "Minimize App On Screen Lock"
         TipOptionsEX.SetText(CkBoxSuspendOnSessionChange, "Stop play and Minimize the window if the screen is locked or screensaver is activated.")
+        CkBoxSuspendOnSessionChange.Text = "Minimize App On Screen Lock"
         CkBoxSuspendOnSessionChange.UseVisualStyleBackColor = True
         ' 
         ' BtnHelperApp1
         ' 
-        TipOptionsEX.SetImage(BtnHelperApp1, Nothing)
         BtnHelperApp1.Image = My.Resources.Resources.ImageGetPath16
+        TipOptionsEX.SetImage(BtnHelperApp1, Nothing)
         BtnHelperApp1.Location = New Point(773, 81)
         BtnHelperApp1.Name = "BtnHelperApp1"
         BtnHelperApp1.Size = New Size(32, 31)
@@ -363,8 +370,8 @@ Partial Class Options
         ' 
         ' BtnHelperApp2
         ' 
-        TipOptionsEX.SetImage(BtnHelperApp2, Nothing)
         BtnHelperApp2.Image = My.Resources.Resources.ImageGetPath16
+        TipOptionsEX.SetImage(BtnHelperApp2, Nothing)
         BtnHelperApp2.Location = New Point(773, 199)
         BtnHelperApp2.Name = "BtnHelperApp2"
         BtnHelperApp2.Size = New Size(32, 31)
@@ -382,6 +389,7 @@ Partial Class Options
         LblSongPlayMode.Size = New Size(123, 21)
         LblSongPlayMode.TabIndex = 131
         LblSongPlayMode.Text = "Song Play Mode"
+        TipOptionsEX.SetText(LblSongPlayMode, Nothing)
         ' 
         ' LblHelperApp1Name
         ' 
@@ -393,6 +401,7 @@ Partial Class Options
         LblHelperApp1Name.Size = New Size(165, 21)
         LblHelperApp1Name.TabIndex = 132
         LblHelperApp1Name.Text = "Name of Helper App 1"
+        TipOptionsEX.SetText(LblHelperApp1Name, Nothing)
         ' 
         ' CoBoxPlaylistDefaultAction
         ' 
@@ -430,6 +439,7 @@ Partial Class Options
         LblDefaultPlaylistAction.Size = New Size(161, 21)
         LblDefaultPlaylistAction.TabIndex = 138
         LblDefaultPlaylistAction.Text = "Default Playlist Action"
+        TipOptionsEX.SetText(LblDefaultPlaylistAction, Nothing)
         ' 
         ' LblPlaylistSearchAction
         ' 
@@ -441,6 +451,7 @@ Partial Class Options
         LblPlaylistSearchAction.Size = New Size(158, 21)
         LblPlaylistSearchAction.TabIndex = 139
         LblPlaylistSearchAction.Text = "Playlist Search Action"
+        TipOptionsEX.SetText(LblPlaylistSearchAction, Nothing)
         ' 
         ' CoBoxTheme
         ' 
@@ -465,6 +476,7 @@ Partial Class Options
         LblTheme.Size = New Size(57, 21)
         LblTheme.TabIndex = 141
         LblTheme.Text = "Theme"
+        TipOptionsEX.SetText(LblTheme, Nothing)
         ' 
         ' TxtBoxHistoryUpdateInterval
         ' 
@@ -506,8 +518,8 @@ Partial Class Options
         ' 
         ' BtnHistorySaveNow
         ' 
-        TipOptionsEX.SetImage(BtnHistorySaveNow, My.Resources.Resources.ImageSave32)
         BtnHistorySaveNow.Image = My.Resources.Resources.ImageSave32
+        TipOptionsEX.SetImage(BtnHistorySaveNow, My.Resources.Resources.ImageSave32)
         BtnHistorySaveNow.ImageAlign = ContentAlignment.MiddleLeft
         BtnHistorySaveNow.Location = New Point(267, 293)
         BtnHistorySaveNow.Name = "BtnHistorySaveNow"
@@ -520,8 +532,8 @@ Partial Class Options
         ' 
         ' BtnHistoryPrune
         ' 
-        TipOptionsEX.SetImage(BtnHistoryPrune, My.Resources.Resources.ImagePrune32)
         BtnHistoryPrune.Image = My.Resources.Resources.ImagePrune32
+        TipOptionsEX.SetImage(BtnHistoryPrune, My.Resources.Resources.ImagePrune32)
         BtnHistoryPrune.ImageAlign = ContentAlignment.MiddleLeft
         BtnHistoryPrune.Location = New Point(587, 293)
         BtnHistoryPrune.Name = "BtnHistoryPrune"
@@ -596,8 +608,8 @@ Partial Class Options
         ' 
         ' BtnPrunePlaylist
         ' 
-        TipOptionsEX.SetImage(BtnPrunePlaylist, Nothing)
         BtnPrunePlaylist.Image = My.Resources.Resources.ImagePrune32
+        TipOptionsEX.SetImage(BtnPrunePlaylist, Nothing)
         BtnPrunePlaylist.ImageAlign = ContentAlignment.MiddleLeft
         BtnPrunePlaylist.Location = New Point(583, 360)
         BtnPrunePlaylist.Name = "BtnPrunePlaylist"
@@ -618,6 +630,7 @@ Partial Class Options
         LblHistoryUpdateInterval2.Size = New Size(68, 21)
         LblHistoryUpdateInterval2.TabIndex = 150
         LblHistoryUpdateInterval2.Text = "Seconds"
+        TipOptionsEX.SetText(LblHistoryUpdateInterval2, Nothing)
         LblHistoryUpdateInterval2.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' LblHistoryUpdateInterval1
@@ -630,6 +643,7 @@ Partial Class Options
         LblHistoryUpdateInterval1.Size = New Size(259, 21)
         LblHistoryUpdateInterval1.TabIndex = 149
         LblHistoryUpdateInterval1.Text = "Update History After Song Plays For"
+        TipOptionsEX.SetText(LblHistoryUpdateInterval1, Nothing)
         LblHistoryUpdateInterval1.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' LblHistoryAutoSaveInterval1
@@ -642,6 +656,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval1.Size = New Size(139, 21)
         LblHistoryAutoSaveInterval1.TabIndex = 143
         LblHistoryAutoSaveInterval1.Text = "Save History Every"
+        TipOptionsEX.SetText(LblHistoryAutoSaveInterval1, Nothing)
         LblHistoryAutoSaveInterval1.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' LblHistoryAutoSaveInterval2
@@ -654,6 +669,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval2.Size = New Size(66, 21)
         LblHistoryAutoSaveInterval2.TabIndex = 144
         LblHistoryAutoSaveInterval2.Text = "Minutes"
+        TipOptionsEX.SetText(LblHistoryAutoSaveInterval2, Nothing)
         LblHistoryAutoSaveInterval2.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' TCOptions
@@ -673,11 +689,14 @@ Partial Class Options
         TCOptions.TabIndex = 148
         TCOptions.TabStop = False
         TCOptions.TabStyle = GetType(Syncfusion.Windows.Forms.Tools.TabRendererWhidbey)
+        TipOptionsEX.SetText(TCOptions, Nothing)
         TCOptions.ThemeName = "TabRendererWhidbey"
         ' 
         ' TPApp
         ' 
         TPApp.BorderStyle = BorderStyle.Fixed3D
+        TPApp.Controls.Add(CkBoxShowTrayIcon)
+        TPApp.Controls.Add(CkBoxMinimizeToTray)
         TPApp.Controls.Add(CkBoxSaveWindowMetrics)
         TPApp.Controls.Add(BtnHelperApp2)
         TPApp.Controls.Add(TxtBoxHelperApp2Path)
@@ -705,8 +724,37 @@ Partial Class Options
         TPApp.ShowCloseButton = True
         TPApp.Size = New Size(815, 413)
         TPApp.TabIndex = 1
+        TipOptionsEX.SetText(TPApp, Nothing)
         TPApp.Text = " App "
         TPApp.ThemesEnabled = False
+        ' 
+        ' CkBoxShowTrayIcon
+        ' 
+        CkBoxShowTrayIcon.AutoSize = True
+        CkBoxShowTrayIcon.FlatStyle = FlatStyle.Flat
+        CkBoxShowTrayIcon.Font = New Font("Segoe UI", 12F)
+        TipOptionsEX.SetImage(CkBoxShowTrayIcon, Nothing)
+        CkBoxShowTrayIcon.Location = New Point(13, 105)
+        CkBoxShowTrayIcon.Name = "CkBoxShowTrayIcon"
+        CkBoxShowTrayIcon.Size = New Size(197, 25)
+        CkBoxShowTrayIcon.TabIndex = 145
+        TipOptionsEX.SetText(CkBoxShowTrayIcon, "Auto save window sizes and locations.")
+        CkBoxShowTrayIcon.Text = "Show Skye Music In Tray"
+        CkBoxShowTrayIcon.UseVisualStyleBackColor = True
+        ' 
+        ' CkBoxMinimizeToTray
+        ' 
+        CkBoxMinimizeToTray.AutoSize = True
+        CkBoxMinimizeToTray.FlatStyle = FlatStyle.Flat
+        CkBoxMinimizeToTray.Font = New Font("Segoe UI", 12F)
+        TipOptionsEX.SetImage(CkBoxMinimizeToTray, Nothing)
+        CkBoxMinimizeToTray.Location = New Point(13, 127)
+        CkBoxMinimizeToTray.Name = "CkBoxMinimizeToTray"
+        CkBoxMinimizeToTray.Size = New Size(189, 25)
+        CkBoxMinimizeToTray.TabIndex = 146
+        TipOptionsEX.SetText(CkBoxMinimizeToTray, "Stop play and Minimize the window if the screen is locked or screensaver is activated.")
+        CkBoxMinimizeToTray.Text = "Minimize Player To Tray"
+        CkBoxMinimizeToTray.UseVisualStyleBackColor = True
         ' 
         ' LblHelperApp2Path
         ' 
@@ -718,6 +766,7 @@ Partial Class Options
         LblHelperApp2Path.Size = New Size(153, 21)
         LblHelperApp2Path.TabIndex = 135
         LblHelperApp2Path.Text = "Path to Helper App 2"
+        TipOptionsEX.SetText(LblHelperApp2Path, Nothing)
         ' 
         ' LblHelperApp2Name
         ' 
@@ -729,6 +778,7 @@ Partial Class Options
         LblHelperApp2Name.Size = New Size(165, 21)
         LblHelperApp2Name.TabIndex = 134
         LblHelperApp2Name.Text = "Name of Helper App 2"
+        TipOptionsEX.SetText(LblHelperApp2Name, Nothing)
         ' 
         ' LblHelperApp1Path
         ' 
@@ -740,6 +790,7 @@ Partial Class Options
         LblHelperApp1Path.Size = New Size(153, 21)
         LblHelperApp1Path.TabIndex = 133
         LblHelperApp1Path.Text = "Path to Helper App 1"
+        TipOptionsEX.SetText(LblHelperApp1Path, Nothing)
         ' 
         ' TPPlayer
         ' 
@@ -761,6 +812,7 @@ Partial Class Options
         TPPlayer.ShowCloseButton = True
         TPPlayer.Size = New Size(815, 413)
         TPPlayer.TabIndex = 2
+        TipOptionsEX.SetText(TPPlayer, Nothing)
         TPPlayer.Text = " Player "
         TPPlayer.ThemesEnabled = False
         ' 
@@ -774,6 +826,7 @@ Partial Class Options
         LblRandomHistoryUpdateInterval1.Size = New Size(345, 21)
         LblRandomHistoryUpdateInterval1.TabIndex = 152
         LblRandomHistoryUpdateInterval1.Text = "Update Shuffle Play History After Song Plays For"
+        TipOptionsEX.SetText(LblRandomHistoryUpdateInterval1, Nothing)
         LblRandomHistoryUpdateInterval1.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' LblRandomHistoryUpdateInterval2
@@ -786,6 +839,7 @@ Partial Class Options
         LblRandomHistoryUpdateInterval2.Size = New Size(68, 21)
         LblRandomHistoryUpdateInterval2.TabIndex = 153
         LblRandomHistoryUpdateInterval2.Text = "Seconds"
+        TipOptionsEX.SetText(LblRandomHistoryUpdateInterval2, Nothing)
         LblRandomHistoryUpdateInterval2.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' TPVisualizers
@@ -801,6 +855,7 @@ Partial Class Options
         TPVisualizers.ShowCloseButton = True
         TPVisualizers.Size = New Size(815, 413)
         TPVisualizers.TabIndex = 5
+        TipOptionsEX.SetText(TPVisualizers, Nothing)
         TPVisualizers.Text = " Visualizers "
         TPVisualizers.ThemesEnabled = False
         ' 
@@ -812,6 +867,7 @@ Partial Class Options
         PanelVisualizers.Name = "PanelVisualizers"
         PanelVisualizers.Size = New Size(815, 341)
         PanelVisualizers.TabIndex = 1
+        TipOptionsEX.SetText(PanelVisualizers, Nothing)
         ' 
         ' CoBoxVisualizers
         ' 
@@ -835,6 +891,7 @@ Partial Class Options
         LblVisualizers.Size = New Size(249, 23)
         LblVisualizers.TabIndex = 2
         LblVisualizers.Text = "Visualizer"
+        TipOptionsEX.SetText(LblVisualizers, Nothing)
         LblVisualizers.TextAlign = ContentAlignment.MiddleLeft
         ' 
         ' TPPlaylist
@@ -864,6 +921,7 @@ Partial Class Options
         TPPlaylist.ShowCloseButton = True
         TPPlaylist.Size = New Size(815, 413)
         TPPlaylist.TabIndex = 3
+        TipOptionsEX.SetText(TPPlaylist, Nothing)
         TPPlaylist.Text = " Playlist "
         TPPlaylist.ThemesEnabled = False
         ' 
@@ -890,6 +948,7 @@ Partial Class Options
         lblStatusMessageDisplayTime1.Size = New Size(195, 21)
         lblStatusMessageDisplayTime1.TabIndex = 258
         lblStatusMessageDisplayTime1.Text = "Show Status Messages for "
+        TipOptionsEX.SetText(lblStatusMessageDisplayTime1, Nothing)
         lblStatusMessageDisplayTime1.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' lblStatusMessageDisplayTime2
@@ -902,6 +961,7 @@ Partial Class Options
         lblStatusMessageDisplayTime2.Size = New Size(68, 21)
         lblStatusMessageDisplayTime2.TabIndex = 259
         lblStatusMessageDisplayTime2.Text = "Seconds"
+        TipOptionsEX.SetText(lblStatusMessageDisplayTime2, Nothing)
         lblStatusMessageDisplayTime2.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' TPLibrary
@@ -922,6 +982,7 @@ Partial Class Options
         TPLibrary.ShowCloseButton = True
         TPLibrary.Size = New Size(815, 413)
         TPLibrary.TabIndex = 4
+        TipOptionsEX.SetText(TPLibrary, Nothing)
         TPLibrary.Text = " Library "
         TPLibrary.ThemesEnabled = False
         ' 
@@ -936,8 +997,8 @@ Partial Class Options
         CkBoxWatchFoldersUpdatePlaylist.Name = "CkBoxWatchFoldersUpdatePlaylist"
         CkBoxWatchFoldersUpdatePlaylist.Size = New Size(168, 25)
         CkBoxWatchFoldersUpdatePlaylist.TabIndex = 94
-        CkBoxWatchFoldersUpdatePlaylist.Text = "Auto-Update Playlist"
         TipOptionsEX.SetText(CkBoxWatchFoldersUpdatePlaylist, resources.GetString("CkBoxWatchFoldersUpdatePlaylist.Text"))
+        CkBoxWatchFoldersUpdatePlaylist.Text = "Auto-Update Playlist"
         CkBoxWatchFoldersUpdatePlaylist.UseVisualStyleBackColor = False
         ' 
         ' CkBoxWatchFoldersUpdateLibrary
@@ -951,8 +1012,8 @@ Partial Class Options
         CkBoxWatchFoldersUpdateLibrary.Name = "CkBoxWatchFoldersUpdateLibrary"
         CkBoxWatchFoldersUpdateLibrary.Size = New Size(168, 25)
         CkBoxWatchFoldersUpdateLibrary.TabIndex = 92
-        CkBoxWatchFoldersUpdateLibrary.Text = "Auto-Update Library"
         TipOptionsEX.SetText(CkBoxWatchFoldersUpdateLibrary, "Automatically update the Library when files are added, renamed, deleted, or changed.")
+        CkBoxWatchFoldersUpdateLibrary.Text = "Auto-Update Library"
         CkBoxWatchFoldersUpdateLibrary.UseVisualStyleBackColor = False
         ' 
         ' CkBoxWatchFolders
@@ -966,8 +1027,8 @@ Partial Class Options
         CkBoxWatchFolders.Name = "CkBoxWatchFolders"
         CkBoxWatchFolders.Size = New Size(215, 25)
         CkBoxWatchFolders.TabIndex = 90
-        CkBoxWatchFolders.Text = "Watch Folders For Changes"
         TipOptionsEX.SetText(CkBoxWatchFolders, "Monitor Library Search Folders for changes and notify the user when changes occur.")
+        CkBoxWatchFolders.Text = "Watch Folders For Changes"
         CkBoxWatchFolders.UseVisualStyleBackColor = False
         ' 
         ' LblLibrarySearchFolders
@@ -979,6 +1040,7 @@ Partial Class Options
         LblLibrarySearchFolders.Size = New Size(165, 21)
         LblLibrarySearchFolders.TabIndex = 83
         LblLibrarySearchFolders.Text = "Library Search Folders"
+        TipOptionsEX.SetText(LblLibrarySearchFolders, Nothing)
         ' 
         ' TipOptionsEX
         ' 
@@ -1005,6 +1067,7 @@ Partial Class Options
         Name = "Options"
         ShowInTaskbar = False
         StartPosition = FormStartPosition.CenterParent
+        TipOptionsEX.SetText(Me, Nothing)
         Text = "Options"
         GrBoxTime.ResumeLayout(False)
         GrBoxTime.PerformLayout()
@@ -1091,4 +1154,6 @@ Partial Class Options
     Friend WithEvents LblVisualizers As Skye.UI.Label
     Friend WithEvents PanelVisualizers As Panel
     Friend WithEvents CoBoxVisualizers As ComboBox
+    Friend WithEvents CkBoxShowTrayIcon As CheckBox
+    Friend WithEvents CkBoxMinimizeToTray As CheckBox
 End Class
