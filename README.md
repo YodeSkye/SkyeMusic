@@ -11,6 +11,8 @@ A modern Windows media player built with **LibVLCSharp** and **WinForms**, featu
 - Local database for play history & statistics.
 - Lightweight installer powered by Inno Setup.
 
+Support the project: https://github.com/sponsors/YodeSkye
+
 ---
 
 # Using from the repo:
