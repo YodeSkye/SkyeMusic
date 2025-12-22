@@ -1,6 +1,6 @@
 ﻿# Skye Music 🎶
 
-[⬇️ Download Skye Music](https://github.com/YodeSkye/SkyeMusic/releases/tag/v1.1)
+[⬇️ Download Skye Music](https://github.com/YodeSkye/SkyeMusic/releases/tag/v1.2)
 ![Skye Music screenshot](My%20Project/ScreenShot%2020251103.png)
 
 A modern Windows media player built with **LibVLCSharp** and **WinForms**, featuring:
