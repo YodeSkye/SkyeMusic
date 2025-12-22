@@ -200,6 +200,8 @@ Namespace My
         Friend ReadOnly AttributionTagLibSharp As String = "https://github.com/mono/taglib-sharp" 'AttributionTagLibSharp is the URL for TagLib# library, which is used for reading and writing metadata in media files.
         Friend ReadOnly AttributionMusicBrainz As String = "https://musicbrainz.org/doc/MusicBrainz_API" 'AttributionMusicBrainz is the URL for MusicBrainz API, which provides music metadata services used in the application.
         Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/" 'AttributionIcons8 is the URL for Icons8, which provides icons used in the application.
+        Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
+        Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
 
         'HotKeys
         Private Structure HotKey

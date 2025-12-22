@@ -65,7 +65,7 @@ Namespace My.Resources
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont6\mwrapIndent1440 }\viewkind4\uc1 
         '''\pard\cf1\b\f0\fs28\lang9 Skye Music v1.2 What&apos;s New\par
-        '''\cf0\fs24 Released ?? 2025\b0\par        ''' [rest of string was truncated]&quot;;.
+        '''\cf0\fs24 Released December 2025\b [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
             Get
@@ -155,6 +155,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property ImageAttributionGitHub() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImageAttributionGitHub", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property ImageAttributionIcons816() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageAttributionIcons816", resourceCulture)
@@ -188,6 +198,16 @@ Namespace My.Resources
         Friend ReadOnly Property ImageAttributionNAudio() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageAttributionNAudio", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImageAttributionPayPal() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImageAttributionPayPal", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

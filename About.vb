@@ -28,6 +28,8 @@ Public Class About
         LblVersion.Text = "v" + My.Application.Info.Version.Major.ToString + "." + My.Application.Info.Version.Minor.ToString + "." + My.Application.Info.Version.Build.ToString
         LLblVLCSharp.Image = App.ResizeImage(My.Resources.ImageAttributionVLCSharp, 16)
         LLblNAudio.Image = App.ResizeImage(My.Resources.ImageAttributionNAudio, 16)
+        LLblSponsorGitHub.Image = App.ResizeImage(My.Resources.ImageAttributionGitHub, 32)
+        LLblSponsorPayPal.Image = App.ResizeImage(My.Resources.ImageAttributionPayPal, 32)
         BtnOK.Select()
     End Sub
     Private Sub About_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblAbout.MouseDown, LblVersion.MouseDown
@@ -143,6 +145,24 @@ Public Class About
     Private Sub LLblIcons8_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblIcons8.MouseClick
         OpenLink(App.AttributionIcons8)
     End Sub
+    Private Sub LLblSponsorGitHub_MouseEnter(sender As Object, e As EventArgs) Handles LLblSponsorGitHub.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LLblSponsorGitHub_MouseLeave(sender As Object, e As EventArgs) Handles LLblSponsorGitHub.MouseLeave
+        ResetCursor()
+    End Sub
+    Private Sub LLblSponsorGitHub_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSponsorGitHub.MouseClick
+        OpenLink(App.SponsorGitHub)
+    End Sub
+    Private Sub LLblSponsorPayPal_MouseEnter(sender As Object, e As EventArgs) Handles LLblSponsorPayPal.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LLblSponsorPayPal_MouseLeave(sender As Object, e As EventArgs) Handles LLblSponsorPayPal.MouseLeave
+        ResetCursor()
+    End Sub
+    Private Sub LLblSponsorPayPal_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSponsorPayPal.MouseClick
+        OpenLink(App.SponsorPayPal)
+    End Sub
 
     'Procedures
     Public Sub OpenLink(target As String)
@@ -175,6 +195,7 @@ Public Class About
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             LblAbout.ForeColor = App.CurrentTheme.AccentTextColor
+            LblSponsorMe.ForeColor = App.CurrentTheme.AccentTextColor
             LblVersion.ForeColor = App.CurrentTheme.AccentTextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.AccentTextColor
             LLblVLCSharp.LinkColor = App.CurrentTheme.AccentTextColor
@@ -182,9 +203,12 @@ Public Class About
             LLblSyncFusion.LinkColor = App.CurrentTheme.AccentTextColor
             LLblTagLibSharp.LinkColor = App.CurrentTheme.AccentTextColor
             LLblIcons8.LinkColor = App.CurrentTheme.AccentTextColor
+            LLblSponsorGitHub.LinkColor = App.CurrentTheme.AccentTextColor
+            LLblSponsorPayPal.LinkColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
             LblAbout.ForeColor = App.CurrentTheme.TextColor
+            LblSponsorMe.ForeColor = App.CurrentTheme.TextColor
             LblVersion.ForeColor = App.CurrentTheme.TextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.TextColor
             LLblVLCSharp.LinkColor = App.CurrentTheme.TextColor
@@ -192,6 +216,8 @@ Public Class About
             LLblSyncFusion.LinkColor = App.CurrentTheme.TextColor
             LLblTagLibSharp.LinkColor = App.CurrentTheme.TextColor
             LLblIcons8.LinkColor = App.CurrentTheme.TextColor
+            LLblSponsorGitHub.LinkColor = App.CurrentTheme.TextColor
+            LLblSponsorPayPal.LinkColor = App.CurrentTheme.TextColor
         End If
         LLblMicrosoft.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblVLCSharp.ActiveLinkColor = App.CurrentTheme.ButtonBackColor

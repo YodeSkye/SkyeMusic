@@ -236,7 +236,10 @@
 \cf2\b Library\cf0\b0\fs28\par
 \b\fs24 &lt;Escape&gt; \b0 closes Library.\par
 \b &lt;Left-Click&gt; \b0\lang1033 on \f2\lang9 the album art to cycle to the next image (only applies if multiple images are available).\f1\lang1033  \f2\lang9 A small number badge in the \f1\lang1033 lower-left \f2\lang9 corner of the album art indicates how many images are associated with the current song.\f1\par
-\b &lt;Right-Click&gt; \b0 on album art enlarges it.\par
+\b &lt;Right-Click&gt; \b0 on album art displays it at full size.\par
+\par
+\cf2\b Tag Editor\cf0\b0\fs28\par
+\b\fs24 &lt;Right-Click&gt; \b0 on any art image displays it at full size.\par
 }
  </value>
   </data>
@@ -383,18 +386,26 @@
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont6\mwrapIndent1440 }\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 Skye Music v1.2 What's New\par
-\cf0\fs24 Released ?? 2025\b0\par
+\cf0\fs24 Released December 2025\b0\par
 \par
 \cf2\b New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  Julia Fractal Visualizer. Introduces a dynamic fractal effect based on Julia set mathematics. The visualizer continually evolves and morphs in real time, producing intricate, organic patterns that respond to audio input.\lang9\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Donation links to the About window.\cf2\b\lang9\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Tray Icon, with option to minimize the Player to the Tray. Find the new settings in the Options dialog.\f1\par
+\'a3\'ab\f0  Added Peak Hold Delay to Rainbow Bar Visualizer\par
+\f1\'a3\'ab\f0  Tag Editor. In the Library you can now edit the metadata tags for a song or songs. Full support for tag information as well as artwork &amp; lyrics is included. You can also download artwork from the MusicBrainz online database.\f1\par
+\'a3\'ab\f0  Julia Fractal Visualizer. Introduces a dynamic fractal effect based on Julia set mathematics. The visualizer continually evolves and morphs in real time, producing intricate, organic patterns that respond to audio input.\lang9\par
 \cf1\b\fs28\par
 \cf2\fs24 Improvements\par
-\cf0\b0\f2\u10003?\f3\lang1033  Changed "Added Not Played" History List to "Forgotten Songs" and included songs not played for over a year.\f4\lang9\par
+\cf0\b0\f2\u10003?\f3\lang1033  Updated the About window with the latest project attributions.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Tag Editor can now be opened directly from the Playlist.\par
+\f2\lang9\u10003?\f3\lang1033  Added tooltips to Classic Spectrum Analyzer's settings page.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Changed "Added Not Played" History List to "Forgotten Songs" and included songs not played for over a year.\f4\lang9\par
 \f2\u10003?\f3\lang1033  Refactored History to include a Source Type field to track the type of media: File, Stream, or AudioCD\par
 \f2\lang9\u10003?\f3\lang1033  Refactored the Player to track the media being played by Source Type.\cf1\b\f0\fs28\lang9\par
 \par
 \cf2\fs24 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  Fixed cursor "blinking" issue on Help, Log, and What's New.\f4\lang9\par
+\cf0\b0\f2\u10005?\f3\lang1033  Fixed issue with a blank window being shown when there was no album art.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed cursor "blinking" issue on Help, Log, and What's New.\f4\lang9\par
 \f2\u10005?\f3\lang1033  Fixed when changing system Accent Color, the Visualizers Settings Pages didn't update the background color.\f4\lang9\par
 \f2\u10005?\f3\lang1033  Fixed errors when using the context menu in Log, Help, and What's New.\f4\lang9\par
 \f2\u10005?\f3\lang1033  Fixed when the File Watcher adds new files to the Library or Playlist, they were not adding to History as well.\f4\lang9\par
@@ -542,5 +553,11 @@ Skye Music v0.8\par
   </data>
   <data name="ImageAttributionMusicBrainz" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAttributionMusicBrainz.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionGitHub" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionGitHub.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionPayPal" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionPayPal.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
