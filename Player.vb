@@ -3045,6 +3045,7 @@ Public Class Player
         End If
         App.PlayMode = CType(newIndex, App.PlayModes)
         ShowPlayMode()
+        SetTipPlayer()
     End Sub
     Private Sub MIPlayMode_MouseEnter(sender As Object, e As EventArgs) Handles MIPlayMode.MouseEnter
         MIPlayMode.ForeColor = Color.Black
