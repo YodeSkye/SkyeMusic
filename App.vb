@@ -1072,6 +1072,13 @@ Namespace My
                 Case MouseButtons.Right
             End Select
         End Sub
+        Private Sub NIApp_MIAbout_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                    ShowAbout(True)
+                Case MouseButtons.Right
+            End Select
+        End Sub
         Private Sub NIApp_MIPlayer_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
@@ -1113,6 +1120,13 @@ Namespace My
             Select Case e.Button
                 Case MouseButtons.Left
                     ShowOptions(True)
+                Case MouseButtons.Right
+            End Select
+        End Sub
+        Private Sub NIApp_MIHelp_MouseDown(sender As Object, e As MouseEventArgs)
+            Select Case e.Button
+                Case MouseButtons.Left
+                    ShowHelp(True)
                 Case MouseButtons.Right
             End Select
         End Sub
@@ -1294,22 +1308,10 @@ Namespace My
             AddHandler NIApp.MouseClick, AddressOf NIApp_MouseClick
             AddHandler NIApp.MouseDoubleClick, AddressOf NIApp_MouseDoubleClick
             Dim cm As New ContextMenuStrip()
+            cm.Font = New Font("Segoe UI", 10.0!)
             Dim cmi As ToolStripMenuItem
-            cmi = New ToolStripMenuItem With {.Name = "NIApp_MIPlay"}
-            cmi.BackColor = Color.LightGray
-            AddHandler cmi.MouseDown, AddressOf NIApp_MIPlay_MouseDown
-            cm.Items.Add(cmi)
-            cmi = New ToolStripMenuItem("Stop") With {.Name = "NIApp_MIStop"}
-            cmi.BackColor = Color.LightGray
-            AddHandler cmi.MouseDown, AddressOf NIApp_MIStop_MouseDown
-            cm.Items.Add(cmi)
-            cmi = New ToolStripMenuItem("Previous") With {.Name = "NIApp_MIPrevious"}
-            cmi.BackColor = Color.LightGray
-            AddHandler cmi.MouseDown, AddressOf NIApp_MIPrevious_MouseDown
-            cm.Items.Add(cmi)
-            cmi = New ToolStripMenuItem("Next") With {.Name = "NIApp_MINext"}
-            cmi.BackColor = Color.LightGray
-            AddHandler cmi.MouseDown, AddressOf NIApp_MINext_MouseDown
+            cmi = New ToolStripMenuItem("About " & My.Application.Info.Title, My.Resources.ImageAbout16) With {.Name = "NIApp_MIAbout"}
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIAbout_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
             cmi = New ToolStripMenuItem("Player", ResizeImage(My.Resources.ImagePlay, 16)) With {
@@ -1328,9 +1330,30 @@ Namespace My
             AddHandler cmi.MouseDown, AddressOf NIApp_MIHistory_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
+            cmi = New ToolStripMenuItem With {.Name = "NIApp_MIPlay"}
+            cmi.BackColor = Color.LightGray
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIPlay_MouseDown
+            cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("Stop") With {.Name = "NIApp_MIStop"}
+            cmi.BackColor = Color.LightGray
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIStop_MouseDown
+            cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("Previous") With {.Name = "NIApp_MIPrevious"}
+            cmi.BackColor = Color.LightGray
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIPrevious_MouseDown
+            cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("Next") With {.Name = "NIApp_MINext"}
+            cmi.BackColor = Color.LightGray
+            AddHandler cmi.MouseDown, AddressOf NIApp_MINext_MouseDown
+            cm.Items.Add(cmi)
+            cm.Items.Add(New ToolStripSeparator())
             cmi = New ToolStripMenuItem("Options", My.Resources.ImageSettings16)
             AddHandler cmi.MouseDown, AddressOf NIApp_MISettings_MouseDown
             cm.Items.Add(cmi)
+            cmi = New ToolStripMenuItem("Help", My.Resources.ImageHelp16) With {.Name = "NIApp_MIHelp"}
+            AddHandler cmi.MouseDown, AddressOf NIApp_MIHelp_MouseDown
+            cm.Items.Add(cmi)
+            cm.Items.Add(New ToolStripSeparator())
             cmi = New ToolStripMenuItem("Exit " & My.Application.Info.Title, My.Resources.ImageExit)
             AddHandler cmi.MouseDown, AddressOf NIApp_MIExit_MouseDown
             cm.Items.Add(cmi)
@@ -1938,6 +1961,20 @@ Namespace My
                 End If
             End If
         End Sub
+        Friend Sub ShowLibrary()
+            If FrmLibrary.WindowState = FormWindowState.Minimized Then
+                FrmLibrary.WindowState = FormWindowState.Normal
+            ElseIf FrmLibrary.Visible Then
+                FrmLibrary.BringToFront()
+            Else
+                FrmLibrary.Show()
+            End If
+        End Sub
+        Private Sub HideLibrary()
+            If FrmLibrary IsNot Nothing AndAlso Not FrmLibrary.IsDisposed Then
+                FrmLibrary.Hide()
+            End If
+        End Sub
         Friend Sub ShowHistory()
             If FrmHistory Is Nothing OrElse FrmHistory.IsDisposed Then
                 FrmHistory = New History
@@ -1958,29 +1995,28 @@ Namespace My
             End If
         End Sub
         Friend Sub ShowOptions(Optional showcentered As Boolean = False)
-            If showcentered Then
-                Options.StartPosition = FormStartPosition.CenterScreen
+            If Options.Visible Then
+                Options.BringToFront()
             Else
-                Options.StartPosition = FormStartPosition.CenterParent
+                If showcentered Then
+                    Options.StartPosition = FormStartPosition.CenterScreen
+                Else
+                    Options.StartPosition = FormStartPosition.CenterParent
+                End If
+                Options.ShowDialog()
             End If
-            Options.ShowDialog()
         End Sub
-        Friend Sub ShowLibrary()
-            If FrmLibrary.WindowState = FormWindowState.Minimized Then
-                FrmLibrary.WindowState = FormWindowState.Normal
-            ElseIf FrmLibrary.Visible Then
-                FrmLibrary.BringToFront()
+        Friend Sub ShowHelp(Optional showcentered As Boolean = False)
+            If Help.Visible Then
+                Help.BringToFront()
             Else
-                FrmLibrary.Show()
+                If showcentered Then
+                    Help.StartPosition = FormStartPosition.CenterScreen
+                Else
+                    Help.StartPosition = FormStartPosition.CenterParent
+                End If
+                Help.ShowDialog()
             End If
-        End Sub
-        Private Sub HideLibrary()
-            If FrmLibrary IsNot Nothing AndAlso Not FrmLibrary.IsDisposed Then
-                FrmLibrary.Hide()
-            End If
-        End Sub
-        Friend Sub ShowHelp()
-            Help.ShowDialog()
         End Sub
         Friend Sub ShowLog(Optional refresh As Boolean = False)
             If refresh AndAlso FrmLog IsNot Nothing Then
@@ -2016,8 +2052,17 @@ Namespace My
             If IO.File.Exists(LogPath) Then IO.File.Delete(LogPath)
             ShowLog(True)
         End Sub
-        Friend Sub ShowAbout()
-            About.ShowDialog()
+        Friend Sub ShowAbout(Optional showcentered As Boolean = False)
+            If About.Visible Then
+                About.BringToFront()
+            Else
+                If showcentered Then
+                    About.StartPosition = FormStartPosition.CenterScreen
+                Else
+                    About.StartPosition = FormStartPosition.CenterParent
+                End If
+                About.ShowDialog()
+            End If
         End Sub
         Friend Sub ShowChangeLog()
             ChangeLog.ShowDialog()
