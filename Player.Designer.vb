@@ -331,11 +331,11 @@ Partial Class Player
         ' MenuPlayer
         ' 
         MenuPlayer.BackColor = Color.Black
-        MenuPlayer.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        MenuPlayer.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         MenuPlayer.Items.AddRange(New ToolStripItem() {MIFile, MIView, MIVisualizer, MILyrics, MIPlayMode, MILibrary, MIAbout})
         MenuPlayer.Location = New Point(0, 0)
         MenuPlayer.Name = "MenuPlayer"
-        MenuPlayer.Size = New Size(984, 25)
+        MenuPlayer.Size = New Size(1011, 28)
         MenuPlayer.TabIndex = 12
         MenuPlayer.Text = "MenuStrip1"
         TipPlayer.SetToolTipImage(MenuPlayer, Nothing)
@@ -346,47 +346,47 @@ Partial Class Player
         MIFile.ForeColor = SystemColors.HighlightText
         MIFile.Image = My.Resources.Resources.ImageOpen16
         MIFile.Name = "MIFile"
-        MIFile.Size = New Size(55, 21)
+        MIFile.Size = New Size(60, 24)
         MIFile.Text = "File"
         ' 
         ' MIOpen
         ' 
         MIOpen.Image = My.Resources.Resources.ImageOpen16
         MIOpen.Name = "MIOpen"
-        MIOpen.Size = New Size(173, 22)
+        MIOpen.Size = New Size(188, 24)
         MIOpen.Text = "Open"
         ' 
         ' MIOpenURL
         ' 
         MIOpenURL.Image = My.Resources.Resources.ImageGlobe
         MIOpenURL.Name = "MIOpenURL"
-        MIOpenURL.Size = New Size(173, 22)
+        MIOpenURL.Size = New Size(188, 24)
         MIOpenURL.Text = "Open URL"
         ' 
         ' MIOpenPlaylist
         ' 
         MIOpenPlaylist.Image = My.Resources.Resources.ImageImport16
         MIOpenPlaylist.Name = "MIOpenPlaylist"
-        MIOpenPlaylist.Size = New Size(173, 22)
+        MIOpenPlaylist.Size = New Size(188, 24)
         MIOpenPlaylist.Text = "Open Playlist..."
         ' 
         ' MISavePlaylist
         ' 
         MISavePlaylist.Image = My.Resources.Resources.ImageExport16
         MISavePlaylist.Name = "MISavePlaylist"
-        MISavePlaylist.Size = New Size(173, 22)
+        MISavePlaylist.Size = New Size(188, 24)
         MISavePlaylist.Text = "Save Playlist As..."
         ' 
         ' ToolStripSeparator4
         ' 
         ToolStripSeparator4.Name = "ToolStripSeparator4"
-        ToolStripSeparator4.Size = New Size(170, 6)
+        ToolStripSeparator4.Size = New Size(185, 6)
         ' 
         ' MIExit
         ' 
         MIExit.Image = My.Resources.Resources.ImageExit
         MIExit.Name = "MIExit"
-        MIExit.Size = New Size(173, 22)
+        MIExit.Size = New Size(188, 24)
         MIExit.Text = "Exit"
         ' 
         ' MIView
@@ -395,72 +395,72 @@ Partial Class Player
         MIView.ForeColor = SystemColors.HighlightText
         MIView.Image = My.Resources.Resources.ImageView
         MIView.Name = "MIView"
-        MIView.Size = New Size(63, 21)
+        MIView.Size = New Size(69, 24)
         MIView.Text = "View"
         ' 
         ' MIFullscreen
         ' 
         MIFullscreen.Image = My.Resources.Resources.ImageFullscreen16
         MIFullscreen.Name = "MIFullscreen"
-        MIFullscreen.Size = New Size(185, 22)
+        MIFullscreen.Size = New Size(203, 24)
         MIFullscreen.Text = "Full Screen"
         ' 
         ' MIVisualizers
         ' 
         MIVisualizers.Name = "MIVisualizers"
-        MIVisualizers.Size = New Size(185, 22)
+        MIVisualizers.Size = New Size(203, 24)
         MIVisualizers.Text = "Visualizer"
         ' 
         ' ToolStripSeparator2
         ' 
         ToolStripSeparator2.Name = "ToolStripSeparator2"
-        ToolStripSeparator2.Size = New Size(182, 6)
+        ToolStripSeparator2.Size = New Size(200, 6)
         ' 
         ' MIViewQueue
         ' 
         MIViewQueue.Image = My.Resources.Resources.ImagePlay
         MIViewQueue.Name = "MIViewQueue"
-        MIViewQueue.Size = New Size(185, 22)
+        MIViewQueue.Size = New Size(203, 24)
         MIViewQueue.Text = "Queue"
         ' 
         ' MIViewHistory
         ' 
         MIViewHistory.Image = My.Resources.Resources.ImageHistory
         MIViewHistory.Name = "MIViewHistory"
-        MIViewHistory.Size = New Size(185, 22)
+        MIViewHistory.Size = New Size(203, 24)
         MIViewHistory.Text = "History && Statistics"
         ' 
         ' ToolStripSeparator5
         ' 
         ToolStripSeparator5.Name = "ToolStripSeparator5"
-        ToolStripSeparator5.Size = New Size(182, 6)
+        ToolStripSeparator5.Size = New Size(200, 6)
         ' 
         ' MIOptions
         ' 
         MIOptions.Image = My.Resources.Resources.ImageSettings16
         MIOptions.Name = "MIOptions"
-        MIOptions.Size = New Size(185, 22)
+        MIOptions.Size = New Size(203, 24)
         MIOptions.Text = "Options"
         ' 
         ' MIVisualizer
         ' 
         MIVisualizer.Image = My.Resources.Resources.ImageVisualizer16
         MIVisualizer.Name = "MIVisualizer"
-        MIVisualizer.Size = New Size(28, 21)
+        MIVisualizer.Size = New Size(28, 24)
         ' 
         ' MILyrics
         ' 
         MILyrics.BackColor = Color.Transparent
         MILyrics.Image = My.Resources.Resources.ImageLyrics
         MILyrics.Name = "MILyrics"
-        MILyrics.Size = New Size(28, 21)
+        MILyrics.Size = New Size(28, 24)
         MILyrics.Visible = False
         ' 
         ' MIPlayMode
         ' 
         MIPlayMode.ForeColor = SystemColors.HighlightText
         MIPlayMode.Name = "MIPlayMode"
-        MIPlayMode.Size = New Size(82, 21)
+        MIPlayMode.Size = New Size(91, 24)
         MIPlayMode.Text = "Play Mode"
         ' 
         ' MILibrary
@@ -468,7 +468,7 @@ Partial Class Player
         MILibrary.ForeColor = SystemColors.HighlightText
         MILibrary.Image = My.Resources.Resources.ImageLibrary16
         MILibrary.Name = "MILibrary"
-        MILibrary.Size = New Size(76, 21)
+        MILibrary.Size = New Size(82, 24)
         MILibrary.Text = "Library"
         ' 
         ' MIAbout
@@ -477,28 +477,28 @@ Partial Class Player
         MIAbout.ForeColor = SystemColors.HighlightText
         MIAbout.Image = My.Resources.Resources.ImageAbout16
         MIAbout.Name = "MIAbout"
-        MIAbout.Size = New Size(71, 21)
+        MIAbout.Size = New Size(78, 24)
         MIAbout.Text = "About"
         ' 
         ' MIShowHelp
         ' 
         MIShowHelp.Image = My.Resources.Resources.ImageHelp16
         MIShowHelp.Name = "MIShowHelp"
-        MIShowHelp.Size = New Size(111, 22)
+        MIShowHelp.Size = New Size(119, 24)
         MIShowHelp.Text = "Help"
         ' 
         ' MIShowLog
         ' 
         MIShowLog.Image = My.Resources.Resources.ImageLog16
         MIShowLog.Name = "MIShowLog"
-        MIShowLog.Size = New Size(111, 22)
+        MIShowLog.Size = New Size(119, 24)
         MIShowLog.Text = "Log"
         ' 
         ' MIShowAbout
         ' 
         MIShowAbout.Image = My.Resources.Resources.ImageAbout16
         MIShowAbout.Name = "MIShowAbout"
-        MIShowAbout.Size = New Size(111, 22)
+        MIShowAbout.Size = New Size(119, 24)
         MIShowAbout.Text = "About"
         ' 
         ' TimerShowMedia
@@ -535,7 +535,7 @@ Partial Class Player
         BtnMute.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         BtnMute.BackColor = Color.Transparent
         BtnMute.Image = My.Resources.Resources.ImagePlayerSound
-        BtnMute.Location = New Point(348, 399)
+        BtnMute.Location = New Point(375, 399)
         BtnMute.Name = "BtnMute"
         BtnMute.Size = New Size(50, 50)
         BtnMute.TabIndex = 11
@@ -594,7 +594,7 @@ Partial Class Player
         PicBoxAlbumArt.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         PicBoxAlbumArt.Location = New Point(1, 27)
         PicBoxAlbumArt.Name = "PicBoxAlbumArt"
-        PicBoxAlbumArt.Size = New Size(407, 294)
+        PicBoxAlbumArt.Size = New Size(434, 294)
         PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.Zoom
         PicBoxAlbumArt.TabIndex = 20
         PicBoxAlbumArt.TabStop = False
@@ -608,7 +608,7 @@ Partial Class Player
         TxtBoxPlaylistSearch.BorderStyle = BorderStyle.None
         TxtBoxPlaylistSearch.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TxtBoxPlaylistSearch.ForeColor = SystemColors.InactiveCaption
-        TxtBoxPlaylistSearch.Location = New Point(414, 5)
+        TxtBoxPlaylistSearch.Location = New Point(441, 5)
         TxtBoxPlaylistSearch.Name = "TxtBoxPlaylistSearch"
         TxtBoxPlaylistSearch.ShortcutsEnabled = False
         TxtBoxPlaylistSearch.Size = New Size(150, 18)
@@ -622,7 +622,7 @@ Partial Class Player
         ListBoxPlaylistSearch.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         ListBoxPlaylistSearch.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         ListBoxPlaylistSearch.FormattingEnabled = True
-        ListBoxPlaylistSearch.Location = New Point(410, 25)
+        ListBoxPlaylistSearch.Location = New Point(437, 25)
         ListBoxPlaylistSearch.Name = "ListBoxPlaylistSearch"
         ListBoxPlaylistSearch.Size = New Size(574, 88)
         ListBoxPlaylistSearch.TabIndex = 25
@@ -634,7 +634,7 @@ Partial Class Player
         PanelMedia.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         PanelMedia.Location = New Point(1, 27)
         PanelMedia.Name = "PanelMedia"
-        PanelMedia.Size = New Size(407, 294)
+        PanelMedia.Size = New Size(434, 294)
         PanelMedia.TabIndex = 30
         TipPlayer.SetToolTipImage(PanelMedia, Nothing)
         PanelMedia.Visible = False
@@ -659,7 +659,7 @@ Partial Class Player
         LVPlaylist.ContextMenuStrip = CMPlaylist
         LVPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LVPlaylist.InsertionLineColor = Color.Teal
-        LVPlaylist.Location = New Point(410, 27)
+        LVPlaylist.Location = New Point(437, 27)
         LVPlaylist.Name = "LVPlaylist"
         LVPlaylist.OwnerDraw = True
         LVPlaylist.Size = New Size(574, 409)
@@ -679,7 +679,7 @@ Partial Class Player
         ' 
         LblPlaylistCount.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         LblPlaylistCount.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblPlaylistCount.Location = New Point(410, 436)
+        LblPlaylistCount.Location = New Point(437, 436)
         LblPlaylistCount.Name = "LblPlaylistCount"
         LblPlaylistCount.Size = New Size(572, 22)
         LblPlaylistCount.TabIndex = 37
@@ -691,7 +691,7 @@ Partial Class Player
         LblDuration.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         LblDuration.BackColor = Color.Transparent
         LblDuration.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        LblDuration.Location = New Point(318, 327)
+        LblDuration.Location = New Point(345, 327)
         LblDuration.Name = "LblDuration"
         LblDuration.Size = New Size(80, 25)
         LblDuration.TabIndex = 15
@@ -715,7 +715,7 @@ Partial Class Player
         TrackBarPosition.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         TrackBarPosition.AutoSize = False
         TrackBarPosition.BackColor = Color.FromArgb(CByte(45), CByte(45), CByte(45))
-        TrackBarPosition.BeforeTouchSize = New Size(385, 20)
+        TrackBarPosition.BeforeTouchSize = New Size(412, 20)
         TrackBarPosition.ChannelHeight = 8
         TrackBarPosition.DecreaseButtonSize = New Size(0, 0)
         TrackBarPosition.Enabled = False
@@ -724,7 +724,7 @@ Partial Class Player
         TrackBarPosition.Name = "TrackBarPosition"
         TrackBarPosition.ShowButtons = False
         TrackBarPosition.ShowFocusRect = False
-        TrackBarPosition.Size = New Size(385, 20)
+        TrackBarPosition.Size = New Size(412, 20)
         TrackBarPosition.SliderSize = New Size(15, 25)
         TrackBarPosition.TabIndex = 20
         TrackBarPosition.TabStop = False
@@ -758,7 +758,7 @@ Partial Class Player
         LblMedia.ForeColor = SystemColors.WindowText
         LblMedia.Location = New Point(98, 321)
         LblMedia.Name = "LblMedia"
-        LblMedia.Size = New Size(214, 32)
+        LblMedia.Size = New Size(241, 32)
         LblMedia.TabIndex = 15
         LblMedia.TextAlign = ContentAlignment.MiddleCenter
         TipPlayer.SetToolTipImage(LblMedia, Nothing)
@@ -773,7 +773,7 @@ Partial Class Player
         RTBLyrics.ReadOnly = True
         RTBLyrics.ScrollBars = RichTextBoxScrollBars.Vertical
         RTBLyrics.ShortcutsEnabled = False
-        RTBLyrics.Size = New Size(407, 294)
+        RTBLyrics.Size = New Size(434, 294)
         RTBLyrics.TabIndex = 39
         RTBLyrics.TabStop = False
         RTBLyrics.Text = ""
@@ -798,14 +798,14 @@ Partial Class Player
         PanelVisualizer.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         PanelVisualizer.Location = New Point(1, 27)
         PanelVisualizer.Name = "PanelVisualizer"
-        PanelVisualizer.Size = New Size(407, 294)
+        PanelVisualizer.Size = New Size(434, 294)
         PanelVisualizer.TabIndex = 40
         TipPlayer.SetToolTipImage(PanelVisualizer, Nothing)
         ' 
         ' Player
         ' 
         AutoScaleMode = AutoScaleMode.None
-        ClientSize = New Size(984, 461)
+        ClientSize = New Size(1011, 461)
         Controls.Add(PanelVisualizer)
         Controls.Add(RTBLyrics)
         Controls.Add(VLCViewer)
@@ -833,7 +833,7 @@ Partial Class Player
         ForeColor = SystemColors.HighlightText
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
-        MinimumSize = New Size(1000, 500)
+        MinimumSize = New Size(1027, 500)
         Name = "Player"
         StartPosition = FormStartPosition.CenterScreen
         Text = "Player"

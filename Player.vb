@@ -2295,19 +2295,19 @@ Public Class Player
     End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        'Player Engine
+        ' Player Engine
         _player = New VLCPlayer(Me)
         VLCViewer.MediaPlayer = CType(_player, VLCPlayer).MediaPlayer
         AddHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
         AddHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
         _player.Volume = 100
 
-        'For Meters
+        ' For Meters
         MeterAudioCapture = New WasapiLoopbackCapture()
         AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
         MeterAudioCapture.StartRecording()
 
-        'For Visualizers
+        ' For Visualizers
         VisualizerHost = New VisualizerHostClass(Me, PanelVisualizer)
         VisualizerHost.Register(New VisualizerRainbowBar)
         VisualizerHost.Register(New VisualizerClassicSpectrumAnalyzer)
@@ -2322,13 +2322,13 @@ Public Class Player
         VisualizerHost.SetVisualizersMenu()
         VisualizerEngine = New VisualizerAudioEngine(VisualizerHost)
 
-        'Initialize Form
+        ' Initialize Form
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
         PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
         TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
 
-        'Initialize Listview
+        ' Initialize Listview
         Dim header As ColumnHeader
         header = New ColumnHeader With {
             .Name = "Title",
@@ -2369,14 +2369,14 @@ Public Class Player
         LVPlaylist.Columns.Add(header)
         header = Nothing
 
-        'More Form Initialization
+        ' More Form Initialization
         SetAccentColor()
         SetTheme()
         LoadPlaylist()
         ClearPlaylistTitles()
         ShowPlayMode()
 
-        'Set ToolTips
+        ' Set ToolTips
         TipPlayer.SetToolTip(BtnPlay, "Play / Pause")
         TipPlayer.SetToolTip(BtnStop, "Stop Playing")
         TipPlayer.SetToolTip(BtnReverse, "Skip Backward")
@@ -2386,7 +2386,7 @@ Public Class Player
         SetTipPlayer()
         CustomDrawCMToolTip(CMPlaylist)
 
-        'Place the window where it was last time
+        ' Place the window where it was last time
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
         'If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
@@ -2395,7 +2395,7 @@ Public Class Player
         If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
 #End If
 
-        'Disable Mouse Wheel support for TrackBar
+        ' Disable Mouse Wheel support for TrackBar
         AddHandler TrackBarPosition.MouseWheel, AddressOf TrackBarPosition_MouseWheel
 
     End Sub
@@ -2909,7 +2909,7 @@ Public Class Player
         SetPlaylistCountText()
         AlbumArtIndex = 0
     End Sub
-    Private Sub PanelMedia_DoubleClick(sender As Object, e As EventArgs) Handles PanelMedia.DoubleClick
+    Private Sub Panel_DoubleClick(sender As Object, e As EventArgs) Handles PanelMedia.DoubleClick, PanelVisualizer.DoubleClick
         ToggleMaximized()
     End Sub
     Private Sub PanelVisualizer_Resize(sender As Object, e As EventArgs) Handles PanelVisualizer.Resize

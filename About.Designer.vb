@@ -229,39 +229,39 @@ Partial Class About
         ' 
         LLblSponsorGitHub.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LLblSponsorGitHub, Nothing)
-        LLblSponsorGitHub.ImageAlign = ContentAlignment.MiddleRight
+        LLblSponsorGitHub.ImageAlign = ContentAlignment.MiddleLeft
         LLblSponsorGitHub.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSponsorGitHub.Location = New Point(43, 291)
+        LLblSponsorGitHub.Location = New Point(53, 291)
         LLblSponsorGitHub.Name = "LLblSponsorGitHub"
         LLblSponsorGitHub.Size = New Size(164, 30)
         LLblSponsorGitHub.TabIndex = 105
         LLblSponsorGitHub.TabStop = True
         LLblSponsorGitHub.Text = "GitHub Sponsors"
         TipAbout.SetText(LLblSponsorGitHub, Nothing)
-        LLblSponsorGitHub.TextAlign = ContentAlignment.MiddleLeft
+        LLblSponsorGitHub.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' LLblSponsorPayPal
         ' 
         LLblSponsorPayPal.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LLblSponsorPayPal, Nothing)
-        LLblSponsorPayPal.ImageAlign = ContentAlignment.MiddleRight
+        LLblSponsorPayPal.ImageAlign = ContentAlignment.MiddleLeft
         LLblSponsorPayPal.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSponsorPayPal.Location = New Point(256, 291)
+        LLblSponsorPayPal.Location = New Point(245, 291)
         LLblSponsorPayPal.Name = "LLblSponsorPayPal"
         LLblSponsorPayPal.Size = New Size(85, 30)
         LLblSponsorPayPal.TabIndex = 106
         LLblSponsorPayPal.TabStop = True
         LLblSponsorPayPal.Text = "PayPal"
         TipAbout.SetText(LLblSponsorPayPal, Nothing)
-        LLblSponsorPayPal.TextAlign = ContentAlignment.MiddleLeft
+        LLblSponsorPayPal.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' LblSponsorMe
         ' 
-        LblSponsorMe.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
+        LblSponsorMe.Font = New Font("Segoe UI", 15.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LblSponsorMe, Nothing)
-        LblSponsorMe.Location = New Point(12, 266)
+        LblSponsorMe.Location = New Point(12, 256)
         LblSponsorMe.Name = "LblSponsorMe"
-        LblSponsorMe.Size = New Size(360, 21)
+        LblSponsorMe.Size = New Size(360, 31)
         LblSponsorMe.TabIndex = 107
         LblSponsorMe.Text = "Support My Work!"
         TipAbout.SetText(LblSponsorMe, Nothing)
