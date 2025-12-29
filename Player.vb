@@ -4662,7 +4662,11 @@ Public Class Player
                         If LVPlaylist.SelectedItems.Count > 0 Then
                             item = LVPlaylist.FindItemWithText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
                         Else
-                            item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+                            If _player.Path Is Nothing OrElse _player.Path = String.Empty Then
+                                item = Nothing
+                            Else
+                                item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+                            End If
                         End If
                         Dim newindex As Integer = 0
                         If item Is Nothing OrElse item.Index + 1 = LVPlaylist.Items.Count Then
