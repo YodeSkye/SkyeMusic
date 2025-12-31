@@ -78,6 +78,17 @@ Partial Class Options
         LblHelperApp2Name = New Skye.UI.Label()
         LblHelperApp1Path = New Skye.UI.Label()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        GrBoxShowNowPlayingToast = New GroupBox()
+        RadBtnNPTBottomRight = New RadioButton()
+        RadBtnNPTBottomCenter = New RadioButton()
+        RadBtnNPTBottomLeft = New RadioButton()
+        RadBtnNPTMiddleRight = New RadioButton()
+        RadBtnNPTMiddleCenter = New RadioButton()
+        RadBtnNPTMiddleLeft = New RadioButton()
+        RadBtnNPTTopRight = New RadioButton()
+        RadBtnNPTTopCenter = New RadioButton()
+        RadBtnNPTTopLeft = New RadioButton()
+        CkBoxShowNowPlayingToast = New CheckBox()
         LblRandomHistoryUpdateInterval1 = New Skye.UI.Label()
         LblRandomHistoryUpdateInterval2 = New Skye.UI.Label()
         TPVisualizers = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
@@ -100,6 +111,7 @@ Partial Class Options
         TCOptions.SuspendLayout()
         TPApp.SuspendLayout()
         TPPlayer.SuspendLayout()
+        GrBoxShowNowPlayingToast.SuspendLayout()
         TPVisualizers.SuspendLayout()
         TPPlaylist.SuspendLayout()
         TPLibrary.SuspendLayout()
@@ -795,6 +807,8 @@ Partial Class Options
         ' TPPlayer
         ' 
         TPPlayer.BorderStyle = BorderStyle.Fixed3D
+        TPPlayer.Controls.Add(GrBoxShowNowPlayingToast)
+        TPPlayer.Controls.Add(CkBoxShowNowPlayingToast)
         TPPlayer.Controls.Add(TxtBoxRandomHistoryUpdateInterval)
         TPPlayer.Controls.Add(TxtBoxHistoryUpdateInterval)
         TPPlayer.Controls.Add(LblHistoryUpdateInterval2)
@@ -815,6 +829,150 @@ Partial Class Options
         TipOptionsEX.SetText(TPPlayer, Nothing)
         TPPlayer.Text = " Player "
         TPPlayer.ThemesEnabled = False
+        ' 
+        ' GrBoxShowNowPlayingToast
+        ' 
+        GrBoxShowNowPlayingToast.Controls.Add(RadBtnNPTBottomRight)
+        GrBoxShowNowPlayingToast.Controls.Add(RadBtnNPTBottomCenter)
+        GrBoxShowNowPlayingToast.Controls.Add(RadBtnNPTBottomLeft)
+        GrBoxShowNowPlayingToast.Controls.Add(RadBtnNPTMiddleRight)
+        GrBoxShowNowPlayingToast.Controls.Add(RadBtnNPTMiddleCenter)
+        GrBoxShowNowPlayingToast.Controls.Add(RadBtnNPTMiddleLeft)
+        GrBoxShowNowPlayingToast.Controls.Add(RadBtnNPTTopRight)
+        GrBoxShowNowPlayingToast.Controls.Add(RadBtnNPTTopCenter)
+        GrBoxShowNowPlayingToast.Controls.Add(RadBtnNPTTopLeft)
+        GrBoxShowNowPlayingToast.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipOptionsEX.SetImage(GrBoxShowNowPlayingToast, Nothing)
+        GrBoxShowNowPlayingToast.Location = New Point(606, 35)
+        GrBoxShowNowPlayingToast.Name = "GrBoxShowNowPlayingToast"
+        GrBoxShowNowPlayingToast.RightToLeft = RightToLeft.Yes
+        GrBoxShowNowPlayingToast.Size = New Size(196, 111)
+        GrBoxShowNowPlayingToast.TabIndex = 155
+        GrBoxShowNowPlayingToast.TabStop = False
+        GrBoxShowNowPlayingToast.Text = "Location"
+        TipOptionsEX.SetText(GrBoxShowNowPlayingToast, "Select the Location for the Now Playing Toast.")
+        ' 
+        ' RadBtnNPTBottomRight
+        ' 
+        RadBtnNPTBottomRight.AutoSize = True
+        TipOptionsEX.SetImage(RadBtnNPTBottomRight, Nothing)
+        RadBtnNPTBottomRight.Location = New Point(171, 87)
+        RadBtnNPTBottomRight.Name = "RadBtnNPTBottomRight"
+        RadBtnNPTBottomRight.Size = New Size(14, 13)
+        RadBtnNPTBottomRight.TabIndex = 8
+        RadBtnNPTBottomRight.TabStop = True
+        TipOptionsEX.SetText(RadBtnNPTBottomRight, Nothing)
+        RadBtnNPTBottomRight.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnNPTBottomCenter
+        ' 
+        RadBtnNPTBottomCenter.AutoSize = True
+        TipOptionsEX.SetImage(RadBtnNPTBottomCenter, Nothing)
+        RadBtnNPTBottomCenter.Location = New Point(89, 87)
+        RadBtnNPTBottomCenter.Name = "RadBtnNPTBottomCenter"
+        RadBtnNPTBottomCenter.Size = New Size(14, 13)
+        RadBtnNPTBottomCenter.TabIndex = 7
+        RadBtnNPTBottomCenter.TabStop = True
+        TipOptionsEX.SetText(RadBtnNPTBottomCenter, Nothing)
+        RadBtnNPTBottomCenter.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnNPTBottomLeft
+        ' 
+        RadBtnNPTBottomLeft.AutoSize = True
+        TipOptionsEX.SetImage(RadBtnNPTBottomLeft, Nothing)
+        RadBtnNPTBottomLeft.Location = New Point(10, 87)
+        RadBtnNPTBottomLeft.Name = "RadBtnNPTBottomLeft"
+        RadBtnNPTBottomLeft.Size = New Size(14, 13)
+        RadBtnNPTBottomLeft.TabIndex = 6
+        RadBtnNPTBottomLeft.TabStop = True
+        TipOptionsEX.SetText(RadBtnNPTBottomLeft, Nothing)
+        RadBtnNPTBottomLeft.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnNPTMiddleRight
+        ' 
+        RadBtnNPTMiddleRight.AutoSize = True
+        TipOptionsEX.SetImage(RadBtnNPTMiddleRight, Nothing)
+        RadBtnNPTMiddleRight.Location = New Point(171, 55)
+        RadBtnNPTMiddleRight.Name = "RadBtnNPTMiddleRight"
+        RadBtnNPTMiddleRight.Size = New Size(14, 13)
+        RadBtnNPTMiddleRight.TabIndex = 5
+        RadBtnNPTMiddleRight.TabStop = True
+        TipOptionsEX.SetText(RadBtnNPTMiddleRight, Nothing)
+        RadBtnNPTMiddleRight.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnNPTMiddleCenter
+        ' 
+        RadBtnNPTMiddleCenter.AutoSize = True
+        TipOptionsEX.SetImage(RadBtnNPTMiddleCenter, Nothing)
+        RadBtnNPTMiddleCenter.Location = New Point(89, 55)
+        RadBtnNPTMiddleCenter.Name = "RadBtnNPTMiddleCenter"
+        RadBtnNPTMiddleCenter.Size = New Size(14, 13)
+        RadBtnNPTMiddleCenter.TabIndex = 4
+        RadBtnNPTMiddleCenter.TabStop = True
+        TipOptionsEX.SetText(RadBtnNPTMiddleCenter, Nothing)
+        RadBtnNPTMiddleCenter.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnNPTMiddleLeft
+        ' 
+        RadBtnNPTMiddleLeft.AutoSize = True
+        TipOptionsEX.SetImage(RadBtnNPTMiddleLeft, Nothing)
+        RadBtnNPTMiddleLeft.Location = New Point(10, 55)
+        RadBtnNPTMiddleLeft.Name = "RadBtnNPTMiddleLeft"
+        RadBtnNPTMiddleLeft.Size = New Size(14, 13)
+        RadBtnNPTMiddleLeft.TabIndex = 3
+        RadBtnNPTMiddleLeft.TabStop = True
+        TipOptionsEX.SetText(RadBtnNPTMiddleLeft, Nothing)
+        RadBtnNPTMiddleLeft.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnNPTTopRight
+        ' 
+        RadBtnNPTTopRight.AutoSize = True
+        TipOptionsEX.SetImage(RadBtnNPTTopRight, Nothing)
+        RadBtnNPTTopRight.Location = New Point(171, 24)
+        RadBtnNPTTopRight.Name = "RadBtnNPTTopRight"
+        RadBtnNPTTopRight.Size = New Size(14, 13)
+        RadBtnNPTTopRight.TabIndex = 2
+        RadBtnNPTTopRight.TabStop = True
+        TipOptionsEX.SetText(RadBtnNPTTopRight, Nothing)
+        RadBtnNPTTopRight.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnNPTTopCenter
+        ' 
+        RadBtnNPTTopCenter.AutoSize = True
+        TipOptionsEX.SetImage(RadBtnNPTTopCenter, Nothing)
+        RadBtnNPTTopCenter.Location = New Point(89, 24)
+        RadBtnNPTTopCenter.Name = "RadBtnNPTTopCenter"
+        RadBtnNPTTopCenter.Size = New Size(14, 13)
+        RadBtnNPTTopCenter.TabIndex = 1
+        RadBtnNPTTopCenter.TabStop = True
+        TipOptionsEX.SetText(RadBtnNPTTopCenter, Nothing)
+        RadBtnNPTTopCenter.UseVisualStyleBackColor = True
+        ' 
+        ' RadBtnNPTTopLeft
+        ' 
+        RadBtnNPTTopLeft.AutoSize = True
+        TipOptionsEX.SetImage(RadBtnNPTTopLeft, Nothing)
+        RadBtnNPTTopLeft.Location = New Point(10, 24)
+        RadBtnNPTTopLeft.Name = "RadBtnNPTTopLeft"
+        RadBtnNPTTopLeft.Size = New Size(14, 13)
+        RadBtnNPTTopLeft.TabIndex = 0
+        RadBtnNPTTopLeft.TabStop = True
+        TipOptionsEX.SetText(RadBtnNPTTopLeft, Nothing)
+        RadBtnNPTTopLeft.UseVisualStyleBackColor = True
+        ' 
+        ' CkBoxShowNowPlayingToast
+        ' 
+        CkBoxShowNowPlayingToast.AutoSize = True
+        CkBoxShowNowPlayingToast.FlatStyle = FlatStyle.Flat
+        CkBoxShowNowPlayingToast.Font = New Font("Segoe UI", 12F)
+        TipOptionsEX.SetImage(CkBoxShowNowPlayingToast, Nothing)
+        CkBoxShowNowPlayingToast.Location = New Point(606, 10)
+        CkBoxShowNowPlayingToast.Name = "CkBoxShowNowPlayingToast"
+        CkBoxShowNowPlayingToast.Size = New Size(196, 25)
+        CkBoxShowNowPlayingToast.TabIndex = 154
+        TipOptionsEX.SetText(CkBoxShowNowPlayingToast, "Show Now Playing Toast in the Specified Location.")
+        CkBoxShowNowPlayingToast.Text = "Show Now Playing Toast"
+        CkBoxShowNowPlayingToast.UseVisualStyleBackColor = True
         ' 
         ' LblRandomHistoryUpdateInterval1
         ' 
@@ -1078,6 +1236,8 @@ Partial Class Options
         TPApp.PerformLayout()
         TPPlayer.ResumeLayout(False)
         TPPlayer.PerformLayout()
+        GrBoxShowNowPlayingToast.ResumeLayout(False)
+        GrBoxShowNowPlayingToast.PerformLayout()
         TPVisualizers.ResumeLayout(False)
         TPPlaylist.ResumeLayout(False)
         TPPlaylist.PerformLayout()
@@ -1156,4 +1316,15 @@ Partial Class Options
     Friend WithEvents CoBoxVisualizers As ComboBox
     Friend WithEvents CkBoxShowTrayIcon As CheckBox
     Friend WithEvents CkBoxMinimizeToTray As CheckBox
+    Friend WithEvents CkBoxShowNowPlayingToast As CheckBox
+    Friend WithEvents GrBoxShowNowPlayingToast As GroupBox
+    Friend WithEvents RadBtnNPTTopCenter As RadioButton
+    Friend WithEvents RadBtnNPTTopLeft As RadioButton
+    Friend WithEvents RadBtnNPTTopRight As RadioButton
+    Friend WithEvents RadBtnNPTBottomRight As RadioButton
+    Friend WithEvents RadBtnNPTBottomCenter As RadioButton
+    Friend WithEvents RadBtnNPTBottomLeft As RadioButton
+    Friend WithEvents RadBtnNPTMiddleRight As RadioButton
+    Friend WithEvents RadBtnNPTMiddleCenter As RadioButton
+    Friend WithEvents RadBtnNPTMiddleLeft As RadioButton
 End Class

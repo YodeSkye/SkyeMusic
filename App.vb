@@ -631,6 +631,8 @@ Namespace My
         Friend ChangeLogLastVersionShown As String = String.Empty
         Friend ShowTrayIcon As Boolean = False
         Friend MinimizeToTray As Boolean = False
+        Friend ShowNowPlayingToast As Boolean = True
+        Friend NowPlayingToastLocation As Skye.UI.ToastLocation = Skye.UI.ToastLocation.TopRight
 
         'Interfaces
         Friend Interface IAccentable
@@ -1475,6 +1477,8 @@ Namespace My
                 ' Player Settings
                 RegKey.SetValue("PlayerPositionShowElapsed", App.PlayerPositionShowElapsed.ToString, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("PlayMode", App.PlayMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("ShowNowPlayingToast", App.ShowNowPlayingToast.ToString, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("NowPlayingToastLocation", App.NowPlayingToastLocation.ToString, Microsoft.Win32.RegistryValueKind.String)
 
                 ' Playlist Settings
                 RegKey.SetValue("PlaylistTitleFormat", App.PlaylistTitleFormat.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1615,6 +1619,13 @@ Namespace My
                 End Select
                 Try : App.PlayMode = CType([Enum].Parse(GetType(App.PlayModes), RegKey.GetValue("PlayMode", App.PlayModes.Random.ToString).ToString), PlayModes)
                 Catch : App.PlayMode = App.PlayModes.Random
+                End Try
+                Select Case RegKey.GetValue("ShowNowPlayingToast", "True").ToString
+                    Case "False", "0" : App.ShowNowPlayingToast = False
+                    Case Else : App.ShowNowPlayingToast = True
+                End Select
+                Try : App.NowPlayingToastLocation = CType([Enum].Parse(GetType(Skye.UI.ToastLocation), RegKey.GetValue("NowPlayingToastLocation", Skye.UI.ToastLocation.TopRight.ToString).ToString), Skye.UI.ToastLocation)
+                Catch : App.NowPlayingToastLocation = Skye.UI.ToastLocation.TopRight
                 End Try
 
                 ' Playlist Settings
@@ -2066,6 +2077,23 @@ Namespace My
         End Sub
         Friend Sub ShowChangeLog()
             ChangeLog.ShowDialog()
+        End Sub
+        Friend Sub ShowToast(title As String, message As String)
+            If App.ShowNowPlayingToast Then
+                If String.IsNullOrWhiteSpace(title) Then title = My.Application.Info.Title
+                Dim toastoptions As New Skye.UI.ToastOptions With {
+                    .Title = title,
+                    .Message = message,
+                    .Duration = 5000,
+                    .BackColor = App.CurrentTheme.BackColor,
+                    .BorderColor = App.CurrentTheme.ButtonBackColor,
+                    .ForeColor = App.CurrentTheme.TextColor,
+                    .TitleFont = New Font("Segoe UI", 12, FontStyle.Bold),
+                    .MessageFont = New Font("Segoe UI", 12),
+                    .Location = Skye.UI.ToastLocation.BottomRight,
+                    .Icon = My.Resources.IconSkyeMusicRed}
+                Skye.UI.Toast.ShowToast(toastoptions)
+            End If
         End Sub
         Friend Sub HelperApp1(filename As String)
             If filename IsNot String.Empty Then

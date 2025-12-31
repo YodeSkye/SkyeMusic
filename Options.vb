@@ -25,12 +25,12 @@ Public Class Options
         End Try
     End Sub
     Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Text = "Options For " + My.Application.Info.Title
+        Text = "Options For " + Application.Info.Title
         SetAccentColor()
         SetTheme()
 
         'Settings
-        Select Case App.PlayerPositionShowElapsed
+        Select Case PlayerPositionShowElapsed
             Case True : RadBtnElapsed.Checked = True
             Case False : RadBtnRemaining.Checked = True
         End Select
@@ -39,30 +39,31 @@ Public Class Options
         CoBoxPlayMode.Items.Add("Repeat")
         CoBoxPlayMode.Items.Add("Play Next")
         CoBoxPlayMode.Items.Add("Shuffle")
-        CoBoxPlayMode.SelectedIndex = App.PlayMode
+        CoBoxPlayMode.SelectedIndex = PlayMode
         CoBoxVisualizers.Items.Clear()
+
         For Each vis In Player.VisualizerHost.GetVisualizerNames
             CoBoxVisualizers.Items.Add(vis)
         Next
-        CoBoxVisualizers.SelectedItem = App.Visualizer
+        CoBoxVisualizers.SelectedItem = Visualizer
         CoBoxPlaylistDefaultAction.Items.Clear()
-        CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Play.ToString)
-        CoBoxPlaylistDefaultAction.Items.Add(App.PlaylistActions.Queue.ToString)
-        CoBoxPlaylistDefaultAction.SelectedIndex = App.PlaylistDefaultAction
+        CoBoxPlaylistDefaultAction.Items.Add(PlaylistActions.Play.ToString)
+        CoBoxPlaylistDefaultAction.Items.Add(PlaylistActions.Queue.ToString)
+        CoBoxPlaylistDefaultAction.SelectedIndex = PlaylistDefaultAction
         CoBoxPlaylistSearchAction.Items.Clear()
-        CoBoxPlaylistSearchAction.Items.Add(App.PlaylistActions.Play.ToString)
-        CoBoxPlaylistSearchAction.Items.Add(App.PlaylistActions.Queue.ToString)
+        CoBoxPlaylistSearchAction.Items.Add(PlaylistActions.Play.ToString)
+        CoBoxPlaylistSearchAction.Items.Add(PlaylistActions.Queue.ToString)
         CoBoxPlaylistSearchAction.Items.Add("Select Only")
-        CoBoxPlaylistSearchAction.SelectedIndex = App.PlaylistSearchAction
+        CoBoxPlaylistSearchAction.SelectedIndex = PlaylistSearchAction
         CoBoxTheme.Items.Clear()
         CoBoxTheme.Items.Add("Blue Accent")
         CoBoxTheme.Items.Add("Pink Accent")
-        CoBoxTheme.Items.Add(App.Themes.Light.ToString)
-        CoBoxTheme.Items.Add(App.Themes.Dark.ToString)
+        CoBoxTheme.Items.Add(Themes.Light.ToString)
+        CoBoxTheme.Items.Add(Themes.Dark.ToString)
         CoBoxTheme.Items.Add("Dark Pink")
-        CoBoxTheme.Items.Add(App.Themes.Pink.ToString)
-        CoBoxTheme.Items.Add(App.Themes.Red.ToString)
-        CoBoxTheme.SelectedIndex = App.Theme
+        CoBoxTheme.Items.Add(Themes.Pink.ToString)
+        CoBoxTheme.Items.Add(Themes.Red.ToString)
+        CoBoxTheme.SelectedIndex = Theme
         CoBoxPlaylistTitleFormat.Items.Clear()
         CoBoxPlaylistTitleFormat.Items.Add("Use FileName As Title")
         CoBoxPlaylistTitleFormat.Items.Add("Song")
@@ -95,40 +96,58 @@ Public Class Options
         CoBoxPlaylistTitleFormat.Items.Add("Genre, Album, Artist, Song")
         CoBoxPlaylistTitleFormat.Items.Add("Genre, Song, Artist, Album")
         CoBoxPlaylistTitleFormat.Items.Add("Genre, Song, Album, Artist")
-        CoBoxPlaylistTitleFormat.SelectedIndex = App.PlaylistTitleFormat
-        CkBoxPlaylistRemoveSpaces.Checked = App.PlaylistTitleRemoveSpaces
-        TxtBoxPlaylistTitleSeparator.Text = App.PlaylistTitleSeparator
-        TxtBoxPlaylistVideoIdentifier.Text = App.PlaylistVideoIdentifier
-        TxtBoxStatusMessageDisplayTime.Text = App.PlaylistStatusMessageDisplayTime.ToString
+        CoBoxPlaylistTitleFormat.SelectedIndex = PlaylistTitleFormat
+        CkBoxPlaylistRemoveSpaces.Checked = PlaylistTitleRemoveSpaces
+        TxtBoxPlaylistTitleSeparator.Text = PlaylistTitleSeparator
+        TxtBoxPlaylistVideoIdentifier.Text = PlaylistVideoIdentifier
+        TxtBoxStatusMessageDisplayTime.Text = PlaylistStatusMessageDisplayTime.ToString
         LBLibrarySearchFolders.Items.Clear()
-        For Each item As String In App.LibrarySearchFolders
+
+        For Each item In LibrarySearchFolders
             LBLibrarySearchFolders.Items.Add(item)
         Next
-        CkBoxLibrarySearchSubFolders.Checked = App.LibrarySearchSubFolders
-        CkBoxWatchFolders.Checked = App.WatcherEnabled
-        CkBoxWatchFoldersUpdateLibrary.Checked = App.WatcherUpdateLibrary
-        CkBoxWatchFoldersUpdatePlaylist.Checked = App.WatcherUpdatePlaylist
-        CkBoxSaveWindowMetrics.Checked = App.SaveWindowMetrics
-        CkBoxSuspendOnSessionChange.Checked = App.SuspendOnSessionChange
-        CkBoxShowTrayIcon.Checked = App.ShowTrayIcon
-        CkBoxMinimizeToTray.Checked = App.MinimizeToTray
-        TxtBoxHelperApp1Name.Text = App.HelperApp1Name
-        TxtBoxHelperApp1Path.Text = App.HelperApp1Path
-        If File.Exists(App.HelperApp1Path) Then
-            TxtBoxHelperApp1Path.ForeColor = App.CurrentTheme.TextColor
+        CkBoxShowNowPlayingToast.Checked = ShowNowPlayingToast
+        Select Case NowPlayingToastLocation
+            Case Skye.UI.ToastLocation.TopLeft : RadBtnNPTTopLeft.Checked = True
+            Case Skye.UI.ToastLocation.TopCenter : RadBtnNPTTopCenter.Checked = True
+            Case Skye.UI.ToastLocation.TopRight : RadBtnNPTTopRight.Checked = True
+            Case Skye.UI.ToastLocation.MiddleLeft : RadBtnNPTMiddleLeft.Checked = True
+            Case Skye.UI.ToastLocation.MiddleCenter : RadBtnNPTMiddleCenter.Checked = True
+            Case Skye.UI.ToastLocation.MiddleRight : RadBtnNPTMiddleRight.Checked = True
+            Case Skye.UI.ToastLocation.BottomLeft : RadBtnNPTBottomLeft.Checked = True
+            Case Skye.UI.ToastLocation.BottomCenter : RadBtnNPTBottomCenter.Checked = True
+            Case Skye.UI.ToastLocation.BottomRight : RadBtnNPTBottomRight.Checked = True
+        End Select
+        If App.ShowNowPlayingToast Then
+            GrBoxShowNowPlayingToast.Enabled = True
+        Else
+            GrBoxShowNowPlayingToast.Enabled = False
+        End If
+        CkBoxLibrarySearchSubFolders.Checked = LibrarySearchSubFolders
+        CkBoxWatchFolders.Checked = WatcherEnabled
+        CkBoxWatchFoldersUpdateLibrary.Checked = WatcherUpdateLibrary
+        CkBoxWatchFoldersUpdatePlaylist.Checked = WatcherUpdatePlaylist
+        CkBoxSaveWindowMetrics.Checked = SaveWindowMetrics
+        CkBoxSuspendOnSessionChange.Checked = SuspendOnSessionChange
+        CkBoxShowTrayIcon.Checked = ShowTrayIcon
+        CkBoxMinimizeToTray.Checked = MinimizeToTray
+        TxtBoxHelperApp1Name.Text = HelperApp1Name
+        TxtBoxHelperApp1Path.Text = HelperApp1Path
+        If File.Exists(HelperApp1Path) Then
+            TxtBoxHelperApp1Path.ForeColor = CurrentTheme.TextColor
         Else
             TxtBoxHelperApp1Path.ForeColor = Color.Red
         End If
-        TxtBoxHelperApp2Name.Text = App.HelperApp2Name
-        TxtBoxHelperApp2Path.Text = App.HelperApp2Path
-        If File.Exists(App.HelperApp2Path) Then
-            TxtBoxHelperApp2Path.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxHelperApp2Name.Text = HelperApp2Name
+        TxtBoxHelperApp2Path.Text = HelperApp2Path
+        If File.Exists(HelperApp2Path) Then
+            TxtBoxHelperApp2Path.ForeColor = CurrentTheme.TextColor
         Else
             TxtBoxHelperApp2Path.ForeColor = Color.Red
         End If
-        TxtBoxRandomHistoryUpdateInterval.Text = App.RandomHistoryUpdateInterval.ToString
-        TxtBoxHistoryUpdateInterval.Text = App.HistoryUpdateInterval.ToString
-        TxtBoxHistoryAutoSaveInterval.Text = App.HistoryAutoSaveInterval.ToString
+        TxtBoxRandomHistoryUpdateInterval.Text = RandomHistoryUpdateInterval.ToString
+        TxtBoxHistoryUpdateInterval.Text = HistoryUpdateInterval.ToString
+        TxtBoxHistoryAutoSaveInterval.Text = HistoryAutoSaveInterval.ToString
         SetPrunePlaylistButtonText()
         SetPruneHistoryButtonText()
     End Sub
@@ -245,6 +264,20 @@ Public Class Options
     Private Sub RadBtnRemainingClick(sender As Object, e As EventArgs) Handles RadBtnRemaining.Click
         App.PlayerPositionShowElapsed = False
         Player.SetTipPlayer()
+    End Sub
+    Private Sub RadBtnNPT_Click(sender As Object, e As EventArgs) Handles RadBtnNPTTopLeft.Click, RadBtnNPTMiddleLeft.Click, RadBtnNPTBottomLeft.Click, RadBtnNPTBottomCenter.Click, RadBtnNPTMiddleCenter.Click, RadBtnNPTTopCenter.Click, RadBtnNPTTopRight.Click, RadBtnNPTMiddleRight.Click, RadBtnNPTBottomRight.Click
+        Dim radbtn As RadioButton = CType(sender, RadioButton)
+        Select Case radbtn.Name
+            Case "RadBtnNPTTopLeft" : App.NowPlayingToastLocation = Skye.UI.ToastLocation.TopLeft
+            Case "RadBtnNPTTopCenter" : App.NowPlayingToastLocation = Skye.UI.ToastLocation.TopCenter
+            Case "RadBtnNPTTopRight" : App.NowPlayingToastLocation = Skye.UI.ToastLocation.TopRight
+            Case "RadBtnNPTMiddleLeft" : App.NowPlayingToastLocation = Skye.UI.ToastLocation.MiddleLeft
+            Case "RadBtnNPTMiddleCenter" : App.NowPlayingToastLocation = Skye.UI.ToastLocation.MiddleCenter
+            Case "RadBtnNPTMiddleRight" : App.NowPlayingToastLocation = Skye.UI.ToastLocation.MiddleRight
+            Case "RadBtnNPTBottomLeft" : App.NowPlayingToastLocation = Skye.UI.ToastLocation.BottomLeft
+            Case "RadBtnNPTBottomCenter" : App.NowPlayingToastLocation = Skye.UI.ToastLocation.BottomCenter
+            Case "RadBtnNPTBottomRight" : App.NowPlayingToastLocation = Skye.UI.ToastLocation.BottomRight
+        End Select
     End Sub
     Private Sub CoBoxPlayMode_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlayMode.SelectionChangeCommitted
         App.PlayMode = CType(CoBoxPlayMode.SelectedIndex, App.PlayModes)
@@ -410,6 +443,14 @@ Public Class Options
             App.SetHistoryAutoSaveTimer()
         End If
     End Sub
+    Private Sub CkBoxShowNowPlayingToast_Click(sender As Object, e As EventArgs) Handles CkBoxShowNowPlayingToast.Click
+        App.ShowNowPlayingToast = Not App.ShowNowPlayingToast
+        If App.ShowNowPlayingToast Then
+            GrBoxShowNowPlayingToast.Enabled = True
+        Else
+            GrBoxShowNowPlayingToast.Enabled = False
+        End If
+    End Sub
     Private Sub CkBoxPlaylistRemoveSpacesClick(sender As Object, e As EventArgs) Handles CkBoxPlaylistRemoveSpaces.Click
         App.PlaylistTitleRemoveSpaces = Not App.PlaylistTitleRemoveSpaces
     End Sub
@@ -436,8 +477,8 @@ Public Class Options
         App.ShowTrayIcon = Not App.ShowTrayIcon
         App.SetNIApp()
     End Sub
-    Private Sub CkBoxMinimizeToTray_Click(sender As Object, e As EventArgs) Handles CkBoxMinimizeToTray.Click
-        App.MinimizeToTray = Not App.MinimizeToTray
+    Private Sub CkBoxMinimizeToTray_Click(sender As Object, e As EventArgs) Handles CkBoxMinimizeToTray.Click, CkBoxMinimizeToTray.Click
+        MinimizeToTray = Not MinimizeToTray
     End Sub
     Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
         If e.Alt Then
@@ -576,7 +617,9 @@ Public Class Options
             c = App.GetAccentColor()
             BackColor = c
             GrBoxTime.BackColor = c
+            GrBoxShowNowPlayingToast.BackColor = c
             RadBtnRemaining.BackColor = c
+            CkBoxShowNowPlayingToast.BackColor = c
             CkBoxLibrarySearchSubFolders.BackColor = c
             CkBoxWatchFolders.BackColor = c
             CkBoxWatchFoldersUpdateLibrary.BackColor = c
@@ -604,7 +647,9 @@ Public Class Options
         Else
             BackColor = App.CurrentTheme.BackColor
             GrBoxTime.BackColor = App.CurrentTheme.BackColor
+            GrBoxShowNowPlayingToast.BackColor = App.CurrentTheme.BackColor
             RadBtnRemaining.BackColor = App.CurrentTheme.BackColor
+            CkBoxShowNowPlayingToast.BackColor = App.CurrentTheme.BackColor
             CkBoxLibrarySearchSubFolders.BackColor = App.CurrentTheme.BackColor
             CkBoxWatchFolders.BackColor = App.CurrentTheme.BackColor
             CkBoxWatchFoldersUpdateLibrary.BackColor = App.CurrentTheme.BackColor
@@ -650,6 +695,7 @@ Public Class Options
         BtnHelperApp1.BackColor = App.CurrentTheme.ButtonBackColor
         BtnHelperApp2.BackColor = App.CurrentTheme.ButtonBackColor
         GrBoxTime.ForeColor = forecolor
+        GrBoxShowNowPlayingToast.ForeColor = forecolor
         LblSongPlayMode.ForeColor = forecolor
         LblDefaultPlaylistAction.ForeColor = forecolor
         LblPlaylistSearchAction.ForeColor = forecolor
@@ -662,6 +708,7 @@ Public Class Options
         LblVideoIdentifier.ForeColor = forecolor
         lblStatusMessageDisplayTime1.ForeColor = forecolor
         lblStatusMessageDisplayTime2.ForeColor = forecolor
+        CkBoxShowNowPlayingToast.ForeColor = forecolor
         CkBoxSaveWindowMetrics.ForeColor = forecolor
         CkBoxShowTrayIcon.ForeColor = forecolor
         CkBoxMinimizeToTray.ForeColor = forecolor

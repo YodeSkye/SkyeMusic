@@ -34,6 +34,7 @@ Public Class Player
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
     Private PlaylistSearchTitle As String 'Title for Playlist Search
     Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
+    Private PlaylistCurrentText As String 'Text of the current playlist item
     Private RandomHistory As New Generic.List(Of String) 'History of played items for shuffle play mode
     Private RandomHistoryIndex As Integer = 0 'Index for the shuffle history
     Private CurrentAccentColor As Color 'Current Windows Accent Color
@@ -3039,7 +3040,7 @@ Public Class Player
     End Sub
     Private Sub MIPlayMode_Click(sender As Object, e As EventArgs) Handles MIPlayMode.Click
         Dim newIndex As Byte = CType(App.PlayMode + 1, Byte)
-        'Debug.Print(newIndex.ToString)
+        App.ShowToast(Nothing, "Shuffle Play Yet?")
         If newIndex = [Enum].GetNames(GetType(App.PlayModes)).Length Then
             newIndex = 0
         End If
@@ -3656,6 +3657,7 @@ Public Class Player
         TimerShowMedia.Stop()
         ShowMedia()
         If Mute Then ToggleMute()
+        ShowNowPlayingToast(PlaylistCurrentText)
     End Sub
     Private Sub TimerStatus_Tick(sender As Object, e As EventArgs) Handles TimerStatus.Tick
         TimerStatus.Stop()
@@ -3797,6 +3799,23 @@ Public Class Player
             Return 0
         End If
     End Function
+    Private Sub ShowNowPlayingToast(songtext As String)
+        If App.ShowNowPlayingToast Then
+            Dim npo As New Skye.UI.ToastOptions With {
+                .Title = "Now Playing",
+                .Message = songtext,
+                .Duration = 6000,
+                .BackColor = App.CurrentTheme.BackColor,
+                .BorderColor = App.CurrentTheme.ButtonBackColor,
+                .ForeColor = App.CurrentTheme.TextColor,
+                .TitleFont = New Font("Segoe UI", 12),
+                .MessageFont = New Font("Segoe UI", 12, FontStyle.Bold),
+                .Location = App.NowPlayingToastLocation,
+                .Image = PicBoxAlbumArt.Image
+            }
+            Skye.UI.Toast.ShowToast(npo)
+        End If
+    End Sub
     Friend Sub TogglePlayer()
         Static lastState As FormWindowState
         Select Case WindowState
@@ -4752,15 +4771,18 @@ Public Class Player
                 Case App.MediaSourceTypes.Stream
                     Dim path As String = _player.Path.TrimEnd("/"c)
                     Dim lvi = LVPlaylist.FindItemWithText(path, True, 0)
+                    PlaylistCurrentText = lvi.Text
                     Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
                     App.NIApp.Text = My.Application.Info.Title + " - " + lvi.Text
                 Case App.MediaSourceTypes.File
                     Dim lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+                    PlaylistCurrentText = lvi.Text
                     Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
                     App.NIApp.Text = My.Application.Info.Title + " - " + lvi.Text
                     LoadLyrics(_player.Path)
             End Select
         Catch
+            PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
             Text = My.Application.Info.Title + " - " + _player.Path
             App.NIApp.Text = Text
         End Try
@@ -4896,6 +4918,7 @@ Public Class Player
             If Lyrics AndAlso Not CurrentMediaType = App.MediaSourceTypes.Stream Then 'Show Lyrics
                 Debug.Print("Showing Lyrics...")
                 PicBoxAlbumArt.Visible = False
+                PicBoxAlbumArt.Image = Nothing
                 LblMedia.Visible = False
                 PanelVisualizer.Visible = False
                 VisualizerEngine?.Stop()
@@ -4916,6 +4939,7 @@ Public Class Player
             Else
                 If Visualizer Then
                     PicBoxAlbumArt.Visible = False
+                    PicBoxAlbumArt.Image = Nothing
                     RTBLyrics.Visible = False
                     VLCViewer.Visible = False
                 Else
@@ -4926,9 +4950,11 @@ Public Class Player
                         RTBLyrics.Visible = False
                         If tlfile Is Nothing Then
                             PicBoxAlbumArt.Visible = False
+                            PicBoxAlbumArt.Image = Nothing
                         Else
                             If tlfile.Tag.Pictures.Length = 0 Then
                                 PicBoxAlbumArt.Visible = False
+                                PicBoxAlbumArt.Image = Nothing
                             Else
                                 Debug.Print("Showing Album Art...")
                                 If AlbumArtIndex + 1 > tlfile.Tag.Pictures.Count Then AlbumArtIndex = 0
@@ -4939,6 +4965,7 @@ Public Class Player
                                 Catch ex As Exception
                                     WriteToLog("Error Loading Album Art for " + _player.Path + vbCr + ex.Message)
                                     PicBoxAlbumArt.Visible = False
+                                    PicBoxAlbumArt.Image = Nothing
                                 End Try
                                 ms.Dispose()
                                 ms = Nothing
@@ -4949,6 +4976,7 @@ Public Class Player
                     ElseIf App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Video
                         Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
+                        PicBoxAlbumArt.Image = Nothing
                         RTBLyrics.Visible = False
                         PanelVisualizer.Visible = False
                         VisualizerEngine?.Stop()
@@ -4960,6 +4988,7 @@ Public Class Player
                     Debug.Print("Showing Visualizer...")
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
+                    PicBoxAlbumArt.Image = Nothing
                     RTBLyrics.Visible = False
                     VisualizerHost.Activate(App.Visualizer)
                     VisualizerEngine?.Start()
