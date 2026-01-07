@@ -24,6 +24,7 @@ Public Class PlayerQueue
     Private Sub PlayerQueue_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetAccentColor()
         SetTheme()
+        App.ThemeMenu(CMQueue)
         Populate()
     End Sub
     Private Sub PlayerQueue_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown

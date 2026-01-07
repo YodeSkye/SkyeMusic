@@ -69,6 +69,7 @@ Public Class TagEditor
         oText = Text
         SetAccentColor()
         SetTheme()
+        App.ThemeMenu(CMBasic)
         For Each s As String In TagLib.Genres.Audio
             CoBoxGenre.Items.Add(s)
         Next

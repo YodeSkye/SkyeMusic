@@ -464,7 +464,7 @@ Public Class Player
         End Sub
         Private Sub ShowVisualizerMenu()
             Dim menu As New ContextMenuStrip()
-
+            App.ThemeMenu(menu)
             For Each vizName In visualizers.Keys
                 Dim item As New ToolStripMenuItem(vizName) With {
                     .Font = ownerForm.Font}
@@ -487,6 +487,7 @@ Public Class Player
         End Sub
         Public Sub SetVisualizersMenu()
             Dim menu As New ContextMenuStrip()
+            App.ThemeMenu(menu)
             For Each vizName In visualizers.Keys
                 Dim item As New ToolStripMenuItem(vizName) With {
                     .Font = ownerForm.Font}
@@ -2373,6 +2374,9 @@ Public Class Player
         ' More Form Initialization
         SetAccentColor()
         SetTheme()
+        App.ThemeMenu(MenuPlayer)
+        App.ThemeMenu(CMPlaylist)
+        App.ThemeMenu(CMRatings)
         LoadPlaylist()
         ClearPlaylistTitles()
         ShowPlayMode()
@@ -2666,11 +2670,11 @@ Public Class Player
                     PlaylistTitleSort = ClearPlaylistSorts(PlaylistTitleSort)
                     Select Case PlaylistTitleSort
                         Case SortOrder.Ascending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             PlaylistTitleSort = SortOrder.Descending
                             LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             PlaylistTitleSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title ↑"
                     End Select
@@ -2678,11 +2682,11 @@ Public Class Player
                     PlaylistPathSort = ClearPlaylistSorts(PlaylistPathSort)
                     Select Case PlaylistPathSort
                         Case SortOrder.Ascending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             PlaylistPathSort = SortOrder.Descending
                             LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             PlaylistPathSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ↑"
                     End Select
@@ -2690,11 +2694,11 @@ Public Class Player
                     PlaylistRatingSort = ClearPlaylistSorts(PlaylistRatingSort)
                     Select Case PlaylistRatingSort
                         Case SortOrder.Ascending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             PlaylistRatingSort = SortOrder.Descending
                             LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             PlaylistRatingSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating ↑"
                     End Select
@@ -2702,11 +2706,11 @@ Public Class Player
                     PlaylistPlayCountSort = ClearPlaylistSorts(PlaylistPlayCountSort)
                     Select Case PlaylistPlayCountSort
                         Case SortOrder.Ascending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemNumberComparer(e.Column, SortOrder.Descending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemNumberComparer(e.Column, SortOrder.Descending)
                             PlaylistPlayCountSort = SortOrder.Descending
                             LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemNumberComparer(e.Column, SortOrder.Ascending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemNumberComparer(e.Column, SortOrder.Ascending)
                             PlaylistPlayCountSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays ↑"
                     End Select
@@ -2714,11 +2718,11 @@ Public Class Player
                     PlaylistLastPlayedSort = ClearPlaylistSorts(PlaylistLastPlayedSort)
                     Select Case PlaylistLastPlayedSort
                         Case SortOrder.Ascending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Descending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Descending)
                             PlaylistLastPlayedSort = SortOrder.Descending
                             LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
                             PlaylistLastPlayedSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played ↑"
                     End Select
@@ -2726,11 +2730,11 @@ Public Class Player
                     PlaylistFirstPlayedSort = ClearPlaylistSorts(PlaylistFirstPlayedSort)
                     Select Case PlaylistFirstPlayedSort
                         Case SortOrder.Ascending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Descending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Descending)
                             PlaylistFirstPlayedSort = SortOrder.Descending
                             LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
                             PlaylistFirstPlayedSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played ↑"
                     End Select
@@ -2738,11 +2742,11 @@ Public Class Player
                     PlaylistAddedSort = ClearPlaylistSorts(PlaylistAddedSort)
                     Select Case PlaylistAddedSort
                         Case SortOrder.Ascending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Descending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Descending)
                             PlaylistAddedSort = SortOrder.Descending
                             LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVPlaylist.ListViewItemSorter = New My.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
+                            LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
                             PlaylistAddedSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ↑"
                     End Select
@@ -3434,9 +3438,6 @@ Public Class Player
                 ListBoxPlaylistSearch.Visible = True
             End If
         End If
-    End Sub
-    Private Sub TxtBoxLyrics_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs)
-        CMLyrics.ShortcutKeys(CType(sender, TextBox), e)
     End Sub
     Private Sub ListBoxPlaylistSearchSelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBoxPlaylistSearch.SelectedIndexChanged
         If ListBoxPlaylistSearch.SelectedItems.Count = 1 Then
@@ -5261,6 +5262,12 @@ Public Class Player
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor(True)
         SetTheme()
+    End Sub
+    Friend Sub ReThemeMenus()
+        App.ThemeMenu(MenuPlayer)
+        App.ThemeMenu(CMPlaylist)
+        App.ThemeMenu(CMRatings)
+        VisualizerHost.SetVisualizersMenu()
     End Sub
     Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
 

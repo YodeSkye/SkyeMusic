@@ -28,6 +28,7 @@ Public Class Options
         Text = "Options For " + Application.Info.Title
         SetAccentColor()
         SetTheme()
+        ReThemeMenus()
 
         'Settings
         Select Case PlayerPositionShowElapsed
@@ -301,10 +302,16 @@ Public Class Options
         App.CurrentTheme = App.GetCurrentThemeProperties
         If App.CurrentTheme.IsAccent Then SetAccentColor()
         SetTheme()
+        ReThemeMenus()
         App.InvokeThemeChanged()
         App.FrmLog?.SetColors()
+        App.FrmLog?.ReThemeMenus()
         App.FrmHistory?.SetColors()
+        App.FrmHistory?.ReThemeMenus()
         App.FrmLibrary.SetColors()
+        App.FrmLibrary.ReThemeMenus()
+        App.ReThemeTrayMenu()
+        Player.ReThemeMenus()
         Player.SetColors()
     End Sub
     Private Sub CoBoxPlaylistTitleFormat_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistTitleFormat.SelectionChangeCommitted
@@ -745,6 +752,10 @@ Public Class Options
         TipOptionsEX.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("Options Theme Set")
+    End Sub
+    Private Sub ReThemeMenus()
+        App.ThemeMenu(CMLibrarySearchFolders)
+        App.ThemeMenu(CMTxtBox)
     End Sub
 
 End Class

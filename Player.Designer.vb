@@ -92,7 +92,6 @@ Partial Class Player
         PanelMedia = New Panel()
         BtnPrevious = New Button()
         LVPlaylist = New Skye.UI.ListViewEX()
-        CMLyrics = New Skye.UI.TextBoxContextMenu()
         LblPlaylistCount = New Skye.UI.Label()
         LblDuration = New Skye.UI.Label()
         LblPosition = New Skye.UI.Label()
@@ -668,13 +667,6 @@ Partial Class Player
         LVPlaylist.UseCompatibleStateImageBehavior = False
         LVPlaylist.View = View.Details
         ' 
-        ' CMLyrics
-        ' 
-        CMLyrics.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        CMLyrics.Name = "CMLyrics"
-        CMLyrics.Size = New Size(149, 176)
-        TipPlayer.SetToolTipImage(CMLyrics, Nothing)
-        ' 
         ' LblPlaylistCount
         ' 
         LblPlaylistCount.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
@@ -907,7 +899,6 @@ Partial Class Player
     Friend WithEvents MIVisualizer As ToolStripMenuItem
     Friend WithEvents LblDuration As Skye.UI.Label
     Friend WithEvents LblPosition As Skye.UI.Label
-    Friend WithEvents CMLyrics As Skye.UI.TextBoxContextMenu
     Friend WithEvents CMIQueue As ToolStripMenuItem
     Friend WithEvents MIOpenURL As ToolStripMenuItem
     Friend WithEvents TrackBarPosition As Syncfusion.Windows.Forms.Tools.TrackBarEx

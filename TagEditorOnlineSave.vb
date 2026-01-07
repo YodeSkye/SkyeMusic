@@ -30,6 +30,8 @@ Public Class TagEditorOnlineSave
     Private Sub TagEditorOnlineSave_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetAccentColor()
         SetTheme()
+        TxtBoxFilename.ContextMenuStrip = App.DummyMenu
+        TxtBoxLocation.ContextMenuStrip = App.DummyMenu
     End Sub
 
     ' Control Events

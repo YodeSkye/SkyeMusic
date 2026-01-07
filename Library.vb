@@ -140,6 +140,7 @@ Public Class Library
         LibrarySearchTitle = TxbxLibrarySearch.Text
         SetAccentColor()
         SetTheme()
+        App.ThemeMenu(CMLibrary)
         LibraryImageList.Images.Add("AlbumArt", Resources.ImageAlbumArtSelect)
         LVLibrary.SmallImageList = LibraryImageList
         PicBoxAlbumArtSmallSize = PicBoxAlbumArt.Size
@@ -282,12 +283,12 @@ Public Class Library
                 Case LVLibrary.Columns("Artist").Index
                     Select Case LibraryArtistSort
                         Case SortOrder.Ascending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryArtistSort = SortOrder.Descending
                             LVLibrary.Columns(e.Column).Text += " ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryArtistSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
@@ -295,12 +296,12 @@ Public Class Library
                 Case LVLibrary.Columns("Title").Index
                     Select Case LibraryTitleSort
                         Case SortOrder.Ascending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryTitleSort = SortOrder.Descending
                             LVLibrary.Columns(e.Column).Text += " ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryTitleSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
@@ -308,12 +309,12 @@ Public Class Library
                 Case LVLibrary.Columns("Album").Index
                     Select Case LibraryAlbumSort
                         Case SortOrder.Ascending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryAlbumSort = SortOrder.Descending
                             LVLibrary.Columns(e.Column).Text += " ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryAlbumSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
@@ -321,12 +322,12 @@ Public Class Library
                 Case LVLibrary.Columns("Genre").Index
                     Select Case LibraryGenreSort
                         Case SortOrder.Ascending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryGenreSort = SortOrder.Descending
                             LVLibrary.Columns(e.Column).Text += " ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryGenreSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
@@ -334,12 +335,12 @@ Public Class Library
                 Case LVLibrary.Columns("Year").Index
                     Select Case LibraryYearSort
                         Case SortOrder.Ascending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryYearSort = SortOrder.Descending
                             LVLibrary.Columns(e.Column).Text += " ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryYearSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
@@ -347,12 +348,12 @@ Public Class Library
                 Case LVLibrary.Columns("Duration").Index
                     Select Case LibraryDurationSort
                         Case SortOrder.Ascending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryDurationSort = SortOrder.Descending
                             LVLibrary.Columns(e.Column).Text += " ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryDurationSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
@@ -360,12 +361,12 @@ Public Class Library
                 Case LVLibrary.Columns("Artists").Index
                     Select Case LibraryArtistsSort
                         Case SortOrder.Ascending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryArtistsSort = SortOrder.Descending
                             LVLibrary.Columns(e.Column).Text += " ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryArtistsSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
@@ -373,12 +374,12 @@ Public Class Library
                 Case LVLibrary.Columns("Comments").Index
                     Select Case LibraryCommentsSort
                         Case SortOrder.Ascending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryCommentsSort = SortOrder.Descending
                             LVLibrary.Columns(e.Column).Text += " ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryCommentsSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
@@ -386,12 +387,12 @@ Public Class Library
                 Case LVLibrary.Columns("FilePath").Index
                     Select Case LibraryFilenameSort
                         Case SortOrder.Ascending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Descending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryFilenameSort = SortOrder.Descending
                             LVLibrary.Columns(e.Column).Text += " ↓"
                         Case SortOrder.None, SortOrder.Descending
-                            LVLibrary.ListViewItemSorter = New My.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
+                            LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryFilenameSort = SortOrder.Ascending
                             LVLibrary.Columns(e.Column).Text += " ↑"
@@ -1518,6 +1519,10 @@ Public Class Library
         SetAccentColor(True)
         SetTheme()
     End Sub
+    Friend Sub ReThemeMenus()
+        App.ThemeMenu(CMLibrary)
+    End Sub
+
     Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
 
         'Initialize

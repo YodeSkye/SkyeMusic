@@ -26,6 +26,7 @@ Public Class PlayerAddStream
     Private Sub AddStream_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetAccentColor()
         SetTheme()
+        App.ThemeMenu(CMAddStream)
         TxtBoxStreamPath.Text = NewStream.Path
     End Sub
     Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblStreamTitle.MouseDown, LblStreamPath.MouseDown

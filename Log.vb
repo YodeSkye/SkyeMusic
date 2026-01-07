@@ -30,6 +30,7 @@ Public Class Log
         TimerDeleteLog.Interval = 5000
         SetAccentColor()
         SetTheme()
+        ReThemeMenus()
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
         'If App.SaveWindowMetrics AndAlso App.LogSize.Height >= 0 Then Me.Size = App.LogSize
@@ -250,6 +251,9 @@ Public Class Log
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor(True)
         SetTheme()
+    End Sub
+    Friend Sub ReThemeMenus()
+        App.ThemeMenu(RTBCMLog)
     End Sub
 
 End Class

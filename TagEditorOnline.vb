@@ -46,6 +46,7 @@ Public Class TagEditorOnline
         Text = My.Application.Info.Title & " " & Text
         SetAccentColor()
         SetTheme()
+        TxtBoxSearchPhrase.ContextMenuStrip = App.DummyMenu
     End Sub
     Private Sub Frm_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         query = BuildQuery(App.FrmTagEditor.ArtistText, App.FrmTagEditor.AlbumText)

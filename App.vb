@@ -202,8 +202,9 @@ Namespace My
         Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/" 'AttributionIcons8 is the URL for Icons8, which provides icons used in the application.
         Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
         Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
+        Friend ReadOnly DummyMenu As New ContextMenuStrip()
 
-        'HotKeys
+        ' HotKeys
         Private Structure HotKey
             Public WinID As Integer
             Public Description As String
@@ -230,7 +231,7 @@ Namespace My
         Private ReadOnly HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
         Private ReadOnly HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
 
-        'Paths
+        ' Paths
         Friend ReadOnly UserPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" 'UserPath is the base path for user-specific files.
 #If DEBUG Then
         Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt" 'LogPath is the path to the log file.
@@ -248,7 +249,7 @@ Namespace My
         Private ReadOnly DatabasePath As String = UserPath + My.Application.Info.ProductName + "History.db" 'DatabasePath is the path to the SQLite database file.
 #End If
 
-        'Themes
+        ' Themes
         Friend Enum Themes
             BlueAccent
             PinkAccent
@@ -262,6 +263,7 @@ Namespace My
             Public IsAccent As Boolean
             Public BackColor As Color
             Public TextColor As Color
+            Public HoverColor As Color
             Public ControlBackColor As Color
             Public ButtonBackColor As Color
             Public ButtonTextColor As Color
@@ -285,6 +287,7 @@ Namespace My
             .IsAccent = True,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
             .TextColor = Color.DodgerBlue,
+            .HoverColor = Color.LightBlue,
             .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
             .ButtonBackColor = Color.SlateGray,
             .ButtonTextColor = Color.White,
@@ -302,6 +305,7 @@ Namespace My
             .IsAccent = True,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
             .TextColor = Color.DeepPink,
+            .HoverColor = Color.HotPink,
             .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
             .ButtonBackColor = Color.DeepPink,
             .ButtonTextColor = Color.White,
@@ -319,6 +323,7 @@ Namespace My
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 241, 240, 240), 'SystemColors.Control = 240,240,240, set to avoid transparency issues in ToolTipEX
             .TextColor = Color.Black,
+            .HoverColor = SystemColors.Window,
             .ControlBackColor = SystemColors.Window,
             .ButtonBackColor = SystemColors.Window,
             .ButtonTextColor = Color.Black,
@@ -336,6 +341,7 @@ Namespace My
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
             .TextColor = Color.White,
+            .HoverColor = Color.LightSlateGray,
             .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
             .ButtonBackColor = Color.SlateGray,
             .ButtonTextColor = Color.White,
@@ -353,6 +359,7 @@ Namespace My
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
             .TextColor = Color.DeepPink,
+            .HoverColor = Color.LightSlateGray,
             .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
             .ButtonBackColor = Color.SlateGray,
             .ButtonTextColor = Color.White,
@@ -370,6 +377,7 @@ Namespace My
             .IsAccent = False,
             .BackColor = Color.Pink,
             .TextColor = Color.DeepPink,
+            .HoverColor = Color.HotPink,
             .ControlBackColor = Color.Pink,
             .ButtonBackColor = Color.HotPink,
             .ButtonTextColor = Color.White,
@@ -387,6 +395,7 @@ Namespace My
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 128, 13, 13),
             .TextColor = Color.AntiqueWhite,
+            .HoverColor = Color.IndianRed,
             .ControlBackColor = Color.IndianRed,
             .ButtonBackColor = Color.FromArgb(255, 200, 20, 20),
             .ButtonTextColor = Color.AntiqueWhite,
@@ -401,7 +410,7 @@ Namespace My
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
 
-        'Database
+        ' Database
         Friend Class PlayData
             Public Property Path As String
             Public Property StartPlayTime As DateTime
@@ -419,7 +428,7 @@ Namespace My
             Public Property PlayTrigger As String
         End Class
 
-        'XML Saved History
+        ' XML Saved History
         Friend History As New Collections.Generic.List(Of Song) 'History is a list that stores the history of songs and streams in the Library and Playlist.
         Friend HistoryTotalPlayedSongs As UInteger = 0 'Tracks the total number of songs played since the history was first created.
         Private HistoryChanged As Boolean = False 'Tracks if history has been changed.
@@ -634,7 +643,7 @@ Namespace My
         Friend ShowNowPlayingToast As Boolean = True
         Friend NowPlayingToastLocation As Skye.UI.ToastLocation = Skye.UI.ToastLocation.TopRight
 
-        'Interfaces
+        ' Interfaces
         Friend Interface IAccentable
             Sub SetAccentColor()
         End Interface
@@ -984,6 +993,211 @@ Namespace My
             End Function
         End Class
 
+        ' Classes
+        Friend Class ListViewItemStringComparer
+            Implements IComparer
+
+            Private ReadOnly col As Integer
+            Private ReadOnly sort As SortOrder
+
+            Public Sub New(column As Integer, sortorder As SortOrder)
+                col = column
+                sort = sortorder
+            End Sub
+            Public Function Compare(x As Object, y As Object) As Integer Implements System.Collections.IComparer.Compare
+                Dim returnVal As Integer
+                returnVal = String.Compare(CType(x, ListViewItem).SubItems(col).Text, CType(y, ListViewItem).SubItems(col).Text)
+                If sort = SortOrder.Descending Then returnVal *= -1
+                Return returnVal
+            End Function
+
+        End Class
+        Friend Class ListViewItemNumberComparer
+            Implements IComparer
+
+            Private ReadOnly col As Integer
+            Private ReadOnly sort As SortOrder
+
+            Public Sub New(column As Integer, sortorder As SortOrder)
+                col = column
+                sort = sortorder
+            End Sub
+            Public Function Compare(x As Object, y As Object) As Integer Implements System.Collections.IComparer.Compare
+                Dim returnval As Integer
+                Dim valx As Integer
+                Dim valy As Integer
+                If Integer.TryParse(CType(x, ListViewItem).SubItems(col).Text, valx) AndAlso Integer.TryParse(CType(y, ListViewItem).SubItems(col).Text, valy) Then
+                    returnval = valx.CompareTo(valy)
+                    If sort = SortOrder.Descending Then
+                        Return -returnval
+                    Else
+                        Return returnval
+                    End If
+                Else
+                    returnval = String.Compare(CType(x, ListViewItem).SubItems(col).Text, CType(y, ListViewItem).SubItems(col).Text)
+                    If sort = SortOrder.Descending Then
+                        Return -returnval
+                    Else
+                        Return returnval
+                    End If
+                End If
+            End Function
+
+        End Class
+        Friend Class ListViewItemDateComparer
+            Implements IComparer
+
+            Private ReadOnly col As Integer
+            Private ReadOnly sort As SortOrder
+
+            Public Sub New(column As Integer, sortorder As SortOrder)
+                col = column
+                sort = sortorder
+            End Sub
+            Public Function Compare(x As Object, y As Object) As Integer Implements System.Collections.IComparer.Compare
+                Dim returnval As Integer
+                Dim datex As DateTime
+                Dim datey As DateTime
+                If DateTime.TryParse(CType(x, ListViewItem).SubItems(col).Text, datex) AndAlso DateTime.TryParse(CType(y, ListViewItem).SubItems(col).Text, datey) Then
+                    returnval = datex.CompareTo(datey)
+                    If sort = SortOrder.Descending Then
+                        Return -returnval
+                    Else
+                        Return returnval
+                    End If
+                Else
+                    returnval = String.Compare(CType(x, ListViewItem).SubItems(col).Text, CType(y, ListViewItem).SubItems(col).Text)
+                    If sort = SortOrder.Descending Then
+                        Return -returnval
+                    Else
+                        Return returnval
+                    End If
+                End If
+            End Function
+
+        End Class
+        Friend Class SkyeMenuRenderer
+            Inherits ToolStripProfessionalRenderer
+
+            Private ReadOnly _back As Color
+            Private ReadOnly _hover As Color
+            Private ReadOnly _border As Color
+            Private ReadOnly _text As Color
+            Private ReadOnly _separator As Color
+
+            Public Sub New(back As Color, hover As Color, border As Color, text As Color, separator As Color)
+                MyBase.New(New SkyeColorTable(back, hover, border, separator))
+                _back = back
+                _hover = hover
+                _border = border
+                _text = text
+                _separator = separator
+            End Sub
+            Protected Overrides Sub OnRenderItemText(e As ToolStripItemTextRenderEventArgs)
+                e.TextColor = _text
+                MyBase.OnRenderItemText(e)
+            End Sub
+            Protected Overrides Sub OnRenderMenuItemBackground(e As ToolStripItemRenderEventArgs)
+                Dim item = e.Item
+
+                ' Only customize when hovered or pressed
+                If item.Selected OrElse item.Pressed Then
+                    Dim g = e.Graphics
+                    Dim bounds = New Rectangle(New Point(1, 0), item.Size)
+
+                    Dim backColor As Color = If(item.Selected, CType(Me.ColorTable, SkyeColorTable).MenuItemSelected, CType(Me.ColorTable, SkyeColorTable).ToolStripDropDownBackground)
+
+                    Using b As New SolidBrush(backColor)
+                        g.FillRectangle(b, bounds)
+                    End Using
+
+                    ' Optional draw border if you want
+                    Using p As New Pen(CType(Me.ColorTable, SkyeColorTable).MenuItemBorder)
+                        g.DrawRectangle(p, 0, 0, bounds.Width - 1, bounds.Height - 1)
+                    End Using
+                Else
+                    ' Let the default behavior handle idle state (no forced background)
+                    MyBase.OnRenderMenuItemBackground(e)
+                End If
+            End Sub
+            Protected Overrides Sub OnRenderToolStripBorder(e As ToolStripRenderEventArgs)
+                ' Skip drawing a border for the MenuStrip itself
+                If TypeOf e.ToolStrip Is MenuStrip Then
+                    Return
+                End If
+
+                ' Draw border for dropdown menus and context menus
+                Dim borderColor As Color = CType(Me.ColorTable, SkyeColorTable).MenuItemBorder
+
+                Using p As New Pen(borderColor)
+                    Dim r = New Rectangle(0, 0, e.ToolStrip.Width - 1, e.ToolStrip.Height - 1)
+                    e.Graphics.DrawRectangle(p, r)
+                End Using
+            End Sub
+            Protected Overrides Sub OnRenderImageMargin(e As ToolStripRenderEventArgs)
+                Using b As New SolidBrush(CType(Me.ColorTable, SkyeColorTable).BackColor)
+                    e.Graphics.FillRectangle(b, e.AffectedBounds)
+                End Using
+            End Sub
+        End Class
+        Friend Class SkyeColorTable
+            Inherits ProfessionalColorTable
+
+            Private ReadOnly _back As Color
+            Private ReadOnly _hover As Color
+            Private ReadOnly _border As Color
+            Private ReadOnly _separator As Color
+
+            Public Overrides ReadOnly Property ToolStripDropDownBackground As Color
+                Get
+                    Return _back
+                End Get
+            End Property
+            Public Overrides ReadOnly Property MenuItemSelected As Color
+                Get
+                    Return _hover
+                End Get
+            End Property
+            Public Overrides ReadOnly Property MenuItemBorder As Color
+                Get
+                    Return _border
+                End Get
+            End Property
+            Public Overrides ReadOnly Property SeparatorDark As Color
+                Get
+                    Return _separator
+                End Get
+            End Property
+            Public ReadOnly Property BackColor As Color
+                Get
+                    Return _back
+                End Get
+            End Property
+            Public Overrides ReadOnly Property ToolStripGradientBegin As Color
+                Get
+                    Return _back
+                End Get
+            End Property
+            Public Overrides ReadOnly Property ToolStripGradientMiddle As Color
+                Get
+                    Return _back
+                End Get
+            End Property
+            Public Overrides ReadOnly Property ToolStripGradientEnd As Color
+                Get
+                    Return _back
+                End Get
+            End Property
+
+            Public Sub New(back As Color, hover As Color, border As Color, separator As Color)
+                _back = back
+                _hover = hover
+                _border = border
+                _separator = separator
+            End Sub
+
+        End Class
+
         ' Control Events
         Private Sub NIApp_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
             Dim miPlay As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlay"), ToolStripMenuItem)
@@ -1001,35 +1215,17 @@ Namespace My
             miPrevious.Image = ResizeImage(CurrentTheme.PlayerPrevious, 16)
             Dim miNext As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MINext"), ToolStripMenuItem)
             miNext.Image = ResizeImage(CurrentTheme.PlayerNext, 16)
-            Select Case PlayMode
-                Case App.PlayModes.None, PlayModes.Repeat
-                    miPrevious.ToolTipText = String.Empty
-                    miNext.ToolTipText = String.Empty
-                Case App.PlayModes.Linear
-                    miPrevious.ToolTipText = "Previous Song In Playlist"
-                    miNext.ToolTipText = "Next Song In Playlist"
-                Case App.PlayModes.Random
-                    miPrevious.ToolTipText = "Previous Song Played"
-                    miNext.ToolTipText = "Next Random Song"
-            End Select
-            Dim miPlayer As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlayer"), ToolStripMenuItem)
-            If Player.WindowState = FormWindowState.Minimized Then
-                miPlayer.Checked = False
-            Else
-                miPlayer.Checked = True
-            End If
-            Dim miLibrary As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MILibrary"), ToolStripMenuItem)
-            If FrmLibrary?.Visible Then
-                miLibrary.Checked = True
-            Else
-                miLibrary.Checked = False
-            End If
-            Dim miHistory As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIHistory"), ToolStripMenuItem)
-            If FrmHistory?.Visible Then
-                miHistory.Checked = True
-            Else
-                miHistory.Checked = False
-            End If
+            'Select Case PlayMode
+            '    Case App.PlayModes.None, PlayModes.Repeat
+            '        miPrevious.ToolTipText = String.Empty
+            '        miNext.ToolTipText = String.Empty
+            '    Case App.PlayModes.Linear
+            '        miPrevious.ToolTipText = "Previous Song In Playlist"
+            '        miNext.ToolTipText = "Next Song In Playlist"
+            '    Case App.PlayModes.Random
+            '        miPrevious.ToolTipText = "Previous Song Played"
+            '        miNext.ToolTipText = "Next Random Song"
+            'End Select
         End Sub
         Private Sub NIApp_MouseClick(sender As Object, e As MouseEventArgs)
             If e.Button = MouseButtons.Left Then
@@ -1084,38 +1280,27 @@ Namespace My
         Private Sub NIApp_MIPlayer_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    Player.TogglePlayer()
-                Case MouseButtons.Right
                     Select Case Player.WindowState
                         Case FormWindowState.Normal, FormWindowState.Maximized
                             Player.BringToFront()
                         Case FormWindowState.Minimized
                             Player.TogglePlayer()
                     End Select
+                Case MouseButtons.Right
             End Select
         End Sub
         Private Sub NIApp_MILibrary_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    If FrmLibrary.Visible Then
-                        HideLibrary()
-                    Else
-                        ShowLibrary()
-                    End If
-                Case MouseButtons.Right
                     ShowLibrary()
+                Case MouseButtons.Right
             End Select
         End Sub
         Private Sub NIApp_MIHistory_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    If FrmHistory?.Visible Then
-                        HideHistory()
-                    Else
-                        ShowHistory()
-                    End If
-                Case MouseButtons.Right
                     ShowHistory()
+                Case MouseButtons.Right
             End Select
         End Sub
         Private Sub NIApp_MISettings_MouseDown(sender As Object, e As MouseEventArgs)
@@ -1310,42 +1495,33 @@ Namespace My
             AddHandler NIApp.MouseClick, AddressOf NIApp_MouseClick
             AddHandler NIApp.MouseDoubleClick, AddressOf NIApp_MouseDoubleClick
             Dim cm As New ContextMenuStrip()
+            ThemeMenu(cm)
             cm.Font = New Font("Segoe UI", 10.0!)
             Dim cmi As ToolStripMenuItem
             cmi = New ToolStripMenuItem("About " & My.Application.Info.Title, My.Resources.ImageAbout16) With {.Name = "NIApp_MIAbout"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIAbout_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
-            cmi = New ToolStripMenuItem("Player", ResizeImage(My.Resources.ImagePlay, 16)) With {
-                .Name = "NIApp_MIPlayer",
-                .ToolTipText = "Left-Click = Toggle Player" & vbCr & "Right-Click = Show Player"}
+            cmi = New ToolStripMenuItem("Player", ResizeImage(My.Resources.ImagePlay, 16)) With {.Name = "NIApp_MIPlayer"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPlayer_MouseDown
             cm.Items.Add(cmi)
-            cmi = New ToolStripMenuItem("Library", My.Resources.ImageLibrary16) With {
-                .Name = "NIApp_MILibrary",
-                .ToolTipText = "Left-Click = Toggle Library" & vbCr & "Right-Click = Show Library"}
+            cmi = New ToolStripMenuItem("Library", My.Resources.ImageLibrary16) With {.Name = "NIApp_MILibrary"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MILibrary_MouseDown
             cm.Items.Add(cmi)
-            cmi = New ToolStripMenuItem("History", My.Resources.ImageHistory) With {
-                .Name = "NIApp_MIHistory",
-                .ToolTipText = "Left-Click = Toggle History" & vbCr & "Right-Click = Show History"}
+            cmi = New ToolStripMenuItem("History", My.Resources.ImageHistory) With {.Name = "NIApp_MIHistory"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIHistory_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
             cmi = New ToolStripMenuItem With {.Name = "NIApp_MIPlay"}
-            cmi.BackColor = Color.LightGray
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPlay_MouseDown
             cm.Items.Add(cmi)
             cmi = New ToolStripMenuItem("Stop") With {.Name = "NIApp_MIStop"}
-            cmi.BackColor = Color.LightGray
             AddHandler cmi.MouseDown, AddressOf NIApp_MIStop_MouseDown
             cm.Items.Add(cmi)
             cmi = New ToolStripMenuItem("Previous") With {.Name = "NIApp_MIPrevious"}
-            cmi.BackColor = Color.LightGray
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPrevious_MouseDown
             cm.Items.Add(cmi)
             cmi = New ToolStripMenuItem("Next") With {.Name = "NIApp_MINext"}
-            cmi.BackColor = Color.LightGray
             AddHandler cmi.MouseDown, AddressOf NIApp_MINext_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
@@ -3098,6 +3274,22 @@ Namespace My
                     Return RedTheme
             End Select
         End Function
+        Friend Sub ThemeMenu(cm As ToolStrip)
+            cm.Renderer = New SkyeMenuRenderer(
+                back:=CurrentTheme.BackColor,
+                hover:=CurrentTheme.HoverColor,
+                border:=CurrentTheme.ButtonBackColor,
+                text:=CurrentTheme.TextColor,
+                separator:=Color.FromArgb(80, 80, 80)
+                )
+            cm.SuspendLayout()
+            cm.PerformLayout()
+            cm.ResumeLayout(True)
+            cm.Invalidate()
+        End Sub
+        Friend Sub ReThemeTrayMenu()
+            If ShowTrayIcon Then ThemeMenu(NIApp.ContextMenuStrip)
+        End Sub
         Friend Function ResizeImage(src As Image, size As Integer) As Image
             Dim bmp As New Bitmap(size, size)
             Using g = Graphics.FromImage(bmp)
@@ -3463,88 +3655,5 @@ Namespace My
         End Function
 
     End Module
-
-    Friend Class ListViewItemStringComparer
-        Implements IComparer
-
-        Private ReadOnly col As Integer
-        Private ReadOnly sort As SortOrder
-
-        Public Sub New(column As Integer, sortorder As SortOrder)
-            col = column
-            sort = sortorder
-        End Sub
-        Public Function Compare(x As Object, y As Object) As Integer Implements System.Collections.IComparer.Compare
-            Dim returnVal As Integer
-            returnVal = String.Compare(CType(x, ListViewItem).SubItems(col).Text, CType(y, ListViewItem).SubItems(col).Text)
-            If sort = SortOrder.Descending Then returnVal *= -1
-            Return returnVal
-        End Function
-
-    End Class
-    Friend Class ListViewItemNumberComparer
-        Implements IComparer
-
-        Private ReadOnly col As Integer
-        Private ReadOnly sort As SortOrder
-
-        Public Sub New(column As Integer, sortorder As SortOrder)
-            col = column
-            sort = sortorder
-        End Sub
-        Public Function Compare(x As Object, y As Object) As Integer Implements System.Collections.IComparer.Compare
-            Dim returnval As Integer
-            Dim valx As Integer
-            Dim valy As Integer
-            If Integer.TryParse(CType(x, ListViewItem).SubItems(col).Text, valx) AndAlso Integer.TryParse(CType(y, ListViewItem).SubItems(col).Text, valy) Then
-                returnval = valx.CompareTo(valy)
-                If sort = SortOrder.Descending Then
-                    Return -returnval
-                Else
-                    Return returnval
-                End If
-            Else
-                returnval = String.Compare(CType(x, ListViewItem).SubItems(col).Text, CType(y, ListViewItem).SubItems(col).Text)
-                If sort = SortOrder.Descending Then
-                    Return -returnval
-                Else
-                    Return returnval
-                End If
-            End If
-        End Function
-
-    End Class
-    Friend Class ListViewItemDateComparer
-        Implements IComparer
-
-        Private ReadOnly col As Integer
-        Private ReadOnly sort As SortOrder
-
-        Public Sub New(column As Integer, sortorder As SortOrder)
-            col = column
-            sort = sortorder
-        End Sub
-        Public Function Compare(x As Object, y As Object) As Integer Implements System.Collections.IComparer.Compare
-            Dim returnval As Integer
-            Dim datex As DateTime
-            Dim datey As DateTime
-            If DateTime.TryParse(CType(x, ListViewItem).SubItems(col).Text, datex) AndAlso DateTime.TryParse(CType(y, ListViewItem).SubItems(col).Text, datey) Then
-                returnval = datex.CompareTo(datey)
-                If sort = SortOrder.Descending Then
-                    Return -returnval
-                Else
-                    Return returnval
-                End If
-            Else
-                returnval = String.Compare(CType(x, ListViewItem).SubItems(col).Text, CType(y, ListViewItem).SubItems(col).Text)
-                If sort = SortOrder.Descending Then
-                    Return -returnval
-                Else
-                    Return returnval
-                End If
-            End If
-        End Function
-
-    End Class
 
 End Namespace

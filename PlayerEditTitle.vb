@@ -26,6 +26,7 @@ Public Class PlayerEditTitle
     Private Sub PlayerEditTitle_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetAccentColor()
         SetTheme()
+        App.ThemeMenu(CMEditTitle)
         TxtBoxTitle.Text = NewTitle
     End Sub
     Private Sub PlayerEditTitle_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblTitle.MouseDown

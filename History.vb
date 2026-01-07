@@ -65,6 +65,7 @@ Public Class History
         Text = My.Application.Info.Title + " History & Statistics"
         SetAccentColor()
         SetTheme()
+        ReThemeMenus()
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
         'If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
@@ -1228,6 +1229,9 @@ Public Class History
 
         ResumeLayout()
         Debug.Print("History Theme Set")
+    End Sub
+    Friend Sub ReThemeMenus()
+        App.ThemeMenu(CMHistoryView)
     End Sub
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor()

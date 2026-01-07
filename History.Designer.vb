@@ -100,6 +100,7 @@ Partial Class History
         TxtBoxTotalPlayedSongs.Margin = New Padding(4)
         TxtBoxTotalPlayedSongs.Name = "TxtBoxTotalPlayedSongs"
         TxtBoxTotalPlayedSongs.ReadOnly = True
+        TxtBoxTotalPlayedSongs.ShortcutsEnabled = False
         TxtBoxTotalPlayedSongs.Size = New Size(120, 29)
         TxtBoxTotalPlayedSongs.TabIndex = 2
         TxtBoxTotalPlayedSongs.TabStop = False
@@ -113,6 +114,7 @@ Partial Class History
         TxtBoxSessionPlayedSongs.Margin = New Padding(4)
         TxtBoxSessionPlayedSongs.Name = "TxtBoxSessionPlayedSongs"
         TxtBoxSessionPlayedSongs.ReadOnly = True
+        TxtBoxSessionPlayedSongs.ShortcutsEnabled = False
         TxtBoxSessionPlayedSongs.Size = New Size(120, 29)
         TxtBoxSessionPlayedSongs.TabIndex = 4
         TxtBoxSessionPlayedSongs.TabStop = False
@@ -139,6 +141,7 @@ Partial Class History
         TxtBoxTotalDuration.Margin = New Padding(4)
         TxtBoxTotalDuration.Name = "TxtBoxTotalDuration"
         TxtBoxTotalDuration.ReadOnly = True
+        TxtBoxTotalDuration.ShortcutsEnabled = False
         TxtBoxTotalDuration.Size = New Size(120, 29)
         TxtBoxTotalDuration.TabIndex = 5
         TxtBoxTotalDuration.TabStop = False
@@ -164,6 +167,7 @@ Partial Class History
         TxtBoxMostPlayedSong.Margin = New Padding(4)
         TxtBoxMostPlayedSong.Name = "TxtBoxMostPlayedSong"
         TxtBoxMostPlayedSong.ReadOnly = True
+        TxtBoxMostPlayedSong.ShortcutsEnabled = False
         TxtBoxMostPlayedSong.Size = New Size(455, 29)
         TxtBoxMostPlayedSong.TabIndex = 7
         TxtBoxMostPlayedSong.TabStop = False
@@ -315,6 +319,7 @@ Partial Class History
         TxtBoxMaxRecords.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         TxtBoxMaxRecords.Location = New Point(12, 592)
         TxtBoxMaxRecords.Name = "TxtBoxMaxRecords"
+        TxtBoxMaxRecords.ShortcutsEnabled = False
         TxtBoxMaxRecords.Size = New Size(88, 29)
         TxtBoxMaxRecords.TabIndex = 4
         TxtBoxMaxRecords.TabStop = False
@@ -479,6 +484,7 @@ Partial Class History
         TxtBoxSessionPlayedDuration.Margin = New Padding(4)
         TxtBoxSessionPlayedDuration.Name = "TxtBoxSessionPlayedDuration"
         TxtBoxSessionPlayedDuration.ReadOnly = True
+        TxtBoxSessionPlayedDuration.ShortcutsEnabled = False
         TxtBoxSessionPlayedDuration.Size = New Size(120, 29)
         TxtBoxSessionPlayedDuration.TabIndex = 14
         TxtBoxSessionPlayedDuration.TabStop = False
