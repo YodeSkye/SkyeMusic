@@ -1537,7 +1537,7 @@ Namespace My
             cm.Items.Add(cmi)
             AddHandler cm.Opening, AddressOf NIApp_Opening
             NIApp.ContextMenuStrip = cm
-            SetNIApp()
+            'SetNIApp()
 
             GenerateHotKeyList()
             RegisterHotKeys()
