@@ -44,7 +44,6 @@ Public Class Player
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
     Private TipPlaylistFont As New Font("Segoe UI", 12) 'Font for Playlist Tooltip
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
-    Private TipWatcherNotification As Skye.UI.ToolTipEX 'Tooltip for Watcher Notifications
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
 
@@ -93,13 +92,7 @@ Public Class Player
         End Get
         Set(value As String)
             _watchernotification = value
-            If String.IsNullOrWhiteSpace(_watchernotification) Then
-                MILibrary.Font = New Font(MILibrary.Font, FontStyle.Regular)
-                MILibrary.Text = StrConv(MILibrary.Text, VbStrConv.ProperCase)
-            Else
-                MILibrary.Text = MILibrary.Text.ToUpper
-                MILibrary.Font = New Font(MILibrary.Font, FontStyle.Bold Or FontStyle.Underline)
-            End If
+            If Not String.IsNullOrWhiteSpace(_watchernotification) Then ShowStatusMessage(_watchernotification)
         End Set
     End Property
 
@@ -3059,25 +3052,13 @@ Public Class Player
         MIPlayMode.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub MILibraryClick(sender As Object, e As EventArgs) Handles MILibrary.Click
-        If Not String.IsNullOrWhiteSpace(WatcherNotification) Then
-            TipWatcherNotification?.HideTooltip()
-            TipWatcherNotification?.Dispose()
-            TipWatcherNotification = Nothing
-        End If
         App.ShowLibrary()
     End Sub
     Private Sub MILibrary_MouseEnter(sender As Object, e As EventArgs) Handles MILibrary.MouseEnter
         MILibrary.ForeColor = Color.Black
-        If Not String.IsNullOrWhiteSpace(WatcherNotification) Then
-            SetWatcherToolTip()
-            TipWatcherNotification?.ShowTooltipAtCursor(WatcherNotification)
-        End If
     End Sub
     Private Sub MILibrary_MouseLeave(sender As Object, e As EventArgs) Handles MILibrary.MouseLeave
         MILibrary.ForeColor = App.CurrentTheme.AccentTextColor
-        If Not String.IsNullOrEmpty(WatcherNotification) Then
-            TipWatcherNotification?.HideTooltip()
-        End If
     End Sub
     Private Sub MIShowHelpClick(sender As Object, e As EventArgs) Handles MIShowHelp.Click
         ShowHelp()
@@ -3907,25 +3888,6 @@ Public Class Player
             PlaylistSearchItems.Clear()
             Debug.Print("Playlist Search Reset")
         End If
-    End Sub
-    Private Sub SetWatcherToolTip()
-        If TipWatcherNotification IsNot Nothing Then
-            TipWatcherNotification?.HideTooltip()
-            TipWatcherNotification?.Dispose()
-            TipWatcherNotification = Nothing
-        End If
-
-        TipWatcherNotification = New Skye.UI.ToolTipEX(components) With {
-            .BackColor = App.CurrentTheme.BackColor,
-            .ForeColor = App.CurrentTheme.TextColor,
-            .BorderColor = App.CurrentTheme.ButtonBackColor,
-            .Font = TipPlaylistFont,
-            .ShadowAlpha = 200,
-            .FadeInRate = 25,
-            .FadeOutRate = 25,
-            .HideDelay = 1000000,
-            .ShowDelay = 500
-        }
     End Sub
     Private Sub ToggleMaximized()
         Select Case WindowState
