@@ -31,6 +31,8 @@ Public Class About
         LLblSponsorGitHub.Image = App.ResizeImage(My.Resources.ImageAttributionGitHub, 32)
         LLblSponsorPayPal.Image = App.ResizeImage(My.Resources.ImageAttributionPayPal, 32)
         BtnOK.Select()
+        App.CheckForUpdatesIfNeeded()
+        ShowUpdateLabelIfNeeded(App.LatestKnownVersion)
     End Sub
     Private Sub About_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblAbout.MouseDown, LblVersion.MouseDown
         Dim cSender As Control
@@ -78,6 +80,22 @@ Public Class About
             My.Computer.Clipboard.SetText(classname.ToString.TrimEnd(Chr(0), CChar(" "))) 'Remove null terminator & trailing spaces from class name
             Debug.Print(classname.ToString.TrimEnd(Chr(0), CChar(" ")))
         End If
+    End Sub
+    Private Sub LblUpdateAvailable_MouseEnter(sender As Object, e As EventArgs) Handles LblUpdateAvailable.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LblUpdateAvailable_MouseLeave(sender As Object, e As EventArgs) Handles LblUpdateAvailable.MouseLeave
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub LblUpdateAvailable_Click(sender As Object, e As EventArgs) Handles LblUpdateAvailable.Click
+        Try
+            Process.Start(New ProcessStartInfo With {
+                .FileName = "https://github.com/yodeskye/SkyeMusic/releases/latest",
+                .UseShellExecute = True
+            })
+        Catch ex As Exception
+            WriteToLog("Cannot Open Update Link" & vbCr & ex.Message)
+        End Try
     End Sub
     Private Sub LLblMicrosoft_MouseEnter(sender As Object, e As EventArgs) Handles LLblMicrosoft.MouseEnter
         Cursor = Cursors.Hand
@@ -164,7 +182,7 @@ Public Class About
         OpenLink(App.SponsorPayPal)
     End Sub
 
-    'Procedures
+    ' Methods
     Public Sub OpenLink(target As String)
         Dim pInfo As New Diagnostics.ProcessStartInfo With {
         .UseShellExecute = True,
@@ -174,6 +192,18 @@ Public Class About
         Catch ex As Exception
             WriteToLog("Cannot Open " & target & vbCr & ex.Message)
         End Try
+    End Sub
+    Private Sub ShowUpdateLabelIfNeeded(latest As String)
+        If String.IsNullOrEmpty(latest) Then
+            LblUpdateAvailable.Visible = False
+            Exit Sub
+        End If
+        If IsNewerVersion(latest) Then
+            LblUpdateAvailable.Text = $"Update Available: v{latest}"
+            LblUpdateAvailable.Visible = True
+        Else
+            LblUpdateAvailable.Visible = False
+        End If
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
@@ -197,6 +227,7 @@ Public Class About
             LblAbout.ForeColor = App.CurrentTheme.AccentTextColor
             LblSponsorMe.ForeColor = App.CurrentTheme.AccentTextColor
             LblVersion.ForeColor = App.CurrentTheme.AccentTextColor
+            LblUpdateAvailable.ForeColor = App.CurrentTheme.AccentTextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.AccentTextColor
             LLblVLCSharp.LinkColor = App.CurrentTheme.AccentTextColor
             LLblNAudio.LinkColor = App.CurrentTheme.AccentTextColor
@@ -210,6 +241,7 @@ Public Class About
             LblAbout.ForeColor = App.CurrentTheme.TextColor
             LblSponsorMe.ForeColor = App.CurrentTheme.TextColor
             LblVersion.ForeColor = App.CurrentTheme.TextColor
+            LblUpdateAvailable.ForeColor = App.CurrentTheme.TextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.TextColor
             LLblVLCSharp.LinkColor = App.CurrentTheme.TextColor
             LLblNAudio.LinkColor = App.CurrentTheme.TextColor

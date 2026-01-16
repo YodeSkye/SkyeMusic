@@ -599,6 +599,7 @@ Namespace My
         End Class
 
         ' Registry Saved Settings
+
         ' Player
         Friend PlayerPositionShowElapsed As Boolean = True
         Friend PlayMode As PlayModes = PlayModes.Random
@@ -642,6 +643,8 @@ Namespace My
         Friend MinimizeToTray As Boolean = False
         Friend ShowNowPlayingToast As Boolean = True
         Friend NowPlayingToastLocation As Skye.UI.ToastLocation = Skye.UI.ToastLocation.TopRight
+        Friend LastUpdateCheck As DateTime = DateTime.MinValue
+        Friend LatestKnownVersion As String = String.Empty
 
         ' Interfaces
         Friend Interface IAccentable
@@ -1560,6 +1563,24 @@ Namespace My
             SetWatchers(True) 'Dispose watchers
             My.App.WriteToLog(My.Application.Info.ProductName + " Closed")
         End Sub
+        Friend Async Sub CheckForUpdatesIfNeeded()
+            Dim last = App.LastUpdateCheck.Date
+            Dim today = Date.Today
+
+            If last = today Then
+                ' Already checked today — use cached version
+                Exit Sub
+            End If
+
+            ' Not checked today — fetch fresh version
+            Dim latest = Await FetchLatestVersionAsync()
+            If latest IsNot Nothing Then
+                App.LatestKnownVersion = latest
+                App.LastUpdateCheck = DateTime.Now
+                App.SaveOptions()
+            End If
+
+        End Sub
         Friend Sub SaveHistory()
             If History Is Nothing OrElse History.Count = 0 Then
                 If My.Computer.FileSystem.FileExists(HistoryPath) Then
@@ -1708,6 +1729,8 @@ Namespace My
                 RegKey.SetValue("HelperApp2Name", App.HelperApp2Name, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("HelperApp2Path", App.HelperApp2Path, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("ChangeLogLastVersionShown", App.ChangeLogLastVersionShown, Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("LastUpdateCheck", App.LastUpdateCheck.ToString("o"), Microsoft.Win32.RegistryValueKind.String)
+                RegKey.SetValue("LatestKnownVersion", App.LatestKnownVersion, Microsoft.Win32.RegistryValueKind.String)
 
                 ' Visualizer Settings
                 RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
@@ -1905,6 +1928,13 @@ Namespace My
                 App.HelperApp2Name = RegKey.GetValue("HelperApp2Name", "MP3Tag").ToString
                 App.HelperApp2Path = RegKey.GetValue("HelperApp2Path", "C:\Program Files\Mp3tag\Mp3tag.exe").ToString
                 App.ChangeLogLastVersionShown = RegKey.GetValue("ChangeLogLastVersionShown", String.Empty).ToString
+                Dim dt As DateTime
+                If DateTime.TryParse(CStr(RegKey.GetValue("LastUpdateCheck", String.Empty)), dt) Then
+                    App.LastUpdateCheck = dt
+                Else
+                    App.LastUpdateCheck = DateTime.MinValue
+                End If
+                App.LatestKnownVersion = RegKey.GetValue("LatestKnownVersion", String.Empty).ToString
 
                 ' Visualizer Settings
                 Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
@@ -3231,6 +3261,9 @@ Namespace My
         Friend Function GetSimpleVersion() As String
             GetSimpleVersion = My.Application.Info.Version.Major.ToString & "." & My.Application.Info.Version.Minor.ToString
         End Function
+        Friend Function GetFullVersion() As String
+            GetFullVersion = My.Application.Info.Version.Major.ToString & "." & My.Application.Info.Version.Minor.ToString & "." & My.Application.Info.Version.Build.ToString
+        End Function
         Friend Function GetAccentColor() As Color
             Dim c As Color
             Dim regkey As RegistryKey
@@ -3299,6 +3332,27 @@ Namespace My
                 g.DrawImage(src, New Rectangle(0, 0, size, size))
             End Using
             Return bmp
+        End Function
+        Private Async Function FetchLatestVersionAsync() As Task(Of String)
+            Try
+                Using client As New Net.Http.HttpClient()
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic")
+                    Dim versionText = Await client.GetStringAsync("https://raw.githubusercontent.com/yodeskye/SkyeMusic/master/publishedversion.txt")
+                    Return versionText.Trim()
+                End Using
+            Catch
+                Return Nothing
+            End Try
+        End Function
+        Friend Function IsNewerVersion(latest As String) As Boolean
+            Try
+                Dim vCurrent As New Version(GetFullVersion())
+                Dim vLatest As New Version(latest)
+                Debug.Print("Comparing Versions: Current=" & vCurrent.ToString() & " Latest=" & vLatest.ToString())
+                Return vLatest > vCurrent
+            Catch
+                Return False
+            End Try
         End Function
 
         'History Handlers
