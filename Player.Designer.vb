@@ -104,6 +104,7 @@ Partial Class Player
         TimerLyrics = New Timer(components)
         TipPlayer = New Skye.UI.ToolTip(components)
         PanelVisualizer = New Panel()
+        MIMiniPlayer = New ToolStripMenuItem()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -390,7 +391,7 @@ Partial Class Player
         ' 
         ' MIView
         ' 
-        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIVisualizers, ToolStripSeparator2, MIViewQueue, MIViewHistory, ToolStripSeparator5, MIOptions})
+        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIVisualizers, MIMiniPlayer, ToolStripSeparator2, MIViewQueue, MIViewHistory, ToolStripSeparator5, MIOptions})
         MIView.ForeColor = SystemColors.HighlightText
         MIView.Image = My.Resources.Resources.ImageView
         MIView.Name = "MIView"
@@ -794,6 +795,12 @@ Partial Class Player
         PanelVisualizer.TabIndex = 40
         TipPlayer.SetToolTipImage(PanelVisualizer, Nothing)
         ' 
+        ' MIMiniPlayer
+        ' 
+        MIMiniPlayer.Name = "MIMiniPlayer"
+        MIMiniPlayer.Size = New Size(203, 24)
+        MIMiniPlayer.Text = "MiniPlayer"
+        ' 
         ' Player
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -924,4 +931,5 @@ Partial Class Player
     Friend WithEvents PanelVisualizer As Panel
     Friend WithEvents MIVisualizers As ToolStripMenuItem
     Friend WithEvents CMIEditTag As ToolStripMenuItem
+    Friend WithEvents MIMiniPlayer As ToolStripMenuItem
 End Class

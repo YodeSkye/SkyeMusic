@@ -171,6 +171,7 @@ Namespace My
         Friend ExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
         Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
         Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
+        Friend FrmMiniPlayer As PlayerMini 'FrmMiniPlayer is the mini player window that provides basic playback controls.
         Friend FrmLibrary As Library 'FrmLibrary is the main library window that displays the media library.
         Friend FrmHistory As History 'FrmHistory is the history window that displays the playback history and statistics.
         Friend FrmTagEditor As TagEditor 'FrmTagEditor is the tag editor window that allows users to edit metadata tags of media files.
@@ -2162,6 +2163,16 @@ Namespace My
                 NIAppClickTimer?.Stop()
                 NIAppClickTimer?.Dispose()
                 NIAppClickTimer = Nothing
+            End If
+        End Sub
+        Friend Sub SetMiniPlayer()
+            If FrmMiniPlayer Is Nothing OrElse FrmMiniPlayer.IsDisposed Then
+                FrmMiniPlayer = New PlayerMini
+                FrmMiniPlayer.Show()
+                Player.Hide()
+            Else
+                FrmMiniPlayer.Close()
+                Player.Show()
             End If
         End Sub
         Friend Sub ShowDevTools()

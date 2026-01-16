@@ -3009,6 +3009,9 @@ Public Class Player
     Private Sub MIFullscreenClick(sender As Object, e As EventArgs) Handles MIFullscreen.Click
         FullScreen = True
     End Sub
+    Private Sub MIMiniPlayer_Click(sender As Object, e As EventArgs) Handles MIMiniPlayer.Click
+        App.SetMiniPlayer()
+    End Sub
     Private Sub MIViewQueue_Click(sender As Object, e As EventArgs) Handles MIViewQueue.Click
         Dim frm As New PlayerQueue
         frm.ShowDialog()
