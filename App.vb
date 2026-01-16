@@ -1563,7 +1563,7 @@ Namespace My
             SetWatchers(True) 'Dispose watchers
             My.App.WriteToLog(My.Application.Info.ProductName + " Closed")
         End Sub
-        Friend Async Sub CheckForUpdatesIfNeeded()
+        Friend Sub CheckForUpdatesIfNeeded()
             Dim last = App.LastUpdateCheck.Date
             Dim today = Date.Today
 
@@ -1573,7 +1573,7 @@ Namespace My
             End If
 
             ' Not checked today — fetch fresh version
-            Dim latest = Await FetchLatestVersionAsync()
+            Dim latest = FetchLatestVersionAsync()
             If latest IsNot Nothing Then
                 App.LatestKnownVersion = latest
                 App.LastUpdateCheck = DateTime.Now
@@ -3333,11 +3333,12 @@ Namespace My
             End Using
             Return bmp
         End Function
-        Private Async Function FetchLatestVersionAsync() As Task(Of String)
+        Private Function FetchLatestVersionAsync() As String
             Try
                 Using client As New Net.Http.HttpClient()
                     client.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic")
-                    Dim versionText = Await client.GetStringAsync("https://raw.githubusercontent.com/yodeskye/SkyeMusic/master/publishedversion.txt")
+                    Dim versionText As String = client.GetStringAsync("https://raw.githubusercontent.com/yodeskye/SkyeMusic/master/publishedversion.txt").Result
+                    Debug.Print("Fetched Latest Version: " & versionText.Trim())
                     Return versionText.Trim()
                 End Using
             Catch

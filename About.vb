@@ -1,6 +1,4 @@
 ﻿
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement.Window
-Imports SkyeMusic.My
 Public Class About
 
     'Declarations
