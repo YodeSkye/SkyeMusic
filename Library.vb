@@ -1067,7 +1067,7 @@ Public Class Library
     End Sub
     Private Sub Queue()
         If LVLibrary.SelectedItems.Count > 0 Then
-            Player.QueueFromLibrary(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+            Player.QueuePath(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
         End If
     End Sub
     Private Sub AddToPlaylist(item As ListViewItem)

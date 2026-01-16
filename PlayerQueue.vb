@@ -289,9 +289,21 @@ Public Class PlayerQueue
     End Sub
     Private Sub RemoveFromQueue()
         If LVQueue.SelectedItems.Count > 0 Then
-            For Each item As ListViewItem In LVQueue.SelectedItems
-                Player.RemoveFromQueue(item.SubItems(1).Text)
+
+            ' Take a snapshot of the indices first
+            Dim indices As New List(Of Integer)
+            For Each idx As Integer In LVQueue.SelectedIndices
+                indices.Add(idx)
             Next
+
+            ' Sort descending so we remove from the end first
+            indices.Sort()
+            indices.Reverse()
+
+            For Each index As Integer In indices
+                Player.RemoveFromQueue(index)
+            Next
+
             Populate()
         End If
     End Sub

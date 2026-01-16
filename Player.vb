@@ -4217,30 +4217,17 @@ Public Class Player
     End Sub
     Private Sub QueueFromPlaylist()
         If LVPlaylist.SelectedItems.Count > 0 Then
-            Dim found As Boolean = False
-            For Each s As String In Queue
-                If s = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text Then
-                    found = True
-                    Exit For
-                End If
-            Next
-            If Not found Then
-                Queue.Add(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                SetPlaylistCountText()
-            End If
-        End If
-    End Sub
-    Friend Sub QueuePath(path As String)
-        Dim found As Boolean = False
-        For Each s As String In Queue
-            If s = path Then
-                found = True
-                Exit For
-            End If
-        Next
-        If Not found Then
-            Queue.Add(path)
-            SetPlaylistCountText()
+            'Dim found As Boolean = False
+            'For Each s As String In Queue
+            '    If s = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text Then
+            '        found = True
+            '        Exit For
+            '    End If
+            'Next
+            'If Not found Then
+            'Queue.Add(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            QueuePath(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+            'End If
         End If
     End Sub
     Private Sub PlaylistRemoveItems()
@@ -4397,6 +4384,7 @@ Public Class Player
         LVPlaylist.EnsureVisible(index)
         LVPlaylist.SelectedIndices.Clear()
         LVPlaylist.SelectedIndices.Add(index)
+        LVPlaylist.Items(index).Focused = True
     End Sub
     Friend Function CreateListviewItem() As ListViewItem
         Dim lvi As New ListViewItem    'Title
@@ -4416,18 +4404,26 @@ Public Class Player
     End Function
 
     'Queue
-    Friend Sub QueueFromLibrary(path As String)
-        Dim found As Boolean = False
-        For Each s As String In Queue
-            If s = path Then
-                found = True
-                Exit For
-            End If
-        Next
-        If Not found Then
-            Queue.Add(path)
-            SetPlaylistCountText()
-        End If
+    Friend Sub QueuePath(path As String)
+        'Dim found As Boolean = False
+        'For Each s As String In Queue
+        '    If s = path Then
+        '        found = True
+        '        Exit For
+        '    End If
+        'Next
+        'If Not found Then
+        Queue.Add(path)
+        SetPlaylistCountText()
+        'End If
+    End Sub
+    Friend Sub RemoveFromQueue(path As String)
+        Queue.Remove(path)
+        SetPlaylistCountText()
+    End Sub
+    Friend Sub RemoveFromQueue(index As Integer)
+        Queue.RemoveAt(index)
+        SetPlaylistCountText()
     End Sub
     Friend Sub PruneQueue()
         Dim count As Integer = 0
@@ -4443,11 +4439,6 @@ Public Class Player
         Next
         SetPlaylistCountText()
         App.WriteToLog("Queue Pruned (" + count.ToString + ")")
-    End Sub
-    Friend Sub RemoveFromQueue(path As String)
-        Queue.Remove(path)
-        'Debug.Print(path + " Removed From Queue")
-        SetPlaylistCountText()
     End Sub
     Private Sub PlayQueued()
         If Queue.Count > 0 Then
