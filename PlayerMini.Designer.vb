@@ -23,15 +23,72 @@ Partial Class PlayerMini
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         BtnClose = New Button()
+        PicBoxAlbumArt = New PictureBox()
+        BtnPlay = New Button()
+        BtnStop = New Button()
+        BtnPrevious = New Button()
+        BtnNext = New Button()
+        LblTitle = New Skye.UI.Label()
+        CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' BtnClose
         ' 
-        BtnClose.Location = New Point(75, 5)
+        BtnClose.Location = New Point(77, 40)
         BtnClose.Name = "BtnClose"
         BtnClose.Size = New Size(20, 20)
         BtnClose.TabIndex = 0
         BtnClose.UseVisualStyleBackColor = True
+        ' 
+        ' PicBoxAlbumArt
+        ' 
+        PicBoxAlbumArt.Location = New Point(25, 25)
+        PicBoxAlbumArt.Name = "PicBoxAlbumArt"
+        PicBoxAlbumArt.Size = New Size(50, 50)
+        PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.CenterImage
+        PicBoxAlbumArt.TabIndex = 1
+        PicBoxAlbumArt.TabStop = False
+        ' 
+        ' BtnPlay
+        ' 
+        BtnPlay.Location = New Point(31, 78)
+        BtnPlay.Name = "BtnPlay"
+        BtnPlay.Size = New Size(20, 20)
+        BtnPlay.TabIndex = 2
+        BtnPlay.UseVisualStyleBackColor = True
+        ' 
+        ' BtnStop
+        ' 
+        BtnStop.Location = New Point(51, 78)
+        BtnStop.Name = "BtnStop"
+        BtnStop.Size = New Size(20, 20)
+        BtnStop.TabIndex = 3
+        BtnStop.UseVisualStyleBackColor = True
+        ' 
+        ' BtnPrevious
+        ' 
+        BtnPrevious.Location = New Point(11, 78)
+        BtnPrevious.Name = "BtnPrevious"
+        BtnPrevious.Size = New Size(20, 20)
+        BtnPrevious.TabIndex = 4
+        BtnPrevious.UseVisualStyleBackColor = True
+        ' 
+        ' BtnNext
+        ' 
+        BtnNext.Location = New Point(71, 78)
+        BtnNext.Name = "BtnNext"
+        BtnNext.Size = New Size(20, 20)
+        BtnNext.TabIndex = 5
+        BtnNext.UseVisualStyleBackColor = True
+        ' 
+        ' LblTitle
+        ' 
+        LblTitle.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LblTitle.Location = New Point(-3, 2)
+        LblTitle.Name = "LblTitle"
+        LblTitle.Size = New Size(100, 20)
+        LblTitle.TabIndex = 6
+        LblTitle.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' PlayerMini
         ' 
@@ -39,6 +96,12 @@ Partial Class PlayerMini
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(100, 100)
         ControlBox = False
+        Controls.Add(LblTitle)
+        Controls.Add(BtnNext)
+        Controls.Add(BtnPrevious)
+        Controls.Add(BtnStop)
+        Controls.Add(BtnPlay)
+        Controls.Add(PicBoxAlbumArt)
         Controls.Add(BtnClose)
         FormBorderStyle = FormBorderStyle.None
         MaximizeBox = False
@@ -49,8 +112,15 @@ Partial Class PlayerMini
         SizeGripStyle = SizeGripStyle.Hide
         StartPosition = FormStartPosition.Manual
         TopMost = True
+        CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
     End Sub
 
     Friend WithEvents BtnClose As Button
+    Friend WithEvents PicBoxAlbumArt As PictureBox
+    Friend WithEvents BtnPlay As Button
+    Friend WithEvents BtnStop As Button
+    Friend WithEvents BtnPrevious As Button
+    Friend WithEvents BtnNext As Button
+    Friend WithEvents LblTitle As Skye.UI.Label
 End Class

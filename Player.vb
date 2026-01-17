@@ -342,7 +342,7 @@ Public Class Player
             MIVisualizer.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
         End If
     End Sub
-    Private Sub VisualizerOff() 'Turn off the Visualizer
+    Friend Sub VisualizerOff() 'Turn off the Visualizer
         If Visualizer Then
             Visualizer = False
             MIVisualizer.BackColor = Color.Transparent
@@ -4717,6 +4717,7 @@ Public Class Player
         End If
 
         BtnPlay.Image = App.CurrentTheme.PlayerPause
+        If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.SetPlayState()
         TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not CurrentMediaType = App.MediaSourceTypes.Stream Then TrackBarPosition.Enabled = True
         LblDuration.Text = FormatDuration(_player.Duration)
@@ -4755,6 +4756,7 @@ Public Class Player
             Debug.Print("Paused at: " & PausedAt.ToString())
         End If
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
+        If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.SetPlayState()
     End Sub
     Private Sub OnStop()
         PlayState = PlayStates.Stopped
@@ -4910,21 +4912,26 @@ Public Class Player
                         If tlfile Is Nothing Then
                             PicBoxAlbumArt.Visible = False
                             PicBoxAlbumArt.Image = Nothing
+                            If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = Nothing
                         Else
                             If tlfile.Tag.Pictures.Length = 0 Then
                                 PicBoxAlbumArt.Visible = False
                                 PicBoxAlbumArt.Image = Nothing
+                                If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = Nothing
                             Else
                                 Debug.Print("Showing Album Art...")
                                 If AlbumArtIndex + 1 > tlfile.Tag.Pictures.Count Then AlbumArtIndex = 0
                                 Dim ms As New IO.MemoryStream(tlfile.Tag.Pictures(AlbumArtIndex).Data.Data)
                                 Try
-                                    PicBoxAlbumArt.Image = Drawing.Image.FromStream(ms)
+                                    Dim img As Drawing.Image = Drawing.Image.FromStream(ms)
+                                    PicBoxAlbumArt.Image = img
+                                    If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = App.ResizeImage(img, App.FrmMiniPlayer.PicBoxAlbumArt.Width)
                                     PicBoxAlbumArt.Visible = True
                                 Catch ex As Exception
                                     WriteToLog("Error Loading Album Art for " + _player.Path + vbCr + ex.Message)
                                     PicBoxAlbumArt.Visible = False
                                     PicBoxAlbumArt.Image = Nothing
+                                    If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = Nothing
                                 End Try
                                 ms.Dispose()
                                 ms = Nothing
@@ -4936,6 +4943,7 @@ Public Class Player
                         Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
                         PicBoxAlbumArt.Image = Nothing
+                        If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = Nothing
                         RTBLyrics.Visible = False
                         PanelVisualizer.Visible = False
                         VisualizerEngine?.Stop()
@@ -5124,7 +5132,7 @@ Public Class Player
             MILyrics.BackColor = Skye.WinAPI.GetSystemColor(Skye.WinAPI.COLOR_HIGHLIGHT)
         End If
     End Sub
-    Private Sub LyricsOff()
+    Friend Sub LyricsOff()
         If Lyrics Then
             Lyrics = False
             MILyrics.BackColor = Color.Transparent

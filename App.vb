@@ -2179,9 +2179,13 @@ Namespace My
                 FrmMiniPlayer = New PlayerMini
                 FrmMiniPlayer.Show()
                 Player.Hide()
+                Player.LyricsOff()
+                Player.VisualizerOff()
+                Player.ShowMedia()
             Else
                 FrmMiniPlayer.Close()
                 Player.Show()
+                Player.ShowMedia()
             End If
         End Sub
         Friend Sub ShowDevTools()

@@ -4,13 +4,19 @@ Public Class PlayerMini
     'Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private ImagePlay As Image
+    Private ImagePause As Image
+    Private ImageStop As Image
+    Private ImagePrevious As Image
+    Private ImageNext As Image
+    Private ImageClose As Image
 
     ' Form Events
     Private Sub PlayerMini_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         DoubleBuffered = True
-        Size = New Size(100, 100)
         SetAccentColor()
         SetTheme()
+        Size = New Size(100, 100)
         Text = My.Application.Info.Title & " Mini Player"
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.PlayerMiniLocation.Y >= 0 Then
@@ -30,7 +36,7 @@ Public Class PlayerMini
         End If
 #End If
     End Sub
-    Private Sub PlayerMini_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
+    Private Sub PlayerMini_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxAlbumArt.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -38,20 +44,20 @@ Public Class PlayerMini
             If cSender Is Me Then
                 mOffset = New Point(-e.X, -e.Y)
             Else
-                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - 4)
+                mOffset = New Point(-e.X - cSender.Left, -e.Y - cSender.Top)
             End If
         End If
     End Sub
-    Private Sub PlayerMini_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove
+    Private Sub PlayerMini_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
-            App.PlayerMiniLocation = Me.Location
+            PlayerMiniLocation = Location
         End If
     End Sub
-    Private Sub PlayerMini_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp
+    Private Sub PlayerMini_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp
         mMove = False
     End Sub
     Private Sub PlayerMini_Move(sender As Object, e As EventArgs) Handles MyBase.Move
@@ -85,8 +91,32 @@ Public Class PlayerMini
     Private Sub BtnClose_Click(sender As Object, e As EventArgs) Handles BtnClose.Click
         App.SetMiniPlayer()
     End Sub
+    Private Sub BtnPlay_Click(sender As Object, e As EventArgs) Handles BtnPlay.Click
+        Player.TogglePlay()
+        SetPlayState()
+    End Sub
+    Private Sub BtnStop_Click(sender As Object, e As EventArgs) Handles BtnStop.Click
+        Player.StopPlay()
+        SetPlayState()
+    End Sub
+    Private Sub BtnPrevious_Click(sender As Object, e As EventArgs) Handles BtnPrevious.Click
+        Player.PlayPrevious()
+        SetPlayState()
+    End Sub
+    Private Sub BtnNext_Click(sender As Object, e As EventArgs) Handles BtnNext.Click
+        Player.PlayNext()
+        SetPlayState()
+    End Sub
 
     ' Methods
+    Friend Sub SetPlayState()
+        Select Case Player.PlayState
+            Case Player.PlayStates.Playing
+                BtnPlay.Image = ImagePause
+            Case Player.PlayStates.Paused, Player.PlayStates.Stopped
+                BtnPlay.Image = ImagePlay
+        End Select
+    End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Width
         If location.Y + Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Height
@@ -111,16 +141,22 @@ Public Class PlayerMini
             BackColor = App.CurrentTheme.BackColor
             'LblAbout.ForeColor = App.CurrentTheme.TextColor
         End If
+        BtnPlay.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnStop.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnPrevious.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnNext.BackColor = App.CurrentTheme.ButtonBackColor
         BtnClose.BackColor = App.CurrentTheme.ButtonBackColor
-        'TipAbout.BackColor = App.CurrentTheme.BackColor
-        'TipAbout.ForeColor = App.CurrentTheme.TextColor
-        'TipAbout.BorderColor = App.CurrentTheme.ButtonBackColor
-
-        Dim baseIcon As Image = My.Resources.ImageMiniPlayerClose
-        Dim tinted As Image = App.TintIcon(baseIcon, CurrentTheme.ButtonTextColor)
-        Dim finalIcon As Image = App.ResizeImage(tinted, 16)
-        BtnClose.Image = finalIcon
-
+        ImagePlay = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerPlay, CurrentTheme.ButtonTextColor), 16)
+        ImagePause = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerPause, CurrentTheme.ButtonTextColor), 16)
+        ImageStop = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerStop, CurrentTheme.ButtonTextColor), 16)
+        ImagePrevious = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerPrevious, CurrentTheme.ButtonTextColor), 16)
+        ImageNext = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerNext, CurrentTheme.ButtonTextColor), 16)
+        ImageClose = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerClose, CurrentTheme.ButtonTextColor), 16)
+        SetPlayState()
+        BtnStop.Image = ImageStop
+        BtnPrevious.Image = ImagePrevious
+        BtnNext.Image = ImageNext
+        BtnClose.Image = ImageClose
         ResumeLayout()
         Debug.Print("About Theme Set")
     End Sub
