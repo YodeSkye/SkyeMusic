@@ -599,7 +599,7 @@ Namespace My
 
         End Class
 
-        ' Registry Saved Settings
+        ' REGISTRY SAVED SETTINGS
 
         ' Player
         Friend PlayerPositionShowElapsed As Boolean = True
@@ -1243,7 +1243,7 @@ Namespace My
                 NIAppClickTimer.Stop()
 
                 ' Handle Double-Click
-                Debug.Print("TrayIcon Double-Click")
+                SetMiniPlayer()
             End If
         End Sub
         Private Sub NIApp_MIPlay_MouseDown(sender As Object, e As MouseEventArgs)
@@ -1407,6 +1407,13 @@ Namespace My
             Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense()
             LibVLCSharp.Shared.Core.Initialize() 'Initialize LibVLCSharp
+
+            'Initialize SkyeLibrary RegistryHelper
+#If DEBUG Then
+            Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName + "DEV" 'Use separate registry key for debug builds
+#Else
+            Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName 'Use standard registry key for release builds
+#End If
 
             GetOptions()
             GetDebugOptions()
