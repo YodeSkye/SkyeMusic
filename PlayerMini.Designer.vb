@@ -51,7 +51,7 @@ Partial Class PlayerMini
         ' 
         ' BtnPlay
         ' 
-        BtnPlay.Location = New Point(31, 78)
+        BtnPlay.Location = New Point(30, 76)
         BtnPlay.Name = "BtnPlay"
         BtnPlay.Size = New Size(20, 20)
         BtnPlay.TabIndex = 2
@@ -59,7 +59,7 @@ Partial Class PlayerMini
         ' 
         ' BtnStop
         ' 
-        BtnStop.Location = New Point(51, 78)
+        BtnStop.Location = New Point(50, 76)
         BtnStop.Name = "BtnStop"
         BtnStop.Size = New Size(20, 20)
         BtnStop.TabIndex = 3
@@ -67,7 +67,7 @@ Partial Class PlayerMini
         ' 
         ' BtnPrevious
         ' 
-        BtnPrevious.Location = New Point(11, 78)
+        BtnPrevious.Location = New Point(10, 76)
         BtnPrevious.Name = "BtnPrevious"
         BtnPrevious.Size = New Size(20, 20)
         BtnPrevious.TabIndex = 4
@@ -75,7 +75,7 @@ Partial Class PlayerMini
         ' 
         ' BtnNext
         ' 
-        BtnNext.Location = New Point(71, 78)
+        BtnNext.Location = New Point(70, 76)
         BtnNext.Name = "BtnNext"
         BtnNext.Size = New Size(20, 20)
         BtnNext.TabIndex = 5
@@ -84,16 +84,15 @@ Partial Class PlayerMini
         ' LblTitle
         ' 
         LblTitle.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        LblTitle.Location = New Point(-3, 2)
+        LblTitle.Location = New Point(10, 3)
         LblTitle.Name = "LblTitle"
-        LblTitle.Size = New Size(100, 20)
+        LblTitle.Size = New Size(80, 20)
         LblTitle.TabIndex = 6
         LblTitle.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' PlayerMini
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
-        AutoScaleMode = AutoScaleMode.Font
+        AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(100, 100)
         ControlBox = False
         Controls.Add(LblTitle)

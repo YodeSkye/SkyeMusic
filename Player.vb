@@ -4912,12 +4912,12 @@ Public Class Player
                         If tlfile Is Nothing Then
                             PicBoxAlbumArt.Visible = False
                             PicBoxAlbumArt.Image = Nothing
-                            If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = Nothing
+                            App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                         Else
                             If tlfile.Tag.Pictures.Length = 0 Then
                                 PicBoxAlbumArt.Visible = False
                                 PicBoxAlbumArt.Image = Nothing
-                                If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = Nothing
+                                App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                             Else
                                 Debug.Print("Showing Album Art...")
                                 If AlbumArtIndex + 1 > tlfile.Tag.Pictures.Count Then AlbumArtIndex = 0
@@ -4925,13 +4925,13 @@ Public Class Player
                                 Try
                                     Dim img As Drawing.Image = Drawing.Image.FromStream(ms)
                                     PicBoxAlbumArt.Image = img
-                                    If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = App.ResizeImage(img, App.FrmMiniPlayer.PicBoxAlbumArt.Width)
+                                    App.FrmMiniPlayer?.SetAlbumArt(img)
                                     PicBoxAlbumArt.Visible = True
                                 Catch ex As Exception
                                     WriteToLog("Error Loading Album Art for " + _player.Path + vbCr + ex.Message)
                                     PicBoxAlbumArt.Visible = False
                                     PicBoxAlbumArt.Image = Nothing
-                                    If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = Nothing
+                                    App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                                 End Try
                                 ms.Dispose()
                                 ms = Nothing
@@ -4943,7 +4943,7 @@ Public Class Player
                         Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
                         PicBoxAlbumArt.Image = Nothing
-                        If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.PicBoxAlbumArt.Image = Nothing
+                        App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                         RTBLyrics.Visible = False
                         PanelVisualizer.Visible = False
                         VisualizerEngine?.Stop()

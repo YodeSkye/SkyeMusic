@@ -1,6 +1,4 @@
 ﻿
-Imports SkyeMusic.My
-
 Public Class Log
 
     ' Declarations

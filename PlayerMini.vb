@@ -66,25 +66,57 @@ Public Class PlayerMini
             App.PlayerMiniLocation = Me.Location
         End If
     End Sub
-    Protected Overrides Sub OnResize(e As EventArgs)
-        MyBase.OnResize(e)
+    'Protected Overrides Sub OnResize(e As EventArgs)
+    '    MyBase.OnResize(e)
 
-        Dim radius As Integer = 20
-        Dim diameter As Integer = radius * 2
-        Dim rect As New Rectangle(0, 0, Width, Height)
+    '    Dim radius As Integer = 20
+    '    Dim diameter As Integer = radius * 2
+    '    Dim rect As New Rectangle(0, 0, Width, Height)
 
-        Dim path As New Drawing2D.GraphicsPath()
-        ' Top-left corner
-        path.AddArc(rect.X, rect.Y, diameter, diameter, 180, 90)
-        ' Top-right corner
-        path.AddArc(rect.Right - diameter, rect.Y, diameter, diameter, 270, 90)
-        ' Bottom-right corner
-        path.AddArc(rect.Right - diameter, rect.Bottom - diameter, diameter, diameter, 0, 90)
-        ' Bottom-left corner
-        path.AddArc(rect.X, rect.Bottom - diameter, diameter, diameter, 90, 90)
-        path.CloseFigure()
+    '    Dim path As New Drawing2D.GraphicsPath()
+    '    ' Top-left corner
+    '    path.AddArc(rect.X, rect.Y, diameter, diameter, 180, 90)
+    '    ' Top-right corner
+    '    path.AddArc(rect.Right - diameter, rect.Y, diameter, diameter, 270, 90)
+    '    ' Bottom-right corner
+    '    path.AddArc(rect.Right - diameter, rect.Bottom - diameter, diameter, diameter, 0, 90)
+    '    ' Bottom-left corner
+    '    path.AddArc(rect.X, rect.Bottom - diameter, diameter, diameter, 90, 90)
+    '    path.CloseFigure()
 
-        Region = New Region(path)
+    '    Region = New Region(path)
+    'End Sub
+    Private Sub PlayerMini_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick, PicBoxAlbumArt.DoubleClick
+        App.SetMiniPlayer()
+    End Sub
+    Protected Overrides Sub OnPaint(e As PaintEventArgs)
+        MyBase.OnPaint(e)
+
+        Dim g = e.Graphics
+        g.SmoothingMode = Drawing2D.SmoothingMode.None
+
+        ' Base border color from your theme
+        Dim baseColor As Color = CurrentTheme.ButtonBackColor
+
+        ' Create lighter + darker tones
+        Dim light As Color = ControlPaint.Light(baseColor)
+        Dim mid As Color = ControlPaint.LightLight(baseColor)
+        Dim dark As Color = ControlPaint.Dark(baseColor)
+
+        ' Outer border
+        Using p As New Pen(light, 1)
+            g.DrawRectangle(p, 0, 0, Me.Width - 1, Me.Height - 1)
+        End Using
+
+        ' mid border
+        Using p As New Pen(mid, 1)
+            g.DrawRectangle(p, 2, 2, Me.Width - 5, Me.Height - 5)
+        End Using
+
+        ' Inner border
+        Using p As New Pen(dark, 1)
+            g.DrawRectangle(p, 1, 1, Me.Width - 3, Me.Height - 3)
+        End Using
     End Sub
 
     ' Control Events
@@ -117,6 +149,13 @@ Public Class PlayerMini
                 BtnPlay.Image = ImagePlay
         End Select
     End Sub
+    Friend Sub SetAlbumArt(img As Image)
+        If img Is Nothing Then
+            PicBoxAlbumArt.Image = Nothing
+        Else
+            PicBoxAlbumArt.Image = App.ResizeImage(img, PicBoxAlbumArt.Width)
+        End If
+    End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Width
         If location.Y + Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Height
@@ -136,10 +175,10 @@ Public Class PlayerMini
     Private Sub SetTheme()
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
-            'LblAbout.ForeColor = App.CurrentTheme.AccentTextColor
+            LblTitle.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
-            'LblAbout.ForeColor = App.CurrentTheme.TextColor
+            LblTitle.ForeColor = App.CurrentTheme.TextColor
         End If
         BtnPlay.BackColor = App.CurrentTheme.ButtonBackColor
         BtnStop.BackColor = App.CurrentTheme.ButtonBackColor
