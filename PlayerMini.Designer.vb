@@ -27,21 +27,28 @@ Partial Class PlayerMini
         ' 
         ' BtnClose
         ' 
-        BtnClose.Location = New Point(337, 53)
+        BtnClose.Location = New Point(75, 5)
         BtnClose.Name = "BtnClose"
-        BtnClose.Size = New Size(75, 23)
+        BtnClose.Size = New Size(20, 20)
         BtnClose.TabIndex = 0
-        BtnClose.Text = "Close"
         BtnClose.UseVisualStyleBackColor = True
         ' 
         ' PlayerMini
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(800, 450)
+        ClientSize = New Size(100, 100)
+        ControlBox = False
         Controls.Add(BtnClose)
+        FormBorderStyle = FormBorderStyle.None
+        MaximizeBox = False
+        MinimizeBox = False
         Name = "PlayerMini"
-        Text = "PlayerMini"
+        ShowIcon = False
+        ShowInTaskbar = False
+        SizeGripStyle = SizeGripStyle.Hide
+        StartPosition = FormStartPosition.Manual
+        TopMost = True
         ResumeLayout(False)
     End Sub
 

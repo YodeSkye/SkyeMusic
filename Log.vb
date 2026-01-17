@@ -3,7 +3,7 @@ Imports SkyeMusic.My
 
 Public Class Log
 
-    'Declarations
+    ' Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
     Private CurrentAccentColor As Color 'Current Windows Accent Color
@@ -11,7 +11,7 @@ Public Class Log
     Private DeleteLogConfirm As Boolean = False
     Private WithEvents TimerDeleteLog As New Timer
 
-    'Form Events
+    ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
@@ -87,7 +87,7 @@ Public Class Log
         ToggleMaximized()
     End Sub
 
-    'Control Events
+    ' Control Events
     Private Sub RTBLog_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles RTBLog.PreviewKeyDown
         RTBCMLog.ShortcutKeys(CType(sender, RichTextBox), e)
     End Sub
@@ -169,12 +169,12 @@ Public Class Log
         End If
     End Sub
 
-    'Handlers
+    ' Handlers
     Private Sub TimerDeleteLog_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerDeleteLog.Tick
         SetDeleteLogConfirm()
     End Sub
 
-    'Procedures
+    ' Methods
     Private Sub ToggleMaximized()
         Select Case WindowState
             Case FormWindowState.Normal, FormWindowState.Minimized

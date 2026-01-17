@@ -304,6 +304,7 @@ Public Class Options
         SetTheme()
         ReThemeMenus()
         App.InvokeThemeChanged()
+        App.FrmMiniPlayer?.SetColors()
         App.FrmLog?.SetColors()
         App.FrmLog?.ReThemeMenus()
         App.FrmHistory?.SetColors()

@@ -2,6 +2,7 @@
 Imports System.Data.SQLite
 Imports System.IO
 Imports Microsoft.Win32
+Imports Windows.Win32.UI.Input
 
 Namespace My
 
@@ -629,6 +630,7 @@ Namespace My
         Friend Theme As Themes = Themes.Red 'The current theme of the application.
         Friend PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend PlayerSize As New Size(-1, -1)
+        Friend PlayerMiniLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend LibraryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
         Friend LibrarySize As New Size(-1, -1)
         Friend HistoryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -3341,8 +3343,35 @@ Namespace My
         Friend Sub ReThemeTrayMenu()
             If ShowTrayIcon Then ThemeMenu(NIApp.ContextMenuStrip)
         End Sub
+        Public Function TintIcon(baseIcon As Image, color As Color) As Image
+            Dim bmp As New Bitmap(baseIcon.Width, baseIcon.Height)
+
+            Using g = Graphics.FromImage(bmp)
+                g.Clear(Color.Transparent)
+
+                Dim cm As New Imaging.ColorMatrix(New Single()() {
+                    New Single() {0, 0, 0, 0, 0},
+                    New Single() {0, 0, 0, 0, 0},
+                    New Single() {0, 0, 0, 0, 0},
+                    New Single() {0, 0, 0, 1, 0},
+                    New Single() {color.R / 255.0F, color.G / 255.0F, color.B / 255.0F, 0, 1}
+                })
+
+                Dim ia As New Imaging.ImageAttributes()
+                ia.SetColorMatrix(cm)
+
+                g.DrawImage(baseIcon,
+                    New Rectangle(0, 0, baseIcon.Width, baseIcon.Height),
+                    0, 0, baseIcon.Width, baseIcon.Height,
+                    GraphicsUnit.Pixel,
+                    ia)
+            End Using
+
+            Return bmp
+        End Function
         Friend Function ResizeImage(src As Image, size As Integer) As Image
             Dim bmp As New Bitmap(size, size)
+            bmp.SetResolution(src.HorizontalResolution, src.VerticalResolution)
             Using g = Graphics.FromImage(bmp)
                 g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
                 g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
