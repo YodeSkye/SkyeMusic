@@ -1,7 +1,4 @@
-﻿
-Imports SkyeMusic.Player
-
-Public Class PlayerMini
+﻿Public Class PlayerMini
 
     'Declarations
     Private mMove As Boolean = False
@@ -43,7 +40,7 @@ Public Class PlayerMini
         AddHandler Player.TitleChanged, AddressOf OnTitleChanged
 
         If Player.MiniPlayerVisualizer IsNot Nothing Then
-            AttachMiniVisualizer(Player.MiniPlayerVisualizer)
+            AttachVisualizer(Player.MiniPlayerVisualizer)
             Player.MiniPlayerVisualizer.Start()
         End If
 
@@ -189,13 +186,17 @@ Public Class PlayerMini
             PanelVisualizer.BringToFront()
         Else
             PicBoxAlbumArt.Image = App.ResizeImage(img, PicBoxAlbumArt.Width)
-            PicBoxAlbumArt.BringToFront()
+            If Player.Visualizer Then
+                PanelVisualizer.BringToFront()
+            Else
+                PicBoxAlbumArt.BringToFront()
+            End If
         End If
     End Sub
     Private Sub ResetMarquee()
         LblTitle.Left = PanelMarquee.Width
     End Sub
-    Friend Sub AttachMiniVisualizer(v As Player.IVisualizer)
+    Friend Sub AttachVisualizer(v As Player.IVisualizer)
         Dim ctrl = v.DockedControl
         ctrl.Dock = DockStyle.Fill
         PanelVisualizer.Controls.Clear()

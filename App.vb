@@ -2176,7 +2176,6 @@ Namespace My
                 FrmMiniPlayer.Show()
                 Player.Hide()
                 Player.LyricsOff()
-                Player.VisualizerOff()
                 Player.ShowMedia()
                 FrmMiniPlayer.Activate()
             Else
