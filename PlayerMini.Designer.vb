@@ -29,6 +29,7 @@ Partial Class PlayerMini
         BtnNext = New Button()
         LblTitle = New Skye.UI.Label()
         PanelMarquee = New Panel()
+        PanelVisualizer = New Panel()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
         PanelMarquee.SuspendLayout()
         SuspendLayout()
@@ -94,11 +95,19 @@ Partial Class PlayerMini
         PanelMarquee.Size = New Size(94, 22)
         PanelMarquee.TabIndex = 7
         ' 
+        ' PanelVisualizer
+        ' 
+        PanelVisualizer.Location = New Point(3, 23)
+        PanelVisualizer.Name = "PanelVisualizer"
+        PanelVisualizer.Size = New Size(94, 94)
+        PanelVisualizer.TabIndex = 8
+        ' 
         ' PlayerMini
         ' 
         AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(100, 144)
         ControlBox = False
+        Controls.Add(PanelVisualizer)
         Controls.Add(PicBoxAlbumArt)
         Controls.Add(PanelMarquee)
         Controls.Add(BtnNext)
@@ -126,4 +135,5 @@ Partial Class PlayerMini
     Friend WithEvents BtnNext As Button
     Friend WithEvents LblTitle As Skye.UI.Label
     Friend WithEvents PanelMarquee As Panel
+    Friend WithEvents PanelVisualizer As Panel
 End Class

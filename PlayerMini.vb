@@ -1,4 +1,6 @@
 ﻿
+Imports SkyeMusic.Player
+
 Public Class PlayerMini
 
     'Declarations
@@ -39,6 +41,12 @@ Public Class PlayerMini
         End If
 #End If
         AddHandler Player.TitleChanged, AddressOf OnTitleChanged
+
+        If Player.MiniPlayerVisualizer IsNot Nothing Then
+            AttachMiniVisualizer(Player.MiniPlayerVisualizer)
+            Player.MiniPlayerVisualizer.Start()
+        End If
+
     End Sub
     Private Sub PlayerMini_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxAlbumArt.MouseDown, LblTitle.MouseDown
         Dim cSender As Control
@@ -129,6 +137,9 @@ Public Class PlayerMini
             g.DrawRectangle(p, 1, 1, Me.Width - 3, Me.Height - 3)
         End Using
     End Sub
+    Private Sub PlayerMini_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+        Player.MiniPlayerVisualizer = Nothing
+    End Sub
 
     ' Control Events
     Private Sub BtnPlay_Click(sender As Object, e As EventArgs) Handles BtnPlay.Click
@@ -175,12 +186,20 @@ Public Class PlayerMini
     Friend Sub SetAlbumArt(img As Image)
         If img Is Nothing Then
             PicBoxAlbumArt.Image = Nothing
+            PanelVisualizer.BringToFront()
         Else
             PicBoxAlbumArt.Image = App.ResizeImage(img, PicBoxAlbumArt.Width)
+            PicBoxAlbumArt.BringToFront()
         End If
     End Sub
     Private Sub ResetMarquee()
         LblTitle.Left = PanelMarquee.Width
+    End Sub
+    Friend Sub AttachMiniVisualizer(v As Player.IVisualizer)
+        Dim ctrl = v.DockedControl
+        ctrl.Dock = DockStyle.Fill
+        PanelVisualizer.Controls.Clear()
+        PanelVisualizer.Controls.Add(ctrl)
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Width

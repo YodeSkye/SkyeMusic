@@ -336,6 +336,7 @@ Public Class Player
     Private Visualizer As Boolean = False 'Indicates if the visualizer is active
     Friend VisualizerHost As VisualizerHostClass 'Host for Visualizers
     Private VisualizerEngine As VisualizerAudioEngine 'Audio Engine for Visualizers
+    Friend Shared MiniPlayerVisualizer As IVisualizer
     Private Sub VisualizerOn() 'Turn on the Visualizer
         If Not Visualizer Then
             Visualizer = True
@@ -419,6 +420,9 @@ Public Class Player
                 LoadVisualizer(visualizers(name))
             End If
         End Sub
+        Private Function CreateVisualizerInstance(v As IVisualizer) As IVisualizer
+            Return CType(Activator.CreateInstance(v.GetType()), IVisualizer)
+        End Function
         Public Sub LoadVisualizer(v As IVisualizer)
             'Stop and clear old visualizer
             If currentVisualizer IsNot Nothing Then
@@ -446,6 +450,16 @@ Public Class Player
 
             hostPanel.Controls.Add(ctrl)
             v.Start()
+
+            ' Create a separate instance for the mini player
+            Dim miniV = CreateVisualizerInstance(v)
+            MiniPlayerVisualizer = miniV
+            ' If the mini player is open, attach it
+            If App.FrmMiniPlayer IsNot Nothing AndAlso Not App.FrmMiniPlayer.IsDisposed Then
+                App.FrmMiniPlayer.AttachMiniVisualizer(miniV)
+                miniV.Start()
+            End If
+
         End Sub
         Public Sub FeedAudio(data As Single())
             currentVisualizer?.Update(data)
@@ -590,6 +604,7 @@ Public Class Player
 
             ' Feed raw waveform to oscilloscope
             visualizerHost.FeedWaveform(samples)
+            MiniPlayerVisualizer?.UpdateWaveform(samples)
 
             ' Apply FFT
             Dim fftSize = 1024
@@ -613,6 +628,7 @@ Public Class Player
 
             ' Feed spectrum to analyzers
             visualizerHost.FeedAudio(magnitudes)
+            MiniPlayerVisualizer?.Update(magnitudes)
         End Sub
     End Class
     Private Class VisualizerRainbowBar
