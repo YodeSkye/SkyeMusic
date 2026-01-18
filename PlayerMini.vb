@@ -11,6 +11,18 @@
     Private WithEvents MarqueeTimer As New Timer With {.Interval = 30}
 
     ' Form Events
+    Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
+        Try
+            Select Case m.Msg
+                Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                    SetAccentColor()
+            End Select
+        Catch ex As Exception
+            App.WriteToLog("MiniPlayer WndProc Handler Error" + Chr(13) + ex.ToString)
+        Finally
+            MyBase.WndProc(m)
+        End Try
+    End Sub
     Private Sub PlayerMini_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         DoubleBuffered = True
         SetAccentColor()
@@ -216,7 +228,7 @@
             BackColor = c
         End If
         ResumeLayout()
-        Debug.Print("About Accent Color Set")
+        'Debug.Print("MinPlayer Accent Color Set")
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
@@ -240,7 +252,7 @@
         BtnPrevious.Image = ImagePrevious
         BtnNext.Image = ImageNext
         ResumeLayout()
-        Debug.Print("About Theme Set")
+        'Debug.Print("MiniPlayer Theme Set")
     End Sub
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor()

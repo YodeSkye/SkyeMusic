@@ -467,7 +467,7 @@ Public Class Player
         Public Sub ResizeHost()
             currentVisualizer?.Resize(hostPanel.Width, hostPanel.Height)
         End Sub
-        Private Sub ShowVisualizerMenu()
+        Public Sub ShowVisualizerMenu()
             Dim menu As New ContextMenuStrip()
             App.ThemeMenu(menu)
             For Each vizName In visualizers.Keys
