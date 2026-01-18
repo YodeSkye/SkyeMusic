@@ -22,36 +22,29 @@ Partial Class PlayerMini
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        BtnClose = New Button()
         PicBoxAlbumArt = New PictureBox()
         BtnPlay = New Button()
         BtnStop = New Button()
         BtnPrevious = New Button()
         BtnNext = New Button()
         LblTitle = New Skye.UI.Label()
+        PanelMarquee = New Panel()
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).BeginInit()
+        PanelMarquee.SuspendLayout()
         SuspendLayout()
-        ' 
-        ' BtnClose
-        ' 
-        BtnClose.Location = New Point(77, 40)
-        BtnClose.Name = "BtnClose"
-        BtnClose.Size = New Size(20, 20)
-        BtnClose.TabIndex = 0
-        BtnClose.UseVisualStyleBackColor = True
         ' 
         ' PicBoxAlbumArt
         ' 
-        PicBoxAlbumArt.Location = New Point(25, 25)
+        PicBoxAlbumArt.Location = New Point(3, 23)
         PicBoxAlbumArt.Name = "PicBoxAlbumArt"
-        PicBoxAlbumArt.Size = New Size(50, 50)
+        PicBoxAlbumArt.Size = New Size(94, 94)
         PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.CenterImage
         PicBoxAlbumArt.TabIndex = 1
         PicBoxAlbumArt.TabStop = False
         ' 
         ' BtnPlay
         ' 
-        BtnPlay.Location = New Point(30, 76)
+        BtnPlay.Location = New Point(30, 119)
         BtnPlay.Name = "BtnPlay"
         BtnPlay.Size = New Size(20, 20)
         BtnPlay.TabIndex = 2
@@ -59,7 +52,7 @@ Partial Class PlayerMini
         ' 
         ' BtnStop
         ' 
-        BtnStop.Location = New Point(50, 76)
+        BtnStop.Location = New Point(50, 119)
         BtnStop.Name = "BtnStop"
         BtnStop.Size = New Size(20, 20)
         BtnStop.TabIndex = 3
@@ -67,7 +60,7 @@ Partial Class PlayerMini
         ' 
         ' BtnPrevious
         ' 
-        BtnPrevious.Location = New Point(10, 76)
+        BtnPrevious.Location = New Point(10, 119)
         BtnPrevious.Name = "BtnPrevious"
         BtnPrevious.Size = New Size(20, 20)
         BtnPrevious.TabIndex = 4
@@ -75,7 +68,7 @@ Partial Class PlayerMini
         ' 
         ' BtnNext
         ' 
-        BtnNext.Location = New Point(70, 76)
+        BtnNext.Location = New Point(70, 119)
         BtnNext.Name = "BtnNext"
         BtnNext.Size = New Size(20, 20)
         BtnNext.TabIndex = 5
@@ -83,25 +76,35 @@ Partial Class PlayerMini
         ' 
         ' LblTitle
         ' 
+        LblTitle.AutoSize = True
+        LblTitle.BackColor = Color.Transparent
         LblTitle.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        LblTitle.Location = New Point(10, 3)
+        LblTitle.Location = New Point(3, 1)
         LblTitle.Name = "LblTitle"
-        LblTitle.Size = New Size(80, 20)
+        LblTitle.Size = New Size(61, 17)
         LblTitle.TabIndex = 6
-        LblTitle.TextAlign = ContentAlignment.MiddleCenter
+        LblTitle.Text = "Marquee"
+        LblTitle.TextAlign = ContentAlignment.MiddleLeft
+        ' 
+        ' PanelMarquee
+        ' 
+        PanelMarquee.Controls.Add(LblTitle)
+        PanelMarquee.Location = New Point(3, 3)
+        PanelMarquee.Name = "PanelMarquee"
+        PanelMarquee.Size = New Size(94, 22)
+        PanelMarquee.TabIndex = 7
         ' 
         ' PlayerMini
         ' 
         AutoScaleMode = AutoScaleMode.None
-        ClientSize = New Size(100, 100)
+        ClientSize = New Size(100, 144)
         ControlBox = False
-        Controls.Add(LblTitle)
+        Controls.Add(PicBoxAlbumArt)
+        Controls.Add(PanelMarquee)
         Controls.Add(BtnNext)
         Controls.Add(BtnPrevious)
         Controls.Add(BtnStop)
         Controls.Add(BtnPlay)
-        Controls.Add(PicBoxAlbumArt)
-        Controls.Add(BtnClose)
         FormBorderStyle = FormBorderStyle.None
         MaximizeBox = False
         MinimizeBox = False
@@ -112,14 +115,15 @@ Partial Class PlayerMini
         StartPosition = FormStartPosition.Manual
         TopMost = True
         CType(PicBoxAlbumArt, ComponentModel.ISupportInitialize).EndInit()
+        PanelMarquee.ResumeLayout(False)
+        PanelMarquee.PerformLayout()
         ResumeLayout(False)
     End Sub
-
-    Friend WithEvents BtnClose As Button
     Friend WithEvents PicBoxAlbumArt As PictureBox
     Friend WithEvents BtnPlay As Button
     Friend WithEvents BtnStop As Button
     Friend WithEvents BtnPrevious As Button
     Friend WithEvents BtnNext As Button
     Friend WithEvents LblTitle As Skye.UI.Label
+    Friend WithEvents PanelMarquee As Panel
 End Class

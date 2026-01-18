@@ -34,7 +34,7 @@ Public Class Player
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
     Private PlaylistSearchTitle As String 'Title for Playlist Search
     Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
-    Private PlaylistCurrentText As String 'Text of the current playlist item
+    Friend PlaylistCurrentText As String 'Text of the current playlist item
     Private RandomHistory As New Generic.List(Of String) 'History of played items for shuffle play mode
     Private RandomHistoryIndex As Integer = 0 'Index for the shuffle history
     Private CurrentAccentColor As Color 'Current Windows Accent Color
@@ -46,6 +46,7 @@ Public Class Player
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
+    Friend Event TitleChanged(newTitle As String)
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -4746,6 +4747,7 @@ Public Class Player
             Text = My.Application.Info.Title + " - " + _player.Path
             App.NIApp.Text = Text
         End Try
+        RaiseEvent TitleChanged(PlaylistCurrentText)
 
         TimerShowMedia.Start()
     End Sub

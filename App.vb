@@ -179,8 +179,8 @@ Namespace My
         Friend FrmLog As Log 'FrmLog is the log window that displays the application log.
         Friend FrmDevTools As DevTools 'FrmDevTools is the developer tools window that provides debugging and database access features.
         Friend NIApp As New NotifyIcon 'NIApp is the system tray icon for the application.
-        Private pendingSingleClick As Boolean = False
-        Private WithEvents NIAppClickTimer As Timer
+        Private clickCount As Integer = 0
+        Private WithEvents NIAppClickTimer As New Timer With {.Interval = SystemInformation.DoubleClickTime}
         Private WithEvents TimerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
         Private WithEvents TimerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
         Private WithEvents TimerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
@@ -1233,19 +1233,11 @@ Namespace My
             '        miNext.ToolTipText = "Next Random Song"
             'End Select
         End Sub
-        Private Sub NIApp_MouseClick(sender As Object, e As MouseEventArgs)
+        Private Sub NIApp_MouseUp(sender As Object, e As MouseEventArgs)
             If e.Button = MouseButtons.Left Then
-                pendingSingleClick = True
-                NIAppClickTimer.Start()
-            End If
-        End Sub
-        Private Sub NIApp_MouseDoubleClick(sender As Object, e As MouseEventArgs)
-            If e.Button = MouseButtons.Left Then
-                pendingSingleClick = False
+                clickCount += 1
                 NIAppClickTimer.Stop()
-
-                ' Handle Double-Click
-                SetMiniPlayer()
+                NIAppClickTimer.Start()
             End If
         End Sub
         Private Sub NIApp_MIPlay_MouseDown(sender As Object, e As MouseEventArgs)
@@ -1334,12 +1326,17 @@ Namespace My
         'Handlers
         Private Sub NIAppClickTimer_Tick(sender As Object, e As EventArgs) Handles NIAppClickTimer.Tick
             NIAppClickTimer.Stop()
-            If pendingSingleClick Then
-                pendingSingleClick = False
 
-                ' Handle Single-Click
-                Player.TogglePlayer()
-            End If
+            Select Case clickCount
+                Case 1
+                    ' Single-click
+                    Player.TogglePlayer()
+                Case >= 2
+                    ' Double-click (or more)
+                    SetMiniPlayer()
+            End Select
+
+            clickCount = 0
         End Sub
         Private Sub TimerScreenSaverWatcher_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerScreenSaverWatcher.Tick
             Static ssStatus As Boolean
@@ -1505,8 +1502,7 @@ Namespace My
             ' Notify Icon
             NIApp.Icon = My.Resources.IconSkyeMusicRed
             NIApp.Text = My.Application.Info.Title
-            AddHandler NIApp.MouseClick, AddressOf NIApp_MouseClick
-            AddHandler NIApp.MouseDoubleClick, AddressOf NIApp_MouseDoubleClick
+            AddHandler NIApp.MouseUp, AddressOf NIApp_MouseUp
             Dim cm As New ContextMenuStrip()
             ThemeMenu(cm)
             cm.Font = New Font("Segoe UI", 10.0!)
@@ -1741,6 +1737,8 @@ Namespace My
                 RegKey.SetValue("ChangeLogLastVersionShown", App.ChangeLogLastVersionShown, Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("LastUpdateCheck", App.LastUpdateCheck.ToString("o"), Microsoft.Win32.RegistryValueKind.String)
                 RegKey.SetValue("LatestKnownVersion", App.LatestKnownVersion, Microsoft.Win32.RegistryValueKind.String)
+                Skye.Common.RegistryHelper.SetInt("PlayerMiniLocationX", PlayerMiniLocation.X)
+                Skye.Common.RegistryHelper.SetInt("PlayerMiniLocationY", PlayerMiniLocation.Y)
 
                 ' Visualizer Settings
                 RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
@@ -1945,6 +1943,8 @@ Namespace My
                     App.LastUpdateCheck = DateTime.MinValue
                 End If
                 App.LatestKnownVersion = RegKey.GetValue("LatestKnownVersion", String.Empty).ToString
+                PlayerMiniLocation.X = Skye.Common.RegistryHelper.GetInt("PlayerMiniLocationX", -AdjustScreenBoundsNormalWindow - 1)
+                PlayerMiniLocation.Y = Skye.Common.RegistryHelper.GetInt("PlayerMiniLocationY", -1)
 
                 ' Visualizer Settings
                 Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
@@ -2165,13 +2165,9 @@ Namespace My
         End Sub
         Friend Sub SetNIApp()
             If ShowTrayIcon Then
-                NIAppClickTimer = New Timer() With {.Interval = SystemInformation.DoubleClickTime}
                 NIApp.Visible = True
             Else
                 NIApp.Visible = False
-                NIAppClickTimer?.Stop()
-                NIAppClickTimer?.Dispose()
-                NIAppClickTimer = Nothing
             End If
         End Sub
         Friend Sub SetMiniPlayer()
@@ -2182,6 +2178,7 @@ Namespace My
                 Player.LyricsOff()
                 Player.VisualizerOff()
                 Player.ShowMedia()
+                FrmMiniPlayer.Activate()
             Else
                 FrmMiniPlayer.Close()
                 Player.Show()

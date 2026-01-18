@@ -9,23 +9,26 @@ Public Class PlayerMini
     Private ImageStop As Image
     Private ImagePrevious As Image
     Private ImageNext As Image
-    Private ImageClose As Image
+    Private WithEvents MarqueeTimer As New Timer With {.Interval = 30}
 
     ' Form Events
     Private Sub PlayerMini_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         DoubleBuffered = True
         SetAccentColor()
         SetTheme()
-        Size = New Size(100, 100)
+        Size = New Size(100, 144)
         Text = My.Application.Info.Title & " Mini Player"
+        LblTitle.Text = Player.PlaylistCurrentText
+        ResetMarquee()
+        MarqueeTimer.Start()
 #If DEBUG Then
-        'If App.SaveWindowMetrics AndAlso App.PlayerMiniLocation.Y >= 0 Then
-        '    Location = App.PlayerMiniLocation
-        'Else
-        Dim wa = Screen.PrimaryScreen.WorkingArea
-        Left = wa.Right - Width
-        Top = wa.Bottom - Height
-        'End If
+        If App.SaveWindowMetrics AndAlso App.PlayerMiniLocation.Y >= 0 Then
+            Location = App.PlayerMiniLocation
+        Else
+            Dim wa = Screen.PrimaryScreen.WorkingArea
+            Left = wa.Right - Width
+            Top = wa.Bottom - Height
+        End If
 #Else
         If App.SaveWindowMetrics AndAlso App.PlayerMiniLocation.Y >= 0 Then
             Location = App.PlayerMiniLocation
@@ -35,8 +38,9 @@ Public Class PlayerMini
             Top = wa.Bottom - Height
         End If
 #End If
+        AddHandler Player.TitleChanged, AddressOf OnTitleChanged
     End Sub
-    Private Sub PlayerMini_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxAlbumArt.MouseDown
+    Private Sub PlayerMini_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxAlbumArt.MouseDown, LblTitle.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -48,7 +52,7 @@ Public Class PlayerMini
             End If
         End If
     End Sub
-    Private Sub PlayerMini_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove
+    Private Sub PlayerMini_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, LblTitle.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -57,7 +61,7 @@ Public Class PlayerMini
             PlayerMiniLocation = Location
         End If
     End Sub
-    Private Sub PlayerMini_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp
+    Private Sub PlayerMini_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp, LblTitle.MouseUp
         mMove = False
     End Sub
     Private Sub PlayerMini_Move(sender As Object, e As EventArgs) Handles MyBase.Move
@@ -89,6 +93,13 @@ Public Class PlayerMini
     Private Sub PlayerMini_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick, PicBoxAlbumArt.DoubleClick
         App.SetMiniPlayer()
     End Sub
+    Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
+        If keyData = Keys.Escape Then
+            App.SetMiniPlayer()
+            Return True
+        End If
+        Return MyBase.ProcessCmdKey(msg, keyData)
+    End Function
     Protected Overrides Sub OnPaint(e As PaintEventArgs)
         MyBase.OnPaint(e)
 
@@ -120,9 +131,6 @@ Public Class PlayerMini
     End Sub
 
     ' Control Events
-    Private Sub BtnClose_Click(sender As Object, e As EventArgs) Handles BtnClose.Click
-        App.SetMiniPlayer()
-    End Sub
     Private Sub BtnPlay_Click(sender As Object, e As EventArgs) Handles BtnPlay.Click
         Player.TogglePlay()
         SetPlayState()
@@ -140,6 +148,21 @@ Public Class PlayerMini
         SetPlayState()
     End Sub
 
+    ' Handlers
+    Private Sub OnTitleChanged(newTitle As String)
+        If IsDisposed Then Return
+        LblTitle.Text = newTitle
+        ResetMarquee()
+    End Sub
+    Private Sub MarqueeTimer_Tick(sender As Object, e As EventArgs) Handles MarqueeTimer.Tick
+        LblTitle.Left -= 1 ' scroll speed
+
+        ' When it scrolls off the left side, reset it
+        If LblTitle.Right < 0 Then
+            LblTitle.Left = PanelMarquee.Width
+        End If
+    End Sub
+
     ' Methods
     Friend Sub SetPlayState()
         Select Case Player.PlayState
@@ -155,6 +178,9 @@ Public Class PlayerMini
         Else
             PicBoxAlbumArt.Image = App.ResizeImage(img, PicBoxAlbumArt.Width)
         End If
+    End Sub
+    Private Sub ResetMarquee()
+        LblTitle.Left = PanelMarquee.Width
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Width
@@ -184,18 +210,15 @@ Public Class PlayerMini
         BtnStop.BackColor = App.CurrentTheme.ButtonBackColor
         BtnPrevious.BackColor = App.CurrentTheme.ButtonBackColor
         BtnNext.BackColor = App.CurrentTheme.ButtonBackColor
-        BtnClose.BackColor = App.CurrentTheme.ButtonBackColor
         ImagePlay = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerPlay, CurrentTheme.ButtonTextColor), 16)
         ImagePause = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerPause, CurrentTheme.ButtonTextColor), 16)
         ImageStop = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerStop, CurrentTheme.ButtonTextColor), 16)
         ImagePrevious = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerPrevious, CurrentTheme.ButtonTextColor), 16)
         ImageNext = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerNext, CurrentTheme.ButtonTextColor), 16)
-        ImageClose = App.ResizeImage(App.TintIcon(My.Resources.ImageMiniPlayerClose, CurrentTheme.ButtonTextColor), 16)
         SetPlayState()
         BtnStop.Image = ImageStop
         BtnPrevious.Image = ImagePrevious
         BtnNext.Image = ImageNext
-        BtnClose.Image = ImageClose
         ResumeLayout()
         Debug.Print("About Theme Set")
     End Sub
