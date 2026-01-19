@@ -459,10 +459,12 @@ Namespace My
 
         'Visualizer Saved Settings
         Friend Visualizer As String = "Rainbow Bar" 'The current visualizer used in the application.
+        Friend VisualizerMiniMode As Boolean = False 'Whether the mini mode is enabled for the visualizer. (Used in MiniPlayer)
         Friend Visualizers As New VisualizerSettings
         Public Class VisualizerSettings
 
             ' Rainbow Bar Visualizer Settings
+            Public Property RainbowBarAllowMiniMode As Boolean = True 'Whether to allow mini mode for the rainbow bar visualizer.
             Public Property RainbowBarCount As Integer = 32 '8-128 'Number of bars to display.
             Public Property RainbowBarGain As Single = 100.0F '10F-1000F 'Controls bar height sensitivity. Higher gain exaggerates quiet sounds, lower gain keeps bars smaller.
             Public Property RainbowBarShowPeaks As Boolean = True 'Whether to show peak indicators.
@@ -477,6 +479,7 @@ Namespace My
                 Linear
                 Logarithmic
             End Enum
+            Public Property ClassicSpectrumAnalyzerAllowMiniMode As Boolean = True 'Whether to allow mini mode for the classic spectrum analyzer.
             Public Property ClassicSpectrumAnalyzerBarCount As Integer = 64 ' 16-96
             Public Property ClassicSpectrumAnalyzerGain As Single = 3.2F ' 1.0F-9.9F Gain multiplier for audio data.
             Public Property ClassicSpectrumAnalyzerSmoothing As Single = 0.7F ' 0.0 - 0.95F Weight for previous frame vs new frame. 0 = instant response, 0.95 = very sluggish.
@@ -495,6 +498,7 @@ Namespace My
                 VShape
                 MidFocus
             End Enum
+            Public Property CircularSpectrumAllowMiniMode As Boolean = True 'Whether to allow mini mode for the circular spectrum visualizer.
             Public Property CircularSpectrumWeightingMode As CircularSpectrumWeightingModes = CircularSpectrumWeightingModes.Raw ' Frequency emphasis curve
             Public Property CircularSpectrumGain As Single = 6.0F ' 1.0F - 30.0F *10 Gain Factor for magnitudes
             Public Property CircularSpectrumSmoothing As Single = 0.3F ' 0.0F - 1.0F *100 Blend Factor for smoothing (0 = no smoothing, 1 = max smoothing)
@@ -503,7 +507,8 @@ Namespace My
             Public Property CircularSpectrumFill As Boolean = False ' Whether to fill the area under the spectrum
 
             ' Waveform Visualizer Settings
-            Public Property WaveformFill As Boolean = False 'Whether to fill underneath the waveform.
+            Public Property WaveformAllowMiniMode As Boolean = True ' Whether to allow mini mode for the waveform visualizer.
+            Public Property WaveformFill As Boolean = False ' Whether to fill underneath the waveform.
 
             ' Oscilloscope Visualizer Settings
             Public Enum OscilloscopeChannelModes
@@ -512,6 +517,7 @@ Namespace My
                 StereoRight
                 StereoBoth
             End Enum
+            Public Property OscilloscopeAllowMiniMode As Boolean = True ' Whether to allow mini mode for the oscilloscope visualizer.
             Public Property OscilloscopeChannelMode As OscilloscopeChannelModes = OscilloscopeChannelModes.Mono ' Channel mode for the oscilloscope.
             Public Property OscilloscopeGain As Single = 1.0F ' 0.1F - 8.0F *10 Gain multiplier for the oscilloscope data.
             Public Property OscilloscopeSmoothing As Single = 0.3F ' 0.0F - 1.0F *100 Smoothing factor for the oscilloscope data. 0 = no smoothing, 1 = maximum smoothing.
@@ -526,12 +532,14 @@ Namespace My
                 Aurora
                 CosmicRainbow
             End Enum
+            Public Property FractalCloudAllowMiniMode As Boolean = True ' Whether to allow mini mode for the fractal cloud visualizer.
             Public Property FractalCloudPalette As FractalCloudPalettes = FractalCloudPalettes.Normal 'The color palette used for the fractal cloud visualizer.
             Public Property FractalCloudSwirlSpeedBase As Double = 0.01F ' 0.001F-0.050F Base speed of swirl rotation.
             Public Property FractalCloudSwirlSpeedAudioFactor As Double = 10.0F ' 1-30 How much audio affects swirl speed.
             Public Property FractalCloudTimeIncrement As Double = 0.02F ' 0.005F-0.100F Increment for fractal time variable. Animation Speed.
 
             'Julia Fractal Visualizer Settings
+            Public Property JuliaFractalAllowMiniMode As Boolean = True ' Whether to allow mini mode for the Julia fractal visualizer.
             Public Property JuliaFractalBaseCX As Single = -0.7F '-1.0 to +1.0 '+1 *100 'The fixed real part of the Julia constant. This anchors the fractal’s overall shape.
             Public Property JuliaFractalBassInfluence As Single = 0.5F '0.0 - 25.0 '*10 'How much the low‑frequency audio band shifts the real part (cx). Strong bass makes the fractal “wobble” horizontally.
             Public Property JuliaFractalBaseCY As Single = 0.27015F '-1.0 to +1.0 '+1 *100 'The fixed imaginary part of the Julia constant. This sets the fractal’s vertical symmetry and complexity.
@@ -539,6 +547,7 @@ Namespace My
             Public Property JuliaFractalMaxIterations As Integer = 100 '10-250 '*1 'Controls fractal detail: higher values = sharper, slower; lower values = simpler, faster.
 
             ' Hyperspace Tunnel Visualizer Settings
+            Public Property HyperspaceTunnelAllowMiniMode As Boolean = True ' Whether to allow mini mode for the hyperspace tunnel visualizer.
             Public Property HyperspaceTunnelParticleCount As Integer = 1000 '100-5000 Number of particles in the tunnel.
             Public Property HyperspaceTunnelSwirlSpeedBase As Double = 0.05F ' 0.01F-0.20F Base speed of swirl rotation.
             Public Property HyperspaceTunnelSwirlSpeedAudioFactor As Double = 0.2F ' 0.05F-1.00F How much audio affects swirl speed.
@@ -546,6 +555,7 @@ Namespace My
             Public Property HyperspaceTunnelParticleSpeedAudioFactor As Double = 20.0F ' 5-50 How much audio affects particle speed.
 
             ' Star Field Visualizer Settings
+            Public Property StarFieldAllowMiniMode As Boolean = True ' Whether to allow mini mode for the star field visualizer.
             Public Property StarFieldStarCount As Integer = 750 ' 100-2000 Number of stars in the field.
             Public Property StarFieldBaseSpeed As Single = 2.0F ' 1.0F-5.0F Minimum star movement speed.
             Public Property StarFieldAudioSpeedFactor As Integer = 10 ' 0-100 How much audio level boosts star speed.
@@ -599,6 +609,7 @@ Namespace My
                 End Select
             End Function
             Public ParticleNebulaActivePalette As ParticleNebulaPalette = ParticleNebulaGetPalette(ParticleNebulaPalettePresets.Cosmic)
+            Public Property ParticleNebulaAllowMiniMode As Boolean = True ' Whether to allow mini mode for the particle nebula visualizer.
             Public Property ParticleNebulaSpawnMultiplier As Single = 2.0F ' 0.5 – 10.0 *10 ' Nebula Density. Higher = More Particles.
             Public Property ParticleNebulaVelocityScale As Integer = 50 ' 10 - 200 *1 ' Speed of Particle Movement.
             Public Property ParticleNebulaSizeScale As Integer = 20 ' 5 – 50 *1 ' Size of Particles. Higher = Bigger Particles.
@@ -2188,6 +2199,7 @@ Namespace My
         End Sub
         Friend Sub SetMiniPlayer()
             If FrmMiniPlayer Is Nothing OrElse FrmMiniPlayer.IsDisposed Then
+                VisualizerMiniMode = True
                 FrmMiniPlayer = New PlayerMini
                 FrmMiniPlayer.Show()
                 Player.Hide()
@@ -2195,6 +2207,7 @@ Namespace My
                 Player.ShowMedia()
                 FrmMiniPlayer.Activate()
             Else
+                VisualizerMiniMode = False
                 FrmMiniPlayer.Close()
                 Player.Show()
                 Player.ShowMedia()

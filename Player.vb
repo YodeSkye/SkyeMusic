@@ -688,9 +688,25 @@ Public Class Player
             If audioData Is Nothing OrElse audioData.Length = 0 Then Exit Sub
 
             Dim g = pe.Graphics
-            Dim barCount = App.Visualizers.RainbowBarCount
-            Dim barWidth As Single = CSng(Width) / barCount
             Dim maxHeight = Height
+            Dim barCount As Integer
+            Dim gain As Single
+            Dim showPeaks As Boolean
+            Dim peakThickness As Integer
+            If VisualizerMiniMode AndAlso App.Visualizers.RainbowBarAllowMiniMode Then
+                ' Mini Mode defaults
+                barCount = Math.Min(16, App.Visualizers.RainbowBarCount)   ' fewer bars
+                gain = App.Visualizers.RainbowBarGain * 0.8F               ' slightly reduced gain
+                showPeaks = False                                          ' peaks look messy in tiny mode
+                peakThickness = 2                                          ' if peaks enabled later
+            Else
+                ' Full mode
+                barCount = App.Visualizers.RainbowBarCount
+                gain = App.Visualizers.RainbowBarGain
+                showPeaks = App.Visualizers.RainbowBarShowPeaks
+                peakThickness = App.Visualizers.RainbowBarPeakThickness
+            End If
+            Dim barWidth As Single = CSng(Width) / barCount
 
             ' Initialize smoothing buffer if needed
             If lastMagnitudes Is Nothing OrElse lastMagnitudes.Length <> barCount Then
@@ -708,7 +724,7 @@ Public Class Player
                 Dim rawMagnitude = audioData(valueIdx)
 
                 ' Apply gain and clamp
-                Dim boosted = Math.Min(rawMagnitude * App.Visualizers.RainbowBarGain, 1.0F)
+                Dim boosted = Math.Min(rawMagnitude * gain, 1.0F)
 
                 ' Smooth with previous frame
                 Dim smoothed = (lastMagnitudes(i) * 0.7F) + (boosted * 0.3F)
@@ -728,7 +744,7 @@ Public Class Player
                 End Using
 
                 ' Peak bar logic
-                If App.Visualizers.RainbowBarShowPeaks Then
+                If showPeaks Then
                     Dim currentPeak As Integer = CInt(smoothed * maxHeight)
 
                     If currentPeak > peakValues(i) Then
@@ -747,7 +763,7 @@ Public Class Player
                     ' Only draw peak if above threshold
                     If peakValues(i) > App.Visualizers.RainbowBarPeakThreshold Then
                         Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
-                        Dim thickness As Integer = App.Visualizers.RainbowBarPeakThickness 'fixed thickness preset
+                        Dim thickness As Integer = peakThickness
                         Dim peakColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
                         Using peakbrush As New SolidBrush(peakColor)
                             g.FillRectangle(peakbrush, x, peakY, width, thickness)
@@ -852,23 +868,51 @@ Public Class Player
         Protected Overrides Sub OnPaint(pe As PaintEventArgs)
             MyBase.OnPaint(pe)
             If audioData Is Nothing OrElse audioData.Length < fftSize Then Exit Sub
+
             Dim g = pe.Graphics
 
-            ' Ensure buffers
+            ' --- MiniMode vs FullMode configuration ---
+            Dim barCount As Integer
+            Dim gain As Single
+            Dim smoothing As Single
+            Dim showPeaks As Boolean
+            Dim peakHoldFrames As Integer
+            Dim peakDecay As Integer
+            Dim peakThickness As Integer = 2
+
+            If VisualizerMiniMode AndAlso App.Visualizers.ClassicSpectrumAnalyzerAllowMiniMode Then
+                ' MiniMode defaults (compact, calmer)
+                barCount = Math.Min(24, App.Visualizers.ClassicSpectrumAnalyzerBarCount)
+                gain = App.Visualizers.ClassicSpectrumAnalyzerGain * 0.8F
+                smoothing = 0.5F
+                showPeaks = False ' peaks can look noisy in tiny mode
+                peakHoldFrames = App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames
+                peakDecay = App.Visualizers.ClassicSpectrumAnalyzerPeakDecay
+            Else
+                ' Full mode uses user settings
+                barCount = App.Visualizers.ClassicSpectrumAnalyzerBarCount
+                gain = App.Visualizers.ClassicSpectrumAnalyzerGain
+                smoothing = App.Visualizers.ClassicSpectrumAnalyzerSmoothing
+                showPeaks = App.Visualizers.ClassicSpectrumAnalyzerShowPeaks
+                peakHoldFrames = App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames
+                peakDecay = App.Visualizers.ClassicSpectrumAnalyzerPeakDecay
+            End If
+
+            ' --- Ensure buffers ---
             If spectrumMagnitudes Is Nothing OrElse spectrumMagnitudes.Length <> fftBins Then
                 ReDim spectrumMagnitudes(fftBins - 1)
             End If
-            If barMagnitudes Is Nothing OrElse barMagnitudes.Length <> App.Visualizers.ClassicSpectrumAnalyzerBarCount Then
-                ReDim barMagnitudes(App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1)
-                ReDim lastBars(App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1)
-                ReDim peakValues(App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1)
-                ReDim peakHold(App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1)
+            If barMagnitudes Is Nothing OrElse barMagnitudes.Length <> barCount Then
+                ReDim barMagnitudes(barCount - 1)
+                ReDim lastBars(barCount - 1)
+                ReDim peakValues(barCount - 1)
+                ReDim peakHold(barCount - 1)
             End If
 
-            ' 1) Compute per-bin magnitudes from latest fftSize samples
+            ' --- 1) Compute per-bin magnitudes from latest fftSize samples ---
             ComputeSpectrum(audioData, fftSize, spectrumMagnitudes)
 
-            ' 2) Map bins -> bars (logarithmic bands for better low-end resolution)
+            ' --- 2) Map bins -> bars (linear or logarithmic) ---
             Select Case App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode
                 Case App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear
                     MapBinsToBarsLinear(spectrumMagnitudes, barMagnitudes)
@@ -876,16 +920,16 @@ Public Class Player
                     MapBinsToBarsLogarithmic(spectrumMagnitudes, barMagnitudes)
             End Select
 
-            ' 3) Draw bars with smoothing, gain, peaks
-            Dim barWidth As Single = CSng(Width) / App.Visualizers.ClassicSpectrumAnalyzerBarCount
+            ' --- 3) Draw bars with smoothing, gain, peaks ---
+            Dim barWidth As Single = CSng(Width) / barCount
             Dim maxHeight As Integer = Height
 
-            For i = 0 To App.Visualizers.ClassicSpectrumAnalyzerBarCount - 1
+            For i = 0 To barCount - 1
                 ' Gain + clamp
-                Dim boosted As Single = Math.Min(barMagnitudes(i) * App.Visualizers.ClassicSpectrumAnalyzerGain, 1.0F)
+                Dim boosted As Single = Math.Min(barMagnitudes(i) * gain, 1.0F)
 
                 ' Smooth
-                Dim smoothed As Single = (lastBars(i) * App.Visualizers.ClassicSpectrumAnalyzerSmoothing) + (boosted * (1.0F - App.Visualizers.ClassicSpectrumAnalyzerSmoothing))
+                Dim smoothed As Single = (lastBars(i) * smoothing) + (boosted * (1.0F - smoothing))
                 lastBars(i) = smoothed
 
                 ' Height
@@ -894,31 +938,29 @@ Public Class Player
                 Dim y As Integer = maxHeight - barHeight
                 Dim width As Integer = Math.Max(1, CInt(barWidth) - 2)
 
-                ' Classic color (choose any solid or subtle gradient)
+                ' Classic color
                 Using brush As New SolidBrush(App.CurrentTheme.TextColor)
                     g.FillRectangle(brush, x, y, width, barHeight)
                 End Using
 
-                ' Peaks
-                If App.Visualizers.ClassicSpectrumAnalyzerShowPeaks Then
+                ' Peaks (optional)
+                If showPeaks Then
                     Dim currentPeak As Integer = barHeight
                     If currentPeak > peakValues(i) Then
-                        ' New higher peak: set it and reset hold counter
                         peakValues(i) = currentPeak
-                        peakHold(i) = App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames
+                        peakHold(i) = peakHoldFrames
                     Else
                         If peakHold(i) > 0 Then
-                            ' Still holding: decrement counter, keep peak stuck
                             peakHold(i) -= 1
                         Else
-                            ' No hold left: start decaying
-                            peakValues(i) = Math.Max(0, peakValues(i) - App.Visualizers.ClassicSpectrumAnalyzerPeakDecay)
+                            peakValues(i) = Math.Max(0, peakValues(i) - peakDecay)
                         End If
                     End If
+
                     If peakValues(i) > 2 Then
                         Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
                         Using pBrush As New SolidBrush(App.CurrentTheme.ButtonTextColor)
-                            g.FillRectangle(pBrush, x, peakY, width, 2)
+                            g.FillRectangle(pBrush, x, peakY, width, peakThickness)
                         End Using
                     End If
                 End If
@@ -1074,8 +1116,31 @@ Public Class Player
                 bins = CType(audioData.Clone(), Single())
             End SyncLock
 
-            ' Use only first half of FFT (unique frequencies)
+            ' --- MiniMode vs FullMode configuration ---
             Dim barCount As Integer = bins.Length \ 2
+            Dim gain As Single
+            Dim smoothing As Single
+            Dim radiusFactor As Single
+            Dim fillMode As Boolean
+            Dim lineWidth As Single
+
+            If VisualizerMiniMode AndAlso App.Visualizers.CircularSpectrumAllowMiniMode Then
+                ' MiniMode defaults (compact, readable)
+                barCount = Math.Min(64, barCount) ' fewer spokes
+                gain = App.Visualizers.CircularSpectrumGain * 0.7F
+                smoothing = 0.6F
+                radiusFactor = App.Visualizers.CircularSpectrumRadiusFactor * 0.8F
+                fillMode = False ' filled mode looks messy when tiny
+                lineWidth = Math.Max(1, App.Visualizers.CircularSpectrumLineWidth)
+            Else
+                ' Full mode uses user settings
+                gain = App.Visualizers.CircularSpectrumGain
+                smoothing = App.Visualizers.CircularSpectrumSmoothing
+                radiusFactor = App.Visualizers.CircularSpectrumRadiusFactor
+                fillMode = App.Visualizers.CircularSpectrumFill
+                lineWidth = App.Visualizers.CircularSpectrumLineWidth
+            End If
+
             If barCount < 2 Then Exit Sub
 
             ' Normalize magnitudes to 0–1
@@ -1086,98 +1151,97 @@ Public Class Player
                 Next
             End If
 
-            ' Apply frequency weighting based on preset
+            ' Apply frequency weighting
             Dim sampleRate As Integer = 44100
             For i As Integer = 0 To barCount - 1
                 Dim freq As Double = (i * sampleRate) / (2.0 * barCount)
                 Dim weight As Single = 1.0F
+
                 Select Case App.Visualizers.CircularSpectrumWeightingMode
                     Case App.VisualizerSettings.CircularSpectrumWeightingModes.Balanced
                         If freq < 200 Then weight = 0.5F
                         If freq >= 200 AndAlso freq < 2000 Then weight = 1.0F
                         If freq >= 2000 AndAlso freq < 8000 Then weight = 1.0F
                         If freq >= 8000 Then weight = 0.7F
+
                     Case App.VisualizerSettings.CircularSpectrumWeightingModes.BassHeavy
                         If freq < 200 Then weight = 1.2F
                         If freq >= 200 AndAlso freq < 2000 Then weight = 1.0F
                         If freq >= 2000 Then weight = 0.8F
+
                     Case App.VisualizerSettings.CircularSpectrumWeightingModes.TrebleBright
                         If freq < 200 Then weight = 0.4F
                         If freq >= 2000 Then weight = 1.3F
+
                     Case App.VisualizerSettings.CircularSpectrumWeightingModes.Raw
                         weight = 1.0F
+
                     Case App.VisualizerSettings.CircularSpectrumWeightingModes.Warm
                         If freq < 200 Then weight = 1.1F
                         If freq >= 2000 Then weight = 0.8F
+
                     Case App.VisualizerSettings.CircularSpectrumWeightingModes.VShape
                         If freq < 200 Then weight = 1.2F
                         If freq >= 500 AndAlso freq < 2000 Then weight = 0.8F
                         If freq >= 2000 Then weight = 1.2F
+
                     Case App.VisualizerSettings.CircularSpectrumWeightingModes.MidFocus
                         If freq >= 500 AndAlso freq < 2000 Then weight = 1.3F
                         If freq < 200 OrElse freq >= 8000 Then weight = 0.6F
-                    Case Else
-                        weight = 1.0F
                 End Select
-                bins(i) = bins(i) * weight
+
+                bins(i) *= weight
             Next
 
-            ' Initialize smoothed buffer if needed
+            ' Initialize smoothed buffer
             If smoothedBins Is Nothing OrElse smoothedBins.Length <> barCount Then
                 ReDim smoothedBins(barCount - 1)
             End If
 
             ' Apply smoothing
             For i As Integer = 0 To barCount - 1
-                smoothedBins(i) = (App.Visualizers.CircularSpectrumSmoothing * bins(i)) + ((1 - App.Visualizers.CircularSpectrumSmoothing) * smoothedBins(i))
+                smoothedBins(i) = (smoothing * bins(i)) + ((1 - smoothing) * smoothedBins(i))
             Next
 
-            ' Center of control
+            ' Geometry
             Dim cx As Single = Me.Width / 2.0F
             Dim cy As Single = Me.Height / 2.0F
-            Dim radiusBase As Single = Math.Min(cx, cy) * App.Visualizers.CircularSpectrumRadiusFactor
+            Dim radiusBase As Single = Math.Min(cx, cy) * radiusFactor
             Dim angleStep As Single = 360.0F / barCount
 
-            ' Collect inner and outer points
             Dim innerPoints As New List(Of PointF)
             Dim outerPoints As New List(Of PointF)
 
             For i As Integer = 0 To barCount - 1
                 Dim angleRad As Single = CSng((i * angleStep) * Math.PI / 180.0F)
-                Dim barLength As Single = CSng(Math.Log(1 + smoothedBins(i) * App.Visualizers.CircularSpectrumGain) * radiusBase)
+                Dim barLength As Single = CSng(Math.Log(1 + smoothedBins(i) * gain) * radiusBase)
 
-                ' Inner circle point
                 innerPoints.Add(New PointF(
                     CSng(cx + Math.Cos(angleRad) * radiusBase),
                     CSng(cy + Math.Sin(angleRad) * radiusBase)))
 
-                ' Outer tip point
                 outerPoints.Add(New PointF(
                     CSng(cx + Math.Cos(angleRad) * (radiusBase + barLength)),
                     CSng(cy + Math.Sin(angleRad) * (radiusBase + barLength))))
             Next
 
-            ' Style
+            ' Render
             e.Graphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
 
-            If App.Visualizers.CircularSpectrumFill Then
-                ' Build band polygon: outer points clockwise, inner points reversed
+            If fillMode Then
                 Dim bandPoints As New List(Of PointF)(outerPoints)
                 innerPoints.Reverse()
                 bandPoints.AddRange(innerPoints)
 
-                ' Fill the band
                 Using brush As New SolidBrush(App.CurrentTheme.TextColor)
                     e.Graphics.FillPolygon(brush, bandPoints.ToArray())
                 End Using
 
-                ' Optional outline
-                Using pen As New Pen(App.CurrentTheme.TextColor, App.Visualizers.CircularSpectrumLineWidth)
+                Using pen As New Pen(App.CurrentTheme.TextColor, lineWidth)
                     e.Graphics.DrawPolygon(pen, bandPoints.ToArray())
                 End Using
             Else
-                ' Original spoke style
-                Using pen As New Pen(App.CurrentTheme.TextColor, App.Visualizers.CircularSpectrumLineWidth)
+                Using pen As New Pen(App.CurrentTheme.TextColor, lineWidth)
                     For i As Integer = 0 To barCount - 1
                         e.Graphics.DrawLine(pen, innerPoints(i), outerPoints(i))
                     Next
@@ -1236,41 +1300,81 @@ Public Class Player
             If audioData Is Nothing OrElse audioData.Length = 0 Then Exit Sub
 
             Dim g = pe.Graphics
-            Dim stepX As Single = CSng(Me.Width) / audioData.Length
 
-            Dim usableHeight As Single = Me.Height / 1.0F
-            Dim baselineY As Single
-            If App.Visualizers.WaveformFill Then
-                baselineY = Me.Height
+            ' --- MiniMode vs FullMode configuration ---
+            Dim fillEnabled As Boolean
+            Dim lineThickness As Single
+            Dim verticalScale As Single
+            Dim downsampleFactor As Integer = 1
+            Dim baselineOffset As Single
+
+            If VisualizerMiniMode AndAlso App.Visualizers.WaveformAllowMiniMode Then
+                ' MiniMode defaults (cleaner, simpler, more readable)
+                fillEnabled = False
+                lineThickness = 1.0F
+                verticalScale = 0.7F
+                downsampleFactor = 2   ' half the points for clarity
+                baselineOffset = 4.0F
             Else
-                baselineY = Me.Height - 10   ' anchor near bottom
+                ' Full mode uses user settings
+                fillEnabled = App.Visualizers.WaveformFill
+                lineThickness = 2.0F
+                verticalScale = 1.0F
+                downsampleFactor = 1
+                baselineOffset = 10.0F
             End If
 
-            Dim maxSample As Single = audioData.Max(Function(s) Math.Abs(s))
+            ' --- Downsample audio if needed ---
+            Dim renderCount As Integer = audioData.Length \ downsampleFactor
+            If renderCount < 2 Then Exit Sub
+
+            Dim stepX As Single = CSng(Me.Width) / renderCount
+
+            ' Vertical scaling
+            Dim usableHeight As Single = Me.Height * verticalScale
+
+            ' Baseline
+            Dim baselineY As Single
+            If fillEnabled Then
+                baselineY = Me.Height
+            Else
+                baselineY = Me.Height - baselineOffset
+            End If
+
+            ' Find max sample for normalization
+            Dim maxSample As Single = 0
+            For Each s In audioData
+                Dim a = Math.Abs(s)
+                If a > maxSample Then maxSample = a
+            Next
             If maxSample = 0 Then maxSample = 1
+
             Dim scale As Single = usableHeight / maxSample
 
             ' Build waveform points
-            Dim pts(audioData.Length - 1) As PointF
-            For i = 0 To audioData.Length - 1
-                Dim sample = audioData(i) * scale
+            Dim pts(renderCount - 1) As PointF
+            Dim idx As Integer = 0
+
+            For i = 0 To renderCount - 1
+                Dim sample = audioData(i * downsampleFactor) * scale
                 Dim y = baselineY - sample
                 pts(i) = New PointF(i * stepX, y)
             Next
 
-            If App.Visualizers.WaveformFill Then
-                ' Build polygon: waveform points + baseline back to start
+            ' Fill mode (optional)
+            If fillEnabled Then
                 Dim poly(pts.Length + 1) As PointF
                 Array.Copy(pts, poly, pts.Length)
                 poly(pts.Length) = New PointF(pts(pts.Length - 1).X, baselineY)
                 poly(pts.Length + 1) = New PointF(pts(0).X, baselineY)
+
                 Using brush As New SolidBrush(Color.FromArgb(128, App.CurrentTheme.TextColor))
                     g.FillPolygon(brush, poly)
                 End Using
             End If
 
-            ' Always draw the line on top
-            Using pen As New Pen(App.CurrentTheme.TextColor, 2)
+            ' Draw waveform line
+            Using pen As New Pen(App.CurrentTheme.TextColor, lineThickness)
                 g.DrawLines(pen, pts)
             End Using
         End Sub
@@ -1347,36 +1451,61 @@ Public Class Player
             SyncLock Me
                 If waveform Is Nothing OrElse waveform.Length < 2 Then Exit Sub
                 localLeft = CType(waveform.Clone(), Single())
+
                 If App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth AndAlso waveformRight IsNot Nothing Then
                     localRight = CType(waveformRight.Clone(), Single())
                 End If
             End SyncLock
 
-            Dim midY = Me.Height \ 2
-            Dim stepX = Me.Width / CSng(localLeft.Length - 1)
+            ' --- MiniMode vs FullMode configuration ---
+            Dim enableGlow As Boolean
+            Dim lineWidth As Single
+            Dim amplitudeScale As Single
+            Dim downsample As Integer = 1
 
-            ' If glow is disabled, draw directly to screen
-            If Not App.Visualizers.OscilloscopeEnableGlow Then
+            If VisualizerMiniMode AndAlso App.Visualizers.OscilloscopeAllowMiniMode Then
+                enableGlow = False
+                lineWidth = Math.Max(2.0F, App.Visualizers.OscilloscopeLineWidth)
+                amplitudeScale = 0.7F
+                downsample = 2
+            Else
+                enableGlow = App.Visualizers.OscilloscopeEnableGlow
+                lineWidth = App.Visualizers.OscilloscopeLineWidth
+                amplitudeScale = 0.9F
+                downsample = 1
+            End If
+
+            ' Downsample for MiniMode clarity
+            Dim renderCount As Integer = localLeft.Length \ downsample
+            If renderCount < 2 Then Exit Sub
+
+            Dim midY = Me.Height \ 2
+            Dim stepX = Me.Width / CSng(renderCount - 1)
+
+            ' --- NO GLOW MODE ---
+            If Not enableGlow Then
                 Dim g = e.Graphics
                 g.Clear(App.CurrentTheme.BackColor)
 
-                Using penLeft As New Pen(App.CurrentTheme.TextColor, App.Visualizers.OscilloscopeLineWidth)
-                    For i = 1 To localLeft.Length - 1
+                ' Left channel
+                Using penLeft As New Pen(App.CurrentTheme.TextColor, lineWidth)
+                    For i = 1 To renderCount - 1
                         Dim x1 = (i - 1) * stepX
-                        Dim y1 = midY - (localLeft(i - 1) * midY * 0.9F)
+                        Dim y1 = midY - (localLeft((i - 1) * downsample) * midY * amplitudeScale)
                         Dim x2 = i * stepX
-                        Dim y2 = midY - (localLeft(i) * midY * 0.9F)
+                        Dim y2 = midY - (localLeft(i * downsample) * midY * amplitudeScale)
                         g.DrawLine(penLeft, x1, y1, x2, y2)
                     Next
                 End Using
 
+                ' Right channel (if stereo)
                 If App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth AndAlso localRight IsNot Nothing Then
-                    Using penRight As New Pen(App.CurrentTheme.TextColor, App.Visualizers.OscilloscopeLineWidth)
-                        For i = 1 To localRight.Length - 1
+                    Using penRight As New Pen(App.CurrentTheme.TextColor, lineWidth)
+                        For i = 1 To renderCount - 1
                             Dim x1 = (i - 1) * stepX
-                            Dim y1 = midY + (localRight(i - 1) * midY * 0.9F)
+                            Dim y1 = midY + (localRight((i - 1) * downsample) * midY * amplitudeScale)
                             Dim x2 = i * stepX
-                            Dim y2 = midY + (localRight(i) * midY * 0.9F)
+                            Dim y2 = midY + (localRight(i * downsample) * midY * amplitudeScale)
                             g.DrawLine(penRight, x1, y1, x2, y2)
                         Next
                     End Using
@@ -1385,44 +1514,47 @@ Public Class Player
                 Exit Sub
             End If
 
+            ' --- GLOW MODE ---
             ' Ensure glow buffer matches control size
             If glowBuffer Is Nothing OrElse glowBuffer.Width <> Me.Width OrElse glowBuffer.Height <> Me.Height Then
                 If glowBuffer IsNot Nothing Then glowBuffer.Dispose()
                 If glowGraphics IsNot Nothing Then glowGraphics.Dispose()
+
                 glowBuffer = New Bitmap(Me.Width, Me.Height)
                 glowGraphics = Graphics.FromImage(glowBuffer)
                 glowGraphics.Clear(App.CurrentTheme.BackColor)
             End If
 
             ' Fade previous frame
-            Dim fadeBrush As New SolidBrush(Color.FromArgb(App.Visualizers.OscilloscopeFadeAlpha, App.CurrentTheme.BackColor))
-            glowGraphics.FillRectangle(fadeBrush, Me.ClientRectangle)
+            Using fadeBrush As New SolidBrush(Color.FromArgb(App.Visualizers.OscilloscopeFadeAlpha, App.CurrentTheme.BackColor))
+                glowGraphics.FillRectangle(fadeBrush, Me.ClientRectangle)
+            End Using
 
-            ' Draw left channel to glow buffer
-            Using penLeft As New Pen(App.CurrentTheme.TextColor, App.Visualizers.OscilloscopeLineWidth)
-                For i = 1 To localLeft.Length - 1
+            ' Draw left channel
+            Using penLeft As New Pen(App.CurrentTheme.TextColor, lineWidth)
+                For i = 1 To renderCount - 1
                     Dim x1 = (i - 1) * stepX
-                    Dim y1 = midY - (localLeft(i - 1) * midY * 0.9F)
+                    Dim y1 = midY - (localLeft((i - 1) * downsample) * midY * amplitudeScale)
                     Dim x2 = i * stepX
-                    Dim y2 = midY - (localLeft(i) * midY * 0.9F)
+                    Dim y2 = midY - (localLeft(i * downsample) * midY * amplitudeScale)
                     glowGraphics.DrawLine(penLeft, x1, y1, x2, y2)
                 Next
             End Using
 
-            ' Draw right channel if StereoBoth
+            ' Draw right channel if stereo
             If App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth AndAlso localRight IsNot Nothing Then
-                Using penRight As New Pen(App.CurrentTheme.TextColor, App.Visualizers.OscilloscopeLineWidth)
-                    For i = 1 To localRight.Length - 1
+                Using penRight As New Pen(App.CurrentTheme.TextColor, lineWidth)
+                    For i = 1 To renderCount - 1
                         Dim x1 = (i - 1) * stepX
-                        Dim y1 = midY + (localRight(i - 1) * midY * 0.9F)
+                        Dim y1 = midY + (localRight((i - 1) * downsample) * midY * amplitudeScale)
                         Dim x2 = i * stepX
-                        Dim y2 = midY + (localRight(i) * midY * 0.9F)
+                        Dim y2 = midY + (localRight(i * downsample) * midY * amplitudeScale)
                         glowGraphics.DrawLine(penRight, x1, y1, x2, y2)
                     Next
                 End Using
             End If
 
-            ' Blit glow buffer to screen
+            ' Blit glow buffer
             e.Graphics.DrawImageUnscaled(glowBuffer, 0, 0)
         End Sub
 
@@ -1523,31 +1655,54 @@ Public Class Player
             Dim cx = Me.Width / 2
             Dim cy = Me.Height / 2
 
-            'Audio reactivity
+            ' --- MiniMode vs FullMode configuration ---
+            Dim renderScale As Integer
+            Dim swirlSpeedBase As Double
+            Dim swirlSpeedAudio As Double
+            Dim timeIncrement As Double
+            Dim audioScale As Double
+
+            If VisualizerMiniMode AndAlso App.Visualizers.FractalCloudAllowMiniMode Then
+                ' MiniMode defaults (cleaner, calmer, faster)
+                renderScale = 4                       ' lower resolution for tiny mode
+                swirlSpeedBase = App.Visualizers.FractalCloudSwirlSpeedBase * 0.6
+                swirlSpeedAudio = App.Visualizers.FractalCloudSwirlSpeedAudioFactor * 0.5
+                timeIncrement = App.Visualizers.FractalCloudTimeIncrement * 0.7
+                audioScale = 0.6                       ' reduce bass/treble influence
+            Else
+                ' Full mode uses user settings
+                renderScale = 3
+                swirlSpeedBase = App.Visualizers.FractalCloudSwirlSpeedBase
+                swirlSpeedAudio = App.Visualizers.FractalCloudSwirlSpeedAudioFactor
+                timeIncrement = App.Visualizers.FractalCloudTimeIncrement
+                audioScale = 1.0
+            End If
+
+            ' --- Audio reactivity ---
             Dim level As Double = 0
             Dim bass As Double = 0
             Dim treble As Double = 0
+
             If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
-                'RMS for smoother energy
                 level = Math.Sqrt(audioData.Average(Function(s) s * s))
-                bass = audioData.Take(audioData.Length \ 4).Average(Function(s) Math.Abs(s))
-                treble = audioData.Skip(audioData.Length \ 2).Average(Function(s) Math.Abs(s))
+                bass = audioData.Take(audioData.Length \ 4).Average(Function(s) Math.Abs(s)) * audioScale
+                treble = audioData.Skip(audioData.Length \ 2).Average(Function(s) Math.Abs(s)) * audioScale
             End If
 
-            'Smooth the level
+            ' Smooth the level
             smoothedLevel = smoothedLevel * 0.9 + level * 0.1
 
-            'Swirl motion: steady baseline + audio modulation
-            swirlAngle += App.Visualizers.FractalCloudSwirlSpeedBase + smoothedLevel * App.Visualizers.FractalCloudSwirlSpeedAudioFactor
-            time += App.Visualizers.FractalCloudTimeIncrement ' fixed baseline, not audio-driven
+            ' Swirl motion
+            swirlAngle += swirlSpeedBase + smoothedLevel * swirlSpeedAudio
+            time += timeIncrement
 
-            'Soft reset to avoid runaway values
             If swirlAngle > 100000 Then swirlAngle = 0
             If time > 100000 Then time = 0
 
-            'Render to smaller buffer for speed
-            Dim renderW = Me.Width \ 3
-            Dim renderH = Me.Height \ 3
+            ' --- Render to smaller buffer ---
+            Dim renderW = Math.Max(1, Me.Width \ renderScale)
+            Dim renderH = Math.Max(1, Me.Height \ renderScale)
+
             Using bmp As New Bitmap(renderW, renderH, Imaging.PixelFormat.Format32bppArgb)
                 Dim rect = New Rectangle(0, 0, bmp.Width, bmp.Height)
                 Dim bmpData = bmp.LockBits(rect, Imaging.ImageLockMode.WriteOnly, bmp.PixelFormat)
@@ -1556,7 +1711,7 @@ Public Class Player
                 Dim bytes = stride * bmp.Height
                 Dim rgbValues(bytes - 1) As Byte
 
-                'Fill pixel buffer
+                ' Fill pixel buffer
                 For y = 0 To bmp.Height - 1
                     For x = 0 To bmp.Width - 1
                         Dim fullX = x * Me.Width / renderW
@@ -1568,7 +1723,7 @@ Public Class Player
                         Dim angle = Math.Atan2(dy, dx) + swirlAngle
                         Dim radius = Math.Sqrt(dx * dx + dy * dy)
 
-                        ' Stable sine fields (no audio modulation here)
+                        ' Stable sine fields
                         Dim v1 = Math.Sin(radius * 0.02 + time)
                         Dim v2 = Math.Sin(angle * 3 + time * 0.5)
                         Dim v3 = Math.Sin((radius * 0.05 + angle * 2) + time * 0.3)
@@ -1576,33 +1731,37 @@ Public Class Player
                         Dim v = v1 + v2 + v3
                         Dim n = (v + 3) / 6.0 ' normalize to 0–1
 
-                        'Choose palette mode (could be an Enum or just a string)
-                        Dim paletteMode As String = "Firestorm" 'Normal, "Firestorm", "Aurora", "CosmicRainbow"
+                        ' Palette
                         Dim hue As Double
                         Dim sat As Double = 1.0
-                        Dim val As Double = n ' default brightness
+                        Dim val As Double = n
                         Dim col As Color
+
                         Select Case App.Visualizers.FractalCloudPalette
                             Case App.VisualizerSettings.FractalCloudPalettes.Normal
                                 hue = (n * 360 + bass * 400 + treble * 200) Mod 360
                                 col = ColorFromHSV(hue, sat, val)
+
                             Case App.VisualizerSettings.FractalCloudPalettes.Firestorm
-                                hue = 0 + (n * 60) ' restrict to red–yellow range
+                                hue = 0 + (n * 60)
                                 col = ColorFromHSV(hue, sat, val)
+
                             Case App.VisualizerSettings.FractalCloudPalettes.Aurora
-                                hue = 120 + (n * 120) ' restrict to green–cyan range
+                                hue = 120 + (n * 120)
                                 col = ColorFromHSV(hue, sat, val)
+
                             Case App.VisualizerSettings.FractalCloudPalettes.CosmicRainbow
                                 hue = (n * 360 + bass * 400 + treble * 200) Mod 360
-                                sat = Math.Min(1.0, 0.5 + bass * 5) ' bass drives vividness
-                                val = Math.Min(1.0, n * (1.0 - treble * 0.5)) ' treble softens brightness
+                                sat = Math.Min(1.0, 0.5 + bass * 5)
+                                val = Math.Min(1.0, n * (1.0 - treble * 0.5))
                                 col = ColorFromHSV(hue, sat, val)
+
                             Case Else
                                 hue = (n * 360 + bass * 400 + treble * 200) Mod 360
                                 col = ColorFromHSV(hue, sat, val)
                         End Select
 
-                        'Write pixel into buffer (BGRA order)
+                        ' Write pixel
                         Dim offset = y * stride + x * 4
                         rgbValues(offset) = col.B
                         rgbValues(offset + 1) = col.G
@@ -1611,7 +1770,6 @@ Public Class Player
                     Next
                 Next
 
-                'Copy buffer back to bitmap
                 Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes)
                 bmp.UnlockBits(bmpData)
 
@@ -1694,14 +1852,36 @@ Public Class Player
                 Return
             End If
 
-            ' Target resolution: 1/3 of 1920x1080
-            Dim targetW As Integer = 640
-            Dim targetH As Integer = 360
+            ' --- MiniMode vs FullMode configuration ---
+            Dim targetW As Integer
+            Dim targetH As Integer
+            Dim maxIterations As Integer
+            Dim bassInfluence As Double
+            Dim midInfluence As Double
+            Dim colorIntensity As Double
+
+            If VisualizerMiniMode AndAlso App.Visualizers.JuliaFractalAllowMiniMode Then
+                ' MiniMode defaults (cleaner, faster, calmer)
+                targetW = 320
+                targetH = 180
+                maxIterations = Math.Max(50, App.Visualizers.JuliaFractalMaxIterations \ 2)
+                bassInfluence = App.Visualizers.JuliaFractalBassInfluence * 0.8
+                midInfluence = App.Visualizers.JuliaFractalMidInfluence * 0.8
+                colorIntensity = 0.7
+            Else
+                ' Full mode uses user settings
+                targetW = 640
+                targetH = 360
+                maxIterations = App.Visualizers.JuliaFractalMaxIterations
+                bassInfluence = App.Visualizers.JuliaFractalBassInfluence
+                midInfluence = App.Visualizers.JuliaFractalMidInfluence
+                colorIntensity = 1.0
+            End If
 
             ' Create reduced-resolution bitmap
             Dim bmp As New Bitmap(targetW, targetH, Imaging.PixelFormat.Format32bppArgb)
 
-            ' Lock bits for fast pixel access
+            ' Lock bits
             Dim rect As New Rectangle(0, 0, bmp.Width, bmp.Height)
             Dim bmpData As Imaging.BitmapData = bmp.LockBits(rect, Imaging.ImageLockMode.WriteOnly, bmp.PixelFormat)
 
@@ -1711,18 +1891,19 @@ Public Class Player
             Dim rgbValues(bytes - 1) As Byte
 
             ' Audio bands
-            Dim bass As Double = If(audioData.Length > 2, audioData(2), 0)
-            Dim mid As Double = If(audioData.Length > 10, audioData(10), 0)
-            Dim treble As Double = If(audioData.Length > 30, audioData(30), 0)
+            Dim bass As Double = If(audioData.Length > 2, audioData(2), 0) * colorIntensity
+            Dim mid As Double = If(audioData.Length > 10, audioData(10), 0) * colorIntensity
+            Dim treble As Double = If(audioData.Length > 30, audioData(30), 0) * colorIntensity
 
             ' Julia constant evolves with audio
-            Dim cx As Double = App.Visualizers.JuliaFractalBaseCX + bass * App.Visualizers.JuliaFractalBassInfluence
-            Dim cy As Double = App.Visualizers.JuliaFractalBaseCY + mid * App.Visualizers.JuliaFractalMidInfluence
+            Dim cx As Double = App.Visualizers.JuliaFractalBaseCX + bass * bassInfluence
+            Dim cy As Double = App.Visualizers.JuliaFractalBaseCY + mid * midInfluence
 
             ' Fill pixel buffer
             For py As Integer = 0 To targetH - 1
                 Dim rowOffset As Integer = py * stride
                 For px As Integer = 0 To targetW - 1
+
                     Dim x As Double = 1.5 * (px - targetW / 2) / (0.5 * targetW)
                     Dim y As Double = (py - targetH / 2) / (0.5 * targetH)
 
@@ -1730,14 +1911,14 @@ Public Class Player
                     Dim zy As Double = y
                     Dim iter As Integer = 0
 
-                    While zx * zx + zy * zy < 4 AndAlso iter < App.Visualizers.JuliaFractalMaxIterations
+                    While zx * zx + zy * zy < 4 AndAlso iter < maxIterations
                         Dim tmp As Double = zx * zx - zy * zy + cx
                         zy = 2.0 * zx * zy + cy
                         zx = tmp
                         iter += 1
                     End While
 
-                    ' Color mapping
+                    ' Color mapping (scaled for MiniMode)
                     Dim r As Byte = CByte((iter * 9 + CInt(treble * 255)) Mod 255)
                     Dim gCol As Byte = CByte((iter * 7 + CInt(treble * 128)) Mod 255)
                     Dim b As Byte = CByte((iter * 5 + CInt(treble * 64)) Mod 255)
@@ -1746,11 +1927,11 @@ Public Class Player
                     rgbValues(idx) = b
                     rgbValues(idx + 1) = gCol
                     rgbValues(idx + 2) = r
-                    rgbValues(idx + 3) = 255 ' alpha
+                    rgbValues(idx + 3) = 255
                 Next
             Next
 
-            ' Copy buffer back to bitmap
+            ' Copy buffer back
             Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes)
             bmp.UnlockBits(bmpData)
 
@@ -1814,24 +1995,59 @@ Public Class Player
             Dim cx = Width / 2
             Dim cy = Height / 2
 
+            ' --- MiniMode vs FullMode configuration ---
+            Dim swirlBase As Double
+            Dim swirlAudio As Double
+            Dim speedBase As Double
+            Dim speedAudio As Double
+            Dim lineThickness As Single
+            Dim streakMultiplier As Double
+            Dim particleLimit As Integer
+
+            If VisualizerMiniMode AndAlso App.Visualizers.HyperspaceTunnelAllowMiniMode Then
+                ' MiniMode defaults (clean, readable, stable)
+                swirlBase = App.Visualizers.HyperspaceTunnelSwirlSpeedBase * 0.6
+                swirlAudio = App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor * 0.5
+                speedBase = App.Visualizers.HyperspaceTunnelParticleSpeedBase * 0.7
+                speedAudio = App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor * 0.6
+                lineThickness = 3.0F
+                streakMultiplier = 1.2
+                particleLimit = Math.Max(40, App.Visualizers.HyperspaceTunnelParticleCount \ 2)
+            Else
+                ' Full mode uses user settings
+                swirlBase = App.Visualizers.HyperspaceTunnelSwirlSpeedBase
+                swirlAudio = App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor
+                speedBase = App.Visualizers.HyperspaceTunnelParticleSpeedBase
+                speedAudio = App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor
+                lineThickness = 2.0F
+                streakMultiplier = 2.0
+                particleLimit = App.Visualizers.HyperspaceTunnelParticleCount
+            End If
+
+            ' Clamp particle count in MiniMode
+            If particles.Count > particleLimit Then
+                particles.RemoveRange(particleLimit, particles.Count - particleLimit)
+            End If
+
             ' Audio level for reactivity
             Dim level As Double = 0
             If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
-                level = Math.Sqrt(audioData.Average(Function(s) s * s)) ' RMS
-                level = Math.Min(level * 10, 1.0) ' Scale and clamp here
+                level = Math.Sqrt(audioData.Average(Function(s) s * s))
+                level = Math.Min(level * 10, 1.0)
             End If
 
-            ' Swirl angle increment based on audio
-            swirlAngle += App.Visualizers.HyperspaceTunnelSwirlSpeedBase + (level * App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor)
+            ' Swirl angle increment
+            swirlAngle += swirlBase + (level * swirlAudio)
             Dim cosA As Double = Math.Cos(swirlAngle)
             Dim sinA As Double = Math.Sin(swirlAngle)
 
+            ' Draw particles
             For Each p In particles
-                ' Speed toward viewer based on audio
-                Dim speed = App.Visualizers.HyperspaceTunnelParticleSpeedBase + level * App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor
+                ' Speed toward viewer
+                Dim speed = speedBase + level * speedAudio
                 p.Z -= speed
 
-                ' Rotate around Z axis for spiral effect
+                ' Rotate around Z axis
                 Dim rx As Double = p.X * cosA - p.Y * sinA
                 Dim ry As Double = p.X * sinA + p.Y * cosA
 
@@ -1840,18 +2056,20 @@ Public Class Player
                 Dim x = cx + rx * scale
                 Dim y = cy + ry * scale
 
-                ' Previous position (slightly further back in Z) for streak
-                Dim prevZ = p.Z + speed * 2
+                ' Previous position for streak
+                Dim prevZ = p.Z + speed * streakMultiplier
                 Dim prevScale = (Width / 2) / prevZ
                 Dim px = cx + rx * prevScale
                 Dim py = cy + ry * prevScale
 
-                ' Color cycling by depth
+                ' Color
                 Dim color = p.Color
 
-                ' Only draw if both ends are inside the control bounds
-                If x >= 0 AndAlso x <= Width AndAlso y >= 0 AndAlso y <= Height AndAlso px >= 0 AndAlso px <= Width AndAlso py >= 0 AndAlso py <= Height Then
-                    Using pen As New Pen(Color.FromArgb(200, color), 2)
+                ' Draw only if visible
+                If x >= 0 AndAlso x <= Width AndAlso y >= 0 AndAlso y <= Height AndAlso
+           px >= 0 AndAlso px <= Width AndAlso py >= 0 AndAlso py <= Height Then
+
+                    Using pen As New Pen(color.FromArgb(200, color), lineThickness)
                         g.DrawLine(pen, CSng(px), CSng(py), CSng(x), CSng(y))
                     End Using
                 End If
@@ -1864,6 +2082,7 @@ Public Class Player
                 End If
             Next
         End Sub
+
         Private Shared Function ColorFromHSV(hue As Double, saturation As Double, value As Double) As Color
             Dim hi As Integer = CInt(Math.Floor(hue / 60)) Mod 6
             Dim f As Double = hue / 60 - Math.Floor(hue / 60)
@@ -1974,25 +2193,56 @@ Public Class Player
         Protected Overrides Sub OnPaint(pe As PaintEventArgs)
             BackColor = Color.Black
             MyBase.OnPaint(pe)
+
             Dim g = pe.Graphics
             Dim cx = Width / 2
             Dim cy = Height / 2
 
+            ' --- MiniMode vs FullMode configuration ---
+            Dim speedBase As Double
+            Dim speedAudio As Double
+            Dim maxStarSize As Integer
+            Dim particleLimit As Integer
+            Dim perspectiveScale As Double
+            Dim audioScale As Double
+
+            If VisualizerMiniMode AndAlso App.Visualizers.StarFieldAllowMiniMode Then
+                ' MiniMode defaults (clean, readable, stable)
+                speedBase = App.Visualizers.StarFieldBaseSpeed * 0.8
+                speedAudio = App.Visualizers.StarFieldAudioSpeedFactor * 0.7
+                maxStarSize = Math.Max(2, App.Visualizers.StarFieldMaxStarSize \ 2)
+                particleLimit = Math.Max(40, App.Visualizers.StarFieldStarCount \ 4)
+                perspectiveScale = 350.0
+                audioScale = 0.5
+            Else
+                ' Full mode uses user settings
+                speedBase = App.Visualizers.StarFieldBaseSpeed
+                speedAudio = App.Visualizers.StarFieldAudioSpeedFactor
+                maxStarSize = App.Visualizers.StarFieldMaxStarSize
+                particleLimit = App.Visualizers.StarFieldStarCount
+                perspectiveScale = 500.0
+                audioScale = 1.0
+            End If
+
+            ' Clamp star count in MiniMode
+            If stars.Count > particleLimit Then
+                stars.RemoveRange(particleLimit, stars.Count - particleLimit)
+            ElseIf stars.Count < particleLimit Then
+                SetStarCount(particleLimit)
+            End If
+
             ' Audio level for reactivity
             Dim level As Double = 0
             If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
-                level = Math.Sqrt(audioData.Average(Function(s) s * s)) * 10
+                level = Math.Sqrt(audioData.Average(Function(s) s * s)) * 10 * audioScale
             End If
-
-            ' Initialize stars if needed
-            If stars.Count = 0 Then SetStarCount(App.Visualizers.StarFieldStarCount)
 
             ' Update and draw stars
             For i = 0 To stars.Count - 1
                 Dim s = stars(i)
-                ' Move star forward based on audio
-                'settings here for base speed + audio level influence
-                Dim speed = App.Visualizers.StarFieldBaseSpeed + level * App.Visualizers.StarFieldAudioSpeedFactor
+
+                ' Movement speed
+                Dim speed = speedBase + level * speedAudio
                 s.Z -= speed
 
                 ' Reset if too close
@@ -2004,10 +2254,10 @@ Public Class Player
                 End If
 
                 ' Perspective projection
-                Dim scale = 500 / s.Z
+                Dim scale = perspectiveScale / s.Z
                 Dim x = cx + s.X * scale
                 Dim y = cy + s.Y * scale
-                Dim size = Math.Min(s.Size * scale, App.Visualizers.StarFieldMaxStarSize)
+                Dim size = Math.Min(s.Size * scale, maxStarSize)
 
                 ' Only draw if visible
                 If x >= 0 AndAlso x <= Width AndAlso y >= 0 AndAlso y <= Height Then
@@ -2142,66 +2392,129 @@ Public Class Player
             MyBase.OnPaint(e)
             e.Graphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
 
+            ' --- MiniMode vs FullMode configuration ---
+            Dim maxParticles As Integer
+            Dim bloomRadius As Integer
+            Dim bloomIntensity As Single
+            Dim trailAlpha As Single
+            Dim trailFade As Boolean
+            Dim sizeScale As Single
+            Dim velocityScale As Single
+            Dim swirlStrength As Single
+            Dim fadeRate As Single
+
+            Dim level As Double = 0
+            If audioData IsNot Nothing AndAlso audioData.Length > 0 Then
+                level = Math.Sqrt(audioData.Average(Function(s) s * s)) ' RMS
+                level = Math.Min(level * 10, 1.0) ' scale + clamp
+            End If
+
+            If VisualizerMiniMode AndAlso App.Visualizers.ParticleNebulaAllowMiniMode Then
+                ' MiniMode defaults (calm, soft, readable)
+                Dim baseCount As Integer = (Width * Height) \ 9000
+                Dim audioBoost As Integer = CInt(level * 30)     ' RMS-based
+                Dim density As Double = 0.75                     ' softer MiniMode look
+                Dim aspect As Double = Width / Math.Max(1, Height)
+                Dim aspectFactor As Double = If(aspect > 1.3, 1.0, 0.8)
+                maxParticles = CInt(Math.Max(80, (baseCount * density * aspectFactor) + audioBoost))
+                bloomRadius = Math.Max(1, App.Visualizers.ParticleNebulaBloomRadius \ 2)
+                bloomIntensity = App.Visualizers.ParticleNebulaBloomIntensity * 0.5F
+                trailAlpha = App.Visualizers.ParticleNebulaTrailAlpha * 0.5F
+                trailFade = True
+                sizeScale = App.Visualizers.ParticleNebulaSizeScale * 0.5F
+                velocityScale = App.Visualizers.ParticleNebulaVelocityScale * 0.4F
+                swirlStrength = App.Visualizers.ParticleNebulaSwirlStrength * 0.5F
+                fadeRate = App.Visualizers.ParticleNebulaFadeRate * 0.7F
+            Else
+                ' Full mode uses user settings
+                maxParticles = Integer.MaxValue
+                bloomRadius = App.Visualizers.ParticleNebulaBloomRadius
+                bloomIntensity = App.Visualizers.ParticleNebulaBloomIntensity
+                trailAlpha = App.Visualizers.ParticleNebulaTrailAlpha
+                trailFade = App.Visualizers.ParticleNebulaFadeTrails
+                sizeScale = App.Visualizers.ParticleNebulaSizeScale
+                velocityScale = App.Visualizers.ParticleNebulaVelocityScale
+                swirlStrength = App.Visualizers.ParticleNebulaSwirlStrength
+                fadeRate = App.Visualizers.ParticleNebulaFadeRate
+            End If
+
+            ' Clamp particle count
+            If particles.Count > maxParticles Then
+                particles.RemoveRange(maxParticles, particles.Count - maxParticles)
+            End If
+
             ' Spawn new particles
-            SpawnParticles()
+            SpawnParticlesMiniAware(sizeScale, velocityScale, swirlStrength, maxParticles)
 
             ' Update + draw particles
             For i As Integer = particles.Count - 1 To 0 Step -1
                 Dim p = particles(i)
+
+                ' Override fade rate in MiniMode
+                p.Life -= fadeRate
+                If p.Life < 0 Then p.Life = 0
+
                 p.Update()
 
                 If p.Life <= 0 Then
                     particles.RemoveAt(i)
-                Else
-                    Dim alpha As Integer = CInt(p.Life * 255)
-                    Using brush As New SolidBrush(Color.FromArgb(alpha, p.Color))
-                        e.Graphics.FillEllipse(brush,
-                                       p.Position.X - p.Size / 2,
-                                       p.Position.Y - p.Size / 2,
-                                       p.Size, p.Size)
-                    End Using
+                    Continue For
                 End If
 
+                ' Base alpha
+                Dim alpha As Integer = CInt(p.Life * 255)
+
+                ' Draw core
+                Using brush As New SolidBrush(Color.FromArgb(alpha, p.Color))
+                    e.Graphics.FillEllipse(brush,
+                                   p.Position.X - p.Size / 2,
+                                   p.Position.Y - p.Size / 2,
+                                   p.Size, p.Size)
+                End Using
+
+                ' Bloom
                 If App.Visualizers.ParticleNebulaShowBloom Then
-                    For r As Integer = 1 To App.Visualizers.ParticleNebulaBloomRadius
-                        ' Fade alpha outward
-                        Dim rawAlpha As Single = p.Life * 255 * App.Visualizers.ParticleNebulaBloomIntensity / r
+                    For r As Integer = 1 To bloomRadius
+                        Dim rawAlpha As Single = p.Life * 255 * bloomIntensity / r
                         Dim alphaBloom As Integer = Math.Min(255, Math.Max(0, CInt(rawAlpha)))
-                        Dim sizeBloom As Single = p.Size + (r * 4) ' expand halo outward
+                        Dim sizeBloom As Single = p.Size + (r * 3)
+
                         Using bloomBrush As New SolidBrush(Color.FromArgb(alphaBloom, p.Color))
-                            e.Graphics.FillEllipse(bloomBrush, p.Position.X - sizeBloom / 2, p.Position.Y - sizeBloom / 2, sizeBloom, sizeBloom)
+                            e.Graphics.FillEllipse(bloomBrush,
+                                           p.Position.X - sizeBloom / 2,
+                                           p.Position.Y - sizeBloom / 2,
+                                           sizeBloom, sizeBloom)
                         End Using
                     Next
                 End If
 
+                ' Trails
                 If App.Visualizers.ParticleNebulaShowTrails AndAlso p.Trail.Count > 1 Then
                     Dim trailPoints() As PointF = p.Trail.ToArray()
 
-                    If App.Visualizers.ParticleNebulaFadeTrails Then
-                        ' Gradient fade along trail
-                        For i2 As Integer = 1 To trailPoints.Length - 1
-                            Dim fadeFactor As Double = i2 / trailPoints.Length
-                            Dim alphaTrail As Integer = CInt(p.Life * 255 * fadeFactor * App.Visualizers.ParticleNebulaTrailAlpha)
+                    If trailFade Then
+                        For t As Integer = 1 To trailPoints.Length - 1
+                            Dim fadeFactor As Double = t / trailPoints.Length
+                            Dim alphaTrail As Integer = CInt(p.Life * 255 * fadeFactor * trailAlpha)
 
                             Using segPen As New Pen(Color.FromArgb(alphaTrail, p.Color), p.Size / 2)
-                                e.Graphics.DrawLine(segPen, trailPoints(i2 - 1), trailPoints(i2))
+                                e.Graphics.DrawLine(segPen, trailPoints(t - 1), trailPoints(t))
                             End Using
                         Next
                     Else
-                        ' Solid streak with one alpha
-                        Dim alphaTrail As Integer = CInt(p.Life * 255 * App.Visualizers.ParticleNebulaTrailAlpha)
+                        Dim alphaTrail As Integer = CInt(p.Life * 255 * trailAlpha)
                         Using trailPen As New Pen(Color.FromArgb(alphaTrail, p.Color), p.Size / 2)
                             e.Graphics.DrawLines(trailPen, trailPoints)
                         End Using
                     End If
                 End If
-
             Next
         End Sub
 
         ' Methods
-        Private Sub SpawnParticles()
+        Private Sub SpawnParticlesMiniAware(sizeScale As Single, velocityScale As Single, swirlStrength As Single, maxParticles As Integer)
             If audioData Is Nothing OrElse audioData.Length < 2 Then Exit Sub
+            If particles.Count >= maxParticles Then Exit Sub
 
             Dim barCount As Integer = audioData.Length \ 2
             Dim sampleRate As Integer = 44100
@@ -2211,17 +2524,25 @@ Public Class Player
                 Dim freq As Double = (i * sampleRate) / (2.0 * barCount)
                 Dim maxFreq As Double = sampleRate / 2.0
 
-                ' Spawn probability based on magnitude
-                If rand.NextDouble() < magnitude * App.Visualizers.ParticleNebulaSpawnMultiplier Then
+                ' MiniMode reduces spawn probability
+                Dim spawnChance As Double = magnitude * App.Visualizers.ParticleNebulaSpawnMultiplier
+                If VisualizerMiniMode AndAlso App.Visualizers.ParticleNebulaAllowMiniMode Then
+                    spawnChance *= 0.4
+                End If
+
+                If rand.NextDouble() < spawnChance Then
                     Dim angle As Double = rand.NextDouble() * 2 * Math.PI
-                    Dim speed As Single = Math.Max(1.0F, magnitude * App.Visualizers.ParticleNebulaVelocityScale)
+                    Dim speed As Single = Math.Max(0.5F, magnitude * velocityScale)
+
                     Dim p As New Particle With {
-                        .Position = New PointF(CSng(Width / 2), CSng(Height / 2)),
-                        .Velocity = New PointF(CSng(Math.Cos(angle) * speed), CSng(Math.Sin(angle) * speed)),
-                        .AngularVelocity = CSng(((rand.NextDouble() - 0.5) + App.Visualizers.ParticleNebulaSwirlBias) * App.Visualizers.ParticleNebulaSwirlStrength),
-                        .Size = CSng(2 + magnitude * App.Visualizers.ParticleNebulaSizeScale),
-                        .Color = GetColorForFrequency(freq, maxFreq),
-                        .Life = 1.0F}
+                .Position = New PointF(CSng(Width / 2), CSng(Height / 2)),
+                .Velocity = New PointF(CSng(Math.Cos(angle) * speed), CSng(Math.Sin(angle) * speed)),
+                .AngularVelocity = CSng(((rand.NextDouble() - 0.5) + App.Visualizers.ParticleNebulaSwirlBias) * swirlStrength),
+                .Size = CSng(1.5F + magnitude * sizeScale),
+                .Color = GetColorForFrequency(freq, maxFreq),
+                .Life = 1.0F
+            }
+
                     particles.Add(p)
                 End If
             Next
@@ -2489,6 +2810,9 @@ Public Class Player
                         e.SuppressKeyPress = True
                     Case Keys.V
                         ToggleVisualizer()
+                        e.SuppressKeyPress = True
+                    Case Keys.P
+                        App.SetMiniPlayer()
                         e.SuppressKeyPress = True
                 End Select
             End If

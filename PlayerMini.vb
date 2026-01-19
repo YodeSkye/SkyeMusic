@@ -95,31 +95,11 @@ Public Class PlayerMini
             App.PlayerMiniLocation = Me.Location
         End If
     End Sub
-    'Protected Overrides Sub OnResize(e As EventArgs)
-    '    MyBase.OnResize(e)
-
-    '    Dim radius As Integer = 20
-    '    Dim diameter As Integer = radius * 2
-    '    Dim rect As New Rectangle(0, 0, Width, Height)
-
-    '    Dim path As New Drawing2D.GraphicsPath()
-    '    ' Top-left corner
-    '    path.AddArc(rect.X, rect.Y, diameter, diameter, 180, 90)
-    '    ' Top-right corner
-    '    path.AddArc(rect.Right - diameter, rect.Y, diameter, diameter, 270, 90)
-    '    ' Bottom-right corner
-    '    path.AddArc(rect.Right - diameter, rect.Bottom - diameter, diameter, diameter, 0, 90)
-    '    ' Bottom-left corner
-    '    path.AddArc(rect.X, rect.Bottom - diameter, diameter, diameter, 90, 90)
-    '    path.CloseFigure()
-
-    '    Region = New Region(path)
-    'End Sub
     Private Sub PlayerMini_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick, PicBoxAlbumArt.DoubleClick, LblTitle.DoubleClick, PanelMarquee.DoubleClick
         App.SetMiniPlayer()
     End Sub
     Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
-        If keyData = Keys.Escape Then
+        If keyData = Keys.Escape OrElse keyData = Keys.P Then
             App.SetMiniPlayer()
             Return True
         End If
