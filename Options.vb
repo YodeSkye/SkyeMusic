@@ -42,7 +42,6 @@ Public Class Options
         CoBoxPlayMode.Items.Add("Shuffle")
         CoBoxPlayMode.SelectedIndex = PlayMode
         CoBoxVisualizers.Items.Clear()
-
         For Each vis In Player.VisualizerHost.GetVisualizerNames
             CoBoxVisualizers.Items.Add(vis)
         Next
@@ -103,7 +102,6 @@ Public Class Options
         TxtBoxPlaylistVideoIdentifier.Text = PlaylistVideoIdentifier
         TxtBoxStatusMessageDisplayTime.Text = PlaylistStatusMessageDisplayTime.ToString
         LBLibrarySearchFolders.Items.Clear()
-
         For Each item In LibrarySearchFolders
             LBLibrarySearchFolders.Items.Add(item)
         Next
@@ -486,7 +484,7 @@ Public Class Options
         App.SetNIApp()
     End Sub
     Private Sub CkBoxMinimizeToTray_Click(sender As Object, e As EventArgs) Handles CkBoxMinimizeToTray.Click, CkBoxMinimizeToTray.Click
-        MinimizeToTray = Not MinimizeToTray
+        App.MinimizeToTray = CkBoxMinimizeToTray.Checked
     End Sub
     Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
         If e.Alt Then
