@@ -43,6 +43,7 @@ Partial Class OptionsCircularSpectrum
         LblGain = New Skye.UI.Label()
         LblWeightingMode = New Skye.UI.Label()
         TipCircularSpectrum = New Skye.UI.ToolTip(components)
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' BtnTrebleGlow
@@ -279,10 +280,26 @@ Partial Class OptionsCircularSpectrum
         TipCircularSpectrum.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipCircularSpectrum.OwnerDraw = True
         ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(215, 293)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.Size = New Size(140, 25)
+        ChkBoxAllowMiniMode.TabIndex = 181
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        ChkBoxAllowMiniMode.TextAlign = ContentAlignment.MiddleCenter
+        TipCircularSpectrum.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipCircularSpectrum.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
+        ' 
         ' OptionsCircularSpectrum
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(BtnTrebleGlow)
         Controls.Add(BtnWarmAnalog)
         Controls.Add(CoBoxWeightingMode)
@@ -331,5 +348,6 @@ Partial Class OptionsCircularSpectrum
     Friend WithEvents LblGain As Skye.UI.Label
     Friend WithEvents LblWeightingMode As Skye.UI.Label
     Friend WithEvents TipCircularSpectrum As Skye.UI.ToolTip
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class

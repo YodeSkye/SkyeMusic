@@ -34,6 +34,9 @@ Public Class OptionsClassicSpectrumAnalyzer
     Private Sub ChkBoxShowPeaks_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxShowPeaks.CheckedChanged
         App.Visualizers.ClassicSpectrumAnalyzerShowPeaks = ChkBoxShowPeaks.Checked
     End Sub
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.ClassicSpectrumAnalyzerAllowMiniMode = ChkBoxAllowMiniMode.Checked
+    End Sub
     Private Sub CoBoxBandMappingMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxBandMappingMode.SelectedIndexChanged
         App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType(CoBoxBandMappingMode.SelectedIndex, App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes)
     End Sub
@@ -109,6 +112,7 @@ Public Class OptionsClassicSpectrumAnalyzer
         IsInitializing = True
         TxtBoxBarCount.Text = App.Visualizers.ClassicSpectrumAnalyzerBarCount.ToString()
         ChkBoxShowPeaks.Checked = App.Visualizers.ClassicSpectrumAnalyzerShowPeaks
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.ClassicSpectrumAnalyzerAllowMiniMode
         CoBoxBandMappingMode.Items.Clear()
         CoBoxBandMappingMode.Items.Add(App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear)
         CoBoxBandMappingMode.Items.Add(App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Logarithmic)
@@ -125,6 +129,7 @@ Public Class OptionsClassicSpectrumAnalyzer
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             ChkBoxShowPeaks.BackColor = c
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
         'Debug.Print("Options Waveform Accent Color Set")
@@ -138,6 +143,7 @@ Public Class OptionsClassicSpectrumAnalyzer
             forecolor = App.CurrentTheme.TextColor
         End If
         ChkBoxShowPeaks.ForeColor = forecolor
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         CoBoxBandMappingMode.BackColor = App.CurrentTheme.ControlBackColor
         CoBoxBandMappingMode.ForeColor = App.CurrentTheme.TextColor
         TxtBoxBarCount.BackColor = App.CurrentTheme.BackColor

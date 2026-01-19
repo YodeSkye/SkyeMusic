@@ -43,6 +43,7 @@ Partial Class OptionsClassicSpectrumAnalyzer
         LblBandMappingMode = New Skye.UI.Label()
         CoBoxBandMappingMode = New ComboBox()
         TipClassicSpectrumAnalyzer = New Skye.UI.ToolTip(components)
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' LblPresets
@@ -280,10 +281,26 @@ Partial Class OptionsClassicSpectrumAnalyzer
         TipClassicSpectrumAnalyzer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClassicSpectrumAnalyzer.OwnerDraw = True
         ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(213, 294)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.Size = New Size(140, 25)
+        ChkBoxAllowMiniMode.TabIndex = 142
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        ChkBoxAllowMiniMode.TextAlign = ContentAlignment.MiddleCenter
+        TipClassicSpectrumAnalyzer.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipClassicSpectrumAnalyzer.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
+        ' 
         ' OptionsClassicSpectrumAnalyzer
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(CoBoxBandMappingMode)
         Controls.Add(TBPeakHoldFrames)
         Controls.Add(TBPeakDecay)
@@ -332,5 +349,6 @@ Partial Class OptionsClassicSpectrumAnalyzer
     Friend WithEvents LblBandMappingMode As Skye.UI.Label
     Friend WithEvents CoBoxBandMappingMode As ComboBox
     Friend WithEvents TipClassicSpectrumAnalyzer As Skye.UI.ToolTip
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class

@@ -43,6 +43,7 @@ Partial Class OptionsRainbowBar
         TipRainbowBar = New Skye.UI.ToolTip(components)
         LblPeakHoldFrames = New Skye.UI.Label()
         TBPeakHoldFrames = New Syncfusion.Windows.Forms.Tools.TrackBarEx(0, 60)
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' TBGain
@@ -100,7 +101,7 @@ Partial Class OptionsRainbowBar
         ChkBoxShowPeaks.BackColor = Color.Transparent
         ChkBoxShowPeaks.CheckAlign = ContentAlignment.BottomCenter
         ChkBoxShowPeaks.FlatStyle = FlatStyle.Flat
-        ChkBoxShowPeaks.Location = New Point(8, 65)
+        ChkBoxShowPeaks.Location = New Point(16, 77)
         ChkBoxShowPeaks.Name = "ChkBoxShowPeaks"
         ChkBoxShowPeaks.RightToLeft = RightToLeft.Yes
         ChkBoxShowPeaks.Size = New Size(96, 36)
@@ -287,10 +288,27 @@ Partial Class OptionsRainbowBar
         TipRainbowBar.SetToolTipImage(TBPeakHoldFrames, Nothing)
         TBPeakHoldFrames.Value = 5
         ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.CheckAlign = ContentAlignment.BottomCenter
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(0, 120)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.RightToLeft = RightToLeft.Yes
+        ChkBoxAllowMiniMode.Size = New Size(128, 36)
+        ChkBoxAllowMiniMode.TabIndex = 5
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        TipRainbowBar.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipRainbowBar.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
+        ' 
         ' OptionsRainbowBar
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(LblPeakHoldFrames)
         Controls.Add(TBPeakHoldFrames)
         Controls.Add(BtnExtreme)
@@ -339,5 +357,6 @@ Partial Class OptionsRainbowBar
     Friend WithEvents TipRainbowBar As Skye.UI.ToolTip
     Friend WithEvents LblPeakHoldFrames As Skye.UI.Label
     Friend WithEvents TBPeakHoldFrames As Syncfusion.Windows.Forms.Tools.TrackBarEx
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class

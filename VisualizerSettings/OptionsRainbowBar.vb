@@ -33,7 +33,10 @@ Public Class OptionsRainbowBar
         'Debug.Print("Rainbow Bar Count set to " & App.Visualizers.RainbowBarCount.ToString)
     End Sub
     Private Sub ChkBoxShowPeaks_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxShowPeaks.CheckedChanged
-        App.Visualizers.RainbowBarShowPeaks = ChkBoxShowPeaks.Checked
+        Visualizers.RainbowBarShowPeaks = ChkBoxShowPeaks.Checked
+    End Sub
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.RainbowBarAllowMiniMode = ChkBoxAllowMiniMode.Checked
     End Sub
     Private Sub TBGain_ValueChanged(sender As Object, e As EventArgs) Handles TBGain.ValueChanged
         If IsInitializing Then Exit Sub
@@ -99,6 +102,7 @@ Public Class OptionsRainbowBar
         IsInitializing = True
         TxtBoxBarCount.Text = App.Visualizers.RainbowBarCount.ToString
         ChkBoxShowPeaks.Checked = App.Visualizers.RainbowBarShowPeaks
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.RainbowBarAllowMiniMode
         TBGain.Value = CInt(App.Visualizers.RainbowBarGain)
         TBPeakDecaySpeed.Value = App.Visualizers.RainbowBarPeakDecaySpeed
         TBPeakThickness.Value = App.Visualizers.RainbowBarPeakThickness
@@ -113,6 +117,7 @@ Public Class OptionsRainbowBar
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             ChkBoxShowPeaks.BackColor = c
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
         Debug.Print("Options Rainbow Bar Accent Color Set")
@@ -164,6 +169,7 @@ Public Class OptionsRainbowBar
         LblPeakHoldFrames.ForeColor = forecolor
         LblPresets.ForeColor = forecolor
         ChkBoxShowPeaks.ForeColor = forecolor
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         TxtBoxBarCount.BackColor = App.CurrentTheme.BackColor
         TxtBoxBarCount.ForeColor = App.CurrentTheme.TextColor
         BtnCalm.BackColor = App.CurrentTheme.ButtonBackColor

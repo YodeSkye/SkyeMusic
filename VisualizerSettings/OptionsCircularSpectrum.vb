@@ -16,6 +16,9 @@ Public Class OptionsCircularSpectrum
     Private Sub ChkBoxFill_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxFill.CheckedChanged
         App.Visualizers.CircularSpectrumFill = ChkBoxFill.Checked
     End Sub
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.CircularSpectrumAllowMiniMode = ChkBoxAllowMiniMode.Checked
+    End Sub
     Private Sub CoBoxWeightingMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxWeightingMode.SelectedIndexChanged
         App.Visualizers.CircularSpectrumWeightingMode = CType(CoBoxWeightingMode.SelectedIndex, App.VisualizerSettings.CircularSpectrumWeightingModes)
     End Sub
@@ -89,6 +92,7 @@ Public Class OptionsCircularSpectrum
     Private Sub ShowSettings()
         IsInitializing = True
         ChkBoxFill.Checked = App.Visualizers.CircularSpectrumFill
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.CircularSpectrumAllowMiniMode
         CoBoxWeightingMode.Items.Clear()
         CoBoxWeightingMode.Items.Add(App.VisualizerSettings.CircularSpectrumWeightingModes.Balanced)
         CoBoxWeightingMode.Items.Add(App.VisualizerSettings.CircularSpectrumWeightingModes.BassHeavy)
@@ -110,6 +114,7 @@ Public Class OptionsCircularSpectrum
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             ChkBoxFill.BackColor = c
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
     End Sub
@@ -122,6 +127,7 @@ Public Class OptionsCircularSpectrum
             forecolor = App.CurrentTheme.TextColor
         End If
         ChkBoxFill.ForeColor = forecolor
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         CoBoxWeightingMode.BackColor = App.CurrentTheme.ControlBackColor
         CoBoxWeightingMode.ForeColor = App.CurrentTheme.TextColor
         TBGain.ButtonColor = App.CurrentTheme.ButtonBackColor
