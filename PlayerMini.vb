@@ -1,5 +1,4 @@
-﻿Imports SkyeMusic.Player
-
+﻿
 Public Class PlayerMini
 
     'Declarations
@@ -55,7 +54,7 @@ Public Class PlayerMini
 
         If Player.MiniPlayerVisualizer Is Nothing Then
             Dim vType = Player.VisualizerHost.GetTypeFromName(App.Visualizer)
-            Player.MiniPlayerVisualizer = CType(Activator.CreateInstance(vType), IVisualizer)
+            Player.MiniPlayerVisualizer = CType(Activator.CreateInstance(vType), Player.IVisualizer)
         End If
         AttachVisualizer(Player.MiniPlayerVisualizer)
 
@@ -248,7 +247,7 @@ Public Class PlayerMini
     End Sub
     Private Sub ShowVisualizerMenu()
         Dim menu As New ContextMenuStrip With {
-            .Font = App.SubBaseFont}
+            .Font = App.CurrentTheme.SubBaseFont}
         App.ThemeMenu(menu)
 
         ' Loop through available visualizers
@@ -272,7 +271,7 @@ Public Class PlayerMini
 
                 ' Reload mini visualizer
                 Dim vType = Player.VisualizerHost.GetTypeFromName(vizName)
-                Dim miniV = CType(Activator.CreateInstance(vType), IVisualizer)
+                Dim miniV = CType(Activator.CreateInstance(vType), Player.IVisualizer)
                 Me.AttachVisualizer(miniV)
                 miniV.Start()
             End Sub

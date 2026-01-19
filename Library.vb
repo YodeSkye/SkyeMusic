@@ -233,9 +233,9 @@ Public Class Library
         e.Graphics.DrawLine(SystemPens.ControlDark, (b.X + 1), b.Bottom, b.Right, b.Bottom)
         e.Graphics.DrawLine(SystemPens.ControlDark, b.Right, (b.Y + 1), b.Right, b.Bottom)
         'Draw Text
-        Dim width As Integer = TextRenderer.MeasureText(" ", App.SubBaseFont).Width
+        Dim width As Integer = TextRenderer.MeasureText(" ", App.CurrentTheme.SubBaseFont).Width
         b = Rectangle.Inflate(e.Bounds, -2, 0)
-        TextRenderer.DrawText(e.Graphics, e.Header.Text, App.SubBaseFont, b, App.CurrentTheme.TextColor, TextFormatFlags.VerticalCenter)
+        TextRenderer.DrawText(e.Graphics, e.Header.Text, App.CurrentTheme.SubBaseFont, b, App.CurrentTheme.TextColor, TextFormatFlags.VerticalCenter)
     End Sub
     Private Sub LVLibrary_DrawItem(sender As Object, e As DrawListViewItemEventArgs) Handles LVLibrary.DrawItem
         If e.Item.Selected = False Then

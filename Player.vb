@@ -469,7 +469,7 @@ Public Class Player
         End Sub
         Public Sub ShowVisualizerMenu()
             Dim menu As New ContextMenuStrip With {
-                .Font = App.SubBaseFont}
+                .Font = App.CurrentTheme.SubBaseFont}
             App.ThemeMenu(menu)
             For Each vizName In visualizers.Keys
                 Dim item As New ToolStripMenuItem(vizName) With {
@@ -2601,12 +2601,12 @@ Public Class Player
         e.Graphics.DrawLine(SystemPens.ControlDark, b.Right, (b.Y + 1), b.Right, b.Bottom)
         'Draw Text
         b = e.Bounds
-        Dim width As Integer = TextRenderer.MeasureText(" ", e.Font).Width
+        Dim width As Integer = TextRenderer.MeasureText(" ", App.CurrentTheme.SubBaseFont).Width
         b = Rectangle.Inflate(e.Bounds, -2, 0)
         If e.Header.TextAlign = HorizontalAlignment.Center Then
-            TextRenderer.DrawText(e.Graphics, e.Header.Text, e.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter)
+            TextRenderer.DrawText(e.Graphics, e.Header.Text, App.CurrentTheme.SubBaseFont, b, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter)
         Else
-            TextRenderer.DrawText(e.Graphics, e.Header.Text, e.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.VerticalCenter)
+            TextRenderer.DrawText(e.Graphics, e.Header.Text, App.CurrentTheme.SubBaseFont, b, App.CurrentTheme.TextColor, TextFormatFlags.VerticalCenter)
         End If
     End Sub
     Private Sub LVPlaylist_DrawItem(sender As Object, e As DrawListViewItemEventArgs) Handles LVPlaylist.DrawItem

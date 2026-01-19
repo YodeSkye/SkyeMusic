@@ -205,8 +205,6 @@ Namespace My
         Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
         Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
-        Friend ReadOnly BaseFont As New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point) 'BaseFont is the default font used in the application.
-        Friend ReadOnly SubBaseFont As New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point) 'SubBaseFont is a slightly smaller font used in the application.
 
         ' HotKeys
         Private Structure HotKey
@@ -281,6 +279,8 @@ Namespace My
             Public PlayerPrevious As Image
             Public PlayerFastForward As Image
             Public PlayerFastReverse As Image
+            Public BaseFont As Font
+            Public SubBaseFont As Font
         End Structure
         Friend CurrentTheme As ThemeProperties 'Holds the current theme settings of the application.
         Friend Event ThemeChanged As EventHandler
@@ -304,7 +304,9 @@ Namespace My
             .PlayerNext = Resources.ImagePlayerAccentNext,
             .PlayerPrevious = Resources.ImagePlayerAccentPrevious,
             .PlayerFastForward = Resources.ImagePlayerAccentFastForward,
-            .PlayerFastReverse = Resources.ImagePlayerAccentFastReverse}
+            .PlayerFastReverse = Resources.ImagePlayerAccentFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
+            .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
         Private ReadOnly PinkAccentTheme As New ThemeProperties With {
             .IsAccent = True,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
@@ -322,7 +324,9 @@ Namespace My
             .PlayerNext = Resources.ImagePlayerWhiteNext,
             .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
-            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
+            .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
         Private ReadOnly LightTheme As New ThemeProperties With {
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 241, 240, 240), 'SystemColors.Control = 240,240,240, set to avoid transparency issues in ToolTipEX
@@ -340,7 +344,9 @@ Namespace My
             .PlayerNext = Resources.ImagePlayerBlackNext,
             .PlayerPrevious = Resources.ImagePlayerBlackPrevious,
             .PlayerFastForward = Resources.ImagePlayerBlackFastForward,
-            .PlayerFastReverse = Resources.ImagePlayerBlackFastReverse}
+            .PlayerFastReverse = Resources.ImagePlayerBlackFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
+            .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
         Private ReadOnly DarkTheme As New ThemeProperties With {
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
@@ -358,7 +364,9 @@ Namespace My
             .PlayerNext = Resources.ImagePlayerWhiteNext,
             .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
-            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
+            .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
         Private ReadOnly DarkPinkTheme As New ThemeProperties With {
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 35, 35, 35),
@@ -376,7 +384,9 @@ Namespace My
             .PlayerNext = Resources.ImagePlayerWhiteNext,
             .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
-            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
+            .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
         Private ReadOnly PinkTheme As New ThemeProperties With {
             .IsAccent = False,
             .BackColor = Color.Pink,
@@ -394,7 +404,9 @@ Namespace My
             .PlayerNext = Resources.ImagePlayerWhiteNext,
             .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
-            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
+            .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
         Friend ReadOnly RedTheme As New ThemeProperties With { 'Used by Splash Screen
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 128, 13, 13),
@@ -412,7 +424,9 @@ Namespace My
             .PlayerNext = Resources.ImagePlayerWhiteNext,
             .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
             .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
-            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse}
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
+            .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
 
         ' Database
         Friend Class PlayData
