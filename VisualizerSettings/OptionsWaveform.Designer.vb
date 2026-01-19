@@ -25,6 +25,7 @@ Partial Class OptionsWaveform
         components = New ComponentModel.Container()
         ChkBoxWaveformFill = New CheckBox()
         TipWaveform = New Skye.UI.ToolTip(components)
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' ChkBoxWaveformFill
@@ -48,10 +49,27 @@ Partial Class OptionsWaveform
         TipWaveform.Font = New Font("Segoe UI", 10F)
         TipWaveform.OwnerDraw = True
         ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.CheckAlign = ContentAlignment.BottomCenter
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(336, 86)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.RightToLeft = RightToLeft.Yes
+        ChkBoxAllowMiniMode.Size = New Size(128, 36)
+        ChkBoxAllowMiniMode.TabIndex = 6
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        TipWaveform.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipWaveform.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
+        ' 
         ' OptionsWaveform
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(ChkBoxWaveformFill)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Margin = New Padding(4)
@@ -64,5 +82,6 @@ Partial Class OptionsWaveform
 
     Friend WithEvents ChkBoxWaveformFill As CheckBox
     Friend WithEvents TipWaveform As Skye.UI.ToolTip
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class

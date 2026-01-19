@@ -34,6 +34,7 @@ Partial Class OptionsHyperspaceTunnel
         TBSwirlSpeedBase = New Syncfusion.Windows.Forms.Tools.TrackBarEx(1, 20)
         LblSwirlSpeedBase = New Skye.UI.Label()
         TipHyperspaceTunnel = New Skye.UI.ToolTip(components)
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' LblParticleSpeedAudioFactor
@@ -55,7 +56,7 @@ Partial Class OptionsHyperspaceTunnel
         TBParticleSpeedAudioFactor.Orientation = Orientation.Vertical
         TBParticleSpeedAudioFactor.ShowFocusRect = False
         TBParticleSpeedAudioFactor.Size = New Size(20, 290)
-        TBParticleSpeedAudioFactor.TabIndex = 19
+        TBParticleSpeedAudioFactor.TabIndex = 140
         TBParticleSpeedAudioFactor.Text = "TrackBarEx2"
         TBParticleSpeedAudioFactor.TimerInterval = 100
         TipHyperspaceTunnel.SetToolTip(TBParticleSpeedAudioFactor, "How Much Audio Affects the Particle Speed.")
@@ -91,7 +92,7 @@ Partial Class OptionsHyperspaceTunnel
         TBParticleSpeedBase.Orientation = Orientation.Vertical
         TBParticleSpeedBase.ShowFocusRect = False
         TBParticleSpeedBase.Size = New Size(20, 290)
-        TBParticleSpeedBase.TabIndex = 16
+        TBParticleSpeedBase.TabIndex = 130
         TBParticleSpeedBase.Text = "TrackBarEx2"
         TBParticleSpeedBase.TimerInterval = 100
         TipHyperspaceTunnel.SetToolTip(TBParticleSpeedBase, "Base Speed of Particles Coming At You.")
@@ -107,7 +108,7 @@ Partial Class OptionsHyperspaceTunnel
         TBSwirlSpeedAudioFactor.Orientation = Orientation.Vertical
         TBSwirlSpeedAudioFactor.ShowFocusRect = False
         TBSwirlSpeedAudioFactor.Size = New Size(20, 290)
-        TBSwirlSpeedAudioFactor.TabIndex = 15
+        TBSwirlSpeedAudioFactor.TabIndex = 120
         TBSwirlSpeedAudioFactor.Text = "TrackBarEx1"
         TBSwirlSpeedAudioFactor.TimerInterval = 100
         TipHyperspaceTunnel.SetToolTip(TBSwirlSpeedAudioFactor, "How Much Audio Affects the Swirl Speed.")
@@ -146,7 +147,7 @@ Partial Class OptionsHyperspaceTunnel
         TBSwirlSpeedBase.Orientation = Orientation.Vertical
         TBSwirlSpeedBase.ShowFocusRect = False
         TBSwirlSpeedBase.Size = New Size(20, 290)
-        TBSwirlSpeedBase.TabIndex = 11
+        TBSwirlSpeedBase.TabIndex = 110
         TBSwirlSpeedBase.TimerInterval = 100
         TipHyperspaceTunnel.SetToolTip(TBSwirlSpeedBase, "Base Speed of Swirl Rotation")
         TipHyperspaceTunnel.SetToolTipImage(TBSwirlSpeedBase, Nothing)
@@ -167,10 +168,25 @@ Partial Class OptionsHyperspaceTunnel
         TipHyperspaceTunnel.Font = New Font("Segoe UI", 10F)
         TipHyperspaceTunnel.OwnerDraw = True
         ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(14, 201)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.Size = New Size(140, 25)
+        ChkBoxAllowMiniMode.TabIndex = 21
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        TipHyperspaceTunnel.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipHyperspaceTunnel.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
+        ' 
         ' OptionsHyperspaceTunnel
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(LblParticleSpeedAudioFactor)
         Controls.Add(TBParticleSpeedAudioFactor)
         Controls.Add(LblParticleSpeedBase)
@@ -201,5 +217,6 @@ Partial Class OptionsHyperspaceTunnel
     Friend WithEvents TBSwirlSpeedBase As Syncfusion.Windows.Forms.Tools.TrackBarEx
     Friend WithEvents LblSwirlSpeedBase As Skye.UI.Label
     Friend WithEvents TipHyperspaceTunnel As Skye.UI.ToolTip
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class

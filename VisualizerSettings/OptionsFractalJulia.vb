@@ -13,6 +13,9 @@ Public Class OptionsFractalJulia
     End Sub
 
     ' Control Events
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.JuliaFractalAllowMiniMode = ChkBoxAllowMiniMode.Checked
+    End Sub
     Private Sub TBBaseCX_ValueChanged(sender As Object, e As EventArgs) Handles TBBaseCX.ValueChanged
         If IsInitializing Then Exit Sub
         App.Visualizers.JuliaFractalBaseCX = CSng(TBBaseCX.Value / 100) - 1
@@ -93,6 +96,7 @@ Public Class OptionsFractalJulia
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.JuliaFractalAllowMiniMode
         TBBaseCX.Value = CInt((App.Visualizers.JuliaFractalBaseCX + 1) * 100)
         TBBassInfluence.Value = CInt(App.Visualizers.JuliaFractalBassInfluence * 10)
         TBBaseCY.Value = CInt((App.Visualizers.JuliaFractalBaseCY + 1) * 100)
@@ -105,6 +109,7 @@ Public Class OptionsFractalJulia
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
     End Sub
@@ -116,6 +121,7 @@ Public Class OptionsFractalJulia
         Else
             forecolor = App.CurrentTheme.TextColor
         End If
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         TBBaseCX.ButtonColor = App.CurrentTheme.ButtonBackColor
         TBBaseCX.HighlightedButtonColor = App.CurrentTheme.TextColor
         TBBaseCX.PushedButtonEndColor = App.CurrentTheme.TextColor

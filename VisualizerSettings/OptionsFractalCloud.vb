@@ -16,6 +16,9 @@ Public Class OptionsFractalCloud
     Private Sub CoBoxPalette_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxPalette.SelectedIndexChanged
         App.Visualizers.FractalCloudPalette = CType(CoBoxPalette.SelectedIndex, App.VisualizerSettings.FractalCloudPalettes)
     End Sub
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.FractalCloudAllowMiniMode = ChkBoxAllowMiniMode.Checked
+    End Sub
     Private Sub TBSwirlSpeedBase_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedBase.ValueChanged
         If IsInitializing Then Exit Sub
         App.Visualizers.FractalCloudSwirlSpeedBase = CDbl(TBSwirlSpeedBase.Value / 1000)
@@ -41,6 +44,7 @@ Public Class OptionsFractalCloud
         CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Aurora)
         CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.CosmicRainbow)
         CoBoxPalette.SelectedItem = App.Visualizers.FractalCloudPalette
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.FractalCloudAllowMiniMode
         TBSwirlSpeedBase.Value = CInt(App.Visualizers.FractalCloudSwirlSpeedBase * 1000)
         TBSwirlSpeedAudioFactor.Value = CInt(App.Visualizers.FractalCloudSwirlSpeedAudioFactor)
         TBTimeIncrement.Value = CInt(App.Visualizers.FractalCloudTimeIncrement * 1000)
@@ -51,6 +55,7 @@ Public Class OptionsFractalCloud
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
         'Debug.Print("Options Fractal Cloud Accent Color Set")
@@ -63,6 +68,7 @@ Public Class OptionsFractalCloud
         Else
             forecolor = App.CurrentTheme.TextColor
         End If
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         TBSwirlSpeedBase.ButtonColor = App.CurrentTheme.ButtonBackColor
         TBSwirlSpeedBase.HighlightedButtonColor = App.CurrentTheme.TextColor
         TBSwirlSpeedBase.PushedButtonEndColor = App.CurrentTheme.TextColor

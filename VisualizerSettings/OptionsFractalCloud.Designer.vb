@@ -32,6 +32,7 @@ Partial Class OptionsFractalCloud
         LblTimeIncrement = New Skye.UI.Label()
         LblPalette = New Skye.UI.Label()
         TipFractalCloud = New Skye.UI.ToolTip(components)
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' LblSwirlSpeedAudioFactor
@@ -138,10 +139,25 @@ Partial Class OptionsFractalCloud
         TipFractalCloud.Font = New Font("Segoe UI", 10F)
         TipFractalCloud.OwnerDraw = True
         ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(13, 108)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.Size = New Size(140, 25)
+        ChkBoxAllowMiniMode.TabIndex = 18
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        TipFractalCloud.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipFractalCloud.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
+        ' 
         ' OptionsFractalCloud
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(LblPalette)
         Controls.Add(LblTimeIncrement)
         Controls.Add(CoBoxPalette)
@@ -168,5 +184,6 @@ Partial Class OptionsFractalCloud
     Friend WithEvents LblTimeIncrement As Skye.UI.Label
     Friend WithEvents LblPalette As Skye.UI.Label
     Friend WithEvents TipFractalCloud As Skye.UI.ToolTip
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class

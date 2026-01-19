@@ -42,6 +42,7 @@ Partial Class OptionsFractalJulia
         TBMaxIterations = New Syncfusion.Windows.Forms.Tools.TrackBarEx(10, 250)
         LblMaxIterations = New Skye.UI.Label()
         TipFractalJulia = New Skye.UI.ToolTip(components)
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' BtnBassquake
@@ -79,7 +80,7 @@ Partial Class OptionsFractalJulia
         BtnCoralReef.Location = New Point(4, 254)
         BtnCoralReef.Name = "BtnCoralReef"
         BtnCoralReef.Size = New Size(132, 32)
-        BtnCoralReef.TabIndex = 167
+        BtnCoralReef.TabIndex = 172
         BtnCoralReef.Text = "Coral Reef"
         TipFractalJulia.SetToolTipImage(BtnCoralReef, Nothing)
         BtnCoralReef.UseVisualStyleBackColor = True
@@ -89,7 +90,7 @@ Partial Class OptionsFractalJulia
         BtnGalaxyBloom.Location = New Point(4, 222)
         BtnGalaxyBloom.Name = "BtnGalaxyBloom"
         BtnGalaxyBloom.Size = New Size(132, 32)
-        BtnGalaxyBloom.TabIndex = 166
+        BtnGalaxyBloom.TabIndex = 171
         BtnGalaxyBloom.Text = "Galaxy Bloom"
         TipFractalJulia.SetToolTipImage(BtnGalaxyBloom, Nothing)
         BtnGalaxyBloom.UseVisualStyleBackColor = True
@@ -99,7 +100,7 @@ Partial Class OptionsFractalJulia
         BtnTreblePulse.Location = New Point(4, 190)
         BtnTreblePulse.Name = "BtnTreblePulse"
         BtnTreblePulse.Size = New Size(132, 32)
-        BtnTreblePulse.TabIndex = 165
+        BtnTreblePulse.TabIndex = 170
         BtnTreblePulse.Text = "Treble Pulse"
         TipFractalJulia.SetToolTipImage(BtnTreblePulse, Nothing)
         BtnTreblePulse.UseVisualStyleBackColor = True
@@ -270,10 +271,25 @@ Partial Class OptionsFractalJulia
         TipFractalJulia.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipFractalJulia.OwnerDraw = True
         ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(6, 296)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.Size = New Size(140, 25)
+        ChkBoxAllowMiniMode.TabIndex = 180
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        TipFractalJulia.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipFractalJulia.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
+        ' 
         ' OptionsFractalJulia
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(TBMaxIterations)
         Controls.Add(LblMaxIterations)
         Controls.Add(TBBaseCY)
@@ -320,5 +336,6 @@ Partial Class OptionsFractalJulia
     Friend WithEvents TBMaxIterations As Syncfusion.Windows.Forms.Tools.TrackBarEx
     Friend WithEvents LblMaxIterations As Skye.UI.Label
     Friend WithEvents TipFractalJulia As Skye.UI.ToolTip
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class

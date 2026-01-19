@@ -38,6 +38,7 @@ Partial Class OptionsStarField
         BtnHyperWarp = New Button()
         BtnNebulaDust = New Button()
         BtnSilentSpace = New Button()
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' LblMaxStarSize
@@ -210,10 +211,25 @@ Partial Class OptionsStarField
         TipStarField.SetToolTipImage(BtnSilentSpace, Nothing)
         BtnSilentSpace.UseVisualStyleBackColor = True
         ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(192, 292)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.Size = New Size(140, 25)
+        ChkBoxAllowMiniMode.TabIndex = 33
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        TipStarField.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipStarField.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
+        ' 
         ' OptionsStarField
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(BtnSilentSpace)
         Controls.Add(BtnNebulaDust)
         Controls.Add(BtnHyperWarp)
@@ -252,5 +268,6 @@ Partial Class OptionsStarField
     Friend WithEvents BtnHyperWarp As Button
     Friend WithEvents BtnNebulaDust As Button
     Friend WithEvents BtnSilentSpace As Button
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class

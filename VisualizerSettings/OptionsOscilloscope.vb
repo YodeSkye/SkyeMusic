@@ -16,6 +16,9 @@ Public Class OptionsOscilloscope
     Private Sub ChkBoxGlow_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxGlow.CheckedChanged
         App.Visualizers.OscilloscopeEnableGlow = ChkBoxGlow.Checked
     End Sub
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.OscilloscopeAllowMiniMode = ChkBoxAllowMiniMode.Checked
+    End Sub
     Private Sub CoBoxBandMappingMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxChannelMode.SelectedIndexChanged
         App.Visualizers.OscilloscopeChannelMode = CType(CoBoxChannelMode.SelectedIndex, App.VisualizerSettings.OscilloscopeChannelModes)
     End Sub
@@ -103,6 +106,7 @@ Public Class OptionsOscilloscope
     Private Sub ShowSettings()
         IsInitializing = True
         ChkBoxGlow.Checked = App.Visualizers.OscilloscopeEnableGlow
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.OscilloscopeAllowMiniMode
         CoBoxChannelMode.Items.Clear()
         CoBoxChannelMode.Items.Add(App.VisualizerSettings.OscilloscopeChannelModes.Mono)
         CoBoxChannelMode.Items.Add(App.VisualizerSettings.OscilloscopeChannelModes.StereoLeft)
@@ -121,6 +125,7 @@ Public Class OptionsOscilloscope
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             ChkBoxGlow.BackColor = c
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
     End Sub
@@ -133,6 +138,7 @@ Public Class OptionsOscilloscope
             forecolor = App.CurrentTheme.TextColor
         End If
         ChkBoxGlow.ForeColor = forecolor
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         CoBoxChannelMode.BackColor = App.CurrentTheme.ControlBackColor
         CoBoxChannelMode.ForeColor = App.CurrentTheme.TextColor
         TBGain.ButtonColor = App.CurrentTheme.ButtonBackColor

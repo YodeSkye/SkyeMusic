@@ -13,6 +13,9 @@ Public Class OptionsHyperspaceTunnel
     End Sub
 
     ' Control Events
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.HyperspaceTunnelAllowMiniMode = ChkBoxAllowMiniMode.Checked
+    End Sub
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxParticleCount.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.Handled = True
@@ -48,6 +51,7 @@ Public Class OptionsHyperspaceTunnel
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.HyperspaceTunnelAllowMiniMode
         TxtBoxParticleCount.Text = App.Visualizers.HyperspaceTunnelParticleCount.ToString
         TBSwirlSpeedBase.Value = CInt(App.Visualizers.HyperspaceTunnelSwirlSpeedBase * 100)
         TBSwirlSpeedAudioFactor.Value = CInt(App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor * 100)
@@ -60,6 +64,7 @@ Public Class OptionsHyperspaceTunnel
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
         'Debug.Print("Options Hyperspace Tunnel Accent Color Set")
@@ -72,6 +77,7 @@ Public Class OptionsHyperspaceTunnel
         Else
             forecolor = App.CurrentTheme.TextColor
         End If
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         TBSwirlSpeedBase.ButtonColor = App.CurrentTheme.ButtonBackColor
         TBSwirlSpeedBase.HighlightedButtonColor = App.CurrentTheme.TextColor
         TBSwirlSpeedBase.PushedButtonEndColor = App.CurrentTheme.TextColor

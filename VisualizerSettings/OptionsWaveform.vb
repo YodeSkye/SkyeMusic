@@ -16,11 +16,15 @@ Public Class OptionsWaveform
     Private Sub ChkBoxShowPeaks_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxWaveformFill.CheckedChanged
         App.Visualizers.WaveformFill = ChkBoxWaveformFill.Checked
     End Sub
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.WaveformAllowMiniMode = ChkBoxAllowMiniMode.Checked
+    End Sub
 
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
         ChkBoxWaveformFill.Checked = App.Visualizers.WaveformFill
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.WaveformAllowMiniMode
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor
@@ -29,6 +33,7 @@ Public Class OptionsWaveform
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
             ChkBoxWaveformFill.BackColor = c
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
         'Debug.Print("Options Waveform Accent Color Set")
@@ -42,6 +47,7 @@ Public Class OptionsWaveform
             forecolor = App.CurrentTheme.TextColor
         End If
         ChkBoxWaveformFill.ForeColor = forecolor
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         TipWaveform.BackColor = App.CurrentTheme.BackColor
         TipWaveform.ForeColor = App.CurrentTheme.TextColor
         TipWaveform.BorderColor = App.CurrentTheme.ButtonBackColor

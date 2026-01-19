@@ -13,6 +13,9 @@ Public Class OptionsStarField
     End Sub
 
     ' Control Events
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.StarFieldAllowMiniMode = ChkBoxAllowMiniMode.Checked
+    End Sub
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxStarCount.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.Handled = True
@@ -79,6 +82,7 @@ Public Class OptionsStarField
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.StarFieldAllowMiniMode
         TxtBoxStarCount.Text = App.Visualizers.StarFieldStarCount.ToString
         TBBaseSpeed.Value = CInt(App.Visualizers.StarFieldBaseSpeed * 10)
         TBAudioSpeedFactor.Value = App.Visualizers.StarFieldAudioSpeedFactor
@@ -90,6 +94,7 @@ Public Class OptionsStarField
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             c = App.GetAccentColor()
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
         'Debug.Print("Options Hyperspace Tunnel Accent Color Set")
@@ -102,6 +107,7 @@ Public Class OptionsStarField
         Else
             forecolor = App.CurrentTheme.TextColor
         End If
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         TBBaseSpeed.ButtonColor = App.CurrentTheme.ButtonBackColor
         TBBaseSpeed.HighlightedButtonColor = App.CurrentTheme.TextColor
         TBBaseSpeed.PushedButtonEndColor = App.CurrentTheme.TextColor

@@ -31,6 +31,9 @@ Public Class OptionsParticleNebula
     Private Sub ChkBoxShowTrails_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxShowTrails.CheckedChanged
         App.Visualizers.ParticleNebulaShowTrails = ChkBoxShowTrails.Checked
     End Sub
+    Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
+        App.Visualizers.ParticleNebulaAllowMiniMode = ChkBoxAllowMiniMode.Checked
+    End Sub
     Private Sub TBBloomIntensity_ValueChanged(sender As Object, e As EventArgs) Handles TBBloomIntensity.ValueChanged
         If IsInitializing Then Exit Sub
         App.Visualizers.ParticleNebulaBloomIntensity = CSng(TBBloomIntensity.Value / 10)
@@ -102,6 +105,7 @@ Public Class OptionsParticleNebula
         ChkBoxRainbowColors.Checked = App.Visualizers.ParticleNebulaRainbowColors
         ChkBoxShowBloom.Checked = App.Visualizers.ParticleNebulaShowBloom
         ChkBoxShowTrails.Checked = App.Visualizers.ParticleNebulaShowTrails
+        ChkBoxAllowMiniMode.Checked = App.Visualizers.ParticleNebulaAllowMiniMode
         TBSizeScale.Value = App.Visualizers.ParticleNebulaSizeScale
         TBSpawnMultiplier.Value = CInt(App.Visualizers.ParticleNebulaSpawnMultiplier * 10)
         TBSwirlBias.Value = CInt((App.Visualizers.ParticleNebulaSwirlBias + 1) * 100)
@@ -119,6 +123,7 @@ Public Class OptionsParticleNebula
             ChkBoxRainbowColors.BackColor = c
             ChkBoxShowBloom.BackColor = c
             ChkBoxShowTrails.BackColor = c
+            ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
     End Sub
@@ -134,6 +139,7 @@ Public Class OptionsParticleNebula
         ChkBoxRainbowColors.ForeColor = forecolor
         ChkBoxShowBloom.ForeColor = forecolor
         ChkBoxShowTrails.ForeColor = forecolor
+        ChkBoxAllowMiniMode.ForeColor = forecolor
         CoBoxActivePalettePreset.BackColor = App.CurrentTheme.ControlBackColor
         CoBoxActivePalettePreset.ForeColor = App.CurrentTheme.TextColor
         TBBloomIntensity.ButtonColor = App.CurrentTheme.ButtonBackColor

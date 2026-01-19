@@ -49,6 +49,7 @@ Partial Class OptionsParticleNebula
         TBTrailAlpha = New Syncfusion.Windows.Forms.Tools.TrackBarEx(10, 100)
         LblTrailAlpha = New Skye.UI.Label()
         TipParticleNebula = New Skye.UI.ToolTip(components)
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' CoBoxActivePalettePreset
@@ -67,7 +68,7 @@ Partial Class OptionsParticleNebula
         BtnDefaults.Location = New Point(8, 291)
         BtnDefaults.Name = "BtnDefaults"
         BtnDefaults.Size = New Size(90, 32)
-        BtnDefaults.TabIndex = 60
+        BtnDefaults.TabIndex = 90
         BtnDefaults.Text = "Defaults"
         TipParticleNebula.SetToolTip(BtnDefaults, "Reset to Defaults")
         TipParticleNebula.SetToolTipImage(BtnDefaults, Nothing)
@@ -397,10 +398,25 @@ Partial Class OptionsParticleNebula
         TipParticleNebula.Font = New Font("Segoe UI", 10F)
         TipParticleNebula.OwnerDraw = True
         ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(8, 228)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.Size = New Size(140, 25)
+        ChkBoxAllowMiniMode.TabIndex = 60
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        TipParticleNebula.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipParticleNebula.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
+        ' 
         ' OptionsParticleNebula
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(TBBloomRadius)
         Controls.Add(TBBloomIntensity)
         Controls.Add(LblBloomIntensity)
@@ -461,5 +477,6 @@ Partial Class OptionsParticleNebula
     Friend WithEvents TBTrailAlpha As Syncfusion.Windows.Forms.Tools.TrackBarEx
     Friend WithEvents LblTrailAlpha As Skye.UI.Label
     Friend WithEvents TipParticleNebula As Skye.UI.ToolTip
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class

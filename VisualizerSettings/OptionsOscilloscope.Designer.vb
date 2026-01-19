@@ -43,6 +43,7 @@ Partial Class OptionsOscilloscope
         TipOscilloscope = New Skye.UI.ToolTip(components)
         BtnDreamy = New Button()
         BtnPunchy = New Button()
+        ChkBoxAllowMiniMode = New CheckBox()
         SuspendLayout()
         ' 
         ' CoBoxChannelMode
@@ -53,7 +54,7 @@ Partial Class OptionsOscilloscope
         CoBoxChannelMode.Location = New Point(9, 33)
         CoBoxChannelMode.Name = "CoBoxChannelMode"
         CoBoxChannelMode.Size = New Size(178, 29)
-        CoBoxChannelMode.TabIndex = 153
+        CoBoxChannelMode.TabIndex = 10
         TipOscilloscope.SetToolTip(CoBoxChannelMode, "Channel Mode for the Oscilloscope.")
         TipOscilloscope.SetToolTipImage(CoBoxChannelMode, Nothing)
         ' 
@@ -116,7 +117,7 @@ Partial Class OptionsOscilloscope
         BtnSoftGlow.Location = New Point(9, 130)
         BtnSoftGlow.Name = "BtnSoftGlow"
         BtnSoftGlow.Size = New Size(112, 32)
-        BtnSoftGlow.TabIndex = 156
+        BtnSoftGlow.TabIndex = 110
         BtnSoftGlow.Text = "Soft Glow"
         TipOscilloscope.SetToolTipImage(BtnSoftGlow, Nothing)
         BtnSoftGlow.UseVisualStyleBackColor = True
@@ -136,7 +137,7 @@ Partial Class OptionsOscilloscope
         BtnNeonPulse.Location = New Point(9, 258)
         BtnNeonPulse.Name = "BtnNeonPulse"
         BtnNeonPulse.Size = New Size(112, 32)
-        BtnNeonPulse.TabIndex = 158
+        BtnNeonPulse.TabIndex = 150
         BtnNeonPulse.Text = "Neon Pulse"
         TipOscilloscope.SetToolTipImage(BtnNeonPulse, Nothing)
         BtnNeonPulse.UseVisualStyleBackColor = True
@@ -146,7 +147,7 @@ Partial Class OptionsOscilloscope
         BtnLiquid.Location = New Point(9, 226)
         BtnLiquid.Name = "BtnLiquid"
         BtnLiquid.Size = New Size(112, 32)
-        BtnLiquid.TabIndex = 157
+        BtnLiquid.TabIndex = 140
         BtnLiquid.Text = "Liquid"
         TipOscilloscope.SetToolTipImage(BtnLiquid, Nothing)
         BtnLiquid.UseVisualStyleBackColor = True
@@ -159,7 +160,7 @@ Partial Class OptionsOscilloscope
         ChkBoxGlow.Location = New Point(224, 35)
         ChkBoxGlow.Name = "ChkBoxGlow"
         ChkBoxGlow.Size = New Size(112, 25)
-        ChkBoxGlow.TabIndex = 149
+        ChkBoxGlow.TabIndex = 20
         ChkBoxGlow.Text = "Enable Glow"
         ChkBoxGlow.TextAlign = ContentAlignment.MiddleCenter
         TipOscilloscope.SetToolTip(ChkBoxGlow, "Whether To Enable Glow Effect on the Oscilloscope Line.")
@@ -182,7 +183,7 @@ Partial Class OptionsOscilloscope
         BtnClean.Location = New Point(8, 98)
         BtnClean.Name = "BtnClean"
         BtnClean.Size = New Size(113, 32)
-        BtnClean.TabIndex = 155
+        BtnClean.TabIndex = 100
         BtnClean.Text = "Clean"
         TipOscilloscope.SetToolTipImage(BtnClean, Nothing)
         BtnClean.UseVisualStyleBackColor = True
@@ -264,7 +265,7 @@ Partial Class OptionsOscilloscope
         BtnDreamy.Location = New Point(9, 162)
         BtnDreamy.Name = "BtnDreamy"
         BtnDreamy.Size = New Size(112, 32)
-        BtnDreamy.TabIndex = 160
+        BtnDreamy.TabIndex = 120
         BtnDreamy.Text = "Dreamy"
         TipOscilloscope.SetToolTipImage(BtnDreamy, Nothing)
         BtnDreamy.UseVisualStyleBackColor = True
@@ -274,15 +275,30 @@ Partial Class OptionsOscilloscope
         BtnPunchy.Location = New Point(9, 194)
         BtnPunchy.Name = "BtnPunchy"
         BtnPunchy.Size = New Size(112, 32)
-        BtnPunchy.TabIndex = 161
+        BtnPunchy.TabIndex = 130
         BtnPunchy.Text = "Punchy"
         TipOscilloscope.SetToolTipImage(BtnPunchy, Nothing)
         BtnPunchy.UseVisualStyleBackColor = True
+        ' 
+        ' ChkBoxAllowMiniMode
+        ' 
+        ChkBoxAllowMiniMode.AutoSize = True
+        ChkBoxAllowMiniMode.BackColor = Color.Transparent
+        ChkBoxAllowMiniMode.FlatStyle = FlatStyle.Flat
+        ChkBoxAllowMiniMode.Location = New Point(182, 295)
+        ChkBoxAllowMiniMode.Name = "ChkBoxAllowMiniMode"
+        ChkBoxAllowMiniMode.Size = New Size(140, 25)
+        ChkBoxAllowMiniMode.TabIndex = 200
+        ChkBoxAllowMiniMode.Text = "Allow MiniMode"
+        TipOscilloscope.SetToolTip(ChkBoxAllowMiniMode, "Enables a compact, optimized version of this visualizer for the MiniPlayer’s smaller layout.")
+        TipOscilloscope.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
+        ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
         ' 
         ' OptionsOscilloscope
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(BtnPunchy)
         Controls.Add(BtnDreamy)
         Controls.Add(CoBoxChannelMode)
@@ -331,5 +347,6 @@ Partial Class OptionsOscilloscope
     Friend WithEvents LblChannelMode As Skye.UI.Label
     Friend WithEvents BtnDreamy As Button
     Friend WithEvents BtnPunchy As Button
+    Friend WithEvents ChkBoxAllowMiniMode As CheckBox
 
 End Class
