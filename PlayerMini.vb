@@ -73,7 +73,7 @@ Public Class PlayerMini
                 mOffset = New Point(-e.X - cSender.Left, -e.Y - cSender.Top)
             ElseIf cSender Is PanelMarquee Then
                 mOffset = New Point(-e.X - cSender.Left, -e.Y - cSender.Top)
-            Else
+            Else 'only for the visualizer host control in the visualizer panel, do not use this for other controls
                 mOffset = New Point(-e.X - PanelVisualizer.Left, -e.Y - PanelVisualizer.Top)
             End If
         End If
