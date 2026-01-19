@@ -114,6 +114,7 @@ Partial Class PlayerMini
         Controls.Add(BtnPrevious)
         Controls.Add(BtnStop)
         Controls.Add(BtnPlay)
+        Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.None
         MaximizeBox = False
         MinimizeBox = False

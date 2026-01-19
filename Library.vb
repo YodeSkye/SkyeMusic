@@ -103,17 +103,17 @@ Public Class Library
         header = New ColumnHeader With {
             .Name = "Track",
             .Text = "T",
-            .Width = 25}
+            .Width = 30}
         LVLibrary.Columns.Add(header)
         header = New ColumnHeader With {
             .Name = "Tracks",
             .Text = "Ts",
-            .Width = 25}
+            .Width = 30}
         LVLibrary.Columns.Add(header)
         header = New ColumnHeader With {
             .Name = "Duration",
             .Text = "Duration",
-            .Width = 67}
+            .Width = 75}
         LVLibrary.Columns.Add(header)
         header = New ColumnHeader With {
             .Name = "AV",
@@ -233,9 +233,9 @@ Public Class Library
         e.Graphics.DrawLine(SystemPens.ControlDark, (b.X + 1), b.Bottom, b.Right, b.Bottom)
         e.Graphics.DrawLine(SystemPens.ControlDark, b.Right, (b.Y + 1), b.Right, b.Bottom)
         'Draw Text
-        Dim width As Integer = TextRenderer.MeasureText(" ", e.Font).Width
+        Dim width As Integer = TextRenderer.MeasureText(" ", App.SubBaseFont).Width
         b = Rectangle.Inflate(e.Bounds, -2, 0)
-        TextRenderer.DrawText(e.Graphics, e.Header.Text, e.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.VerticalCenter)
+        TextRenderer.DrawText(e.Graphics, e.Header.Text, App.SubBaseFont, b, App.CurrentTheme.TextColor, TextFormatFlags.VerticalCenter)
     End Sub
     Private Sub LVLibrary_DrawItem(sender As Object, e As DrawListViewItemEventArgs) Handles LVLibrary.DrawItem
         If e.Item.Selected = False Then

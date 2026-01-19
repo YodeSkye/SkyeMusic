@@ -49,7 +49,7 @@ Partial Class Library
         BtnOK = New Button()
         TxbxLibrarySearch = New TextBox()
         LBXLibrarySearch = New ListBox()
-        PicBoxAlbumArt = New System.Windows.Forms.PictureBox()
+        PicBoxAlbumArt = New PictureBox()
         RadBtnGroupByGenre = New RadioButton()
         GrpBoxGroupBy = New GroupBox()
         RadBtnGroupByType = New RadioButton()
@@ -76,7 +76,7 @@ Partial Class Library
         CMLibrary.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIEditTag, CMISeparatorEditTag, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMLibrary.Name = "CMLibrary"
-        CMLibrary.Size = New Size(229, 446)
+        CMLibrary.Size = New Size(229, 424)
         TipLibrary.SetToolTipImage(CMLibrary, Nothing)
         ' 
         ' CMIPlay
@@ -450,7 +450,7 @@ Partial Class Library
         LVLibrary.AllowColumnReorder = True
         LVLibrary.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LVLibrary.ContextMenuStrip = CMLibrary
-        LVLibrary.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LVLibrary.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LVLibrary.FullRowSelect = True
         LVLibrary.Location = New Point(12, 42)
         LVLibrary.Name = "LVLibrary"

@@ -1,4 +1,6 @@
-﻿Public Class PlayerMini
+﻿Imports SkyeMusic.Player
+
+Public Class PlayerMini
 
     'Declarations
     Private mMove As Boolean = False
@@ -51,25 +53,32 @@
 #End If
         AddHandler Player.TitleChanged, AddressOf OnTitleChanged
 
-        If Player.MiniPlayerVisualizer IsNot Nothing Then
-            AttachVisualizer(Player.MiniPlayerVisualizer)
-            Player.MiniPlayerVisualizer.Start()
+        If Player.MiniPlayerVisualizer Is Nothing Then
+            Dim vType = Player.VisualizerHost.GetTypeFromName(App.Visualizer)
+            Player.MiniPlayerVisualizer = CType(Activator.CreateInstance(vType), IVisualizer)
         End If
+        AttachVisualizer(Player.MiniPlayerVisualizer)
 
     End Sub
-    Private Sub PlayerMini_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxAlbumArt.MouseDown, LblTitle.MouseDown
+    Private Sub PlayerMini_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxAlbumArt.MouseDown, LblTitle.MouseDown, PanelMarquee.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
             cSender = CType(sender, Control)
             If cSender Is Me Then
                 mOffset = New Point(-e.X, -e.Y)
-            Else
+            ElseIf cSender Is LblTitle Then
+                mOffset = New Point(-e.X - cSender.Left - 3, -e.Y - cSender.Top - 3)
+            ElseIf cSender Is PicBoxAlbumArt Then
                 mOffset = New Point(-e.X - cSender.Left, -e.Y - cSender.Top)
+            ElseIf cSender Is PanelMarquee Then
+                mOffset = New Point(-e.X - cSender.Left, -e.Y - cSender.Top)
+            Else
+                mOffset = New Point(-e.X - PanelVisualizer.Left, -e.Y - PanelVisualizer.Top)
             End If
         End If
     End Sub
-    Private Sub PlayerMini_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, LblTitle.MouseMove
+    Private Sub PlayerMini_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, LblTitle.MouseMove, PanelMarquee.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -78,7 +87,7 @@
             PlayerMiniLocation = Location
         End If
     End Sub
-    Private Sub PlayerMini_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp, LblTitle.MouseUp
+    Private Sub PlayerMini_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp, LblTitle.MouseUp, PanelMarquee.MouseUp
         mMove = False
     End Sub
     Private Sub PlayerMini_Move(sender As Object, e As EventArgs) Handles MyBase.Move
@@ -107,7 +116,7 @@
 
     '    Region = New Region(path)
     'End Sub
-    Private Sub PlayerMini_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick, PicBoxAlbumArt.DoubleClick
+    Private Sub PlayerMini_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick, PicBoxAlbumArt.DoubleClick, LblTitle.DoubleClick, PanelMarquee.DoubleClick
         App.SetMiniPlayer()
     End Sub
     Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
@@ -167,6 +176,12 @@
         Player.PlayNext()
         SetPlayState()
     End Sub
+    Private Sub Visualizer_MouseClick(sender As Object, e As MouseEventArgs)
+        If e.Button = MouseButtons.Right Then ShowVisualizerMenu()
+    End Sub
+    Private Sub Visualizer_MouseDoubleClick(sender As Object, e As MouseEventArgs)
+        If e.Button = MouseButtons.Left Then App.SetMiniPlayer()
+    End Sub
 
     ' Handlers
     Private Sub OnTitleChanged(newTitle As String)
@@ -209,10 +224,63 @@
         LblTitle.Left = PanelMarquee.Width
     End Sub
     Friend Sub AttachVisualizer(v As Player.IVisualizer)
+
+        ' Stop old mini visualizer
+        Player.MiniPlayerVisualizer?.Stop()
+
+        ' Replace reference
+        Player.MiniPlayerVisualizer = v
+
+        ' Attach UI
         Dim ctrl = v.DockedControl
         ctrl.Dock = DockStyle.Fill
         PanelVisualizer.Controls.Clear()
         PanelVisualizer.Controls.Add(ctrl)
+
+        ' Start new visualizer
+        v.Start()
+
+        AddHandler ctrl.MouseDown, AddressOf PlayerMini_MouseDown
+        AddHandler ctrl.MouseMove, AddressOf PlayerMini_MouseMove
+        AddHandler ctrl.MouseUp, AddressOf PlayerMini_MouseUp
+        AddHandler ctrl.MouseClick, AddressOf Visualizer_MouseClick
+        AddHandler ctrl.MouseDoubleClick, AddressOf Visualizer_MouseDoubleClick
+    End Sub
+    Private Sub ShowVisualizerMenu()
+        Dim menu As New ContextMenuStrip With {
+            .Font = App.SubBaseFont}
+        App.ThemeMenu(menu)
+
+        ' Loop through available visualizers
+        For Each vizName In Player.VisualizerHost.GetVisualizerNames()
+            Dim item As New ToolStripMenuItem(vizName) With {
+            .Font = menu.Font
+        }
+
+            ' Check the active one
+            If vizName.Equals(App.Visualizer, StringComparison.OrdinalIgnoreCase) Then
+                item.Checked = True
+            End If
+
+            AddHandler item.Click,
+            Sub()
+                ' Update global selection
+                App.Visualizer = vizName
+
+                ' Reload main player visualizer
+                Player.ShowMedia()
+
+                ' Reload mini visualizer
+                Dim vType = Player.VisualizerHost.GetTypeFromName(vizName)
+                Dim miniV = CType(Activator.CreateInstance(vType), IVisualizer)
+                Me.AttachVisualizer(miniV)
+                miniV.Start()
+            End Sub
+
+            menu.Items.Add(item)
+        Next
+
+        menu.Show(Cursor.Position)
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Width

@@ -468,11 +468,12 @@ Public Class Player
             currentVisualizer?.Resize(hostPanel.Width, hostPanel.Height)
         End Sub
         Public Sub ShowVisualizerMenu()
-            Dim menu As New ContextMenuStrip()
+            Dim menu As New ContextMenuStrip With {
+                .Font = App.SubBaseFont}
             App.ThemeMenu(menu)
             For Each vizName In visualizers.Keys
                 Dim item As New ToolStripMenuItem(vizName) With {
-                    .Font = ownerForm.Font}
+                    .Font = menu.Font}
 
                 'Mark the active one with a check
                 If vizName.Equals(Me.ActiveVisualizerName, StringComparison.OrdinalIgnoreCase) Then
@@ -491,11 +492,12 @@ Public Class Player
             menu.Show(Cursor.Position)
         End Sub
         Public Sub SetVisualizersMenu()
-            Dim menu As New ContextMenuStrip()
+            Dim menu As New ContextMenuStrip With {
+                .Font = New Font(ownerForm.Font.FontFamily, 11)}
             App.ThemeMenu(menu)
             For Each vizName In visualizers.Keys
                 Dim item As New ToolStripMenuItem(vizName) With {
-                    .Font = ownerForm.Font}
+                    .Font = menu.Font}
                 AddHandler item.Click,
                     Sub(sender, e)
                         App.Visualizer = vizName
@@ -518,6 +520,12 @@ Public Class Player
         End Sub
         Public Function GetVisualizerNames() As List(Of String)
             Return visualizers.Keys.ToList
+        End Function
+        Public Function GetTypeFromName(name As String) As Type
+            If visualizers.ContainsKey(name) Then
+                Return visualizers(name).GetType()
+            End If
+            Return Nothing
         End Function
         Public Sub SetHyperspaceTunnelParticleCount(count As Integer)
             Dim tunnel = TryCast(visualizers("Hyperspace Tunnel"), VisualizerHyperspaceTunnel)

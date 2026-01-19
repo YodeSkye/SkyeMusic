@@ -205,6 +205,8 @@ Namespace My
         Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
         Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
+        Friend ReadOnly BaseFont As New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point) 'BaseFont is the default font used in the application.
+        Friend ReadOnly SubBaseFont As New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point) 'SubBaseFont is a slightly smaller font used in the application.
 
         ' HotKeys
         Private Structure HotKey
