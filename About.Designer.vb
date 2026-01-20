@@ -279,6 +279,7 @@ Partial Class About
         LblUpdateAvailable.Text = "Update Available"
         TipAbout.SetText(LblUpdateAvailable, Nothing)
         LblUpdateAvailable.TextAlign = ContentAlignment.TopCenter
+        LblUpdateAvailable.Visible = False
         ' 
         ' About
         ' 

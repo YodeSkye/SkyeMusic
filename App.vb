@@ -628,7 +628,6 @@ Namespace My
         End Class
 
         ' REGISTRY SAVED SETTINGS
-
         ' Player
         Friend PlayerPositionShowElapsed As Boolean = True
         Friend PlayMode As PlayModes = PlayModes.Random
@@ -1606,7 +1605,7 @@ Namespace My
             End If
 
             ' Not checked today — fetch fresh version
-            Dim latest = FetchLatestVersionAsync()
+            Dim latest = FetchLatestVersion()
             If latest IsNot Nothing Then
                 App.LatestKnownVersion = latest
                 App.LastUpdateCheck = DateTime.Now
@@ -3409,7 +3408,7 @@ Namespace My
             End Using
             Return bmp
         End Function
-        Private Function FetchLatestVersionAsync() As String
+        Private Function FetchLatestVersion() As String
             Try
                 Using client As New Net.Http.HttpClient()
                     client.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic")
