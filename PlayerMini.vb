@@ -10,6 +10,7 @@ Public Class PlayerMini
     Private ImagePrevious As Image
     Private ImageNext As Image
     Private WithEvents MarqueeTimer As New Timer With {.Interval = 30}
+    Private ReadOnly topmostTimer As New Timer With {.Interval = 500}
 
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -58,6 +59,9 @@ Public Class PlayerMini
         End If
         AttachVisualizer(Player.MiniPlayerVisualizer)
 
+        AddHandler topmostTimer.Tick, AddressOf EnforceTopMost
+        topmostTimer.Start()
+
     End Sub
     Private Sub PlayerMini_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxAlbumArt.MouseDown, LblTitle.MouseDown, PanelMarquee.MouseDown
         Dim cSender As Control
@@ -99,10 +103,14 @@ Public Class PlayerMini
         App.SetMiniPlayer()
     End Sub
     Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
-        If keyData = Keys.Escape OrElse keyData = Keys.P Then
-            App.SetMiniPlayer()
-            Return True
-        End If
+        Select Case keyData
+            Case Keys.Escape, Keys.P
+                App.SetMiniPlayer()
+                Return True
+            Case Keys.V
+                Player.ToggleVisualizer()
+                Return True
+        End Select
         Return MyBase.ProcessCmdKey(msg, keyData)
     End Function
     Protected Overrides Sub OnPaint(e As PaintEventArgs)
@@ -174,6 +182,12 @@ Public Class PlayerMini
         ' When it scrolls off the left side, reset it
         If LblTitle.Right < 0 Then
             LblTitle.Left = PanelMarquee.Width
+        End If
+    End Sub
+    Private Sub EnforceTopMost(sender As Object, e As EventArgs)
+        If Not Me.TopMost Then
+            Me.TopMost = True
+            App.WriteToLog("MiniPlayer TopMost Enforced")
         End If
     End Sub
 

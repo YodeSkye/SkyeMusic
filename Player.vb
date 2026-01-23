@@ -350,7 +350,7 @@ Public Class Player
             MIVisualizer.BackColor = Color.Transparent
         End If
     End Sub
-    Private Sub ToggleVisualizer() 'Toggle the Visualizer On/Off
+    Friend Sub ToggleVisualizer() 'Toggle the Visualizer On/Off
         If Visualizer Then
             VisualizerOff()
         Else
@@ -1305,7 +1305,7 @@ Public Class Player
             Dim fillEnabled As Boolean
             Dim lineThickness As Single
             Dim verticalScale As Single
-            Dim downsampleFactor As Integer = 1
+            Dim downsampleFactor As Integer
             Dim baselineOffset As Single
 
             If VisualizerMiniMode AndAlso App.Visualizers.WaveformAllowMiniMode Then
@@ -1353,7 +1353,6 @@ Public Class Player
 
             ' Build waveform points
             Dim pts(renderCount - 1) As PointF
-            Dim idx As Integer = 0
 
             For i = 0 To renderCount - 1
                 Dim sample = audioData(i * downsampleFactor) * scale
@@ -1461,7 +1460,7 @@ Public Class Player
             Dim enableGlow As Boolean
             Dim lineWidth As Single
             Dim amplitudeScale As Single
-            Dim downsample As Integer = 1
+            Dim downsample As Integer
 
             If VisualizerMiniMode AndAlso App.Visualizers.OscilloscopeAllowMiniMode Then
                 enableGlow = False
@@ -5248,6 +5247,7 @@ Public Class Player
                 If Visualizer Then
                     PicBoxAlbumArt.Visible = False
                     PicBoxAlbumArt.Image = Nothing
+                    App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                     RTBLyrics.Visible = False
                     VLCViewer.Visible = False
                 Else
