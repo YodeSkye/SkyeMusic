@@ -66,6 +66,7 @@ Partial Class Player
         MIView = New ToolStripMenuItem()
         MIFullscreen = New ToolStripMenuItem()
         MIVisualizers = New ToolStripMenuItem()
+        MIMiniPlayer = New ToolStripMenuItem()
         ToolStripSeparator2 = New ToolStripSeparator()
         MIViewQueue = New ToolStripMenuItem()
         MIViewHistory = New ToolStripMenuItem()
@@ -104,7 +105,7 @@ Partial Class Player
         TimerLyrics = New Timer(components)
         TipPlayer = New Skye.UI.ToolTip(components)
         PanelVisualizer = New Panel()
-        MIMiniPlayer = New ToolStripMenuItem()
+        MIDirectory = New ToolStripMenuItem()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -391,7 +392,7 @@ Partial Class Player
         ' 
         ' MIView
         ' 
-        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIVisualizers, MIMiniPlayer, ToolStripSeparator2, MIViewQueue, MIViewHistory, ToolStripSeparator5, MIOptions})
+        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIVisualizers, MIMiniPlayer, ToolStripSeparator2, MIViewQueue, MIDirectory, MIViewHistory, ToolStripSeparator5, MIOptions})
         MIView.ForeColor = SystemColors.HighlightText
         MIView.Image = My.Resources.Resources.ImageView
         MIView.Name = "MIView"
@@ -410,6 +411,12 @@ Partial Class Player
         MIVisualizers.Name = "MIVisualizers"
         MIVisualizers.Size = New Size(203, 24)
         MIVisualizers.Text = "Visualizer"
+        ' 
+        ' MIMiniPlayer
+        ' 
+        MIMiniPlayer.Name = "MIMiniPlayer"
+        MIMiniPlayer.Size = New Size(203, 24)
+        MIMiniPlayer.Text = "MiniPlayer"
         ' 
         ' ToolStripSeparator2
         ' 
@@ -795,11 +802,11 @@ Partial Class Player
         PanelVisualizer.TabIndex = 40
         TipPlayer.SetToolTipImage(PanelVisualizer, Nothing)
         ' 
-        ' MIMiniPlayer
+        ' MIDirectory
         ' 
-        MIMiniPlayer.Name = "MIMiniPlayer"
-        MIMiniPlayer.Size = New Size(203, 24)
-        MIMiniPlayer.Text = "MiniPlayer"
+        MIDirectory.Name = "MIDirectory"
+        MIDirectory.Size = New Size(203, 24)
+        MIDirectory.Text = "Stream Directory"
         ' 
         ' Player
         ' 
@@ -932,4 +939,5 @@ Partial Class Player
     Friend WithEvents MIVisualizers As ToolStripMenuItem
     Friend WithEvents CMIEditTag As ToolStripMenuItem
     Friend WithEvents MIMiniPlayer As ToolStripMenuItem
+    Friend WithEvents MIDirectory As ToolStripMenuItem
 End Class

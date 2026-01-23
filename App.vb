@@ -174,6 +174,7 @@ Namespace My
         Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
         Friend FrmMiniPlayer As PlayerMini 'FrmMiniPlayer is the mini player window that provides basic playback controls.
         Friend FrmLibrary As Library 'FrmLibrary is the main library window that displays the media library.
+        Friend FrmDirectory As Directory 'FrmDirectory is the internet radio directory window that allows users to browse and play internet radio stations.
         Friend FrmHistory As History 'FrmHistory is the history window that displays the playback history and statistics.
         Friend FrmTagEditor As TagEditor 'FrmTagEditor is the tag editor window that allows users to edit metadata tags of media files.
         Friend FrmLog As Log 'FrmLog is the log window that displays the application log.
@@ -2238,6 +2239,25 @@ Namespace My
         Private Sub HideLibrary()
             If FrmLibrary IsNot Nothing AndAlso Not FrmLibrary.IsDisposed Then
                 FrmLibrary.Hide()
+            End If
+        End Sub
+        Friend Sub ShowDirectory()
+            If FrmDirectory Is Nothing OrElse FrmDirectory.IsDisposed Then
+                FrmDirectory = New Directory
+                FrmDirectory.Show()
+            Else
+                If FrmDirectory.WindowState = FormWindowState.Minimized Then
+                    FrmDirectory.WindowState = FormWindowState.Normal
+                ElseIf FrmDirectory.Visible Then
+                    FrmDirectory.BringToFront()
+                Else
+                    FrmDirectory.Show()
+                End If
+            End If
+        End Sub
+        Private Sub HideDirectory()
+            If FrmDirectory IsNot Nothing AndAlso Not FrmDirectory.IsDisposed Then
+                FrmDirectory.Close()
             End If
         End Sub
         Friend Sub ShowHistory()

@@ -3361,6 +3361,9 @@ Public Class Player
         Dim frm As New PlayerQueue
         frm.ShowDialog()
     End Sub
+    Private Sub MIDirectory_Click(sender As Object, e As EventArgs) Handles MIDirectory.Click
+        App.ShowDirectory()
+    End Sub
     Private Sub MIViewHistory_Click(sender As Object, e As EventArgs) Handles MIViewHistory.Click
         App.ShowHistory()
     End Sub
