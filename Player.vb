@@ -5116,18 +5116,18 @@ Public Class Player
                     Dim lvi = LVPlaylist.FindItemWithText(path, True, 0)
                     PlaylistCurrentText = lvi.Text
                     Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
-                    App.NIApp.Text = My.Application.Info.Title + " - " + lvi.Text
+                    App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 128)
                 Case App.MediaSourceTypes.File
                     Dim lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
                     PlaylistCurrentText = lvi.Text
                     Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
-                    App.NIApp.Text = My.Application.Info.Title + " - " + lvi.Text
+                    App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 128)
                     LoadLyrics(_player.Path)
             End Select
         Catch
             PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
             Text = My.Application.Info.Title + " - " + _player.Path
-            App.NIApp.Text = Text
+            App.NIApp.Text = My.Application.Info.Title
         End Try
         RaiseEvent TitleChanged(PlaylistCurrentText)
 
