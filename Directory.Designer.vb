@@ -38,6 +38,7 @@ Partial Class Directory
         Bitrate = New ColumnHeader()
         Country = New ColumnHeader()
         Status = New ColumnHeader()
+        URL = New ColumnHeader()
         CMStations = New ContextMenuStrip(components)
         CMIPlay = New ToolStripMenuItem()
         CMIAddToPlaylist = New ToolStripMenuItem()
@@ -127,10 +128,9 @@ Partial Class Directory
         ' 
         ' LVStations
         ' 
-        LVStations.Columns.AddRange(New ColumnHeader() {StreamName, Tags, Bitrate, Country, Status})
+        LVStations.Columns.AddRange(New ColumnHeader() {StreamName, Tags, Bitrate, Country, Status, URL})
         LVStations.ContextMenuStrip = CMStations
         LVStations.Dock = DockStyle.Fill
-        LVStations.Enabled = False
         LVStations.InsertionLineColor = Color.Teal
         LVStations.Location = New Point(0, 0)
         LVStations.Name = "LVStations"
@@ -165,6 +165,11 @@ Partial Class Directory
         ' 
         Status.Text = "Status"
         Status.Width = 140
+        ' 
+        ' URL
+        ' 
+        URL.Text = "URL"
+        URL.Width = 300
         ' 
         ' CMStations
         ' 
@@ -202,6 +207,7 @@ Partial Class Directory
         Margin = New Padding(4)
         Name = "Directory"
         SizeGripStyle = SizeGripStyle.Show
+        StartPosition = FormStartPosition.CenterScreen
         Text = "Stream Directory"
         PanelSearch.ResumeLayout(False)
         PanelSearch.PerformLayout()
@@ -233,4 +239,5 @@ Partial Class Directory
     Friend WithEvents CMIAddToPlaylist As ToolStripMenuItem
     Friend WithEvents CMICopyStreamURL As ToolStripMenuItem
     Friend WithEvents StatusLabel As ToolStripStatusLabel
+    Friend WithEvents URL As ColumnHeader
 End Class

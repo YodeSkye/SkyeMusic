@@ -4542,6 +4542,31 @@ Public Class Player
         SetPlaylistCountText()
         lvi = Nothing
     End Sub
+    Friend Sub AddToPlaylistFromDirectory(stream As String)
+        If LVPlaylist.Items.Count = 0 Then Return
+        Dim lvi As ListViewItem
+        lvi = LVPlaylist.FindItemWithText(stream, True, 0)
+        If lvi Is Nothing Then
+            lvi = CreateListviewItem()
+            App.AddToHistoryFromPlaylist(stream, True)
+            GetHistory(lvi, stream)
+        Else
+            LVPlaylist.Items.Remove(lvi)
+            lvi = CreateListviewItem()
+            GetHistory(lvi, stream)
+        End If
+        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(stream)
+        lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = stream
+        ClearPlaylistTitles()
+        LVPlaylist.ListViewItemSorter = Nothing
+        If LVPlaylist.SelectedItems.Count = 0 Then
+            LVPlaylist.Items.Add(lvi)
+        Else
+            LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
+        End If
+        SetPlaylistCountText()
+    End Sub
+
     Friend Sub AddToPlaylistFromHistory(items As List(Of String))
         Dim addedcount As Integer = 0
         LVPlaylist.BeginUpdate()
