@@ -8,7 +8,22 @@ Public Class Directory
     Private radioBrowser As RadioBrowserSource
 
     ' Form Events
+    Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
+        Try
+            Select Case m.Msg
+                Case Skye.WinAPI.WM_DWMCOLORIZATIONCOLORCHANGED
+                    SetAccentColor()
+            End Select
+        Catch ex As Exception
+            App.WriteToLog("Help WndProc Handler Error" + Chr(13) + ex.ToString)
+        Finally
+            MyBase.WndProc(m)
+        End Try
+    End Sub
     Private Sub Directory_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        SetAccentColor()
+        SetTheme()
+        ReThemeMenus()
         radioBrowser = New RadioBrowserSource
         LoadSources()
         SetStatusLabelEmptyText()
@@ -65,15 +80,21 @@ Public Class Directory
                 StatusLabel.Text = "Search not implemented for this source."
         End Select
     End Sub
+    Private Sub LVStations_DoubleClick(sender As Object, e As EventArgs) Handles LVStations.DoubleClick
+        If LVStations.SelectedItems.Count = 0 Then Return
+        Player.PlayFromDirectory(LVStations.SelectedItems(0).Tag.ToString)
+    End Sub
     Private Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
-
+        If LVStations.SelectedItems.Count = 0 Then Return
+        Player.PlayFromDirectory(LVStations.SelectedItems(0).Tag.ToString)
     End Sub
     Private Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
         If LVStations.SelectedItems.Count = 0 Then Return
         Player.AddToPlaylistFromDirectory(LVStations.SelectedItems(0).Tag.ToString)
     End Sub
     Private Sub CMICopyStreamURL_Click(sender As Object, e As EventArgs) Handles CMICopyStreamURL.Click
-
+        If LVStations.SelectedItems.Count = 0 Then Return
+        Clipboard.SetText(LVStations.SelectedItems(0).Tag.ToString)
     End Sub
 
     ' Methods
@@ -114,6 +135,46 @@ Public Class Directory
     End Sub
     Private Sub SetStatusLabelEmptyText()
         StatusLabel.Text = "No stations to display. Select a source from the left to begin."
+    End Sub
+    Private Sub SetAccentColor()
+        Static c As Color
+        SuspendLayout()
+        If App.CurrentTheme.IsAccent Then
+            c = App.GetAccentColor()
+            BackColor = c
+            StatusStripDirectory.BackColor = c
+        End If
+        ResumeLayout()
+        Debug.Print("History Accent Color Set")
+    End Sub
+    Private Sub SetTheme()
+        SuspendLayout()
+
+        If App.CurrentTheme.IsAccent Then
+            StatusStripDirectory.ForeColor = App.CurrentTheme.AccentTextColor
+        Else
+            BackColor = App.CurrentTheme.BackColor
+            StatusStripDirectory.BackColor = App.CurrentTheme.BackColor
+            StatusStripDirectory.ForeColor = App.CurrentTheme.TextColor
+        End If
+        TxtBoxSearch.BackColor = App.CurrentTheme.BackColor
+        TxtBoxSearch.ForeColor = App.CurrentTheme.TextColor
+        BtnSearch.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnSearch.ForeColor = App.CurrentTheme.ButtonTextColor
+        LVSources.BackColor = App.CurrentTheme.BackColor
+        LVSources.ForeColor = App.CurrentTheme.TextColor
+        LVStations.BackColor = App.CurrentTheme.BackColor
+        LVStations.ForeColor = App.CurrentTheme.TextColor
+
+        ResumeLayout()
+        Debug.Print("History Theme Set")
+    End Sub
+    Friend Sub ReThemeMenus()
+        App.ThemeMenu(CMStations)
+    End Sub
+    Friend Sub SetColors() 'Used By Options Form
+        SetAccentColor()
+        SetTheme()
     End Sub
 
     ' Source Classes

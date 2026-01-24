@@ -307,6 +307,8 @@ Public Class Options
         App.FrmLog?.ReThemeMenus()
         App.FrmHistory?.SetColors()
         App.FrmHistory?.ReThemeMenus()
+        App.FrmDirectory?.SetColors()
+        App.FrmDirectory?.ReThemeMenus()
         App.FrmLibrary.SetColors()
         App.FrmLibrary.ReThemeMenus()
         App.ReThemeTrayMenu()

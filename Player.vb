@@ -4566,7 +4566,6 @@ Public Class Player
         End If
         SetPlaylistCountText()
     End Sub
-
     Friend Sub AddToPlaylistFromHistory(items As List(Of String))
         Dim addedcount As Integer = 0
         LVPlaylist.BeginUpdate()
@@ -4929,6 +4928,17 @@ Public Class Player
         End If
         StopPlay()
         PlayFile(filename, "PlayFromLibrary")
+    End Sub
+    Friend Sub PlayFromDirectory(stream As String)
+        LyricsOff()
+        Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(stream, True, 0)
+        If existingitem Is Nothing Then
+            AddToPlaylistFromDirectory(stream)
+        Else
+            EnsurePlaylistItemIsVisible(existingitem.Index)
+        End If
+        StopPlay()
+        PlayStream(stream)
     End Sub
     Friend Sub PlayPrevious()
         'Stream = False
