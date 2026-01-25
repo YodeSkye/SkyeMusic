@@ -1,5 +1,7 @@
 ﻿
 Imports System.IO
+Imports System.Net.Http
+Imports System.Security.AccessControl
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
@@ -47,6 +49,7 @@ Public Class Player
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
+    Private ReadOnly httpClient As New HttpClient()
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -2068,7 +2071,7 @@ Public Class Player
                 If x >= 0 AndAlso x <= Width AndAlso y >= 0 AndAlso y <= Height AndAlso
            px >= 0 AndAlso px <= Width AndAlso py >= 0 AndAlso py <= Height Then
 
-                    Using pen As New Pen(color.FromArgb(200, color), lineThickness)
+                    Using pen As New Pen(Color.FromArgb(200, color), lineThickness)
                         g.DrawLine(pen, CSng(px), CSng(py), CSng(x), CSng(y))
                     End Using
                 End If
@@ -4077,6 +4080,63 @@ Public Class Player
             Return False
         End If
     End Function
+    Private Async Function ResolvePlaylistUrl(url As String) As Task(Of String)
+        If url.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase) OrElse url.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) Then
+            Try
+                Dim text = Await httpClient.GetStringAsync(url)
+                Dim urls = ExtractUrlsFromPlaylistText(text)
+
+                If urls.Count > 0 Then
+                    Return urls(0) ' first real stream URL
+                End If
+
+            Catch ex As Exception
+                App.WriteToLog("Player Playlist resolve failed: " & ex.ToString())
+            End Try
+        End If
+        Return url ' fallback
+    End Function
+    Private Function ExtractUrlsFromPlaylistText(text As String) As List(Of String)
+        Dim urls As New List(Of String)
+
+        For Each rawLine In text.Split({vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+            Dim line = rawLine.Trim()
+
+            ' --- .pls format: File1=URL ---
+            If line.StartsWith("File", StringComparison.OrdinalIgnoreCase) Then
+                Dim parts = line.Split("="c)
+                If parts.Length = 2 AndAlso parts(1).StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
+                    urls.Add(parts(1).Trim())
+                End If
+                Continue For
+            End If
+
+            ' --- .m3u format: raw URL lines ---
+            If line.StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
+                urls.Add(line)
+            End If
+        Next
+
+        Return urls
+    End Function
+    Private Function NormalizeUrl(url As String) As String
+        Try
+            Dim u = New Uri(url)
+
+            ' If port is default (80 for http, 443 for https), remove it
+            If (u.Scheme = "http" AndAlso u.Port = 80) OrElse
+           (u.Scheme = "https" AndAlso u.Port = 443) Then
+
+                Dim builder As New UriBuilder(u)
+                builder.Port = -1 ' remove port
+                Return builder.Uri.ToString()
+            End If
+
+            Return url
+        Catch
+            Return url
+        End Try
+    End Function
     Private Function FormatDuration(duration As Double) As String
         Dim dur As TimeSpan = TimeSpan.FromSeconds(duration)
         Dim durstr As String = ""
@@ -4548,21 +4608,26 @@ Public Class Player
         SetPlaylistCountText()
         lvi = Nothing
     End Sub
-    Friend Sub AddToPlaylistFromDirectory(stream As String)
-        If LVPlaylist.Items.Count = 0 Then Return
-        Dim lvi As ListViewItem
-        lvi = LVPlaylist.FindItemWithText(stream, True, 0)
+    Friend Async Sub AddToPlaylistFromDirectory(stream As String, Optional alreadyResolved As Boolean = False)
+        Dim realUrl As String = stream
+        If Not alreadyResolved Then
+            realUrl = Await ResolvePlaylistUrl(realUrl)
+            realUrl = NormalizeUrl(realUrl)
+        End If
+
+        Dim lvi As ListViewItem = Nothing
+        If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(realUrl, True, 0)
         If lvi Is Nothing Then
             lvi = CreateListviewItem()
-            App.AddToHistoryFromPlaylist(stream, True)
-            GetHistory(lvi, stream)
+            App.AddToHistoryFromPlaylist(realUrl, True)
+            GetHistory(lvi, realUrl)
         Else
             LVPlaylist.Items.Remove(lvi)
             lvi = CreateListviewItem()
-            GetHistory(lvi, stream)
+            GetHistory(lvi, realUrl)
         End If
-        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(stream)
-        lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = stream
+        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(realUrl)
+        lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = realUrl
         ClearPlaylistTitles()
         LVPlaylist.ListViewItemSorter = Nothing
         If LVPlaylist.SelectedItems.Count = 0 Then
@@ -4935,16 +5000,18 @@ Public Class Player
         StopPlay()
         PlayFile(filename, "PlayFromLibrary")
     End Sub
-    Friend Sub PlayFromDirectory(stream As String)
+    Friend Async Sub PlayFromDirectory(stream As String)
         LyricsOff()
-        Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(stream, True, 0)
+        Dim realUrl = Await ResolvePlaylistUrl(stream)
+        realUrl = NormalizeUrl(realUrl)
+        Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(realUrl, True, 0)
         If existingitem Is Nothing Then
-            AddToPlaylistFromDirectory(stream)
+            AddToPlaylistFromDirectory(realUrl, True)
         Else
             EnsurePlaylistItemIsVisible(existingitem.Index)
         End If
         StopPlay()
-        PlayStream(stream)
+        PlayStream(realUrl)
     End Sub
     Friend Sub PlayPrevious()
         'Stream = False
@@ -5102,6 +5169,7 @@ Public Class Player
         End If
         If App.SongPlayData.StartPlayTime = DateTime.MinValue Then 'Because of OnPlay happening on seek.
             App.SongPlayData.Path = _player.Path.TrimEnd("/"c)
+            Debug.Print("showing Play Data Path: " & App.SongPlayData.Path)
             App.SongPlayData.StartPlayTime = Now
         End If
 
@@ -5113,28 +5181,40 @@ Public Class Player
         ShowPosition()
         HasLyrics = False
         HasLyricsSynced = False
-        Try
-            Select Case CurrentMediaType
+        'Try
+        Select Case CurrentMediaType
                 Case App.MediaSourceTypes.AudioCD
                     ' not implemented
                 Case App.MediaSourceTypes.Stream
                     Dim path As String = _player.Path.TrimEnd("/"c)
                     Dim lvi = LVPlaylist.FindItemWithText(path, True, 0)
-                    PlaylistCurrentText = lvi.Text
-                    Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
-                    App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
+                    If lvi Is Nothing Then
+                        PlaylistCurrentText = IO.Path.GetFileNameWithoutExtension(_player.Path)
+                        Text = My.Application.Info.Title + " - " + _player.Path
+                        App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
+                    Else
+                        PlaylistCurrentText = lvi.Text
+                        Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
+                        App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
+                    End If
                 Case App.MediaSourceTypes.File
                     Dim lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
-                    PlaylistCurrentText = lvi.Text
-                    Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
-                    App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
+                    If lvi Is Nothing Then
+                        PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
+                        Text = My.Application.Info.Title + " - " + _player.Path
+                        App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
+                    Else
+                        PlaylistCurrentText = lvi.Text
+                        Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
+                        App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
+                    End If
                     LoadLyrics(_player.Path)
             End Select
-        Catch
-            PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
-            Text = My.Application.Info.Title + " - " + _player.Path
-            App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
-        End Try
+        'Catch
+        '    PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
+        '    Text = My.Application.Info.Title + " - " + _player.Path
+        '    App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
+        'End Try
         RaiseEvent TitleChanged(PlaylistCurrentText)
 
         TimerShowMedia.Start()
