@@ -69,6 +69,7 @@ Partial Class Player
         MIMiniPlayer = New ToolStripMenuItem()
         ToolStripSeparator2 = New ToolStripSeparator()
         MIViewQueue = New ToolStripMenuItem()
+        MIDirectory = New ToolStripMenuItem()
         MIViewHistory = New ToolStripMenuItem()
         ToolStripSeparator5 = New ToolStripSeparator()
         MIOptions = New ToolStripMenuItem()
@@ -105,7 +106,6 @@ Partial Class Player
         TimerLyrics = New Timer(components)
         TipPlayer = New Skye.UI.ToolTip(components)
         PanelVisualizer = New Panel()
-        MIDirectory = New ToolStripMenuItem()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -429,6 +429,13 @@ Partial Class Player
         MIViewQueue.Name = "MIViewQueue"
         MIViewQueue.Size = New Size(203, 24)
         MIViewQueue.Text = "Queue"
+        ' 
+        ' MIDirectory
+        ' 
+        MIDirectory.Image = My.Resources.Resources.ImageDirectory16
+        MIDirectory.Name = "MIDirectory"
+        MIDirectory.Size = New Size(203, 24)
+        MIDirectory.Text = "Stream Directory"
         ' 
         ' MIViewHistory
         ' 
@@ -801,12 +808,6 @@ Partial Class Player
         PanelVisualizer.Size = New Size(434, 294)
         PanelVisualizer.TabIndex = 40
         TipPlayer.SetToolTipImage(PanelVisualizer, Nothing)
-        ' 
-        ' MIDirectory
-        ' 
-        MIDirectory.Name = "MIDirectory"
-        MIDirectory.Size = New Size(203, 24)
-        MIDirectory.Text = "Stream Directory"
         ' 
         ' Player
         ' 

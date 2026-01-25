@@ -23,6 +23,7 @@ Partial Class Directory
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Directory))
         PanelSearch = New Panel()
         BtnSearch = New Button()
         TxtBoxSearch = New TextBox()
@@ -182,27 +183,27 @@ Partial Class Directory
         ' 
         CMStations.Items.AddRange(New ToolStripItem() {CMIPlay, CMIAddToPlaylist, CMICopyStreamURL})
         CMStations.Name = "CMStations"
-        CMStations.Size = New Size(181, 92)
+        CMStations.Size = New Size(153, 70)
         ' 
         ' CMIPlay
         ' 
-        CMIPlay.Image = Resources.Resources.ImagePlay
+        CMIPlay.Image = My.Resources.Resources.ImagePlay
         CMIPlay.Name = "CMIPlay"
-        CMIPlay.Size = New Size(180, 22)
+        CMIPlay.Size = New Size(152, 22)
         CMIPlay.Text = "Play"
         ' 
         ' CMIAddToPlaylist
         ' 
-        CMIAddToPlaylist.Image = Resources.Resources.ImageAdd16
+        CMIAddToPlaylist.Image = My.Resources.Resources.ImageAdd16
         CMIAddToPlaylist.Name = "CMIAddToPlaylist"
-        CMIAddToPlaylist.Size = New Size(180, 22)
+        CMIAddToPlaylist.Size = New Size(152, 22)
         CMIAddToPlaylist.Text = "Add To Playlist"
         ' 
         ' CMICopyStreamURL
         ' 
-        CMICopyStreamURL.Image = Resources.Resources.ImageCopy16
+        CMICopyStreamURL.Image = My.Resources.Resources.ImageCopy16
         CMICopyStreamURL.Name = "CMICopyStreamURL"
-        CMICopyStreamURL.Size = New Size(180, 22)
+        CMICopyStreamURL.Size = New Size(152, 22)
         CMICopyStreamURL.Text = "Copy"
         ' 
         ' Directory
@@ -214,6 +215,7 @@ Partial Class Directory
         Controls.Add(StatusStripDirectory)
         Controls.Add(PanelSearch)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(4)
         Name = "Directory"
         SizeGripStyle = SizeGripStyle.Show
