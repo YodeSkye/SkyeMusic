@@ -1589,6 +1589,7 @@ Namespace My
         Friend Sub Finalize()
             UnRegisterHotKeys()
             If FrmLog IsNot Nothing AndAlso FrmLog.Visible Then FrmLog.Close()
+            If FrmDirectory IsNot Nothing AndAlso FrmDirectory.Visible Then FrmDirectory.Close()
             If FrmLibrary.Visible Then FrmLibrary.Close()
             FrmLibrary.Dispose()
             SaveHistory()
@@ -1627,7 +1628,7 @@ Namespace My
                     My.Computer.FileSystem.CreateDirectory(App.UserPath)
                 End If
 
-                Dim data As New HistoryData With {.SchemaVersion = 1, .History = History, .TotalPlayedSongs = HistoryTotalPlayedSongs}
+                Dim data As New HistoryData With {.SchemaVersion = 2, .History = History, .TotalPlayedSongs = HistoryTotalPlayedSongs}
 
                 Using file As New System.IO.StreamWriter(HistoryPath)
                     writer.Serialize(file, data)
@@ -1653,15 +1654,15 @@ Namespace My
 
                                 ' 🔑 Conversion step: map old flags into SourceType
                                 For Each s In History
-                                    If s.IsStream Then
+                                    If s.IsStream OrElse (s.Path IsNot Nothing AndAlso s.Path.StartsWith("http", StringComparison.OrdinalIgnoreCase)) Then
                                         s.SourceType = MediaSourceTypes.Stream
                                     Else
                                         s.SourceType = MediaSourceTypes.File
                                     End If
                                 Next
 
-                                ' bump schema version so it won’t run again
-                                data.SchemaVersion = 2
+                                '' bump schema version so it won’t run again
+                                'data.SchemaVersion = 2
                             Case 2
                                 History = If(data.History, New List(Of Song))
                                 HistoryTotalPlayedSongs = data.TotalPlayedSongs
