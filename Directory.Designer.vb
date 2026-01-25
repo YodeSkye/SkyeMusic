@@ -102,10 +102,14 @@ Partial Class Directory
         ' 
         ' LVSources
         ' 
+        LVSources.BorderStyle = BorderStyle.FixedSingle
         LVSources.Columns.AddRange(New ColumnHeader() {Source})
         LVSources.Dock = DockStyle.Fill
+        LVSources.FullRowSelect = True
+        LVSources.HeaderStyle = ColumnHeaderStyle.Nonclickable
         LVSources.InsertionLineColor = Color.Teal
         LVSources.Location = New Point(0, 0)
+        LVSources.MultiSelect = False
         LVSources.Name = "LVSources"
         LVSources.Size = New Size(279, 559)
         LVSources.TabIndex = 0
@@ -128,11 +132,14 @@ Partial Class Directory
         ' 
         ' LVStations
         ' 
+        LVStations.BorderStyle = BorderStyle.FixedSingle
         LVStations.Columns.AddRange(New ColumnHeader() {StreamName, Tags, Bitrate, Country, Status, URL})
         LVStations.ContextMenuStrip = CMStations
         LVStations.Dock = DockStyle.Fill
+        LVStations.FullRowSelect = True
         LVStations.InsertionLineColor = Color.Teal
         LVStations.Location = New Point(0, 0)
+        LVStations.MultiSelect = False
         LVStations.Name = "LVStations"
         LVStations.Size = New Size(750, 559)
         LVStations.TabIndex = 0
@@ -175,24 +182,27 @@ Partial Class Directory
         ' 
         CMStations.Items.AddRange(New ToolStripItem() {CMIPlay, CMIAddToPlaylist, CMICopyStreamURL})
         CMStations.Name = "CMStations"
-        CMStations.Size = New Size(153, 70)
+        CMStations.Size = New Size(181, 92)
         ' 
         ' CMIPlay
         ' 
+        CMIPlay.Image = Resources.Resources.ImagePlay
         CMIPlay.Name = "CMIPlay"
-        CMIPlay.Size = New Size(152, 22)
+        CMIPlay.Size = New Size(180, 22)
         CMIPlay.Text = "Play"
         ' 
         ' CMIAddToPlaylist
         ' 
+        CMIAddToPlaylist.Image = Resources.Resources.ImageAdd16
         CMIAddToPlaylist.Name = "CMIAddToPlaylist"
-        CMIAddToPlaylist.Size = New Size(152, 22)
+        CMIAddToPlaylist.Size = New Size(180, 22)
         CMIAddToPlaylist.Text = "Add To Playlist"
         ' 
         ' CMICopyStreamURL
         ' 
+        CMICopyStreamURL.Image = Resources.Resources.ImageCopy16
         CMICopyStreamURL.Name = "CMICopyStreamURL"
-        CMICopyStreamURL.Size = New Size(152, 22)
+        CMICopyStreamURL.Size = New Size(180, 22)
         CMICopyStreamURL.Text = "Copy"
         ' 
         ' Directory
