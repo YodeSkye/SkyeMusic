@@ -48,7 +48,7 @@ Partial Class PlayerMini
         BtnPlay.Location = New Point(30, 119)
         BtnPlay.Name = "BtnPlay"
         BtnPlay.Size = New Size(20, 20)
-        BtnPlay.TabIndex = 2
+        BtnPlay.TabIndex = 8
         BtnPlay.UseVisualStyleBackColor = True
         ' 
         ' BtnStop
@@ -56,7 +56,7 @@ Partial Class PlayerMini
         BtnStop.Location = New Point(50, 119)
         BtnStop.Name = "BtnStop"
         BtnStop.Size = New Size(20, 20)
-        BtnStop.TabIndex = 3
+        BtnStop.TabIndex = 12
         BtnStop.UseVisualStyleBackColor = True
         ' 
         ' BtnPrevious
@@ -72,7 +72,7 @@ Partial Class PlayerMini
         BtnNext.Location = New Point(70, 119)
         BtnNext.Name = "BtnNext"
         BtnNext.Size = New Size(20, 20)
-        BtnNext.TabIndex = 5
+        BtnNext.TabIndex = 16
         BtnNext.UseVisualStyleBackColor = True
         ' 
         ' LblTitle
@@ -83,7 +83,7 @@ Partial Class PlayerMini
         LblTitle.Location = New Point(3, 1)
         LblTitle.Name = "LblTitle"
         LblTitle.Size = New Size(61, 17)
-        LblTitle.TabIndex = 6
+        LblTitle.TabIndex = 0
         LblTitle.Text = "Marquee"
         LblTitle.TextAlign = ContentAlignment.MiddleLeft
         ' 
@@ -93,19 +93,19 @@ Partial Class PlayerMini
         PanelMarquee.Location = New Point(3, 3)
         PanelMarquee.Name = "PanelMarquee"
         PanelMarquee.Size = New Size(94, 22)
-        PanelMarquee.TabIndex = 7
+        PanelMarquee.TabIndex = 0
         ' 
         ' PanelVisualizer
         ' 
         PanelVisualizer.Location = New Point(3, 23)
         PanelVisualizer.Name = "PanelVisualizer"
         PanelVisualizer.Size = New Size(94, 94)
-        PanelVisualizer.TabIndex = 8
+        PanelVisualizer.TabIndex = 0
         ' 
         ' PlayerMini
         ' 
         AutoScaleMode = AutoScaleMode.None
-        ClientSize = New Size(100, 144)
+        ClientSize = New Size(120, 144)
         ControlBox = False
         Controls.Add(PanelVisualizer)
         Controls.Add(PicBoxAlbumArt)
@@ -116,6 +116,7 @@ Partial Class PlayerMini
         Controls.Add(BtnPlay)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.None
+        KeyPreview = True
         MaximizeBox = False
         MinimizeBox = False
         Name = "PlayerMini"

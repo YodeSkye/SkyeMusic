@@ -2764,10 +2764,13 @@ Public Class Player
             ElseIf e.Control Then
                 Select Case e.KeyCode
                     Case Keys.D
-                        If e.Shift Then App.ShowDevTools()
+                        If e.Shift Then
+                            e.SuppressKeyPress = True
+                            App.ShowDevTools()
+                        End If
                     Case Keys.Space
-                        StopPlay()
                         e.SuppressKeyPress = True
+                        StopPlay()
                 End Select
             ElseIf e.Shift Then
             Else
@@ -2778,14 +2781,14 @@ Public Class Player
                     Case Keys.End
                     Case Keys.Up
                     Case Keys.Left
+                        e.SuppressKeyPress = True
                         UpdatePosition(False, 10)
-                        e.SuppressKeyPress = True
                     Case Keys.Right
+                        e.SuppressKeyPress = True
                         UpdatePosition(True, 10)
-                        e.SuppressKeyPress = True
                     Case Keys.Space
-                        TogglePlay()
                         e.SuppressKeyPress = True
+                        TogglePlay()
                     Case Keys.OemQuestion
                     Case Keys.PageUp
                     Case Keys.PageDown
@@ -2793,29 +2796,29 @@ Public Class Player
                     Case Keys.Delete
                     Case Keys.Insert
                     Case Keys.F, Keys.F11 'Fullscreen
+                        e.SuppressKeyPress = True
                         FullScreen = Not FullScreen
-                        e.SuppressKeyPress = True
                     Case Keys.M
+                        e.SuppressKeyPress = True
                         ToggleMute()
-                        e.SuppressKeyPress = True
                     Case Keys.N
+                        e.SuppressKeyPress = True
                         PlayNext()
-                        e.SuppressKeyPress = True
                     Case Keys.B
+                        e.SuppressKeyPress = True
                         PlayPrevious()
-                        e.SuppressKeyPress = True
                     Case Keys.L
+                        e.SuppressKeyPress = True
                         App.ShowLibrary()
-                        e.SuppressKeyPress = True
                     Case Keys.D
+                        e.SuppressKeyPress = True
                         App.ShowDirectory()
-                        e.SuppressKeyPress = True
                     Case Keys.V
+                        e.SuppressKeyPress = True
                         ToggleVisualizer()
-                        e.SuppressKeyPress = True
                     Case Keys.P
-                        App.SetMiniPlayer()
                         e.SuppressKeyPress = True
+                        App.SetMiniPlayer()
                 End Select
             End If
         End If
@@ -5201,7 +5204,7 @@ Public Class Player
             LblPosition.Text = "00:00"
         End Try
     End Sub
-    Private Sub UpdatePosition(ByVal forward As Boolean, Optional ByVal seconds As Byte = 20)
+    Friend Sub UpdatePosition(ByVal forward As Boolean, Optional ByVal seconds As Byte = 20)
         If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             If forward Then
                 If _player.Position + seconds > _player.Duration Then
@@ -5220,7 +5223,7 @@ Public Class Player
             LVPlaylist.Focus()
         End If
     End Sub
-    Private Sub ToggleMute()
+    Friend Sub ToggleMute()
         If Mute Then
             Debug.Print("Enabling Sound")
             _player.Volume = 100

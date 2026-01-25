@@ -63,6 +63,61 @@ Public Class PlayerMini
         topmostTimer.Start()
 
     End Sub
+    Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnPlay.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
+        If e.Alt Then
+        ElseIf e.Control Then
+            Select Case e.KeyCode
+                Case Keys.D
+                    If e.Shift Then App.ShowDevTools()
+                Case Keys.Space
+                    e.SuppressKeyPress = True
+                    Player.StopPlay()
+            End Select
+        ElseIf e.Shift Then
+        Else
+            Select Case e.KeyCode
+                Case Keys.Enter
+                Case Keys.Escape, Keys.P
+                    e.SuppressKeyPress = True
+                    App.SetMiniPlayer()
+                Case Keys.End
+                Case Keys.Up
+                'Case Keys.Left
+                '    e.SuppressKeyPress = True
+                '    Player.UpdatePosition(False, 10)
+                'Case Keys.Right
+                '    e.SuppressKeyPress = True
+                '    Player.UpdatePosition(True, 10)
+                Case Keys.Space
+                    e.SuppressKeyPress = True
+                    Player.TogglePlay()
+                Case Keys.OemQuestion
+                Case Keys.PageUp
+                Case Keys.PageDown
+                Case Keys.Home
+                Case Keys.Delete
+                Case Keys.Insert
+                Case Keys.M
+                    e.SuppressKeyPress = True
+                    Player.ToggleMute()
+                Case Keys.N
+                    e.SuppressKeyPress = True
+                    Player.PlayNext()
+                Case Keys.B
+                    e.SuppressKeyPress = True
+                    Player.PlayPrevious()
+                Case Keys.L
+                    e.SuppressKeyPress = True
+                    App.ShowLibrary()
+                Case Keys.D
+                    e.SuppressKeyPress = True
+                    App.ShowDirectory()
+                Case Keys.V
+                    e.SuppressKeyPress = True
+                    Player.ToggleVisualizer()
+            End Select
+        End If
+    End Sub
     Private Sub PlayerMini_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PicBoxAlbumArt.MouseDown, LblTitle.MouseDown, PanelMarquee.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
@@ -104,11 +159,11 @@ Public Class PlayerMini
     End Sub
     Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
         Select Case keyData
-            Case Keys.Escape, Keys.P
-                App.SetMiniPlayer()
+            Case Keys.Left
+                Player.UpdatePosition(False, 10)
                 Return True
-            Case Keys.V
-                Player.ToggleVisualizer()
+            Case Keys.Right
+                Player.UpdatePosition(True, 10)
                 Return True
         End Select
         Return MyBase.ProcessCmdKey(msg, keyData)
