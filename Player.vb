@@ -2730,11 +2730,11 @@ Public Class Player
 
         ' Place the window where it was last time
 #If DEBUG Then
-        'If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
         'If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
+        'If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
 #Else
-        If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
         If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
+        If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
 #End If
 
         ' Disable Mouse Wheel support for TrackBar
@@ -2806,6 +2806,9 @@ Public Class Player
                         e.SuppressKeyPress = True
                     Case Keys.L
                         App.ShowLibrary()
+                        e.SuppressKeyPress = True
+                    Case Keys.D
+                        App.ShowDirectory()
                         e.SuppressKeyPress = True
                     Case Keys.V
                         ToggleVisualizer()

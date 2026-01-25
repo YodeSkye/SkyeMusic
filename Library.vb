@@ -156,11 +156,11 @@ Public Class Library
         LoadLibrary()
 
 #If DEBUG Then
-        'If App.SaveWindowMetrics AndAlso App.LibraryLocation.Y >= 0 Then Me.Location = App.LibraryLocation
         'If App.SaveWindowMetrics AndAlso App.LibrarySize.Height >= 0 Then Me.Size = App.LibrarySize
+        'If App.SaveWindowMetrics AndAlso App.LibraryLocation.Y >= 0 Then Me.Location = App.LibraryLocation
 #Else
-        If App.SaveWindowMetrics AndAlso App.LibraryLocation.Y >= 0 Then Me.Location = App.LibraryLocation
         If App.SaveWindowMetrics AndAlso App.LibrarySize.Height >= 0 Then Me.Size = App.LibrarySize
+        If App.SaveWindowMetrics AndAlso App.LibraryLocation.Y >= 0 Then Me.Location = App.LibraryLocation
 #End If
 
     End Sub

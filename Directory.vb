@@ -33,6 +33,13 @@ Public Class Directory
         SetStatusLabelEmptyText()
         CMStations.Font = CurrentTheme.BaseFont
         CMIPlay.Font = New Font(CurrentTheme.BaseFont, FontStyle.Bold)
+#If DEBUG Then
+        If App.SaveWindowMetrics AndAlso App.DirectorySize.Height >= 0 Then Me.Size = App.DirectorySize
+        If App.SaveWindowMetrics AndAlso App.DirectoryLocation.Y >= 0 Then Me.Location = App.DirectoryLocation
+#Else
+        If App.SaveWindowMetrics AndAlso App.DirectorySize.Height >= 0 Then Me.Size = App.DirectorySize
+        If App.SaveWindowMetrics AndAlso App.DirectoryLocation.Y >= 0 Then Me.Location = App.DirectoryLocation
+#End If
     End Sub
     Private Sub Directory_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PanelSearch.MouseDown, StatusStripDirectory.MouseDown
         Dim cSender As Control
@@ -52,7 +59,7 @@ Public Class Directory
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
-            'App.LogLocation = Me.Location
+            App.DirectoryLocation = Location
         End If
     End Sub
     Private Sub Directory_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PanelSearch.MouseUp, StatusStripDirectory.MouseUp
@@ -61,12 +68,12 @@ Public Class Directory
     Private Sub Directory_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
-            'App.LogLocation = Me.Location
+            App.DirectoryLocation = Location
         End If
     End Sub
     Private Sub Directory_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         If Visible AndAlso WindowState = FormWindowState.Normal Then
-            'App.LogSize = Me.Size
+            App.DirectorySize = Size
         End If
     End Sub
 
@@ -234,10 +241,10 @@ Public Class Directory
         LVStations.ListViewItemSorter = Nothing
     End Sub
     Private Sub CheckMove(ByRef location As Point)
-        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
-        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
-        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsDialogWindow
-        If location.Y < App.AdjustScreenBoundsDialogWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
+        If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
+        If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
+        If location.X < My.Computer.Screen.WorkingArea.Left Then location.X = My.Computer.Screen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
+        If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
     Private Sub SetAccentColor()
         Static c As Color

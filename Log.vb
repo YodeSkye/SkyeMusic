@@ -30,11 +30,11 @@ Public Class Log
         SetTheme()
         ReThemeMenus()
 #If DEBUG Then
-        'If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
         'If App.SaveWindowMetrics AndAlso App.LogSize.Height >= 0 Then Me.Size = App.LogSize
+        'If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
 #Else
-        If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
         If App.SaveWindowMetrics AndAlso App.LogSize.Height >= 0 Then Me.Size = App.LogSize
+        If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
 #End If
     End Sub
     Private Sub Log_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
