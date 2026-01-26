@@ -34,13 +34,14 @@ Partial Class Directory
         Source = New ColumnHeader()
         PanelDirectoryList = New Panel()
         LVStations = New Skye.UI.ListViewEX()
-        StreamName = New ColumnHeader()
-        Tags = New ColumnHeader()
-        Format = New ColumnHeader()
-        Bitrate = New ColumnHeader()
-        Country = New ColumnHeader()
-        Status = New ColumnHeader()
-        URL = New ColumnHeader()
+        ColStreamName = New ColumnHeader()
+        ColTags = New ColumnHeader()
+        ColFormat = New ColumnHeader()
+        ColBitrate = New ColumnHeader()
+        ColCountry = New ColumnHeader()
+        ColStatus = New ColumnHeader()
+        ColURL = New ColumnHeader()
+        ColMore = New ColumnHeader()
         CMStations = New ContextMenuStrip(components)
         CMIPlay = New ToolStripMenuItem()
         CMIAddToPlaylist = New ToolStripMenuItem()
@@ -135,7 +136,7 @@ Partial Class Directory
         ' LVStations
         ' 
         LVStations.BorderStyle = BorderStyle.FixedSingle
-        LVStations.Columns.AddRange(New ColumnHeader() {StreamName, Tags, Format, Bitrate, Country, Status, URL})
+        LVStations.Columns.AddRange(New ColumnHeader() {ColStreamName, ColTags, ColFormat, ColBitrate, ColCountry, ColStatus, ColURL, ColMore})
         LVStations.ContextMenuStrip = CMStations
         LVStations.Dock = DockStyle.Fill
         LVStations.FullRowSelect = True
@@ -147,43 +148,48 @@ Partial Class Directory
         LVStations.UseCompatibleStateImageBehavior = False
         LVStations.View = View.Details
         ' 
-        ' StreamName
+        ' ColStreamName
         ' 
-        StreamName.Text = "Name"
-        StreamName.Width = 300
+        ColStreamName.Text = "Name"
+        ColStreamName.Width = 300
         ' 
-        ' Tags
+        ' ColTags
         ' 
-        Tags.Text = "Tags"
-        Tags.Width = 150
+        ColTags.Text = "Tags"
+        ColTags.Width = 150
         ' 
-        ' Format
+        ' ColFormat
         ' 
-        Format.Text = "Format"
-        Format.TextAlign = HorizontalAlignment.Center
-        Format.Width = 90
+        ColFormat.Text = "Format"
+        ColFormat.TextAlign = HorizontalAlignment.Center
+        ColFormat.Width = 90
         ' 
-        ' Bitrate
+        ' ColBitrate
         ' 
-        Bitrate.Text = "Bitrate"
-        Bitrate.TextAlign = HorizontalAlignment.Center
-        Bitrate.Width = 75
+        ColBitrate.Text = "Bitrate"
+        ColBitrate.TextAlign = HorizontalAlignment.Center
+        ColBitrate.Width = 75
         ' 
-        ' Country
+        ' ColCountry
         ' 
-        Country.Text = "Country"
-        Country.TextAlign = HorizontalAlignment.Center
-        Country.Width = 75
+        ColCountry.Text = "Country"
+        ColCountry.TextAlign = HorizontalAlignment.Center
+        ColCountry.Width = 75
         ' 
-        ' Status
+        ' ColStatus
         ' 
-        Status.Text = "Status"
-        Status.Width = 140
+        ColStatus.Text = "Status"
+        ColStatus.Width = 140
         ' 
-        ' URL
+        ' ColURL
         ' 
-        URL.Text = "URL"
-        URL.Width = 300
+        ColURL.Text = "URL"
+        ColURL.Width = 300
+        ' 
+        ' ColMore
+        ' 
+        ColMore.Text = ""
+        ColMore.Width = 30
         ' 
         ' CMStations
         ' 
@@ -244,11 +250,11 @@ Partial Class Directory
     Friend WithEvents PanelDirectoryList As Panel
     Friend WithEvents LVSources As Skye.UI.ListViewEX
     Friend WithEvents LVStations As Skye.UI.ListViewEX
-    Friend WithEvents StreamName As ColumnHeader
-    Friend WithEvents Tags As ColumnHeader
-    Friend WithEvents Bitrate As ColumnHeader
-    Friend WithEvents Country As ColumnHeader
-    Friend WithEvents Status As ColumnHeader
+    Friend WithEvents ColStreamName As ColumnHeader
+    Friend WithEvents ColTags As ColumnHeader
+    Friend WithEvents ColBitrate As ColumnHeader
+    Friend WithEvents ColCountry As ColumnHeader
+    Friend WithEvents ColStatus As ColumnHeader
     Friend WithEvents BtnSearch As Button
     Friend WithEvents TxtBoxSearch As TextBox
     Friend WithEvents Source As ColumnHeader
@@ -257,6 +263,7 @@ Partial Class Directory
     Friend WithEvents CMIAddToPlaylist As ToolStripMenuItem
     Friend WithEvents CMICopyStreamURL As ToolStripMenuItem
     Friend WithEvents StatusLabel As ToolStripStatusLabel
-    Friend WithEvents URL As ColumnHeader
-    Friend WithEvents Format As ColumnHeader
+    Friend WithEvents ColURL As ColumnHeader
+    Friend WithEvents ColFormat As ColumnHeader
+    Friend WithEvents ColMore As ColumnHeader
 End Class

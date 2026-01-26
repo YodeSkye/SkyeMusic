@@ -29,6 +29,17 @@ Public Class Directory
         SetAccentColor()
         SetTheme()
         ReThemeMenus()
+        ' Assign stable names to columns
+        If LVStations.Columns.Count >= 8 Then
+            LVStations.Columns(0).Name = "ColName"
+            LVStations.Columns(1).Name = "ColTags"
+            LVStations.Columns(2).Name = "ColFormat"
+            LVStations.Columns(3).Name = "ColBitrate"
+            LVStations.Columns(4).Name = "ColCountry"
+            LVStations.Columns(5).Name = "ColStatus"
+            LVStations.Columns(6).Name = "ColURL"
+            LVStations.Columns(7).Name = "ColMore"
+        End If
         radioBrowser = New RadioBrowserSource
         soma = New SomaFMSource
         LoadSources()
@@ -109,94 +120,54 @@ Public Class Directory
                 StatusLabel.Text = "Source not implemented yet."
         End Select
     End Sub
-    Private Sub BtnSearch_Click(sender As Object, e As EventArgs) Handles BtnSearch.Click
-        Search()
+    Private Sub LVStations_MouseDown(sender As Object, e As MouseEventArgs) Handles LVStations.MouseDown
+        If e.Button = MouseButtons.Right Then Return ' Handled by ContextMenu
+        Dim info = LVStations.HitTest(e.Location)
+        If info.Item Is Nothing Then Return
+        Dim clickedColumn = info.Item.SubItems.IndexOf(info.SubItem)
+
+        If LVStations.Columns(clickedColumn).Name = "ColMore" Then ShowStreamMenu(info.Item, e.Location)
+
     End Sub
     Private Async Sub LVStations_DoubleClick(sender As Object, e As EventArgs) Handles LVStations.DoubleClick
-        'If LVStations.SelectedItems.Count = 0 Then Return
-        'Player.PlayFromDirectory(LVStations.SelectedItems(0).Tag.ToString)
         If LVStations.SelectedItems.Count = 0 Then Return
 
-        Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
+        Dim item = LVStations.SelectedItems(0)
+        Dim url = Await GetPlayableURL(item)
 
-        ' No playable stream check
-        If (String.IsNullOrWhiteSpace(entry.Url)) AndAlso (entry.PlaylistUrls Is Nothing OrElse entry.PlaylistUrls.Count = 0) Then
-            StatusLabel.Text = "This station has no playable stream."
-            Return
-        End If
-
-        ' Explode playlists or use direct URL
-        Dim options = Await ExplodeAllPlaylistsAsync(entry)
-
-        If options.Count = 0 Then
+        If String.IsNullOrWhiteSpace(url) Then
             StatusLabel.Text = "No playable streams found."
             Return
         End If
 
-        ' If only one stream, play immediately
-        If options.Count = 1 Then
-            Player.PlayFromDirectory(options(0).Url)
-            Return
-        End If
-
-        ' Show popup for user selection
-        Using f As New DirectoryStreamList(options)
-            If f.ShowDialog(Me) = DialogResult.OK Then
-                Player.PlayFromDirectory(f.SelectedUrl)
-            End If
-        End Using
+        Player.PlayFromDirectory(url)
     End Sub
     Private Async Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
         If LVStations.SelectedItems.Count = 0 Then Return
 
-        Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
+        Dim item = LVStations.SelectedItems(0)
+        Dim url = Await GetPlayableURL(item)
 
-        ' No playable stream check
-        If (String.IsNullOrWhiteSpace(entry.Url)) AndAlso (entry.PlaylistUrls Is Nothing OrElse entry.PlaylistUrls.Count = 0) Then
-            StatusLabel.Text = "This station has no playable stream."
+        If String.IsNullOrWhiteSpace(url) Then
+            StatusLabel.Text = "No playable streams found."
             Return
         End If
 
-        Dim options = Await ExplodeAllPlaylistsAsync(entry)
-
-        If options.Count = 0 Then Return
-        If options.Count = 1 Then
-            Player.PlayFromDirectory(options(0).Url)
-            Return
-        End If
-
-        Using f As New DirectoryStreamList(options)
-            If f.ShowDialog(Me) = DialogResult.OK Then
-                Player.PlayFromDirectory(f.SelectedUrl)
-            End If
-        End Using
+        Player.PlayFromDirectory(url)
     End Sub
     Private Async Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
         If LVStations.SelectedItems.Count = 0 Then Return
 
-        Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
+        Dim item = LVStations.SelectedItems(0)
+        Dim url = Await GetPlayableURL(item)
 
-        ' No playable stream check
-        If (String.IsNullOrWhiteSpace(entry.Url)) AndAlso (entry.PlaylistUrls Is Nothing OrElse entry.PlaylistUrls.Count = 0) Then
-            StatusLabel.Text = "This station has no playable stream."
+        If String.IsNullOrWhiteSpace(url) Then
+            StatusLabel.Text = "No playable streams found."
             Return
         End If
 
-        Dim options = Await ExplodeAllPlaylistsAsync(entry)
-
-        If options.Count = 0 Then Return
-        If options.Count = 1 Then
-            Player.AddToPlaylistFromDirectory(options(0).Url)
-            Return
-        End If
-
-        Using f As New DirectoryStreamList(options)
-            If f.ShowDialog(Me) = DialogResult.OK Then
-                Player.AddToPlaylistFromDirectory(f.SelectedUrl)
-            End If
-        End Using
+        Player.AddToPlaylistFromDirectory(url)
     End Sub
-
     Private Sub CMICopyStreamURL_Click(sender As Object, e As EventArgs) Handles CMICopyStreamURL.Click
         If LVStations.SelectedItems.Count = 0 Then Return
         Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
@@ -214,6 +185,9 @@ Public Class Directory
         End If
         Clipboard.SetText(urlToCopy)
         StatusLabel.Text = "Stream URL copied."
+    End Sub
+    Private Sub BtnSearch_Click(sender As Object, e As EventArgs) Handles BtnSearch.Click
+        Search()
     End Sub
     Private Sub TxtBoxSearch_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxSearch.KeyDown
         If e.KeyCode = Keys.Enter Then
@@ -276,54 +250,46 @@ Public Class Directory
         ClearStationsSortState()
 
         For Each s In list
+
             Dim item As New ListViewItem(s.Name)
             item.SubItems.Add(s.Tags)
             item.SubItems.Add(s.Format)
             item.SubItems.Add(s.Bitrate.ToString())
             item.SubItems.Add(s.Country)
             item.SubItems.Add(s.Status)
+
+            ' Decide what to show in the URL column
             Dim displayUrl As String
+
             If Not String.IsNullOrWhiteSpace(s.Url) Then
-                ' Direct stream exists → show it
+                ' Direct stream OR resolved playlist
                 displayUrl = s.Url
+
             ElseIf s.PlaylistUrls IsNot Nothing AndAlso s.PlaylistUrls.Count > 0 Then
-                ' Playlist exists → show the playlist URL
+                ' Playlist with multiple streams
                 displayUrl = "Playlist"
             Else
-                ' Nothing playable → show placeholder
                 displayUrl = "No Stream Available"
             End If
+
             item.SubItems.Add(displayUrl)
+
+            ' More column (▾ only when multiple streams exist)
+            Dim moreText As String = ""
+            If s.PlaylistUrls IsNot Nothing AndAlso s.PlaylistUrls.Count > 1 Then
+                moreText = "▾"
+            End If
+            item.SubItems.Add(moreText)
+
             item.Tag = s
             LVStations.Items.Add(item)
         Next
 
-        ' Auto-resize each column to fit both content and header
-        LVStations.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.ColumnContent)
-        Dim contentWidth = LVStations.Columns(0).Width
-        LVStations.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.HeaderSize)
-        Dim headerWidth = LVStations.Columns(0).Width
-        LVStations.Columns(0).Width = Math.Min(300, Math.Max(contentWidth, headerWidth))
-        LVStations.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent)
-        contentWidth = LVStations.Columns(1).Width
-        LVStations.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.HeaderSize)
-        headerWidth = LVStations.Columns(1).Width
-        LVStations.Columns(1).Width = Math.Min(200, Math.Max(contentWidth, headerWidth))
-        LVStations.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.ColumnContent)
-        contentWidth = LVStations.Columns(4).Width
-        LVStations.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
-        headerWidth = LVStations.Columns(4).Width
-        LVStations.Columns(4).Width = Math.Max(contentWidth, headerWidth)
-        LVStations.AutoResizeColumn(5, ColumnHeaderAutoResizeStyle.ColumnContent)
-        contentWidth = LVStations.Columns(5).Width
-        LVStations.AutoResizeColumn(5, ColumnHeaderAutoResizeStyle.HeaderSize)
-        headerWidth = LVStations.Columns(5).Width
-        LVStations.Columns(5).Width = Math.Max(contentWidth, headerWidth)
-        LVStations.AutoResizeColumn(6, ColumnHeaderAutoResizeStyle.ColumnContent)
-        contentWidth = LVStations.Columns(6).Width
-        LVStations.AutoResizeColumn(6, ColumnHeaderAutoResizeStyle.HeaderSize)
-        headerWidth = LVStations.Columns(6).Width
-        LVStations.Columns(6).Width = Math.Max(contentWidth, headerWidth)
+        AutoSizeColumn(LVStations.Columns("ColName"), 300)
+        AutoSizeColumn(LVStations.Columns("ColTags"), 200)
+        AutoSizeColumn(LVStations.Columns("ColCountry"))
+        AutoSizeColumn(LVStations.Columns("ColStatus"))
+        AutoSizeColumn(LVStations.Columns("ColURL"))
 
         LVStations.EndUpdate()
     End Sub
@@ -377,7 +343,34 @@ Public Class Directory
                 StatusLabel.Text = "Search not implemented for this source."
         End Select
     End Sub
-    Private Async Function ExplodeAllPlaylistsAsync(entry As StreamEntry) As Task(Of List(Of StreamOption))
+    Private Async Function GetPlayableURL(item As ListViewItem) As Task(Of String)
+        Dim entry As StreamEntry = CType(item.Tag, StreamEntry)
+
+        ' If already resolved, return it
+        If Not String.IsNullOrWhiteSpace(entry.Url) AndAlso item.SubItems(6).Text <> "Playlist" Then
+            Return entry.Url
+        End If
+
+        ' If URL column says Playlist, explode now
+        Dim urlColIndex = LVStations.Columns("ColURL").Index
+        If item.SubItems(urlColIndex).Text = "Playlist" Then
+            Dim options = Await ExplodeAllPlaylists(entry)
+
+            If options.Count = 0 Then
+                Return Nothing
+            End If
+
+            ' Auto-select first stream
+            entry.Url = options(0).Url
+            item.SubItems(urlColIndex).Text = entry.Url
+
+            Return entry.Url
+        End If
+
+        ' Fallback
+        Return entry.Url
+    End Function
+    Private Async Function ExplodeAllPlaylists(entry As StreamEntry) As Task(Of List(Of StreamOption))
         Dim results As New List(Of StreamOption)
 
         ' If RadioBrowser gives a direct URL, handle that too
@@ -430,22 +423,6 @@ Public Class Directory
 
         Return "Unknown"
     End Function
-    Private Async Function ResolvePlaylistUrl(url As String) As Task(Of String)
-        If url.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase) OrElse url.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) Then
-            Try
-                Dim text = Await App.Http.GetStringAsync(url)
-                Dim urls = ExtractUrlsFromPlaylistText(text)
-
-                If urls.Count > 0 Then
-                    Return urls(0) ' first real stream URL
-                End If
-
-            Catch ex As Exception
-                App.WriteToLog("Player Playlist resolve failed: " & ex.ToString())
-            End Try
-        End If
-        Return url ' fallback
-    End Function
     Private Function ExtractUrlsFromPlaylistText(text As String) As List(Of String)
         Dim urls As New List(Of String)
 
@@ -481,6 +458,60 @@ Public Class Directory
 
         Return urls
     End Function
+    Private Async Sub ShowStreamMenu(item As ListViewItem, clickPoint As Point)
+        Dim entry As StreamEntry = CType(item.Tag, StreamEntry)
+
+        ' Explode playlists
+        Dim options = Await ExplodeAllPlaylists(entry)
+        If options.Count = 0 Then Return
+
+        Dim menu As New ContextMenuStrip With {
+            .Font = CurrentTheme.SubBaseFont,
+            .ShowImageMargin = False
+        }
+        App.ThemeMenu(menu)
+
+        For Each opt In options
+            Dim shortUrl = TruncateUrl(opt.Url, 50)
+            Dim label = $"{opt.Bitrate} {opt.Format}   {shortUrl}"
+
+            Dim mi As New ToolStripMenuItem(label)
+            mi.Tag = opt.Url
+
+            AddHandler mi.Click,
+            Sub()
+                entry.Url = opt.Url
+
+                Dim urlCol = LVStations.Columns("ColURL").Index
+                item.SubItems(urlCol).Text = entry.Url
+            End Sub
+
+            menu.Items.Add(mi)
+        Next
+
+        menu.Show(LVStations, clickPoint)
+    End Sub
+    Private Function TruncateUrl(url As String, maxLength As Integer) As String
+        If url.Length <= maxLength Then Return url
+
+        Dim keep = (maxLength - 5) \ 2
+        Dim startPart = url.Substring(0, keep)
+        Dim endPart = url.Substring(url.Length - keep)
+
+        Return $"{startPart}...{endPart}"
+    End Function
+    Private Sub AutoSizeColumn(col As ColumnHeader, Optional maxWidth As Integer = 0)
+        LVStations.AutoResizeColumn(col.Index, ColumnHeaderAutoResizeStyle.ColumnContent)
+        Dim contentWidth = col.Width
+
+        LVStations.AutoResizeColumn(col.Index, ColumnHeaderAutoResizeStyle.HeaderSize)
+        Dim headerWidth = col.Width
+
+        Dim finalWidth = Math.Max(contentWidth, headerWidth)
+        If maxWidth > 0 Then finalWidth = Math.Min(maxWidth, finalWidth)
+
+        col.Width = finalWidth
+    End Sub
     Private Sub SetStatusLabelEmptyText()
         StatusLabel.Text = "No stations to display. Select a source from the left to begin."
     End Sub
@@ -511,7 +542,7 @@ Public Class Directory
             StatusStripDirectory.BackColor = c
         End If
         ResumeLayout()
-        Debug.Print("History Accent Color Set")
+        'Debug.Print("Directory Accent Color Set")
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
@@ -533,7 +564,7 @@ Public Class Directory
         LVStations.ForeColor = App.CurrentTheme.TextColor
 
         ResumeLayout()
-        Debug.Print("History Theme Set")
+        'Debug.Print("Directory Theme Set")
     End Sub
     Friend Sub ReThemeMenus()
         App.ThemeMenu(CMStations)
@@ -674,8 +705,6 @@ Public Class Directory
         Public Async Function GetStationsAsync() As Task(Of List(Of StreamEntry))
             Try
                 Dim json = Await client.GetStringAsync("channels.json")
-                Debug.Print(json)
-
                 Return ParseStations(json)
             Catch ex As Exception
                 App.WriteToLog("SomaFM Error: " & ex.ToString())
