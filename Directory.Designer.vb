@@ -36,6 +36,7 @@ Partial Class Directory
         LVStations = New Skye.UI.ListViewEX()
         StreamName = New ColumnHeader()
         Tags = New ColumnHeader()
+        Format = New ColumnHeader()
         Bitrate = New ColumnHeader()
         Country = New ColumnHeader()
         Status = New ColumnHeader()
@@ -64,9 +65,9 @@ Partial Class Directory
         ' 
         ' BtnSearch
         ' 
-        BtnSearch.Location = New Point(285, 12)
+        BtnSearch.Location = New Point(285, 11)
         BtnSearch.Name = "BtnSearch"
-        BtnSearch.Size = New Size(75, 29)
+        BtnSearch.Size = New Size(75, 30)
         BtnSearch.TabIndex = 1
         BtnSearch.Text = "Search"
         BtnSearch.UseVisualStyleBackColor = True
@@ -120,7 +121,7 @@ Partial Class Directory
         ' Source
         ' 
         Source.Text = "Source"
-        Source.Width = 275
+        Source.Width = 277
         ' 
         ' PanelDirectoryList
         ' 
@@ -134,13 +135,12 @@ Partial Class Directory
         ' LVStations
         ' 
         LVStations.BorderStyle = BorderStyle.FixedSingle
-        LVStations.Columns.AddRange(New ColumnHeader() {StreamName, Tags, Bitrate, Country, Status, URL})
+        LVStations.Columns.AddRange(New ColumnHeader() {StreamName, Tags, Format, Bitrate, Country, Status, URL})
         LVStations.ContextMenuStrip = CMStations
         LVStations.Dock = DockStyle.Fill
         LVStations.FullRowSelect = True
         LVStations.InsertionLineColor = Color.Teal
         LVStations.Location = New Point(0, 0)
-        LVStations.MultiSelect = False
         LVStations.Name = "LVStations"
         LVStations.Size = New Size(750, 559)
         LVStations.TabIndex = 0
@@ -156,6 +156,12 @@ Partial Class Directory
         ' 
         Tags.Text = "Tags"
         Tags.Width = 150
+        ' 
+        ' Format
+        ' 
+        Format.Text = "Format"
+        Format.TextAlign = HorizontalAlignment.Center
+        Format.Width = 90
         ' 
         ' Bitrate
         ' 
@@ -204,7 +210,7 @@ Partial Class Directory
         CMICopyStreamURL.Image = My.Resources.Resources.ImageCopy16
         CMICopyStreamURL.Name = "CMICopyStreamURL"
         CMICopyStreamURL.Size = New Size(152, 22)
-        CMICopyStreamURL.Text = "Copy"
+        CMICopyStreamURL.Text = "Copy URL"
         ' 
         ' Directory
         ' 
@@ -252,4 +258,5 @@ Partial Class Directory
     Friend WithEvents CMICopyStreamURL As ToolStripMenuItem
     Friend WithEvents StatusLabel As ToolStripStatusLabel
     Friend WithEvents URL As ColumnHeader
+    Friend WithEvents Format As ColumnHeader
 End Class

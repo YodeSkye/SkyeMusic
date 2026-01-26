@@ -4080,63 +4080,6 @@ Public Class Player
             Return False
         End If
     End Function
-    Private Async Function ResolvePlaylistUrl(url As String) As Task(Of String)
-        If url.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase) OrElse url.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) Then
-            Try
-                Dim text = Await httpClient.GetStringAsync(url)
-                Dim urls = ExtractUrlsFromPlaylistText(text)
-
-                If urls.Count > 0 Then
-                    Return urls(0) ' first real stream URL
-                End If
-
-            Catch ex As Exception
-                App.WriteToLog("Player Playlist resolve failed: " & ex.ToString())
-            End Try
-        End If
-        Return url ' fallback
-    End Function
-    Private Function ExtractUrlsFromPlaylistText(text As String) As List(Of String)
-        Dim urls As New List(Of String)
-
-        For Each rawLine In text.Split({vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
-            Dim line = rawLine.Trim()
-
-            ' --- .pls format: File1=URL ---
-            If line.StartsWith("File", StringComparison.OrdinalIgnoreCase) Then
-                Dim parts = line.Split("="c)
-                If parts.Length = 2 AndAlso parts(1).StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
-                    urls.Add(parts(1).Trim())
-                End If
-                Continue For
-            End If
-
-            ' --- .m3u format: raw URL lines ---
-            If line.StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
-                urls.Add(line)
-            End If
-        Next
-
-        Return urls
-    End Function
-    Private Function NormalizeUrl(url As String) As String
-        Try
-            Dim u = New Uri(url)
-
-            ' If port is default (80 for http, 443 for https), remove it
-            If (u.Scheme = "http" AndAlso u.Port = 80) OrElse
-           (u.Scheme = "https" AndAlso u.Port = 443) Then
-
-                Dim builder As New UriBuilder(u)
-                builder.Port = -1 ' remove port
-                Return builder.Uri.ToString()
-            End If
-
-            Return url
-        Catch
-            Return url
-        End Try
-    End Function
     Private Function FormatDuration(duration As Double) As String
         Dim dur As TimeSpan = TimeSpan.FromSeconds(duration)
         Dim durstr As String = ""
@@ -4749,6 +4692,63 @@ Public Class Player
             'Debug.Print("Added " + songorstream + " to Random History")
         End If
     End Sub
+    Private Async Function ResolvePlaylistUrl(url As String) As Task(Of String)
+        If url.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase) OrElse url.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) Then
+            Try
+                Dim text = Await httpClient.GetStringAsync(url)
+                Dim urls = ExtractUrlsFromPlaylistText(text)
+
+                If urls.Count > 0 Then
+                    Return urls(0) ' first real stream URL
+                End If
+
+            Catch ex As Exception
+                App.WriteToLog("Player Playlist resolve failed: " & ex.ToString())
+            End Try
+        End If
+        Return url ' fallback
+    End Function
+    Private Function ExtractUrlsFromPlaylistText(text As String) As List(Of String)
+        Dim urls As New List(Of String)
+
+        For Each rawLine In text.Split({vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+            Dim line = rawLine.Trim()
+
+            ' --- .pls format: File1=URL ---
+            If line.StartsWith("File", StringComparison.OrdinalIgnoreCase) Then
+                Dim parts = line.Split("="c)
+                If parts.Length = 2 AndAlso parts(1).StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
+                    urls.Add(parts(1).Trim())
+                End If
+                Continue For
+            End If
+
+            ' --- .m3u format: raw URL lines ---
+            If line.StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
+                urls.Add(line)
+            End If
+        Next
+
+        Return urls
+    End Function
+    Private Function NormalizeUrl(url As String) As String
+        Try
+            Dim u = New Uri(url)
+
+            ' If port is default (80 for http, 443 for https), remove it
+            If (u.Scheme = "http" AndAlso u.Port = 80) OrElse
+           (u.Scheme = "https" AndAlso u.Port = 443) Then
+
+                Dim builder As New UriBuilder(u)
+                builder.Port = -1 ' remove port
+                Return builder.Uri.ToString()
+            End If
+
+            Return url
+        Catch
+            Return url
+        End Try
+    End Function
     Friend Sub RandomHistoryClear()
         RandomHistory.Clear()
     End Sub

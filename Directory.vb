@@ -7,9 +7,11 @@ Public Class Directory
     ' Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
-    Private radioBrowser As RadioBrowserSource
     Private sortColumn As Integer = -1
     Private sortOrder As SortOrder = SortOrder.Ascending
+    Private radioBrowser As RadioBrowserSource
+    Private soma As SomaFMSource
+
 
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -29,6 +31,7 @@ Public Class Directory
         SetTheme()
         ReThemeMenus()
         radioBrowser = New RadioBrowserSource
+        soma = New SomaFMSource
         LoadSources()
         SetStatusLabelEmptyText()
         CMStations.Font = CurrentTheme.BaseFont
@@ -91,6 +94,10 @@ Public Class Directory
                 Dim results = Await radioBrowser.GetDefaultStationsAsync()
                 PopulateStations(results)
                 StatusLabel.Text = $"Loaded {results.Count} stations."
+            Case "SomaFM"
+                Dim results = Await soma.GetStationsAsync()
+                PopulateStations(results)
+                StatusLabel.Text = $"Loaded {results.Count} SomaFM channels."
             Case Else
                 StatusLabel.Text = "Source not implemented yet."
         End Select
@@ -108,7 +115,9 @@ Public Class Directory
     End Sub
     Private Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
         If LVStations.SelectedItems.Count = 0 Then Return
-        Player.AddToPlaylistFromDirectory(LVStations.SelectedItems(0).Tag.ToString)
+        For Each item As ListViewItem In LVStations.SelectedItems
+            Player.AddToPlaylistFromDirectory(item.Tag.ToString)
+        Next
     End Sub
     Private Sub CMICopyStreamURL_Click(sender As Object, e As EventArgs) Handles CMICopyStreamURL.Click
         If LVStations.SelectedItems.Count = 0 Then Return
@@ -161,8 +170,7 @@ Public Class Directory
         LVSources.Items.Clear()
 
         LVSources.Items.Add(New ListViewItem("RadioBrowser"))
-        ' Future:
-        ' LVSources.Items.Add(New ListViewItem("Icecast"))
+        LVSources.Items.Add(New ListViewItem("SomaFM"))
         ' LVSources.Items.Add(New ListViewItem("SHOUTcast"))
         ' LVSources.Items.Add(New ListViewItem("Live365"))
         ' LVSources.Items.Add(New ListViewItem("Favorites"))
@@ -178,6 +186,7 @@ Public Class Directory
         For Each s In list
             Dim item As New ListViewItem(s.Name)
             item.SubItems.Add(s.Tags)
+            item.SubItems.Add(s.Format)
             item.SubItems.Add(s.Bitrate.ToString())
             item.SubItems.Add(s.Country)
             item.SubItems.Add(s.Status)
@@ -186,13 +195,34 @@ Public Class Directory
             LVStations.Items.Add(item)
         Next
 
-        LVStations.EndUpdate()
-    End Sub
-    Private Async Sub SearchRadioBrowser(query As String)
-        Await Task.Delay(300)
+        ' Auto-resize each column to fit both content and header
+        LVStations.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.ColumnContent)
+        Dim contentWidth = LVStations.Columns(0).Width
+        LVStations.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.HeaderSize)
+        Dim headerWidth = LVStations.Columns(0).Width
+        LVStations.Columns(0).Width = Math.Min(300, Math.Max(contentWidth, headerWidth))
+        LVStations.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent)
+        contentWidth = LVStations.Columns(1).Width
+        LVStations.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.HeaderSize)
+        headerWidth = LVStations.Columns(1).Width
+        LVStations.Columns(1).Width = Math.Min(200, Math.Max(contentWidth, headerWidth))
+        LVStations.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.ColumnContent)
+        contentWidth = LVStations.Columns(4).Width
+        LVStations.AutoResizeColumn(4, ColumnHeaderAutoResizeStyle.HeaderSize)
+        headerWidth = LVStations.Columns(4).Width
+        LVStations.Columns(4).Width = Math.Max(contentWidth, headerWidth)
+        LVStations.AutoResizeColumn(5, ColumnHeaderAutoResizeStyle.ColumnContent)
+        contentWidth = LVStations.Columns(5).Width
+        LVStations.AutoResizeColumn(5, ColumnHeaderAutoResizeStyle.HeaderSize)
+        headerWidth = LVStations.Columns(5).Width
+        LVStations.Columns(5).Width = Math.Max(contentWidth, headerWidth)
+        LVStations.AutoResizeColumn(6, ColumnHeaderAutoResizeStyle.ColumnContent)
+        contentWidth = LVStations.Columns(6).Width
+        LVStations.AutoResizeColumn(6, ColumnHeaderAutoResizeStyle.HeaderSize)
+        headerWidth = LVStations.Columns(6).Width
+        LVStations.Columns(6).Width = Math.Max(contentWidth, headerWidth)
 
-        ' TODO: Replace with actual API call
-        StatusLabel.Text = $"No results for '{query}'."
+        LVStations.EndUpdate()
     End Sub
     Private Async Sub Search()
         Dim query As String = TxtBoxSearch.Text.Trim()
@@ -221,10 +251,42 @@ Public Class Directory
                 Else
                     StatusLabel.Text = $"Found {results.Count} stations."
                 End If
+            Case "SomaFM"
+                ' Load all channels
+                Dim all = Await soma.GetStationsAsync()
+
+                ' Local filtering
+                Dim results = all.Where(Function(s)
+                                            Return (s.Name IsNot Nothing AndAlso
+                                        s.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) _
+                                    OrElse (s.Tags IsNot Nothing AndAlso
+                                        s.Tags.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
+                                        End Function).ToList()
+
+                PopulateStations(results)
+
+                If results.Count = 0 Then
+                    StatusLabel.Text = $"No SomaFM results for '{query}'."
+                Else
+                    StatusLabel.Text = $"Found {results.Count} SomaFM channels."
+                End If
             Case Else
                 StatusLabel.Text = "Search not implemented for this source."
         End Select
     End Sub
+    Private Shared Function ExtractBitrateFromUrl(url As String) As Integer
+        If String.IsNullOrWhiteSpace(url) Then Return 0
+
+        Dim parts = url.Split("-"c)
+        For Each p In parts
+            Dim n As Integer
+            If Integer.TryParse(p, n) Then
+                Return n
+            End If
+        Next
+
+        Return 0
+    End Function
     Private Sub SetStatusLabelEmptyText()
         StatusLabel.Text = "No stations to display. Select a source from the left to begin."
     End Sub
@@ -330,11 +392,12 @@ Public Class Directory
     ' Source Classes
     Public Class StreamEntry
         Public Property Name As String
-        Public Property Url As String
         Public Property Tags As String
+        Public Property Format As String
         Public Property Bitrate As Integer
         Public Property Country As String
         Public Property Status As String
+        Public Property Url As String
     End Class
     Public Class RadioBrowserSource
 
@@ -366,6 +429,57 @@ Public Class Directory
                     .Country = item("country")?.ToString(),
                     .Status = item("status")?.ToString()
                 })
+            Next
+
+            Return list
+        End Function
+
+    End Class
+    Public Class SomaFMSource
+
+        Private ReadOnly client As HttpClient
+
+        Public Sub New()
+            client = New HttpClient With {.BaseAddress = New Uri("https://api.somafm.com/")}
+        End Sub
+
+        Public Async Function GetStationsAsync() As Task(Of List(Of StreamEntry))
+            Try
+                Dim json = Await client.GetStringAsync("channels.json")
+                Debug.Print(json)
+
+                Return ParseStations(json)
+            Catch ex As Exception
+                App.WriteToLog("SomaFM Error: " & ex.ToString())
+                Return New List(Of StreamEntry)
+            End Try
+        End Function
+        Private Function ParseStations(json As String) As List(Of StreamEntry)
+            Dim root = JObject.Parse(json)
+            Dim arr = root("channels")
+            Dim list As New List(Of StreamEntry)
+
+            For Each item In arr
+                Dim title As String = item("title")?.ToString()
+                Dim genre As String = item("genre")?.ToString()
+
+                Dim playlists = item("playlists")
+                If playlists IsNot Nothing AndAlso playlists.Count > 0 Then
+                    For Each p In playlists
+                        Dim url As String = p("url")?.ToString()
+                        If String.IsNullOrWhiteSpace(url) Then Continue For
+
+                        list.Add(New StreamEntry With {
+                            .Name = title,
+                            .Url = url,
+                            .Tags = genre,
+                            .Bitrate = 0,
+                            .Country = "USA",
+                            .Status = "OK",
+                            .Format = p("format")?.ToString()
+                        })
+                    Next
+                End If
             Next
 
             Return list
