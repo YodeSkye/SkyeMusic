@@ -1,7 +1,5 @@
 ﻿
 Imports System.IO
-Imports System.Net.Http
-Imports System.Security.AccessControl
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
@@ -49,7 +47,6 @@ Public Class Player
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
-    Private ReadOnly httpClient As New HttpClient()
 
     'Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -3312,6 +3309,7 @@ Public Class Player
         If frmAddStream.DialogResult = DialogResult.OK Then
             If Uri.TryCreate(frmAddStream.NewStream.Path, UriKind.Absolute, uriresult) Then
                 Dim newstream As String = frmAddStream.NewStream.Path.TrimEnd("/"c)
+                newstream = NormalizeUrl(newstream)
                 'Add to History
                 App.AddToHistoryFromPlaylist(newstream, True)
                 'Add to Playlist
@@ -4383,15 +4381,16 @@ Public Class Player
         Try
             Dim items = format.Import(filename)
             For Each item In items
+                Dim path = NormalizeUrl(item.Path.TrimEnd("/"c))
                 Dim lvi As ListViewItem = Nothing
                 If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(item.Path, True, 0)
                 If lvi Is Nothing Then 'Create new Playlist entry
                     lvi = CreateListviewItem()
                     lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = item.Title
-                    lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = item.Path.TrimEnd("/"c)
-                    Dim isstream As Boolean = App.IsUrl(item.Path)
-                    App.AddToHistoryFromPlaylist(item.Path, isstream)
-                    GetHistory(lvi, item.Path)
+                    lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = path
+                    Dim isstream As Boolean = App.IsUrl(path)
+                    App.AddToHistoryFromPlaylist(path, isstream)
+                    GetHistory(lvi, path)
                     If LVPlaylist.SelectedItems.Count > 0 Then
                         LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
                     Else
@@ -4400,8 +4399,8 @@ Public Class Player
                     'Debug.Print("MergePlaylistFromFile isstream = " & isstream.ToString)
                 Else 'Update existing Playlist entry
                     If String.IsNullOrWhiteSpace(item.Title) Then
-                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = IO.Path.GetFileNameWithoutExtension(item.Path)
-                        If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(item.Path)) Then lvi.SubItems(LVPlaylist.Columns("Title").Index).Text += App.PlaylistVideoIdentifier
+                        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = IO.Path.GetFileNameWithoutExtension(path)
+                        If App.VideoExtensionDictionary.ContainsKey(IO.Path.GetExtension(path)) Then lvi.SubItems(LVPlaylist.Columns("Title").Index).Text += App.PlaylistVideoIdentifier
                     Else
                         lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = item.Title
                     End If
@@ -4551,12 +4550,8 @@ Public Class Player
         SetPlaylistCountText()
         lvi = Nothing
     End Sub
-    Friend Async Sub AddToPlaylistFromDirectory(stream As String, Optional alreadyResolved As Boolean = False)
-        Dim realUrl As String = stream
-        If Not alreadyResolved Then
-            realUrl = Await ResolvePlaylistUrl(realUrl)
-            realUrl = NormalizeUrl(realUrl)
-        End If
+    Friend Sub AddToPlaylistFromDirectory(stream As String)
+        Dim realUrl As String = NormalizeUrl(stream)
 
         Dim lvi As ListViewItem = Nothing
         If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(realUrl, True, 0)
@@ -4579,6 +4574,7 @@ Public Class Player
             LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
         End If
         SetPlaylistCountText()
+
     End Sub
     Friend Sub AddToPlaylistFromHistory(items As List(Of String))
         Dim addedcount As Integer = 0
@@ -4692,55 +4688,13 @@ Public Class Player
             'Debug.Print("Added " + songorstream + " to Random History")
         End If
     End Sub
-    Private Async Function ResolvePlaylistUrl(url As String) As Task(Of String)
-        If url.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase) OrElse url.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) Then
-            Try
-                Dim text = Await httpClient.GetStringAsync(url)
-                Dim urls = ExtractUrlsFromPlaylistText(text)
-
-                If urls.Count > 0 Then
-                    Return urls(0) ' first real stream URL
-                End If
-
-            Catch ex As Exception
-                App.WriteToLog("Player Playlist resolve failed: " & ex.ToString())
-            End Try
-        End If
-        Return url ' fallback
-    End Function
-    Private Function ExtractUrlsFromPlaylistText(text As String) As List(Of String)
-        Dim urls As New List(Of String)
-
-        For Each rawLine In text.Split({vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
-            Dim line = rawLine.Trim()
-
-            ' --- .pls format: File1=URL ---
-            If line.StartsWith("File", StringComparison.OrdinalIgnoreCase) Then
-                Dim parts = line.Split("="c)
-                If parts.Length = 2 AndAlso parts(1).StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
-                    urls.Add(parts(1).Trim())
-                End If
-                Continue For
-            End If
-
-            ' --- .m3u format: raw URL lines ---
-            If line.StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
-                urls.Add(line)
-            End If
-        Next
-
-        Return urls
-    End Function
     Private Function NormalizeUrl(url As String) As String
         Try
             Dim u = New Uri(url)
 
             ' If port is default (80 for http, 443 for https), remove it
-            If (u.Scheme = "http" AndAlso u.Port = 80) OrElse
-           (u.Scheme = "https" AndAlso u.Port = 443) Then
-
-                Dim builder As New UriBuilder(u)
-                builder.Port = -1 ' remove port
+            If (u.Scheme = "http" AndAlso u.Port = 80) OrElse (u.Scheme = "https" AndAlso u.Port = 443) Then
+                Dim builder As New UriBuilder(u) With {.Port = -1} ' remove port
                 Return builder.Uri.ToString()
             End If
 
@@ -5000,13 +4954,12 @@ Public Class Player
         StopPlay()
         PlayFile(filename, "PlayFromLibrary")
     End Sub
-    Friend Async Sub PlayFromDirectory(stream As String)
+    Friend Sub PlayFromDirectory(stream As String)
         LyricsOff()
-        Dim realUrl = Await ResolvePlaylistUrl(stream)
-        realUrl = NormalizeUrl(realUrl)
+        Dim realUrl As String = NormalizeUrl(stream)
         Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(realUrl, True, 0)
         If existingitem Is Nothing Then
-            AddToPlaylistFromDirectory(realUrl, True)
+            AddToPlaylistFromDirectory(realUrl)
         Else
             EnsurePlaylistItemIsVisible(existingitem.Index)
         End If

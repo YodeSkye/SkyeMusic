@@ -12,7 +12,6 @@ Public Class Directory
     Private radioBrowser As RadioBrowserSource
     Private soma As SomaFMSource
 
-
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
@@ -81,20 +80,28 @@ Public Class Directory
     End Sub
 
     ' Control Events
-    Private Async Sub LVSources_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVSources.SelectedIndexChanged
-        If LVSources.SelectedItems.Count = 0 Then Return
+    Private Async Sub LVSources_MouseDown(sender As Object, e As MouseEventArgs) Handles LVSources.MouseDown
+        ' Find the item under the mouse
+        Dim info = LVSources.HitTest(e.Location)
+        Dim item = info.Item
+        If item Is Nothing Then Return
 
-        Dim selectedSource As String = LVSources.SelectedItems(0).Text
+        ' Ensure it becomes selected (for visual feedback)
+        item.Selected = True
+
+        Dim selectedSource As String = item.Text
 
         LVStations.Items.Clear()
         StatusLabel.Text = $"Loading {selectedSource}…"
 
         Select Case selectedSource
             Case "RadioBrowser"
+                TxtBoxSearch.PlaceholderText = "< Top Stations >"
                 Dim results = Await radioBrowser.GetDefaultStationsAsync()
                 PopulateStations(results)
-                StatusLabel.Text = $"Loaded {results.Count} stations."
+                StatusLabel.Text = $"Loaded {results.Count} stations of thousands."
             Case "SomaFM"
+                TxtBoxSearch.PlaceholderText = "< All SomaFM Channels >"
                 Dim results = Await soma.GetStationsAsync()
                 PopulateStations(results)
                 StatusLabel.Text = $"Loaded {results.Count} SomaFM channels."
@@ -105,23 +112,108 @@ Public Class Directory
     Private Sub BtnSearch_Click(sender As Object, e As EventArgs) Handles BtnSearch.Click
         Search()
     End Sub
-    Private Sub LVStations_DoubleClick(sender As Object, e As EventArgs) Handles LVStations.DoubleClick
+    Private Async Sub LVStations_DoubleClick(sender As Object, e As EventArgs) Handles LVStations.DoubleClick
+        'If LVStations.SelectedItems.Count = 0 Then Return
+        'Player.PlayFromDirectory(LVStations.SelectedItems(0).Tag.ToString)
         If LVStations.SelectedItems.Count = 0 Then Return
-        Player.PlayFromDirectory(LVStations.SelectedItems(0).Tag.ToString)
+
+        Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
+
+        ' No playable stream check
+        If (String.IsNullOrWhiteSpace(entry.Url)) AndAlso (entry.PlaylistUrls Is Nothing OrElse entry.PlaylistUrls.Count = 0) Then
+            StatusLabel.Text = "This station has no playable stream."
+            Return
+        End If
+
+        ' Explode playlists or use direct URL
+        Dim options = Await ExplodeAllPlaylistsAsync(entry)
+
+        If options.Count = 0 Then
+            StatusLabel.Text = "No playable streams found."
+            Return
+        End If
+
+        ' If only one stream, play immediately
+        If options.Count = 1 Then
+            Player.PlayFromDirectory(options(0).Url)
+            Return
+        End If
+
+        ' Show popup for user selection
+        Using f As New DirectoryStreamList(options)
+            If f.ShowDialog(Me) = DialogResult.OK Then
+                Player.PlayFromDirectory(f.SelectedUrl)
+            End If
+        End Using
     End Sub
-    Private Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
+    Private Async Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
         If LVStations.SelectedItems.Count = 0 Then Return
-        Player.PlayFromDirectory(LVStations.SelectedItems(0).Tag.ToString)
+
+        Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
+
+        ' No playable stream check
+        If (String.IsNullOrWhiteSpace(entry.Url)) AndAlso (entry.PlaylistUrls Is Nothing OrElse entry.PlaylistUrls.Count = 0) Then
+            StatusLabel.Text = "This station has no playable stream."
+            Return
+        End If
+
+        Dim options = Await ExplodeAllPlaylistsAsync(entry)
+
+        If options.Count = 0 Then Return
+        If options.Count = 1 Then
+            Player.PlayFromDirectory(options(0).Url)
+            Return
+        End If
+
+        Using f As New DirectoryStreamList(options)
+            If f.ShowDialog(Me) = DialogResult.OK Then
+                Player.PlayFromDirectory(f.SelectedUrl)
+            End If
+        End Using
     End Sub
-    Private Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
+    Private Async Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
         If LVStations.SelectedItems.Count = 0 Then Return
-        For Each item As ListViewItem In LVStations.SelectedItems
-            Player.AddToPlaylistFromDirectory(item.Tag.ToString)
-        Next
+
+        Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
+
+        ' No playable stream check
+        If (String.IsNullOrWhiteSpace(entry.Url)) AndAlso (entry.PlaylistUrls Is Nothing OrElse entry.PlaylistUrls.Count = 0) Then
+            StatusLabel.Text = "This station has no playable stream."
+            Return
+        End If
+
+        Dim options = Await ExplodeAllPlaylistsAsync(entry)
+
+        If options.Count = 0 Then Return
+        If options.Count = 1 Then
+            Player.AddToPlaylistFromDirectory(options(0).Url)
+            Return
+        End If
+
+        Using f As New DirectoryStreamList(options)
+            If f.ShowDialog(Me) = DialogResult.OK Then
+                Player.AddToPlaylistFromDirectory(f.SelectedUrl)
+            End If
+        End Using
     End Sub
+
     Private Sub CMICopyStreamURL_Click(sender As Object, e As EventArgs) Handles CMICopyStreamURL.Click
         If LVStations.SelectedItems.Count = 0 Then Return
-        Clipboard.SetText(LVStations.SelectedItems(0).Tag.ToString)
+        Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
+        Dim urlToCopy As String = Nothing
+
+        If Not String.IsNullOrWhiteSpace(entry.Url) Then
+            urlToCopy = entry.Url
+        ElseIf entry.PlaylistUrls IsNot Nothing AndAlso entry.PlaylistUrls.Count > 0 Then
+            urlToCopy = entry.PlaylistUrls(0)
+        End If
+
+        If String.IsNullOrWhiteSpace(urlToCopy) Then
+            StatusLabel.Text = "This station has no stream URL to copy."
+            Return
+        End If
+        Clipboard.SetText(urlToCopy)
+        StatusLabel.Text = "Stream URL copied."
     End Sub
     Private Sub TxtBoxSearch_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxSearch.KeyDown
         If e.KeyCode = Keys.Enter Then
@@ -190,8 +282,19 @@ Public Class Directory
             item.SubItems.Add(s.Bitrate.ToString())
             item.SubItems.Add(s.Country)
             item.SubItems.Add(s.Status)
-            item.SubItems.Add(s.Url)
-            item.Tag = s.Url
+            Dim displayUrl As String
+            If Not String.IsNullOrWhiteSpace(s.Url) Then
+                ' Direct stream exists → show it
+                displayUrl = s.Url
+            ElseIf s.PlaylistUrls IsNot Nothing AndAlso s.PlaylistUrls.Count > 0 Then
+                ' Playlist exists → show the playlist URL
+                displayUrl = "Playlist"
+            Else
+                ' Nothing playable → show placeholder
+                displayUrl = "No Stream Available"
+            End If
+            item.SubItems.Add(displayUrl)
+            item.Tag = s
             LVStations.Items.Add(item)
         Next
 
@@ -274,18 +377,109 @@ Public Class Directory
                 StatusLabel.Text = "Search not implemented for this source."
         End Select
     End Sub
-    Private Shared Function ExtractBitrateFromUrl(url As String) As Integer
-        If String.IsNullOrWhiteSpace(url) Then Return 0
+    Private Async Function ExplodeAllPlaylistsAsync(entry As StreamEntry) As Task(Of List(Of StreamOption))
+        Dim results As New List(Of StreamOption)
 
-        Dim parts = url.Split("-"c)
-        For Each p In parts
-            Dim n As Integer
-            If Integer.TryParse(p, n) Then
-                Return n
+        ' If RadioBrowser gives a direct URL, handle that too
+        If entry.PlaylistUrls Is Nothing OrElse entry.PlaylistUrls.Count = 0 Then
+            ' Single direct stream
+            results.Add(New StreamOption With {
+            .Url = entry.Url,
+            .Bitrate = entry.Bitrate,
+            .Format = entry.Format
+        })
+            Return results
+        End If
+
+        ' Handle playlist URLs (SomaFM or RadioBrowser)
+        For Each playlistUrl In entry.PlaylistUrls
+            Try
+                Dim text = Await App.Http.GetStringAsync(playlistUrl)
+                Dim urls = ExtractUrlsFromPlaylistText(text)
+
+                For Each u In urls
+                    results.Add(New StreamOption With {
+                    .Url = u,
+                    .Bitrate = ExtractBitrateFromUrl(u),
+                    .Format = ExtractFormatFromUrl(u)
+                })
+                Next
+
+            Catch ex As Exception
+                App.WriteToLog("Playlist explode failed: " & ex.ToString())
+            End Try
+        Next
+
+        Return results
+    End Function
+    Private Function ExtractBitrateFromUrl(url As String) As Integer
+        Dim m = System.Text.RegularExpressions.Regex.Match(url, "(\d{2,3})")
+        If m.Success Then
+            Return CInt(m.Value)
+        End If
+        Return 0
+    End Function
+    Private Function ExtractFormatFromUrl(url As String) As String
+        Dim u = url.ToLower()
+
+        If u.Contains("aacp") Then Return "AAC+"
+        If u.Contains("aac") Then Return "AAC"
+        If u.Contains("mp3") Then Return "MP3"
+        If u.Contains("ogg") OrElse u.Contains("opus") Then Return "OGG"
+        If u.Contains("m3u8") Then Return "HLS"
+
+        Return "Unknown"
+    End Function
+    Private Async Function ResolvePlaylistUrl(url As String) As Task(Of String)
+        If url.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase) OrElse url.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) Then
+            Try
+                Dim text = Await App.Http.GetStringAsync(url)
+                Dim urls = ExtractUrlsFromPlaylistText(text)
+
+                If urls.Count > 0 Then
+                    Return urls(0) ' first real stream URL
+                End If
+
+            Catch ex As Exception
+                App.WriteToLog("Player Playlist resolve failed: " & ex.ToString())
+            End Try
+        End If
+        Return url ' fallback
+    End Function
+    Private Function ExtractUrlsFromPlaylistText(text As String) As List(Of String)
+        Dim urls As New List(Of String)
+
+        For Each rawLine In text.Split({vbCrLf, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+            Dim line = rawLine.Trim()
+
+            ' Skip comments (#EXTM3U, #EXTINF, etc.)
+            If line.StartsWith("#") Then Continue For
+
+            ' --- .pls format: File1=URL ---
+            If line.StartsWith("File", StringComparison.OrdinalIgnoreCase) Then
+                Dim parts = line.Split("="c)
+                If parts.Length = 2 AndAlso parts(1).Trim().StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
+                    urls.Add(parts(1).Trim())
+                End If
+                Continue For
+            End If
+
+            ' --- .m3u / .m3u8 format: raw URL lines ---
+            If line.StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
+                urls.Add(line)
+                Continue For
+            End If
+
+            ' Some .m3u files have URLs after whitespace or metadata
+            If line.Contains("http://") OrElse line.Contains("https://") Then
+                Dim idx = line.IndexOf("http", StringComparison.OrdinalIgnoreCase)
+                If idx >= 0 Then
+                    urls.Add(line.Substring(idx).Trim())
+                End If
             End If
         Next
 
-        Return 0
+        Return urls
     End Function
     Private Sub SetStatusLabelEmptyText()
         StatusLabel.Text = "No stations to display. Select a source from the left to begin."
@@ -347,14 +541,15 @@ Public Class Directory
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor()
         SetTheme()
+        ReThemeMenus()
     End Sub
 
     ' ListView Sorter Class
     Public Class ListViewItemComparer
         Implements IComparer
 
-        Private col As Integer
-        Private order As SortOrder
+        Private ReadOnly col As Integer
+        Private ReadOnly order As SortOrder
 
         Public Sub New(column As Integer, sortOrder As SortOrder)
             col = column
@@ -397,7 +592,13 @@ Public Class Directory
         Public Property Bitrate As Integer
         Public Property Country As String
         Public Property Status As String
+        Public Property PlaylistUrls As List(Of String)
         Public Property Url As String
+    End Class
+    Public Class StreamOption
+        Public Property Url As String
+        Public Property Bitrate As Integer
+        Public Property Format As String
     End Class
     Public Class RadioBrowserSource
 
@@ -421,14 +622,41 @@ Public Class Directory
             Dim list As New List(Of StreamEntry)
 
             For Each item In arr
-                list.Add(New StreamEntry With {
+
+                Dim entry As New StreamEntry With {
                     .Name = item("name")?.ToString(),
-                    .Url = item("url")?.ToString(),
                     .Tags = item("tags")?.ToString(),
                     .Bitrate = If(Integer.TryParse(item("bitrate")?.ToString(), Nothing), CInt(item("bitrate")), 0),
                     .Country = item("country")?.ToString(),
-                    .Status = item("status")?.ToString()
-                })
+                    .Status = item("status")?.ToString(),
+                    .PlaylistUrls = New List(Of String)
+                }
+
+                ' Prefer url_resolved
+                Dim rawUrl As String = item("url_resolved")?.ToString()
+                If String.IsNullOrWhiteSpace(rawUrl) Then
+                    rawUrl = item("url")?.ToString()
+                End If
+
+                ' Try urlcache as fallback
+                If String.IsNullOrWhiteSpace(rawUrl) Then
+                    rawUrl = item("urlcache")?.ToString()
+                End If
+
+                ' If still blank, skip station
+                If String.IsNullOrWhiteSpace(rawUrl) Then
+                    Continue For
+                End If
+
+                ' Detect playlist URLs
+                If rawUrl.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) OrElse rawUrl.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase) Then
+                    entry.PlaylistUrls.Add(rawUrl)
+                    entry.Url = Nothing
+                Else
+                    entry.Url = rawUrl
+                End If
+
+                list.Add(entry)
             Next
 
             Return list
@@ -464,22 +692,28 @@ Public Class Directory
                 Dim genre As String = item("genre")?.ToString()
 
                 Dim playlists = item("playlists")
-                If playlists IsNot Nothing AndAlso playlists.Count > 0 Then
-                    For Each p In playlists
-                        Dim url As String = p("url")?.ToString()
-                        If String.IsNullOrWhiteSpace(url) Then Continue For
+                If playlists Is Nothing OrElse playlists.Count = 0 Then Continue For
 
-                        list.Add(New StreamEntry With {
-                            .Name = title,
-                            .Url = url,
-                            .Tags = genre,
-                            .Bitrate = 0,
-                            .Country = "USA",
-                            .Status = "OK",
-                            .Format = p("format")?.ToString()
-                        })
-                    Next
-                End If
+                ' Create ONE entry per station
+                Dim entry As New StreamEntry With {
+                    .Name = title,
+                    .Tags = genre,
+                    .Bitrate = 0,
+                    .Country = "USA",
+                    .Status = "OK",
+                    .Format = "Multiple",
+                    .PlaylistUrls = New List(Of String)
+                }
+
+                ' Add all playlist URLs to the entry
+                For Each p In playlists
+                    Dim url As String = p("url")?.ToString()
+                    If Not String.IsNullOrWhiteSpace(url) Then
+                        entry.PlaylistUrls.Add(url)
+                    End If
+                Next
+
+                list.Add(entry)
             Next
 
             Return list

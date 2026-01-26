@@ -1,6 +1,7 @@
 ﻿
 Imports System.Data.SQLite
 Imports System.IO
+Imports System.Net.Http
 Imports Microsoft.Win32
 Imports Windows.Win32.UI.Input
 
@@ -206,6 +207,7 @@ Namespace My
         Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
         Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
+        Public ReadOnly Http As New HttpClient()
 
         ' HotKeys
         Private Structure HotKey
