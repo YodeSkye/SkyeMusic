@@ -1,15 +1,19 @@
 ﻿# Skye Music 🎶
 
 [⬇️ Download Skye Music](https://github.com/YodeSkye/SkyeMusic/releases/tag/v1.2)
-![Skye Music screenshot](My%20Project/ScreenShot%2020251103.png)
+![Skye Music screenshot](https://raw.githubusercontent.com/YodeSkye/SkyeMusic/refs/heads/master/share/Screenshot%20Directory.png)
 
 A modern Windows media player built with **LibVLCSharp** and **WinForms**, featuring:
 - Smooth audio & video playback.
 - Playlist and queue management.
 - Integrated library for browsing and managing media files.
+- Integrated directory for browsing online streams.
 - Metadata tag reading with **TagLib#**.
+- A compact mini-player mode.
 - Local database for play history & statistics.
 - Lightweight installer powered by Inno Setup.
+- Upgrade notifications for new versions.
+- Open source and free to use!
 
 Support the project: https://github.com/sponsors/YodeSkye
 
@@ -120,8 +124,19 @@ End Using
 
 ---
 
+### 6. Newtonsoft.Json
 
-### 6. Syncfusion.Tools.Windows
+A fast, powerful, and widely‑used JSON library for .NET, supporting serialization, deserialization, LINQ‑to‑JSON, and advanced customization.
+Newtonsoft.Json provides Skye Music with fast, reliable JSON parsing for loading station data, stream lists, and directory information from online sources.
+
+```powershell
+Install-Package Newtonsoft.Json
+```
+
+---
+
+
+### 7. Syncfusion.Tools.Windows
 
 Provides advanced WinForms UI components like Ribbon, Docking Manager, and TreeView. It 's free for individual developers and small businesses. To get a license, visit their website [Syncfusion Community License](https://www.syncfusion.com/products/communitylicense).
 
@@ -131,7 +146,7 @@ Install-Package Syncfusion.Tools.Windows
 
 ---
 
-### 7. WinForms.DataVisualization
+### 8. WinForms.DataVisualization
 
 Provides the **System.Windows.Forms.DataVisualization.Charting** namespace, which includes chart controls (Pie, Bar, Radar, Pareto, etc.) used in the **History & Statistics** page.
 
@@ -154,7 +169,7 @@ chart.Series.Add(series)
 
 ---
 
-### 8. WordCloudSharp
+### 9. WordCloudSharp
 
 Provides word cloud generation for visualizing artist frequency in SkyeMusic. Used in the **Artist Word Cloud** chart view.
 
@@ -181,7 +196,7 @@ PictureBox1.Image = bmp
 
 ---
 
-### 9. MetaBrainz.MusicBrainz
+### 10. MetaBrainz.MusicBrainz
 
 A .NET client for the MusicBrainz API, used for fetching additional metadata about music tracks and artists.
 
@@ -191,7 +206,7 @@ Install-Package MetaBrainz.MusicBrainz
 
 ---
 
-### 10. MetaBrainz.MusicBrainz.CoverArt
+### 11. MetaBrainz.MusicBrainz.CoverArt
 
 A .NET client for fetching cover art from the MusicBrainz Cover Art Archive.
 
