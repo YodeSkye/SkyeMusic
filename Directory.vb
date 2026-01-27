@@ -40,6 +40,10 @@ Public Class Directory
             LVStations.Columns(6).Name = "ColURL"
             LVStations.Columns(7).Name = "ColMore"
         End If
+        ILSources.Images.Add(My.Resources.ImageRadioBrowser96)
+        ILSources.Images.Add(My.Resources.ImageSomaFM96)
+        ILSources.Images.Add(My.Resources.ImageRadioParadise96)
+        ILSources.Images.Add(My.Resources.ImageFavorites96)
         radioBrowser = New RadioBrowserSource
         soma = New SomaFMSource
         LoadSources()
@@ -106,7 +110,7 @@ Public Class Directory
         StatusLabel.Text = $"Loading {selectedSource}…"
 
         Select Case selectedSource
-            Case "RadioBrowser"
+            Case "Radio Browser"
                 TxtBoxSearch.PlaceholderText = "< Top Stations >"
                 Dim results = Await radioBrowser.GetDefaultStationsAsync()
                 PopulateStations(results)
@@ -116,6 +120,12 @@ Public Class Directory
                 Dim results = Await soma.GetStationsAsync()
                 PopulateStations(results)
                 StatusLabel.Text = $"Loaded {results.Count} SomaFM channels."
+            Case "Radio Paradise"
+                TxtBoxSearch.PlaceholderText = "< All Radio Paradise Channels >"
+                StatusLabel.Text = "Source not implemented yet."
+            Case "Favorites"
+                TxtBoxSearch.PlaceholderText = "< Your Favorite Stations >"
+                StatusLabel.Text = "Source not implemented yet."
             Case Else
                 StatusLabel.Text = "Source not implemented yet."
         End Select
@@ -235,11 +245,10 @@ Public Class Directory
     Private Sub LoadSources()
         LVSources.Items.Clear()
 
-        LVSources.Items.Add(New ListViewItem("RadioBrowser"))
-        LVSources.Items.Add(New ListViewItem("SomaFM"))
-        ' LVSources.Items.Add(New ListViewItem("SHOUTcast"))
-        ' LVSources.Items.Add(New ListViewItem("Live365"))
-        ' LVSources.Items.Add(New ListViewItem("Favorites"))
+        LVSources.Items.Add("Radio Browser", 0)
+        LVSources.Items.Add("SomaFM", 1)
+        LVSources.Items.Add("Radio Paradise", 2)
+        LVSources.Items.Add("Favorites", 3)
 
         StatusLabel.Text = "Select a source to begin."
     End Sub

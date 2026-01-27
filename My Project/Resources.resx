@@ -662,4 +662,16 @@ Skye Music v0.8\par
   <data name="ImageDirectory16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageDirectory16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageFavorites96" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageFavorites96.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageRadioBrowser96" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageRadioBrowser96.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageRadioParadise96" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageRadioParadise96.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageSomaFM96" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageSomaFM96.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

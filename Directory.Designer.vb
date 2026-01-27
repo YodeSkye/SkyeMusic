@@ -32,6 +32,7 @@ Partial Class Directory
         PanelDirectory = New Panel()
         LVSources = New Skye.UI.ListViewEX()
         Source = New ColumnHeader()
+        ILSources = New ImageList(components)
         PanelDirectoryList = New Panel()
         LVStations = New Skye.UI.ListViewEX()
         ColStreamName = New ColumnHeader()
@@ -100,7 +101,7 @@ Partial Class Directory
         PanelDirectory.Dock = DockStyle.Left
         PanelDirectory.Location = New Point(0, 49)
         PanelDirectory.Name = "PanelDirectory"
-        PanelDirectory.Size = New Size(279, 559)
+        PanelDirectory.Size = New Size(95, 559)
         PanelDirectory.TabIndex = 5
         ' 
         ' LVSources
@@ -111,26 +112,32 @@ Partial Class Directory
         LVSources.FullRowSelect = True
         LVSources.HeaderStyle = ColumnHeaderStyle.Nonclickable
         LVSources.InsertionLineColor = Color.Teal
+        LVSources.LargeImageList = ILSources
         LVSources.Location = New Point(0, 0)
         LVSources.MultiSelect = False
         LVSources.Name = "LVSources"
-        LVSources.Size = New Size(279, 559)
+        LVSources.Size = New Size(95, 559)
         LVSources.TabIndex = 0
         LVSources.UseCompatibleStateImageBehavior = False
-        LVSources.View = View.Details
         ' 
         ' Source
         ' 
         Source.Text = "Source"
         Source.Width = 277
         ' 
+        ' ILSources
+        ' 
+        ILSources.ColorDepth = ColorDepth.Depth32Bit
+        ILSources.ImageSize = New Size(48, 48)
+        ILSources.TransparentColor = Color.Transparent
+        ' 
         ' PanelDirectoryList
         ' 
         PanelDirectoryList.Controls.Add(LVStations)
         PanelDirectoryList.Dock = DockStyle.Fill
-        PanelDirectoryList.Location = New Point(279, 49)
+        PanelDirectoryList.Location = New Point(95, 49)
         PanelDirectoryList.Name = "PanelDirectoryList"
-        PanelDirectoryList.Size = New Size(750, 559)
+        PanelDirectoryList.Size = New Size(934, 559)
         PanelDirectoryList.TabIndex = 6
         ' 
         ' LVStations
@@ -143,7 +150,7 @@ Partial Class Directory
         LVStations.InsertionLineColor = Color.Teal
         LVStations.Location = New Point(0, 0)
         LVStations.Name = "LVStations"
-        LVStations.Size = New Size(750, 559)
+        LVStations.Size = New Size(934, 559)
         LVStations.TabIndex = 0
         LVStations.UseCompatibleStateImageBehavior = False
         LVStations.View = View.Details
@@ -266,4 +273,5 @@ Partial Class Directory
     Friend WithEvents ColURL As ColumnHeader
     Friend WithEvents ColFormat As ColumnHeader
     Friend WithEvents ColMore As ColumnHeader
+    Friend WithEvents ILSources As ImageList
 End Class
