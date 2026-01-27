@@ -11,6 +11,7 @@ Public Class Directory
     Private sortOrder As SortOrder = SortOrder.Ascending
     Private radioBrowser As RadioBrowserSource
     Private soma As SomaFMSource
+    Private radioParadise As RadioParadiseSource
 
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -48,6 +49,7 @@ Public Class Directory
         ILSources.Images.Add(My.Resources.ImageImport96)
         radioBrowser = New RadioBrowserSource
         soma = New SomaFMSource
+        radioParadise = New RadioParadiseSource
         LoadSources()
         SetStatusLabelEmptyText()
         CMStations.Font = CurrentTheme.BaseFont
@@ -124,7 +126,9 @@ Public Class Directory
                 StatusLabel.Text = $"Loaded {results.Count} SomaFM channels."
             Case "Radio Paradise"
                 TxtBoxSearch.PlaceholderText = "< All Radio Paradise Channels >"
-                StatusLabel.Text = "Source not implemented yet."
+                Dim results = radioParadise.GetStations()
+                PopulateStations(results)
+                StatusLabel.Text = $"Loaded {results.Count} Radio Paradise channels."
             Case "Favorites"
                 TxtBoxSearch.PlaceholderText = "< Your Favorite Stations >"
                 StatusLabel.Text = "Source not implemented yet."
@@ -285,8 +289,7 @@ Public Class Directory
             If Not String.IsNullOrWhiteSpace(s.Url) Then
                 ' Direct stream OR resolved playlist
                 displayUrl = s.Url
-
-            ElseIf s.PlaylistUrls IsNot Nothing AndAlso s.PlaylistUrls.Count > 0 Then
+            ElseIf (s.PlaylistUrls IsNot Nothing AndAlso s.PlaylistUrls.Count > 1) OrElse (s.PlaylistOptions IsNot Nothing AndAlso s.PlaylistOptions.Count > 1) Then
                 ' Playlist with multiple streams
                 displayUrl = "Playlist"
             Else
@@ -297,7 +300,7 @@ Public Class Directory
 
             ' More column (▾ only when multiple streams exist)
             Dim moreText As String = ""
-            If s.PlaylistUrls IsNot Nothing AndAlso s.PlaylistUrls.Count > 1 Then
+            If (s.PlaylistUrls IsNot Nothing AndAlso s.PlaylistUrls.Count > 1) OrElse (s.PlaylistOptions IsNot Nothing AndAlso s.PlaylistOptions.Count > 1) Then
                 moreText = "▾"
             End If
             item.SubItems.Add(moreText)
@@ -485,7 +488,12 @@ Public Class Directory
         Dim entry As StreamEntry = CType(item.Tag, StreamEntry)
 
         ' Explode playlists
-        Dim options = Await ExplodeAllPlaylists(entry)
+        Dim options As List(Of StreamOption)
+        If entry.PlaylistOptions Is Nothing Then
+            options = Await ExplodeAllPlaylists(entry)
+        Else
+            options = entry.PlaylistOptions
+        End If
         If options.Count = 0 Then Return
 
         Dim menu As New ContextMenuStrip With {
@@ -498,8 +506,7 @@ Public Class Directory
             Dim shortUrl = TruncateUrl(opt.Url, 50)
             Dim label = $"{opt.Bitrate} {opt.Format}   {shortUrl}"
 
-            Dim mi As New ToolStripMenuItem(label)
-            mi.Tag = opt.Url
+            Dim mi As New ToolStripMenuItem(label) With {.Tag = opt.Url}
 
             AddHandler mi.Click,
             Sub()
@@ -647,6 +654,7 @@ Public Class Directory
         Public Property Country As String
         Public Property Status As String
         Public Property PlaylistUrls As List(Of String)
+        Public Property PlaylistOptions As List(Of StreamOption)
         Public Property Url As String
     End Class
     Public Class StreamOption
@@ -768,6 +776,103 @@ Public Class Directory
                 list.Add(entry)
             Next
 
+            Return list
+        End Function
+
+    End Class
+    Public Class RadioParadiseSource
+
+        Public Function GetStations() As List(Of Directory.StreamEntry)
+            Dim list As New List(Of Directory.StreamEntry) From {
+                New Directory.StreamEntry With {
+                    .Name = "Radio Paradise – Main Mix",
+                    .Tags = "Radio Paradise",
+                    .Format = "Multiple",
+                    .Country = "USA",
+                    .Status = "OK",
+                    .Url = Nothing,
+                    .PlaylistOptions = New List(Of Directory.StreamOption) From {
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/aac-320", .Format = "AAC", .Bitrate = 320},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/mp3-192", .Format = "MP3", .Bitrate = 192},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/ogg-192m", .Format = "OGG", .Bitrate = 192},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/flacm (Not Supported Yet)", .Format = "FLAC", .Bitrate = 0}
+                    }
+                },
+                New Directory.StreamEntry With {
+                    .Name = "Radio Paradise – Mellow Mix",
+                    .Tags = "Radio Paradise",
+                    .Format = "Multiple",
+                    .Country = "USA",
+                    .Status = "OK",
+                    .Url = Nothing,
+                    .PlaylistOptions = New List(Of Directory.StreamOption) From {
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/mellow-320", .Format = "AAC", .Bitrate = 320},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/mellow-192", .Format = "MP3", .Bitrate = 192},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/mellow-flacm (Not Supported Yet)", .Format = "FLAC", .Bitrate = 0}
+                    }
+                },
+                New Directory.StreamEntry With {
+                    .Name = "Radio Paradise – Rock Mix",
+                    .Tags = "Radio Paradise",
+                    .Format = "Multiple",
+                    .Country = "USA",
+                    .Status = "OK",
+                    .Url = Nothing,
+                    .PlaylistOptions = New List(Of Directory.StreamOption) From {
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/rock-320", .Format = "AAC", .Bitrate = 320},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/rock-192", .Format = "MP3", .Bitrate = 192},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/rock-flacm (Not Supported Yet)", .Format = "FLAC", .Bitrate = 0}
+                    }
+                },
+                New Directory.StreamEntry With {
+                    .Name = "Radio Paradise – Global Mix",
+                    .Tags = "Radio Paradise",
+                    .Format = "Multiple",
+                    .Country = "USA",
+                    .Status = "OK",
+                    .Url = Nothing,
+                    .PlaylistOptions = New List(Of Directory.StreamOption) From {
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/global-320", .Format = "AAC", .Bitrate = 320},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/global-192", .Format = "MP3", .Bitrate = 192},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/global-flacm (Not Supported Yet)", .Format = "FLAC", .Bitrate = 0}
+                    }
+                },
+                 New Directory.StreamEntry With {
+                    .Name = "Radio Paradise – Beyond...",
+                    .Tags = "Radio Paradise",
+                    .Format = "Multiple",
+                    .Country = "USA",
+                    .Status = "OK",
+                    .Url = Nothing,
+                    .PlaylistOptions = New List(Of Directory.StreamOption) From {
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/beyond-320", .Format = "AAC", .Bitrate = 320},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/beyond-192", .Format = "MP3", .Bitrate = 192},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/beyond-flacm (Not Supported Yet)", .Format = "FLAC", .Bitrate = 0}
+                    }
+                },
+                 New Directory.StreamEntry With {
+                    .Name = "Radio Paradise – Serenity",
+                    .Tags = "Radio Paradise",
+                    .Format = "AAC",
+                    .Bitrate = 64,
+                    .Country = "USA",
+                    .Status = "OK",
+                    .Url = "http://stream.radioparadise.com/serenity"
+                },
+                New Directory.StreamEntry With {
+                    .Name = "Radio Paradise – Radio 2050",
+                    .Tags = "Radio Paradise",
+                    .Format = "Multiple",
+                    .Country = "USA",
+                    .Status = "OK",
+                    .Url = Nothing,
+                    .PlaylistOptions = New List(Of Directory.StreamOption) From {
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/radio2050-320", .Format = "AAC", .Bitrate = 320},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/radio2050-192", .Format = "MP3", .Bitrate = 192},
+                        New Directory.StreamOption With {.Url = "http://stream.radioparadise.com/radio2050-flacm (Not Supported Yet)", .Format = "FLAC", .Bitrate = 0}
+                    }
+                }
+            }
             Return list
         End Function
 
