@@ -3297,35 +3297,7 @@ Public Class Player
         AddToPlaylistFromFile()
     End Sub
     Private Sub MIOpenURL_Click(sender As Object, e As EventArgs) Handles MIOpenURL.Click
-        Dim frmAddStream As New PlayerAddStream
-        Dim uriresult As Uri = Nothing
-        If Clipboard.ContainsText Then
-            frmAddStream.NewStream.Path = Clipboard.GetText
-            If Not Uri.TryCreate(frmAddStream.NewStream.Path, UriKind.Absolute, uriresult) Then
-                frmAddStream.NewStream.Path = String.Empty
-            End If
-        End If
-        frmAddStream.ShowDialog(Me)
-        If frmAddStream.DialogResult = DialogResult.OK Then
-            If Uri.TryCreate(frmAddStream.NewStream.Path, UriKind.Absolute, uriresult) Then
-                Dim newstream As String = frmAddStream.NewStream.Path.TrimEnd("/"c)
-                newstream = NormalizeUrl(newstream)
-                'Add to History
-                App.AddToHistoryFromPlaylist(newstream, True)
-                'Add to Playlist
-                AddToPlaylistFromLibrary(frmAddStream.NewStream.Title, newstream)
-                LVPlaylist.SelectedIndices.Clear()
-                LVPlaylist.SelectedIndices.Add(LVPlaylist.FindItemWithText(frmAddStream.NewStream.Title).Index)
-                'Play Stream
-                PlayStream(newstream)
-                Debug.Print("New Stream Added (" + newstream + ")")
-            Else
-                Debug.Print("Invalid Stream")
-                WriteToLog("Invalid Stream, New Stream Not Added")
-            End If
-        Else
-            Debug.Print("Add Stream Cancelled")
-        End If
+        OpenURL()
     End Sub
     Private Sub MIOpenPlaylist_Click(sender As Object, e As EventArgs) Handles MIOpenPlaylist.Click
         OpenPlaylist()
@@ -4335,7 +4307,7 @@ Public Class Player
             App.WriteToLog("Playlist Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
     End Sub
-    Private Sub OpenPlaylist()
+    Friend Sub OpenPlaylist()
         Dim ext As String
         Dim filename As String
 
@@ -4465,6 +4437,37 @@ Public Class Player
         End Try
 
         format = Nothing
+    End Sub
+    Friend Sub OpenURL()
+        Dim frmAddStream As New PlayerAddStream
+        Dim uriresult As Uri = Nothing
+        If Clipboard.ContainsText Then
+            frmAddStream.NewStream.Path = Clipboard.GetText
+            If Not Uri.TryCreate(frmAddStream.NewStream.Path, UriKind.Absolute, uriresult) Then
+                frmAddStream.NewStream.Path = String.Empty
+            End If
+        End If
+        frmAddStream.ShowDialog(Me)
+        If frmAddStream.DialogResult = DialogResult.OK Then
+            If Uri.TryCreate(frmAddStream.NewStream.Path, UriKind.Absolute, uriresult) Then
+                Dim newstream As String = frmAddStream.NewStream.Path.TrimEnd("/"c)
+                newstream = NormalizeUrl(newstream)
+                'Add to History
+                App.AddToHistoryFromPlaylist(newstream, True)
+                'Add to Playlist
+                AddToPlaylistFromLibrary(frmAddStream.NewStream.Title, newstream)
+                LVPlaylist.SelectedIndices.Clear()
+                LVPlaylist.SelectedIndices.Add(LVPlaylist.FindItemWithText(frmAddStream.NewStream.Title).Index)
+                'Play Stream
+                PlayStream(newstream)
+                Debug.Print("New Stream Added (" + newstream + ")")
+            Else
+                Debug.Print("Invalid Stream")
+                WriteToLog("Invalid Stream, New Stream Not Added")
+            End If
+        Else
+            Debug.Print("Add Stream Cancelled")
+        End If
     End Sub
     Private Sub AddToPlaylistFromFile()
         Dim ofd As New OpenFileDialog With {

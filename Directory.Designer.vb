@@ -116,6 +116,7 @@ Partial Class Directory
         LVSources.Location = New Point(0, 0)
         LVSources.MultiSelect = False
         LVSources.Name = "LVSources"
+        LVSources.Scrollable = False
         LVSources.Size = New Size(95, 559)
         LVSources.TabIndex = 0
         LVSources.UseCompatibleStateImageBehavior = False
@@ -236,6 +237,7 @@ Partial Class Directory
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(4)
+        MinimumSize = New Size(200, 200)
         Name = "Directory"
         SizeGripStyle = SizeGripStyle.Show
         StartPosition = FormStartPosition.CenterScreen

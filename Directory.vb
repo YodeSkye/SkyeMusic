@@ -44,6 +44,8 @@ Public Class Directory
         ILSources.Images.Add(My.Resources.ImageSomaFM96)
         ILSources.Images.Add(My.Resources.ImageRadioParadise96)
         ILSources.Images.Add(My.Resources.ImageFavorites96)
+        ILSources.Images.Add(My.Resources.ImageAdd96)
+        ILSources.Images.Add(My.Resources.ImageImport96)
         radioBrowser = New RadioBrowserSource
         soma = New SomaFMSource
         LoadSources()
@@ -126,6 +128,14 @@ Public Class Directory
             Case "Favorites"
                 TxtBoxSearch.PlaceholderText = "< Your Favorite Stations >"
                 StatusLabel.Text = "Source not implemented yet."
+            Case "Add Stream To Playlist"
+                TxtBoxSearch.PlaceholderText = String.Empty
+                StatusLabel.Text = String.Empty
+                Player.OpenURL()
+            Case "Import Playlist"
+                TxtBoxSearch.PlaceholderText = String.Empty
+                StatusLabel.Text = String.Empty
+                Player.OpenPlaylist()
             Case Else
                 StatusLabel.Text = "Source not implemented yet."
         End Select
@@ -249,6 +259,8 @@ Public Class Directory
         LVSources.Items.Add("SomaFM", 1)
         LVSources.Items.Add("Radio Paradise", 2)
         LVSources.Items.Add("Favorites", 3)
+        LVSources.Items.Add("Add Stream To Playlist", 4)
+        LVSources.Items.Add("Import Playlist", 5)
 
         StatusLabel.Text = "Select a source to begin."
     End Sub
@@ -348,6 +360,8 @@ Public Class Directory
                 Else
                     StatusLabel.Text = $"Found {results.Count} SomaFM channels."
                 End If
+            Case "Add Stream To Playlist"
+                StatusLabel.Text = "Not Searchable."
             Case Else
                 StatusLabel.Text = "Search not implemented for this source."
         End Select
