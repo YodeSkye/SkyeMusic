@@ -321,7 +321,7 @@ Public Class Directory
         LVStations.Items.Clear()
 
         Select Case selectedSource
-            Case "RadioBrowser"
+            Case "Radio Browser"
                 Dim results = Await radioBrowser.SearchAsync(query)
                 PopulateStations(results)
                 If results.Count = 0 Then
