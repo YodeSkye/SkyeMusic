@@ -380,8 +380,12 @@ Public Class Directory
         ' If URL column says Playlist, explode now
         Dim urlColIndex = LVStations.Columns("ColURL").Index
         If item.SubItems(urlColIndex).Text = "Playlist" Then
-            Dim options = Await ExplodeAllPlaylists(entry)
-
+            Dim options As List(Of StreamOption)
+            If entry.PlaylistOptions IsNot Nothing AndAlso entry.PlaylistOptions.Count > 0 Then
+                options = entry.PlaylistOptions
+            Else
+                options = Await ExplodeAllPlaylists(entry)
+            End If
             If options.Count = 0 Then
                 Return Nothing
             End If
@@ -494,7 +498,7 @@ Public Class Directory
         Else
             options = entry.PlaylistOptions
         End If
-        If options.Count = 0 Then Return
+        If options.Count <= 1 Then Return
 
         Dim menu As New ContextMenuStrip With {
             .Font = CurrentTheme.SubBaseFont,

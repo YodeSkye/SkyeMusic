@@ -434,12 +434,6 @@ If a station provides multiple streams, Skye\f1\lang1033  \f2\lang9 Music \f1\la
   <data name="ImageMoveUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageMoveUp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageImport16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageImport16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ImageExport16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageExport16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ChangeLogRT" xml:space="preserve">
     <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil\fcharset1 Cambria Math;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
@@ -679,5 +673,11 @@ Skye Music v0.8\par
   </data>
   <data name="ImageImport96" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageImport96.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageExport16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageExport16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageImport16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageImport16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
