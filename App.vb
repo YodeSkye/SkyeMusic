@@ -207,7 +207,7 @@ Namespace My
         Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
         Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
-        Public ReadOnly Http As New HttpClient()
+        Friend ReadOnly Http As New HttpClient()
 
         ' HotKeys
         Private Structure HotKey
@@ -1439,6 +1439,7 @@ Namespace My
             Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense()
             LibVLCSharp.Shared.Core.Initialize() 'Initialize LibVLCSharp
+            Http.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic/1.0")
 
             'Initialize SkyeLibrary RegistryHelper
 #If DEBUG Then
@@ -1579,7 +1580,6 @@ Namespace My
             cm.Items.Add(cmi)
             AddHandler cm.Opening, AddressOf NIApp_Opening
             NIApp.ContextMenuStrip = cm
-            'SetNIApp()
 
             GenerateHotKeyList()
             RegisterHotKeys()

@@ -821,7 +821,7 @@ Public Class Directory
     End Function
 
     ' ListView Sorter Class
-    Public Class ListViewItemComparer
+    Private Class ListViewItemComparer
         Implements IComparer
 
         Private ReadOnly col As Integer
@@ -861,7 +861,7 @@ Public Class Directory
     End Class
 
     ' Source Classes
-    Public Class StreamEntry
+    Private Class StreamEntry
         Public Property Name As String
         Public Property Tags As String
         Public Property Format As String
@@ -872,33 +872,27 @@ Public Class Directory
         Public Property PlaylistOptions As List(Of StreamOption)
         Public Property Url As String
     End Class
-    Public Class StreamOption
+    Private Class StreamOption
         Public Property Url As String
         Public Property Bitrate As Integer
         Public Property Format As String
     End Class
-    Public Class FavoriteEntry
+    Private Class FavoriteEntry
         Public Property Name As String
         Public Property Url As String
         Public Property Format As String
         Public Property Bitrate As Integer
         Public Property Source As String   ' "RadioBrowser", "SomaFM", "Radio Paradise", etc.
     End Class
-    Public Class RadioBrowserSource
-
-        Private ReadOnly client As HttpClient
-
-        Public Sub New()
-            client = New HttpClient With {.BaseAddress = New Uri("https://de1.api.radio-browser.info/json/")}
-        End Sub
+    Private Class RadioBrowserSource
 
         Public Async Function SearchAsync(query As String) As Task(Of List(Of StreamEntry))
-            Dim url = $"stations/search?name={Uri.EscapeDataString(query)}"
-            Dim json = Await client.GetStringAsync(url)
+            Dim url = $"https://de1.api.radio-browser.info/json/stations/search?name={Uri.EscapeDataString(query)}"
+            Dim json = Await App.Http.GetStringAsync(url)
             Return ParseStations(json)
         End Function
         Public Async Function GetDefaultStationsAsync() As Task(Of List(Of StreamEntry))
-            Dim json = Await client.GetStringAsync("stations/topclick/24")
+            Dim json = Await App.Http.GetStringAsync("https://de1.api.radio-browser.info/json/stations/topclick/24")
             Return ParseStations(json)
         End Function
         Private Function ParseStations(json As String) As List(Of StreamEntry)
@@ -947,17 +941,11 @@ Public Class Directory
         End Function
 
     End Class
-    Public Class SomaFMSource
-
-        Private ReadOnly client As HttpClient
-
-        Public Sub New()
-            client = New HttpClient With {.BaseAddress = New Uri("https://api.somafm.com/")}
-        End Sub
+    Private Class SomaFMSource
 
         Public Async Function GetStationsAsync() As Task(Of List(Of StreamEntry))
             Try
-                Dim json = Await client.GetStringAsync("channels.json")
+                Dim json = Await App.Http.GetStringAsync("https://api.somafm.com/channels.json")
                 Return ParseStations(json)
             Catch ex As Exception
                 App.WriteToLog("SomaFM Error: " & ex.ToString())
@@ -1002,7 +990,7 @@ Public Class Directory
         End Function
 
     End Class
-    Public Class RadioParadiseSource
+    Private Class RadioParadiseSource
 
         Public Function GetStations() As List(Of Directory.StreamEntry)
             Dim list As New List(Of Directory.StreamEntry) From {
