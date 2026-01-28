@@ -47,8 +47,8 @@ Partial Class Directory
         CMIPlay = New ToolStripMenuItem()
         CMIAddToPlaylist = New ToolStripMenuItem()
         CMIAddToFavorites = New ToolStripMenuItem()
-        CMICopyStreamURL = New ToolStripMenuItem()
         CMIRemoveFromFavorites = New ToolStripMenuItem()
+        CMICopyStreamURL = New ToolStripMenuItem()
         PanelSearch.SuspendLayout()
         StatusStripDirectory.SuspendLayout()
         PanelDirectory.SuspendLayout()
@@ -228,19 +228,19 @@ Partial Class Directory
         CMIAddToFavorites.Size = New Size(198, 22)
         CMIAddToFavorites.Text = "Add To Favorites"
         ' 
-        ' CMICopyStreamURL
-        ' 
-        CMICopyStreamURL.Image = My.Resources.Resources.ImageCopy16
-        CMICopyStreamURL.Name = "CMICopyStreamURL"
-        CMICopyStreamURL.Size = New Size(198, 22)
-        CMICopyStreamURL.Text = "Copy URL"
-        ' 
         ' CMIRemoveFromFavorites
         ' 
         CMIRemoveFromFavorites.Image = My.Resources.Resources.ImageFavorites16
         CMIRemoveFromFavorites.Name = "CMIRemoveFromFavorites"
         CMIRemoveFromFavorites.Size = New Size(198, 22)
         CMIRemoveFromFavorites.Text = "Remove From Favorites"
+        ' 
+        ' CMICopyStreamURL
+        ' 
+        CMICopyStreamURL.Image = My.Resources.Resources.ImageCopy16
+        CMICopyStreamURL.Name = "CMICopyStreamURL"
+        CMICopyStreamURL.Size = New Size(198, 22)
+        CMICopyStreamURL.Text = "Copy URL"
         ' 
         ' Directory
         ' 

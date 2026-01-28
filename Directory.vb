@@ -171,6 +171,19 @@ Public Class Directory
 
         Player.PlayFromDirectory(url)
     End Sub
+    Private Sub CMStations_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMStations.Opening
+        If LVStations.SelectedItems.Count = 0 Then
+            e.Cancel = True
+            Return
+        End If
+        If LVSources.SelectedItems(0).Text = "Favorites" Then
+            CMIRemoveFromFavorites.Visible = True
+            CMIAddToFavorites.Visible = False
+        Else
+            CMIRemoveFromFavorites.Visible = False
+            CMIAddToFavorites.Visible = True
+        End If  
+    End Sub
     Private Async Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
         If LVStations.SelectedItems.Count = 0 Then Return
 
@@ -434,6 +447,14 @@ Public Class Directory
             ' Auto-select first stream
             entry.Url = options(0).Url
             item.SubItems(urlColIndex).Text = entry.Url
+
+            ' Set Format and Bitrate
+            entry.Format = options(0).Format
+            entry.Bitrate = options(0).Bitrate
+            Dim formatCol = LVStations.Columns("ColFormat").Index
+            Dim bitrateCol = LVStations.Columns("ColBitrate").Index
+            item.SubItems(formatCol).Text = entry.Format
+            item.SubItems(bitrateCol).Text = entry.Bitrate.ToString()
 
             Return entry.Url
         End If
