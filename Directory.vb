@@ -1,5 +1,8 @@
 ﻿
 Imports System.Net.Http
+Imports NAudio.FileFormats
+Imports NAudio.Utils
+Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public Class Directory
@@ -12,6 +15,7 @@ Public Class Directory
     Private radioBrowser As RadioBrowserSource
     Private soma As SomaFMSource
     Private radioParadise As RadioParadiseSource
+    Private Favorites As List(Of FavoriteEntry)
 
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -131,7 +135,8 @@ Public Class Directory
                 StatusLabel.Text = $"Loaded {results.Count} Radio Paradise channels."
             Case "Favorites"
                 TxtBoxSearch.PlaceholderText = "< Your Favorite Stations >"
-                StatusLabel.Text = "Source not implemented yet."
+                PopulateStations(GetFavoritesAsStreamEntries())
+                StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
             Case "Add Stream To Playlist"
                 TxtBoxSearch.PlaceholderText = String.Empty
                 StatusLabel.Text = String.Empty
@@ -191,6 +196,42 @@ Public Class Directory
         End If
 
         Player.AddToPlaylistFromDirectory(url)
+    End Sub
+    Private Async Sub CMIAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIAddToFavorites.Click
+        If LVStations.SelectedItems.Count = 0 Then Exit Sub
+
+        Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
+        Dim sourceName As String = LVSources.SelectedItems(0).Text
+        Dim item As ListViewItem = LVStations.SelectedItems(0)
+        Dim url = Await GetPlayableURL(item)
+
+        Dim fav As New FavoriteEntry With {
+            .Name = entry.Name,
+            .Url = url,
+            .Format = entry.Format,
+            .Bitrate = entry.Bitrate,
+            .Source = sourceName
+        }
+
+        Dim added = AddFavorite(fav)
+        If added Then
+            StatusLabel.Text = "Added to Favorites."
+        Else
+            StatusLabel.Text = "This stream is already in Favorites."
+        End If
+
+    End Sub
+    Private Sub CMIRemoveFromFavorites_Click(sender As Object, e As EventArgs) Handles CMIRemoveFromFavorites.Click
+        If LVStations.SelectedItems.Count = 0 Then Exit Sub
+
+        Dim url As String = LVStations.SelectedItems(0).SubItems(6).Text
+        Dim removed = RemoveFavorite(url)
+
+        If removed Then
+            StatusLabel.Text = "Removed from Favorites."
+        Else
+            StatusLabel.Text = "Favorite not removed."
+        End If
     End Sub
     Private Sub CMICopyStreamURL_Click(sender As Object, e As EventArgs) Handles CMICopyStreamURL.Click
         If LVStations.SelectedItems.Count = 0 Then Return
@@ -609,6 +650,83 @@ Public Class Directory
         ReThemeMenus()
     End Sub
 
+    ' Favorites
+    Private Sub LoadFavorites()
+        Try
+            If IO.File.Exists(App.DirectoryFavoritesPath) Then
+                Dim json = IO.File.ReadAllText(App.DirectoryFavoritesPath)
+                Favorites = JsonConvert.DeserializeObject(Of List(Of FavoriteEntry))(json)
+            Else
+                Favorites = New List(Of FavoriteEntry)
+            End If
+        Catch
+            Favorites = New List(Of FavoriteEntry)
+            WriteToLog("Failed to load Directory Favorites.")
+        End Try
+    End Sub
+    Private Sub SaveFavorites()
+        Try
+            Dim json = JsonConvert.SerializeObject(Favorites, Formatting.Indented)
+            IO.File.WriteAllText(DirectoryFavoritesPath, json)
+        Catch
+            WriteToLog("Failed to save Directory Favorites.")
+        End Try
+    End Sub
+    Private Function AddFavorite(fav As FavoriteEntry) As Boolean
+        If Favorites Is Nothing Then LoadFavorites()
+
+        ' Deduplicate by URL
+        If Favorites.Any(Function(f)
+                             Return f IsNot Nothing AndAlso
+                            f.Url IsNot Nothing AndAlso
+                            fav.Url IsNot Nothing AndAlso
+                            f.Url.Equals(fav.Url, StringComparison.OrdinalIgnoreCase)
+                         End Function) Then
+            Return False   ' Already exists
+        End If
+
+        Favorites.Add(fav)
+        SaveFavorites()
+        Return True
+    End Function
+    Private Function RemoveFavorite(url As String) As Boolean
+        If Favorites Is Nothing Then LoadFavorites()
+
+        Dim removed = Favorites.RemoveAll(
+            Function(f)
+                Return f IsNot Nothing AndAlso
+                       f.Url IsNot Nothing AndAlso
+                       f.Url.Equals(url, StringComparison.OrdinalIgnoreCase)
+            End Function)
+        If removed > 0 Then
+            SaveFavorites()
+            PopulateStations(GetFavoritesAsStreamEntries())
+            Return True
+        End If
+
+        Return False
+    End Function
+    Private Function GetFavoritesAsStreamEntries() As List(Of StreamEntry)
+        Dim list As New List(Of StreamEntry)
+
+        If Favorites Is Nothing Then LoadFavorites()
+
+        For Each fav In Favorites
+            Dim s As New StreamEntry With {
+                .Name = fav.Name,
+                .Url = fav.Url,
+                .Format = fav.Format,
+                .Bitrate = fav.Bitrate,
+                .Tags = fav.Source,      ' This is safe: Tags here = source label, not genre
+                .Country = String.Empty,           ' Favorites don’t store country
+                .Status = "Favorite"     ' Optional: helps you style them differently
+            }
+            list.Add(s)
+        Next
+
+        Return list
+    End Function
+
     ' ListView Sorter Class
     Public Class ListViewItemComparer
         Implements IComparer
@@ -665,6 +783,13 @@ Public Class Directory
         Public Property Url As String
         Public Property Bitrate As Integer
         Public Property Format As String
+    End Class
+    Public Class FavoriteEntry
+        Public Property Name As String
+        Public Property Url As String
+        Public Property Format As String
+        Public Property Bitrate As Integer
+        Public Property Source As String   ' "RadioBrowser", "SomaFM", "Radio Paradise", etc.
     End Class
     Public Class RadioBrowserSource
 

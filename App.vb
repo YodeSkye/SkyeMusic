@@ -245,6 +245,7 @@ Namespace My
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
         Private ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.xml" 'HistoryPath is the path to the media history XML file.
         Private ReadOnly DatabasePath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.db" 'DatabasePath is the path to the SQLite database file.
+        Friend ReadOnly DirectoryFavoritesPath As String = UserPath + My.Application.Info.ProductName + "DirectoryFavoritesDEV.json" 'DirectoryFavoritesPath is the path to the Directory Favorites JSON file.
 #Else
         Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "Log.txt" 'LogPath is the path to the log file.
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName 'RegPath is the path to the registry key where application settings are stored.
@@ -252,6 +253,7 @@ Namespace My
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
         Private ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "History.xml" 'HistoryPath is the path to the media history XML file.
         Private ReadOnly DatabasePath As String = UserPath + My.Application.Info.ProductName + "History.db" 'DatabasePath is the path to the SQLite database file.
+        Friend ReadOnly DirectoryFavoritesPath As String = UserPath + My.Application.Info.ProductName + "DirectoryFavorites.json" 'DirectoryFavoritesPath is the path to the Directory Favorites JSON file.
 #End If
 
         ' Themes

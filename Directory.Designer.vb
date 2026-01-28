@@ -46,7 +46,9 @@ Partial Class Directory
         CMStations = New ContextMenuStrip(components)
         CMIPlay = New ToolStripMenuItem()
         CMIAddToPlaylist = New ToolStripMenuItem()
+        CMIAddToFavorites = New ToolStripMenuItem()
         CMICopyStreamURL = New ToolStripMenuItem()
+        CMIRemoveFromFavorites = New ToolStripMenuItem()
         PanelSearch.SuspendLayout()
         StatusStripDirectory.SuspendLayout()
         PanelDirectory.SuspendLayout()
@@ -201,30 +203,44 @@ Partial Class Directory
         ' 
         ' CMStations
         ' 
-        CMStations.Items.AddRange(New ToolStripItem() {CMIPlay, CMIAddToPlaylist, CMICopyStreamURL})
+        CMStations.Items.AddRange(New ToolStripItem() {CMIPlay, CMIAddToPlaylist, CMIAddToFavorites, CMIRemoveFromFavorites, CMICopyStreamURL})
         CMStations.Name = "CMStations"
-        CMStations.Size = New Size(153, 70)
+        CMStations.Size = New Size(199, 136)
         ' 
         ' CMIPlay
         ' 
         CMIPlay.Image = My.Resources.Resources.ImagePlay
         CMIPlay.Name = "CMIPlay"
-        CMIPlay.Size = New Size(152, 22)
+        CMIPlay.Size = New Size(198, 22)
         CMIPlay.Text = "Play"
         ' 
         ' CMIAddToPlaylist
         ' 
         CMIAddToPlaylist.Image = My.Resources.Resources.ImageAdd16
         CMIAddToPlaylist.Name = "CMIAddToPlaylist"
-        CMIAddToPlaylist.Size = New Size(152, 22)
+        CMIAddToPlaylist.Size = New Size(198, 22)
         CMIAddToPlaylist.Text = "Add To Playlist"
+        ' 
+        ' CMIAddToFavorites
+        ' 
+        CMIAddToFavorites.Image = My.Resources.Resources.ImageFavorites16
+        CMIAddToFavorites.Name = "CMIAddToFavorites"
+        CMIAddToFavorites.Size = New Size(198, 22)
+        CMIAddToFavorites.Text = "Add To Favorites"
         ' 
         ' CMICopyStreamURL
         ' 
         CMICopyStreamURL.Image = My.Resources.Resources.ImageCopy16
         CMICopyStreamURL.Name = "CMICopyStreamURL"
-        CMICopyStreamURL.Size = New Size(152, 22)
+        CMICopyStreamURL.Size = New Size(198, 22)
         CMICopyStreamURL.Text = "Copy URL"
+        ' 
+        ' CMIRemoveFromFavorites
+        ' 
+        CMIRemoveFromFavorites.Image = My.Resources.Resources.ImageFavorites16
+        CMIRemoveFromFavorites.Name = "CMIRemoveFromFavorites"
+        CMIRemoveFromFavorites.Size = New Size(198, 22)
+        CMIRemoveFromFavorites.Text = "Remove From Favorites"
         ' 
         ' Directory
         ' 
@@ -276,4 +292,6 @@ Partial Class Directory
     Friend WithEvents ColFormat As ColumnHeader
     Friend WithEvents ColMore As ColumnHeader
     Friend WithEvents ILSources As ImageList
+    Friend WithEvents CMIAddToFavorites As ToolStripMenuItem
+    Friend WithEvents CMIRemoveFromFavorites As ToolStripMenuItem
 End Class
