@@ -205,7 +205,7 @@ Partial Class Directory
         ' 
         CMStations.Items.AddRange(New ToolStripItem() {CMIPlay, CMIAddToPlaylist, CMIAddToFavorites, CMIRemoveFromFavorites, CMICopyStreamURL})
         CMStations.Name = "CMStations"
-        CMStations.Size = New Size(199, 136)
+        CMStations.Size = New Size(199, 114)
         ' 
         ' CMIPlay
         ' 

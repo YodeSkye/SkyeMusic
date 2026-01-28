@@ -4553,7 +4553,7 @@ Public Class Player
         SetPlaylistCountText()
         lvi = Nothing
     End Sub
-    Friend Sub AddToPlaylistFromDirectory(stream As String)
+    Friend Sub AddToPlaylistFromDirectory(title As String, stream As String)
         Dim realUrl As String = NormalizeUrl(stream)
 
         Dim lvi As ListViewItem = Nothing
@@ -4567,7 +4567,7 @@ Public Class Player
             lvi = CreateListviewItem()
             GetHistory(lvi, realUrl)
         End If
-        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(realUrl)
+        lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = title
         lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = realUrl
         ClearPlaylistTitles()
         LVPlaylist.ListViewItemSorter = Nothing
@@ -4957,12 +4957,12 @@ Public Class Player
         StopPlay()
         PlayFile(filename, "PlayFromLibrary")
     End Sub
-    Friend Sub PlayFromDirectory(stream As String)
+    Friend Sub PlayFromDirectory(title As String, stream As String)
         LyricsOff()
         Dim realUrl As String = NormalizeUrl(stream)
         Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(realUrl, True, 0)
         If existingitem Is Nothing Then
-            AddToPlaylistFromDirectory(realUrl)
+            AddToPlaylistFromDirectory(title, realUrl)
         Else
             EnsurePlaylistItemIsVisible(existingitem.Index)
         End If

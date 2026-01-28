@@ -12,6 +12,7 @@ Public Class Directory
     Private mOffset, mPosition As Point
     Private sortColumn As Integer = -1
     Private sortOrder As SortOrder = SortOrder.Ascending
+    Private suppressSelection As Boolean = False
     Private radioBrowser As RadioBrowserSource
     Private soma As SomaFMSource
     Private radioParadise As RadioParadiseSource
@@ -101,53 +102,42 @@ Public Class Directory
             App.DirectorySize = Size
         End If
     End Sub
+    Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
+        ' Enter = Play
+        If keyData = Keys.Enter Then
+            If LVStations.Focused AndAlso LVStations.SelectedItems.Count > 0 Then
+                CMIPlay.PerformClick()
+                Return True
+            ElseIf TxtBoxSearch.Focused Then
+                Search()
+                Return True
+            End If
+        End If
+
+        Return MyBase.ProcessCmdKey(msg, keyData)
+    End Function
 
     ' Control Events
-    Private Async Sub LVSources_MouseDown(sender As Object, e As MouseEventArgs) Handles LVSources.MouseDown
+    Private Sub LVSources_MouseDown(sender As Object, e As MouseEventArgs) Handles LVSources.MouseDown
         ' Find the item under the mouse
+        suppressSelection = True
         Dim info = LVSources.HitTest(e.Location)
         Dim item = info.Item
         If item Is Nothing Then Return
 
         ' Ensure it becomes selected (for visual feedback)
-        item.Selected = True
 
+        item.Selected = True
         Dim selectedSource As String = item.Text
 
-        LVStations.Items.Clear()
-        StatusLabel.Text = $"Loading {selectedSource}…"
-
-        Select Case selectedSource
-            Case "Radio Browser"
-                TxtBoxSearch.PlaceholderText = "< Top Stations >"
-                Dim results = Await radioBrowser.GetDefaultStationsAsync()
-                PopulateStations(results)
-                StatusLabel.Text = $"Loaded {results.Count} stations of thousands."
-            Case "SomaFM"
-                TxtBoxSearch.PlaceholderText = "< All SomaFM Channels >"
-                Dim results = Await soma.GetStationsAsync()
-                PopulateStations(results)
-                StatusLabel.Text = $"Loaded {results.Count} SomaFM channels."
-            Case "Radio Paradise"
-                TxtBoxSearch.PlaceholderText = "< All Radio Paradise Channels >"
-                Dim results = radioParadise.GetStations()
-                PopulateStations(results)
-                StatusLabel.Text = $"Loaded {results.Count} Radio Paradise channels."
-            Case "Favorites"
-                TxtBoxSearch.PlaceholderText = "< Your Favorite Stations >"
-                PopulateStations(GetFavoritesAsStreamEntries())
-                StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
-            Case "Add Stream To Playlist"
-                TxtBoxSearch.PlaceholderText = String.Empty
-                StatusLabel.Text = String.Empty
-                Player.OpenURL()
-            Case "Import Playlist"
-                TxtBoxSearch.PlaceholderText = String.Empty
-                StatusLabel.Text = String.Empty
-                Player.OpenPlaylist()
-            Case Else
-                StatusLabel.Text = "Source not implemented yet."
-        End Select
+        SetSearch(selectedSource)
+        suppressSelection = False
+    End Sub
+    Private Sub LVSources_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVSources.SelectedIndexChanged
+        If suppressSelection OrElse LVSources.SelectedItems.Count = 0 Then Return
+        Dim selectedSource As String = LVSources.SelectedItems(0).Text
+        If selectedSource = "Add Stream To Playlist" OrElse selectedSource = "Import Playlist" Then Return
+        SetSearch(LVSources.SelectedItems(0).Text)
     End Sub
     Private Sub LVStations_MouseDown(sender As Object, e As MouseEventArgs) Handles LVStations.MouseDown
         If e.Button = MouseButtons.Right Then Return ' Handled by ContextMenu
@@ -160,8 +150,8 @@ Public Class Directory
     End Sub
     Private Async Sub LVStations_DoubleClick(sender As Object, e As EventArgs) Handles LVStations.DoubleClick
         If LVStations.SelectedItems.Count = 0 Then Return
-
         Dim item = LVStations.SelectedItems(0)
+        Dim title As String = LVStations.SelectedItems(0).Text
         Dim url = Await GetPlayableURL(item)
 
         If String.IsNullOrWhiteSpace(url) Then
@@ -169,7 +159,7 @@ Public Class Directory
             Return
         End If
 
-        Player.PlayFromDirectory(url)
+        Player.PlayFromDirectory(title, url)
     End Sub
     Private Sub CMStations_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMStations.Opening
         If LVStations.SelectedItems.Count = 0 Then
@@ -182,12 +172,12 @@ Public Class Directory
         Else
             CMIRemoveFromFavorites.Visible = False
             CMIAddToFavorites.Visible = True
-        End If  
+        End If
     End Sub
     Private Async Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
         If LVStations.SelectedItems.Count = 0 Then Return
-
         Dim item = LVStations.SelectedItems(0)
+        Dim title As String = LVStations.SelectedItems(0).Text
         Dim url = Await GetPlayableURL(item)
 
         If String.IsNullOrWhiteSpace(url) Then
@@ -195,12 +185,12 @@ Public Class Directory
             Return
         End If
 
-        Player.PlayFromDirectory(url)
+        Player.PlayFromDirectory(title, url)
     End Sub
     Private Async Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
         If LVStations.SelectedItems.Count = 0 Then Return
-
         Dim item = LVStations.SelectedItems(0)
+        Dim title As String = LVStations.SelectedItems(0).Text
         Dim url = Await GetPlayableURL(item)
 
         If String.IsNullOrWhiteSpace(url) Then
@@ -208,7 +198,7 @@ Public Class Directory
             Return
         End If
 
-        Player.AddToPlaylistFromDirectory(url)
+        Player.AddToPlaylistFromDirectory(title, url)
     End Sub
     Private Async Sub CMIAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIAddToFavorites.Click
         If LVStations.SelectedItems.Count = 0 Then Exit Sub
@@ -266,12 +256,6 @@ Public Class Directory
     End Sub
     Private Sub BtnSearch_Click(sender As Object, e As EventArgs) Handles BtnSearch.Click
         Search()
-    End Sub
-    Private Sub TxtBoxSearch_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxSearch.KeyDown
-        If e.KeyCode = Keys.Enter Then
-            e.SuppressKeyPress = True ' Prevents the 'ding' sound
-            Search()
-        End If
     End Sub
     Private Sub LVStations_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVStations.ColumnClick
         ' Remove arrow from previous sort column
@@ -371,6 +355,42 @@ Public Class Directory
 
         LVStations.EndUpdate()
     End Sub
+    Private Async Sub SetSearch(source As String)
+        LVStations.Items.Clear()
+        StatusLabel.Text = $"Loading {source}…"
+
+        Select Case source
+            Case "Radio Browser"
+                TxtBoxSearch.PlaceholderText = "< Top Stations >"
+                Dim results = Await radioBrowser.GetDefaultStationsAsync()
+                PopulateStations(results)
+                StatusLabel.Text = $"Loaded {results.Count} stations of thousands."
+            Case "SomaFM"
+                TxtBoxSearch.PlaceholderText = "< All SomaFM Channels >"
+                Dim results = Await soma.GetStationsAsync()
+                PopulateStations(results)
+                StatusLabel.Text = $"Loaded {results.Count} SomaFM channels."
+            Case "Radio Paradise"
+                TxtBoxSearch.PlaceholderText = "< All Radio Paradise Channels >"
+                Dim results = radioParadise.GetStations()
+                PopulateStations(results)
+                StatusLabel.Text = $"Loaded {results.Count} Radio Paradise channels."
+            Case "Favorites"
+                TxtBoxSearch.PlaceholderText = "< Your Favorite Stations >"
+                PopulateStations(GetFavoritesAsStreamEntries())
+                StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
+            Case "Add Stream To Playlist"
+                TxtBoxSearch.PlaceholderText = String.Empty
+                StatusLabel.Text = String.Empty
+                Player.OpenURL()
+            Case "Import Playlist"
+                TxtBoxSearch.PlaceholderText = String.Empty
+                StatusLabel.Text = String.Empty
+                Player.OpenPlaylist()
+            Case Else
+                StatusLabel.Text = "Source not implemented yet."
+        End Select
+    End Sub
     Private Async Sub Search()
         Dim query As String = TxtBoxSearch.Text.Trim()
 
@@ -405,9 +425,9 @@ Public Class Directory
                 ' Local filtering
                 Dim results = all.Where(Function(s)
                                             Return (s.Name IsNot Nothing AndAlso
-                                        s.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) _
-                                    OrElse (s.Tags IsNot Nothing AndAlso
-                                        s.Tags.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
+                                            s.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) _
+                                            OrElse (s.Tags IsNot Nothing AndAlso
+                                            s.Tags.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
                                         End Function).ToList()
 
                 PopulateStations(results)
@@ -417,7 +437,45 @@ Public Class Directory
                 Else
                     StatusLabel.Text = $"Found {results.Count} SomaFM channels."
                 End If
-            Case "Add Stream To Playlist"
+            Case "Radio Paradise"
+                ' Load all channels
+                Dim all = radioParadise.GetStations
+
+                ' Local filtering
+                Dim results = all.Where(Function(s)
+                                            Return (s.Name IsNot Nothing AndAlso
+                                            s.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) _
+                                            OrElse (s.Tags IsNot Nothing AndAlso
+                                            s.Tags.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
+                                        End Function).ToList()
+
+                PopulateStations(results)
+
+                If results.Count = 0 Then
+                    StatusLabel.Text = $"No Radio Paradise results for '{query}'."
+                Else
+                    StatusLabel.Text = $"Found {results.Count} Radio Paradise channels."
+                End If
+            Case "Favorites"
+                ' Load all channels
+                Dim all = GetFavoritesAsStreamEntries()
+
+                ' Local filtering
+                Dim results = all.Where(Function(s)
+                                            Return (s.Name IsNot Nothing AndAlso
+                                            s.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) _
+                                            OrElse (s.Tags IsNot Nothing AndAlso
+                                            s.Tags.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
+                                        End Function).ToList()
+
+                PopulateStations(results)
+
+                If results.Count = 0 Then
+                    StatusLabel.Text = $"No Favorites matching '{query}'."
+                Else
+                    StatusLabel.Text = $"Found {results.Count} Favorites."
+                End If
+            Case "Add Stream To Playlist", "Import Playlist"
                 StatusLabel.Text = "Not Searchable."
             Case Else
                 StatusLabel.Text = "Search not implemented for this source."
@@ -684,6 +742,20 @@ Public Class Directory
             Favorites = New List(Of FavoriteEntry)
             WriteToLog("Failed to load Directory Favorites.")
         End Try
+
+        ' --- AUTOCLEAN ---
+        If Favorites Is Nothing Then
+            Favorites = New List(Of FavoriteEntry)
+            Exit Sub
+        End If
+        ' Remove nulls and entries with no URL
+        Favorites = Favorites.
+        Where(Function(f) f IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(f.Url)).ToList()
+        ' Remove duplicates by URL
+        Favorites = Favorites.GroupBy(Function(f) f.Url.ToLower()).Select(Function(g) g.First()).ToList()
+        ' Save cleaned list if anything changed
+        SaveFavorites()
+
     End Sub
     Private Sub SaveFavorites()
         Try
