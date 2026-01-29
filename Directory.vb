@@ -66,6 +66,17 @@ Public Class Directory
         If App.SaveWindowMetrics AndAlso App.DirectorySize.Height >= 0 Then Me.Size = App.DirectorySize
         If App.SaveWindowMetrics AndAlso App.DirectoryLocation.Y >= 0 Then Me.Location = App.DirectoryLocation
 #End If
+        If App.DirectoryLastSelectedSource >= 0 Then
+            LVSources.Items(App.DirectoryLastSelectedSource).Selected = True
+        End If
+    End Sub
+    Private Sub Directory_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        If LVSources.SelectedItems.Count > 0 Then
+            App.DirectoryLastSelectedSource = LVSources.SelectedItems(0).Index
+            LVSources.Focus()
+        Else
+            App.DirectoryLastSelectedSource = -1
+        End If
     End Sub
     Private Sub Directory_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PanelSearch.MouseDown, StatusStripDirectory.MouseDown
         Dim cSender As Control
