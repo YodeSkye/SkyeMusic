@@ -14,7 +14,7 @@ Public Class OptionsStarField
 
     ' Control Events
     Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
-        App.Visualizers.StarFieldAllowMiniMode = ChkBoxAllowMiniMode.Checked
+        App.Settings.Visualizers.StarFieldAllowMiniMode = ChkBoxAllowMiniMode.Checked
     End Sub
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxStarCount.KeyDown
         If e.KeyCode = Keys.Enter Then
@@ -26,67 +26,67 @@ Public Class OptionsStarField
         If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
     End Sub
     Private Sub TxtBoxStarCount_Validated(sender As Object, e As EventArgs) Handles TxtBoxStarCount.Validated
-        App.Visualizers.StarFieldStarCount = CInt(TxtBoxStarCount.Text)
-        App.Visualizers.StarFieldStarCount = Math.Max(100, Math.Min(2000, App.Visualizers.StarFieldStarCount))
-        TxtBoxStarCount.Text = App.Visualizers.StarFieldStarCount.ToString
-        Player.VisualizerHost.SetStarFieldStarCount(App.Visualizers.StarFieldStarCount)
+        App.Settings.Visualizers.StarFieldStarCount = CInt(TxtBoxStarCount.Text)
+        App.Settings.Visualizers.StarFieldStarCount = Math.Max(100, Math.Min(2000, App.Settings.Visualizers.StarFieldStarCount))
+        TxtBoxStarCount.Text = App.Settings.Visualizers.StarFieldStarCount.ToString
+        Player.VisualizerHost.SetStarFieldStarCount(App.Settings.Visualizers.StarFieldStarCount)
     End Sub
     Private Sub TBBaseSpeed_ValueChanged(sender As Object, e As EventArgs) Handles TBBaseSpeed.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.StarFieldBaseSpeed = CSng(TBBaseSpeed.Value / 10)
+        App.Settings.Visualizers.StarFieldBaseSpeed = CSng(TBBaseSpeed.Value / 10)
     End Sub
     Private Sub TBAudioSpeedFactor_ValueChanged(sender As Object, e As EventArgs) Handles TBAudioSpeedFactor.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.StarFieldAudioSpeedFactor = TBAudioSpeedFactor.Value
+        App.Settings.Visualizers.StarFieldAudioSpeedFactor = TBAudioSpeedFactor.Value
     End Sub
     Private Sub TBMaxStarSize_ValueChanged(sender As Object, e As EventArgs) Handles TBMaxStarSize.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.StarFieldMaxStarSize = TBMaxStarSize.Value
+        App.Settings.Visualizers.StarFieldMaxStarSize = TBMaxStarSize.Value
     End Sub
     Private Sub BtnCalmDrift_Click(sender As Object, e As EventArgs) Handles BtnCalmDrift.Click
-        App.Visualizers.StarFieldStarCount = 300
-        App.Visualizers.StarFieldBaseSpeed = 1.0F
-        App.Visualizers.StarFieldAudioSpeedFactor = 5
-        App.Visualizers.StarFieldMaxStarSize = 3
+        App.Settings.Visualizers.StarFieldStarCount = 300
+        App.Settings.Visualizers.StarFieldBaseSpeed = 1.0F
+        App.Settings.Visualizers.StarFieldAudioSpeedFactor = 5
+        App.Settings.Visualizers.StarFieldMaxStarSize = 3
         ShowSettings()
     End Sub
     Private Sub BtnClassicArcade_Click(sender As Object, e As EventArgs) Handles BtnClassicArcade.Click
-        App.Visualizers.StarFieldStarCount = 500
-        App.Visualizers.StarFieldBaseSpeed = 2.0F
-        App.Visualizers.StarFieldAudioSpeedFactor = 35
-        App.Visualizers.StarFieldMaxStarSize = 6
+        App.Settings.Visualizers.StarFieldStarCount = 500
+        App.Settings.Visualizers.StarFieldBaseSpeed = 2.0F
+        App.Settings.Visualizers.StarFieldAudioSpeedFactor = 35
+        App.Settings.Visualizers.StarFieldMaxStarSize = 6
         ShowSettings()
     End Sub
     Private Sub BtnHyperWarp_Click(sender As Object, e As EventArgs) Handles BtnHyperWarp.Click
-        App.Visualizers.StarFieldStarCount = 1000
-        App.Visualizers.StarFieldBaseSpeed = 3.0F
-        App.Visualizers.StarFieldAudioSpeedFactor = 75
-        App.Visualizers.StarFieldMaxStarSize = 8
+        App.Settings.Visualizers.StarFieldStarCount = 1000
+        App.Settings.Visualizers.StarFieldBaseSpeed = 3.0F
+        App.Settings.Visualizers.StarFieldAudioSpeedFactor = 75
+        App.Settings.Visualizers.StarFieldMaxStarSize = 8
         ShowSettings()
     End Sub
     Private Sub BtnNebulaDust_Click(sender As Object, e As EventArgs) Handles BtnNebulaDust.Click
-        App.Visualizers.StarFieldStarCount = 800
-        App.Visualizers.StarFieldBaseSpeed = 1.5F
-        App.Visualizers.StarFieldAudioSpeedFactor = 1
-        App.Visualizers.StarFieldMaxStarSize = 3
+        App.Settings.Visualizers.StarFieldStarCount = 800
+        App.Settings.Visualizers.StarFieldBaseSpeed = 1.5F
+        App.Settings.Visualizers.StarFieldAudioSpeedFactor = 1
+        App.Settings.Visualizers.StarFieldMaxStarSize = 3
         ShowSettings()
     End Sub
     Private Sub BtnSilentSpace_Click(sender As Object, e As EventArgs) Handles BtnSilentSpace.Click
-        App.Visualizers.StarFieldStarCount = 200
-        App.Visualizers.StarFieldBaseSpeed = 1.0F
-        App.Visualizers.StarFieldAudioSpeedFactor = 0
-        App.Visualizers.StarFieldMaxStarSize = 2
+        App.Settings.Visualizers.StarFieldStarCount = 200
+        App.Settings.Visualizers.StarFieldBaseSpeed = 1.0F
+        App.Settings.Visualizers.StarFieldAudioSpeedFactor = 0
+        App.Settings.Visualizers.StarFieldMaxStarSize = 2
         ShowSettings()
     End Sub
 
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
-        ChkBoxAllowMiniMode.Checked = App.Visualizers.StarFieldAllowMiniMode
-        TxtBoxStarCount.Text = App.Visualizers.StarFieldStarCount.ToString
-        TBBaseSpeed.Value = CInt(App.Visualizers.StarFieldBaseSpeed * 10)
-        TBAudioSpeedFactor.Value = App.Visualizers.StarFieldAudioSpeedFactor
-        TBMaxStarSize.Value = App.Visualizers.StarFieldMaxStarSize
+        ChkBoxAllowMiniMode.Checked = App.Settings.Visualizers.StarFieldAllowMiniMode
+        TxtBoxStarCount.Text = App.Settings.Visualizers.StarFieldStarCount.ToString
+        TBBaseSpeed.Value = CInt(App.Settings.Visualizers.StarFieldBaseSpeed * 10)
+        TBAudioSpeedFactor.Value = App.Settings.Visualizers.StarFieldAudioSpeedFactor
+        TBMaxStarSize.Value = App.Settings.Visualizers.StarFieldMaxStarSize
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor

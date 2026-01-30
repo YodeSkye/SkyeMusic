@@ -14,17 +14,17 @@ Public Class OptionsWaveform
 
     ' Control Events
     Private Sub ChkBoxShowPeaks_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxWaveformFill.CheckedChanged
-        App.Visualizers.WaveformFill = ChkBoxWaveformFill.Checked
+        App.Settings.Visualizers.WaveformFill = ChkBoxWaveformFill.Checked
     End Sub
     Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
-        App.Visualizers.WaveformAllowMiniMode = ChkBoxAllowMiniMode.Checked
+        App.Settings.Visualizers.WaveformAllowMiniMode = ChkBoxAllowMiniMode.Checked
     End Sub
 
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
-        ChkBoxWaveformFill.Checked = App.Visualizers.WaveformFill
-        ChkBoxAllowMiniMode.Checked = App.Visualizers.WaveformAllowMiniMode
+        ChkBoxWaveformFill.Checked = App.Settings.Visualizers.WaveformFill
+        ChkBoxAllowMiniMode.Checked = App.Settings.Visualizers.WaveformAllowMiniMode
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor

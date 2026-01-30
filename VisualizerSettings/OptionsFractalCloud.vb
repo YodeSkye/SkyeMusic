@@ -14,40 +14,40 @@ Public Class OptionsFractalCloud
 
     ' Control Events
     Private Sub CoBoxPalette_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxPalette.SelectedIndexChanged
-        App.Visualizers.FractalCloudPalette = CType(CoBoxPalette.SelectedIndex, App.VisualizerSettings.FractalCloudPalettes)
+        App.Settings.Visualizers.FractalCloudPalette = CType(CoBoxPalette.SelectedIndex, App.FractalCloudPalettes)
     End Sub
     Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
-        App.Visualizers.FractalCloudAllowMiniMode = ChkBoxAllowMiniMode.Checked
+        App.Settings.Visualizers.FractalCloudAllowMiniMode = ChkBoxAllowMiniMode.Checked
     End Sub
     Private Sub TBSwirlSpeedBase_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedBase.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.FractalCloudSwirlSpeedBase = CDbl(TBSwirlSpeedBase.Value / 1000)
-        Debug.Print("Fractal Cloud Swirl Speed Base set to " & App.Visualizers.FractalCloudSwirlSpeedBase.ToString)
+        App.Settings.Visualizers.FractalCloudSwirlSpeedBase = CDbl(TBSwirlSpeedBase.Value / 1000)
+        Debug.Print("Fractal Cloud Swirl Speed Base set to " & App.Settings.Visualizers.FractalCloudSwirlSpeedBase.ToString)
     End Sub
     Private Sub TBPeakDecaySpeed_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedAudioFactor.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(TBSwirlSpeedAudioFactor.Value)
-        Debug.Print("Fractal Cloud Swirl Speed Audio Factor set to " & App.Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString)
+        App.Settings.Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(TBSwirlSpeedAudioFactor.Value)
+        Debug.Print("Fractal Cloud Swirl Speed Audio Factor set to " & App.Settings.Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString)
     End Sub
     Private Sub TBPeakThickness_ValueChanged(sender As Object, e As EventArgs) Handles TBTimeIncrement.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.FractalCloudTimeIncrement = CDbl(TBTimeIncrement.Value / 1000)
-        Debug.Print("Fractal Cloud Time Increment set to " & App.Visualizers.FractalCloudTimeIncrement.ToString)
+        App.Settings.Visualizers.FractalCloudTimeIncrement = CDbl(TBTimeIncrement.Value / 1000)
+        Debug.Print("Fractal Cloud Time Increment set to " & App.Settings.Visualizers.FractalCloudTimeIncrement.ToString)
     End Sub
 
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
         CoBoxPalette.Items.Clear()
-        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Normal)
-        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Firestorm)
-        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.Aurora)
-        CoBoxPalette.Items.Add(App.VisualizerSettings.FractalCloudPalettes.CosmicRainbow)
-        CoBoxPalette.SelectedItem = App.Visualizers.FractalCloudPalette
-        ChkBoxAllowMiniMode.Checked = App.Visualizers.FractalCloudAllowMiniMode
-        TBSwirlSpeedBase.Value = CInt(App.Visualizers.FractalCloudSwirlSpeedBase * 1000)
-        TBSwirlSpeedAudioFactor.Value = CInt(App.Visualizers.FractalCloudSwirlSpeedAudioFactor)
-        TBTimeIncrement.Value = CInt(App.Visualizers.FractalCloudTimeIncrement * 1000)
+        CoBoxPalette.Items.Add(App.FractalCloudPalettes.Normal)
+        CoBoxPalette.Items.Add(App.FractalCloudPalettes.Firestorm)
+        CoBoxPalette.Items.Add(App.FractalCloudPalettes.Aurora)
+        CoBoxPalette.Items.Add(App.FractalCloudPalettes.CosmicRainbow)
+        CoBoxPalette.SelectedItem = App.Settings.Visualizers.FractalCloudPalette
+        ChkBoxAllowMiniMode.Checked = App.Settings.Visualizers.FractalCloudAllowMiniMode
+        TBSwirlSpeedBase.Value = CInt(App.Settings.Visualizers.FractalCloudSwirlSpeedBase * 1000)
+        TBSwirlSpeedAudioFactor.Value = CInt(App.Settings.Visualizers.FractalCloudSwirlSpeedAudioFactor)
+        TBTimeIncrement.Value = CInt(App.Settings.Visualizers.FractalCloudTimeIncrement * 1000)
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor

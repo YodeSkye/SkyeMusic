@@ -63,8 +63,8 @@ Public Class Directory
         'If App.SaveWindowMetrics AndAlso App.DirectorySize.Height >= 0 Then Me.Size = App.DirectorySize
         'If App.SaveWindowMetrics AndAlso App.DirectoryLocation.Y >= 0 Then Me.Location = App.DirectoryLocation
 #Else
-        If App.SaveWindowMetrics AndAlso App.DirectorySize.Height >= 0 Then Me.Size = App.DirectorySize
-        If App.SaveWindowMetrics AndAlso App.DirectoryLocation.Y >= 0 Then Me.Location = App.DirectoryLocation
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.DirectorySize.Height >= 0 Then Me.Size = App.Settings.DirectorySize
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.DirectoryLocation.Y >= 0 Then Me.Location = App.Settings.DirectoryLocation
 #End If
         If App.DirectoryLastSelectedSource >= 0 Then
             LVSources.Items(App.DirectoryLastSelectedSource).Selected = True
@@ -96,7 +96,7 @@ Public Class Directory
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
-            App.DirectoryLocation = Location
+            App.Settings.DirectoryLocation = Location
         End If
     End Sub
     Private Sub Directory_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PanelSearch.MouseUp, StatusStripDirectory.MouseUp
@@ -105,12 +105,12 @@ Public Class Directory
     Private Sub Directory_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
-            App.DirectoryLocation = Location
+            App.Settings.DirectoryLocation = Location
         End If
     End Sub
     Private Sub Directory_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         If Visible AndAlso WindowState = FormWindowState.Normal Then
-            App.DirectorySize = Size
+            App.Settings.DirectorySize = Size
         End If
     End Sub
     Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean

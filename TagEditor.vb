@@ -882,8 +882,8 @@ Public Class TagEditor
 
         ' Only update library and reset UI if at least one successful save
         If failedPaths.Count = 0 Then
-            If Not App.WatcherUpdateLibrary Then _libraryneedsupdated = True
-            If Not App.WatcherUpdatePlaylist Then _playlistneedsupdated = True
+            If Not App.Settings.WatcherUpdateLibrary Then _libraryneedsupdated = True
+            If Not App.Settings.WatcherUpdatePlaylist Then _playlistneedsupdated = True
 
             ' Reset state once after all attempts
             HasChanged = False

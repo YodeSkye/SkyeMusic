@@ -463,225 +463,634 @@ Namespace My
             Public Property TotalPlayedSongs As UInteger
         End Class
 
-        'Visualizer Saved Settings
-        Friend Visualizer As String = "Rainbow Bar" 'The current visualizer used in the application.
-        Friend VisualizerMiniMode As Boolean = False 'Whether the mini mode is enabled for the visualizer. (Used in MiniPlayer)
-        Friend Visualizers As New VisualizerSettings
-        Public Class VisualizerSettings
-
-            ' Rainbow Bar Visualizer Settings
-            Public Property RainbowBarAllowMiniMode As Boolean = True 'Whether to allow mini mode for the rainbow bar visualizer.
-            Public Property RainbowBarCount As Integer = 32 '8-128 'Number of bars to display.
-            Public Property RainbowBarGain As Single = 100.0F '10F-1000F 'Controls bar height sensitivity. Higher gain exaggerates quiet sounds, lower gain keeps bars smaller.
-            Public Property RainbowBarShowPeaks As Boolean = True 'Whether to show peak indicators.
-            Public Property RainbowBarPeakDecaySpeed As Integer = 7 '1-20 'Peak falloff per frame
-            Public Property RainbowBarPeakThickness As Integer = 6 '1-20 'Width of peak indicators
-            Public Property RainbowBarPeakThreshold As Integer = 50 '0-200 'Pixels above bottom 'Threshold to avoid flicker at bottom
-            Public Property RainbowBarPeakHoldFrames As Integer = 10 '0-60 How long peaks “stick” before decaying. At 30 FPS, 30 = ~1 second.
-            Public Property RainbowBarHueCycleSpeed As Single = 2.0F '0.1F-20F 'How fast rainbow shifts
-
-            ' Classic Spectrum Analyzer
-            Public Enum ClassicSpectrumAnalyzerBandMappingModes
-                Linear
-                Logarithmic
-            End Enum
-            Public Property ClassicSpectrumAnalyzerAllowMiniMode As Boolean = True 'Whether to allow mini mode for the classic spectrum analyzer.
-            Public Property ClassicSpectrumAnalyzerBarCount As Integer = 64 ' 16-96
-            Public Property ClassicSpectrumAnalyzerGain As Single = 3.2F ' 1.0F-9.9F Gain multiplier for audio data.
-            Public Property ClassicSpectrumAnalyzerSmoothing As Single = 0.7F ' 0.0 - 0.95F Weight for previous frame vs new frame. 0 = instant response, 0.95 = very sluggish.
-            Public Property ClassicSpectrumAnalyzerShowPeaks As Boolean = True
-            Public Property ClassicSpectrumAnalyzerPeakDecay As Integer = 2 ' 1-10 px per frame
-            Public Property ClassicSpectrumAnalyzerPeakHoldFrames As Integer = 10 '0-60 How long peaks “stick” before decaying. At 30 FPS, 30 = ~1 second.
-            Public Property ClassicSpectrumAnalyzerBandMappingMode As ClassicSpectrumAnalyzerBandMappingModes = ClassicSpectrumAnalyzerBandMappingModes.Linear
-
-            ' Circular Spectrum Visualizer Settings
-            Public Enum CircularSpectrumWeightingModes
-                Balanced
-                BassHeavy
-                TrebleBright
-                Raw
-                Warm
-                VShape
-                MidFocus
-            End Enum
-            Public Property CircularSpectrumAllowMiniMode As Boolean = True 'Whether to allow mini mode for the circular spectrum visualizer.
-            Public Property CircularSpectrumWeightingMode As CircularSpectrumWeightingModes = CircularSpectrumWeightingModes.Raw ' Frequency emphasis curve
-            Public Property CircularSpectrumGain As Single = 6.0F ' 1.0F - 30.0F *10 Gain Factor for magnitudes
-            Public Property CircularSpectrumSmoothing As Single = 0.3F ' 0.0F - 1.0F *100 Blend Factor for smoothing (0 = no smoothing, 1 = max smoothing)
-            Public Property CircularSpectrumLineWidth As Integer = 1 ' 1 - 5 Thickness of each spoke line
-            Public Property CircularSpectrumRadiusFactor As Single = 0.3F ' 0.1F - 0.5F *10 ' Proportion of control size used as base radius
-            Public Property CircularSpectrumFill As Boolean = False ' Whether to fill the area under the spectrum
-
-            ' Waveform Visualizer Settings
-            Public Property WaveformAllowMiniMode As Boolean = True ' Whether to allow mini mode for the waveform visualizer.
-            Public Property WaveformFill As Boolean = False ' Whether to fill underneath the waveform.
-
-            ' Oscilloscope Visualizer Settings
-            Public Enum OscilloscopeChannelModes
-                Mono
-                StereoLeft
-                StereoRight
-                StereoBoth
-            End Enum
-            Public Property OscilloscopeAllowMiniMode As Boolean = True ' Whether to allow mini mode for the oscilloscope visualizer.
-            Public Property OscilloscopeChannelMode As OscilloscopeChannelModes = OscilloscopeChannelModes.Mono ' Channel mode for the oscilloscope.
-            Public Property OscilloscopeGain As Single = 1.0F ' 0.1F - 8.0F *10 Gain multiplier for the oscilloscope data.
-            Public Property OscilloscopeSmoothing As Single = 0.3F ' 0.0F - 1.0F *100 Smoothing factor for the oscilloscope data. 0 = no smoothing, 1 = maximum smoothing.
-            Public Property OscilloscopeLineWidth As Single = 1.5F ' 0.5F - 10.0F *10 Width of the oscilloscope line.
-            Public Property OscilloscopeEnableGlow As Boolean = False ' Whether to enable glow effect on the oscilloscope line.
-            Public Property OscilloscopeFadeAlpha As Integer = 48 ' 16 - 128 Alpha value for the glow effect. Higher values = less after glow.
-
-            ' Fractal Cloud Visualizer Settings
-            Public Enum FractalCloudPalettes
-                Normal
-                Firestorm
-                Aurora
-                CosmicRainbow
-            End Enum
-            Public Property FractalCloudAllowMiniMode As Boolean = True ' Whether to allow mini mode for the fractal cloud visualizer.
-            Public Property FractalCloudPalette As FractalCloudPalettes = FractalCloudPalettes.Normal 'The color palette used for the fractal cloud visualizer.
-            Public Property FractalCloudSwirlSpeedBase As Double = 0.01F ' 0.001F-0.050F Base speed of swirl rotation.
-            Public Property FractalCloudSwirlSpeedAudioFactor As Double = 10.0F ' 1-30 How much audio affects swirl speed.
-            Public Property FractalCloudTimeIncrement As Double = 0.02F ' 0.005F-0.100F Increment for fractal time variable. Animation Speed.
-
-            'Julia Fractal Visualizer Settings
-            Public Property JuliaFractalAllowMiniMode As Boolean = True ' Whether to allow mini mode for the Julia fractal visualizer.
-            Public Property JuliaFractalBaseCX As Single = -0.7F '-1.0 to +1.0 '+1 *100 'The fixed real part of the Julia constant. This anchors the fractal’s overall shape.
-            Public Property JuliaFractalBassInfluence As Single = 0.5F '0.0 - 25.0 '*10 'How much the low‑frequency audio band shifts the real part (cx). Strong bass makes the fractal “wobble” horizontally.
-            Public Property JuliaFractalBaseCY As Single = 0.27015F '-1.0 to +1.0 '+1 *100 'The fixed imaginary part of the Julia constant. This sets the fractal’s vertical symmetry and complexity.
-            Public Property JuliaFractalMidInfluence As Single = 2.5F '0.0F - 25.0F '*10 'How much the mid‑frequency audio band shifts the imaginary part (cy). Strong mids make the fractal “stretch” vertically.
-            Public Property JuliaFractalMaxIterations As Integer = 100 '10-250 '*1 'Controls fractal detail: higher values = sharper, slower; lower values = simpler, faster.
-
-            ' Hyperspace Tunnel Visualizer Settings
-            Public Property HyperspaceTunnelAllowMiniMode As Boolean = True ' Whether to allow mini mode for the hyperspace tunnel visualizer.
-            Public Property HyperspaceTunnelParticleCount As Integer = 1000 '100-5000 Number of particles in the tunnel.
-            Public Property HyperspaceTunnelSwirlSpeedBase As Double = 0.05F ' 0.01F-0.20F Base speed of swirl rotation.
-            Public Property HyperspaceTunnelSwirlSpeedAudioFactor As Double = 0.2F ' 0.05F-1.00F How much audio affects swirl speed.
-            Public Property HyperspaceTunnelParticleSpeedBase As Double = 2.0F ' 1.0F-5.0F Base speed of particles coming at you.
-            Public Property HyperspaceTunnelParticleSpeedAudioFactor As Double = 20.0F ' 5-50 How much audio affects particle speed.
-
-            ' Star Field Visualizer Settings
-            Public Property StarFieldAllowMiniMode As Boolean = True ' Whether to allow mini mode for the star field visualizer.
-            Public Property StarFieldStarCount As Integer = 750 ' 100-2000 Number of stars in the field.
-            Public Property StarFieldBaseSpeed As Single = 2.0F ' 1.0F-5.0F Minimum star movement speed.
-            Public Property StarFieldAudioSpeedFactor As Integer = 10 ' 0-100 How much audio level boosts star speed.
-            Public Property StarFieldMaxStarSize As Integer = 6 ' 2-12 Maximum size of stars.
-
-            'Particle Nebula Visualizer Settings
-            Public Enum ParticleNebulaPalettePresets ' Enum of available palettes
-                Cosmic
-                Firestorm
-                Oceanic
-                Aurora
-                MonochromeGlow
-            End Enum
-            Public Structure ParticleNebulaPalette ' Structure to hold colors
-                Public BassColor As Color
-                Public MidColor As Color
-                Public TrebleColor As Color
-            End Structure
-            Public Function ParticleNebulaGetPalette(preset As ParticleNebulaPalettePresets) As ParticleNebulaPalette ' Helper to get palette colors from preset
-                Select Case preset
-                    Case ParticleNebulaPalettePresets.Cosmic
-                        Return New ParticleNebulaPalette With {
+        ' Visualizers
+        Friend Enum CircularSpectrumWeightingModes
+            Balanced
+            BassHeavy
+            TrebleBright
+            Raw
+            Warm
+            VShape
+            MidFocus
+        End Enum
+        Friend Enum ClassicSpectrumAnalyzerBandMappingModes
+            Linear
+            Logarithmic
+        End Enum
+        Friend Enum FractalCloudPalettes
+            Normal
+            Firestorm
+            Aurora
+            CosmicRainbow
+        End Enum
+        Friend Enum OscilloscopeChannelModes
+            Mono
+            StereoLeft
+            StereoRight
+            StereoBoth
+        End Enum
+        Friend Enum ParticleNebulaPalettePresets
+            Cosmic
+            Firestorm
+            Oceanic
+            Aurora
+            MonochromeGlow
+        End Enum
+        Friend Structure ParticleNebulaPalette ' Structure to hold colors
+            Public BassColor As Color
+            Public MidColor As Color
+            Public TrebleColor As Color
+        End Structure
+        Friend Function ParticleNebulaGetPalette(preset As ParticleNebulaPalettePresets) As ParticleNebulaPalette ' Helper to get palette colors from preset
+            Select Case preset
+                Case ParticleNebulaPalettePresets.Cosmic
+                    Return New ParticleNebulaPalette With {
                             .BassColor = Color.FromArgb(180, 200, 50, 200),
                             .MidColor = Color.FromArgb(180, 50, 200, 255),
                             .TrebleColor = Color.FromArgb(200, 255, 255, 180)}
-                    Case ParticleNebulaPalettePresets.Firestorm
-                        Return New ParticleNebulaPalette With {
+                Case ParticleNebulaPalettePresets.Firestorm
+                    Return New ParticleNebulaPalette With {
                             .BassColor = Color.DarkRed,
                             .MidColor = Color.Orange,
                             .TrebleColor = Color.White}
-                    Case ParticleNebulaPalettePresets.Oceanic
-                        Return New ParticleNebulaPalette With {
+                Case ParticleNebulaPalettePresets.Oceanic
+                    Return New ParticleNebulaPalette With {
                             .BassColor = Color.Navy,
                             .MidColor = Color.Teal,
                             .TrebleColor = Color.Aqua}
-                    Case ParticleNebulaPalettePresets.Aurora
-                        Return New ParticleNebulaPalette With {
+                Case ParticleNebulaPalettePresets.Aurora
+                    Return New ParticleNebulaPalette With {
                             .BassColor = Color.Green,
                             .MidColor = Color.Magenta,
                             .TrebleColor = Color.Violet}
-                    Case ParticleNebulaPalettePresets.MonochromeGlow
-                        Return New ParticleNebulaPalette With {
+                Case ParticleNebulaPalettePresets.MonochromeGlow
+                    Return New ParticleNebulaPalette With {
                             .BassColor = Color.DarkGray,
                             .MidColor = Color.Silver,
                             .TrebleColor = Color.White}
-                    Case Else
-                        Return New ParticleNebulaPalette With {
+                Case Else
+                    Return New ParticleNebulaPalette With {
                             .BassColor = Color.Gray,
                             .MidColor = Color.LightGray,
                             .TrebleColor = Color.White}
-                End Select
-            End Function
-            Public ParticleNebulaActivePalette As ParticleNebulaPalette = ParticleNebulaGetPalette(ParticleNebulaPalettePresets.Cosmic)
-            Public Property ParticleNebulaAllowMiniMode As Boolean = True ' Whether to allow mini mode for the particle nebula visualizer.
-            Public Property ParticleNebulaSpawnMultiplier As Single = 2.0F ' 0.5 – 10.0 *10 ' Nebula Density. Higher = More Particles.
-            Public Property ParticleNebulaVelocityScale As Integer = 50 ' 10 - 200 *1 ' Speed of Particle Movement.
-            Public Property ParticleNebulaSizeScale As Integer = 20 ' 5 – 50 *1 ' Size of Particles. Higher = Bigger Particles.
-            Public Property ParticleNebulaFadeRate As Single = 0.005F '0.001 – 0.02 *10000 ' How Quickly Particles Fade Out.
-            Public Property ParticleNebulaSwirlStrength As Single = 0.15F ' 0.0 – 0.5 *100 ' How Strongly Particles Swirl.
-            Public Property ParticleNebulaSwirlBias As Single = 0.0F '-1 - 1 0-2*100-1 ' Directional Bias. -1 = mostly CCW, 0 = Balanced, +1 = mostly CW
-            Public Property ParticleNebulaActivePalettePreset As ParticleNebulaPalettePresets = ParticleNebulaPalettePresets.Cosmic ' Selected Color Palette.
-            Public Property ParticleNebulaRainbowColors As Boolean = False ' Use Rainbow Coloring Instead of Palette.
-            Public Property ParticleNebulaShowTrails As Boolean = False ' Whether to Draw Particle Trails.
-            Public Property ParticleNebulaFadeTrails As Boolean = False ' Whether Trail Segments Fade Out.
-            Public Property ParticleNebulaTrailAlpha As Single = 0.5F ' 0.1 – 1.0 *100 ' Brightness of Trail Segments.
-            Public Property ParticleNebulaShowBloom As Boolean = False ' Whether to Draw Bloom Effect.
-            Public Property ParticleNebulaBloomIntensity As Single = 0.5F ' 0.1 – 2.0 *10 ' Bloom Brightness Multiplier.
-            Public Property ParticleNebulaBloomRadius As Integer = 2 ' 1 – 5 *1 ' How Many Extra Bloom Rings to Draw.
+            End Select
+        End Function
+        Friend ParticleNebulaActivePalette As ParticleNebulaPalette = ParticleNebulaGetPalette(ParticleNebulaPalettePresets.Cosmic)
+
+        ' Settings
+        Friend Class Settings
+
+            ' App
+            Friend Shared SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
+            Friend Shared SaveWindowMetrics As Boolean = False 'Flag that indicates whether to save and restore window positions and sizes.
+            Friend Shared Theme As Themes = Themes.Red 'The current theme of the application.
+            Friend Shared DirectoryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
+            Friend Shared DirectorySize As New Size(-1, -1)
+            Friend Shared LogLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
+            Friend Shared LogSize As New Size(-1, -1)
+            Friend Shared HelperApp1Name As String = String.Empty
+            Friend Shared HelperApp1Path As String = String.Empty
+            Friend Shared HelperApp2Name As String = String.Empty
+            Friend Shared HelperApp2Path As String = String.Empty
+            Friend Shared ChangeLogLastVersionShown As String = String.Empty
+            Friend Shared ShowTrayIcon As Boolean = False
+            Friend Shared MinimizeToTray As Boolean = False
+            Friend Shared LastUpdateCheck As DateTime = DateTime.MinValue
+            Friend Shared LatestKnownVersion As String = String.Empty
+
+            ' Player
+            Friend Shared PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
+            Friend Shared PlayerSize As New Size(-1, -1)
+            Friend Shared PlayerMiniLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
+            Friend Shared PlayerPositionShowElapsed As Boolean = True
+            Friend Shared PlayMode As PlayModes = PlayModes.Random
+            Friend Shared ShowNowPlayingToast As Boolean = True
+            Friend Shared NowPlayingToastLocation As Skye.UI.ToastLocation = Skye.UI.ToastLocation.TopRight
+
+            ' Playlist
+            Friend Shared PlaylistTitleFormat As PlaylistTitleFormats = PlaylistTitleFormats.ArtistSong
+            Friend Shared PlaylistTitleRemoveSpaces As Boolean = False
+            Friend Shared PlaylistTitleSeparator As String = " "
+            Friend Shared PlaylistVideoIdentifier As String = String.Empty
+            Friend Shared PlaylistDefaultAction As PlaylistActions = PlaylistActions.Play
+            Friend Shared PlaylistSearchAction As PlaylistActions = PlaylistActions.Play
+            Friend Shared PlaylistStatusMessageDisplayTime As Byte = 8 '0 - 60, 0 = Don't display status messages.
+
+            ' Library
+            Friend Shared LibraryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
+            Friend Shared LibrarySize As New Size(-1, -1)
+            Friend Shared LibrarySearchFolders As New Collections.Generic.List(Of String)
+            Friend Shared LibrarySearchSubFolders As Boolean = True
+            Friend Shared WatcherEnabled As Boolean = False 'Flag that indicates whether to watch for changes in the library folders.
+            Friend Shared WatcherUpdateLibrary As Boolean = False 'Flag that indicates whether to automatically update the library when changes are detected in the file system.
+            Friend Shared WatcherUpdatePlaylist As Boolean = False 'Flag that indicates whether to automatically update the playlist when changes are detected in the file system.
+
+            ' History
+            Friend Shared HistoryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
+            Friend Shared HistorySize As New Size(-1, -1)
+            Friend Shared RandomHistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to add the currently playing song to the shuffle play history.
+            Friend Shared HistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to update the play count of the currently playing song.
+            Friend Shared HistoryAutoSaveInterval As UShort = 5 '1-1440 'Interval in minutes to automatically save the history.
+            Friend Shared HistoryViewMaxRecords As UShort = 25 'Maximum number of records to display in the history view.
+
+            ' Visualizers
+            Friend Shared Visualizer As String = "Rainbow Bar" 'The current visualizer used in the application.
+            Friend Shared VisualizerMiniMode As Boolean = False 'Whether the mini mode is enabled for the visualizer. (Used in MiniPlayer)
+            Friend Shared Visualizers As New Settings.VisualizerSettings
+            Friend Class VisualizerSettings
+
+                ' Rainbow Bar Visualizer Settings
+                Public Property RainbowBarAllowMiniMode As Boolean = True 'Whether to allow mini mode for the rainbow bar visualizer.
+                Public Property RainbowBarCount As Integer = 32 '8-128 'Number of bars to display.
+                Public Property RainbowBarGain As Single = 100.0F '10F-1000F 'Controls bar height sensitivity. Higher gain exaggerates quiet sounds, lower gain keeps bars smaller.
+                Public Property RainbowBarShowPeaks As Boolean = True 'Whether to show peak indicators.
+                Public Property RainbowBarPeakDecaySpeed As Integer = 7 '1-20 'Peak falloff per frame
+                Public Property RainbowBarPeakThickness As Integer = 6 '1-20 'Width of peak indicators
+                Public Property RainbowBarPeakThreshold As Integer = 50 '0-200 'Pixels above bottom 'Threshold to avoid flicker at bottom
+                Public Property RainbowBarPeakHoldFrames As Integer = 10 '0-60 How long peaks “stick” before decaying. At 30 FPS, 30 = ~1 second.
+                Public Property RainbowBarHueCycleSpeed As Single = 2.0F '0.1F-20F 'How fast rainbow shifts
+
+                ' Classic Spectrum Analyzer
+                Public Property ClassicSpectrumAnalyzerAllowMiniMode As Boolean = True 'Whether to allow mini mode for the classic spectrum analyzer.
+                Public Property ClassicSpectrumAnalyzerBarCount As Integer = 64 ' 16-96
+                Public Property ClassicSpectrumAnalyzerGain As Single = 3.2F ' 1.0F-9.9F Gain multiplier for audio data.
+                Public Property ClassicSpectrumAnalyzerSmoothing As Single = 0.7F ' 0.0 - 0.95F Weight for previous frame vs new frame. 0 = instant response, 0.95 = very sluggish.
+                Public Property ClassicSpectrumAnalyzerShowPeaks As Boolean = True
+                Public Property ClassicSpectrumAnalyzerPeakDecay As Integer = 2 ' 1-10 px per frame
+                Public Property ClassicSpectrumAnalyzerPeakHoldFrames As Integer = 10 '0-60 How long peaks “stick” before decaying. At 30 FPS, 30 = ~1 second.
+                Public Property ClassicSpectrumAnalyzerBandMappingMode As ClassicSpectrumAnalyzerBandMappingModes = ClassicSpectrumAnalyzerBandMappingModes.Linear
+
+                ' Circular Spectrum Visualizer Settings
+                Public Property CircularSpectrumAllowMiniMode As Boolean = True 'Whether to allow mini mode for the circular spectrum visualizer.
+                Public Property CircularSpectrumWeightingMode As CircularSpectrumWeightingModes = CircularSpectrumWeightingModes.Raw ' Frequency emphasis curve
+                Public Property CircularSpectrumGain As Single = 6.0F ' 1.0F - 30.0F *10 Gain Factor for magnitudes
+                Public Property CircularSpectrumSmoothing As Single = 0.3F ' 0.0F - 1.0F *100 Blend Factor for smoothing (0 = no smoothing, 1 = max smoothing)
+                Public Property CircularSpectrumLineWidth As Integer = 1 ' 1 - 5 Thickness of each spoke line
+                Public Property CircularSpectrumRadiusFactor As Single = 0.3F ' 0.1F - 0.5F *10 ' Proportion of control size used as base radius
+                Public Property CircularSpectrumFill As Boolean = False ' Whether to fill the area under the spectrum
+
+                ' Waveform Visualizer Settings
+                Public Property WaveformAllowMiniMode As Boolean = True ' Whether to allow mini mode for the waveform visualizer.
+                Public Property WaveformFill As Boolean = False ' Whether to fill underneath the waveform.
+
+                ' Oscilloscope Visualizer Settings
+                Public Property OscilloscopeAllowMiniMode As Boolean = True ' Whether to allow mini mode for the oscilloscope visualizer.
+                Public Property OscilloscopeChannelMode As OscilloscopeChannelModes = OscilloscopeChannelModes.Mono ' Channel mode for the oscilloscope.
+                Public Property OscilloscopeGain As Single = 1.0F ' 0.1F - 8.0F *10 Gain multiplier for the oscilloscope data.
+                Public Property OscilloscopeSmoothing As Single = 0.3F ' 0.0F - 1.0F *100 Smoothing factor for the oscilloscope data. 0 = no smoothing, 1 = maximum smoothing.
+                Public Property OscilloscopeLineWidth As Single = 1.5F ' 0.5F - 10.0F *10 Width of the oscilloscope line.
+                Public Property OscilloscopeEnableGlow As Boolean = False ' Whether to enable glow effect on the oscilloscope line.
+                Public Property OscilloscopeFadeAlpha As Integer = 48 ' 16 - 128 Alpha value for the glow effect. Higher values = less after glow.
+
+                ' Fractal Cloud Visualizer Settings
+                Public Property FractalCloudAllowMiniMode As Boolean = True ' Whether to allow mini mode for the fractal cloud visualizer.
+                Public Property FractalCloudPalette As FractalCloudPalettes = FractalCloudPalettes.Normal 'The color palette used for the fractal cloud visualizer.
+                Public Property FractalCloudSwirlSpeedBase As Double = 0.01F ' 0.001F-0.050F Base speed of swirl rotation.
+                Public Property FractalCloudSwirlSpeedAudioFactor As Double = 10.0F ' 1-30 How much audio affects swirl speed.
+                Public Property FractalCloudTimeIncrement As Double = 0.02F ' 0.005F-0.100F Increment for fractal time variable. Animation Speed.
+
+                'Julia Fractal Visualizer Settings
+                Public Property JuliaFractalAllowMiniMode As Boolean = True ' Whether to allow mini mode for the Julia fractal visualizer.
+                Public Property JuliaFractalBaseCX As Single = -0.7F '-1.0 to +1.0 '+1 *100 'The fixed real part of the Julia constant. This anchors the fractal’s overall shape.
+                Public Property JuliaFractalBassInfluence As Single = 0.5F '0.0 - 25.0 '*10 'How much the low‑frequency audio band shifts the real part (cx). Strong bass makes the fractal “wobble” horizontally.
+                Public Property JuliaFractalBaseCY As Single = 0.27015F '-1.0 to +1.0 '+1 *100 'The fixed imaginary part of the Julia constant. This sets the fractal’s vertical symmetry and complexity.
+                Public Property JuliaFractalMidInfluence As Single = 2.5F '0.0F - 25.0F '*10 'How much the mid‑frequency audio band shifts the imaginary part (cy). Strong mids make the fractal “stretch” vertically.
+                Public Property JuliaFractalMaxIterations As Integer = 100 '10-250 '*1 'Controls fractal detail: higher values = sharper, slower; lower values = simpler, faster.
+
+                ' Hyperspace Tunnel Visualizer Settings
+                Public Property HyperspaceTunnelAllowMiniMode As Boolean = True ' Whether to allow mini mode for the hyperspace tunnel visualizer.
+                Public Property HyperspaceTunnelParticleCount As Integer = 1000 '100-5000 Number of particles in the tunnel.
+                Public Property HyperspaceTunnelSwirlSpeedBase As Double = 0.05F ' 0.01F-0.20F Base speed of swirl rotation.
+                Public Property HyperspaceTunnelSwirlSpeedAudioFactor As Double = 0.2F ' 0.05F-1.00F How much audio affects swirl speed.
+                Public Property HyperspaceTunnelParticleSpeedBase As Double = 2.0F ' 1.0F-5.0F Base speed of particles coming at you.
+                Public Property HyperspaceTunnelParticleSpeedAudioFactor As Double = 20.0F ' 5-50 How much audio affects particle speed.
+
+                ' Star Field Visualizer Settings
+                Public Property StarFieldAllowMiniMode As Boolean = True ' Whether to allow mini mode for the star field visualizer.
+                Public Property StarFieldStarCount As Integer = 750 ' 100-2000 Number of stars in the field.
+                Public Property StarFieldBaseSpeed As Single = 2.0F ' 1.0F-5.0F Minimum star movement speed.
+                Public Property StarFieldAudioSpeedFactor As Integer = 10 ' 0-100 How much audio level boosts star speed.
+                Public Property StarFieldMaxStarSize As Integer = 6 ' 2-12 Maximum size of stars.
+
+                'Particle Nebula Visualizer Settings
+                Public Property ParticleNebulaAllowMiniMode As Boolean = True ' Whether to allow mini mode for the particle nebula visualizer.
+                Public Property ParticleNebulaSpawnMultiplier As Single = 2.0F ' 0.5 – 10.0 *10 ' Nebula Density. Higher = More Particles.
+                Public Property ParticleNebulaVelocityScale As Integer = 50 ' 10 - 200 *1 ' Speed of Particle Movement.
+                Public Property ParticleNebulaSizeScale As Integer = 20 ' 5 – 50 *1 ' Size of Particles. Higher = Bigger Particles.
+                Public Property ParticleNebulaFadeRate As Single = 0.005F '0.001 – 0.02 *10000 ' How Quickly Particles Fade Out.
+                Public Property ParticleNebulaSwirlStrength As Single = 0.15F ' 0.0 – 0.5 *100 ' How Strongly Particles Swirl.
+                Public Property ParticleNebulaSwirlBias As Single = 0.0F '-1 - 1 0-2*100-1 ' Directional Bias. -1 = mostly CCW, 0 = Balanced, +1 = mostly CW
+                Public Property ParticleNebulaActivePalettePreset As ParticleNebulaPalettePresets = ParticleNebulaPalettePresets.Cosmic ' Selected Color Palette.
+                Public Property ParticleNebulaRainbowColors As Boolean = False ' Use Rainbow Coloring Instead of Palette.
+                Public Property ParticleNebulaShowTrails As Boolean = False ' Whether to Draw Particle Trails.
+                Public Property ParticleNebulaFadeTrails As Boolean = False ' Whether Trail Segments Fade Out.
+                Public Property ParticleNebulaTrailAlpha As Single = 0.5F ' 0.1 – 1.0 *100 ' Brightness of Trail Segments.
+                Public Property ParticleNebulaShowBloom As Boolean = False ' Whether to Draw Bloom Effect.
+                Public Property ParticleNebulaBloomIntensity As Single = 0.5F ' 0.1 – 2.0 *10 ' Bloom Brightness Multiplier.
+                Public Property ParticleNebulaBloomRadius As Integer = 2 ' 1 – 5 *1 ' How Many Extra Bloom Rings to Draw.
+
+            End Class
+
+            Friend Shared Sub Load()
+                Try
+                    Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+                    Dim RegKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegPath)
+                    Dim RegSubKey As Microsoft.Win32.RegistryKey
+
+                    ' Player Settings
+                    Settings.PlayerLocation.X = CInt(Val(RegKey.GetValue("PlayerLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
+                    Settings.PlayerLocation.Y = CInt(Val(RegKey.GetValue("PlayerLocationY", (-1).ToString)))
+                    Settings.PlayerSize.Width = CInt(Val(RegKey.GetValue("PlayerSizeX", (-1).ToString)))
+                    Settings.PlayerSize.Height = CInt(Val(RegKey.GetValue("PlayerSizeY", (-1).ToString)))
+                    PlayerMiniLocation.X = Skye.Common.RegistryHelper.GetInt("PlayerMiniLocationX", -AdjustScreenBoundsNormalWindow - 1)
+                    PlayerMiniLocation.Y = Skye.Common.RegistryHelper.GetInt("PlayerMiniLocationY", -1)
+                    Select Case RegKey.GetValue("PlayerPositionShowElapsed", "True").ToString
+                        Case "False", "0" : PlayerPositionShowElapsed = False
+                        Case Else : PlayerPositionShowElapsed = True
+                    End Select
+                    Try : Settings.PlayMode = CType([Enum].Parse(GetType(App.PlayModes), RegKey.GetValue("PlayMode", App.PlayModes.Random.ToString).ToString), PlayModes)
+                    Catch : Settings.PlayMode = App.PlayModes.Random
+                    End Try
+                    Select Case RegKey.GetValue("ShowNowPlayingToast", "True").ToString
+                        Case "False", "0" : Settings.ShowNowPlayingToast = False
+                        Case Else : Settings.ShowNowPlayingToast = True
+                    End Select
+                    Try : Settings.NowPlayingToastLocation = CType([Enum].Parse(GetType(Skye.UI.ToastLocation), RegKey.GetValue("NowPlayingToastLocation", Skye.UI.ToastLocation.TopRight.ToString).ToString), Skye.UI.ToastLocation)
+                    Catch : Settings.NowPlayingToastLocation = Skye.UI.ToastLocation.TopRight
+                    End Try
+
+                    ' Playlist Settings
+                    Try : Settings.PlaylistTitleFormat = CType([Enum].Parse(GetType(App.PlaylistTitleFormats), RegKey.GetValue("PlaylistTitleFormat", App.PlaylistTitleFormats.ArtistSong.ToString).ToString), PlaylistTitleFormats)
+                    Catch : Settings.PlaylistTitleFormat = App.PlaylistTitleFormats.ArtistSong
+                    End Try
+                    Select Case RegKey.GetValue("PlaylistTitleRemoveSpaces", "False").ToString
+                        Case "True", "1" : Settings.PlaylistTitleRemoveSpaces = True
+                        Case Else : Settings.PlaylistTitleRemoveSpaces = False
+                    End Select
+                    Settings.PlaylistVideoIdentifier = RegKey.GetValue("PlaylistVideoIdentifier", String.Empty).ToString
+                    Try : Settings.PlaylistDefaultAction = CType([Enum].Parse(GetType(App.PlaylistActions), RegKey.GetValue("PlaylistDefaultAction", App.PlaylistActions.Play.ToString).ToString), App.PlaylistActions)
+                    Catch : Settings.PlaylistDefaultAction = App.PlaylistActions.Play
+                    End Try
+                    Try : Settings.PlaylistSearchAction = CType([Enum].Parse(GetType(App.PlaylistActions), RegKey.GetValue("PlaylistSearchAction", App.PlaylistActions.Play.ToString).ToString), App.PlaylistActions)
+                    Catch : Settings.PlaylistSearchAction = App.PlaylistActions.Play
+                    End Try
+                    Settings.PlaylistStatusMessageDisplayTime = CByte(Val(RegKey.GetValue("PlaylistStatusMessageDisplayTime", 8.ToString)))
+                    If Settings.PlaylistStatusMessageDisplayTime > 60 Then
+                        Settings.PlaylistStatusMessageDisplayTime = 60 'Limit the value to a maximum of 60 seconds
+                    End If
+
+                    ' Library Settings
+                    Settings.LibraryLocation.X = CInt(Val(RegKey.GetValue("LibraryLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
+                    Settings.LibraryLocation.Y = CInt(Val(RegKey.GetValue("LibraryLocationY", (-1).ToString)))
+                    Settings.LibrarySize.Width = CInt(Val(RegKey.GetValue("LibrarySizeX", (-1).ToString)))
+                    Settings.LibrarySize.Height = CInt(Val(RegKey.GetValue("LibrarySizeY", (-1).ToString)))
+                    LibrarySearchFolders.Clear()
+                    Select Case RegKey.GetValue("LibrarySearchSubFolders", "True").ToString
+                        Case "False", "0" : LibrarySearchSubFolders = False
+                        Case Else : LibrarySearchSubFolders = True
+                    End Select
+                    Select Case RegKey.GetValue("WatcherEnabled", "False").ToString
+                        Case "True", "1" : WatcherEnabled = True
+                        Case Else : WatcherEnabled = False
+                    End Select
+                    Select Case RegKey.GetValue("WatcherUpdateLibrary", "False").ToString
+                        Case "True", "1" : WatcherUpdateLibrary = True
+                        Case Else : WatcherUpdateLibrary = False
+                    End Select
+                    Select Case RegKey.GetValue("WatcherUpdatePlaylist", "False").ToString
+                        Case "True", "1" : WatcherUpdatePlaylist = True
+                        Case Else : WatcherUpdatePlaylist = False
+                    End Select
+                    RegSubKey = RegKey.CreateSubKey("LibraryWatchFolders")
+                    For Each s As String In RegSubKey.GetValueNames : LibrarySearchFolders.Add(RegSubKey.GetValue(s).ToString) : Next
+                    RegSubKey.Close()
+
+                    ' History Settings
+                    Settings.HistoryLocation.X = CInt(Val(RegKey.GetValue("HistoryLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
+                    Settings.HistoryLocation.Y = CInt(Val(RegKey.GetValue("HistoryLocationY", (-1).ToString)))
+                    Settings.HistorySize.Width = CInt(Val(RegKey.GetValue("HistorySizeX", (-1).ToString)))
+                    Settings.HistorySize.Height = CInt(Val(RegKey.GetValue("HistorySizeY", (-1).ToString)))
+                    RandomHistoryUpdateInterval = CByte(Val(RegKey.GetValue("RandomHistoryUpdateInterval", 5.ToString)))
+                    If RandomHistoryUpdateInterval > 60 Then
+                        RandomHistoryUpdateInterval = 60 'Limit the interval to a maximum of 60 seconds
+                    End If
+                    HistoryUpdateInterval = CByte(Val(RegKey.GetValue("HistoryUpdateInterval", 5.ToString)))
+                    If HistoryUpdateInterval > 60 Then
+                        HistoryUpdateInterval = 60 'Limit the interval to a maximum of 60 seconds
+                    End If
+                    HistoryAutoSaveInterval = CUShort(Val(RegKey.GetValue("HistoryAutoSaveInterval", 5.ToString)))
+                    If HistoryAutoSaveInterval < 1 Then
+                        Settings.HistoryAutoSaveInterval = 1
+                    ElseIf HistoryAutoSaveInterval > 1440 Then
+                        HistoryAutoSaveInterval = 1440 'Limit the interval to a maximum of 1440 minutes (24 hours)
+                    End If
+                    HistoryViewMaxRecords = CUShort(Val(RegKey.GetValue("HistoryViewMaxRecords", 25.ToString)))
+
+                    ' General App Settings
+                    Try : Settings.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Red.ToString).ToString), App.Themes)
+                    Catch : Settings.Theme = App.Themes.Red
+                    End Try
+                    Select Case RegKey.GetValue("ShowTrayIcon", "False").ToString
+                        Case "True", "1" : Settings.ShowTrayIcon = True
+                        Case Else : Settings.ShowTrayIcon = False
+                    End Select
+                    Select Case RegKey.GetValue("MinimizeToTray", "False").ToString
+                        Case "True", "1" : Settings.MinimizeToTray = True
+                        Case Else : Settings.MinimizeToTray = False
+                    End Select
+                    Select Case RegKey.GetValue("SuspendOnSessionChange", "True").ToString
+                        Case "False", "0" : Settings.SuspendOnSessionChange = False
+                        Case Else : Settings.SuspendOnSessionChange = True
+                    End Select
+                    Select Case RegKey.GetValue("SaveWindowMetrics", "False").ToString
+                        Case "True", "1" : Settings.SaveWindowMetrics = True
+                        Case Else : Settings.SaveWindowMetrics = False
+                    End Select
+                    DirectoryLocation.X = Skye.Common.RegistryHelper.GetInt("DirectoryLocationX", -AdjustScreenBoundsNormalWindow - 1)
+                    DirectoryLocation.Y = Skye.Common.RegistryHelper.GetInt("DirectoryLocationY", -1)
+                    DirectorySize.Width = Skye.Common.RegistryHelper.GetInt("DirectorySizeX", -1)
+                    DirectorySize.Height = Skye.Common.RegistryHelper.GetInt("DirectorySizeY", -1)
+                    Settings.LogLocation.X = CInt(Val(RegKey.GetValue("LogLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
+                    Settings.LogLocation.Y = CInt(Val(RegKey.GetValue("LogLocationY", (-1).ToString)))
+                    Settings.LogSize.Width = CInt(Val(RegKey.GetValue("LogSizeX", (-1).ToString)))
+                    Settings.LogSize.Height = CInt(Val(RegKey.GetValue("LogSizeY", (-1).ToString)))
+                    Settings.HelperApp1Name = RegKey.GetValue("HelperApp1Name", "SkyeTag").ToString
+                    Settings.HelperApp1Path = RegKey.GetValue("HelperApp1Path", "C:\Program Files\SkyeApps\SkyeTag.exe").ToString
+                    Settings.HelperApp2Name = RegKey.GetValue("HelperApp2Name", "MP3Tag").ToString
+                    Settings.HelperApp2Path = RegKey.GetValue("HelperApp2Path", "C:\Program Files\Mp3tag\Mp3tag.exe").ToString
+                    Settings.ChangeLogLastVersionShown = RegKey.GetValue("ChangeLogLastVersionShown", String.Empty).ToString
+                    Dim dt As DateTime
+                    If DateTime.TryParse(CStr(RegKey.GetValue("LastUpdateCheck", String.Empty)), dt) Then
+                        Settings.LastUpdateCheck = dt
+                    Else
+                        Settings.LastUpdateCheck = DateTime.MinValue
+                    End If
+                    Settings.LatestKnownVersion = RegKey.GetValue("LatestKnownVersion", String.Empty).ToString
+
+                    ' Visualizer Settings
+                    Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
+                    RegSubKey = RegKey.CreateSubKey("Visualizers")
+                    Visualizers.RainbowBarCount = CInt(Val(RegSubKey.GetValue("RainbowBarCount", 32.ToString)))
+                    Visualizers.RainbowBarGain = CSng(Val(RegSubKey.GetValue("RainbowBarGain", 100.0F.ToString)))
+                    Select Case RegSubKey.GetValue("RainbowBarShowPeaks", "True").ToString
+                        Case "False", "0" : Visualizers.RainbowBarShowPeaks = False
+                        Case Else : Visualizers.RainbowBarShowPeaks = True
+                    End Select
+                    Visualizers.RainbowBarPeakDecaySpeed = CInt(Val(RegSubKey.GetValue("RainbowBarPeakDecaySpeed", 7.ToString)))
+                    Visualizers.RainbowBarPeakThickness = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThickness", 6.ToString)))
+                    Visualizers.RainbowBarPeakThreshold = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThreshold", 50.ToString)))
+                    Visualizers.RainbowBarHueCycleSpeed = CSng(Val(RegSubKey.GetValue("RainbowBarHueCycleSpeed", 2.0F.ToString)))
+                    Visualizers.ClassicSpectrumAnalyzerBarCount = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerBarCount", 64.ToString)))
+                    Visualizers.ClassicSpectrumAnalyzerGain = CSng(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerGain", 3.2F.ToString)))
+                    Visualizers.ClassicSpectrumAnalyzerSmoothing = CSng(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerSmoothing", 0.7F.ToString)))
+                    Select Case RegSubKey.GetValue("ClassicSpectrumAnalyzerShowPeaks", "True").ToString
+                        Case "False", "0" : Visualizers.ClassicSpectrumAnalyzerShowPeaks = False
+                        Case Else : Visualizers.ClassicSpectrumAnalyzerShowPeaks = True
+                    End Select
+                    Visualizers.ClassicSpectrumAnalyzerPeakDecay = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerPeakDecay", 2.ToString)))
+                    Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerPeakHoldFrames", 10.ToString)))
+                    Try : Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType([Enum].Parse(GetType(ClassicSpectrumAnalyzerBandMappingModes), RegSubKey.GetValue("ClassicSpectrumAnalyzerBandMappingMode", ClassicSpectrumAnalyzerBandMappingModes.Linear.ToString).ToString), ClassicSpectrumAnalyzerBandMappingModes)
+                    Catch : Settings.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = ClassicSpectrumAnalyzerBandMappingModes.Linear
+                    End Try
+                    Try : Visualizers.CircularSpectrumWeightingMode = CType([Enum].Parse(GetType(CircularSpectrumWeightingModes), RegSubKey.GetValue("CircularSpectrumWeightingMode", CircularSpectrumWeightingModes.Raw.ToString).ToString), CircularSpectrumWeightingModes)
+                    Catch : Settings.Visualizers.CircularSpectrumWeightingMode = CircularSpectrumWeightingModes.Raw
+                    End Try
+                    Visualizers.CircularSpectrumGain = CSng(Val(RegSubKey.GetValue("CircularSpectrumGain", 6.0F.ToString)))
+                    Visualizers.CircularSpectrumSmoothing = CSng(Val(RegSubKey.GetValue("CircularSpectrumSmoothing", 0.3F.ToString)))
+                    Visualizers.CircularSpectrumLineWidth = CInt(Val(RegSubKey.GetValue("CircularSpectrumLineWidth", 1.ToString)))
+                    Visualizers.CircularSpectrumRadiusFactor = CSng(Val(RegSubKey.GetValue("CircularSpectrumRadiusFactor", 0.3F.ToString)))
+                    Select Case RegSubKey.GetValue("CircularSpectrumFill", "False").ToString
+                        Case "True", "1" : Visualizers.CircularSpectrumFill = True
+                        Case Else : Visualizers.CircularSpectrumFill = False
+                    End Select
+                    Select Case RegSubKey.GetValue("WaveformFill", "False").ToString
+                        Case "True", "1" : Visualizers.WaveformFill = True
+                        Case Else : Visualizers.WaveformFill = False
+                    End Select
+                    Try : Visualizers.OscilloscopeChannelMode = CType([Enum].Parse(GetType(OscilloscopeChannelModes), RegSubKey.GetValue("OscilloscopeChannelMode", OscilloscopeChannelModes.Mono.ToString).ToString), OscilloscopeChannelModes)
+                    Catch : Settings.Visualizers.OscilloscopeChannelMode = OscilloscopeChannelModes.Mono
+                    End Try
+                    Visualizers.OscilloscopeGain = CSng(Val(RegSubKey.GetValue("OscilloscopeGain", 1.0F.ToString)))
+                    Visualizers.OscilloscopeSmoothing = CSng(Val(RegSubKey.GetValue("OscilloscopeSmoothing", 0.3F.ToString)))
+                    Visualizers.OscilloscopeLineWidth = CSng(Val(RegSubKey.GetValue("OscilloscopeLineWidth", 1.5F.ToString)))
+                    Select Case RegSubKey.GetValue("OscilloscopeEnableGlow", "False").ToString
+                        Case "True", "1" : Visualizers.OscilloscopeEnableGlow = True
+                        Case Else : Visualizers.OscilloscopeEnableGlow = False
+                    End Select
+                    Visualizers.OscilloscopeFadeAlpha = CInt(Val(RegSubKey.GetValue("OscilloscopeFadeAlpha", 48.ToString)))
+                    Try : Visualizers.FractalCloudPalette = CType([Enum].Parse(GetType(FractalCloudPalettes), RegSubKey.GetValue("FractalCloudPalette", FractalCloudPalettes.Normal.ToString).ToString), FractalCloudPalettes)
+                    Catch : Settings.Visualizers.FractalCloudPalette = FractalCloudPalettes.Normal
+                    End Try
+                    Visualizers.FractalCloudSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedBase", 0.01F.ToString)))
+                    Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedAudioFactor", 10.0F.ToString)))
+                    Visualizers.FractalCloudTimeIncrement = CDbl(Val(RegSubKey.GetValue("FractalCloudTimeIncrement", 0.02F.ToString)))
+                    Visualizers.JuliaFractalBaseCX = CSng(Val(RegSubKey.GetValue("JuliaFractalBaseCX", (-0.7F).ToString)))
+                    Visualizers.JuliaFractalBassInfluence = CSng(Val(RegSubKey.GetValue("JuliaFractalBassInfluence", 0.5F.ToString)))
+                    Visualizers.JuliaFractalBaseCY = CSng(Val(RegSubKey.GetValue("JuliaFractalBaseCY", 0.27015F.ToString)))
+                    Visualizers.JuliaFractalMidInfluence = CSng(Val(RegSubKey.GetValue("JuliaFractalMidInfluence", 2.5F.ToString)))
+                    Visualizers.JuliaFractalMaxIterations = CInt(Val(RegSubKey.GetValue("JuliaFractalMaxIterations", 100.ToString)))
+                    Visualizers.HyperspaceTunnelParticleCount = CInt(Val(RegSubKey.GetValue("HyperspaceTunnelParticleCount", 1000.ToString)))
+                    Visualizers.HyperspaceTunnelSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedBase", 0.05F.ToString)))
+                    Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedAudioFactor", 0.2F.ToString)))
+                    Visualizers.HyperspaceTunnelParticleSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedBase", 2.0F.ToString)))
+                    Visualizers.HyperspaceTunnelParticleSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedAudioFactor", 20.0F.ToString)))
+                    Visualizers.StarFieldStarCount = CInt(Val(RegSubKey.GetValue("StarFieldStarCount", 750.ToString)))
+                    Visualizers.StarFieldBaseSpeed = CSng(Val(RegSubKey.GetValue("StarFieldBaseSpeed", 2.0F.ToString)))
+                    Visualizers.StarFieldAudioSpeedFactor = CInt(Val(RegSubKey.GetValue("StarFieldAudioSpeedFactor", 10.ToString)))
+                    Visualizers.StarFieldMaxStarSize = CInt(Val(RegSubKey.GetValue("StarFieldMaxStarSize", 6.ToString)))
+                    Try : Visualizers.ParticleNebulaActivePalettePreset = CType([Enum].Parse(GetType(ParticleNebulaPalettePresets), RegSubKey.GetValue("ParticleNebulaActivePalettePreset", ParticleNebulaPalettePresets.Cosmic.ToString).ToString), ParticleNebulaPalettePresets)
+                    Catch : Settings.Visualizers.ParticleNebulaActivePalettePreset = ParticleNebulaPalettePresets.Cosmic
+                    End Try
+                    Visualizers.ParticleNebulaBloomIntensity = CSng(Val(RegSubKey.GetValue("ParticleNebulaBloomIntensity", 0.5F.ToString)))
+                    Visualizers.ParticleNebulaBloomRadius = CInt(Val(RegSubKey.GetValue("ParticleNebulaBloomRadius", 2.ToString)))
+                    Visualizers.ParticleNebulaFadeRate = CSng(Val(RegSubKey.GetValue("ParticleNebulaFadeRate", 0.005F.ToString)))
+                    Select Case RegSubKey.GetValue("ParticleNebulaFadeTrails", "False").ToString
+                        Case "True", "1" : Visualizers.ParticleNebulaFadeTrails = True
+                        Case Else : Visualizers.ParticleNebulaFadeTrails = False
+                    End Select
+                    Select Case RegSubKey.GetValue("ParticleNebulaRainbowColors", "False").ToString
+                        Case "True", "1" : Visualizers.ParticleNebulaRainbowColors = True
+                        Case Else : Visualizers.ParticleNebulaRainbowColors = False
+                    End Select
+                    Select Case RegSubKey.GetValue("ParticleNebulaShowBloom", "False").ToString
+                        Case "True", "1" : Visualizers.ParticleNebulaShowBloom = True
+                        Case Else : Visualizers.ParticleNebulaShowBloom = False
+                    End Select
+                    Select Case RegSubKey.GetValue("ParticleNebulaShowTrails", "False").ToString
+                        Case "True", "1" : Visualizers.ParticleNebulaShowTrails = True
+                        Case Else : Visualizers.ParticleNebulaShowTrails = False
+                    End Select
+                    Visualizers.ParticleNebulaSizeScale = CInt(Val(RegSubKey.GetValue("ParticleNebulaSizeScale", 20.ToString)))
+                    Visualizers.ParticleNebulaSpawnMultiplier = CSng(Val(RegSubKey.GetValue("ParticleNebulaSpawnMultiplier", 2.0F.ToString)))
+                    Visualizers.ParticleNebulaSwirlBias = CSng(Val(RegSubKey.GetValue("ParticleNebulaSwirlBias", 0.0F.ToString)))
+                    Visualizers.ParticleNebulaSwirlStrength = CSng(Val(RegSubKey.GetValue("ParticleNebulaSwirlStrength", 0.15F.ToString)))
+                    Visualizers.ParticleNebulaTrailAlpha = CSng(Val(RegSubKey.GetValue("ParticleNebulaTrailAlpha", 0.5F.ToString)))
+                    Visualizers.ParticleNebulaVelocityScale = CInt(Val(RegSubKey.GetValue("ParticleNebulaVelocityScale", 50.ToString)))
+                    RegSubKey.Close()
+
+                    RegSubKey.Dispose()
+                    RegKey.Close()
+                    RegKey.Dispose()
+                    App.WriteToLog("Options Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                Catch ex As Exception
+                    WriteToLog("Error Loading Options" + vbCr + ex.Message)
+                End Try
+            End Sub
+            Friend Shared Sub LoadDebug()
+#If DEBUG Then
+                'WatcherEnabled = True
+                'WatcherUpdateLibrary = True
+                'WatcherUpdatePlaylist = True
+#End If
+            End Sub
+            Friend Shared Sub Save()
+                Try
+                    Dim starttime As TimeSpan = Computer.Clock.LocalTime.TimeOfDay
+                    Dim RegKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegPath, True)
+                    Dim RegSubKey As Microsoft.Win32.RegistryKey
+
+                    ' Player Settings
+                    RegKey.SetValue("PlayerLocationX", Settings.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlayerLocationY", Settings.PlayerLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlayerSizeX", Settings.PlayerSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlayerSizeY", Settings.PlayerSize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    Skye.Common.RegistryHelper.SetInt("PlayerMiniLocationX", PlayerMiniLocation.X)
+                    Skye.Common.RegistryHelper.SetInt("PlayerMiniLocationY", PlayerMiniLocation.Y)
+                    RegKey.SetValue("PlayerPositionShowElapsed", Settings.PlayerPositionShowElapsed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlayMode", Settings.PlayMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("ShowNowPlayingToast", Settings.ShowNowPlayingToast.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("NowPlayingToastLocation", Settings.NowPlayingToastLocation.ToString, Microsoft.Win32.RegistryValueKind.String)
+
+                    ' Playlist Settings
+                    RegKey.SetValue("PlaylistTitleFormat", Settings.PlaylistTitleFormat.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlaylistTitleRemoveSpaces", Settings.PlaylistTitleRemoveSpaces.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlaylistTitleSeparator", Settings.PlaylistTitleSeparator, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlaylistVideoIdentifier", Settings.PlaylistVideoIdentifier, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlaylistDefaultAction", Settings.PlaylistDefaultAction.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlaylistSearchAction", Settings.PlaylistSearchAction.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("PlaylistStatusMessageDisplayTime", Settings.PlaylistStatusMessageDisplayTime.ToString, Microsoft.Win32.RegistryValueKind.String)
+
+                    ' Library Settings
+                    RegKey.SetValue("LibraryLocationX", Settings.LibraryLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LibraryLocationY", Settings.LibraryLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LibrarySizeX", Settings.LibrarySize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LibrarySizeY", Settings.LibrarySize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LibrarySearchSubFolders", LibrarySearchSubFolders.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("WatcherEnabled", WatcherEnabled.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("WatcherUpdateLibrary", WatcherUpdateLibrary.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("WatcherUpdatePlaylist", WatcherUpdatePlaylist.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey = RegKey.OpenSubKey("LibraryWatchFolders", True)
+                    For Each s As String In RegSubKey.GetValueNames : RegSubKey.DeleteValue(s) : Next
+                    For Each s As String In LibrarySearchFolders : RegSubKey.SetValue("Folder" + Str(LibrarySearchFolders.IndexOf(s) + 1).Trim, s, Microsoft.Win32.RegistryValueKind.String) : Next
+                    RegSubKey.Close()
+
+                    ' History Settings
+                    RegKey.SetValue("RandomHistoryUpdateInterval", Settings.RandomHistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HistoryUpdateInterval", Settings.HistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HistoryAutoSaveInterval", Settings.HistoryAutoSaveInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HistoryViewMaxRecords", Settings.HistoryViewMaxRecords.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HistoryLocationX", Settings.HistoryLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HistoryLocationY", Settings.HistoryLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HistorySizeX", Settings.HistorySize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HistorySizeY", Settings.HistorySize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
+
+                    ' General App Settings
+                    RegKey.SetValue("Theme", Settings.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("ShowTrayIcon", Settings.ShowTrayIcon.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("MinimizeToTray", Settings.MinimizeToTray.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("SuspendOnSessionChange", Settings.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("SaveWindowMetrics", Settings.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    Skye.Common.RegistryHelper.SetInt("DirectoryLocationX", DirectoryLocation.X)
+                    Skye.Common.RegistryHelper.SetInt("DirectoryLocationY", DirectoryLocation.Y)
+                    Skye.Common.RegistryHelper.SetInt("DirectorySizeX", DirectorySize.Width)
+                    Skye.Common.RegistryHelper.SetInt("DirectorySizeY", DirectorySize.Height)
+                    RegKey.SetValue("LogLocationX", Settings.LogLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LogLocationY", Settings.LogLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LogSizeX", Settings.LogSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LogSizeY", Settings.LogSize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HelperApp1Name", Settings.HelperApp1Name, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HelperApp1Path", Settings.HelperApp1Path, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HelperApp2Name", Settings.HelperApp2Name, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HelperApp2Path", Settings.HelperApp2Path, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("ChangeLogLastVersionShown", Settings.ChangeLogLastVersionShown, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LastUpdateCheck", Settings.LastUpdateCheck.ToString("o"), Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LatestKnownVersion", Settings.LatestKnownVersion, Microsoft.Win32.RegistryValueKind.String)
+
+                    ' Visualizer Settings
+                    RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
+                    RegSubKey = RegKey.OpenSubKey("Visualizers", True)
+                    RegSubKey.SetValue("RainbowBarCount", Visualizers.RainbowBarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("RainbowBarGain", Visualizers.RainbowBarGain.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("RainbowBarShowPeaks", Visualizers.RainbowBarShowPeaks.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("RainbowBarPeakDecaySpeed", Visualizers.RainbowBarPeakDecaySpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("RainbowBarPeakThickness", Visualizers.RainbowBarPeakThickness.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("RainbowBarPeakThreshold", Visualizers.RainbowBarPeakThreshold.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("RainbowBarHueCycleSpeed", Visualizers.RainbowBarHueCycleSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ClassicSpectrumAnalyzerBarCount", Visualizers.ClassicSpectrumAnalyzerBarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ClassicSpectrumAnalyzerGain", Visualizers.ClassicSpectrumAnalyzerGain.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ClassicSpectrumAnalyzerSmoothing", Visualizers.ClassicSpectrumAnalyzerSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ClassicSpectrumAnalyzerShowPeaks", Visualizers.ClassicSpectrumAnalyzerShowPeaks.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakDecay", Visualizers.ClassicSpectrumAnalyzerPeakDecay.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakHoldFrames", Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ClassicSpectrumAnalyzerBandMappingMode", Settings.Visualizers.ClassicSpectrumAnalyzerBandMappingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("CircularSpectrumWeightingMode", Settings.Visualizers.CircularSpectrumWeightingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("CircularSpectrumGain", Visualizers.CircularSpectrumGain.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("CircularSpectrumSmoothing", Visualizers.CircularSpectrumSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("CircularSpectrumLineWidth", Visualizers.CircularSpectrumLineWidth.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("CircularSpectrumRadiusFactor", Visualizers.CircularSpectrumRadiusFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("CircularSpectrumFill", Visualizers.CircularSpectrumFill.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("WaveformFill", Visualizers.WaveformFill.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("OscilloscopeChannelMode", Settings.Visualizers.OscilloscopeChannelMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("OscilloscopeGain", Visualizers.OscilloscopeGain.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("OscilloscopeSmoothing", Visualizers.OscilloscopeSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("OscilloscopeLineWidth", Visualizers.OscilloscopeLineWidth.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("OscilloscopeEnableGlow", Visualizers.OscilloscopeEnableGlow.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("OscilloscopeFadeAlpha", Visualizers.OscilloscopeFadeAlpha.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("FractalCloudPalette", Visualizers.FractalCloudPalette.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("FractalCloudSwirlSpeedBase", Visualizers.FractalCloudSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("FractalCloudSwirlSpeedAudioFactor", Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("FractalCloudTimeIncrement", Visualizers.FractalCloudTimeIncrement.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("JuliaFractalBaseCX", Visualizers.JuliaFractalBaseCX.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("JuliaFractalBassInfluence", Visualizers.JuliaFractalBassInfluence.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("JuliaFractalBaseCY", Visualizers.JuliaFractalBaseCY.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("JuliaFractalMidInfluence", Visualizers.JuliaFractalMidInfluence.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("JuliaFractalMaxIterations", Visualizers.JuliaFractalMaxIterations.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("HyperspaceTunnelParticleCount", Visualizers.HyperspaceTunnelParticleCount.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedBase", Visualizers.HyperspaceTunnelSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedAudioFactor", Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("HyperspaceTunnelParticleSpeedBase", Visualizers.HyperspaceTunnelParticleSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("HyperspaceTunnelParticleSpeedAudioFactor", Visualizers.HyperspaceTunnelParticleSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("StarFieldStarCount", Visualizers.StarFieldStarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("StarFieldBaseSpeed", Visualizers.StarFieldBaseSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("StarFieldAudioSpeedFactor", Visualizers.StarFieldAudioSpeedFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("StarFieldMaxStarSize", Visualizers.StarFieldMaxStarSize.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaActivePalettePreset", Settings.Visualizers.ParticleNebulaActivePalettePreset.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaBloomIntensity", Settings.Visualizers.ParticleNebulaBloomIntensity.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaBloomRadius", Settings.Visualizers.ParticleNebulaBloomRadius.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaFadeRate", Settings.Visualizers.ParticleNebulaFadeRate.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaFadeTrails", Settings.Visualizers.ParticleNebulaFadeTrails.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaRainbowColors", Settings.Visualizers.ParticleNebulaRainbowColors.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaShowBloom", Settings.Visualizers.ParticleNebulaShowBloom.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaShowTrails", Settings.Visualizers.ParticleNebulaShowTrails.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaSizeScale", Settings.Visualizers.ParticleNebulaSizeScale.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaSpawnMultiplier", Settings.Visualizers.ParticleNebulaSpawnMultiplier.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaSwirlBias", Settings.Visualizers.ParticleNebulaSwirlBias.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaSwirlStrength", Settings.Visualizers.ParticleNebulaSwirlStrength.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaTrailAlpha", Settings.Visualizers.ParticleNebulaTrailAlpha.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaVelocityScale", Settings.Visualizers.ParticleNebulaVelocityScale.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.Close()
+
+                    RegKey.Flush()
+                    RegSubKey.Dispose()
+                    RegKey.Close()
+                    RegKey.Dispose()
+                    App.WriteToLog("Options Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                Catch ex As Exception
+                    WriteToLog("Error Saving Options" + vbCr + ex.Message)
+                End Try
+            End Sub
 
         End Class
-
-        ' REGISTRY SAVED SETTINGS
-        ' Player
-        Friend PlayerPositionShowElapsed As Boolean = True
-        Friend PlayMode As PlayModes = PlayModes.Random
-        ' Playlist
-        Friend PlaylistTitleFormat As PlaylistTitleFormats = PlaylistTitleFormats.ArtistSong
-        Friend PlaylistTitleRemoveSpaces As Boolean = False
-        Friend PlaylistTitleSeparator As String = " "
-        Friend PlaylistVideoIdentifier As String = String.Empty
-        Friend PlaylistDefaultAction As PlaylistActions = PlaylistActions.Play
-        Friend PlaylistSearchAction As PlaylistActions = PlaylistActions.Play
-        Friend PlaylistStatusMessageDisplayTime As Byte = 8 '0 - 60, 0 = Don't display status messages.
-        ' Library
-        Friend LibrarySearchFolders As New Collections.Generic.List(Of String)
-        Friend LibrarySearchSubFolders As Boolean = True
-        Friend WatcherEnabled As Boolean = False 'Flag that indicates whether to watch for changes in the library folders.
-        Friend WatcherUpdateLibrary As Boolean = False 'Flag that indicates whether to automatically update the library when changes are detected in the file system.
-        Friend WatcherUpdatePlaylist As Boolean = False 'Flag that indicates whether to automatically update the playlist when changes are detected in the file system.
-        ' History
-        Friend RandomHistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to add the currently playing song to the shuffle play history.
-        Friend HistoryUpdateInterval As Byte = 5 '0-60 'Interval in seconds to update the play count of the currently playing song.
-        Friend HistoryAutoSaveInterval As UShort = 5 '1-1440 'Interval in minutes to automatically save the history.
-        Friend HistoryViewMaxRecords As UShort = 25 'Maximum number of records to display in the history view.
-        ' App
-        Friend SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
-        Friend SaveWindowMetrics As Boolean = False 'Flag that indicates whether to save and restore window positions and sizes.
-        Friend Theme As Themes = Themes.Red 'The current theme of the application.
-        Friend PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
-        Friend PlayerSize As New Size(-1, -1)
-        Friend PlayerMiniLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
-        Friend LibraryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
-        Friend LibrarySize As New Size(-1, -1)
-        Friend DirectoryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
-        Friend DirectorySize As New Size(-1, -1)
-        Friend HistoryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
-        Friend HistorySize As New Size(-1, -1)
-        Friend LogLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
-        Friend LogSize As New Size(-1, -1)
-        Friend HelperApp1Name As String = String.Empty
-        Friend HelperApp1Path As String = String.Empty
-        Friend HelperApp2Name As String = String.Empty
-        Friend HelperApp2Path As String = String.Empty
-        Friend ChangeLogLastVersionShown As String = String.Empty
-        Friend ShowTrayIcon As Boolean = False
-        Friend MinimizeToTray As Boolean = False
-        Friend ShowNowPlayingToast As Boolean = True
-        Friend NowPlayingToastLocation As Skye.UI.ToastLocation = Skye.UI.ToastLocation.TopRight
-        Friend LastUpdateCheck As DateTime = DateTime.MinValue
-        Friend LatestKnownVersion As String = String.Empty
 
         ' Interfaces
         Friend Interface IAccentable
@@ -1453,8 +1862,8 @@ Namespace My
             Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName 'Use standard registry key for release builds
 #End If
 
-            GetOptions()
-            GetDebugOptions()
+            Settings.Load()
+            Settings.LoadDebug()
             CurrentTheme = GetCurrentThemeProperties()
             LoadHistory()
             LoadPlayHistoryDatabase()
@@ -1604,12 +2013,12 @@ Namespace My
             If FrmLibrary.Visible Then FrmLibrary.Close()
             FrmLibrary.Dispose()
             SaveHistory()
-            SaveOptions()
+            Settings.Save()
             SetWatchers(True) 'Dispose watchers
             My.App.WriteToLog(My.Application.Info.ProductName + " Closed")
         End Sub
         Friend Sub CheckForUpdatesIfNeeded()
-            Dim last = App.LastUpdateCheck.Date
+            Dim last = Settings.LastUpdateCheck.Date
             Dim today = Date.Today
 
             If last = today Then
@@ -1620,9 +2029,9 @@ Namespace My
             ' Not checked today — fetch fresh version
             Dim latest = FetchLatestVersion()
             If latest IsNot Nothing Then
-                App.LatestKnownVersion = latest
-                App.LastUpdateCheck = DateTime.Now
-                App.SaveOptions()
+                Settings.LatestKnownVersion = latest
+                Settings.LastUpdateCheck = DateTime.Now
+                Settings.Save()
             End If
 
         End Sub
@@ -1710,405 +2119,6 @@ Namespace My
                 HistoryTotalPlayedSongs = 0
             End If
         End Sub
-        Friend Sub SaveOptions()
-            Try
-                Dim starttime As TimeSpan = Computer.Clock.LocalTime.TimeOfDay
-                Dim RegKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegPath, True)
-                Dim RegSubKey As Microsoft.Win32.RegistryKey
-
-                ' Player Settings
-                RegKey.SetValue("PlayerPositionShowElapsed", App.PlayerPositionShowElapsed.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlayMode", App.PlayMode.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("ShowNowPlayingToast", App.ShowNowPlayingToast.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("NowPlayingToastLocation", App.NowPlayingToastLocation.ToString, Microsoft.Win32.RegistryValueKind.String)
-
-                ' Playlist Settings
-                RegKey.SetValue("PlaylistTitleFormat", App.PlaylistTitleFormat.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlaylistTitleRemoveSpaces", App.PlaylistTitleRemoveSpaces.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlaylistTitleSeparator", App.PlaylistTitleSeparator, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlaylistVideoIdentifier", App.PlaylistVideoIdentifier, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlaylistDefaultAction", App.PlaylistDefaultAction.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlaylistSearchAction", App.PlaylistSearchAction.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlaylistStatusMessageDisplayTime", App.PlaylistStatusMessageDisplayTime.ToString, Microsoft.Win32.RegistryValueKind.String)
-
-                ' Library Settings
-                RegKey.SetValue("LibrarySearchSubFolders", LibrarySearchSubFolders.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("WatcherEnabled", WatcherEnabled.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("WatcherUpdateLibrary", WatcherUpdateLibrary.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("WatcherUpdatePlaylist", WatcherUpdatePlaylist.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey = RegKey.OpenSubKey("LibraryWatchFolders", True)
-                For Each s As String In RegSubKey.GetValueNames : RegSubKey.DeleteValue(s) : Next
-                For Each s As String In LibrarySearchFolders : RegSubKey.SetValue("Folder" + Str(LibrarySearchFolders.IndexOf(s) + 1).Trim, s, Microsoft.Win32.RegistryValueKind.String) : Next
-                RegSubKey.Close()
-
-                ' History Settings
-                RegKey.SetValue("RandomHistoryUpdateInterval", App.RandomHistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HistoryUpdateInterval", App.HistoryUpdateInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HistoryAutoSaveInterval", App.HistoryAutoSaveInterval.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HistoryViewMaxRecords", App.HistoryViewMaxRecords.ToString, Microsoft.Win32.RegistryValueKind.String)
-
-                ' General App Settings
-                RegKey.SetValue("Theme", App.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("ShowTrayIcon", App.ShowTrayIcon.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("MinimizeToTray", App.MinimizeToTray.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("SuspendOnSessionChange", App.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("SaveWindowMetrics", App.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlayerLocationX", App.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlayerLocationY", App.PlayerLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlayerSizeX", App.PlayerSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("PlayerSizeY", App.PlayerSize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LibraryLocationX", App.LibraryLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LibraryLocationY", App.LibraryLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LibrarySizeX", App.LibrarySize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LibrarySizeY", App.LibrarySize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
-                Skye.Common.RegistryHelper.SetInt("DirectoryLocationX", DirectoryLocation.X)
-                Skye.Common.RegistryHelper.SetInt("DirectoryLocationY", DirectoryLocation.Y)
-                Skye.Common.RegistryHelper.SetInt("DirectorySizeX", DirectorySize.Width)
-                Skye.Common.RegistryHelper.SetInt("DirectorySizeY", DirectorySize.Height)
-                RegKey.SetValue("HistoryLocationX", App.HistoryLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HistoryLocationY", App.HistoryLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HistorySizeX", App.HistorySize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HistorySizeY", App.HistorySize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LogLocationX", App.LogLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LogLocationY", App.LogLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LogSizeX", App.LogSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LogSizeY", App.LogSize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HelperApp1Name", App.HelperApp1Name, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HelperApp1Path", App.HelperApp1Path, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HelperApp2Name", App.HelperApp2Name, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("HelperApp2Path", App.HelperApp2Path, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("ChangeLogLastVersionShown", App.ChangeLogLastVersionShown, Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LastUpdateCheck", App.LastUpdateCheck.ToString("o"), Microsoft.Win32.RegistryValueKind.String)
-                RegKey.SetValue("LatestKnownVersion", App.LatestKnownVersion, Microsoft.Win32.RegistryValueKind.String)
-                Skye.Common.RegistryHelper.SetInt("PlayerMiniLocationX", PlayerMiniLocation.X)
-                Skye.Common.RegistryHelper.SetInt("PlayerMiniLocationY", PlayerMiniLocation.Y)
-
-                ' Visualizer Settings
-                RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
-                RegSubKey = RegKey.OpenSubKey("Visualizers", True)
-                RegSubKey.SetValue("RainbowBarCount", Visualizers.RainbowBarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("RainbowBarGain", Visualizers.RainbowBarGain.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("RainbowBarShowPeaks", Visualizers.RainbowBarShowPeaks.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("RainbowBarPeakDecaySpeed", Visualizers.RainbowBarPeakDecaySpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("RainbowBarPeakThickness", Visualizers.RainbowBarPeakThickness.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("RainbowBarPeakThreshold", Visualizers.RainbowBarPeakThreshold.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("RainbowBarHueCycleSpeed", Visualizers.RainbowBarHueCycleSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ClassicSpectrumAnalyzerBarCount", Visualizers.ClassicSpectrumAnalyzerBarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ClassicSpectrumAnalyzerGain", Visualizers.ClassicSpectrumAnalyzerGain.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ClassicSpectrumAnalyzerSmoothing", Visualizers.ClassicSpectrumAnalyzerSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ClassicSpectrumAnalyzerShowPeaks", Visualizers.ClassicSpectrumAnalyzerShowPeaks.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakDecay", Visualizers.ClassicSpectrumAnalyzerPeakDecay.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakHoldFrames", Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ClassicSpectrumAnalyzerBandMappingMode", App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("CircularSpectrumWeightingMode", App.Visualizers.CircularSpectrumWeightingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("CircularSpectrumGain", Visualizers.CircularSpectrumGain.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("CircularSpectrumSmoothing", Visualizers.CircularSpectrumSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("CircularSpectrumLineWidth", Visualizers.CircularSpectrumLineWidth.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("CircularSpectrumRadiusFactor", Visualizers.CircularSpectrumRadiusFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("CircularSpectrumFill", Visualizers.CircularSpectrumFill.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("WaveformFill", Visualizers.WaveformFill.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("OscilloscopeChannelMode", App.Visualizers.OscilloscopeChannelMode.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("OscilloscopeGain", Visualizers.OscilloscopeGain.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("OscilloscopeSmoothing", Visualizers.OscilloscopeSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("OscilloscopeLineWidth", Visualizers.OscilloscopeLineWidth.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("OscilloscopeEnableGlow", Visualizers.OscilloscopeEnableGlow.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("OscilloscopeFadeAlpha", Visualizers.OscilloscopeFadeAlpha.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("FractalCloudPalette", Visualizers.FractalCloudPalette.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("FractalCloudSwirlSpeedBase", Visualizers.FractalCloudSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("FractalCloudSwirlSpeedAudioFactor", Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("FractalCloudTimeIncrement", Visualizers.FractalCloudTimeIncrement.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("JuliaFractalBaseCX", Visualizers.JuliaFractalBaseCX.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("JuliaFractalBassInfluence", Visualizers.JuliaFractalBassInfluence.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("JuliaFractalBaseCY", Visualizers.JuliaFractalBaseCY.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("JuliaFractalMidInfluence", Visualizers.JuliaFractalMidInfluence.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("JuliaFractalMaxIterations", Visualizers.JuliaFractalMaxIterations.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("HyperspaceTunnelParticleCount", Visualizers.HyperspaceTunnelParticleCount.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedBase", Visualizers.HyperspaceTunnelSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedAudioFactor", Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("HyperspaceTunnelParticleSpeedBase", Visualizers.HyperspaceTunnelParticleSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("HyperspaceTunnelParticleSpeedAudioFactor", Visualizers.HyperspaceTunnelParticleSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("StarFieldStarCount", Visualizers.StarFieldStarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("StarFieldBaseSpeed", Visualizers.StarFieldBaseSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("StarFieldAudioSpeedFactor", Visualizers.StarFieldAudioSpeedFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("StarFieldMaxStarSize", Visualizers.StarFieldMaxStarSize.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaActivePalettePreset", App.Visualizers.ParticleNebulaActivePalettePreset.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaBloomIntensity", App.Visualizers.ParticleNebulaBloomIntensity.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaBloomRadius", App.Visualizers.ParticleNebulaBloomRadius.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaFadeRate", App.Visualizers.ParticleNebulaFadeRate.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaFadeTrails", App.Visualizers.ParticleNebulaFadeTrails.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaRainbowColors", App.Visualizers.ParticleNebulaRainbowColors.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaShowBloom", App.Visualizers.ParticleNebulaShowBloom.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaShowTrails", App.Visualizers.ParticleNebulaShowTrails.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaSizeScale", App.Visualizers.ParticleNebulaSizeScale.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaSpawnMultiplier", App.Visualizers.ParticleNebulaSpawnMultiplier.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaSwirlBias", App.Visualizers.ParticleNebulaSwirlBias.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaSwirlStrength", App.Visualizers.ParticleNebulaSwirlStrength.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaTrailAlpha", App.Visualizers.ParticleNebulaTrailAlpha.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.SetValue("ParticleNebulaVelocityScale", App.Visualizers.ParticleNebulaVelocityScale.ToString, Microsoft.Win32.RegistryValueKind.String)
-                RegSubKey.Close()
-
-                RegKey.Flush()
-                RegSubKey.Dispose()
-                RegKey.Close()
-                RegKey.Dispose()
-                App.WriteToLog("Options Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
-            Catch ex As Exception
-                WriteToLog("Error Saving Options" + vbCr + ex.Message)
-            End Try
-        End Sub
-        Private Sub GetOptions()
-            Try
-                Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-                Dim RegKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegPath)
-                Dim RegSubKey As Microsoft.Win32.RegistryKey
-
-                ' Player Settings
-                Select Case RegKey.GetValue("PlayerPositionShowElapsed", "True").ToString
-                    Case "False", "0" : PlayerPositionShowElapsed = False
-                    Case Else : PlayerPositionShowElapsed = True
-                End Select
-                Try : App.PlayMode = CType([Enum].Parse(GetType(App.PlayModes), RegKey.GetValue("PlayMode", App.PlayModes.Random.ToString).ToString), PlayModes)
-                Catch : App.PlayMode = App.PlayModes.Random
-                End Try
-                Select Case RegKey.GetValue("ShowNowPlayingToast", "True").ToString
-                    Case "False", "0" : App.ShowNowPlayingToast = False
-                    Case Else : App.ShowNowPlayingToast = True
-                End Select
-                Try : App.NowPlayingToastLocation = CType([Enum].Parse(GetType(Skye.UI.ToastLocation), RegKey.GetValue("NowPlayingToastLocation", Skye.UI.ToastLocation.TopRight.ToString).ToString), Skye.UI.ToastLocation)
-                Catch : App.NowPlayingToastLocation = Skye.UI.ToastLocation.TopRight
-                End Try
-
-                ' Playlist Settings
-                Try : App.PlaylistTitleFormat = CType([Enum].Parse(GetType(App.PlaylistTitleFormats), RegKey.GetValue("PlaylistTitleFormat", App.PlaylistTitleFormats.ArtistSong.ToString).ToString), PlaylistTitleFormats)
-                Catch : App.PlaylistTitleFormat = App.PlaylistTitleFormats.ArtistSong
-                End Try
-                Select Case RegKey.GetValue("PlaylistTitleRemoveSpaces", "False").ToString
-                    Case "True", "1" : App.PlaylistTitleRemoveSpaces = True
-                    Case Else : App.PlaylistTitleRemoveSpaces = False
-                End Select
-                App.PlaylistTitleSeparator = RegKey.GetValue("PlaylistTitleSeparator", " ").ToString
-                App.PlaylistVideoIdentifier = RegKey.GetValue("PlaylistVideoIdentifier", String.Empty).ToString
-                Try : App.PlaylistDefaultAction = CType([Enum].Parse(GetType(App.PlaylistActions), RegKey.GetValue("PlaylistDefaultAction", App.PlaylistActions.Play.ToString).ToString), App.PlaylistActions)
-                Catch : App.PlaylistDefaultAction = App.PlaylistActions.Play
-                End Try
-                Try : App.PlaylistSearchAction = CType([Enum].Parse(GetType(App.PlaylistActions), RegKey.GetValue("PlaylistSearchAction", App.PlaylistActions.Play.ToString).ToString), App.PlaylistActions)
-                Catch : App.PlaylistSearchAction = App.PlaylistActions.Play
-                End Try
-                PlaylistStatusMessageDisplayTime = CByte(Val(RegKey.GetValue("PlaylistStatusMessageDisplayTime", 8.ToString)))
-                If PlaylistStatusMessageDisplayTime > 60 Then
-                    PlaylistStatusMessageDisplayTime = 60 'Limit the value to a maximum of 60 seconds
-                End If
-
-                ' Library Settings
-                LibrarySearchFolders.Clear()
-                Select Case RegKey.GetValue("LibrarySearchSubFolders", "True").ToString
-                    Case "False", "0" : LibrarySearchSubFolders = False
-                    Case Else : LibrarySearchSubFolders = True
-                End Select
-                Select Case RegKey.GetValue("WatcherEnabled", "False").ToString
-                    Case "True", "1" : WatcherEnabled = True
-                    Case Else : WatcherEnabled = False
-                End Select
-                Select Case RegKey.GetValue("WatcherUpdateLibrary", "False").ToString
-                    Case "True", "1" : WatcherUpdateLibrary = True
-                    Case Else : WatcherUpdateLibrary = False
-                End Select
-                Select Case RegKey.GetValue("WatcherUpdatePlaylist", "False").ToString
-                    Case "True", "1" : WatcherUpdatePlaylist = True
-                    Case Else : WatcherUpdatePlaylist = False
-                End Select
-                RegSubKey = RegKey.CreateSubKey("LibraryWatchFolders")
-                For Each s As String In RegSubKey.GetValueNames : LibrarySearchFolders.Add(RegSubKey.GetValue(s).ToString) : Next
-                RegSubKey.Close()
-
-                ' History Settings
-                RandomHistoryUpdateInterval = CByte(Val(RegKey.GetValue("RandomHistoryUpdateInterval", 5.ToString)))
-                If RandomHistoryUpdateInterval > 60 Then
-                    RandomHistoryUpdateInterval = 60 'Limit the interval to a maximum of 60 seconds
-                End If
-                HistoryUpdateInterval = CByte(Val(RegKey.GetValue("HistoryUpdateInterval", 5.ToString)))
-                If HistoryUpdateInterval > 60 Then
-                    HistoryUpdateInterval = 60 'Limit the interval to a maximum of 60 seconds
-                End If
-                HistoryAutoSaveInterval = CUShort(Val(RegKey.GetValue("HistoryAutoSaveInterval", 5.ToString)))
-                If HistoryAutoSaveInterval < 1 Then
-                    App.HistoryAutoSaveInterval = 1
-                ElseIf HistoryAutoSaveInterval > 1440 Then
-                    HistoryAutoSaveInterval = 1440 'Limit the interval to a maximum of 1440 minutes (24 hours)
-                End If
-                HistoryViewMaxRecords = CUShort(Val(RegKey.GetValue("HistoryViewMaxRecords", 25.ToString)))
-
-                ' General App Settings
-                Try : App.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Red.ToString).ToString), App.Themes)
-                Catch : App.Theme = App.Themes.Red
-                End Try
-                Select Case RegKey.GetValue("ShowTrayIcon", "False").ToString
-                    Case "True", "1" : App.ShowTrayIcon = True
-                    Case Else : App.ShowTrayIcon = False
-                End Select
-                Select Case RegKey.GetValue("MinimizeToTray", "False").ToString
-                    Case "True", "1" : App.MinimizeToTray = True
-                    Case Else : App.MinimizeToTray = False
-                End Select
-                Select Case RegKey.GetValue("SuspendOnSessionChange", "True").ToString
-                    Case "False", "0" : App.SuspendOnSessionChange = False
-                    Case Else : App.SuspendOnSessionChange = True
-                End Select
-                Select Case RegKey.GetValue("SaveWindowMetrics", "False").ToString
-                    Case "True", "1" : App.SaveWindowMetrics = True
-                    Case Else : App.SaveWindowMetrics = False
-                End Select
-                App.PlayerLocation.X = CInt(Val(RegKey.GetValue("PlayerLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
-                App.PlayerLocation.Y = CInt(Val(RegKey.GetValue("PlayerLocationY", (-1).ToString)))
-                App.PlayerSize.Width = CInt(Val(RegKey.GetValue("PlayerSizeX", (-1).ToString)))
-                App.PlayerSize.Height = CInt(Val(RegKey.GetValue("PlayerSizeY", (-1).ToString)))
-                App.LibraryLocation.X = CInt(Val(RegKey.GetValue("LibraryLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
-                App.LibraryLocation.Y = CInt(Val(RegKey.GetValue("LibraryLocationY", (-1).ToString)))
-                App.LibrarySize.Width = CInt(Val(RegKey.GetValue("LibrarySizeX", (-1).ToString)))
-                App.LibrarySize.Height = CInt(Val(RegKey.GetValue("LibrarySizeY", (-1).ToString)))
-                DirectoryLocation.X = Skye.Common.RegistryHelper.GetInt("DirectoryLocationX", -AdjustScreenBoundsNormalWindow - 1)
-                DirectoryLocation.Y = Skye.Common.RegistryHelper.GetInt("DirectoryLocationY", -1)
-                DirectorySize.Width = Skye.Common.RegistryHelper.GetInt("DirectorySizeX", -1)
-                DirectorySize.Height = Skye.Common.RegistryHelper.GetInt("DirectorySizeY", -1)
-                App.HistoryLocation.X = CInt(Val(RegKey.GetValue("HistoryLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
-                App.HistoryLocation.Y = CInt(Val(RegKey.GetValue("HistoryLocationY", (-1).ToString)))
-                App.HistorySize.Width = CInt(Val(RegKey.GetValue("HistorySizeX", (-1).ToString)))
-                App.HistorySize.Height = CInt(Val(RegKey.GetValue("HistorySizeY", (-1).ToString)))
-                App.LogLocation.X = CInt(Val(RegKey.GetValue("LogLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
-                App.LogLocation.Y = CInt(Val(RegKey.GetValue("LogLocationY", (-1).ToString)))
-                App.LogSize.Width = CInt(Val(RegKey.GetValue("LogSizeX", (-1).ToString)))
-                App.LogSize.Height = CInt(Val(RegKey.GetValue("LogSizeY", (-1).ToString)))
-                App.HelperApp1Name = RegKey.GetValue("HelperApp1Name", "SkyeTag").ToString
-                App.HelperApp1Path = RegKey.GetValue("HelperApp1Path", "C:\Program Files\SkyeApps\SkyeTag.exe").ToString
-                App.HelperApp2Name = RegKey.GetValue("HelperApp2Name", "MP3Tag").ToString
-                App.HelperApp2Path = RegKey.GetValue("HelperApp2Path", "C:\Program Files\Mp3tag\Mp3tag.exe").ToString
-                App.ChangeLogLastVersionShown = RegKey.GetValue("ChangeLogLastVersionShown", String.Empty).ToString
-                Dim dt As DateTime
-                If DateTime.TryParse(CStr(RegKey.GetValue("LastUpdateCheck", String.Empty)), dt) Then
-                    App.LastUpdateCheck = dt
-                Else
-                    App.LastUpdateCheck = DateTime.MinValue
-                End If
-                App.LatestKnownVersion = RegKey.GetValue("LatestKnownVersion", String.Empty).ToString
-                PlayerMiniLocation.X = Skye.Common.RegistryHelper.GetInt("PlayerMiniLocationX", -AdjustScreenBoundsNormalWindow - 1)
-                PlayerMiniLocation.Y = Skye.Common.RegistryHelper.GetInt("PlayerMiniLocationY", -1)
-
-                ' Visualizer Settings
-                Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
-                RegSubKey = RegKey.CreateSubKey("Visualizers")
-                Visualizers.RainbowBarCount = CInt(Val(RegSubKey.GetValue("RainbowBarCount", 32.ToString)))
-                Visualizers.RainbowBarGain = CSng(Val(RegSubKey.GetValue("RainbowBarGain", 100.0F.ToString)))
-                Select Case RegSubKey.GetValue("RainbowBarShowPeaks", "True").ToString
-                    Case "False", "0" : Visualizers.RainbowBarShowPeaks = False
-                    Case Else : Visualizers.RainbowBarShowPeaks = True
-                End Select
-                Visualizers.RainbowBarPeakDecaySpeed = CInt(Val(RegSubKey.GetValue("RainbowBarPeakDecaySpeed", 7.ToString)))
-                Visualizers.RainbowBarPeakThickness = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThickness", 6.ToString)))
-                Visualizers.RainbowBarPeakThreshold = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThreshold", 50.ToString)))
-                Visualizers.RainbowBarHueCycleSpeed = CSng(Val(RegSubKey.GetValue("RainbowBarHueCycleSpeed", 2.0F.ToString)))
-                Visualizers.ClassicSpectrumAnalyzerBarCount = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerBarCount", 64.ToString)))
-                Visualizers.ClassicSpectrumAnalyzerGain = CSng(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerGain", 3.2F.ToString)))
-                Visualizers.ClassicSpectrumAnalyzerSmoothing = CSng(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerSmoothing", 0.7F.ToString)))
-                Select Case RegSubKey.GetValue("ClassicSpectrumAnalyzerShowPeaks", "True").ToString
-                    Case "False", "0" : Visualizers.ClassicSpectrumAnalyzerShowPeaks = False
-                    Case Else : Visualizers.ClassicSpectrumAnalyzerShowPeaks = True
-                End Select
-                Visualizers.ClassicSpectrumAnalyzerPeakDecay = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerPeakDecay", 2.ToString)))
-                Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerPeakHoldFrames", 10.ToString)))
-                Try : Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType([Enum].Parse(GetType(VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes), RegSubKey.GetValue("ClassicSpectrumAnalyzerBandMappingMode", VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear.ToString).ToString), VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes)
-                Catch : App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear
-                End Try
-                Try : Visualizers.CircularSpectrumWeightingMode = CType([Enum].Parse(GetType(VisualizerSettings.CircularSpectrumWeightingModes), RegSubKey.GetValue("CircularSpectrumWeightingMode", VisualizerSettings.CircularSpectrumWeightingModes.Raw.ToString).ToString), VisualizerSettings.CircularSpectrumWeightingModes)
-                Catch : App.Visualizers.CircularSpectrumWeightingMode = VisualizerSettings.CircularSpectrumWeightingModes.Raw
-                End Try
-                Visualizers.CircularSpectrumGain = CSng(Val(RegSubKey.GetValue("CircularSpectrumGain", 6.0F.ToString)))
-                Visualizers.CircularSpectrumSmoothing = CSng(Val(RegSubKey.GetValue("CircularSpectrumSmoothing", 0.3F.ToString)))
-                Visualizers.CircularSpectrumLineWidth = CInt(Val(RegSubKey.GetValue("CircularSpectrumLineWidth", 1.ToString)))
-                Visualizers.CircularSpectrumRadiusFactor = CSng(Val(RegSubKey.GetValue("CircularSpectrumRadiusFactor", 0.3F.ToString)))
-                Select Case RegSubKey.GetValue("CircularSpectrumFill", "False").ToString
-                    Case "True", "1" : Visualizers.CircularSpectrumFill = True
-                    Case Else : Visualizers.CircularSpectrumFill = False
-                End Select
-                Select Case RegSubKey.GetValue("WaveformFill", "False").ToString
-                    Case "True", "1" : Visualizers.WaveformFill = True
-                    Case Else : Visualizers.WaveformFill = False
-                End Select
-                Try : Visualizers.OscilloscopeChannelMode = CType([Enum].Parse(GetType(VisualizerSettings.OscilloscopeChannelModes), RegSubKey.GetValue("OscilloscopeChannelMode", VisualizerSettings.OscilloscopeChannelModes.Mono.ToString).ToString), VisualizerSettings.OscilloscopeChannelModes)
-                Catch : App.Visualizers.OscilloscopeChannelMode = VisualizerSettings.OscilloscopeChannelModes.Mono
-                End Try
-                Visualizers.OscilloscopeGain = CSng(Val(RegSubKey.GetValue("OscilloscopeGain", 1.0F.ToString)))
-                Visualizers.OscilloscopeSmoothing = CSng(Val(RegSubKey.GetValue("OscilloscopeSmoothing", 0.3F.ToString)))
-                Visualizers.OscilloscopeLineWidth = CSng(Val(RegSubKey.GetValue("OscilloscopeLineWidth", 1.5F.ToString)))
-                Select Case RegSubKey.GetValue("OscilloscopeEnableGlow", "False").ToString
-                    Case "True", "1" : Visualizers.OscilloscopeEnableGlow = True
-                    Case Else : Visualizers.OscilloscopeEnableGlow = False
-                End Select
-                Visualizers.OscilloscopeFadeAlpha = CInt(Val(RegSubKey.GetValue("OscilloscopeFadeAlpha", 48.ToString)))
-                Try : Visualizers.FractalCloudPalette = CType([Enum].Parse(GetType(VisualizerSettings.FractalCloudPalettes), RegSubKey.GetValue("FractalCloudPalette", VisualizerSettings.FractalCloudPalettes.Normal.ToString).ToString), VisualizerSettings.FractalCloudPalettes)
-                Catch : App.Visualizers.FractalCloudPalette = VisualizerSettings.FractalCloudPalettes.Normal
-                End Try
-                Visualizers.FractalCloudSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedBase", 0.01F.ToString)))
-                Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedAudioFactor", 10.0F.ToString)))
-                Visualizers.FractalCloudTimeIncrement = CDbl(Val(RegSubKey.GetValue("FractalCloudTimeIncrement", 0.02F.ToString)))
-                Visualizers.JuliaFractalBaseCX = CSng(Val(RegSubKey.GetValue("JuliaFractalBaseCX", (-0.7F).ToString)))
-                Visualizers.JuliaFractalBassInfluence = CSng(Val(RegSubKey.GetValue("JuliaFractalBassInfluence", 0.5F.ToString)))
-                Visualizers.JuliaFractalBaseCY = CSng(Val(RegSubKey.GetValue("JuliaFractalBaseCY", 0.27015F.ToString)))
-                Visualizers.JuliaFractalMidInfluence = CSng(Val(RegSubKey.GetValue("JuliaFractalMidInfluence", 2.5F.ToString)))
-                Visualizers.JuliaFractalMaxIterations = CInt(Val(RegSubKey.GetValue("JuliaFractalMaxIterations", 100.ToString)))
-                Visualizers.HyperspaceTunnelParticleCount = CInt(Val(RegSubKey.GetValue("HyperspaceTunnelParticleCount", 1000.ToString)))
-                Visualizers.HyperspaceTunnelSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedBase", 0.05F.ToString)))
-                Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedAudioFactor", 0.2F.ToString)))
-                Visualizers.HyperspaceTunnelParticleSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedBase", 2.0F.ToString)))
-                Visualizers.HyperspaceTunnelParticleSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedAudioFactor", 20.0F.ToString)))
-                Visualizers.StarFieldStarCount = CInt(Val(RegSubKey.GetValue("StarFieldStarCount", 750.ToString)))
-                Visualizers.StarFieldBaseSpeed = CSng(Val(RegSubKey.GetValue("StarFieldBaseSpeed", 2.0F.ToString)))
-                Visualizers.StarFieldAudioSpeedFactor = CInt(Val(RegSubKey.GetValue("StarFieldAudioSpeedFactor", 10.ToString)))
-                Visualizers.StarFieldMaxStarSize = CInt(Val(RegSubKey.GetValue("StarFieldMaxStarSize", 6.ToString)))
-                Try : Visualizers.ParticleNebulaActivePalettePreset = CType([Enum].Parse(GetType(VisualizerSettings.ParticleNebulaPalettePresets), RegSubKey.GetValue("ParticleNebulaActivePalettePreset", VisualizerSettings.ParticleNebulaPalettePresets.Cosmic.ToString).ToString), VisualizerSettings.ParticleNebulaPalettePresets)
-                Catch : App.Visualizers.ParticleNebulaActivePalettePreset = VisualizerSettings.ParticleNebulaPalettePresets.Cosmic
-                End Try
-                Visualizers.ParticleNebulaBloomIntensity = CSng(Val(RegSubKey.GetValue("ParticleNebulaBloomIntensity", 0.5F.ToString)))
-                Visualizers.ParticleNebulaBloomRadius = CInt(Val(RegSubKey.GetValue("ParticleNebulaBloomRadius", 2.ToString)))
-                Visualizers.ParticleNebulaFadeRate = CSng(Val(RegSubKey.GetValue("ParticleNebulaFadeRate", 0.005F.ToString)))
-                Select Case RegSubKey.GetValue("ParticleNebulaFadeTrails", "False").ToString
-                    Case "True", "1" : Visualizers.ParticleNebulaFadeTrails = True
-                    Case Else : Visualizers.ParticleNebulaFadeTrails = False
-                End Select
-                Select Case RegSubKey.GetValue("ParticleNebulaRainbowColors", "False").ToString
-                    Case "True", "1" : Visualizers.ParticleNebulaRainbowColors = True
-                    Case Else : Visualizers.ParticleNebulaRainbowColors = False
-                End Select
-                Select Case RegSubKey.GetValue("ParticleNebulaShowBloom", "False").ToString
-                    Case "True", "1" : Visualizers.ParticleNebulaShowBloom = True
-                    Case Else : Visualizers.ParticleNebulaShowBloom = False
-                End Select
-                Select Case RegSubKey.GetValue("ParticleNebulaShowTrails", "False").ToString
-                    Case "True", "1" : Visualizers.ParticleNebulaShowTrails = True
-                    Case Else : Visualizers.ParticleNebulaShowTrails = False
-                End Select
-                Visualizers.ParticleNebulaSizeScale = CInt(Val(RegSubKey.GetValue("ParticleNebulaSizeScale", 20.ToString)))
-                Visualizers.ParticleNebulaSpawnMultiplier = CSng(Val(RegSubKey.GetValue("ParticleNebulaSpawnMultiplier", 2.0F.ToString)))
-                Visualizers.ParticleNebulaSwirlBias = CSng(Val(RegSubKey.GetValue("ParticleNebulaSwirlBias", 0.0F.ToString)))
-                Visualizers.ParticleNebulaSwirlStrength = CSng(Val(RegSubKey.GetValue("ParticleNebulaSwirlStrength", 0.15F.ToString)))
-                Visualizers.ParticleNebulaTrailAlpha = CSng(Val(RegSubKey.GetValue("ParticleNebulaTrailAlpha", 0.5F.ToString)))
-                Visualizers.ParticleNebulaVelocityScale = CInt(Val(RegSubKey.GetValue("ParticleNebulaVelocityScale", 50.ToString)))
-                RegSubKey.Close()
-
-                RegSubKey.Dispose()
-                RegKey.Close()
-                RegKey.Dispose()
-                App.WriteToLog("Options Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
-            Catch ex As Exception
-                WriteToLog("Error Loading Options" + vbCr + ex.Message)
-            End Try
-        End Sub
-        Private Sub GetDebugOptions()
-#If DEBUG Then
-            'WatcherEnabled = True
-            'WatcherUpdateLibrary = True
-            'WatcherUpdatePlaylist = True
-#End If
-        End Sub
         Private Sub GenerateHotKeyList()
             HotKeys.Clear()
             HotKeys.Add(HotKeyPlay)
@@ -2174,10 +2184,10 @@ Namespace My
             Watchers.Clear()
 
             'Set new watchers
-            If WatcherEnabled AndAlso LibrarySearchFolders.Count > 0 AndAlso Not forcestop Then
-                For Each folder In LibrarySearchFolders
+            If Settings.WatcherEnabled AndAlso Settings.LibrarySearchFolders.Count > 0 AndAlso Not forcestop Then
+                For Each folder In Settings.LibrarySearchFolders
                     Dim watcher As New FileSystemWatcher(folder) With {
-                        .IncludeSubdirectories = LibrarySearchSubFolders,
+                        .IncludeSubdirectories = Settings.LibrarySearchSubFolders,
                         .NotifyFilter = NotifyFilters.FileName Or NotifyFilters.Size Or NotifyFilters.LastWrite}
                     AddHandler watcher.Created, AddressOf Watcher_Created
                     AddHandler watcher.Renamed, AddressOf Watcher_Renamed
@@ -2211,7 +2221,7 @@ Namespace My
             End If
         End Sub
         Friend Sub SetNIApp()
-            If ShowTrayIcon Then
+            If Settings.ShowTrayIcon Then
                 NIApp.Visible = True
             Else
                 NIApp.Visible = False
@@ -2219,7 +2229,7 @@ Namespace My
         End Sub
         Friend Sub SetMiniPlayer()
             If FrmMiniPlayer Is Nothing OrElse FrmMiniPlayer.IsDisposed Then
-                VisualizerMiniMode = True
+                Settings.VisualizerMiniMode = True
                 FrmMiniPlayer = New PlayerMini
                 FrmMiniPlayer.Show()
                 Player.Hide()
@@ -2227,7 +2237,7 @@ Namespace My
                 Player.ShowMedia()
                 FrmMiniPlayer.Activate()
             Else
-                VisualizerMiniMode = False
+                Settings.VisualizerMiniMode = False
                 FrmMiniPlayer.Close()
                 FrmMiniPlayer = Nothing
                 Player.Show()
@@ -2374,7 +2384,7 @@ Namespace My
             ChangeLog.ShowDialog()
         End Sub
         Friend Sub ShowToast(title As String, message As String)
-            If App.ShowNowPlayingToast Then
+            If Settings.ShowNowPlayingToast Then
                 If String.IsNullOrWhiteSpace(title) Then title = My.Application.Info.Title
                 Dim toastoptions As New Skye.UI.ToastOptions With {
                     .Title = title,
@@ -2395,13 +2405,13 @@ Namespace My
                 If IO.File.Exists(filename) Then
                     Dim pInfo As New ProcessStartInfo With {
                         .UseShellExecute = False,
-                        .FileName = HelperApp1Path,
+                        .FileName = Settings.HelperApp1Path,
                         .Arguments = """" + filename + """"}
                     Try
                         Diagnostics.Process.Start(pInfo)
-                        WriteToLog(HelperApp1Name + " Opened (" + filename + ")")
+                        WriteToLog(Settings.HelperApp1Name + " Opened (" + filename + ")")
                     Catch ex As Exception
-                        WriteToLog("Cannot Open " + HelperApp1Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
+                        WriteToLog("Cannot Open " + Settings.HelperApp1Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
                     End Try
                 End If
             End If
@@ -2411,13 +2421,13 @@ Namespace My
                 If IO.File.Exists(filename) Then
                     Dim pInfo As New Diagnostics.ProcessStartInfo With {
                         .UseShellExecute = False,
-                        .FileName = HelperApp2Path,
+                        .FileName = Settings.HelperApp2Path,
                         .Arguments = """" + filename + """"}
                     Try
                         Diagnostics.Process.Start(pInfo)
-                        WriteToLog(HelperApp2Name + " Opened (" + filename + ")")
+                        WriteToLog(Settings.HelperApp2Name + " Opened (" + filename + ")")
                     Catch ex As Exception
-                        WriteToLog("Cannot Open " + HelperApp2Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
+                        WriteToLog("Cannot Open " + Settings.HelperApp2Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
                     End Try
                 End If
             End If
@@ -2450,7 +2460,7 @@ Namespace My
         Private Function FormatPlaylistTitleCore(filePath As String) As String 'Core routine: all formatting logic lives here
             FormatPlaylistTitleCore = String.Empty
             Dim tlfile As TagLib.File = Nothing
-            If App.PlaylistTitleFormat <> App.PlaylistTitleFormats.UseFilename Then
+            If Settings.PlaylistTitleFormat <> App.PlaylistTitleFormats.UseFilename Then
                 Try
                     tlfile = TagLib.File.Create(filePath)
                 Catch ex As Exception
@@ -2461,12 +2471,12 @@ Namespace My
             If tlfile Is Nothing Then
                 FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
             Else
-                Select Case App.PlaylistTitleFormat
+                Select Case Settings.PlaylistTitleFormat
                     Case App.PlaylistTitleFormats.Song
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
@@ -2476,14 +2486,14 @@ Namespace My
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
@@ -2494,14 +2504,14 @@ Namespace My
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
@@ -2512,22 +2522,22 @@ Namespace My
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
@@ -2538,22 +2548,22 @@ Namespace My
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
@@ -2564,22 +2574,22 @@ Namespace My
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
@@ -2590,22 +2600,22 @@ Namespace My
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
@@ -2616,30 +2626,30 @@ Namespace My
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
                                 End If
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
@@ -2650,30 +2660,30 @@ Namespace My
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
@@ -2684,30 +2694,30 @@ Namespace My
                         If tlfile.Tag.Title = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Title
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
@@ -2718,14 +2728,14 @@ Namespace My
                         If tlfile.Tag.FirstPerformer = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
@@ -2736,22 +2746,22 @@ Namespace My
                         If tlfile.Tag.FirstPerformer = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
@@ -2762,22 +2772,22 @@ Namespace My
                         If tlfile.Tag.FirstPerformer = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
@@ -2788,22 +2798,22 @@ Namespace My
                         If tlfile.Tag.FirstPerformer = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
@@ -2814,22 +2824,22 @@ Namespace My
                         If tlfile.Tag.FirstPerformer = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
@@ -2840,30 +2850,30 @@ Namespace My
                         If tlfile.Tag.FirstPerformer = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
                                 End If
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
@@ -2874,30 +2884,30 @@ Namespace My
                         If tlfile.Tag.FirstPerformer = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
@@ -2908,22 +2918,22 @@ Namespace My
                         If tlfile.Tag.Album = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Album
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
@@ -2934,22 +2944,22 @@ Namespace My
                         If tlfile.Tag.Album = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Album
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
@@ -2960,30 +2970,30 @@ Namespace My
                         If tlfile.Tag.Album = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Album
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
@@ -2994,30 +3004,30 @@ Namespace My
                         If tlfile.Tag.Album = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Album
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
@@ -3028,30 +3038,30 @@ Namespace My
                         If tlfile.Tag.Album = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Album
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
@@ -3062,30 +3072,30 @@ Namespace My
                         If tlfile.Tag.Album = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.Album
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.FirstGenre = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
@@ -3096,14 +3106,14 @@ Namespace My
                         If tlfile.Tag.FirstGenre = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
@@ -3114,22 +3124,22 @@ Namespace My
                         If tlfile.Tag.FirstGenre = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
@@ -3140,22 +3150,22 @@ Namespace My
                         If tlfile.Tag.FirstGenre = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
@@ -3166,30 +3176,30 @@ Namespace My
                         If tlfile.Tag.FirstGenre = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
@@ -3200,30 +3210,30 @@ Namespace My
                         If tlfile.Tag.FirstGenre = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
@@ -3234,30 +3244,30 @@ Namespace My
                         If tlfile.Tag.FirstGenre = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
                                 End If
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
@@ -3268,30 +3278,30 @@ Namespace My
                         If tlfile.Tag.FirstGenre = String.Empty Then
                             FormatPlaylistTitleCore = IO.Path.GetFileNameWithoutExtension(filePath)
                         Else
-                            If App.PlaylistTitleRemoveSpaces Then
+                            If Settings.PlaylistTitleRemoveSpaces Then
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre.Replace(" ", "")
                             Else
                                 FormatPlaylistTitleCore += tlfile.Tag.FirstGenre
                             End If
                             If Not tlfile.Tag.Title = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Title.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Title
                                 End If
                             End If
                             If Not tlfile.Tag.Album = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.Album.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.Album
                                 End If
                             End If
                             If Not tlfile.Tag.FirstPerformer = String.Empty Then
-                                FormatPlaylistTitleCore += App.PlaylistTitleSeparator
-                                If App.PlaylistTitleRemoveSpaces Then
+                                FormatPlaylistTitleCore += Settings.PlaylistTitleSeparator
+                                If Settings.PlaylistTitleRemoveSpaces Then
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer.Replace(" ", "")
                                 Else
                                     FormatPlaylistTitleCore += tlfile.Tag.FirstPerformer
@@ -3301,7 +3311,7 @@ Namespace My
                 End Select
             End If
             If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(filePath)) Then
-                FormatPlaylistTitleCore += PlaylistVideoIdentifier
+                FormatPlaylistTitleCore += Settings.PlaylistVideoIdentifier
             End If
         End Function
         ''' <summary>
@@ -3377,7 +3387,7 @@ Namespace My
 
         End Function
         Friend Function GetCurrentThemeProperties() As ThemeProperties
-            Select Case Theme
+            Select Case Settings.Theme
                 Case Themes.BlueAccent
                     Return BlueAccentTheme
                 Case Themes.PinkAccent
@@ -3410,7 +3420,7 @@ Namespace My
             cm.Invalidate()
         End Sub
         Friend Sub ReThemeTrayMenu()
-            If ShowTrayIcon Then ThemeMenu(NIApp.ContextMenuStrip)
+            If Settings.ShowTrayIcon Then ThemeMenu(NIApp.ContextMenuStrip)
         End Sub
         Public Function TintIcon(baseIcon As Image, color As Color) As Image
             Dim bmp As New Bitmap(baseIcon.Width, baseIcon.Height)
@@ -3588,12 +3598,12 @@ Namespace My
         End Sub
         Friend Sub UpdateHistory(songorstream As String)
             TimerHistoryUpdate.Stop()
-            If HistoryUpdateInterval = 0 Then
+            If Settings.HistoryUpdateInterval = 0 Then
                 TimerHistoryUpdate.Tag = songorstream
                 UpdateHistory()
                 Return
             Else
-                TimerHistoryUpdate.Interval = HistoryUpdateInterval * 1000
+                TimerHistoryUpdate.Interval = Settings.HistoryUpdateInterval * 1000
                 TimerHistoryUpdate.Tag = songorstream
                 TimerHistoryUpdate.Start()
             End If
@@ -3620,12 +3630,12 @@ Namespace My
         End Sub
         Friend Sub UpdateRandomHistory(songorstream As String)
             TimerRandomHistoryUpdate.Stop()
-            If RandomHistoryUpdateInterval = 0 Then
+            If Settings.RandomHistoryUpdateInterval = 0 Then
                 TimerRandomHistoryUpdate.Tag = songorstream
                 UpdateRandomHistory()
                 Return
             Else
-                TimerRandomHistoryUpdate.Interval = RandomHistoryUpdateInterval * 1000
+                TimerRandomHistoryUpdate.Interval = Settings.RandomHistoryUpdateInterval * 1000
                 TimerRandomHistoryUpdate.Tag = songorstream
                 TimerRandomHistoryUpdate.Start()
             End If
@@ -3641,7 +3651,7 @@ Namespace My
         End Sub
         Friend Sub SetHistoryAutoSaveTimer()
             TimerHistoryAutoSave.Stop()
-            TimerHistoryAutoSave.Interval = App.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
+            TimerHistoryAutoSave.Interval = Settings.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
             TimerHistoryAutoSave.Start()
             'Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
         End Sub

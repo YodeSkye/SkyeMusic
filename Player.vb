@@ -482,7 +482,7 @@ Public Class Player
 
                 AddHandler item.Click,
                     Sub(sender, e)
-                        App.Visualizer = vizName
+                        App.Settings.Visualizer = vizName
                         ownerForm.ShowMedia()
                     End Sub
                 menu.Items.Add(item)
@@ -500,7 +500,7 @@ Public Class Player
                     .Font = menu.Font}
                 AddHandler item.Click,
                     Sub(sender, e)
-                        App.Visualizer = vizName
+                        App.Settings.Visualizer = vizName
                         ownerForm.VisualizerOn()
                         ownerForm.ShowMedia()
                     End Sub
@@ -511,7 +511,7 @@ Public Class Player
                     Dim s As ContextMenuStrip = CType(sender, ContextMenuStrip)
                     For Each tsmi As ToolStripMenuItem In s.Items
                         tsmi.Checked = False
-                        If tsmi.Text.Equals(App.Visualizer, StringComparison.OrdinalIgnoreCase) Then
+                        If tsmi.Text.Equals(App.Settings.Visualizer, StringComparison.OrdinalIgnoreCase) Then
                             tsmi.Checked = True
                         End If
                     Next
@@ -693,18 +693,18 @@ Public Class Player
             Dim gain As Single
             Dim showPeaks As Boolean
             Dim peakThickness As Integer
-            If VisualizerMiniMode AndAlso App.Visualizers.RainbowBarAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.RainbowBarAllowMiniMode Then
                 ' Mini Mode defaults
-                barCount = Math.Min(16, App.Visualizers.RainbowBarCount)   ' fewer bars
-                gain = App.Visualizers.RainbowBarGain * 0.8F               ' slightly reduced gain
+                barCount = Math.Min(16, App.Settings.Visualizers.RainbowBarCount)   ' fewer bars
+                gain = App.Settings.Visualizers.RainbowBarGain * 0.8F               ' slightly reduced gain
                 showPeaks = False                                          ' peaks look messy in tiny mode
                 peakThickness = 2                                          ' if peaks enabled later
             Else
                 ' Full mode
-                barCount = App.Visualizers.RainbowBarCount
-                gain = App.Visualizers.RainbowBarGain
-                showPeaks = App.Visualizers.RainbowBarShowPeaks
-                peakThickness = App.Visualizers.RainbowBarPeakThickness
+                barCount = App.Settings.Visualizers.RainbowBarCount
+                gain = App.Settings.Visualizers.RainbowBarGain
+                showPeaks = App.Settings.Visualizers.RainbowBarShowPeaks
+                peakThickness = App.Settings.Visualizers.RainbowBarPeakThickness
             End If
             Dim barWidth As Single = CSng(Width) / barCount
 
@@ -749,19 +749,19 @@ Public Class Player
 
                     If currentPeak > peakValues(i) Then
                         peakValues(i) = currentPeak
-                        peakHold(i) = App.Visualizers.RainbowBarPeakHoldFrames
+                        peakHold(i) = App.Settings.Visualizers.RainbowBarPeakHoldFrames
                     Else
                         If peakHold(i) > 0 Then
                             ' Still holding: decrement counter, keep peak stuck
                             peakHold(i) -= 1
                         Else
                             ' No hold left: start decaying
-                            peakValues(i) = Math.Max(0, peakValues(i) - App.Visualizers.RainbowBarPeakDecaySpeed)
+                            peakValues(i) = Math.Max(0, peakValues(i) - App.Settings.Visualizers.RainbowBarPeakDecaySpeed)
                         End If
                     End If
 
                     ' Only draw peak if above threshold
-                    If peakValues(i) > App.Visualizers.RainbowBarPeakThreshold Then
+                    If peakValues(i) > App.Settings.Visualizers.RainbowBarPeakThreshold Then
                         Dim peakY As Integer = maxHeight - CInt(peakValues(i)) - 1
                         Dim thickness As Integer = peakThickness
                         Dim peakColor As Color = ColorFromHSV(hue, 1.0F, 1.0F)
@@ -774,7 +774,7 @@ Public Class Player
             Next
 
             ' Advance hue offset for next frame
-            hueOffset = (hueOffset + App.Visualizers.RainbowBarHueCycleSpeed) Mod 360.0F
+            hueOffset = (hueOffset + App.Settings.Visualizers.RainbowBarHueCycleSpeed) Mod 360.0F
         End Sub
 
         ' Methods
@@ -880,22 +880,22 @@ Public Class Player
             Dim peakDecay As Integer
             Dim peakThickness As Integer = 2
 
-            If VisualizerMiniMode AndAlso App.Visualizers.ClassicSpectrumAnalyzerAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.ClassicSpectrumAnalyzerAllowMiniMode Then
                 ' MiniMode defaults (compact, calmer)
-                barCount = Math.Min(24, App.Visualizers.ClassicSpectrumAnalyzerBarCount)
-                gain = App.Visualizers.ClassicSpectrumAnalyzerGain * 0.8F
+                barCount = Math.Min(24, App.Settings.Visualizers.ClassicSpectrumAnalyzerBarCount)
+                gain = App.Settings.Visualizers.ClassicSpectrumAnalyzerGain * 0.8F
                 smoothing = 0.5F
                 showPeaks = False ' peaks can look noisy in tiny mode
-                peakHoldFrames = App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames
-                peakDecay = App.Visualizers.ClassicSpectrumAnalyzerPeakDecay
+                peakHoldFrames = App.Settings.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames
+                peakDecay = App.Settings.Visualizers.ClassicSpectrumAnalyzerPeakDecay
             Else
                 ' Full mode uses user settings
-                barCount = App.Visualizers.ClassicSpectrumAnalyzerBarCount
-                gain = App.Visualizers.ClassicSpectrumAnalyzerGain
-                smoothing = App.Visualizers.ClassicSpectrumAnalyzerSmoothing
-                showPeaks = App.Visualizers.ClassicSpectrumAnalyzerShowPeaks
-                peakHoldFrames = App.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames
-                peakDecay = App.Visualizers.ClassicSpectrumAnalyzerPeakDecay
+                barCount = App.Settings.Visualizers.ClassicSpectrumAnalyzerBarCount
+                gain = App.Settings.Visualizers.ClassicSpectrumAnalyzerGain
+                smoothing = App.Settings.Visualizers.ClassicSpectrumAnalyzerSmoothing
+                showPeaks = App.Settings.Visualizers.ClassicSpectrumAnalyzerShowPeaks
+                peakHoldFrames = App.Settings.Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames
+                peakDecay = App.Settings.Visualizers.ClassicSpectrumAnalyzerPeakDecay
             End If
 
             ' --- Ensure buffers ---
@@ -913,10 +913,10 @@ Public Class Player
             ComputeSpectrum(audioData, fftSize, spectrumMagnitudes)
 
             ' --- 2) Map bins -> bars (linear or logarithmic) ---
-            Select Case App.Visualizers.ClassicSpectrumAnalyzerBandMappingMode
-                Case App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Linear
+            Select Case App.Settings.Visualizers.ClassicSpectrumAnalyzerBandMappingMode
+                Case App.ClassicSpectrumAnalyzerBandMappingModes.Linear
                     MapBinsToBarsLinear(spectrumMagnitudes, barMagnitudes)
-                Case App.VisualizerSettings.ClassicSpectrumAnalyzerBandMappingModes.Logarithmic
+                Case App.ClassicSpectrumAnalyzerBandMappingModes.Logarithmic
                     MapBinsToBarsLogarithmic(spectrumMagnitudes, barMagnitudes)
             End Select
 
@@ -1124,21 +1124,21 @@ Public Class Player
             Dim fillMode As Boolean
             Dim lineWidth As Single
 
-            If VisualizerMiniMode AndAlso App.Visualizers.CircularSpectrumAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.CircularSpectrumAllowMiniMode Then
                 ' MiniMode defaults (compact, readable)
                 barCount = Math.Min(64, barCount) ' fewer spokes
-                gain = App.Visualizers.CircularSpectrumGain * 0.7F
+                gain = App.Settings.Visualizers.CircularSpectrumGain * 0.7F
                 smoothing = 0.6F
-                radiusFactor = App.Visualizers.CircularSpectrumRadiusFactor * 0.8F
+                radiusFactor = App.Settings.Visualizers.CircularSpectrumRadiusFactor * 0.8F
                 fillMode = False ' filled mode looks messy when tiny
-                lineWidth = Math.Max(1, App.Visualizers.CircularSpectrumLineWidth)
+                lineWidth = Math.Max(1, App.Settings.Visualizers.CircularSpectrumLineWidth)
             Else
                 ' Full mode uses user settings
-                gain = App.Visualizers.CircularSpectrumGain
-                smoothing = App.Visualizers.CircularSpectrumSmoothing
-                radiusFactor = App.Visualizers.CircularSpectrumRadiusFactor
-                fillMode = App.Visualizers.CircularSpectrumFill
-                lineWidth = App.Visualizers.CircularSpectrumLineWidth
+                gain = App.Settings.Visualizers.CircularSpectrumGain
+                smoothing = App.Settings.Visualizers.CircularSpectrumSmoothing
+                radiusFactor = App.Settings.Visualizers.CircularSpectrumRadiusFactor
+                fillMode = App.Settings.Visualizers.CircularSpectrumFill
+                lineWidth = App.Settings.Visualizers.CircularSpectrumLineWidth
             End If
 
             If barCount < 2 Then Exit Sub
@@ -1157,35 +1157,35 @@ Public Class Player
                 Dim freq As Double = (i * sampleRate) / (2.0 * barCount)
                 Dim weight As Single = 1.0F
 
-                Select Case App.Visualizers.CircularSpectrumWeightingMode
-                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.Balanced
+                Select Case App.Settings.Visualizers.CircularSpectrumWeightingMode
+                    Case App.CircularSpectrumWeightingModes.Balanced
                         If freq < 200 Then weight = 0.5F
                         If freq >= 200 AndAlso freq < 2000 Then weight = 1.0F
                         If freq >= 2000 AndAlso freq < 8000 Then weight = 1.0F
                         If freq >= 8000 Then weight = 0.7F
 
-                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.BassHeavy
+                    Case App.CircularSpectrumWeightingModes.BassHeavy
                         If freq < 200 Then weight = 1.2F
                         If freq >= 200 AndAlso freq < 2000 Then weight = 1.0F
                         If freq >= 2000 Then weight = 0.8F
 
-                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.TrebleBright
+                    Case App.CircularSpectrumWeightingModes.TrebleBright
                         If freq < 200 Then weight = 0.4F
                         If freq >= 2000 Then weight = 1.3F
 
-                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.Raw
+                    Case App.CircularSpectrumWeightingModes.Raw
                         weight = 1.0F
 
-                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.Warm
+                    Case App.CircularSpectrumWeightingModes.Warm
                         If freq < 200 Then weight = 1.1F
                         If freq >= 2000 Then weight = 0.8F
 
-                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.VShape
+                    Case App.CircularSpectrumWeightingModes.VShape
                         If freq < 200 Then weight = 1.2F
                         If freq >= 500 AndAlso freq < 2000 Then weight = 0.8F
                         If freq >= 2000 Then weight = 1.2F
 
-                    Case App.VisualizerSettings.CircularSpectrumWeightingModes.MidFocus
+                    Case App.CircularSpectrumWeightingModes.MidFocus
                         If freq >= 500 AndAlso freq < 2000 Then weight = 1.3F
                         If freq < 200 OrElse freq >= 8000 Then weight = 0.6F
                 End Select
@@ -1308,7 +1308,7 @@ Public Class Player
             Dim downsampleFactor As Integer
             Dim baselineOffset As Single
 
-            If VisualizerMiniMode AndAlso App.Visualizers.WaveformAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.WaveformAllowMiniMode Then
                 ' MiniMode defaults (cleaner, simpler, more readable)
                 fillEnabled = False
                 lineThickness = 1.0F
@@ -1317,7 +1317,7 @@ Public Class Player
                 baselineOffset = 4.0F
             Else
                 ' Full mode uses user settings
-                fillEnabled = App.Visualizers.WaveformFill
+                fillEnabled = App.Settings.Visualizers.WaveformFill
                 lineThickness = 2.0F
                 verticalScale = 1.0F
                 downsampleFactor = 1
@@ -1451,7 +1451,7 @@ Public Class Player
                 If waveform Is Nothing OrElse waveform.Length < 2 Then Exit Sub
                 localLeft = CType(waveform.Clone(), Single())
 
-                If App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth AndAlso waveformRight IsNot Nothing Then
+                If App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.StereoBoth AndAlso waveformRight IsNot Nothing Then
                     localRight = CType(waveformRight.Clone(), Single())
                 End If
             End SyncLock
@@ -1462,14 +1462,14 @@ Public Class Player
             Dim amplitudeScale As Single
             Dim downsample As Integer
 
-            If VisualizerMiniMode AndAlso App.Visualizers.OscilloscopeAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.OscilloscopeAllowMiniMode Then
                 enableGlow = False
-                lineWidth = Math.Max(2.0F, App.Visualizers.OscilloscopeLineWidth)
+                lineWidth = Math.Max(2.0F, App.Settings.Visualizers.OscilloscopeLineWidth)
                 amplitudeScale = 0.7F
                 downsample = 2
             Else
-                enableGlow = App.Visualizers.OscilloscopeEnableGlow
-                lineWidth = App.Visualizers.OscilloscopeLineWidth
+                enableGlow = App.Settings.Visualizers.OscilloscopeEnableGlow
+                lineWidth = App.Settings.Visualizers.OscilloscopeLineWidth
                 amplitudeScale = 0.9F
                 downsample = 1
             End If
@@ -1498,7 +1498,7 @@ Public Class Player
                 End Using
 
                 ' Right channel (if stereo)
-                If App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth AndAlso localRight IsNot Nothing Then
+                If App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.StereoBoth AndAlso localRight IsNot Nothing Then
                     Using penRight As New Pen(App.CurrentTheme.TextColor, lineWidth)
                         For i = 1 To renderCount - 1
                             Dim x1 = (i - 1) * stepX
@@ -1525,7 +1525,7 @@ Public Class Player
             End If
 
             ' Fade previous frame
-            Using fadeBrush As New SolidBrush(Color.FromArgb(App.Visualizers.OscilloscopeFadeAlpha, App.CurrentTheme.BackColor))
+            Using fadeBrush As New SolidBrush(Color.FromArgb(App.Settings.Visualizers.OscilloscopeFadeAlpha, App.CurrentTheme.BackColor))
                 glowGraphics.FillRectangle(fadeBrush, Me.ClientRectangle)
             End Using
 
@@ -1541,7 +1541,7 @@ Public Class Player
             End Using
 
             ' Draw right channel if stereo
-            If App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth AndAlso localRight IsNot Nothing Then
+            If App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.StereoBoth AndAlso localRight IsNot Nothing Then
                 Using penRight As New Pen(App.CurrentTheme.TextColor, lineWidth)
                     For i = 1 To renderCount - 1
                         Dim x1 = (i - 1) * stepX
@@ -1574,15 +1574,15 @@ Public Class Player
                     Dim left = samples(i * 2)
                     Dim right = samples(i * 2 + 1)
 
-                    Select Case App.Visualizers.OscilloscopeChannelMode
-                        Case App.VisualizerSettings.OscilloscopeChannelModes.Mono
+                    Select Case App.Settings.Visualizers.OscilloscopeChannelMode
+                        Case App.OscilloscopeChannelModes.Mono
                             Dim mixed = (left + right) / 2.0F
                             waveform(i) = Smooth(i, mixed)
-                        Case App.VisualizerSettings.OscilloscopeChannelModes.StereoLeft
+                        Case App.OscilloscopeChannelModes.StereoLeft
                             waveform(i) = Smooth(i, left)
-                        Case App.VisualizerSettings.OscilloscopeChannelModes.StereoRight
+                        Case App.OscilloscopeChannelModes.StereoRight
                             waveform(i) = Smooth(i, right)
-                        Case App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth
+                        Case App.OscilloscopeChannelModes.StereoBoth
                             waveform(i) = Smooth(i, left)
                             waveformRight(i) = SmoothRight(i, right)
                     End Select
@@ -1590,14 +1590,14 @@ Public Class Player
             End SyncLock
         End Sub
         Private Function Smooth(i As Integer, sample As Single) As Single
-            Dim boosted = Math.Max(-1.0F, Math.Min(sample * App.Visualizers.OscilloscopeGain, 1.0F))
-            Dim smoothed = (lastWaveform(i) * App.Visualizers.OscilloscopeSmoothing) + (boosted * (1.0F - App.Visualizers.OscilloscopeSmoothing))
+            Dim boosted = Math.Max(-1.0F, Math.Min(sample * App.Settings.Visualizers.OscilloscopeGain, 1.0F))
+            Dim smoothed = (lastWaveform(i) * App.Settings.Visualizers.OscilloscopeSmoothing) + (boosted * (1.0F - App.Settings.Visualizers.OscilloscopeSmoothing))
             lastWaveform(i) = smoothed
             Return smoothed
         End Function
         Private Function SmoothRight(i As Integer, sample As Single) As Single
-            Dim boosted = Math.Max(-1.0F, Math.Min(sample * App.Visualizers.OscilloscopeGain, 1.0F))
-            Dim smoothed = (lastWaveformRight(i) * App.Visualizers.OscilloscopeSmoothing) + (boosted * (1.0F - App.Visualizers.OscilloscopeSmoothing))
+            Dim boosted = Math.Max(-1.0F, Math.Min(sample * App.Settings.Visualizers.OscilloscopeGain, 1.0F))
+            Dim smoothed = (lastWaveformRight(i) * App.Settings.Visualizers.OscilloscopeSmoothing) + (boosted * (1.0F - App.Settings.Visualizers.OscilloscopeSmoothing))
             lastWaveformRight(i) = smoothed
             Return smoothed
         End Function
@@ -1661,19 +1661,19 @@ Public Class Player
             Dim timeIncrement As Double
             Dim audioScale As Double
 
-            If VisualizerMiniMode AndAlso App.Visualizers.FractalCloudAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.FractalCloudAllowMiniMode Then
                 ' MiniMode defaults (cleaner, calmer, faster)
                 renderScale = 4                       ' lower resolution for tiny mode
-                swirlSpeedBase = App.Visualizers.FractalCloudSwirlSpeedBase * 0.6
-                swirlSpeedAudio = App.Visualizers.FractalCloudSwirlSpeedAudioFactor * 0.5
-                timeIncrement = App.Visualizers.FractalCloudTimeIncrement * 0.7
+                swirlSpeedBase = App.Settings.Visualizers.FractalCloudSwirlSpeedBase * 0.6
+                swirlSpeedAudio = App.Settings.Visualizers.FractalCloudSwirlSpeedAudioFactor * 0.5
+                timeIncrement = App.Settings.Visualizers.FractalCloudTimeIncrement * 0.7
                 audioScale = 0.6                       ' reduce bass/treble influence
             Else
                 ' Full mode uses user settings
                 renderScale = 3
-                swirlSpeedBase = App.Visualizers.FractalCloudSwirlSpeedBase
-                swirlSpeedAudio = App.Visualizers.FractalCloudSwirlSpeedAudioFactor
-                timeIncrement = App.Visualizers.FractalCloudTimeIncrement
+                swirlSpeedBase = App.Settings.Visualizers.FractalCloudSwirlSpeedBase
+                swirlSpeedAudio = App.Settings.Visualizers.FractalCloudSwirlSpeedAudioFactor
+                timeIncrement = App.Settings.Visualizers.FractalCloudTimeIncrement
                 audioScale = 1.0
             End If
 
@@ -1736,20 +1736,20 @@ Public Class Player
                         Dim val As Double = n
                         Dim col As Color
 
-                        Select Case App.Visualizers.FractalCloudPalette
-                            Case App.VisualizerSettings.FractalCloudPalettes.Normal
+                        Select Case App.Settings.Visualizers.FractalCloudPalette
+                            Case App.FractalCloudPalettes.Normal
                                 hue = (n * 360 + bass * 400 + treble * 200) Mod 360
                                 col = ColorFromHSV(hue, sat, val)
 
-                            Case App.VisualizerSettings.FractalCloudPalettes.Firestorm
+                            Case App.FractalCloudPalettes.Firestorm
                                 hue = 0 + (n * 60)
                                 col = ColorFromHSV(hue, sat, val)
 
-                            Case App.VisualizerSettings.FractalCloudPalettes.Aurora
+                            Case App.FractalCloudPalettes.Aurora
                                 hue = 120 + (n * 120)
                                 col = ColorFromHSV(hue, sat, val)
 
-                            Case App.VisualizerSettings.FractalCloudPalettes.CosmicRainbow
+                            Case App.FractalCloudPalettes.CosmicRainbow
                                 hue = (n * 360 + bass * 400 + treble * 200) Mod 360
                                 sat = Math.Min(1.0, 0.5 + bass * 5)
                                 val = Math.Min(1.0, n * (1.0 - treble * 0.5))
@@ -1859,21 +1859,21 @@ Public Class Player
             Dim midInfluence As Double
             Dim colorIntensity As Double
 
-            If VisualizerMiniMode AndAlso App.Visualizers.JuliaFractalAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.JuliaFractalAllowMiniMode Then
                 ' MiniMode defaults (cleaner, faster, calmer)
                 targetW = 320
                 targetH = 180
-                maxIterations = Math.Max(50, App.Visualizers.JuliaFractalMaxIterations \ 2)
-                bassInfluence = App.Visualizers.JuliaFractalBassInfluence * 0.8
-                midInfluence = App.Visualizers.JuliaFractalMidInfluence * 0.8
+                maxIterations = Math.Max(50, App.Settings.Visualizers.JuliaFractalMaxIterations \ 2)
+                bassInfluence = App.Settings.Visualizers.JuliaFractalBassInfluence * 0.8
+                midInfluence = App.Settings.Visualizers.JuliaFractalMidInfluence * 0.8
                 colorIntensity = 0.7
             Else
                 ' Full mode uses user settings
                 targetW = 640
                 targetH = 360
-                maxIterations = App.Visualizers.JuliaFractalMaxIterations
-                bassInfluence = App.Visualizers.JuliaFractalBassInfluence
-                midInfluence = App.Visualizers.JuliaFractalMidInfluence
+                maxIterations = App.Settings.Visualizers.JuliaFractalMaxIterations
+                bassInfluence = App.Settings.Visualizers.JuliaFractalBassInfluence
+                midInfluence = App.Settings.Visualizers.JuliaFractalMidInfluence
                 colorIntensity = 1.0
             End If
 
@@ -1895,8 +1895,8 @@ Public Class Player
             Dim treble As Double = If(audioData.Length > 30, audioData(30), 0) * colorIntensity
 
             ' Julia constant evolves with audio
-            Dim cx As Double = App.Visualizers.JuliaFractalBaseCX + bass * bassInfluence
-            Dim cy As Double = App.Visualizers.JuliaFractalBaseCY + mid * midInfluence
+            Dim cx As Double = App.Settings.Visualizers.JuliaFractalBaseCX + bass * bassInfluence
+            Dim cy As Double = App.Settings.Visualizers.JuliaFractalBaseCY + mid * midInfluence
 
             ' Fill pixel buffer
             For py As Integer = 0 To targetH - 1
@@ -1967,7 +1967,7 @@ Public Class Player
             AddHandler updateTimer.Tick, AddressOf OnTick
             particles = New List(Of Particle)()
             'Initialize particles
-            SetParticleCount(App.Visualizers.HyperspaceTunnelParticleCount)
+            SetParticleCount(App.Settings.Visualizers.HyperspaceTunnelParticleCount)
         End Sub
 
         Public Sub Start() Implements IVisualizer.Start
@@ -2003,24 +2003,24 @@ Public Class Player
             Dim streakMultiplier As Double
             Dim particleLimit As Integer
 
-            If VisualizerMiniMode AndAlso App.Visualizers.HyperspaceTunnelAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.HyperspaceTunnelAllowMiniMode Then
                 ' MiniMode defaults (clean, readable, stable)
-                swirlBase = App.Visualizers.HyperspaceTunnelSwirlSpeedBase * 0.6
-                swirlAudio = App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor * 0.5
-                speedBase = App.Visualizers.HyperspaceTunnelParticleSpeedBase * 0.7
-                speedAudio = App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor * 0.6
+                swirlBase = App.Settings.Visualizers.HyperspaceTunnelSwirlSpeedBase * 0.6
+                swirlAudio = App.Settings.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor * 0.5
+                speedBase = App.Settings.Visualizers.HyperspaceTunnelParticleSpeedBase * 0.7
+                speedAudio = App.Settings.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor * 0.6
                 lineThickness = 3.0F
                 streakMultiplier = 1.2
-                particleLimit = Math.Max(40, App.Visualizers.HyperspaceTunnelParticleCount \ 2)
+                particleLimit = Math.Max(40, App.Settings.Visualizers.HyperspaceTunnelParticleCount \ 2)
             Else
                 ' Full mode uses user settings
-                swirlBase = App.Visualizers.HyperspaceTunnelSwirlSpeedBase
-                swirlAudio = App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor
-                speedBase = App.Visualizers.HyperspaceTunnelParticleSpeedBase
-                speedAudio = App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor
+                swirlBase = App.Settings.Visualizers.HyperspaceTunnelSwirlSpeedBase
+                swirlAudio = App.Settings.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor
+                speedBase = App.Settings.Visualizers.HyperspaceTunnelParticleSpeedBase
+                speedAudio = App.Settings.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor
                 lineThickness = 2.0F
                 streakMultiplier = 2.0
-                particleLimit = App.Visualizers.HyperspaceTunnelParticleCount
+                particleLimit = App.Settings.Visualizers.HyperspaceTunnelParticleCount
             End If
 
             ' Clamp particle count in MiniMode
@@ -2205,20 +2205,20 @@ Public Class Player
             Dim perspectiveScale As Double
             Dim audioScale As Double
 
-            If VisualizerMiniMode AndAlso App.Visualizers.StarFieldAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.StarFieldAllowMiniMode Then
                 ' MiniMode defaults (clean, readable, stable)
-                speedBase = App.Visualizers.StarFieldBaseSpeed * 0.8
-                speedAudio = App.Visualizers.StarFieldAudioSpeedFactor * 0.7
-                maxStarSize = Math.Max(2, App.Visualizers.StarFieldMaxStarSize \ 2)
-                particleLimit = Math.Max(40, App.Visualizers.StarFieldStarCount \ 4)
+                speedBase = App.Settings.Visualizers.StarFieldBaseSpeed * 0.8
+                speedAudio = App.Settings.Visualizers.StarFieldAudioSpeedFactor * 0.7
+                maxStarSize = Math.Max(2, App.Settings.Visualizers.StarFieldMaxStarSize \ 2)
+                particleLimit = Math.Max(40, App.Settings.Visualizers.StarFieldStarCount \ 4)
                 perspectiveScale = 350.0
                 audioScale = 0.5
             Else
                 ' Full mode uses user settings
-                speedBase = App.Visualizers.StarFieldBaseSpeed
-                speedAudio = App.Visualizers.StarFieldAudioSpeedFactor
-                maxStarSize = App.Visualizers.StarFieldMaxStarSize
-                particleLimit = App.Visualizers.StarFieldStarCount
+                speedBase = App.Settings.Visualizers.StarFieldBaseSpeed
+                speedAudio = App.Settings.Visualizers.StarFieldAudioSpeedFactor
+                maxStarSize = App.Settings.Visualizers.StarFieldMaxStarSize
+                particleLimit = App.Settings.Visualizers.StarFieldStarCount
                 perspectiveScale = 500.0
                 audioScale = 1.0
             End If
@@ -2326,7 +2326,7 @@ Public Class Player
                 End If
 
                 ' Fade life
-                Life -= App.Visualizers.ParticleNebulaFadeRate
+                Life -= App.Settings.Visualizers.ParticleNebulaFadeRate
                 If Life < 0 Then Life = 0
             End Sub
 
@@ -2408,7 +2408,7 @@ Public Class Player
                 level = Math.Min(level * 10, 1.0) ' scale + clamp
             End If
 
-            If VisualizerMiniMode AndAlso App.Visualizers.ParticleNebulaAllowMiniMode Then
+            If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.ParticleNebulaAllowMiniMode Then
                 ' MiniMode defaults (calm, soft, readable)
                 Dim baseCount As Integer = (Width * Height) \ 9000
                 Dim audioBoost As Integer = CInt(level * 30)     ' RMS-based
@@ -2416,25 +2416,25 @@ Public Class Player
                 Dim aspect As Double = Width / Math.Max(1, Height)
                 Dim aspectFactor As Double = If(aspect > 1.3, 1.0, 0.8)
                 maxParticles = CInt(Math.Max(80, (baseCount * density * aspectFactor) + audioBoost))
-                bloomRadius = Math.Max(1, App.Visualizers.ParticleNebulaBloomRadius \ 2)
-                bloomIntensity = App.Visualizers.ParticleNebulaBloomIntensity * 0.5F
-                trailAlpha = App.Visualizers.ParticleNebulaTrailAlpha * 0.5F
+                bloomRadius = Math.Max(1, App.Settings.Visualizers.ParticleNebulaBloomRadius \ 2)
+                bloomIntensity = App.Settings.Visualizers.ParticleNebulaBloomIntensity * 0.5F
+                trailAlpha = App.Settings.Visualizers.ParticleNebulaTrailAlpha * 0.5F
                 trailFade = True
-                sizeScale = App.Visualizers.ParticleNebulaSizeScale * 0.5F
-                velocityScale = App.Visualizers.ParticleNebulaVelocityScale * 0.4F
-                swirlStrength = App.Visualizers.ParticleNebulaSwirlStrength * 0.5F
-                fadeRate = App.Visualizers.ParticleNebulaFadeRate * 0.7F
+                sizeScale = App.Settings.Visualizers.ParticleNebulaSizeScale * 0.5F
+                velocityScale = App.Settings.Visualizers.ParticleNebulaVelocityScale * 0.4F
+                swirlStrength = App.Settings.Visualizers.ParticleNebulaSwirlStrength * 0.5F
+                fadeRate = App.Settings.Visualizers.ParticleNebulaFadeRate * 0.7F
             Else
                 ' Full mode uses user settings
                 maxParticles = Integer.MaxValue
-                bloomRadius = App.Visualizers.ParticleNebulaBloomRadius
-                bloomIntensity = App.Visualizers.ParticleNebulaBloomIntensity
-                trailAlpha = App.Visualizers.ParticleNebulaTrailAlpha
-                trailFade = App.Visualizers.ParticleNebulaFadeTrails
-                sizeScale = App.Visualizers.ParticleNebulaSizeScale
-                velocityScale = App.Visualizers.ParticleNebulaVelocityScale
-                swirlStrength = App.Visualizers.ParticleNebulaSwirlStrength
-                fadeRate = App.Visualizers.ParticleNebulaFadeRate
+                bloomRadius = App.Settings.Visualizers.ParticleNebulaBloomRadius
+                bloomIntensity = App.Settings.Visualizers.ParticleNebulaBloomIntensity
+                trailAlpha = App.Settings.Visualizers.ParticleNebulaTrailAlpha
+                trailFade = App.Settings.Visualizers.ParticleNebulaFadeTrails
+                sizeScale = App.Settings.Visualizers.ParticleNebulaSizeScale
+                velocityScale = App.Settings.Visualizers.ParticleNebulaVelocityScale
+                swirlStrength = App.Settings.Visualizers.ParticleNebulaSwirlStrength
+                fadeRate = App.Settings.Visualizers.ParticleNebulaFadeRate
             End If
 
             ' Clamp particle count
@@ -2472,7 +2472,7 @@ Public Class Player
                 End Using
 
                 ' Bloom
-                If App.Visualizers.ParticleNebulaShowBloom Then
+                If App.Settings.Visualizers.ParticleNebulaShowBloom Then
                     For r As Integer = 1 To bloomRadius
                         Dim rawAlpha As Single = p.Life * 255 * bloomIntensity / r
                         Dim alphaBloom As Integer = Math.Min(255, Math.Max(0, CInt(rawAlpha)))
@@ -2488,7 +2488,7 @@ Public Class Player
                 End If
 
                 ' Trails
-                If App.Visualizers.ParticleNebulaShowTrails AndAlso p.Trail.Count > 1 Then
+                If App.Settings.Visualizers.ParticleNebulaShowTrails AndAlso p.Trail.Count > 1 Then
                     Dim trailPoints() As PointF = p.Trail.ToArray()
 
                     If trailFade Then
@@ -2524,8 +2524,8 @@ Public Class Player
                 Dim maxFreq As Double = sampleRate / 2.0
 
                 ' MiniMode reduces spawn probability
-                Dim spawnChance As Double = magnitude * App.Visualizers.ParticleNebulaSpawnMultiplier
-                If VisualizerMiniMode AndAlso App.Visualizers.ParticleNebulaAllowMiniMode Then
+                Dim spawnChance As Double = magnitude * App.Settings.Visualizers.ParticleNebulaSpawnMultiplier
+                If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.ParticleNebulaAllowMiniMode Then
                     spawnChance *= 0.4
                 End If
 
@@ -2536,7 +2536,7 @@ Public Class Player
                     Dim p As New Particle With {
                 .Position = New PointF(CSng(Width / 2), CSng(Height / 2)),
                 .Velocity = New PointF(CSng(Math.Cos(angle) * speed), CSng(Math.Sin(angle) * speed)),
-                .AngularVelocity = CSng(((rand.NextDouble() - 0.5) + App.Visualizers.ParticleNebulaSwirlBias) * swirlStrength),
+                .AngularVelocity = CSng(((rand.NextDouble() - 0.5) + App.Settings.Visualizers.ParticleNebulaSwirlBias) * swirlStrength),
                 .Size = CSng(1.5F + magnitude * sizeScale),
                 .Color = GetColorForFrequency(freq, maxFreq),
                 .Life = 1.0F
@@ -2547,18 +2547,18 @@ Public Class Player
             Next
         End Sub
         Private Function GetColorForFrequency(freq As Double, maxFreq As Double) As Color
-            If App.Visualizers.ParticleNebulaRainbowColors Then
+            If App.Settings.Visualizers.ParticleNebulaRainbowColors Then
                 ' Map frequency to hue (0–360)
                 Dim hue As Double = (freq / maxFreq) * 360.0
                 Return ColorFromHSV(hue, 1.0, 1.0)
             Else
                 ' Default cosmic gradient
                 If freq < 200 Then
-                    Return App.Visualizers.ParticleNebulaActivePalette.BassColor
+                    Return App.ParticleNebulaActivePalette.BassColor
                 ElseIf freq < 2000 Then
-                    Return App.Visualizers.ParticleNebulaActivePalette.MidColor
+                    Return App.ParticleNebulaActivePalette.MidColor
                 Else
-                    Return App.Visualizers.ParticleNebulaActivePalette.TrebleColor
+                    Return App.ParticleNebulaActivePalette.TrebleColor
                 End If
             End If
         End Function
@@ -2733,8 +2733,8 @@ Public Class Player
         'If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
         'If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
 #Else
-        If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
-        If App.SaveWindowMetrics AndAlso App.PlayerLocation.Y >= 0 Then Me.Location = App.PlayerLocation
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.PlayerSize.Height >= 0 Then Me.Size = App.Settings.PlayerSize
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.PlayerLocation.Y >= 0 Then Me.Location = App.Settings.PlayerLocation
 #End If
 
         ' Disable Mouse Wheel support for TrackBar
@@ -2743,9 +2743,9 @@ Public Class Player
     End Sub
     Private Sub Player_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         TopMost = False
-        If App.GetSimpleVersion() <> ChangeLogLastVersionShown Then
-            ChangeLogLastVersionShown = App.GetSimpleVersion()
-            SaveOptions()
+        If App.GetSimpleVersion() <> Settings.ChangeLogLastVersionShown Then
+            Settings.ChangeLogLastVersionShown = App.GetSimpleVersion()
+            App.Settings.Save()
             Me.BeginInvoke(Sub()
                                With New ChangeLog
                                    .TopMost = True
@@ -2857,16 +2857,16 @@ Public Class Player
     Private Sub Player_Move(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Move
         If Visible AndAlso Me.WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
-            App.PlayerLocation = Location
+            App.Settings.PlayerLocation = Location
         End If
     End Sub
     Private Sub Player_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         If Visible AndAlso WindowState = FormWindowState.Normal Then
-            App.PlayerSize = Size
+            App.Settings.PlayerSize = Size
         End If
         Select Case WindowState
             Case FormWindowState.Minimized
-                If App.ShowTrayIcon AndAlso App.MinimizeToTray Then
+                If App.Settings.ShowTrayIcon AndAlso App.Settings.MinimizeToTray Then
                     ShowInTaskbar = False
                 End If
             Case FormWindowState.Normal, FormWindowState.Maximized
@@ -2985,7 +2985,7 @@ Public Class Player
         Else
             Select Case e.KeyCode
                 Case Keys.Enter
-                    Select Case App.PlaylistDefaultAction
+                    Select Case App.Settings.PlaylistDefaultAction
                         Case App.PlaylistActions.Play
                             PlayFromPlaylist()
                         Case App.PlaylistActions.Queue
@@ -3018,11 +3018,11 @@ Public Class Player
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             PlaylistTitleSort = SortOrder.Descending
-                            LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title ↓"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             PlaylistTitleSort = SortOrder.Ascending
-                            LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title ↑"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title ▲"
                     End Select
                 Case LVPlaylist.Columns("Path").Index
                     PlaylistPathSort = ClearPlaylistSorts(PlaylistPathSort)
@@ -3030,11 +3030,11 @@ Public Class Player
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             PlaylistPathSort = SortOrder.Descending
-                            LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ↓"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             PlaylistPathSort = SortOrder.Ascending
-                            LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ↑"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ▲"
                     End Select
                 Case LVPlaylist.Columns("Rating").Index
                     PlaylistRatingSort = ClearPlaylistSorts(PlaylistRatingSort)
@@ -3042,11 +3042,11 @@ Public Class Player
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             PlaylistRatingSort = SortOrder.Descending
-                            LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating ↓"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             PlaylistRatingSort = SortOrder.Ascending
-                            LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating ↑"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating ▲"
                     End Select
                 Case LVPlaylist.Columns("PlayCount").Index
                     PlaylistPlayCountSort = ClearPlaylistSorts(PlaylistPlayCountSort)
@@ -3054,11 +3054,11 @@ Public Class Player
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemNumberComparer(e.Column, SortOrder.Descending)
                             PlaylistPlayCountSort = SortOrder.Descending
-                            LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays ↓"
+                            LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemNumberComparer(e.Column, SortOrder.Ascending)
                             PlaylistPlayCountSort = SortOrder.Ascending
-                            LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays ↑"
+                            LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays ▲"
                     End Select
                 Case LVPlaylist.Columns("LastPlayed").Index
                     PlaylistLastPlayedSort = ClearPlaylistSorts(PlaylistLastPlayedSort)
@@ -3066,11 +3066,11 @@ Public Class Player
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Descending)
                             PlaylistLastPlayedSort = SortOrder.Descending
-                            LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played ↓"
+                            LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
                             PlaylistLastPlayedSort = SortOrder.Ascending
-                            LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played ↑"
+                            LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played ▲"
                     End Select
                 Case LVPlaylist.Columns("FirstPlayed").Index
                     PlaylistFirstPlayedSort = ClearPlaylistSorts(PlaylistFirstPlayedSort)
@@ -3078,11 +3078,11 @@ Public Class Player
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Descending)
                             PlaylistFirstPlayedSort = SortOrder.Descending
-                            LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played ↓"
+                            LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
                             PlaylistFirstPlayedSort = SortOrder.Ascending
-                            LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played ↑"
+                            LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played ▲"
                     End Select
                 Case LVPlaylist.Columns("Added").Index
                     PlaylistAddedSort = ClearPlaylistSorts(PlaylistAddedSort)
@@ -3090,17 +3090,17 @@ Public Class Player
                         Case SortOrder.Ascending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Descending)
                             PlaylistAddedSort = SortOrder.Descending
-                            LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ↓"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVPlaylist.ListViewItemSorter = New App.ListViewItemDateComparer(e.Column, SortOrder.Ascending)
                             PlaylistAddedSort = SortOrder.Ascending
-                            LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ↑"
+                            LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ▲"
                     End Select
             End Select
         End If
     End Sub
     Private Sub LVPlaylist_DoubleClick(sender As Object, e As EventArgs) Handles LVPlaylist.DoubleClick
-        Select Case App.PlaylistDefaultAction
+        Select Case App.Settings.PlaylistDefaultAction
             Case App.PlaylistActions.Play
                 PlayFromPlaylist()
             Case App.PlaylistActions.Queue
@@ -3368,12 +3368,12 @@ Public Class Player
         End If
     End Sub
     Private Sub MIPlayMode_Click(sender As Object, e As EventArgs) Handles MIPlayMode.Click
-        Dim newIndex As Byte = CType(App.PlayMode + 1, Byte)
+        Dim newIndex As Byte = CType(App.Settings.PlayMode + 1, Byte)
         App.ShowToast(Nothing, "Shuffle Play Yet?")
         If newIndex = [Enum].GetNames(GetType(App.PlayModes)).Length Then
             newIndex = 0
         End If
-        App.PlayMode = CType(newIndex, App.PlayModes)
+        App.Settings.PlayMode = CType(newIndex, App.PlayModes)
         ShowPlayMode()
         SetTipPlayer()
     End Sub
@@ -3420,8 +3420,8 @@ Public Class Player
             Dim tiptext As String = App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)?.ToString
             If TipPlaylist IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(tiptext) Then TipPlaylist.ShowTooltipAt(New Point(CMPlaylist.Location.X, CMPlaylist.Location.Y - 37), tiptext)
         End If
-        CMIHelperApp1.Text = "Open with " + App.HelperApp1Name
-        CMIHelperApp2.Text = "Open with " + App.HelperApp2Name
+        CMIHelperApp1.Text = "Open with " + App.Settings.HelperApp1Name
+        CMIHelperApp2.Text = "Open with " + App.Settings.HelperApp2Name
         If LVPlaylist.Items.Count = 0 Then
             CMIClearPlaylist.Enabled = False
             CMIShowCurrent.Enabled = False
@@ -3466,12 +3466,12 @@ Public Class Player
             CMICopyTitle.Enabled = True
             CMICopyFileName.Enabled = True
             CMICopyFilePath.Enabled = True
-            If IO.File.Exists(App.HelperApp1Path) Then
+            If IO.File.Exists(App.Settings.HelperApp1Path) Then
                 CMIHelperApp1.Visible = True
             Else
                 CMIHelperApp1.Visible = False
             End If
-            If IO.File.Exists(App.HelperApp2Path) Then
+            If IO.File.Exists(App.Settings.HelperApp2Path) Then
                 CMIHelperApp2.Visible = True
             Else
                 CMIHelperApp2.Visible = False
@@ -3483,7 +3483,7 @@ Public Class Player
             CMIPlay.Enabled = True
             CMIQueue.Enabled = True
             CMIPlayWithWindows.Enabled = True
-            Select Case App.PlaylistDefaultAction
+            Select Case App.Settings.PlaylistDefaultAction
                 Case App.PlaylistActions.Play
                     CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Bold)
                     CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Regular)
@@ -3683,7 +3683,7 @@ Public Class Player
         ToggleMaximized()
     End Sub
     Private Sub LblPosition_MouseUp(sender As Object, e As MouseEventArgs) Handles LblPosition.MouseUp
-        PlayerPositionShowElapsed = Not PlayerPositionShowElapsed
+        App.Settings.PlayerPositionShowElapsed = Not App.Settings.PlayerPositionShowElapsed
         ShowPosition()
         SetTipPlayer()
     End Sub
@@ -3759,7 +3759,7 @@ Public Class Player
             LVPlaylist.SelectedIndices.Add(PlaylistSearchItems.Item(ListBoxPlaylistSearch.SelectedIndex).Index)
             ResetTxtBoxPlaylistSearch()
             LVPlaylist.Select()
-            Select Case App.PlaylistSearchAction
+            Select Case App.Settings.PlaylistSearchAction
                 Case App.PlaylistActions.Play
                     PlayFromPlaylist()
                 Case App.PlaylistActions.Queue
@@ -3882,7 +3882,7 @@ Public Class Player
         PEXLeft.Value = 0
         PEXRight.Value = 0
         ResetLblPositionText()
-        If Not App.PlayMode = App.PlayModes.None Then
+        If Not App.Settings.PlayMode = App.PlayModes.None Then
             AutoNext = True
             PlayNext()
         End If
@@ -4067,7 +4067,7 @@ Public Class Player
     Private Function FormatPosition(position As Double) As String
         Dim pos As TimeSpan = TimeSpan.FromSeconds(position)
         Dim posstr As String = ""
-        If Not My.App.PlayerPositionShowElapsed Then posstr = "-"
+        If Not App.Settings.PlayerPositionShowElapsed Then posstr = "-"
         If pos.Hours > 0 Then
             posstr &= pos.Hours.ToString
             posstr &= ":"
@@ -4114,7 +4114,7 @@ Public Class Player
         End If
     End Function
     Private Sub ShowNowPlayingToast(songtext As String)
-        If App.ShowNowPlayingToast Then
+        If App.Settings.ShowNowPlayingToast Then
             Dim npo As New Skye.UI.ToastOptions With {
                 .Title = "Now Playing",
                 .Message = songtext,
@@ -4124,7 +4124,7 @@ Public Class Player
                 .ForeColor = App.CurrentTheme.TextColor,
                 .TitleFont = New Font("Segoe UI", 12),
                 .MessageFont = New Font("Segoe UI", 12, FontStyle.Bold),
-                .Location = App.NowPlayingToastLocation,
+                .Location = App.Settings.NowPlayingToastLocation,
                 .Image = PicBoxAlbumArt.Image
             }
             Skye.UI.Toast.ShowToast(npo)
@@ -4153,7 +4153,7 @@ Public Class Player
             If paths.Count > 0 Then
                 App.FrmTagEditor = New TagEditor(paths.ToList)
                 Dim result = App.FrmTagEditor.ShowDialog(Me)
-                If result = DialogResult.OK AndAlso Not App.WatcherUpdatePlaylist Then
+                If result = DialogResult.OK AndAlso Not App.Settings.WatcherUpdatePlaylist Then
                     For Each path In paths
                         AddToPlaylistFromPath(path)
                     Next
@@ -4163,7 +4163,7 @@ Public Class Player
         End If
     End Sub
     Friend Sub ShowPlayMode()
-        Select Case App.PlayMode
+        Select Case App.Settings.PlayMode
             Case PlayModes.None
                 MIPlayMode.Text = "Play Once"
             Case PlayModes.Repeat
@@ -4175,7 +4175,7 @@ Public Class Player
         End Select
     End Sub
     Friend Sub SetTipPlayer()
-        Select Case App.PlayMode
+        Select Case App.Settings.PlayMode
             Case App.PlayModes.None, PlayModes.Repeat
                 TipPlayer.SetToolTip(BtnPrevious, String.Empty)
                 TipPlayer.SetToolTip(BtnNext, String.Empty)
@@ -4186,7 +4186,7 @@ Public Class Player
                 TipPlayer.SetToolTip(BtnPrevious, "Previous Song Played")
                 TipPlayer.SetToolTip(BtnNext, "Next Random Song")
         End Select
-        Select Case App.PlayerPositionShowElapsed
+        Select Case App.Settings.PlayerPositionShowElapsed
             Case True
                 TipPlayer.SetToolTip(LblPosition, "Elapsed Time")
             Case False
@@ -4194,15 +4194,15 @@ Public Class Player
         End Select
     End Sub
     Private Sub ShowStatusMessage(msg As String)
-        If App.PlaylistStatusMessageDisplayTime > 0 Then
+        If App.Settings.PlaylistStatusMessageDisplayTime > 0 Then
             LblPlaylistCount.Text = StrConv(msg, VbStrConv.ProperCase)
-            TimerStatus.Interval = App.PlaylistStatusMessageDisplayTime * 1000
+            TimerStatus.Interval = App.Settings.PlaylistStatusMessageDisplayTime * 1000
             TimerStatus.Start()
         End If
     End Sub
     Private Sub ResetLblPositionText()
         If _player.HasMedia Then
-            If App.PlayerPositionShowElapsed Then
+            If App.Settings.PlayerPositionShowElapsed Then
                 LblPosition.Text = "00:00"
             Else
                 LblPosition.Text = "-" + FormatDuration(_player.Duration)
@@ -4230,7 +4230,7 @@ Public Class Player
         End Select
     End Sub
     Friend Sub Suspend() 'Called when the user locks the screen or activates the screen saver
-        If App.SuspendOnSessionChange Then
+        If App.Settings.SuspendOnSessionChange Then
             Debug.Print("Suspending...")
             StopPlay()
             Me.WindowState = FormWindowState.Minimized
@@ -4372,7 +4372,7 @@ Public Class Player
                 Else 'Update existing Playlist entry
                     If String.IsNullOrWhiteSpace(item.Title) Then
                         lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = IO.Path.GetFileNameWithoutExtension(path)
-                        If App.VideoExtensionDictionary.ContainsKey(IO.Path.GetExtension(path)) Then lvi.SubItems(LVPlaylist.Columns("Title").Index).Text += App.PlaylistVideoIdentifier
+                        If App.VideoExtensionDictionary.ContainsKey(IO.Path.GetExtension(path)) Then lvi.SubItems(LVPlaylist.Columns("Title").Index).Text += App.Settings.PlaylistVideoIdentifier
                     Else
                         lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = item.Title
                     End If
@@ -4625,7 +4625,7 @@ Public Class Player
             Else
                 LVPlaylist.Enabled = False
                 For Each item As ListViewItem In LVPlaylist.SelectedItems
-                    If App.PlayMode = App.PlayModes.Random Then
+                    If App.Settings.PlayMode = App.PlayModes.Random Then
                         RandomHistory.Remove(item.SubItems(LVPlaylist.Columns("Path").Index).Text)
                     End If
                     item.Remove()
@@ -4674,7 +4674,7 @@ Public Class Player
         End If
     End Sub
     Private Sub RandomHistoryAdd(songorstream As String)
-        If App.PlayMode = App.PlayModes.Random AndAlso LVPlaylist.FindItemWithText(songorstream, True, 0) IsNot Nothing Then
+        If App.Settings.PlayMode = App.PlayModes.Random AndAlso LVPlaylist.FindItemWithText(songorstream, True, 0) IsNot Nothing Then
             If RandomHistory.FindIndex(Function(p) p = songorstream) < 0 Then
                 App.UpdateRandomHistory(songorstream)
             Else
@@ -4685,7 +4685,7 @@ Public Class Player
         End If
     End Sub
     Friend Sub AddToRandomHistory(songorstream As String)
-        If App.PlayMode = App.PlayModes.Random Then
+        If App.Settings.PlayMode = App.PlayModes.Random Then
             RandomHistory.Add(songorstream)
             RandomHistoryIndex = RandomHistory.Count
             'Debug.Print("Added " + songorstream + " to Random History")
@@ -4973,7 +4973,7 @@ Public Class Player
         'Stream = False
         StopPlay()
         LyricsOff()
-        Select Case App.PlayMode
+        Select Case App.Settings.PlayMode
             Case PlayModes.Repeat
                 TimerShowMedia.Start()
             Case PlayModes.Linear
@@ -5039,7 +5039,7 @@ Public Class Player
         'Stream = False
         StopPlay()
         LyricsOff()
-        Select Case App.PlayMode
+        Select Case App.Settings.PlayMode
             Case PlayModes.Repeat
                 TogglePlay()
                 TimerShowMedia.Start()
@@ -5201,7 +5201,7 @@ Public Class Player
         App.SongPlayData = New App.PlayData
         TotalPausedDuration = TimeSpan.Zero
         If AutoNext Then
-            Select Case App.PlayMode
+            Select Case App.Settings.PlayMode
                 Case App.PlayModes.Repeat
                     App.SongPlayData.PlayTrigger = App.PlayTriggers.Repeat
                 Case App.PlayModes.Linear
@@ -5225,7 +5225,7 @@ Public Class Player
     End Sub
     Private Sub ShowPosition()
         Try
-            If My.App.PlayerPositionShowElapsed Then
+            If App.Settings.PlayerPositionShowElapsed Then
                 LblPosition.Text = FormatPosition(_player.Position)
             Else
                 If CurrentMediaType = App.MediaSourceTypes.Stream Then
@@ -5384,7 +5384,7 @@ Public Class Player
                     PicBoxAlbumArt.Visible = False
                     PicBoxAlbumArt.Image = Nothing
                     RTBLyrics.Visible = False
-                    VisualizerHost.Activate(App.Visualizer)
+                    VisualizerHost.Activate(App.Settings.Visualizer)
                     VisualizerEngine?.Start()
                     PanelVisualizer.Visible = True
                     PanelVisualizer.BringToFront()

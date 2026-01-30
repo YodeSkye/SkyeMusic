@@ -30,7 +30,7 @@ Public Class About
         LLblSponsorPayPal.Image = App.ResizeImage(My.Resources.ImageAttributionPayPal, 32)
         BtnOK.Select()
         App.CheckForUpdatesIfNeeded()
-        ShowUpdateLabelIfNeeded(App.LatestKnownVersion)
+        ShowUpdateLabelIfNeeded(App.Settings.LatestKnownVersion)
     End Sub
     Private Sub About_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblAbout.MouseDown, LblVersion.MouseDown
         Dim cSender As Control

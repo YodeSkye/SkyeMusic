@@ -159,8 +159,8 @@ Public Class Library
         'If App.SaveWindowMetrics AndAlso App.LibrarySize.Height >= 0 Then Me.Size = App.LibrarySize
         'If App.SaveWindowMetrics AndAlso App.LibraryLocation.Y >= 0 Then Me.Location = App.LibraryLocation
 #Else
-        If App.SaveWindowMetrics AndAlso App.LibrarySize.Height >= 0 Then Me.Size = App.LibrarySize
-        If App.SaveWindowMetrics AndAlso App.LibraryLocation.Y >= 0 Then Me.Location = App.LibraryLocation
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.LibrarySize.Height >= 0 Then Me.Size = App.Settings.LibrarySize
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.LibraryLocation.Y >= 0 Then Me.Location = App.Settings.LibraryLocation
 #End If
 
     End Sub
@@ -190,7 +190,7 @@ Public Class Library
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
-            LibraryLocation = Location
+            Settings.LibraryLocation = Location
         End If
     End Sub
     Private Sub Library_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LblLibraryCounts.MouseUp, LblExtTitle.MouseUp, LblExtFileInfo.MouseUp, LblExtProperties.MouseUp, LblExtType.MouseUp, GrpBoxGroupBy.MouseUp
@@ -199,12 +199,12 @@ Public Class Library
     Private Sub Library_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
-            App.LibraryLocation = Location
+            App.Settings.LibraryLocation = Location
         End If
     End Sub
     Private Sub Library_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         If Visible AndAlso WindowState = FormWindowState.Normal Then
-            App.LibrarySize = Me.Size
+            App.Settings.LibrarySize = Me.Size
         End If
     End Sub
     Private Sub Library_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
@@ -401,7 +401,7 @@ Public Class Library
         End If
     End Sub
     Private Sub LVLibrary_DoubleClick(sender As Object, e As EventArgs) Handles LVLibrary.DoubleClick
-        Select Case App.PlaylistDefaultAction
+        Select Case App.Settings.PlaylistDefaultAction
             Case App.PlaylistActions.Play
                 Play()
             Case App.PlaylistActions.Queue
@@ -409,8 +409,8 @@ Public Class Library
         End Select
     End Sub
     Private Sub CMLibraryOpening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMLibrary.Opening
-        CMIHelperApp1.Text = "Open with " + App.HelperApp1Name
-        CMIHelperApp2.Text = "Open with " + App.HelperApp2Name
+        CMIHelperApp1.Text = "Open with " + App.Settings.HelperApp1Name
+        CMIHelperApp2.Text = "Open with " + App.Settings.HelperApp2Name
         If LVLibrary.Groups.Count = 0 Then
             CMIAddGroupToPlaylist.Visible = False
             CMICollapseGroup.Visible = False
@@ -466,7 +466,7 @@ Public Class Library
             CMICopyTitle.Enabled = True
             CMICopyFileName.Enabled = True
             CMICopyFilePath.Enabled = True
-            Select Case App.PlaylistDefaultAction
+            Select Case App.Settings.PlaylistDefaultAction
                 Case App.PlaylistActions.Play
                     CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Bold)
                     CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Regular)
@@ -474,12 +474,12 @@ Public Class Library
                     CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Regular)
                     CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Bold)
             End Select
-            If File.Exists(App.HelperApp1Path) Then
+            If File.Exists(App.Settings.HelperApp1Path) Then
                 CMIHelperApp1.Visible = True
             Else
                 CMIHelperApp1.Visible = False
             End If
-            If File.Exists(App.HelperApp2Path) Then
+            If File.Exists(App.Settings.HelperApp2Path) Then
                 CMIHelperApp2.Visible = True
             Else
                 CMIHelperApp2.Visible = False
@@ -894,20 +894,20 @@ Public Class Library
                 LblStatus.Refresh()
 
                 'if exists in library or playlist, remove
-                If WatcherUpdateLibrary Then
+                If Settings.WatcherUpdateLibrary Then
                     Dim lvi As ListViewItem = LVLibrary.FindItemWithText(path, True, 0)
                     If lvi IsNot Nothing Then
                         existinglibraryindex = lvi.Index
                         LVLibrary.Items.Remove(lvi)
                     End If
                 End If
-                If WatcherUpdatePlaylist Then RemoveFromPlaylist(path)
+                If Settings.WatcherUpdatePlaylist Then RemoveFromPlaylist(path)
 
                 'If file exists, add to library & playlist
-                If WatcherUpdateLibrary Or WatcherUpdatePlaylist Then
+                If Settings.WatcherUpdateLibrary Or Settings.WatcherUpdatePlaylist Then
                     If File.Exists(path) Then
                         Dim lvi As ListViewItem = CreateLibraryItem(path)
-                        If WatcherUpdateLibrary Then
+                        If Settings.WatcherUpdateLibrary Then
                             App.AddToHistoryFromLibrary(path)
                             If existinglibraryindex > -1 Then
                                 LVLibrary.Items.Insert(existinglibraryindex, lvi)
@@ -915,7 +915,7 @@ Public Class Library
                                 LVLibrary.Items.Add(lvi)
                             End If
                         End If
-                        If WatcherUpdatePlaylist Then
+                        If Settings.WatcherUpdatePlaylist Then
                             App.AddToHistoryFromPlaylist(path)
                             AddToPlaylist(lvi)
                         End If
@@ -934,7 +934,7 @@ Public Class Library
 
         LblStatus.Visible = False
         SetLibraryCountText()
-        If WatcherUpdateLibrary Or WatcherUpdatePlaylist Then
+        If Settings.WatcherUpdateLibrary Or Settings.WatcherUpdatePlaylist Then
             If paths.Count > 0 Then Player.WatcherNotification = "Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs")
             App.WriteToLog("Library Watcher Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs"))
         Else
@@ -1019,7 +1019,7 @@ Public Class Library
         Return item
     End Function
     Private Sub SearchFolders()
-        If App.LibrarySearchFolders.Count > 0 Then
+        If Settings.LibrarySearchFolders.Count > 0 Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim files As New Collections.Generic.List(Of String)
             Dim col As New Collections.Generic.List(Of ListViewItem)
@@ -1030,9 +1030,9 @@ Public Class Library
             ClearHistoryInLibraryFlag()
             LVLibrary.BeginUpdate()
             LVLibrary.Items.Clear()
-            For Each folder As String In App.LibrarySearchFolders
+            For Each folder As String In Settings.LibrarySearchFolders
                 Try
-                    If App.LibrarySearchSubFolders Then
+                    If Settings.LibrarySearchSubFolders Then
                         files.AddRange(IO.Directory.GetFiles(folder, "*", IO.SearchOption.AllDirectories))
                     Else
                         files.AddRange(IO.Directory.GetFiles(folder, "*", IO.SearchOption.TopDirectoryOnly))

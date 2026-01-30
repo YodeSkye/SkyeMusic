@@ -14,109 +14,109 @@ Public Class OptionsOscilloscope
 
     ' Control Events
     Private Sub ChkBoxGlow_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxGlow.CheckedChanged
-        App.Visualizers.OscilloscopeEnableGlow = ChkBoxGlow.Checked
+        App.Settings.Visualizers.OscilloscopeEnableGlow = ChkBoxGlow.Checked
     End Sub
     Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
-        App.Visualizers.OscilloscopeAllowMiniMode = ChkBoxAllowMiniMode.Checked
+        App.Settings.Visualizers.OscilloscopeAllowMiniMode = ChkBoxAllowMiniMode.Checked
     End Sub
     Private Sub CoBoxBandMappingMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxChannelMode.SelectedIndexChanged
-        App.Visualizers.OscilloscopeChannelMode = CType(CoBoxChannelMode.SelectedIndex, App.VisualizerSettings.OscilloscopeChannelModes)
+        App.Settings.Visualizers.OscilloscopeChannelMode = CType(CoBoxChannelMode.SelectedIndex, App.OscilloscopeChannelModes)
     End Sub
     Private Sub TBGain_ValueChanged(sender As Object, e As EventArgs) Handles TBGain.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.OscilloscopeGain = CSng(TBGain.Value / 10)
+        App.Settings.Visualizers.OscilloscopeGain = CSng(TBGain.Value / 10)
     End Sub
     Private Sub TBSmoothing_ValueChanged(sender As Object, e As EventArgs) Handles TBSmoothing.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.OscilloscopeSmoothing = CSng(TBSmoothing.Value / 100)
+        App.Settings.Visualizers.OscilloscopeSmoothing = CSng(TBSmoothing.Value / 100)
     End Sub
     Private Sub TBLineWidth_ValueChanged(sender As Object, e As EventArgs) Handles TBLineWidth.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.OscilloscopeLineWidth = CSng(TBLineWidth.Value / 10)
+        App.Settings.Visualizers.OscilloscopeLineWidth = CSng(TBLineWidth.Value / 10)
     End Sub
     Private Sub TBFadeAlpha_ValueChanged(sender As Object, e As EventArgs) Handles TBFadeAlpha.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.OscilloscopeFadeAlpha = TBFadeAlpha.Value
+        App.Settings.Visualizers.OscilloscopeFadeAlpha = TBFadeAlpha.Value
     End Sub
     Private Sub BtnClean_Click(sender As Object, e As EventArgs) Handles BtnClean.Click
-        App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.Mono
-        App.Visualizers.OscilloscopeGain = 1.0F
-        App.Visualizers.OscilloscopeSmoothing = 0.1F
-        App.Visualizers.OscilloscopeLineWidth = 1.0F
-        App.Visualizers.OscilloscopeEnableGlow = False
-        App.Visualizers.OscilloscopeFadeAlpha = 48
+        App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.Mono
+        App.Settings.Visualizers.OscilloscopeGain = 1.0F
+        App.Settings.Visualizers.OscilloscopeSmoothing = 0.1F
+        App.Settings.Visualizers.OscilloscopeLineWidth = 1.0F
+        App.Settings.Visualizers.OscilloscopeEnableGlow = False
+        App.Settings.Visualizers.OscilloscopeFadeAlpha = 48
         ShowSettings()
     End Sub
     Private Sub BtnSoftGlow_Click(sender As Object, e As EventArgs) Handles BtnSoftGlow.Click
-        App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoLeft
-        App.Visualizers.OscilloscopeGain = 1.2F
-        App.Visualizers.OscilloscopeSmoothing = 0.3F
-        App.Visualizers.OscilloscopeLineWidth = 1.5F
-        App.Visualizers.OscilloscopeEnableGlow = True
-        App.Visualizers.OscilloscopeFadeAlpha = 96
+        App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.StereoLeft
+        App.Settings.Visualizers.OscilloscopeGain = 1.2F
+        App.Settings.Visualizers.OscilloscopeSmoothing = 0.3F
+        App.Settings.Visualizers.OscilloscopeLineWidth = 1.5F
+        App.Settings.Visualizers.OscilloscopeEnableGlow = True
+        App.Settings.Visualizers.OscilloscopeFadeAlpha = 96
         ShowSettings()
     End Sub
     Private Sub BtnDreamy_Click(sender As Object, e As EventArgs) Handles BtnDreamy.Click
-        App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth
-        App.Visualizers.OscilloscopeGain = 1.5F
-        App.Visualizers.OscilloscopeSmoothing = 0.6F
-        App.Visualizers.OscilloscopeLineWidth = 2.0F
-        App.Visualizers.OscilloscopeEnableGlow = True
-        App.Visualizers.OscilloscopeFadeAlpha = 32
+        App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.StereoBoth
+        App.Settings.Visualizers.OscilloscopeGain = 1.5F
+        App.Settings.Visualizers.OscilloscopeSmoothing = 0.6F
+        App.Settings.Visualizers.OscilloscopeLineWidth = 2.0F
+        App.Settings.Visualizers.OscilloscopeEnableGlow = True
+        App.Settings.Visualizers.OscilloscopeFadeAlpha = 32
         ShowSettings()
     End Sub
     Private Sub BtnPunchy_Click(sender As Object, e As EventArgs) Handles BtnPunchy.Click
-        App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.Mono
-        App.Visualizers.OscilloscopeGain = 2.0F
-        App.Visualizers.OscilloscopeSmoothing = 0.2F
-        App.Visualizers.OscilloscopeLineWidth = 2.5F
-        App.Visualizers.OscilloscopeEnableGlow = False
-        App.Visualizers.OscilloscopeFadeAlpha = 48
+        App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.Mono
+        App.Settings.Visualizers.OscilloscopeGain = 2.0F
+        App.Settings.Visualizers.OscilloscopeSmoothing = 0.2F
+        App.Settings.Visualizers.OscilloscopeLineWidth = 2.5F
+        App.Settings.Visualizers.OscilloscopeEnableGlow = False
+        App.Settings.Visualizers.OscilloscopeFadeAlpha = 48
         ShowSettings()
     End Sub
     Private Sub BtnLiquid_Click(sender As Object, e As EventArgs) Handles BtnLiquid.Click
-        App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoRight
-        App.Visualizers.OscilloscopeGain = 1.0F
-        App.Visualizers.OscilloscopeSmoothing = 0.9F
-        App.Visualizers.OscilloscopeLineWidth = 1.2F
-        App.Visualizers.OscilloscopeEnableGlow = True
-        App.Visualizers.OscilloscopeFadeAlpha = 64
+        App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.StereoRight
+        App.Settings.Visualizers.OscilloscopeGain = 1.0F
+        App.Settings.Visualizers.OscilloscopeSmoothing = 0.9F
+        App.Settings.Visualizers.OscilloscopeLineWidth = 1.2F
+        App.Settings.Visualizers.OscilloscopeEnableGlow = True
+        App.Settings.Visualizers.OscilloscopeFadeAlpha = 64
         ShowSettings()
     End Sub
     Private Sub BtnNeonPulse_Click(sender As Object, e As EventArgs) Handles BtnNeonPulse.Click
-        App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth
-        App.Visualizers.OscilloscopeGain = 1.8F
-        App.Visualizers.OscilloscopeSmoothing = 0.4F
-        App.Visualizers.OscilloscopeLineWidth = 2.0F
-        App.Visualizers.OscilloscopeEnableGlow = True
-        App.Visualizers.OscilloscopeFadeAlpha = 48
+        App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.StereoBoth
+        App.Settings.Visualizers.OscilloscopeGain = 1.8F
+        App.Settings.Visualizers.OscilloscopeSmoothing = 0.4F
+        App.Settings.Visualizers.OscilloscopeLineWidth = 2.0F
+        App.Settings.Visualizers.OscilloscopeEnableGlow = True
+        App.Settings.Visualizers.OscilloscopeFadeAlpha = 48
         ShowSettings()
     End Sub
     Private Sub BtnMinimal_Click(sender As Object, e As EventArgs) Handles BtnMinimal.Click
-        App.Visualizers.OscilloscopeChannelMode = App.VisualizerSettings.OscilloscopeChannelModes.Mono
-        App.Visualizers.OscilloscopeGain = 0.8F
-        App.Visualizers.OscilloscopeSmoothing = 0.2F
-        App.Visualizers.OscilloscopeLineWidth = 0.8F
-        App.Visualizers.OscilloscopeEnableGlow = False
-        App.Visualizers.OscilloscopeFadeAlpha = 48
+        App.Settings.Visualizers.OscilloscopeChannelMode = App.OscilloscopeChannelModes.Mono
+        App.Settings.Visualizers.OscilloscopeGain = 0.8F
+        App.Settings.Visualizers.OscilloscopeSmoothing = 0.2F
+        App.Settings.Visualizers.OscilloscopeLineWidth = 0.8F
+        App.Settings.Visualizers.OscilloscopeEnableGlow = False
+        App.Settings.Visualizers.OscilloscopeFadeAlpha = 48
         ShowSettings()
     End Sub
 
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
-        ChkBoxGlow.Checked = App.Visualizers.OscilloscopeEnableGlow
-        ChkBoxAllowMiniMode.Checked = App.Visualizers.OscilloscopeAllowMiniMode
+        ChkBoxGlow.Checked = App.Settings.Visualizers.OscilloscopeEnableGlow
+        ChkBoxAllowMiniMode.Checked = App.Settings.Visualizers.OscilloscopeAllowMiniMode
         CoBoxChannelMode.Items.Clear()
-        CoBoxChannelMode.Items.Add(App.VisualizerSettings.OscilloscopeChannelModes.Mono)
-        CoBoxChannelMode.Items.Add(App.VisualizerSettings.OscilloscopeChannelModes.StereoLeft)
-        CoBoxChannelMode.Items.Add(App.VisualizerSettings.OscilloscopeChannelModes.StereoRight)
-        CoBoxChannelMode.Items.Add(App.VisualizerSettings.OscilloscopeChannelModes.StereoBoth)
-        CoBoxChannelMode.SelectedItem = App.Visualizers.OscilloscopeChannelMode
-        TBGain.Value = CInt(App.Visualizers.OscilloscopeGain * 10)
-        TBSmoothing.Value = CInt(App.Visualizers.OscilloscopeSmoothing * 100)
-        TBLineWidth.Value = CInt(App.Visualizers.OscilloscopeLineWidth * 10)
-        TBFadeAlpha.Value = App.Visualizers.OscilloscopeFadeAlpha
+        CoBoxChannelMode.Items.Add(App.OscilloscopeChannelModes.Mono)
+        CoBoxChannelMode.Items.Add(App.OscilloscopeChannelModes.StereoLeft)
+        CoBoxChannelMode.Items.Add(App.OscilloscopeChannelModes.StereoRight)
+        CoBoxChannelMode.Items.Add(App.OscilloscopeChannelModes.StereoBoth)
+        CoBoxChannelMode.SelectedItem = App.Settings.Visualizers.OscilloscopeChannelMode
+        TBGain.Value = CInt(App.Settings.Visualizers.OscilloscopeGain * 10)
+        TBSmoothing.Value = CInt(App.Settings.Visualizers.OscilloscopeSmoothing * 100)
+        TBLineWidth.Value = CInt(App.Settings.Visualizers.OscilloscopeLineWidth * 10)
+        TBFadeAlpha.Value = App.Settings.Visualizers.OscilloscopeFadeAlpha
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor

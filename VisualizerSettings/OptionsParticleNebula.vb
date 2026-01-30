@@ -16,75 +16,75 @@ Public Class OptionsParticleNebula
 
     ' Control Events
     Private Sub CoBoxActivePalettePreset_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxActivePalettePreset.SelectedIndexChanged
-        App.Visualizers.ParticleNebulaActivePalettePreset = CType(CoBoxActivePalettePreset.SelectedIndex, App.VisualizerSettings.ParticleNebulaPalettePresets)
-        App.Visualizers.ParticleNebulaActivePalette = App.Visualizers.ParticleNebulaGetPalette(App.Visualizers.ParticleNebulaActivePalettePreset)
+        App.Settings.Visualizers.ParticleNebulaActivePalettePreset = CType(CoBoxActivePalettePreset.SelectedIndex, App.ParticleNebulaPalettePresets)
+        App.ParticleNebulaActivePalette = App.ParticleNebulaGetPalette(App.Settings.Visualizers.ParticleNebulaActivePalettePreset)
     End Sub
     Private Sub ChkBoxFadeTrails_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxFadeTrails.CheckedChanged
-        App.Visualizers.ParticleNebulaFadeTrails = ChkBoxFadeTrails.Checked
+        App.Settings.Visualizers.ParticleNebulaFadeTrails = ChkBoxFadeTrails.Checked
     End Sub
     Private Sub ChkBoxRainbowColors_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxRainbowColors.CheckedChanged
-        App.Visualizers.ParticleNebulaRainbowColors = ChkBoxRainbowColors.Checked
+        App.Settings.Visualizers.ParticleNebulaRainbowColors = ChkBoxRainbowColors.Checked
     End Sub
     Private Sub ChkBoxShowBloom_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxShowBloom.CheckedChanged
-        App.Visualizers.ParticleNebulaShowBloom = ChkBoxShowBloom.Checked
+        App.Settings.Visualizers.ParticleNebulaShowBloom = ChkBoxShowBloom.Checked
     End Sub
     Private Sub ChkBoxShowTrails_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxShowTrails.CheckedChanged
-        App.Visualizers.ParticleNebulaShowTrails = ChkBoxShowTrails.Checked
+        App.Settings.Visualizers.ParticleNebulaShowTrails = ChkBoxShowTrails.Checked
     End Sub
     Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
-        App.Visualizers.ParticleNebulaAllowMiniMode = ChkBoxAllowMiniMode.Checked
+        App.Settings.Visualizers.ParticleNebulaAllowMiniMode = ChkBoxAllowMiniMode.Checked
     End Sub
     Private Sub TBBloomIntensity_ValueChanged(sender As Object, e As EventArgs) Handles TBBloomIntensity.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.ParticleNebulaBloomIntensity = CSng(TBBloomIntensity.Value / 10)
+        App.Settings.Visualizers.ParticleNebulaBloomIntensity = CSng(TBBloomIntensity.Value / 10)
     End Sub
     Private Sub TBBloomRadius_ValueChanged(sender As Object, e As EventArgs) Handles TBBloomRadius.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.ParticleNebulaBloomRadius = TBBloomRadius.Value
+        App.Settings.Visualizers.ParticleNebulaBloomRadius = TBBloomRadius.Value
     End Sub
     Private Sub TBFadeRate_ValueChanged(sender As Object, e As EventArgs) Handles TBFadeRate.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.ParticleNebulaFadeRate = CSng(TBFadeRate.Value / 10000)
+        App.Settings.Visualizers.ParticleNebulaFadeRate = CSng(TBFadeRate.Value / 10000)
     End Sub
     Private Sub TBSizeScale_ValueChanged(sender As Object, e As EventArgs) Handles TBSizeScale.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.ParticleNebulaSizeScale = TBSizeScale.Value
+        App.Settings.Visualizers.ParticleNebulaSizeScale = TBSizeScale.Value
     End Sub
     Private Sub TBSpawnMultiplier_ValueChanged(sender As Object, e As EventArgs) Handles TBSpawnMultiplier.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.ParticleNebulaSpawnMultiplier = CSng(TBSpawnMultiplier.Value / 10)
+        App.Settings.Visualizers.ParticleNebulaSpawnMultiplier = CSng(TBSpawnMultiplier.Value / 10)
     End Sub
     Private Sub TBSwirlBias_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlBias.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.ParticleNebulaSwirlBias = CSng((TBSwirlBias.Value / 100) - 1)
+        App.Settings.Visualizers.ParticleNebulaSwirlBias = CSng((TBSwirlBias.Value / 100) - 1)
     End Sub
     Private Sub TBSwirlStrength_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlStrength.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.ParticleNebulaSwirlStrength = CSng(TBSwirlStrength.Value / 100)
+        App.Settings.Visualizers.ParticleNebulaSwirlStrength = CSng(TBSwirlStrength.Value / 100)
     End Sub
     Private Sub TBTrailAlpha_ValueChanged(sender As Object, e As EventArgs) Handles TBTrailAlpha.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.ParticleNebulaTrailAlpha = CSng(TBTrailAlpha.Value / 100)
+        App.Settings.Visualizers.ParticleNebulaTrailAlpha = CSng(TBTrailAlpha.Value / 100)
     End Sub
     Private Sub TBVelocityScale_ValueChanged(sender As Object, e As EventArgs) Handles TBVelocityScale.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.ParticleNebulaVelocityScale = TBVelocityScale.Value
+        App.Settings.Visualizers.ParticleNebulaVelocityScale = TBVelocityScale.Value
     End Sub
     Private Sub BtnDefaults_Click(sender As Object, e As EventArgs) Handles BtnDefaults.Click
-        App.Visualizers.ParticleNebulaActivePalettePreset = App.VisualizerSettings.ParticleNebulaPalettePresets.Cosmic
-        App.Visualizers.ParticleNebulaBloomIntensity = 0.5F
-        App.Visualizers.ParticleNebulaBloomRadius = 2
-        App.Visualizers.ParticleNebulaFadeRate = 0.005F
-        App.Visualizers.ParticleNebulaFadeTrails = False
-        App.Visualizers.ParticleNebulaRainbowColors = False
-        App.Visualizers.ParticleNebulaShowBloom = False
-        App.Visualizers.ParticleNebulaShowTrails = False
-        App.Visualizers.ParticleNebulaSizeScale = 20
-        App.Visualizers.ParticleNebulaSpawnMultiplier = 2.0F
-        App.Visualizers.ParticleNebulaSwirlBias = 0.0F
-        App.Visualizers.ParticleNebulaSwirlStrength = 0.15F
-        App.Visualizers.ParticleNebulaTrailAlpha = 0.5F
-        App.Visualizers.ParticleNebulaVelocityScale = 50
+        App.Settings.Visualizers.ParticleNebulaActivePalettePreset = App.ParticleNebulaPalettePresets.Cosmic
+        App.Settings.Visualizers.ParticleNebulaBloomIntensity = 0.5F
+        App.Settings.Visualizers.ParticleNebulaBloomRadius = 2
+        App.Settings.Visualizers.ParticleNebulaFadeRate = 0.005F
+        App.Settings.Visualizers.ParticleNebulaFadeTrails = False
+        App.Settings.Visualizers.ParticleNebulaRainbowColors = False
+        App.Settings.Visualizers.ParticleNebulaShowBloom = False
+        App.Settings.Visualizers.ParticleNebulaShowTrails = False
+        App.Settings.Visualizers.ParticleNebulaSizeScale = 20
+        App.Settings.Visualizers.ParticleNebulaSpawnMultiplier = 2.0F
+        App.Settings.Visualizers.ParticleNebulaSwirlBias = 0.0F
+        App.Settings.Visualizers.ParticleNebulaSwirlStrength = 0.15F
+        App.Settings.Visualizers.ParticleNebulaTrailAlpha = 0.5F
+        App.Settings.Visualizers.ParticleNebulaVelocityScale = 50
         ShowSettings()
     End Sub
 
@@ -92,26 +92,26 @@ Public Class OptionsParticleNebula
     Private Sub ShowSettings()
         IsInitializing = True
         CoBoxActivePalettePreset.Items.Clear()
-        CoBoxActivePalettePreset.Items.Add(App.VisualizerSettings.ParticleNebulaPalettePresets.Cosmic)
-        CoBoxActivePalettePreset.Items.Add(App.VisualizerSettings.ParticleNebulaPalettePresets.Firestorm)
-        CoBoxActivePalettePreset.Items.Add(App.VisualizerSettings.ParticleNebulaPalettePresets.Oceanic)
-        CoBoxActivePalettePreset.Items.Add(App.VisualizerSettings.ParticleNebulaPalettePresets.Aurora)
-        CoBoxActivePalettePreset.Items.Add(App.VisualizerSettings.ParticleNebulaPalettePresets.MonochromeGlow)
-        CoBoxActivePalettePreset.SelectedItem = App.Visualizers.ParticleNebulaActivePalettePreset
-        TBBloomIntensity.Value = CInt(App.Visualizers.ParticleNebulaBloomIntensity * 10)
-        TBBloomRadius.Value = App.Visualizers.ParticleNebulaBloomRadius
-        TBFadeRate.Value = CInt(App.Visualizers.ParticleNebulaFadeRate * 10000)
-        ChkBoxFadeTrails.Checked = App.Visualizers.ParticleNebulaFadeTrails
-        ChkBoxRainbowColors.Checked = App.Visualizers.ParticleNebulaRainbowColors
-        ChkBoxShowBloom.Checked = App.Visualizers.ParticleNebulaShowBloom
-        ChkBoxShowTrails.Checked = App.Visualizers.ParticleNebulaShowTrails
-        ChkBoxAllowMiniMode.Checked = App.Visualizers.ParticleNebulaAllowMiniMode
-        TBSizeScale.Value = App.Visualizers.ParticleNebulaSizeScale
-        TBSpawnMultiplier.Value = CInt(App.Visualizers.ParticleNebulaSpawnMultiplier * 10)
-        TBSwirlBias.Value = CInt((App.Visualizers.ParticleNebulaSwirlBias + 1) * 100)
-        TBSwirlStrength.Value = CInt(App.Visualizers.ParticleNebulaSwirlStrength * 100)
-        TBTrailAlpha.Value = CInt(App.Visualizers.ParticleNebulaTrailAlpha * 100)
-        TBVelocityScale.Value = App.Visualizers.ParticleNebulaVelocityScale
+        CoBoxActivePalettePreset.Items.Add(App.ParticleNebulaPalettePresets.Cosmic)
+        CoBoxActivePalettePreset.Items.Add(App.ParticleNebulaPalettePresets.Firestorm)
+        CoBoxActivePalettePreset.Items.Add(App.ParticleNebulaPalettePresets.Oceanic)
+        CoBoxActivePalettePreset.Items.Add(App.ParticleNebulaPalettePresets.Aurora)
+        CoBoxActivePalettePreset.Items.Add(App.ParticleNebulaPalettePresets.MonochromeGlow)
+        CoBoxActivePalettePreset.SelectedItem = App.Settings.Visualizers.ParticleNebulaActivePalettePreset
+        TBBloomIntensity.Value = CInt(App.Settings.Visualizers.ParticleNebulaBloomIntensity * 10)
+        TBBloomRadius.Value = App.Settings.Visualizers.ParticleNebulaBloomRadius
+        TBFadeRate.Value = CInt(App.Settings.Visualizers.ParticleNebulaFadeRate * 10000)
+        ChkBoxFadeTrails.Checked = App.Settings.Visualizers.ParticleNebulaFadeTrails
+        ChkBoxRainbowColors.Checked = App.Settings.Visualizers.ParticleNebulaRainbowColors
+        ChkBoxShowBloom.Checked = App.Settings.Visualizers.ParticleNebulaShowBloom
+        ChkBoxShowTrails.Checked = App.Settings.Visualizers.ParticleNebulaShowTrails
+        ChkBoxAllowMiniMode.Checked = App.Settings.Visualizers.ParticleNebulaAllowMiniMode
+        TBSizeScale.Value = App.Settings.Visualizers.ParticleNebulaSizeScale
+        TBSpawnMultiplier.Value = CInt(App.Settings.Visualizers.ParticleNebulaSpawnMultiplier * 10)
+        TBSwirlBias.Value = CInt((App.Settings.Visualizers.ParticleNebulaSwirlBias + 1) * 100)
+        TBSwirlStrength.Value = CInt(App.Settings.Visualizers.ParticleNebulaSwirlStrength * 100)
+        TBTrailAlpha.Value = CInt(App.Settings.Visualizers.ParticleNebulaTrailAlpha * 100)
+        TBVelocityScale.Value = App.Settings.Visualizers.ParticleNebulaVelocityScale
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor

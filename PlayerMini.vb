@@ -35,16 +35,16 @@ Public Class PlayerMini
         ResetMarquee()
         MarqueeTimer.Start()
 #If DEBUG Then
-        If App.SaveWindowMetrics AndAlso App.PlayerMiniLocation.Y >= 0 Then
-            Location = App.PlayerMiniLocation
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.PlayerMiniLocation.Y >= 0 Then
+            Location = App.Settings.PlayerMiniLocation
         Else
             Dim wa = Screen.PrimaryScreen.WorkingArea
             Left = wa.Right - Width
             Top = wa.Bottom - Height
         End If
 #Else
-        If App.SaveWindowMetrics AndAlso App.PlayerMiniLocation.Y >= 0 Then
-            Location = App.PlayerMiniLocation
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.PlayerMiniLocation.Y >= 0 Then
+            Location = App.Settings.PlayerMiniLocation
         Else
             Dim wa = Screen.PrimaryScreen.WorkingArea
             Left = wa.Right - Width
@@ -54,7 +54,7 @@ Public Class PlayerMini
         AddHandler Player.TitleChanged, AddressOf OnTitleChanged
 
         If Player.MiniPlayerVisualizer Is Nothing Then
-            Dim vType = Player.VisualizerHost.GetTypeFromName(App.Visualizer)
+            Dim vType = Player.VisualizerHost.GetTypeFromName(App.Settings.Visualizer)
             Player.MiniPlayerVisualizer = CType(Activator.CreateInstance(vType), Player.IVisualizer)
         End If
         AttachVisualizer(Player.MiniPlayerVisualizer)
@@ -146,7 +146,7 @@ Public Class PlayerMini
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
-            PlayerMiniLocation = Location
+            App.Settings.PlayerMiniLocation = Location
         End If
     End Sub
     Private Sub PlayerMini_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp, LblTitle.MouseUp, PanelMarquee.MouseUp
@@ -155,7 +155,7 @@ Public Class PlayerMini
     Private Sub PlayerMini_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
-            App.PlayerMiniLocation = Me.Location
+            App.Settings.PlayerMiniLocation = Me.Location
         End If
     End Sub
     Private Sub PlayerMini_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick, PicBoxAlbumArt.DoubleClick, LblTitle.DoubleClick, PanelMarquee.DoubleClick
@@ -304,14 +304,14 @@ Public Class PlayerMini
         }
 
             ' Check the active one
-            If vizName.Equals(App.Visualizer, StringComparison.OrdinalIgnoreCase) Then
+            If vizName.Equals(App.Settings.Visualizer, StringComparison.OrdinalIgnoreCase) Then
                 item.Checked = True
             End If
 
             AddHandler item.Click,
             Sub()
                 ' Update global selection
-                App.Visualizer = vizName
+                App.Settings.Visualizer = vizName
 
                 ' Reload main player visualizer
                 Player.ShowMedia()

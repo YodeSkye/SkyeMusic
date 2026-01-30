@@ -23,92 +23,92 @@ Public Class OptionsRainbowBar
         If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
     End Sub
     Private Sub TxtBoxBarCount_Validated(sender As Object, e As EventArgs) Handles TxtBoxBarCount.Validated
-        App.Visualizers.RainbowBarCount = CInt(TxtBoxBarCount.Text)
-        If App.Visualizers.RainbowBarCount < 8 Then
-            App.Visualizers.RainbowBarCount = 8
-        ElseIf App.Visualizers.RainbowBarCount > 128 Then
-            App.Visualizers.RainbowBarCount = 128
+        App.Settings.Visualizers.RainbowBarCount = CInt(TxtBoxBarCount.Text)
+        If App.Settings.Visualizers.RainbowBarCount < 8 Then
+            App.Settings.Visualizers.RainbowBarCount = 8
+        ElseIf App.Settings.Visualizers.RainbowBarCount > 128 Then
+            App.Settings.Visualizers.RainbowBarCount = 128
         End If
-        TxtBoxBarCount.Text = App.Visualizers.RainbowBarCount.ToString
-        'Debug.Print("Rainbow Bar Count set to " & App.Visualizers.RainbowBarCount.ToString)
+        TxtBoxBarCount.Text = App.Settings.Visualizers.RainbowBarCount.ToString
+        'Debug.Print("Rainbow Bar Count set to " & App.Settings.Visualizers.RainbowBarCount.ToString)
     End Sub
     Private Sub ChkBoxShowPeaks_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxShowPeaks.CheckedChanged
-        Visualizers.RainbowBarShowPeaks = ChkBoxShowPeaks.Checked
+        App.Settings.Visualizers.RainbowBarShowPeaks = ChkBoxShowPeaks.Checked
     End Sub
     Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
-        App.Visualizers.RainbowBarAllowMiniMode = ChkBoxAllowMiniMode.Checked
+        App.Settings.Visualizers.RainbowBarAllowMiniMode = ChkBoxAllowMiniMode.Checked
     End Sub
     Private Sub TBGain_ValueChanged(sender As Object, e As EventArgs) Handles TBGain.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.RainbowBarGain = TBGain.Value
-        'Debug.Print("Rainbow Bar Gain set to " & App.Visualizers.RainbowBarGain.ToString)
+        App.Settings.Visualizers.RainbowBarGain = TBGain.Value
+        'Debug.Print("Rainbow Bar Gain set to " & App.Settings.Visualizers.RainbowBarGain.ToString)
     End Sub
     Private Sub TBPeakDecaySpeed_ValueChanged(sender As Object, e As EventArgs) Handles TBPeakDecaySpeed.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.RainbowBarPeakDecaySpeed = TBPeakDecaySpeed.Value
+        App.Settings.Visualizers.RainbowBarPeakDecaySpeed = TBPeakDecaySpeed.Value
     End Sub
     Private Sub TBPeakThickness_ValueChanged(sender As Object, e As EventArgs) Handles TBPeakThickness.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.RainbowBarPeakThickness = TBPeakThickness.Value
+        App.Settings.Visualizers.RainbowBarPeakThickness = TBPeakThickness.Value
     End Sub
     Private Sub TBPeakThreshold_ValueChanged(sender As Object, e As EventArgs) Handles TBPeakThreshold.ValueChanged
         If IsInitializing Then Exit Sub
-        Visualizers.RainbowBarPeakThreshold = TBPeakThreshold.Value
+        App.Settings.Visualizers.RainbowBarPeakThreshold = TBPeakThreshold.Value
     End Sub
     Private Sub TBPeakHoldFrames_ValueChanged(sender As Object, e As EventArgs) Handles TBPeakHoldFrames.ValueChanged
         If IsInitializing Then Exit Sub
-        Visualizers.RainbowBarPeakHoldFrames = TBPeakHoldFrames.Value
+        App.Settings.Visualizers.RainbowBarPeakHoldFrames = TBPeakHoldFrames.Value
     End Sub
     Private Sub TBHueCycleSpeed_ValueChanged(sender As Object, e As EventArgs) Handles TBHueCycleSpeed.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.RainbowBarHueCycleSpeed = TBHueCycleSpeed.Value / 10.0F
+        App.Settings.Visualizers.RainbowBarHueCycleSpeed = TBHueCycleSpeed.Value / 10.0F
     End Sub
     Private Sub BtnCalm_Click(sender As Object, e As EventArgs) Handles BtnCalm.Click
-        App.Visualizers.RainbowBarCount = 24
-        App.Visualizers.RainbowBarGain = 80.0F
-        App.Visualizers.RainbowBarShowPeaks = False
-        App.Visualizers.RainbowBarPeakDecaySpeed = 5
-        App.Visualizers.RainbowBarPeakThickness = 4
-        App.Visualizers.RainbowBarPeakThreshold = 60
-        App.Visualizers.RainbowBarPeakHoldFrames = 30
-        App.Visualizers.RainbowBarHueCycleSpeed = 0.5F
+        App.Settings.Visualizers.RainbowBarCount = 24
+        App.Settings.Visualizers.RainbowBarGain = 80.0F
+        App.Settings.Visualizers.RainbowBarShowPeaks = False
+        App.Settings.Visualizers.RainbowBarPeakDecaySpeed = 5
+        App.Settings.Visualizers.RainbowBarPeakThickness = 4
+        App.Settings.Visualizers.RainbowBarPeakThreshold = 60
+        App.Settings.Visualizers.RainbowBarPeakHoldFrames = 30
+        App.Settings.Visualizers.RainbowBarHueCycleSpeed = 0.5F
         ShowSettings()
     End Sub
     Private Sub BtnEnergetic_Click(sender As Object, e As EventArgs) Handles BtnEnergetic.Click
-        App.Visualizers.RainbowBarCount = 32
-        App.Visualizers.RainbowBarGain = 120.0F
-        App.Visualizers.RainbowBarShowPeaks = True
-        App.Visualizers.RainbowBarPeakDecaySpeed = 7
-        App.Visualizers.RainbowBarPeakThickness = 6
-        App.Visualizers.RainbowBarPeakThreshold = 50
-        App.Visualizers.RainbowBarPeakHoldFrames = 20
-        App.Visualizers.RainbowBarHueCycleSpeed = 2.0F
+        App.Settings.Visualizers.RainbowBarCount = 32
+        App.Settings.Visualizers.RainbowBarGain = 120.0F
+        App.Settings.Visualizers.RainbowBarShowPeaks = True
+        App.Settings.Visualizers.RainbowBarPeakDecaySpeed = 7
+        App.Settings.Visualizers.RainbowBarPeakThickness = 6
+        App.Settings.Visualizers.RainbowBarPeakThreshold = 50
+        App.Settings.Visualizers.RainbowBarPeakHoldFrames = 20
+        App.Settings.Visualizers.RainbowBarHueCycleSpeed = 2.0F
         ShowSettings()
     End Sub
     Private Sub BtnExtreme_Click(sender As Object, e As EventArgs) Handles BtnExtreme.Click
-        App.Visualizers.RainbowBarCount = 64
-        App.Visualizers.RainbowBarGain = 200.0F
-        App.Visualizers.RainbowBarShowPeaks = True
-        App.Visualizers.RainbowBarPeakDecaySpeed = 10
-        App.Visualizers.RainbowBarPeakThickness = 8
-        App.Visualizers.RainbowBarPeakThreshold = 40
-        App.Visualizers.RainbowBarPeakHoldFrames = 10
-        App.Visualizers.RainbowBarHueCycleSpeed = 5.0F
+        App.Settings.Visualizers.RainbowBarCount = 64
+        App.Settings.Visualizers.RainbowBarGain = 200.0F
+        App.Settings.Visualizers.RainbowBarShowPeaks = True
+        App.Settings.Visualizers.RainbowBarPeakDecaySpeed = 10
+        App.Settings.Visualizers.RainbowBarPeakThickness = 8
+        App.Settings.Visualizers.RainbowBarPeakThreshold = 40
+        App.Settings.Visualizers.RainbowBarPeakHoldFrames = 10
+        App.Settings.Visualizers.RainbowBarHueCycleSpeed = 5.0F
         ShowSettings()
     End Sub
 
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
-        TxtBoxBarCount.Text = App.Visualizers.RainbowBarCount.ToString
-        ChkBoxShowPeaks.Checked = App.Visualizers.RainbowBarShowPeaks
-        ChkBoxAllowMiniMode.Checked = App.Visualizers.RainbowBarAllowMiniMode
-        TBGain.Value = CInt(App.Visualizers.RainbowBarGain)
-        TBPeakDecaySpeed.Value = App.Visualizers.RainbowBarPeakDecaySpeed
-        TBPeakThickness.Value = App.Visualizers.RainbowBarPeakThickness
-        TBPeakThreshold.Value = App.Visualizers.RainbowBarPeakThreshold
-        TBPeakHoldFrames.Value = App.Visualizers.RainbowBarPeakHoldFrames
-        TBHueCycleSpeed.Value = CInt(App.Visualizers.RainbowBarHueCycleSpeed * 10)
+        TxtBoxBarCount.Text = App.Settings.Visualizers.RainbowBarCount.ToString
+        ChkBoxShowPeaks.Checked = App.Settings.Visualizers.RainbowBarShowPeaks
+        ChkBoxAllowMiniMode.Checked = App.Settings.Visualizers.RainbowBarAllowMiniMode
+        TBGain.Value = CInt(App.Settings.Visualizers.RainbowBarGain)
+        TBPeakDecaySpeed.Value = App.Settings.Visualizers.RainbowBarPeakDecaySpeed
+        TBPeakThickness.Value = App.Settings.Visualizers.RainbowBarPeakThickness
+        TBPeakThreshold.Value = App.Settings.Visualizers.RainbowBarPeakThreshold
+        TBPeakHoldFrames.Value = App.Settings.Visualizers.RainbowBarPeakHoldFrames
+        TBHueCycleSpeed.Value = CInt(App.Settings.Visualizers.RainbowBarHueCycleSpeed * 10)
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor

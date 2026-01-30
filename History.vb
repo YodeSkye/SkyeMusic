@@ -36,7 +36,7 @@ Public Class History
         Charts
     End Enum
     Private CurrentViewMode As ViewMode = ViewMode.Lists
-    Private CurrentViewMaxRecords As Integer = CInt(App.HistoryViewMaxRecords)
+    Private CurrentViewMaxRecords As Integer = CInt(App.Settings.HistoryViewMaxRecords)
     Private views As List(Of App.SongView)
     Public Class MostPlayedArtistsList
         Public Property Artist As String
@@ -70,8 +70,8 @@ Public Class History
         'If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
         'If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
 #Else
-        If App.SaveWindowMetrics AndAlso App.HistorySize.Height >= 0 Then Me.Size = App.HistorySize
-        If App.SaveWindowMetrics AndAlso App.HistoryLocation.Y >= 0 Then Me.Location = App.HistoryLocation
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.HistorySize.Height >= 0 Then Me.Size = App.Settings.HistorySize
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.HistoryLocation.Y >= 0 Then Me.Location = App.Settings.HistoryLocation
 #End If
         PanelLoading.BackColor = App.CurrentTheme.BackColor
         PanelLoading.Parent = Me
@@ -102,11 +102,11 @@ Public Class History
             Case HistoryView.Favorites
                 RadBtnFavorites.Checked = True
         End Select
-        Select Case App.HistoryViewMaxRecords
+        Select Case App.Settings.HistoryViewMaxRecords
             Case 0
                 TxtBoxMaxRecords.Text = "All"
             Case Else
-                TxtBoxMaxRecords.Text = App.HistoryViewMaxRecords.ToString
+                TxtBoxMaxRecords.Text = App.Settings.HistoryViewMaxRecords.ToString
         End Select
         Select Case CurrentChartView
             Case ChartView.Genres
@@ -126,9 +126,9 @@ Public Class History
         Enabled = True
     End Sub
     Private Sub History_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        If CurrentViewMaxRecords <> App.HistoryViewMaxRecords Then
-            App.HistoryViewMaxRecords = CUShort(CurrentViewMaxRecords)
-            App.SaveOptions()
+        If CurrentViewMaxRecords <> App.Settings.HistoryViewMaxRecords Then
+            App.Settings.HistoryViewMaxRecords = CUShort(CurrentViewMaxRecords)
+            App.Settings.Save()
         End If
         App.FrmHistory.Dispose()
         App.FrmHistory = Nothing
@@ -159,12 +159,12 @@ Public Class History
     Private Sub History_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
-            App.HistoryLocation = Location
+            App.Settings.HistoryLocation = Location
         End If
     End Sub
     Private Sub History_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         If Visible AndAlso WindowState = FormWindowState.Normal Then
-            App.HistorySize = Me.Size
+            App.Settings.HistorySize = Me.Size
         End If
     End Sub
     Private Sub History_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown

@@ -33,8 +33,8 @@ Public Class Log
         'If App.SaveWindowMetrics AndAlso App.LogSize.Height >= 0 Then Me.Size = App.LogSize
         'If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
 #Else
-        If App.SaveWindowMetrics AndAlso App.LogSize.Height >= 0 Then Me.Size = App.LogSize
-        If App.SaveWindowMetrics AndAlso App.LogLocation.Y >= 0 Then Me.Location = App.LogLocation
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.LogSize.Height >= 0 Then Me.Size = App.Settings.LogSize
+        If App.Settings.SaveWindowMetrics AndAlso App.Settings.LogLocation.Y >= 0 Then Me.Location = App.Settings.LogLocation
 #End If
     End Sub
     Private Sub Log_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
@@ -59,7 +59,7 @@ Public Class Log
             mPosition.Offset(mOffset.X, mOffset.Y)
             CheckMove(mPosition)
             Location = mPosition
-            App.LogLocation = Me.Location
+            App.Settings.LogLocation = Me.Location
         End If
     End Sub
     Private Sub Log_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LBLLogInfo.MouseUp
@@ -68,12 +68,12 @@ Public Class Log
     Private Sub Log_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
             CheckMove(Location)
-            App.LogLocation = Me.Location
+            App.Settings.LogLocation = Me.Location
         End If
     End Sub
     Private Sub Log_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         If Visible AndAlso WindowState = FormWindowState.Normal Then
-            App.LogSize = Me.Size
+            App.Settings.LogSize = Me.Size
         End If
     End Sub
     Private Sub Log_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown

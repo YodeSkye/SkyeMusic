@@ -14,94 +14,94 @@ Public Class OptionsFractalJulia
 
     ' Control Events
     Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
-        App.Visualizers.JuliaFractalAllowMiniMode = ChkBoxAllowMiniMode.Checked
+        App.Settings.Visualizers.JuliaFractalAllowMiniMode = ChkBoxAllowMiniMode.Checked
     End Sub
     Private Sub TBBaseCX_ValueChanged(sender As Object, e As EventArgs) Handles TBBaseCX.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.JuliaFractalBaseCX = CSng(TBBaseCX.Value / 100) - 1
+        App.Settings.Visualizers.JuliaFractalBaseCX = CSng(TBBaseCX.Value / 100) - 1
     End Sub
     Private Sub TBBaseCY_ValueChanged(sender As Object, e As EventArgs) Handles TBBaseCY.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.JuliaFractalBaseCY = CSng(TBBaseCY.Value / 100) - 1
+        App.Settings.Visualizers.JuliaFractalBaseCY = CSng(TBBaseCY.Value / 100) - 1
     End Sub
     Private Sub TBBassInfluence_ValueChanged(sender As Object, e As EventArgs) Handles TBBassInfluence.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.JuliaFractalBassInfluence = CSng(TBBassInfluence.Value / 10)
+        App.Settings.Visualizers.JuliaFractalBassInfluence = CSng(TBBassInfluence.Value / 10)
     End Sub
     Private Sub TBMidInfluence_ValueChanged(sender As Object, e As EventArgs) Handles TBMidInfluence.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.JuliaFractalMidInfluence = CSng(TBMidInfluence.Value / 10)
+        App.Settings.Visualizers.JuliaFractalMidInfluence = CSng(TBMidInfluence.Value / 10)
     End Sub
     Private Sub TBMaxIterations_ValueChanged(sender As Object, e As EventArgs) Handles TBMaxIterations.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.JuliaFractalMaxIterations = TBMaxIterations.Value
+        App.Settings.Visualizers.JuliaFractalMaxIterations = TBMaxIterations.Value
     End Sub
     Private Sub BtnCalmOcean_Click(sender As Object, e As EventArgs) Handles BtnCalmOcean.Click
-        App.Visualizers.JuliaFractalBaseCX = -0.7F
-        App.Visualizers.JuliaFractalBaseCY = 0.27015F
-        App.Visualizers.JuliaFractalBassInfluence = 0.2F
-        App.Visualizers.JuliaFractalMidInfluence = 0.5F
-        App.Visualizers.JuliaFractalMaxIterations = 85
+        App.Settings.Visualizers.JuliaFractalBaseCX = -0.7F
+        App.Settings.Visualizers.JuliaFractalBaseCY = 0.27015F
+        App.Settings.Visualizers.JuliaFractalBassInfluence = 0.2F
+        App.Settings.Visualizers.JuliaFractalMidInfluence = 0.5F
+        App.Settings.Visualizers.JuliaFractalMaxIterations = 85
         ShowSettings()
     End Sub
     Private Sub BtnFirestorm_Click(sender As Object, e As EventArgs) Handles BtnFirestorm.Click
-        App.Visualizers.JuliaFractalBaseCX = -0.5F
-        App.Visualizers.JuliaFractalBaseCY = 0.3F
-        App.Visualizers.JuliaFractalBassInfluence = 0.5F
-        App.Visualizers.JuliaFractalMidInfluence = 2.0F
-        App.Visualizers.JuliaFractalMaxIterations = 150
+        App.Settings.Visualizers.JuliaFractalBaseCX = -0.5F
+        App.Settings.Visualizers.JuliaFractalBaseCY = 0.3F
+        App.Settings.Visualizers.JuliaFractalBassInfluence = 0.5F
+        App.Settings.Visualizers.JuliaFractalMidInfluence = 2.0F
+        App.Settings.Visualizers.JuliaFractalMaxIterations = 150
         ShowSettings()
     End Sub
     Private Sub BtnCrystalGrid_Click(sender As Object, e As EventArgs) Handles BtnCrystalGrid.Click
-        App.Visualizers.JuliaFractalBaseCX = 0.355F
-        App.Visualizers.JuliaFractalBaseCY = 0.355F
-        App.Visualizers.JuliaFractalBassInfluence = 0.1F
-        App.Visualizers.JuliaFractalMidInfluence = 0.1F
-        App.Visualizers.JuliaFractalMaxIterations = 250
+        App.Settings.Visualizers.JuliaFractalBaseCX = 0.355F
+        App.Settings.Visualizers.JuliaFractalBaseCY = 0.355F
+        App.Settings.Visualizers.JuliaFractalBassInfluence = 0.1F
+        App.Settings.Visualizers.JuliaFractalMidInfluence = 0.1F
+        App.Settings.Visualizers.JuliaFractalMaxIterations = 250
         ShowSettings()
     End Sub
     Private Sub BtnBassquake_Click(sender As Object, e As EventArgs) Handles BtnBassquake.Click
-        App.Visualizers.JuliaFractalBaseCX = -0.8F
-        App.Visualizers.JuliaFractalBaseCY = 0.156F
-        App.Visualizers.JuliaFractalBassInfluence = 1.0F
-        App.Visualizers.JuliaFractalMidInfluence = 0.2F
-        App.Visualizers.JuliaFractalMaxIterations = 100
+        App.Settings.Visualizers.JuliaFractalBaseCX = -0.8F
+        App.Settings.Visualizers.JuliaFractalBaseCY = 0.156F
+        App.Settings.Visualizers.JuliaFractalBassInfluence = 1.0F
+        App.Settings.Visualizers.JuliaFractalMidInfluence = 0.2F
+        App.Settings.Visualizers.JuliaFractalMaxIterations = 100
         ShowSettings()
     End Sub
     Private Sub BtnTreblePulse_Click(sender As Object, e As EventArgs) Handles BtnTreblePulse.Click
-        App.Visualizers.JuliaFractalBaseCX = -0.7F
-        App.Visualizers.JuliaFractalBaseCY = 0.2F
-        App.Visualizers.JuliaFractalBassInfluence = 0.2F
-        App.Visualizers.JuliaFractalMidInfluence = 0.2F
-        App.Visualizers.JuliaFractalMaxIterations = 75
+        App.Settings.Visualizers.JuliaFractalBaseCX = -0.7F
+        App.Settings.Visualizers.JuliaFractalBaseCY = 0.2F
+        App.Settings.Visualizers.JuliaFractalBassInfluence = 0.2F
+        App.Settings.Visualizers.JuliaFractalMidInfluence = 0.2F
+        App.Settings.Visualizers.JuliaFractalMaxIterations = 75
         ShowSettings()
     End Sub
     Private Sub BtnGalaxyBloom_Click(sender As Object, e As EventArgs) Handles BtnGalaxyBloom.Click
-        App.Visualizers.JuliaFractalBaseCX = -0.4F
-        App.Visualizers.JuliaFractalBaseCY = 0.6F
-        App.Visualizers.JuliaFractalBassInfluence = 0.3F
-        App.Visualizers.JuliaFractalMidInfluence = 1.5F
-        App.Visualizers.JuliaFractalMaxIterations = 200
+        App.Settings.Visualizers.JuliaFractalBaseCX = -0.4F
+        App.Settings.Visualizers.JuliaFractalBaseCY = 0.6F
+        App.Settings.Visualizers.JuliaFractalBassInfluence = 0.3F
+        App.Settings.Visualizers.JuliaFractalMidInfluence = 1.5F
+        App.Settings.Visualizers.JuliaFractalMaxIterations = 200
         ShowSettings()
     End Sub
     Private Sub BtnCoralReef_Click(sender As Object, e As EventArgs) Handles BtnCoralReef.Click
-        App.Visualizers.JuliaFractalBaseCX = 0.285F
-        App.Visualizers.JuliaFractalBaseCY = 0.01F
-        App.Visualizers.JuliaFractalBassInfluence = 0.4F
-        App.Visualizers.JuliaFractalMidInfluence = 0.8F
-        App.Visualizers.JuliaFractalMaxIterations = 120
+        App.Settings.Visualizers.JuliaFractalBaseCX = 0.285F
+        App.Settings.Visualizers.JuliaFractalBaseCY = 0.01F
+        App.Settings.Visualizers.JuliaFractalBassInfluence = 0.4F
+        App.Settings.Visualizers.JuliaFractalMidInfluence = 0.8F
+        App.Settings.Visualizers.JuliaFractalMaxIterations = 120
         ShowSettings()
     End Sub
 
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
-        ChkBoxAllowMiniMode.Checked = App.Visualizers.JuliaFractalAllowMiniMode
-        TBBaseCX.Value = CInt((App.Visualizers.JuliaFractalBaseCX + 1) * 100)
-        TBBassInfluence.Value = CInt(App.Visualizers.JuliaFractalBassInfluence * 10)
-        TBBaseCY.Value = CInt((App.Visualizers.JuliaFractalBaseCY + 1) * 100)
-        TBMidInfluence.Value = CInt(App.Visualizers.JuliaFractalMidInfluence * 10)
-        TBMaxIterations.Value = App.Visualizers.JuliaFractalMaxIterations
+        ChkBoxAllowMiniMode.Checked = App.Settings.Visualizers.JuliaFractalAllowMiniMode
+        TBBaseCX.Value = CInt((App.Settings.Visualizers.JuliaFractalBaseCX + 1) * 100)
+        TBBassInfluence.Value = CInt(App.Settings.Visualizers.JuliaFractalBassInfluence * 10)
+        TBBaseCY.Value = CInt((App.Settings.Visualizers.JuliaFractalBaseCY + 1) * 100)
+        TBMidInfluence.Value = CInt(App.Settings.Visualizers.JuliaFractalMidInfluence * 10)
+        TBMaxIterations.Value = App.Settings.Visualizers.JuliaFractalMaxIterations
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor

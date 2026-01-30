@@ -14,7 +14,7 @@ Public Class OptionsHyperspaceTunnel
 
     ' Control Events
     Private Sub ChkBoxAllowMiniMode_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxAllowMiniMode.CheckedChanged
-        App.Visualizers.HyperspaceTunnelAllowMiniMode = ChkBoxAllowMiniMode.Checked
+        App.Settings.Visualizers.HyperspaceTunnelAllowMiniMode = ChkBoxAllowMiniMode.Checked
     End Sub
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxParticleCount.KeyDown
         If e.KeyCode = Keys.Enter Then
@@ -26,37 +26,37 @@ Public Class OptionsHyperspaceTunnel
         If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
     End Sub
     Private Sub TxtBoxBarCount_Validated(sender As Object, e As EventArgs) Handles TxtBoxParticleCount.Validated
-        App.Visualizers.HyperspaceTunnelParticleCount = CInt(TxtBoxParticleCount.Text)
-        App.Visualizers.HyperspaceTunnelParticleCount = Math.Max(100, Math.Min(5000, App.Visualizers.HyperspaceTunnelParticleCount))
-        TxtBoxParticleCount.Text = App.Visualizers.HyperspaceTunnelParticleCount.ToString
-        Player.VisualizerHost.SetHyperspaceTunnelParticleCount(App.Visualizers.HyperspaceTunnelParticleCount)
+        App.Settings.Visualizers.HyperspaceTunnelParticleCount = CInt(TxtBoxParticleCount.Text)
+        App.Settings.Visualizers.HyperspaceTunnelParticleCount = Math.Max(100, Math.Min(5000, App.Settings.Visualizers.HyperspaceTunnelParticleCount))
+        TxtBoxParticleCount.Text = App.Settings.Visualizers.HyperspaceTunnelParticleCount.ToString
+        Player.VisualizerHost.SetHyperspaceTunnelParticleCount(App.Settings.Visualizers.HyperspaceTunnelParticleCount)
     End Sub
     Private Sub TBSwirlSpeedBase_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedBase.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.HyperspaceTunnelSwirlSpeedBase = CDbl(TBSwirlSpeedBase.Value / 100)
+        App.Settings.Visualizers.HyperspaceTunnelSwirlSpeedBase = CDbl(TBSwirlSpeedBase.Value / 100)
     End Sub
     Private Sub TBSwirlSpeedAudioFactor_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedAudioFactor.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor = CDbl(TBSwirlSpeedAudioFactor.Value / 100)
+        App.Settings.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor = CDbl(TBSwirlSpeedAudioFactor.Value / 100)
     End Sub
     Private Sub TBParticleSpeedBase_ValueChanged(sender As Object, e As EventArgs) Handles TBParticleSpeedBase.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.HyperspaceTunnelParticleSpeedBase = CDbl(TBParticleSpeedBase.Value / 10)
+        App.Settings.Visualizers.HyperspaceTunnelParticleSpeedBase = CDbl(TBParticleSpeedBase.Value / 10)
     End Sub
     Private Sub TBParticleSpeedAudioFactor_ValueChanged(sender As Object, e As EventArgs) Handles TBParticleSpeedAudioFactor.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor = CDbl(TBParticleSpeedAudioFactor.Value)
+        App.Settings.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor = CDbl(TBParticleSpeedAudioFactor.Value)
     End Sub
 
     ' Methods
     Private Sub ShowSettings()
         IsInitializing = True
-        ChkBoxAllowMiniMode.Checked = App.Visualizers.HyperspaceTunnelAllowMiniMode
-        TxtBoxParticleCount.Text = App.Visualizers.HyperspaceTunnelParticleCount.ToString
-        TBSwirlSpeedBase.Value = CInt(App.Visualizers.HyperspaceTunnelSwirlSpeedBase * 100)
-        TBSwirlSpeedAudioFactor.Value = CInt(App.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor * 100)
-        TBParticleSpeedBase.Value = CInt(App.Visualizers.HyperspaceTunnelParticleSpeedBase * 10)
-        TBParticleSpeedAudioFactor.Value = CInt(App.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor)
+        ChkBoxAllowMiniMode.Checked = App.Settings.Visualizers.HyperspaceTunnelAllowMiniMode
+        TxtBoxParticleCount.Text = App.Settings.Visualizers.HyperspaceTunnelParticleCount.ToString
+        TBSwirlSpeedBase.Value = CInt(App.Settings.Visualizers.HyperspaceTunnelSwirlSpeedBase * 100)
+        TBSwirlSpeedAudioFactor.Value = CInt(App.Settings.Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor * 100)
+        TBParticleSpeedBase.Value = CInt(App.Settings.Visualizers.HyperspaceTunnelParticleSpeedBase * 10)
+        TBParticleSpeedAudioFactor.Value = CInt(App.Settings.Visualizers.HyperspaceTunnelParticleSpeedAudioFactor)
         IsInitializing = False
     End Sub
     Private Sub SetAccentColor() Implements App.IAccentable.SetAccentColor
