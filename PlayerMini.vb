@@ -10,7 +10,7 @@ Public Class PlayerMini
     Private ImagePrevious As Image
     Private ImageNext As Image
     Private WithEvents MarqueeTimer As New Timer With {.Interval = 30}
-    Private ReadOnly topmostTimer As New Timer With {.Interval = 500}
+    Private ReadOnly topmostTimer As New Timer With {.Interval = 3000}
 
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -62,6 +62,10 @@ Public Class PlayerMini
         AddHandler topmostTimer.Tick, AddressOf EnforceTopMost
         topmostTimer.Start()
 
+    End Sub
+    Private Sub PlayerMini_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        If topmostTimer IsNot Nothing Then topmostTimer.Stop()
+        Player.MiniPlayerVisualizer = Nothing
     End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnPlay.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
         If e.Alt Then
@@ -197,9 +201,6 @@ Public Class PlayerMini
             g.DrawRectangle(p, 1, 1, Me.Width - 3, Me.Height - 3)
         End Using
     End Sub
-    Private Sub PlayerMini_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
-        Player.MiniPlayerVisualizer = Nothing
-    End Sub
 
     ' Control Events
     Private Sub BtnPlay_Click(sender As Object, e As EventArgs) Handles BtnPlay.Click
@@ -240,10 +241,7 @@ Public Class PlayerMini
         End If
     End Sub
     Private Sub EnforceTopMost(sender As Object, e As EventArgs)
-        If Not Me.TopMost Then
-            Me.TopMost = True
-            App.WriteToLog("MiniPlayer TopMost Enforced")
-        End If
+        Skye.WinAPI.SetWindowPos(Me.Handle, Skye.WinAPI.HWND_TOPMOST, 0, 0, 0, 0, Skye.WinAPI.SWP_NOMOVE Or Skye.WinAPI.SWP_NOSIZE Or Skye.WinAPI.SWP_NOACTIVATE)
     End Sub
 
     ' Methods

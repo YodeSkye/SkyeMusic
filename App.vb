@@ -1312,12 +1312,16 @@ Namespace My
         Private Sub NIApp_MIPlayer_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    Select Case Player.WindowState
-                        Case FormWindowState.Normal, FormWindowState.Maximized
-                            Player.BringToFront()
-                        Case FormWindowState.Minimized
-                            Player.TogglePlayer()
-                    End Select
+                    If FrmMiniPlayer Is Nothing Then
+                        Select Case Player.WindowState
+                            Case FormWindowState.Normal, FormWindowState.Maximized
+                                Player.BringToFront()
+                            Case FormWindowState.Minimized
+                                Player.TogglePlayer()
+                        End Select
+                    Else
+                        SetMiniPlayer()
+                    End If
                 Case MouseButtons.Right
             End Select
         End Sub
@@ -2225,6 +2229,7 @@ Namespace My
             Else
                 VisualizerMiniMode = False
                 FrmMiniPlayer.Close()
+                FrmMiniPlayer = Nothing
                 Player.Show()
                 Player.ShowMedia()
             End If

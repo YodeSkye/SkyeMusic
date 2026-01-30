@@ -116,7 +116,7 @@
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SkyeLibrary" Version="1.4.5" />
-    <PackageReference Include="Syncfusion.Tools.Windows" Version="32.1.24" />
+    <PackageReference Include="Syncfusion.Tools.Windows" Version="32.1.25" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23" />
