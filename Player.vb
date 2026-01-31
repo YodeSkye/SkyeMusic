@@ -71,8 +71,8 @@ Public Class Player
 
     'FullScreen
     Private frmFullScreen As Form 'Fullscreen Form
-    Private originalParent As Control 'Original Parent Control of VLC Viewer
-    Private originalBounds As Rectangle 'Original Bounds of VLC Viewer
+    Private fullscreenOriginalParent As Control 'Original Parent Control of VLC Viewer
+    Private fullscreenOriginalBounds As Rectangle 'Original Bounds of VLC Viewer
     Private _FullScreen As Boolean = False 'ONLY Used by FullScreen Property Getter/Setter
     Private Property FullScreen As Boolean 'Indicates if the player is in fullscreen mode
         Get
@@ -5139,33 +5139,33 @@ Public Class Player
         HasLyricsSynced = False
         'Try
         Select Case CurrentMediaType
-                Case App.MediaSourceTypes.AudioCD
+            Case App.MediaSourceTypes.AudioCD
                     ' not implemented
-                Case App.MediaSourceTypes.Stream
-                    Dim path As String = _player.Path.TrimEnd("/"c)
-                    Dim lvi = LVPlaylist.FindItemWithText(path, True, 0)
-                    If lvi Is Nothing Then
-                        PlaylistCurrentText = IO.Path.GetFileNameWithoutExtension(_player.Path)
-                        Text = My.Application.Info.Title + " - " + _player.Path
-                        App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
-                    Else
-                        PlaylistCurrentText = lvi.Text
-                        Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
-                        App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
-                    End If
-                Case App.MediaSourceTypes.File
-                    Dim lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
-                    If lvi Is Nothing Then
-                        PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
-                        Text = My.Application.Info.Title + " - " + _player.Path
-                        App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
-                    Else
-                        PlaylistCurrentText = lvi.Text
-                        Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
-                        App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
-                    End If
-                    LoadLyrics(_player.Path)
-            End Select
+            Case App.MediaSourceTypes.Stream
+                Dim path As String = _player.Path.TrimEnd("/"c)
+                Dim lvi = LVPlaylist.FindItemWithText(path, True, 0)
+                If lvi Is Nothing Then
+                    PlaylistCurrentText = IO.Path.GetFileNameWithoutExtension(_player.Path)
+                    Text = My.Application.Info.Title + " - " + _player.Path
+                    App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
+                Else
+                    PlaylistCurrentText = lvi.Text
+                    Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
+                    App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
+                End If
+            Case App.MediaSourceTypes.File
+                Dim lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+                If lvi Is Nothing Then
+                    PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
+                    Text = My.Application.Info.Title + " - " + _player.Path
+                    App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
+                Else
+                    PlaylistCurrentText = lvi.Text
+                    Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
+                    App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
+                End If
+                LoadLyrics(_player.Path)
+        End Select
         'Catch
         '    PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
         '    Text = My.Application.Info.Title + " - " + _player.Path
@@ -5425,8 +5425,8 @@ Public Class Player
             If frmFullScreen Is Nothing Then
 
                 'Save original parent and bounds
-                originalParent = VLCViewer.Parent
-                originalBounds = VLCViewer.Bounds
+                fullscreenOriginalParent = VLCViewer.Parent
+                fullscreenOriginalBounds = VLCViewer.Bounds
 
                 'Create fullscreen host form
                 frmFullScreen = New FullScreen With {
@@ -5453,9 +5453,9 @@ Public Class Player
                 'Reparent the VideoView back to original parent
                 If VLCViewer.IsHandleCreated AndAlso Not VLCViewer.IsDisposed Then
                     frmFullScreen.Controls.Remove(VLCViewer)
-                    originalParent.Controls.Add(VLCViewer)
+                    fullscreenOriginalParent.Controls.Add(VLCViewer)
                     VLCViewer.Dock = DockStyle.None
-                    VLCViewer.Bounds = originalBounds
+                    VLCViewer.Bounds = fullscreenOriginalBounds
                 End If
 
                 'Dispose of fullscreen form

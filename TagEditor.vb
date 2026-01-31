@@ -728,7 +728,11 @@ Public Class TagEditor
 
                         For Each pic In pics
                             Using ms As New MemoryStream(pic.Data.Data)
-                                images.Add(Image.FromStream(ms))
+                                Try
+                                    images.Add(Image.FromStream(ms))
+                                Catch
+                                    images.Add(My.Resources.ImageCorruptImage)
+                                End Try
                             End Using
                             oArt.Add(pic)
                         Next
@@ -936,7 +940,11 @@ Public Class TagEditor
             'Debug.Print("Showing Art Index: " & artindex.ToString & " of " & nArt.Count.ToString)
 
             Using ms As New MemoryStream(nArt(artindex).Data.Data)
-                Image = Image.FromStream(ms)
+                Try
+                    Image = Image.FromStream(ms)
+                Catch
+                    Image = My.Resources.ImageCorruptImage
+                End Try
             End Using
             PicBoxArt.Image = Image
             TxtBoxArtDescription.Text = nArt(artindex).Description
