@@ -369,7 +369,7 @@ Public Class Directory
     Private Async Sub SetSearch(source As String)
         LVStations.Items.Clear()
         StatusLabel.Text = $"Loading {source}…"
-
+        TxtBoxSearch.Text = String.Empty
         Select Case source
             Case "Radio Browser"
                 TxtBoxSearch.PlaceholderText = "< Top Stations >"
