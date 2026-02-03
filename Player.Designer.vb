@@ -435,7 +435,7 @@ Partial Class Player
         MIDirectory.Image = My.Resources.Resources.ImageDirectory16
         MIDirectory.Name = "MIDirectory"
         MIDirectory.Size = New Size(203, 24)
-        MIDirectory.Text = "Stream Directory"
+        MIDirectory.Text = "Directory"
         ' 
         ' MIViewHistory
         ' 

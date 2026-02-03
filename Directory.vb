@@ -49,6 +49,7 @@ Public Class Directory
         ILSources.Images.Add(My.Resources.ImageRadioBrowser96)
         ILSources.Images.Add(My.Resources.ImageSomaFM96)
         ILSources.Images.Add(My.Resources.ImageRadioParadise96)
+        ILSources.Images.Add(My.Resources.ImageApplePodcasts96)
         ILSources.Images.Add(My.Resources.ImageFavorites96)
         ILSources.Images.Add(My.Resources.ImageAdd96)
         ILSources.Images.Add(My.Resources.ImageImport96)
@@ -58,7 +59,7 @@ Public Class Directory
         LoadSources()
         SetStatusLabelEmptyText()
         CMStations.Font = CurrentTheme.BaseFont
-        CMIPlay.Font = New Font(CurrentTheme.BaseFont, FontStyle.Bold)
+        CMIStreamPlay.Font = New Font(CurrentTheme.BaseFont, FontStyle.Bold)
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.DirectorySize.Height >= 0 Then Me.Size = App.DirectorySize
         'If App.SaveWindowMetrics AndAlso App.DirectoryLocation.Y >= 0 Then Me.Location = App.DirectoryLocation
@@ -117,7 +118,7 @@ Public Class Directory
         ' Enter = Play
         If keyData = Keys.Enter Then
             If LVStations.Focused AndAlso LVStations.SelectedItems.Count > 0 Then
-                CMIPlay.PerformClick()
+                CMIStreamPlay.PerformClick()
                 Return True
             ElseIf TxtBoxSearch.Focused Then
                 Search()
@@ -178,14 +179,14 @@ Public Class Directory
             Return
         End If
         If LVSources.SelectedItems(0).Text = "Favorites" Then
-            CMIRemoveFromFavorites.Visible = True
-            CMIAddToFavorites.Visible = False
+            CMIStreamRemoveFromFavorites.Visible = True
+            CMIStreamAddToFavorites.Visible = False
         Else
-            CMIRemoveFromFavorites.Visible = False
-            CMIAddToFavorites.Visible = True
+            CMIStreamRemoveFromFavorites.Visible = False
+            CMIStreamAddToFavorites.Visible = True
         End If
     End Sub
-    Private Async Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIPlay.Click
+    Private Async Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIStreamPlay.Click
         If LVStations.SelectedItems.Count = 0 Then Return
         Dim item = LVStations.SelectedItems(0)
         Dim title As String = LVStations.SelectedItems(0).Text
@@ -198,7 +199,7 @@ Public Class Directory
 
         Player.PlayFromDirectory(title, url)
     End Sub
-    Private Async Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddToPlaylist.Click
+    Private Async Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIStreamAddToPlaylist.Click
         If LVStations.SelectedItems.Count = 0 Then Return
         Dim item = LVStations.SelectedItems(0)
         Dim title As String = LVStations.SelectedItems(0).Text
@@ -211,7 +212,7 @@ Public Class Directory
 
         Player.AddToPlaylistFromDirectory(title, url)
     End Sub
-    Private Async Sub CMIAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIAddToFavorites.Click
+    Private Async Sub CMIAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIStreamAddToFavorites.Click
         If LVStations.SelectedItems.Count = 0 Then Exit Sub
 
         Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
@@ -235,7 +236,7 @@ Public Class Directory
         End If
 
     End Sub
-    Private Sub CMIRemoveFromFavorites_Click(sender As Object, e As EventArgs) Handles CMIRemoveFromFavorites.Click
+    Private Sub CMIRemoveFromFavorites_Click(sender As Object, e As EventArgs) Handles CMIStreamRemoveFromFavorites.Click
         If LVStations.SelectedItems.Count = 0 Then Exit Sub
 
         Dim url As String = LVStations.SelectedItems(0).SubItems(6).Text
@@ -247,7 +248,7 @@ Public Class Directory
             StatusLabel.Text = "Favorite not removed."
         End If
     End Sub
-    Private Sub CMICopyStreamURL_Click(sender As Object, e As EventArgs) Handles CMICopyStreamURL.Click
+    Private Sub CMICopyStreamURL_Click(sender As Object, e As EventArgs) Handles CMIStreamCopyStreamURL.Click
         If LVStations.SelectedItems.Count = 0 Then Return
         Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
         Dim urlToCopy As String = Nothing
@@ -311,9 +312,10 @@ Public Class Directory
         LVSources.Items.Add("Radio Browser", 0)
         LVSources.Items.Add("SomaFM", 1)
         LVSources.Items.Add("Radio Paradise", 2)
-        LVSources.Items.Add("Favorites", 3)
-        LVSources.Items.Add("Add Stream To Playlist", 4)
-        LVSources.Items.Add("Import Playlist", 5)
+        LVSources.Items.Add("Apple Podcasts", 3)
+        LVSources.Items.Add("Favorites", 4)
+        LVSources.Items.Add("Add Stream To Playlist", 5)
+        LVSources.Items.Add("Import Playlist", 6)
 
         StatusLabel.Text = "Select a source to begin."
     End Sub
@@ -368,37 +370,52 @@ Public Class Directory
     End Sub
     Private Async Sub SetSearch(source As String)
         LVStations.Items.Clear()
+        LVPodcasts.Items.Clear()
+        LVEpisodes.Items.Clear()
         StatusLabel.Text = $"Loading {source}…"
         TxtBoxSearch.Text = String.Empty
         Select Case source
             Case "Radio Browser"
                 TxtBoxSearch.PlaceholderText = "< Top Stations >"
+                SetPanels(source)
                 Dim results = Await radioBrowser.GetDefaultStationsAsync()
                 PopulateStations(results)
                 StatusLabel.Text = $"Loaded {results.Count} stations of thousands."
             Case "SomaFM"
                 TxtBoxSearch.PlaceholderText = "< All SomaFM Channels >"
+                SetPanels(source)
                 Dim results = Await soma.GetStationsAsync()
                 PopulateStations(results)
                 StatusLabel.Text = $"Loaded {results.Count} SomaFM channels."
             Case "Radio Paradise"
                 TxtBoxSearch.PlaceholderText = "< All Radio Paradise Channels >"
+                SetPanels(source)
                 Dim results = radioParadise.GetStations()
                 PopulateStations(results)
                 StatusLabel.Text = $"Loaded {results.Count} Radio Paradise channels."
+            Case "Apple Podcasts"
+                TxtBoxSearch.PlaceholderText = "< Apple Podcasts >"
+                SetPanels(source)
+                'PopulateStations(GetFavoritesAsStreamEntries())
+                StatusLabel.Text = $""
             Case "Favorites"
                 TxtBoxSearch.PlaceholderText = "< Your Favorite Stations >"
+                SetPanels(source)
                 PopulateStations(GetFavoritesAsStreamEntries())
                 StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
             Case "Add Stream To Playlist"
                 TxtBoxSearch.PlaceholderText = String.Empty
-                StatusLabel.Text = String.Empty
+                SetPanels(source)
+                StatusLabel.Text = "Select a source to begin."
                 Player.OpenURL()
             Case "Import Playlist"
                 TxtBoxSearch.PlaceholderText = String.Empty
-                StatusLabel.Text = String.Empty
+                SetPanels(source)
+                StatusLabel.Text = "Select a source to begin."
                 Player.OpenPlaylist()
             Case Else
+                TxtBoxSearch.PlaceholderText = String.Empty
+                SetPanels(source)
                 StatusLabel.Text = "Source not implemented yet."
         End Select
     End Sub
@@ -665,6 +682,50 @@ Public Class Directory
 
         Return $"{startPart}...{endPart}"
     End Function
+    Private Sub SetPanels(source As String)
+        Select Case source
+            Case "Radio Browser"
+                PanelStreams.Enabled = True
+                PanelStreams.Visible = True
+                PanelPodcasts.Enabled = False
+                PanelStreams.BringToFront()
+            Case "SomaFM"
+                PanelStreams.Enabled = True
+                PanelStreams.Visible = True
+                PanelPodcasts.Enabled = False
+                PanelStreams.BringToFront()
+            Case "Radio Paradise"
+                PanelStreams.Enabled = True
+                PanelStreams.Visible = True
+                PanelPodcasts.Enabled = False
+                PanelStreams.BringToFront()
+            Case "Apple Podcasts"
+                PanelStreams.Enabled = False
+                PanelPodcasts.Enabled = True
+                PanelPodcasts.Visible = True
+                PanelPodcasts.BringToFront()
+            Case "Favorites"
+                PanelStreams.Enabled = True
+                PanelStreams.Visible = True
+                PanelPodcasts.Enabled = False
+                PanelStreams.BringToFront()
+            Case "Add Stream To Playlist"
+                PanelStreams.Visible = False
+                PanelStreams.Enabled = False
+                PanelPodcasts.Visible = False
+                PanelPodcasts.Enabled = False
+            Case "Import Playlist"
+                PanelStreams.Visible = False
+                PanelStreams.Enabled = False
+                PanelPodcasts.Visible = False
+                PanelPodcasts.Enabled = False
+            Case Else
+                PanelStreams.Visible = False
+                PanelStreams.Enabled = False
+                PanelPodcasts.Visible = False
+                PanelPodcasts.Enabled = False
+        End Select
+    End Sub
     Private Sub AutoSizeColumn(col As ColumnHeader, Optional maxWidth As Integer = 0)
         LVStations.AutoResizeColumn(col.Index, ColumnHeaderAutoResizeStyle.ColumnContent)
         Dim contentWidth = col.Width
@@ -727,6 +788,10 @@ Public Class Directory
         LVSources.ForeColor = App.CurrentTheme.TextColor
         LVStations.BackColor = App.CurrentTheme.BackColor
         LVStations.ForeColor = App.CurrentTheme.TextColor
+        LVPodcasts.BackColor = App.CurrentTheme.BackColor
+        LVPodcasts.ForeColor = App.CurrentTheme.TextColor
+        LVEpisodes.BackColor = App.CurrentTheme.BackColor
+        LVEpisodes.ForeColor = App.CurrentTheme.TextColor
 
         ResumeLayout()
         'Debug.Print("Directory Theme Set")
