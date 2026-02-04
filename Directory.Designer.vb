@@ -283,16 +283,16 @@ Partial Class Directory
         LVEpisodes.ContextMenuStrip = CMEpisodes
         LVEpisodes.Dock = DockStyle.Fill
         LVEpisodes.FullRowSelect = True
-        LVEpisodes.Location = New Point(0, 143)
+        LVEpisodes.Location = New Point(0, 250)
         LVEpisodes.Name = "LVEpisodes"
-        LVEpisodes.Size = New Size(1089, 507)
+        LVEpisodes.Size = New Size(1089, 400)
         LVEpisodes.TabIndex = 1
         LVEpisodes.UseCompatibleStateImageBehavior = False
         LVEpisodes.View = View.Details
         ' 
         ' ColumnEpisodesTitle
         ' 
-        ColumnEpisodesTitle.Text = "Title"
+        ColumnEpisodesTitle.Text = "Episode Title"
         ColumnEpisodesTitle.Width = 400
         ' 
         ' ColumnEpisodesDuration
@@ -370,7 +370,7 @@ Partial Class Directory
         LVPodcasts.FullRowSelect = True
         LVPodcasts.Location = New Point(0, 0)
         LVPodcasts.Name = "LVPodcasts"
-        LVPodcasts.Size = New Size(1089, 143)
+        LVPodcasts.Size = New Size(1089, 250)
         LVPodcasts.SmallImageList = ILPodcasts
         LVPodcasts.TabIndex = 0
         LVPodcasts.UseCompatibleStateImageBehavior = False
@@ -383,7 +383,7 @@ Partial Class Directory
         ' 
         ' ColumnPodcastsTitle
         ' 
-        ColumnPodcastsTitle.Text = "Title"
+        ColumnPodcastsTitle.Text = "Podcast Title"
         ColumnPodcastsTitle.Width = 400
         ' 
         ' ColumnPodcastsAuthor
@@ -404,7 +404,7 @@ Partial Class Directory
         ' ILPodcasts
         ' 
         ILPodcasts.ColorDepth = ColorDepth.Depth32Bit
-        ILPodcasts.ImageSize = New Size(48, 48)
+        ILPodcasts.ImageSize = New Size(24, 24)
         ILPodcasts.TransparentColor = Color.Transparent
         ' 
         ' Directory

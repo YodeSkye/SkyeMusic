@@ -1,4 +1,5 @@
 ﻿
+Imports System.IO
 Imports System.Net.Http
 Imports NAudio.FileFormats
 Imports NAudio.Utils
@@ -173,18 +174,29 @@ Public Class Directory
 
         Player.PlayFromDirectory(title, url)
     End Sub
+    Private Async Sub LVPodcasts_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVPodcasts.SelectedIndexChanged
+        If LVPodcasts.SelectedItems.Count = 0 Then Return
+
+        StatusLabel.Text = "Loading podcast episodes…"
+        Dim feedUrl = CStr(LVPodcasts.SelectedItems(0).Tag)
+        Await LoadPodcastEpisodes(feedUrl)
+    End Sub
     Private Sub CMStations_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMStations.Opening
         If LVStations.SelectedItems.Count = 0 Then
             e.Cancel = True
             Return
         End If
-        If LVSources.SelectedItems(0).Text = "Favorites" Then
+
+        Dim item = LVStations.SelectedItems(0)
+        Dim url = CType(item.Tag, StreamEntry).Url
+        If IsURLFavorited(url) Then
             CMIStreamRemoveFromFavorites.Visible = True
             CMIStreamAddToFavorites.Visible = False
         Else
             CMIStreamRemoveFromFavorites.Visible = False
             CMIStreamAddToFavorites.Visible = True
         End If
+
     End Sub
     Private Async Sub CMIPlay_Click(sender As Object, e As EventArgs) Handles CMIStreamPlay.Click
         If LVStations.SelectedItems.Count = 0 Then Return
@@ -265,6 +277,52 @@ Public Class Directory
         End If
         Clipboard.SetText(urlToCopy)
         StatusLabel.Text = "Stream URL copied."
+    End Sub
+    Private Sub CMEpisodes_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMEpisodes.Opening
+        If LVEpisodes.SelectedItems.Count = 0 Then
+            e.Cancel = True
+            Return
+        End If
+
+        Dim item = LVEpisodes.SelectedItems(0)
+        Dim url = CStr(item.Tag)
+        If IsURLFavorited(url) Then
+            CMIEpisodeRemoveFromFavorites.Visible = True
+            CMIEpisodeAddToFavorites.Visible = False
+        Else
+            CMIEpisodeRemoveFromFavorites.Visible = False
+            CMIEpisodeAddToFavorites.Visible = True
+        End If
+
+    End Sub
+    Private Sub CMIEpisodePlay_Click(sender As Object, e As EventArgs) Handles CMIEpisodePlay.Click
+        If LVEpisodes.SelectedItems.Count = 0 Then Return
+        Dim item = LVEpisodes.SelectedItems(0)
+        Dim title = item.Text
+        Dim url = CStr(item.Tag)
+        Player.PlayFromDirectory(title, url)
+    End Sub
+    Private Sub CMIEpisodeAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIEpisodeAddToPlaylist.Click
+        If LVEpisodes.SelectedItems.Count = 0 Then Return
+        Dim item = LVEpisodes.SelectedItems(0)
+        Dim title = item.Text
+        Dim url = CStr(item.Tag)
+        Player.AddToPlaylistFromDirectory(title, url)
+    End Sub
+    Private Sub CMIEpisodeAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIEpisodeAddToFavorites.Click
+        AddEpisodeToFavorites()
+    End Sub
+    Private Sub CMIEpisodeRemoveFromFavorites_Click(sender As Object, e As EventArgs) Handles CMIEpisodeRemoveFromFavorites.Click
+        If LVEpisodes.SelectedItems.Count = 0 Then Exit Sub
+
+        Dim url As String = LVEpisodes.SelectedItems(0).SubItems(4).Text
+        Dim removed = RemoveFavorite(url)
+
+        If removed Then
+            StatusLabel.Text = "Removed from Favorites."
+        Else
+            StatusLabel.Text = "Favorite not removed."
+        End If
     End Sub
     Private Sub BtnSearch_Click(sender As Object, e As EventArgs) Handles BtnSearch.Click
         Search()
@@ -368,6 +426,53 @@ Public Class Directory
 
         LVStations.EndUpdate()
     End Sub
+    Private Async Function PopulatePodcasts(results As JArray) As Task
+        LVPodcasts.BeginUpdate()
+        LVPodcasts.Items.Clear()
+        ILPodcasts.Images.Clear()
+
+        Dim index As Integer = 0
+
+        For Each p In results
+            Dim title = CStr(p("collectionName"))
+            Dim author = CStr(p("artistName"))
+            Dim genre = If(p("primaryGenreName")?.ToString(), "")
+            Dim feedUrl = CStr(p("feedUrl"))
+            Dim artworkUrl = CStr(p("artworkUrl100"))
+
+            ' Download artwork
+            Dim img As Image = Nothing
+            Try
+                Dim bytes = Await App.Http.GetByteArrayAsync(artworkUrl)
+                Using ms As New MemoryStream(bytes)
+                    img = Image.FromStream(ms)
+                End Using
+            Catch
+            End Try
+
+            If img IsNot Nothing Then
+                Dim resized = ResizeImage(img, ILPodcasts.ImageSize)
+                ILPodcasts.Images.Add(resized)
+            Else
+                ILPodcasts.Images.Add(My.Resources.ImageApplePodcasts96)
+            End If
+
+            Dim item As New ListViewItem("")
+            item.ImageIndex = index
+            item.SubItems.Add(title)
+            item.SubItems.Add(author)
+            item.SubItems.Add(genre)
+            item.SubItems.Add(feedUrl)
+            item.Tag = feedUrl
+
+            LVPodcasts.Items.Add(item)
+            index += 1
+        Next
+
+        LVPodcasts.EndUpdate()
+
+        Return
+    End Function
     Private Async Sub SetSearch(source As String)
         LVStations.Items.Clear()
         LVPodcasts.Items.Clear()
@@ -396,13 +501,44 @@ Public Class Directory
             Case "Apple Podcasts"
                 TxtBoxSearch.PlaceholderText = "< Apple Podcasts >"
                 SetPanels(source)
-                'PopulateStations(GetFavoritesAsStreamEntries())
-                StatusLabel.Text = $""
+                StatusLabel.Text = $"Search for Apple Podcasts."
             Case "Favorites"
-                TxtBoxSearch.PlaceholderText = "< Your Favorite Stations >"
-                SetPanels(source)
-                PopulateStations(GetFavoritesAsStreamEntries())
-                StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
+                TxtBoxSearch.PlaceholderText = "< Your Favorites >"
+
+                ' Load favorites as StreamEntry objects
+                Dim favs = GetFavoritesAsStreamEntries()
+
+                ' Do we have any podcast favorites?
+                Dim hasPodcast = favs.Any(Function(f) f.Format = "PodcastFeed")
+
+                If hasPodcast Then
+                    ' Show the podcast panel
+                    SetPanels("Apple Podcasts")   ' Reuses your existing panel logic
+                    PanelPodcasts.Visible = True
+                    PanelStreams.Visible = False
+
+                    ' Populate the top ListView with podcast favorites
+                    LVPodcasts.Items.Clear()
+                    LVEpisodes.Items.Clear()
+
+                    For Each p In favs.Where(Function(f) f.Format = "PodcastFeed")
+                        Dim item As New ListViewItem("")
+                        item.SubItems.Add(p.Name)
+                        item.SubItems.Add("Favorite Podcast")
+                        item.SubItems.Add("Podcast")
+                        item.SubItems.Add(p.Url)
+                        item.Tag = p.Url
+                        LVPodcasts.Items.Add(item)
+                    Next
+
+                    StatusLabel.Text = $"Loaded {favs.Count} favorites (including podcasts)."
+
+                Else
+                    ' Normal radio favorites
+                    SetPanels(source)
+                    PopulateStations(favs)
+                    StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
+                End If
             Case "Add Stream To Playlist"
                 TxtBoxSearch.PlaceholderText = String.Empty
                 SetPanels(source)
@@ -484,6 +620,10 @@ Public Class Directory
                 Else
                     StatusLabel.Text = $"Found {results.Count} Radio Paradise channels."
                 End If
+            Case "Apple Podcasts"
+                Dim results = Await SearchApplePodcasts(query)
+                Await PopulatePodcasts(results)
+                StatusLabel.Text = $"Found {results.Count} podcasts."
             Case "Favorites"
                 ' Load all channels
                 Dim all = GetFavoritesAsStreamEntries()
@@ -682,6 +822,20 @@ Public Class Directory
 
         Return $"{startPart}...{endPart}"
     End Function
+    Private Function ResizeImage(img As Image, size As Size) As Image
+        Dim bmp As New Bitmap(size.Width, size.Height)
+        Using g = Graphics.FromImage(bmp)
+            g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+            g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+            g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+            g.DrawImage(img, 0, 0, size.Width, size.Height)
+        End Using
+        Return bmp
+    End Function
+    Private Function IsURLFavorited(url As String) As Boolean
+        If Favorites Is Nothing Then LoadFavorites()
+        Return Favorites.Any(Function(f) f.Url = url)
+    End Function
     Private Sub SetPanels(source As String)
         Select Case source
             Case "Radio Browser"
@@ -858,6 +1012,42 @@ Public Class Directory
         SaveFavorites()
         Return True
     End Function
+    Private Sub AddPodcastToFavorites()
+        If LVPodcasts.SelectedItems.Count = 0 Then Exit Sub
+
+        Dim item = LVPodcasts.SelectedItems(0)
+        Dim title = item.SubItems(1).Text
+        Dim feedUrl = CStr(item.Tag)
+
+        Dim fav As New FavoriteEntry With {
+        .Name = title,
+        .Url = feedUrl,
+        .Format = "PodcastFeed",
+        .Bitrate = 0,
+        .Source = "Apple Podcasts"
+    }
+
+        Dim added = AddFavorite(fav)
+        StatusLabel.Text = If(added, "Podcast added to Favorites.", "Already in Favorites.")
+    End Sub
+    Private Sub AddEpisodeToFavorites()
+        If LVEpisodes.SelectedItems.Count = 0 Then Exit Sub
+
+        Dim item = LVEpisodes.SelectedItems(0)
+        Dim title = item.Text
+        Dim url = CStr(item.Tag)
+
+        Dim fav As New FavoriteEntry With {
+            .Name = title,
+            .Url = url,
+            .Format = "Podcast",
+            .Bitrate = 0,
+            .Source = "Apple Podcasts"
+        }
+
+        Dim added = AddFavorite(fav)
+        StatusLabel.Text = If(added, "Episode added to Favorites.", "Already in Favorites.")
+    End Sub
     Private Function RemoveFavorite(url As String) As Boolean
         If Favorites Is Nothing Then LoadFavorites()
 
@@ -869,7 +1059,6 @@ Public Class Directory
             End Function)
         If removed > 0 Then
             SaveFavorites()
-            PopulateStations(GetFavoritesAsStreamEntries())
             Return True
         End If
 
@@ -881,15 +1070,36 @@ Public Class Directory
         If Favorites Is Nothing Then LoadFavorites()
 
         For Each fav In Favorites
-            Dim s As New StreamEntry With {
+
+            ' Detect podcast feed favorites
+            If fav.Source = "Apple Podcasts" AndAlso fav.Format = "PodcastFeed" Then
+
+                ' Podcast feed favorite
+                Dim p As New StreamEntry With {
                 .Name = fav.Name,
-                .Url = fav.Url,
-                .Format = fav.Format,
-                .Bitrate = fav.Bitrate,
-                .Tags = fav.Source,      ' This is safe: Tags here = source label, not genre
-                .Country = String.Empty,           ' Favorites don’t store country
-                .Status = "Favorite"     ' Optional: helps you style them differently
+                .Url = fav.Url,                 ' This is the RSS feed URL
+                .Format = "PodcastFeed",        ' Tells Directory this is a podcast
+                .Bitrate = 0,
+                .Tags = "Podcast",              ' Display tag
+                .Country = "",
+                .Status = "Favorite"
             }
+
+                list.Add(p)
+                Continue For
+            End If
+
+            ' Normal radio favorite
+            Dim s As New StreamEntry With {
+            .Name = fav.Name,
+            .Url = fav.Url,
+            .Format = fav.Format,
+            .Bitrate = fav.Bitrate,
+            .Tags = fav.Source,                ' Source label
+            .Country = "",
+            .Status = "Favorite"
+        }
+
             list.Add(s)
         Next
 
@@ -936,7 +1146,7 @@ Public Class Directory
         End Function
     End Class
 
-    ' Source Classes
+    ' Stream Source Classes
     Private Class StreamEntry
         Public Property Name As String
         Public Property Tags As String
@@ -1163,5 +1373,47 @@ Public Class Directory
         End Function
 
     End Class
+
+    ' Podcasts
+    Private Async Function SearchApplePodcasts(query As String) As Task(Of JArray)
+        Dim url = $"https://itunes.apple.com/search?media=podcast&term={Uri.EscapeDataString(query)}"
+        Dim json = Await App.Http.GetStringAsync(url)
+        Dim obj = JObject.Parse(json)
+        Return CType(obj("results"), JArray)
+    End Function
+    Private Async Function LoadPodcastEpisodes(feedUrl As String) As Task
+        Try
+            Dim nsItunes As XNamespace = "http://www.itunes.com/dtds/podcast-1.0.dtd"
+            Dim xml = Await App.Http.GetStringAsync(feedUrl)
+            Dim doc As XDocument = XDocument.Parse(xml)
+
+            Dim items = doc...<item>
+
+            LVEpisodes.BeginUpdate()
+            LVEpisodes.Items.Clear()
+
+            For Each ep In items
+                Dim title = ep.<title>.Value
+                Dim pubDate = ep.<pubDate>.Value
+                Dim desc = ep.<description>.Value
+                Dim duration = ep.Element(nsItunes + "duration")?.Value
+                Dim enclosure = ep.<enclosure>.@url
+                Dim item As New ListViewItem(title)
+                item.SubItems.Add(duration)
+                item.SubItems.Add(pubDate)
+                item.SubItems.Add(desc)
+                item.SubItems.Add(enclosure)
+                item.Tag = enclosure
+
+                LVEpisodes.Items.Add(item)
+            Next
+
+            LVEpisodes.EndUpdate()
+            StatusLabel.Text = $"Loaded {LVEpisodes.Items.Count} episodes."
+
+        Catch ex As Exception
+            StatusLabel.Text = "Failed to load podcast feed."
+        End Try
+    End Function
 
 End Class
