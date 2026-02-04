@@ -174,6 +174,41 @@ Public Class Directory
 
         Player.PlayFromDirectory(title, url)
     End Sub
+    Private Sub LVStations_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVStations.ColumnClick
+        ' Remove arrow from previous sort column
+        If sortColumn >= 0 AndAlso sortColumn < LVStations.Columns.Count Then
+            Dim oldHeader = LVStations.Columns(sortColumn).Text
+            LVStations.Columns(sortColumn).Text = oldHeader.Replace(" ▲", "").Replace(" ▼", "")
+        End If
+
+        ' Determine if clicked column is already the sort column
+        If e.Column = sortColumn Then
+            ' Reverse the current sort direction
+            If sortOrder = SortOrder.Ascending Then
+                sortOrder = SortOrder.Descending
+            Else
+                sortOrder = SortOrder.Ascending
+            End If
+        Else
+            ' Set the column number that is to be sorted; default to ascending
+            sortColumn = e.Column
+            sortOrder = SortOrder.Ascending
+        End If
+
+        ' Add arrow to current sort column
+        Dim currentHeader = LVStations.Columns(sortColumn).Text.Replace(" ▲", "").Replace(" ▼", "")
+        If sortOrder = SortOrder.Ascending Then
+            LVStations.Columns(sortColumn).Text = currentHeader & " ▲"
+        Else
+            LVStations.Columns(sortColumn).Text = currentHeader & " ▼"
+        End If
+
+        ' Set the ListViewItemSorter with the new sort options
+        LVStations.ListViewItemSorter = New ListViewItemComparer(sortColumn, sortOrder)
+
+        ' Call the sort method to manually sort
+        LVStations.Sort()
+    End Sub
     Private Async Sub LVPodcasts_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVPodcasts.SelectedIndexChanged
         If LVPodcasts.SelectedItems.Count = 0 Then Return
 
@@ -256,6 +291,7 @@ Public Class Directory
 
         If removed Then
             StatusLabel.Text = "Removed from Favorites."
+            SetSearch("Favorites")
         Else
             StatusLabel.Text = "Favorite not removed."
         End If
@@ -277,6 +313,38 @@ Public Class Directory
         End If
         Clipboard.SetText(urlToCopy)
         StatusLabel.Text = "Stream URL copied."
+    End Sub
+    Private Sub CMPodcasts_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPodcasts.Opening
+        If LVPodcasts.SelectedItems.Count = 0 Then
+            e.Cancel = True
+            Return
+        End If
+
+        Dim item = LVPodcasts.SelectedItems(0)
+        Dim url = CStr(item.Tag)
+        If IsURLFavorited(url) Then
+            CMIPodcastsRemoveFromFavorites.Visible = True
+            CMIPodcastsAddToFavorites.Visible = False
+        Else
+            CMIPodcastsRemoveFromFavorites.Visible = False
+            CMIPodcastsAddToFavorites.Visible = True
+        End If
+
+    End Sub
+    Private Sub CMIPodcastsAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIPodcastsAddToFavorites.Click
+        AddPodcastToFavorites()
+    End Sub
+    Private Sub CMIPodcastsRemoveFromFavorites_Click(sender As Object, e As EventArgs) Handles CMIPodcastsRemoveFromFavorites.Click
+        If LVPodcasts.SelectedItems.Count = 0 Then Exit Sub
+
+        Dim url As String = LVPodcasts.SelectedItems(0).SubItems(4).Text
+        Dim removed = RemoveFavorite(url)
+
+        If removed Then
+            StatusLabel.Text = "Removed from Favorites."
+        Else
+            StatusLabel.Text = "Favorite not removed."
+        End If
     End Sub
     Private Sub CMEpisodes_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMEpisodes.Opening
         If LVEpisodes.SelectedItems.Count = 0 Then
@@ -326,41 +394,6 @@ Public Class Directory
     End Sub
     Private Sub BtnSearch_Click(sender As Object, e As EventArgs) Handles BtnSearch.Click
         Search()
-    End Sub
-    Private Sub LVStations_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVStations.ColumnClick
-        ' Remove arrow from previous sort column
-        If sortColumn >= 0 AndAlso sortColumn < LVStations.Columns.Count Then
-            Dim oldHeader = LVStations.Columns(sortColumn).Text
-            LVStations.Columns(sortColumn).Text = oldHeader.Replace(" ▲", "").Replace(" ▼", "")
-        End If
-
-        ' Determine if clicked column is already the sort column
-        If e.Column = sortColumn Then
-            ' Reverse the current sort direction
-            If sortOrder = SortOrder.Ascending Then
-                sortOrder = SortOrder.Descending
-            Else
-                sortOrder = SortOrder.Ascending
-            End If
-        Else
-            ' Set the column number that is to be sorted; default to ascending
-            sortColumn = e.Column
-            sortOrder = SortOrder.Ascending
-        End If
-
-        ' Add arrow to current sort column
-        Dim currentHeader = LVStations.Columns(sortColumn).Text.Replace(" ▲", "").Replace(" ▼", "")
-        If sortOrder = SortOrder.Ascending Then
-            LVStations.Columns(sortColumn).Text = currentHeader & " ▲"
-        Else
-            LVStations.Columns(sortColumn).Text = currentHeader & " ▼"
-        End If
-
-        ' Set the ListViewItemSorter with the new sort options
-        LVStations.ListViewItemSorter = New ListViewItemComparer(sortColumn, sortOrder)
-
-        ' Call the sort method to manually sort
-        LVStations.Sort()
     End Sub
 
     ' Methods
@@ -475,6 +508,7 @@ Public Class Directory
     End Function
     Private Async Sub SetSearch(source As String)
         LVStations.Items.Clear()
+        LVStations.MultiSelect = False
         LVPodcasts.Items.Clear()
         LVEpisodes.Items.Clear()
         StatusLabel.Text = $"Loading {source}…"
@@ -508,37 +542,10 @@ Public Class Directory
                 ' Load favorites as StreamEntry objects
                 Dim favs = GetFavoritesAsStreamEntries()
 
-                ' Do we have any podcast favorites?
-                Dim hasPodcast = favs.Any(Function(f) f.Format = "PodcastFeed")
-
-                If hasPodcast Then
-                    ' Show the podcast panel
-                    SetPanels("Apple Podcasts")   ' Reuses your existing panel logic
-                    PanelPodcasts.Visible = True
-                    PanelStreams.Visible = False
-
-                    ' Populate the top ListView with podcast favorites
-                    LVPodcasts.Items.Clear()
-                    LVEpisodes.Items.Clear()
-
-                    For Each p In favs.Where(Function(f) f.Format = "PodcastFeed")
-                        Dim item As New ListViewItem("")
-                        item.SubItems.Add(p.Name)
-                        item.SubItems.Add("Favorite Podcast")
-                        item.SubItems.Add("Podcast")
-                        item.SubItems.Add(p.Url)
-                        item.Tag = p.Url
-                        LVPodcasts.Items.Add(item)
-                    Next
-
-                    StatusLabel.Text = $"Loaded {favs.Count} favorites (including podcasts)."
-
-                Else
-                    ' Normal radio favorites
-                    SetPanels(source)
-                    PopulateStations(favs)
-                    StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
-                End If
+                SetPanels(source)
+                LVStations.MultiSelect = True
+                PopulateStations(favs)
+                StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
             Case "Add Stream To Playlist"
                 TxtBoxSearch.PlaceholderText = String.Empty
                 SetPanels(source)

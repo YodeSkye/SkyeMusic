@@ -127,7 +127,10 @@
     <value>315, 21</value>
   </metadata>
   <metadata name="CMEpisodes.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>316, 46</value>
+    <value>421, 48</value>
+  </metadata>
+  <metadata name="CMPodcasts.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>420, 23</value>
   </metadata>
   <metadata name="ILPodcasts.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>185, 45</value>

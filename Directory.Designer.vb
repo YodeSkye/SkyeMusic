@@ -69,6 +69,9 @@ Partial Class Directory
         ColumnPodcastsAuthor = New ColumnHeader()
         ColumnPodcastsGenre = New ColumnHeader()
         ColumnPodcastsURL = New ColumnHeader()
+        CMPodcasts = New ContextMenuStrip(components)
+        CMIPodcastsAddToFavorites = New ToolStripMenuItem()
+        CMIPodcastsRemoveFromFavorites = New ToolStripMenuItem()
         ILPodcasts = New ImageList(components)
         PanelSearch.SuspendLayout()
         StatusStripDirectory.SuspendLayout()
@@ -77,6 +80,7 @@ Partial Class Directory
         CMStations.SuspendLayout()
         PanelPodcasts.SuspendLayout()
         CMEpisodes.SuspendLayout()
+        CMPodcasts.SuspendLayout()
         SuspendLayout()
         ' 
         ' PanelSearch
@@ -176,6 +180,7 @@ Partial Class Directory
         LVStations.FullRowSelect = True
         LVStations.InsertionLineColor = Color.Teal
         LVStations.Location = New Point(0, 0)
+        LVStations.MultiSelect = False
         LVStations.Name = "LVStations"
         LVStations.Size = New Size(1089, 650)
         LVStations.TabIndex = 0
@@ -284,6 +289,7 @@ Partial Class Directory
         LVEpisodes.Dock = DockStyle.Fill
         LVEpisodes.FullRowSelect = True
         LVEpisodes.Location = New Point(0, 250)
+        LVEpisodes.MultiSelect = False
         LVEpisodes.Name = "LVEpisodes"
         LVEpisodes.Size = New Size(1089, 400)
         LVEpisodes.TabIndex = 1
@@ -366,9 +372,11 @@ Partial Class Directory
         ' LVPodcasts
         ' 
         LVPodcasts.Columns.AddRange(New ColumnHeader() {ColumnPodcastsArtwork, ColumnPodcastsTitle, ColumnPodcastsAuthor, ColumnPodcastsGenre, ColumnPodcastsURL})
+        LVPodcasts.ContextMenuStrip = CMPodcasts
         LVPodcasts.Dock = DockStyle.Top
         LVPodcasts.FullRowSelect = True
         LVPodcasts.Location = New Point(0, 0)
+        LVPodcasts.MultiSelect = False
         LVPodcasts.Name = "LVPodcasts"
         LVPodcasts.Size = New Size(1089, 250)
         LVPodcasts.SmallImageList = ILPodcasts
@@ -400,6 +408,26 @@ Partial Class Directory
         ' 
         ColumnPodcastsURL.Text = "Feed URL"
         ColumnPodcastsURL.Width = 270
+        ' 
+        ' CMPodcasts
+        ' 
+        CMPodcasts.Items.AddRange(New ToolStripItem() {CMIPodcastsAddToFavorites, CMIPodcastsRemoveFromFavorites})
+        CMPodcasts.Name = "CMPodcasts"
+        CMPodcasts.Size = New Size(199, 48)
+        ' 
+        ' CMIPodcastsAddToFavorites
+        ' 
+        CMIPodcastsAddToFavorites.Image = My.Resources.Resources.ImageFavorites16
+        CMIPodcastsAddToFavorites.Name = "CMIPodcastsAddToFavorites"
+        CMIPodcastsAddToFavorites.Size = New Size(198, 22)
+        CMIPodcastsAddToFavorites.Text = "Add To Favorites"
+        ' 
+        ' CMIPodcastsRemoveFromFavorites
+        ' 
+        CMIPodcastsRemoveFromFavorites.Image = My.Resources.Resources.ImageFavorites16
+        CMIPodcastsRemoveFromFavorites.Name = "CMIPodcastsRemoveFromFavorites"
+        CMIPodcastsRemoveFromFavorites.Size = New Size(198, 22)
+        CMIPodcastsRemoveFromFavorites.Text = "Remove From Favorites"
         ' 
         ' ILPodcasts
         ' 
@@ -433,6 +461,7 @@ Partial Class Directory
         CMStations.ResumeLayout(False)
         PanelPodcasts.ResumeLayout(False)
         CMEpisodes.ResumeLayout(False)
+        CMPodcasts.ResumeLayout(False)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -483,4 +512,7 @@ Partial Class Directory
     Friend WithEvents ColumnEpisodesDescription As ColumnHeader
     Friend WithEvents ColumnEpisodesURL As ColumnHeader
     Friend WithEvents ILPodcasts As ImageList
+    Friend WithEvents CMPodcasts As ContextMenuStrip
+    Friend WithEvents CMIPodcastsAddToFavorites As ToolStripMenuItem
+    Friend WithEvents CMIPodcastsRemoveFromFavorites As ToolStripMenuItem
 End Class
