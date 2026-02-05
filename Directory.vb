@@ -11,8 +11,12 @@ Public Class Directory
     ' Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
-    Private sortColumn As Integer = -1
-    Private sortOrder As SortOrder = SortOrder.Ascending
+    Private sortColumnStations As Integer = -1
+    Private sortOrderStations As SortOrder = SortOrder.Ascending
+    Private sortColumnPodcasts As Integer = -1
+    Private sortOrderPodcasts As SortOrder = SortOrder.Ascending
+    Private sortColumnEpisodes As Integer = -1
+    Private sortOrderEpisodes As SortOrder = SortOrder.Ascending
     Private suppressSelection As Boolean = False
     Private radioBrowser As RadioBrowserSource
     Private soma As SomaFMSource
@@ -36,6 +40,7 @@ Public Class Directory
         SetAccentColor()
         SetTheme()
         ReThemeMenus()
+
         ' Assign stable names to columns
         If LVStations.Columns.Count >= 8 Then
             LVStations.Columns(0).Name = "ColName"
@@ -47,6 +52,20 @@ Public Class Directory
             LVStations.Columns(6).Name = "ColURL"
             LVStations.Columns(7).Name = "ColMore"
         End If
+        If LVPodcasts.Columns.Count >= 5 Then
+            LVPodcasts.Columns(0).Name = "ColPodcastsArtwork"
+            LVPodcasts.Columns(1).Name = "ColPodcastsTitle"
+            LVPodcasts.Columns(2).Name = "ColPodcastsAuthor"
+            LVPodcasts.Columns(3).Name = "ColPodcastsGenre"
+            LVPodcasts.Columns(4).Name = "ColPodcastsURL"
+        End If
+        If LVEpisodes.Columns.Count >= 5 Then
+            LVEpisodes.Columns(0).Name = "ColEpisodesTitle"
+            LVEpisodes.Columns(1).Name = "ColEpisodesDuration"
+            LVEpisodes.Columns(2).Name = "ColEpisodesReleaseDate"
+            LVEpisodes.Columns(3).Name = "ColEpisodesDescription"
+            LVEpisodes.Columns(4).Name = "ColEpisodesURL"
+        End If
         ILSources.Images.Add(My.Resources.ImageRadioBrowser96)
         ILSources.Images.Add(My.Resources.ImageSomaFM96)
         ILSources.Images.Add(My.Resources.ImageRadioParadise96)
@@ -54,13 +73,19 @@ Public Class Directory
         ILSources.Images.Add(My.Resources.ImageFavorites96)
         ILSources.Images.Add(My.Resources.ImageAdd96)
         ILSources.Images.Add(My.Resources.ImageImport96)
+
         radioBrowser = New RadioBrowserSource
         soma = New SomaFMSource
         radioParadise = New RadioParadiseSource
         LoadSources()
+
         SetStatusLabelEmptyText()
         CMStations.Font = CurrentTheme.BaseFont
+        CMPodcasts.Font = CurrentTheme.BaseFont
+        CMEpisodes.Font = CurrentTheme.BaseFont
         CMIStreamPlay.Font = New Font(CurrentTheme.BaseFont, FontStyle.Bold)
+        CMIEpisodePlay.Font = New Font(CurrentTheme.BaseFont, FontStyle.Bold)
+
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.DirectorySize.Height >= 0 Then Me.Size = App.DirectorySize
         'If App.SaveWindowMetrics AndAlso App.DirectoryLocation.Y >= 0 Then Me.Location = App.DirectoryLocation
@@ -71,6 +96,7 @@ Public Class Directory
         If App.DirectoryLastSelectedSource >= 0 Then
             LVSources.Items(App.DirectoryLastSelectedSource).Selected = True
         End If
+
     End Sub
     Private Sub Directory_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If LVSources.SelectedItems.Count > 0 Then
@@ -163,8 +189,18 @@ Public Class Directory
     End Sub
     Private Async Sub LVStations_DoubleClick(sender As Object, e As EventArgs) Handles LVStations.DoubleClick
         If LVStations.SelectedItems.Count = 0 Then Return
+
+        Dim entry As StreamEntry = CType(LVStations.SelectedItems(0).Tag, StreamEntry)
+
+        ' NEW: Handle podcast favorites
+        If entry.Format = "PodcastFeed" Then
+            Await OpenPodcastFavorite(entry)
+            Return
+        End If
+
+        ' Existing radio logic
         Dim item = LVStations.SelectedItems(0)
-        Dim title As String = LVStations.SelectedItems(0).Text
+        Dim title As String = item.Text
         Dim url = Await GetPlayableURL(item)
 
         If String.IsNullOrWhiteSpace(url) Then
@@ -176,35 +212,35 @@ Public Class Directory
     End Sub
     Private Sub LVStations_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVStations.ColumnClick
         ' Remove arrow from previous sort column
-        If sortColumn >= 0 AndAlso sortColumn < LVStations.Columns.Count Then
-            Dim oldHeader = LVStations.Columns(sortColumn).Text
-            LVStations.Columns(sortColumn).Text = oldHeader.Replace(" ▲", "").Replace(" ▼", "")
+        If sortColumnStations >= 0 AndAlso sortColumnStations < LVStations.Columns.Count Then
+            Dim oldHeader = LVStations.Columns(sortColumnStations).Text
+            LVStations.Columns(sortColumnStations).Text = oldHeader.Replace(" ▲", "").Replace(" ▼", "")
         End If
 
         ' Determine if clicked column is already the sort column
-        If e.Column = sortColumn Then
+        If e.Column = sortColumnStations Then
             ' Reverse the current sort direction
-            If sortOrder = SortOrder.Ascending Then
-                sortOrder = SortOrder.Descending
+            If sortOrderStations = SortOrder.Ascending Then
+                sortOrderStations = SortOrder.Descending
             Else
-                sortOrder = SortOrder.Ascending
+                sortOrderStations = SortOrder.Ascending
             End If
         Else
             ' Set the column number that is to be sorted; default to ascending
-            sortColumn = e.Column
-            sortOrder = SortOrder.Ascending
+            sortColumnStations = e.Column
+            sortOrderStations = SortOrder.Ascending
         End If
 
         ' Add arrow to current sort column
-        Dim currentHeader = LVStations.Columns(sortColumn).Text.Replace(" ▲", "").Replace(" ▼", "")
-        If sortOrder = SortOrder.Ascending Then
-            LVStations.Columns(sortColumn).Text = currentHeader & " ▲"
+        Dim currentHeader = LVStations.Columns(sortColumnStations).Text.Replace(" ▲", "").Replace(" ▼", "")
+        If sortOrderStations = SortOrder.Ascending Then
+            LVStations.Columns(sortColumnStations).Text = currentHeader & " ▲"
         Else
-            LVStations.Columns(sortColumn).Text = currentHeader & " ▼"
+            LVStations.Columns(sortColumnStations).Text = currentHeader & " ▼"
         End If
 
         ' Set the ListViewItemSorter with the new sort options
-        LVStations.ListViewItemSorter = New ListViewItemComparer(sortColumn, sortOrder)
+        LVStations.ListViewItemSorter = New ListViewItemComparer(sortColumnStations, sortOrderStations)
 
         ' Call the sort method to manually sort
         LVStations.Sort()
@@ -215,6 +251,83 @@ Public Class Directory
         StatusLabel.Text = "Loading podcast episodes…"
         Dim feedUrl = CStr(LVPodcasts.SelectedItems(0).Tag)
         Await LoadPodcastEpisodes(feedUrl)
+    End Sub
+    Private Sub LVPodcasts_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVPodcasts.ColumnClick
+        ' Remove arrow from previous sort column
+        If sortColumnPodcasts >= 0 AndAlso sortColumnPodcasts < LVPodcasts.Columns.Count Then
+            Dim oldHeader = LVPodcasts.Columns(sortColumnPodcasts).Text
+            LVPodcasts.Columns(sortColumnPodcasts).Text = oldHeader.Replace(" ▲", "").Replace(" ▼", "")
+        End If
+
+        ' Determine if clicked column is already the sort column
+        If e.Column = sortColumnPodcasts Then
+            ' Reverse the current sort direction
+            If sortOrderPodcasts = SortOrder.Ascending Then
+                sortOrderPodcasts = SortOrder.Descending
+            Else
+                sortOrderPodcasts = SortOrder.Ascending
+            End If
+        Else
+            ' Set the column number that is to be sorted; default to ascending
+            sortColumnPodcasts = e.Column
+            sortOrderPodcasts = SortOrder.Ascending
+        End If
+
+        ' Add arrow to current sort column
+        Dim currentHeader = LVPodcasts.Columns(sortColumnPodcasts).Text.Replace(" ▲", "").Replace(" ▼", "")
+        If sortOrderPodcasts = SortOrder.Ascending Then
+            LVPodcasts.Columns(sortColumnPodcasts).Text = currentHeader & " ▲"
+        Else
+            LVPodcasts.Columns(sortColumnPodcasts).Text = currentHeader & " ▼"
+        End If
+
+        ' Set the ListViewItemSorter with the new sort options
+        LVPodcasts.ListViewItemSorter = New ListViewItemComparer(sortColumnPodcasts, sortOrderPodcasts)
+
+        ' Call the sort method to manually sort
+        LVPodcasts.Sort()
+    End Sub
+    Private Sub LVEpisodes_DoubleClick(sender As Object, e As EventArgs) Handles LVEpisodes.DoubleClick
+        If LVEpisodes.SelectedItems.Count = 0 Then Return
+        Dim item = LVEpisodes.SelectedItems(0)
+        Dim title = item.Text
+        Dim url = CStr(item.Tag)
+        Player.PlayFromDirectory(title, url)
+    End Sub
+    Private Sub LVEpisodes_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVEpisodes.ColumnClick
+        ' Remove arrow from previous sort column
+        If sortColumnEpisodes >= 0 AndAlso sortColumnEpisodes < LVEpisodes.Columns.Count Then
+            Dim oldHeader = LVEpisodes.Columns(sortColumnEpisodes).Text
+            LVEpisodes.Columns(sortColumnEpisodes).Text = oldHeader.Replace(" ▲", "").Replace(" ▼", "")
+        End If
+
+        ' Determine if clicked column is already the sort column
+        If e.Column = sortColumnEpisodes Then
+            ' Reverse the current sort direction
+            If sortOrderEpisodes = SortOrder.Ascending Then
+                sortOrderEpisodes = SortOrder.Descending
+            Else
+                sortOrderEpisodes = SortOrder.Ascending
+            End If
+        Else
+            ' Set the column number that is to be sorted; default to ascending
+            sortColumnEpisodes = e.Column
+            sortOrderEpisodes = SortOrder.Ascending
+        End If
+
+        ' Add arrow to current sort column
+        Dim currentHeader = LVEpisodes.Columns(sortColumnEpisodes).Text.Replace(" ▲", "").Replace(" ▼", "")
+        If sortOrderEpisodes = SortOrder.Ascending Then
+            LVEpisodes.Columns(sortColumnEpisodes).Text = currentHeader & " ▲"
+        Else
+            LVEpisodes.Columns(sortColumnEpisodes).Text = currentHeader & " ▼"
+        End If
+
+        ' Set the ListViewItemSorter with the new sort options
+        LVEpisodes.ListViewItemSorter = New ListViewItemComparer(sortColumnEpisodes, sortOrderEpisodes)
+
+        ' Call the sort method to manually sort
+        LVEpisodes.Sort()
     End Sub
     Private Sub CMStations_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMStations.Opening
         If LVStations.SelectedItems.Count = 0 Then
@@ -286,15 +399,32 @@ Public Class Directory
     Private Sub CMIRemoveFromFavorites_Click(sender As Object, e As EventArgs) Handles CMIStreamRemoveFromFavorites.Click
         If LVStations.SelectedItems.Count = 0 Then Exit Sub
 
-        Dim url As String = LVStations.SelectedItems(0).SubItems(6).Text
-        Dim removed = RemoveFavorite(url)
+        Dim removedCount As Integer = 0
 
-        If removed Then
-            StatusLabel.Text = "Removed from Favorites."
-            SetSearch("Favorites")
+        ' Collect URLs first so we don't modify the ListView while iterating
+        Dim urls As New List(Of String)
+        For Each item As ListViewItem In LVStations.SelectedItems
+            urls.Add(item.SubItems(6).Text)
+        Next
+
+        ' Remove each favorite
+        For Each url In urls
+            If RemoveFavorite(url) Then
+                removedCount += 1
+            End If
+        Next
+
+        ' Status message
+        If removedCount = 0 Then
+            StatusLabel.Text = "No favorites were removed."
+        ElseIf removedCount = 1 Then
+            StatusLabel.Text = "Removed 1 favorite."
         Else
-            StatusLabel.Text = "Favorite not removed."
+            StatusLabel.Text = $"Removed {removedCount} favorites."
         End If
+
+        ' Refresh Favorites view
+        SetSearch("Favorites")
     End Sub
     Private Sub CMICopyStreamURL_Click(sender As Object, e As EventArgs) Handles CMIStreamCopyStreamURL.Click
         If LVStations.SelectedItems.Count = 0 Then Return
@@ -377,6 +507,13 @@ Public Class Directory
         Dim url = CStr(item.Tag)
         Player.AddToPlaylistFromDirectory(title, url)
     End Sub
+    Private Sub CMIEpisodeDownload_Click(sender As Object, e As EventArgs) Handles CMIEpisodeDownload.Click
+        If LVEpisodes.SelectedItems.Count = 0 Then Return
+        Dim item = LVEpisodes.SelectedItems(0)
+        Dim title = item.Text
+        Dim url = CStr(item.Tag)
+
+    End Sub
     Private Sub CMIEpisodeAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIEpisodeAddToFavorites.Click
         AddEpisodeToFavorites()
     End Sub
@@ -451,11 +588,11 @@ Public Class Directory
             LVStations.Items.Add(item)
         Next
 
-        AutoSizeColumn(LVStations.Columns("ColName"), 300)
-        AutoSizeColumn(LVStations.Columns("ColTags"), 200)
-        AutoSizeColumn(LVStations.Columns("ColCountry"))
-        AutoSizeColumn(LVStations.Columns("ColStatus"))
-        AutoSizeColumn(LVStations.Columns("ColURL"))
+        AutoSizeStationsColumn(LVStations.Columns("ColName"), 300)
+        AutoSizeStationsColumn(LVStations.Columns("ColTags"), 200)
+        AutoSizeStationsColumn(LVStations.Columns("ColCountry"))
+        AutoSizeStationsColumn(LVStations.Columns("ColStatus"))
+        AutoSizeStationsColumn(LVStations.Columns("ColURL"))
 
         LVStations.EndUpdate()
     End Sub
@@ -501,6 +638,14 @@ Public Class Directory
             LVPodcasts.Items.Add(item)
             index += 1
         Next
+
+        For Each col As ColumnHeader In LVPodcasts.Columns
+            Debug.WriteLine($"Podcast Column: {col.Name}")
+        Next
+        AutoSizePodcastsColumn(LVPodcasts.Columns("ColPodcastsTitle"), 800)
+        AutoSizePodcastsColumn(LVPodcasts.Columns("ColPodcastsAuthor"), 400)
+        AutoSizePodcastsColumn(LVPodcasts.Columns("ColPodcastsGenre"))
+        AutoSizePodcastsColumn(LVPodcasts.Columns("ColPodcastsURL"))
 
         LVPodcasts.EndUpdate()
 
@@ -887,11 +1032,35 @@ Public Class Directory
                 PanelPodcasts.Enabled = False
         End Select
     End Sub
-    Private Sub AutoSizeColumn(col As ColumnHeader, Optional maxWidth As Integer = 0)
+    Private Sub AutoSizeStationsColumn(col As ColumnHeader, Optional maxWidth As Integer = 0)
         LVStations.AutoResizeColumn(col.Index, ColumnHeaderAutoResizeStyle.ColumnContent)
         Dim contentWidth = col.Width
 
         LVStations.AutoResizeColumn(col.Index, ColumnHeaderAutoResizeStyle.HeaderSize)
+        Dim headerWidth = col.Width
+
+        Dim finalWidth = Math.Max(contentWidth, headerWidth)
+        If maxWidth > 0 Then finalWidth = Math.Min(maxWidth, finalWidth)
+
+        col.Width = finalWidth
+    End Sub
+    Private Sub AutoSizePodcastsColumn(col As ColumnHeader, Optional maxWidth As Integer = 0)
+        LVPodcasts.AutoResizeColumn(col.Index, ColumnHeaderAutoResizeStyle.ColumnContent)
+        Dim contentWidth = col.Width
+
+        LVPodcasts.AutoResizeColumn(col.Index, ColumnHeaderAutoResizeStyle.HeaderSize)
+        Dim headerWidth = col.Width
+
+        Dim finalWidth = Math.Max(contentWidth, headerWidth)
+        If maxWidth > 0 Then finalWidth = Math.Min(maxWidth, finalWidth)
+
+        col.Width = finalWidth
+    End Sub
+    Private Sub AutoSizeEpisodesColumn(col As ColumnHeader, Optional maxWidth As Integer = 0)
+        LVEpisodes.AutoResizeColumn(col.Index, ColumnHeaderAutoResizeStyle.ColumnContent)
+        Dim contentWidth = col.Width
+
+        LVEpisodes.AutoResizeColumn(col.Index, ColumnHeaderAutoResizeStyle.HeaderSize)
         Dim headerWidth = col.Width
 
         Dim finalWidth = Math.Max(contentWidth, headerWidth)
@@ -910,8 +1079,8 @@ Public Class Directory
         Next
 
         ' Reset sort state
-        sortColumn = -1
-        sortOrder = SortOrder.Ascending
+        sortColumnStations = -1
+        sortOrderStations = SortOrder.Ascending
         LVStations.ListViewItemSorter = Nothing
     End Sub
     Private Sub CheckMove(ByRef location As Point)
@@ -959,6 +1128,8 @@ Public Class Directory
     End Sub
     Friend Sub ReThemeMenus()
         App.ThemeMenu(CMStations)
+        App.ThemeMenu(CMPodcasts)
+        App.ThemeMenu(CMEpisodes)
     End Sub
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor()
@@ -1111,6 +1282,33 @@ Public Class Directory
         Next
 
         Return list
+    End Function
+    Private Async Function OpenPodcastFavorite(entry As StreamEntry) As Task
+        ' Switch UI to podcast mode
+        SetPanels("Apple Podcasts")
+        PanelPodcasts.Visible = True
+        PanelStreams.Visible = False
+
+        ' Clear lists
+        LVPodcasts.Items.Clear()
+        LVEpisodes.Items.Clear()
+
+        ' Add a single podcast entry to LVPodcasts
+        Dim item As New ListViewItem("")
+        item.SubItems.Add(entry.Name)
+        item.SubItems.Add("Favorite Podcast")
+        item.SubItems.Add("Podcast")
+        item.SubItems.Add(entry.Url)
+        item.Tag = entry.Url
+
+        LVPodcasts.Items.Add(item)
+
+        ' Auto-select it
+        item.Selected = True
+
+        ' Load episodes
+        StatusLabel.Text = "Loading podcast episodes…"
+        Await LoadPodcastEpisodes(entry.Url)
     End Function
 
     ' ListView Sorter Class
@@ -1401,10 +1599,20 @@ Public Class Directory
 
             For Each ep In items
                 Dim title = ep.<title>.Value
-                Dim pubDate = ep.<pubDate>.Value
+
+                ' Parse pubDate safely and format using system settings
+                Dim pubDateRaw = ep.<pubDate>.Value
+                Dim pubDate As String = ""
+                Dim dt As Date
+
+                If Date.TryParse(pubDateRaw, dt) Then
+                    pubDate = dt.ToShortDateString()   ' ← system format
+                End If
+
                 Dim desc = ep.<description>.Value
                 Dim duration = ep.Element(nsItunes + "duration")?.Value
                 Dim enclosure = ep.<enclosure>.@url
+
                 Dim item As New ListViewItem(title)
                 item.SubItems.Add(duration)
                 item.SubItems.Add(pubDate)
@@ -1414,6 +1622,12 @@ Public Class Directory
 
                 LVEpisodes.Items.Add(item)
             Next
+
+            AutoSizeEpisodesColumn(LVEpisodes.Columns("ColEpisodesTitle"), 800)
+            AutoSizeEpisodesColumn(LVEpisodes.Columns("ColEpisodesDuration"))
+            AutoSizeEpisodesColumn(LVEpisodes.Columns("ColEpisodesReleaseDate"))
+            AutoSizeEpisodesColumn(LVEpisodes.Columns("ColEpisodesDescription"), 800)
+            AutoSizeEpisodesColumn(LVEpisodes.Columns("ColEpisodesURL"))
 
             LVEpisodes.EndUpdate()
             StatusLabel.Text = $"Loaded {LVEpisodes.Items.Count} episodes."

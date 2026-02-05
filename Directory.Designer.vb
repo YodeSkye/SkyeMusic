@@ -51,11 +51,11 @@ Partial Class Directory
         CMIStreamCopyStreamURL = New ToolStripMenuItem()
         PanelPodcasts = New Panel()
         LVEpisodes = New ListView()
-        ColumnEpisodesTitle = New ColumnHeader()
-        ColumnEpisodesDuration = New ColumnHeader()
-        ColumnEpisodesReleaseDate = New ColumnHeader()
-        ColumnEpisodesDescription = New ColumnHeader()
-        ColumnEpisodesURL = New ColumnHeader()
+        ColEpisodesTitle = New ColumnHeader()
+        ColEpisodesDuration = New ColumnHeader()
+        ColEpisodesReleaseDate = New ColumnHeader()
+        ColEpisodesDescription = New ColumnHeader()
+        ColEpisodesURL = New ColumnHeader()
         CMEpisodes = New ContextMenuStrip(components)
         CMIEpisodePlay = New ToolStripMenuItem()
         CMIEpisodeAddToPlaylist = New ToolStripMenuItem()
@@ -64,11 +64,11 @@ Partial Class Directory
         CMIEpisodeRemoveFromFavorites = New ToolStripMenuItem()
         CMIEpisodeCopyURL = New ToolStripMenuItem()
         LVPodcasts = New ListView()
-        ColumnPodcastsArtwork = New ColumnHeader()
-        ColumnPodcastsTitle = New ColumnHeader()
-        ColumnPodcastsAuthor = New ColumnHeader()
-        ColumnPodcastsGenre = New ColumnHeader()
-        ColumnPodcastsURL = New ColumnHeader()
+        ColPodcastsArtwork = New ColumnHeader()
+        ColPodcastsTitle = New ColumnHeader()
+        ColPodcastsAuthor = New ColumnHeader()
+        ColPodcastsGenre = New ColumnHeader()
+        ColPodcastsURL = New ColumnHeader()
         CMPodcasts = New ContextMenuStrip(components)
         CMIPodcastsAddToFavorites = New ToolStripMenuItem()
         CMIPodcastsRemoveFromFavorites = New ToolStripMenuItem()
@@ -284,7 +284,7 @@ Partial Class Directory
         ' 
         ' LVEpisodes
         ' 
-        LVEpisodes.Columns.AddRange(New ColumnHeader() {ColumnEpisodesTitle, ColumnEpisodesDuration, ColumnEpisodesReleaseDate, ColumnEpisodesDescription, ColumnEpisodesURL})
+        LVEpisodes.Columns.AddRange(New ColumnHeader() {ColEpisodesTitle, ColEpisodesDuration, ColEpisodesReleaseDate, ColEpisodesDescription, ColEpisodesURL})
         LVEpisodes.ContextMenuStrip = CMEpisodes
         LVEpisodes.Dock = DockStyle.Fill
         LVEpisodes.FullRowSelect = True
@@ -296,30 +296,30 @@ Partial Class Directory
         LVEpisodes.UseCompatibleStateImageBehavior = False
         LVEpisodes.View = View.Details
         ' 
-        ' ColumnEpisodesTitle
+        ' ColEpisodesTitle
         ' 
-        ColumnEpisodesTitle.Text = "Episode Title"
-        ColumnEpisodesTitle.Width = 400
+        ColEpisodesTitle.Text = "Episode Title"
+        ColEpisodesTitle.Width = 400
         ' 
-        ' ColumnEpisodesDuration
+        ' ColEpisodesDuration
         ' 
-        ColumnEpisodesDuration.Text = "Duration"
-        ColumnEpisodesDuration.Width = 75
+        ColEpisodesDuration.Text = "Duration"
+        ColEpisodesDuration.Width = 75
         ' 
-        ' ColumnEpisodesReleaseDate
+        ' ColEpisodesReleaseDate
         ' 
-        ColumnEpisodesReleaseDate.Text = "Release Date"
-        ColumnEpisodesReleaseDate.Width = 110
+        ColEpisodesReleaseDate.Text = "Release Date"
+        ColEpisodesReleaseDate.Width = 110
         ' 
-        ' ColumnEpisodesDescription
+        ' ColEpisodesDescription
         ' 
-        ColumnEpisodesDescription.Text = "Description"
-        ColumnEpisodesDescription.Width = 400
+        ColEpisodesDescription.Text = "Description"
+        ColEpisodesDescription.Width = 400
         ' 
-        ' ColumnEpisodesURL
+        ' ColEpisodesURL
         ' 
-        ColumnEpisodesURL.Text = "URL"
-        ColumnEpisodesURL.Width = 400
+        ColEpisodesURL.Text = "URL"
+        ColEpisodesURL.Width = 400
         ' 
         ' CMEpisodes
         ' 
@@ -371,7 +371,7 @@ Partial Class Directory
         ' 
         ' LVPodcasts
         ' 
-        LVPodcasts.Columns.AddRange(New ColumnHeader() {ColumnPodcastsArtwork, ColumnPodcastsTitle, ColumnPodcastsAuthor, ColumnPodcastsGenre, ColumnPodcastsURL})
+        LVPodcasts.Columns.AddRange(New ColumnHeader() {ColPodcastsArtwork, ColPodcastsTitle, ColPodcastsAuthor, ColPodcastsGenre, ColPodcastsURL})
         LVPodcasts.ContextMenuStrip = CMPodcasts
         LVPodcasts.Dock = DockStyle.Top
         LVPodcasts.FullRowSelect = True
@@ -384,30 +384,30 @@ Partial Class Directory
         LVPodcasts.UseCompatibleStateImageBehavior = False
         LVPodcasts.View = View.Details
         ' 
-        ' ColumnPodcastsArtwork
+        ' ColPodcastsArtwork
         ' 
-        ColumnPodcastsArtwork.Text = ""
-        ColumnPodcastsArtwork.Width = 32
+        ColPodcastsArtwork.Text = ""
+        ColPodcastsArtwork.Width = 32
         ' 
-        ' ColumnPodcastsTitle
+        ' ColPodcastsTitle
         ' 
-        ColumnPodcastsTitle.Text = "Podcast Title"
-        ColumnPodcastsTitle.Width = 400
+        ColPodcastsTitle.Text = "Podcast Title"
+        ColPodcastsTitle.Width = 400
         ' 
-        ' ColumnPodcastsAuthor
+        ' ColPodcastsAuthor
         ' 
-        ColumnPodcastsAuthor.Text = "Author"
-        ColumnPodcastsAuthor.Width = 200
+        ColPodcastsAuthor.Text = "Author"
+        ColPodcastsAuthor.Width = 200
         ' 
-        ' ColumnPodcastsGenre
+        ' ColPodcastsGenre
         ' 
-        ColumnPodcastsGenre.Text = "Genre"
-        ColumnPodcastsGenre.Width = 150
+        ColPodcastsGenre.Text = "Genre"
+        ColPodcastsGenre.Width = 150
         ' 
-        ' ColumnPodcastsURL
+        ' ColPodcastsURL
         ' 
-        ColumnPodcastsURL.Text = "Feed URL"
-        ColumnPodcastsURL.Width = 270
+        ColPodcastsURL.Text = "Feed URL"
+        ColPodcastsURL.Width = 270
         ' 
         ' CMPodcasts
         ' 
@@ -501,16 +501,16 @@ Partial Class Directory
     Friend WithEvents CMIEpisodeAddToFavorites As ToolStripMenuItem
     Friend WithEvents CMIEpisodeRemoveFromFavorites As ToolStripMenuItem
     Friend WithEvents CMIEpisodeCopyURL As ToolStripMenuItem
-    Friend WithEvents ColumnPodcastsArtwork As ColumnHeader
-    Friend WithEvents ColumnPodcastsTitle As ColumnHeader
-    Friend WithEvents ColumnPodcastsAuthor As ColumnHeader
-    Friend WithEvents ColumnPodcastsGenre As ColumnHeader
-    Friend WithEvents ColumnPodcastsURL As ColumnHeader
-    Friend WithEvents ColumnEpisodesTitle As ColumnHeader
-    Friend WithEvents ColumnEpisodesDuration As ColumnHeader
-    Friend WithEvents ColumnEpisodesReleaseDate As ColumnHeader
-    Friend WithEvents ColumnEpisodesDescription As ColumnHeader
-    Friend WithEvents ColumnEpisodesURL As ColumnHeader
+    Friend WithEvents ColPodcastsArtwork As ColumnHeader
+    Friend WithEvents ColPodcastsTitle As ColumnHeader
+    Friend WithEvents ColPodcastsAuthor As ColumnHeader
+    Friend WithEvents ColPodcastsGenre As ColumnHeader
+    Friend WithEvents ColPodcastsURL As ColumnHeader
+    Friend WithEvents ColEpisodesTitle As ColumnHeader
+    Friend WithEvents ColEpisodesDuration As ColumnHeader
+    Friend WithEvents ColEpisodesReleaseDate As ColumnHeader
+    Friend WithEvents ColEpisodesDescription As ColumnHeader
+    Friend WithEvents ColEpisodesURL As ColumnHeader
     Friend WithEvents ILPodcasts As ImageList
     Friend WithEvents CMPodcasts As ContextMenuStrip
     Friend WithEvents CMIPodcastsAddToFavorites As ToolStripMenuItem
