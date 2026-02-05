@@ -1,4 +1,5 @@
 ﻿
+Imports System.DirectoryServices.ActiveDirectory
 Imports System.IO
 Imports System.Text
 Imports LibVLCSharp.Shared
@@ -3837,7 +3838,7 @@ Public Class Player
         ' Use retry loop with delay to wait for GetVLCChild() to return valid handle.
         ' Avoid attaching hooks too early after playback starts.
 
-        'Clean up any previous hook
+        ' Clean up any previous hook
         If VLCHook IsNot Nothing Then
             VLCHook.ReleaseHandle()
             RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
@@ -3847,7 +3848,7 @@ Public Class Player
             'Debug.Print("VLC Viewer Hook Detached")
         End If
 
-        'Attach to the new child
+        ' Attach to the new child
         If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
             'Debug.Print("Attaching VLC Viewer Hook...")
 
@@ -3873,6 +3874,10 @@ Public Class Player
                 'Debug.Print("VLC Viewer Hook Attached")
             End If
         End If
+
+        ' Done here to make sure duration is available
+        If CurrentMediaType = MediaSourceTypes.Stream AndAlso _player.Duration > 0 Then TrackBarPosition.Enabled = True
+        LblDuration.Text = FormatDuration(_player.Duration)
 
     End Sub
     Private Sub OnPlaybackEnded()
@@ -5133,11 +5138,10 @@ Public Class Player
         If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.SetPlayState()
         TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not CurrentMediaType = App.MediaSourceTypes.Stream Then TrackBarPosition.Enabled = True
-        LblDuration.Text = FormatDuration(_player.Duration)
+        'LblDuration.Text = FormatDuration(_player.Duration) 'Moved to OnPlaybackStarted Handler to fix duration 00:00 on some files.
         ShowPosition()
         HasLyrics = False
         HasLyricsSynced = False
-        'Try
         Select Case CurrentMediaType
             Case App.MediaSourceTypes.AudioCD
                     ' not implemented
@@ -5166,11 +5170,6 @@ Public Class Player
                 End If
                 LoadLyrics(_player.Path)
         End Select
-        'Catch
-        '    PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
-        '    Text = My.Application.Info.Title + " - " + _player.Path
-        '    App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
-        'End Try
         RaiseEvent TitleChanged(PlaylistCurrentText)
 
         TimerShowMedia.Start()
