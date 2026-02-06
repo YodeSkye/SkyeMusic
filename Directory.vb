@@ -464,18 +464,18 @@ Public Class Directory
         Dim item = LVPodcasts.SelectedItems(0)
         Dim url = CStr(item.Tag)
         If IsURLFavorited(url) Then
-            CMIPodcastsRemoveFromFavorites.Visible = True
-            CMIPodcastsAddToFavorites.Visible = False
+            CMIPodcastRemoveFromFavorites.Visible = True
+            CMIPodcastAddToFavorites.Visible = False
         Else
-            CMIPodcastsRemoveFromFavorites.Visible = False
-            CMIPodcastsAddToFavorites.Visible = True
+            CMIPodcastRemoveFromFavorites.Visible = False
+            CMIPodcastAddToFavorites.Visible = True
         End If
 
     End Sub
-    Private Sub CMIPodcastsAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIPodcastsAddToFavorites.Click
+    Private Sub CMIPodcastsAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIPodcastAddToFavorites.Click
         AddPodcastToFavorites()
     End Sub
-    Private Sub CMIPodcastsRemoveFromFavorites_Click(sender As Object, e As EventArgs) Handles CMIPodcastsRemoveFromFavorites.Click
+    Private Sub CMIPodcastsRemoveFromFavorites_Click(sender As Object, e As EventArgs) Handles CMIPodcastRemoveFromFavorites.Click
         If LVPodcasts.SelectedItems.Count = 0 Then Exit Sub
 
         Dim url As String = LVPodcasts.SelectedItems(0).SubItems(4).Text
@@ -486,6 +486,11 @@ Public Class Directory
         Else
             StatusLabel.Text = "Favorite not removed."
         End If
+    End Sub
+    Private Sub CMIPodcastCopyURL_Click(sender As Object, e As EventArgs) Handles CMIPodcastCopyURL.Click
+        If LVPodcasts.SelectedItems.Count = 0 Then Return
+        Dim url As String = LVPodcasts.SelectedItems(0).SubItems(4).Text
+        Clipboard.SetText(url)
     End Sub
     Private Sub CMEpisodes_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMEpisodes.Opening
         If LVEpisodes.SelectedItems.Count = 0 Then
@@ -555,6 +560,11 @@ Public Class Directory
         Else
             StatusLabel.Text = "Favorite not removed."
         End If
+    End Sub
+    Private Sub CMIEpisodeCopyURL_Click(sender As Object, e As EventArgs) Handles CMIEpisodeCopyURL.Click
+        If LVEpisodes.SelectedItems.Count = 0 Then Return
+        Dim url As String = LVEpisodes.SelectedItems(0).SubItems(4).Text
+        Clipboard.SetText(url)
     End Sub
     Private Sub BtnSearch_Click(sender As Object, e As EventArgs) Handles BtnSearch.Click
         Search()

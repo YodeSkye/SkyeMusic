@@ -70,8 +70,9 @@ Partial Class Directory
         ColPodcastsGenre = New ColumnHeader()
         ColPodcastsURL = New ColumnHeader()
         CMPodcasts = New ContextMenuStrip(components)
-        CMIPodcastsAddToFavorites = New ToolStripMenuItem()
-        CMIPodcastsRemoveFromFavorites = New ToolStripMenuItem()
+        CMIPodcastAddToFavorites = New ToolStripMenuItem()
+        CMIPodcastRemoveFromFavorites = New ToolStripMenuItem()
+        CMIPodcastCopyURL = New ToolStripMenuItem()
         ILPodcasts = New ImageList(components)
         SplitContainerPodcasts = New SplitContainer()
         PanelSearch.SuspendLayout()
@@ -324,7 +325,7 @@ Partial Class Directory
         ' 
         CMEpisodes.Items.AddRange(New ToolStripItem() {CMIEpisodePlay, CMIEpisodeAddToPlaylist, CMIEpisodeDownload, CMIEpisodeAddToFavorites, CMIEpisodeRemoveFromFavorites, CMIEpisodeCopyURL})
         CMEpisodes.Name = "CMEpisodes"
-        CMEpisodes.Size = New Size(199, 136)
+        CMEpisodes.Size = New Size(199, 158)
         ' 
         ' CMIEpisodePlay
         ' 
@@ -410,23 +411,30 @@ Partial Class Directory
         ' 
         ' CMPodcasts
         ' 
-        CMPodcasts.Items.AddRange(New ToolStripItem() {CMIPodcastsAddToFavorites, CMIPodcastsRemoveFromFavorites})
+        CMPodcasts.Items.AddRange(New ToolStripItem() {CMIPodcastAddToFavorites, CMIPodcastRemoveFromFavorites, CMIPodcastCopyURL})
         CMPodcasts.Name = "CMPodcasts"
-        CMPodcasts.Size = New Size(199, 48)
+        CMPodcasts.Size = New Size(199, 70)
         ' 
-        ' CMIPodcastsAddToFavorites
+        ' CMIPodcastAddToFavorites
         ' 
-        CMIPodcastsAddToFavorites.Image = My.Resources.Resources.ImageFavorites16
-        CMIPodcastsAddToFavorites.Name = "CMIPodcastsAddToFavorites"
-        CMIPodcastsAddToFavorites.Size = New Size(198, 22)
-        CMIPodcastsAddToFavorites.Text = "Add To Favorites"
+        CMIPodcastAddToFavorites.Image = My.Resources.Resources.ImageFavorites16
+        CMIPodcastAddToFavorites.Name = "CMIPodcastAddToFavorites"
+        CMIPodcastAddToFavorites.Size = New Size(198, 22)
+        CMIPodcastAddToFavorites.Text = "Add To Favorites"
         ' 
-        ' CMIPodcastsRemoveFromFavorites
+        ' CMIPodcastRemoveFromFavorites
         ' 
-        CMIPodcastsRemoveFromFavorites.Image = My.Resources.Resources.ImageFavorites16
-        CMIPodcastsRemoveFromFavorites.Name = "CMIPodcastsRemoveFromFavorites"
-        CMIPodcastsRemoveFromFavorites.Size = New Size(198, 22)
-        CMIPodcastsRemoveFromFavorites.Text = "Remove From Favorites"
+        CMIPodcastRemoveFromFavorites.Image = My.Resources.Resources.ImageFavorites16
+        CMIPodcastRemoveFromFavorites.Name = "CMIPodcastRemoveFromFavorites"
+        CMIPodcastRemoveFromFavorites.Size = New Size(198, 22)
+        CMIPodcastRemoveFromFavorites.Text = "Remove From Favorites"
+        ' 
+        ' CMIPodcastCopyURL
+        ' 
+        CMIPodcastCopyURL.Image = My.Resources.Resources.ImageCopy16
+        CMIPodcastCopyURL.Name = "CMIPodcastCopyURL"
+        CMIPodcastCopyURL.Size = New Size(198, 22)
+        CMIPodcastCopyURL.Text = "Copy URL"
         ' 
         ' ILPodcasts
         ' 
@@ -533,8 +541,9 @@ Partial Class Directory
     Friend WithEvents ColEpisodesURL As ColumnHeader
     Friend WithEvents ILPodcasts As ImageList
     Friend WithEvents CMPodcasts As ContextMenuStrip
-    Friend WithEvents CMIPodcastsAddToFavorites As ToolStripMenuItem
-    Friend WithEvents CMIPodcastsRemoveFromFavorites As ToolStripMenuItem
+    Friend WithEvents CMIPodcastAddToFavorites As ToolStripMenuItem
+    Friend WithEvents CMIPodcastRemoveFromFavorites As ToolStripMenuItem
     Friend WithEvents StatusProgressBar As ToolStripProgressBar
     Friend WithEvents SplitContainerPodcasts As SplitContainer
+    Friend WithEvents CMIPodcastCopyURL As ToolStripMenuItem
 End Class
