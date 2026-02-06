@@ -29,6 +29,7 @@ Partial Class Directory
         TxtBoxSearch = New TextBox()
         StatusStripDirectory = New StatusStrip()
         StatusLabel = New ToolStripStatusLabel()
+        StatusProgressBar = New ToolStripProgressBar()
         PanelSources = New Panel()
         LVSources = New Skye.UI.ListViewEX()
         Source = New ColumnHeader()
@@ -73,7 +74,6 @@ Partial Class Directory
         CMIPodcastsAddToFavorites = New ToolStripMenuItem()
         CMIPodcastsRemoveFromFavorites = New ToolStripMenuItem()
         ILPodcasts = New ImageList(components)
-        StatusProgressBar = New ToolStripProgressBar()
         PanelSearch.SuspendLayout()
         StatusStripDirectory.SuspendLayout()
         PanelSources.SuspendLayout()
@@ -125,13 +125,19 @@ Partial Class Directory
         StatusLabel.Size = New Size(39, 17)
         StatusLabel.Text = "Status"
         ' 
+        ' StatusProgressBar
+        ' 
+        StatusProgressBar.Name = "StatusProgressBar"
+        StatusProgressBar.Size = New Size(100, 16)
+        StatusProgressBar.Visible = False
+        ' 
         ' PanelSources
         ' 
         PanelSources.Controls.Add(LVSources)
         PanelSources.Dock = DockStyle.Left
         PanelSources.Location = New Point(0, 49)
         PanelSources.Name = "PanelSources"
-        PanelSources.Size = New Size(95, 650)
+        PanelSources.Size = New Size(190, 650)
         PanelSources.TabIndex = 5
         ' 
         ' LVSources
@@ -147,7 +153,7 @@ Partial Class Directory
         LVSources.MultiSelect = False
         LVSources.Name = "LVSources"
         LVSources.Scrollable = False
-        LVSources.Size = New Size(95, 650)
+        LVSources.Size = New Size(190, 650)
         LVSources.TabIndex = 0
         LVSources.UseCompatibleStateImageBehavior = False
         ' 
@@ -166,9 +172,9 @@ Partial Class Directory
         ' 
         PanelStreams.Controls.Add(LVStations)
         PanelStreams.Dock = DockStyle.Fill
-        PanelStreams.Location = New Point(95, 49)
+        PanelStreams.Location = New Point(190, 49)
         PanelStreams.Name = "PanelStreams"
-        PanelStreams.Size = New Size(1089, 650)
+        PanelStreams.Size = New Size(994, 650)
         PanelStreams.TabIndex = 6
         PanelStreams.Visible = False
         ' 
@@ -183,7 +189,7 @@ Partial Class Directory
         LVStations.Location = New Point(0, 0)
         LVStations.MultiSelect = False
         LVStations.Name = "LVStations"
-        LVStations.Size = New Size(1089, 650)
+        LVStations.Size = New Size(994, 650)
         LVStations.TabIndex = 0
         LVStations.UseCompatibleStateImageBehavior = False
         LVStations.View = View.Details
@@ -277,9 +283,9 @@ Partial Class Directory
         PanelPodcasts.Controls.Add(LVEpisodes)
         PanelPodcasts.Controls.Add(LVPodcasts)
         PanelPodcasts.Dock = DockStyle.Fill
-        PanelPodcasts.Location = New Point(95, 49)
+        PanelPodcasts.Location = New Point(190, 49)
         PanelPodcasts.Name = "PanelPodcasts"
-        PanelPodcasts.Size = New Size(1089, 650)
+        PanelPodcasts.Size = New Size(994, 650)
         PanelPodcasts.TabIndex = 7
         PanelPodcasts.Visible = False
         ' 
@@ -292,7 +298,7 @@ Partial Class Directory
         LVEpisodes.Location = New Point(0, 250)
         LVEpisodes.MultiSelect = False
         LVEpisodes.Name = "LVEpisodes"
-        LVEpisodes.Size = New Size(1089, 400)
+        LVEpisodes.Size = New Size(994, 400)
         LVEpisodes.TabIndex = 1
         LVEpisodes.UseCompatibleStateImageBehavior = False
         LVEpisodes.View = View.Details
@@ -379,7 +385,7 @@ Partial Class Directory
         LVPodcasts.Location = New Point(0, 0)
         LVPodcasts.MultiSelect = False
         LVPodcasts.Name = "LVPodcasts"
-        LVPodcasts.Size = New Size(1089, 250)
+        LVPodcasts.Size = New Size(994, 250)
         LVPodcasts.SmallImageList = ILPodcasts
         LVPodcasts.TabIndex = 0
         LVPodcasts.UseCompatibleStateImageBehavior = False
@@ -435,12 +441,6 @@ Partial Class Directory
         ILPodcasts.ColorDepth = ColorDepth.Depth32Bit
         ILPodcasts.ImageSize = New Size(24, 24)
         ILPodcasts.TransparentColor = Color.Transparent
-        ' 
-        ' StatusProgressBar
-        ' 
-        StatusProgressBar.Name = "StatusProgressBar"
-        StatusProgressBar.Size = New Size(100, 16)
-        StatusProgressBar.Visible = False
         ' 
         ' Directory
         ' 

@@ -66,11 +66,13 @@ Public Class Directory
             LVEpisodes.Columns(3).Name = "ColEpisodesDescription"
             LVEpisodes.Columns(4).Name = "ColEpisodesURL"
         End If
+
         ILSources.Images.Add(My.Resources.ImageRadioBrowser96)
         ILSources.Images.Add(My.Resources.ImageSomaFM96)
         ILSources.Images.Add(My.Resources.ImageRadioParadise96)
         ILSources.Images.Add(My.Resources.ImageApplePodcasts96)
         ILSources.Images.Add(My.Resources.ImageFavorites96)
+        ILSources.Images.Add(My.Resources.ImageAddPodcastFeed96)
         ILSources.Images.Add(My.Resources.ImageAdd96)
         ILSources.Images.Add(My.Resources.ImageImport96)
 
@@ -175,7 +177,7 @@ Public Class Directory
     Private Sub LVSources_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVSources.SelectedIndexChanged
         If suppressSelection OrElse LVSources.SelectedItems.Count = 0 Then Return
         Dim selectedSource As String = LVSources.SelectedItems(0).Text
-        If selectedSource = "Add Stream To Playlist" OrElse selectedSource = "Import Playlist" Then Return
+        If selectedSource = "Add Podcast Feed" OrElse selectedSource = "Add Stream To Playlist" OrElse selectedSource = "Import Playlist" Then Return
         SetSearch(LVSources.SelectedItems(0).Text)
     End Sub
     Private Sub LVStations_MouseDown(sender As Object, e As MouseEventArgs) Handles LVStations.MouseDown
@@ -558,8 +560,9 @@ Public Class Directory
         LVSources.Items.Add("Radio Paradise", 2)
         LVSources.Items.Add("Apple Podcasts", 3)
         LVSources.Items.Add("Favorites", 4)
-        LVSources.Items.Add("Add Stream To Playlist", 5)
-        LVSources.Items.Add("Import Playlist", 6)
+        LVSources.Items.Add("Add Podcast Feed", 5)
+        LVSources.Items.Add("Add Stream To Playlist", 6)
+        LVSources.Items.Add("Import Playlist", 7)
 
         StatusLabel.Text = "Select a source to begin."
     End Sub
@@ -699,14 +702,15 @@ Public Class Directory
                 StatusLabel.Text = $"Search for Apple Podcasts."
             Case "Favorites"
                 TxtBoxSearch.PlaceholderText = "< Your Favorites >"
-
-                ' Load favorites as StreamEntry objects
                 Dim favs = GetFavoritesAsStreamEntries()
-
                 SetPanels(source)
                 LVStations.MultiSelect = True
                 PopulateStations(favs)
                 StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
+            Case "Add Podcast Feed"
+                TxtBoxSearch.PlaceholderText = "< Enter RSS Feed URL >"
+                SetPanels(source)
+                ShowManualFeedDialog()
             Case "Add Stream To Playlist"
                 TxtBoxSearch.PlaceholderText = String.Empty
                 SetPanels(source)
@@ -811,7 +815,7 @@ Public Class Directory
                 Else
                     StatusLabel.Text = $"Found {results.Count} Favorites."
                 End If
-            Case "Add Stream To Playlist", "Import Playlist"
+            Case "Add Podcast Feed", "Add Stream To Playlist", "Import Playlist"
                 StatusLabel.Text = "Not Searchable."
             Case Else
                 StatusLabel.Text = "Search not implemented for this source."
@@ -1031,6 +1035,11 @@ Public Class Directory
                 PanelStreams.Visible = True
                 PanelPodcasts.Enabled = False
                 PanelStreams.BringToFront()
+            Case "Add Podcast Feed"
+                PanelStreams.Enabled = False
+                PanelPodcasts.Enabled = True
+                PanelPodcasts.Visible = True
+                PanelPodcasts.BringToFront()
             Case "Add Stream To Playlist"
                 PanelStreams.Visible = False
                 PanelStreams.Enabled = False
@@ -1085,7 +1094,7 @@ Public Class Directory
         col.Width = finalWidth
     End Sub
     Private Sub SetStatusLabelEmptyText()
-        StatusLabel.Text = "No stations to display. Select a source from the left to begin."
+        StatusLabel.Text = "Nothing to display. Select a source from the left to begin."
     End Sub
     Private Sub ClearStationsSortState()
         ' Clear sort arrows from all columns
@@ -1099,6 +1108,14 @@ Public Class Directory
         sortOrderStations = SortOrder.Ascending
         LVStations.ListViewItemSorter = Nothing
     End Sub
+    Private Function IsValidHTTPURL(url As String) As Boolean
+        If String.IsNullOrWhiteSpace(url) Then Return False
+
+        Dim uri As Uri = Nothing
+        If Not Uri.TryCreate(url, UriKind.Absolute, uri) Then Return False
+
+        Return uri.Scheme = Uri.UriSchemeHttp OrElse uri.Scheme = Uri.UriSchemeHttps
+    End Function
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
@@ -1649,7 +1666,7 @@ Public Class Directory
             StatusLabel.Text = $"Loaded {LVEpisodes.Items.Count} episodes."
 
         Catch ex As Exception
-            StatusLabel.Text = "Failed to load podcast feed."
+            StatusLabel.Text = "Failed to Load Podcast Feed." & vbCr & ex.Message
         End Try
     End Function
     Private Async Function DownloadEpisodeAsync(podcastName As String, episodeTitle As String, url As String) As Task(Of String)
@@ -1712,6 +1729,98 @@ Public Class Directory
         Catch ex As Exception
             StatusProgressBar.Visible = False
             App.WriteToLog("Podcast Episode Download Error:" & vbCrLf & ex.ToString())
+            Return Nothing
+        End Try
+    End Function
+    Private Async Sub ShowManualFeedDialog()
+        Dim url = InputBox("Enter the RSS feed URL:", "Add Podcast Feed")
+        If String.IsNullOrWhiteSpace(url) Then
+            StatusLabel.Text = "No feed entered."
+            Return
+        End If
+
+        LVPodcasts.Items.Clear()
+        LVEpisodes.Items.Clear()
+
+        ' Fetch metadata
+        Dim meta = Await GetPodcastMetadata(url)
+
+        Dim title = If(meta.Title, "Unknown Podcast")
+        Dim author = If(meta.Author, "Unknown Author")
+        Dim genre = If(meta.Genre, "Podcast")
+        Dim artworkUrl = meta.Artwork
+
+        ' Load artwork
+        Dim img As Image = My.Resources.ImageAddPodcastFeed96
+        If IsValidHTTPURL(artworkUrl) Then
+            Try
+                Dim bytes = Await App.Http.GetByteArrayAsync(artworkUrl)
+                Using ms As New MemoryStream(bytes)
+                    img = Image.FromStream(ms)
+                End Using
+            Catch ex As HttpRequestException When ex.Message.Contains("No such host")
+                ' Artwork host is invalid; ignore
+            Catch ex As Exception
+                App.WriteToLog("Podcast Artwork Download Error: " & vbCr & ex.ToString())
+            End Try
+        End If
+        ILPodcasts.Images.Clear()
+        ILPodcasts.Images.Add(ResizeImage(img, ILPodcasts.ImageSize))
+
+        ' Add the podcast entry
+        Dim item As New ListViewItem("")
+        item.ImageIndex = 0
+        item.SubItems.Add(title)
+        item.SubItems.Add(author)
+        item.SubItems.Add(genre)
+        item.SubItems.Add(url)
+        item.Tag = url
+
+        LVPodcasts.Items.Add(item)
+        item.Selected = True
+
+        StatusLabel.Text = "Loading podcast episodes…"
+        Await LoadPodcastEpisodes(url)
+    End Sub
+    Private Async Function GetPodcastMetadata(feedUrl As String) As Task(Of (Title As String, Author As String, Artwork As String, Genre As String))
+        Try
+            Dim xmlString = Await App.Http.GetStringAsync(feedUrl)
+            Dim doc As XDocument = XDocument.Parse(xmlString)
+
+            Dim channel = doc.Root.<channel>.FirstOrDefault()
+            If channel Is Nothing Then Return Nothing
+
+            ' Declare namespaces
+            Dim nsItunes As XNamespace = "http://www.itunes.com/dtds/podcast-1.0.dtd"
+            Dim nsMedia As XNamespace = "http://search.yahoo.com/mrss/"
+            Dim nsDc As XNamespace = "http://purl.org/dc/elements/1.1/"
+
+            ' Title (always present)
+            Dim title = channel.<title>.FirstOrDefault()?.Value
+
+            ' Author with fallbacks
+            Dim author =
+            If(channel.Element(nsItunes + "author")?.Value,
+            If(channel.Element(nsDc + "creator")?.Value,
+            If(channel.<author>.FirstOrDefault()?.Value,
+            "Unknown Author")))
+
+            ' Artwork with fallbacks
+            Dim artwork =
+            If(channel.Element(nsItunes + "image")?.Attribute("href")?.Value,
+            If(channel.Element(nsMedia + "thumbnail")?.Attribute("url")?.Value,
+            If(channel.<image>.FirstOrDefault()?.<url>.FirstOrDefault()?.Value,
+            Nothing)))
+
+            ' Genre with fallbacks
+            Dim genre =
+            If(channel.Element(nsItunes + "category")?.Attribute("text")?.Value,
+            If(channel.<category>.FirstOrDefault()?.Value,
+            "Podcast"))
+
+            Return (title, author, artwork, genre)
+
+        Catch
             Return Nothing
         End Try
     End Function
