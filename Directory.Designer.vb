@@ -73,6 +73,7 @@ Partial Class Directory
         CMIPodcastsAddToFavorites = New ToolStripMenuItem()
         CMIPodcastsRemoveFromFavorites = New ToolStripMenuItem()
         ILPodcasts = New ImageList(components)
+        StatusProgressBar = New ToolStripProgressBar()
         PanelSearch.SuspendLayout()
         StatusStripDirectory.SuspendLayout()
         PanelSources.SuspendLayout()
@@ -112,7 +113,7 @@ Partial Class Directory
         ' 
         ' StatusStripDirectory
         ' 
-        StatusStripDirectory.Items.AddRange(New ToolStripItem() {StatusLabel})
+        StatusStripDirectory.Items.AddRange(New ToolStripItem() {StatusLabel, StatusProgressBar})
         StatusStripDirectory.Location = New Point(0, 699)
         StatusStripDirectory.Name = "StatusStripDirectory"
         StatusStripDirectory.Size = New Size(1184, 22)
@@ -435,6 +436,12 @@ Partial Class Directory
         ILPodcasts.ImageSize = New Size(24, 24)
         ILPodcasts.TransparentColor = Color.Transparent
         ' 
+        ' StatusProgressBar
+        ' 
+        StatusProgressBar.Name = "StatusProgressBar"
+        StatusProgressBar.Size = New Size(100, 16)
+        StatusProgressBar.Visible = False
+        ' 
         ' Directory
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -515,4 +522,5 @@ Partial Class Directory
     Friend WithEvents CMPodcasts As ContextMenuStrip
     Friend WithEvents CMIPodcastsAddToFavorites As ToolStripMenuItem
     Friend WithEvents CMIPodcastsRemoveFromFavorites As ToolStripMenuItem
+    Friend WithEvents StatusProgressBar As ToolStripProgressBar
 End Class

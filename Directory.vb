@@ -507,12 +507,28 @@ Public Class Directory
         Dim url = CStr(item.Tag)
         Player.AddToPlaylistFromDirectory(title, url)
     End Sub
-    Private Sub CMIEpisodeDownload_Click(sender As Object, e As EventArgs) Handles CMIEpisodeDownload.Click
+    Private Async Sub CMIEpisodeDownload_Click(sender As Object, e As EventArgs) Handles CMIEpisodeDownload.Click
         If LVEpisodes.SelectedItems.Count = 0 Then Return
+
         Dim item = LVEpisodes.SelectedItems(0)
         Dim title = item.Text
         Dim url = CStr(item.Tag)
 
+        ' Get podcast name from LVPodcasts selection
+        Dim podcastName As String = "Podcast"
+        If LVPodcasts.SelectedItems.Count > 0 Then
+            podcastName = LVPodcasts.SelectedItems(0).SubItems(1).Text
+        End If
+
+        StatusLabel.Text = "Downloading episode…"
+
+        Dim savedPath = Await DownloadEpisodeAsync(podcastName, title, url)
+
+        If savedPath Is Nothing Then
+            StatusLabel.Text = "Episode Download failed."
+        Else
+            StatusLabel.Text = $"Episode Saved to: {savedPath}"
+        End If
     End Sub
     Private Sub CMIEpisodeAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIEpisodeAddToFavorites.Click
         AddEpisodeToFavorites()
@@ -1634,6 +1650,69 @@ Public Class Directory
 
         Catch ex As Exception
             StatusLabel.Text = "Failed to load podcast feed."
+        End Try
+    End Function
+    Private Async Function DownloadEpisodeAsync(podcastName As String, episodeTitle As String, url As String) As Task(Of String)
+        Try
+            ' Sanitize names
+            Dim safePodcast = String.Join("_", podcastName.Split(Path.GetInvalidFileNameChars()))
+            Dim safeTitle = String.Join("_", episodeTitle.Split(Path.GetInvalidFileNameChars()))
+
+            ' Strip query string
+            Dim cleanUrl = url
+            Dim qIndex = cleanUrl.IndexOf("?"c)
+            If qIndex >= 0 Then cleanUrl = cleanUrl.Substring(0, qIndex)
+
+            ' Determine extension
+            Dim ext = Path.GetExtension(cleanUrl)
+            If String.IsNullOrWhiteSpace(ext) Then ext = ".mp3"
+
+            ' Build folder + file path
+            Dim folder = Path.Combine(DownloadPath, "Podcasts", safePodcast)
+            IO.Directory.CreateDirectory(folder)
+
+            Dim filePath = Path.Combine(folder, safeTitle & ext)
+
+            ' Prepare progress bar
+            StatusProgressBar.Value = 0
+            StatusProgressBar.Visible = True
+
+            ' Stream download
+            Using response = Await App.Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead)
+                response.EnsureSuccessStatusCode()
+
+                Dim totalBytes = response.Content.Headers.ContentLength.GetValueOrDefault(-1)
+                Dim canReportProgress = totalBytes > 0
+
+                Using input = Await response.Content.ReadAsStreamAsync(),
+                  output = File.Create(filePath)
+
+                    Dim buffer(8191) As Byte
+                    Dim bytesRead As Integer
+                    Dim totalRead As Long = 0
+
+                    Do
+                        bytesRead = Await input.ReadAsync(buffer, 0, buffer.Length)
+                        If bytesRead = 0 Then Exit Do
+
+                        Await output.WriteAsync(buffer, 0, bytesRead)
+                        totalRead += bytesRead
+
+                        If canReportProgress Then
+                            Dim pct = CInt((totalRead * 100L) / totalBytes)
+                            StatusProgressBar.Value = Math.Min(100, pct)
+                        End If
+                    Loop
+                End Using
+            End Using
+
+            StatusProgressBar.Visible = False
+            Return filePath
+
+        Catch ex As Exception
+            StatusProgressBar.Visible = False
+            App.WriteToLog("Podcast Episode Download Error:" & vbCrLf & ex.ToString())
+            Return Nothing
         End Try
     End Function
 
