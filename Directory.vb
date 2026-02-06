@@ -87,9 +87,7 @@ Public Class Directory
         CMEpisodes.Font = CurrentTheme.BaseFont
         CMIStreamPlay.Font = New Font(CurrentTheme.BaseFont, FontStyle.Bold)
         CMIEpisodePlay.Font = New Font(CurrentTheme.BaseFont, FontStyle.Bold)
-        SplitContainerPodcasts.BackColor = Color.FromArgb(50, 50, 50)
         SplitContainerPodcasts.SplitterWidth = 8
-        SplitContainerPodcasts.Cursor = Cursors.SizeNS
 
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.DirectorySize.Height >= 0 Then Me.Size = App.DirectorySize
@@ -162,11 +160,31 @@ Public Class Directory
     End Function
 
     ' Control Events
-    Private Sub SplitContainerPodcasts_MouseEnter(sender As Object, e As EventArgs) Handles SplitContainerPodcasts.MouseEnter
-        SplitContainerPodcasts.BackColor = Color.FromArgb(80, 80, 80)
+    Private Sub SplitContainerPodcasts_MouseMove(sender As Object, e As MouseEventArgs) Handles SplitContainerPodcasts.MouseMove
+        If SplitContainerPodcasts.Orientation = Orientation.Horizontal Then
+            ' Horizontal: splitter is a horizontal bar
+            Dim top = SplitContainerPodcasts.SplitterDistance
+            Dim bottom = top + SplitContainerPodcasts.SplitterWidth
+
+            If e.Y >= top AndAlso e.Y <= bottom Then
+                SplitContainerPodcasts.Cursor = Cursors.SizeNS
+            Else
+                SplitContainerPodcasts.Cursor = Cursors.Default
+            End If
+        Else
+            ' Vertical: splitter is a vertical bar
+            Dim left = SplitContainerPodcasts.SplitterDistance
+            Dim right = left + SplitContainerPodcasts.SplitterWidth
+
+            If e.X >= left AndAlso e.X <= right Then
+                SplitContainerPodcasts.Cursor = Cursors.SizeWE
+            Else
+                SplitContainerPodcasts.Cursor = Cursors.Default
+            End If
+        End If
     End Sub
     Private Sub SplitContainerPodcasts_MouseLeave(sender As Object, e As EventArgs) Handles SplitContainerPodcasts.MouseLeave
-        SplitContainerPodcasts.BackColor = Color.FromArgb(50, 50, 50)
+        SplitContainerPodcasts.Cursor = Cursors.Default
     End Sub
     Private Sub LVSources_MouseDown(sender As Object, e As MouseEventArgs) Handles LVSources.MouseDown
         ' Find the item under the mouse
@@ -1638,6 +1656,48 @@ Public Class Directory
         Dim obj = JObject.Parse(json)
         Return CType(obj("results"), JArray)
     End Function
+    Private Async Function GetPodcastMetadata(feedUrl As String) As Task(Of (Title As String, Author As String, Artwork As String, Genre As String))
+        Try
+            Dim xmlString = Await App.Http.GetStringAsync(feedUrl)
+            Dim doc As XDocument = XDocument.Parse(xmlString)
+
+            Dim channel = doc.Root.<channel>.FirstOrDefault()
+            If channel Is Nothing Then Return Nothing
+
+            ' Declare namespaces
+            Dim nsItunes As XNamespace = "http://www.itunes.com/dtds/podcast-1.0.dtd"
+            Dim nsMedia As XNamespace = "http://search.yahoo.com/mrss/"
+            Dim nsDc As XNamespace = "http://purl.org/dc/elements/1.1/"
+
+            ' Title (always present)
+            Dim title = channel.<title>.FirstOrDefault()?.Value
+
+            ' Author with fallbacks
+            Dim author =
+            If(channel.Element(nsItunes + "author")?.Value,
+            If(channel.Element(nsDc + "creator")?.Value,
+            If(channel.<author>.FirstOrDefault()?.Value,
+            "Unknown Author")))
+
+            ' Artwork with fallbacks
+            Dim artwork =
+            If(channel.Element(nsItunes + "image")?.Attribute("href")?.Value,
+            If(channel.Element(nsMedia + "thumbnail")?.Attribute("url")?.Value,
+            If(channel.<image>.FirstOrDefault()?.<url>.FirstOrDefault()?.Value,
+            Nothing)))
+
+            ' Genre with fallbacks
+            Dim genre =
+            If(channel.Element(nsItunes + "category")?.Attribute("text")?.Value,
+            If(channel.<category>.FirstOrDefault()?.Value,
+            "Podcast"))
+
+            Return (title, author, artwork, genre)
+
+        Catch
+            Return Nothing
+        End Try
+    End Function
     Private Async Function LoadPodcastEpisodes(feedUrl As String) As Task
         Try
             Dim nsItunes As XNamespace = "http://www.itunes.com/dtds/podcast-1.0.dtd"
@@ -1752,7 +1812,7 @@ Public Class Directory
         End Try
     End Function
     Private Async Sub ShowManualFeedDialog()
-        Dim url = InputBox("Enter the RSS Feed URL:", "Add Podcast Feed")
+        Dim url = InputDialog.ShowDialog("Add Podcast Feed", "Enter the RSS Feed URL:")
         If String.IsNullOrWhiteSpace(url) Then
             StatusLabel.Text = "No feed entered."
             Return
@@ -1802,47 +1862,5 @@ Public Class Directory
         StatusLabel.Text = "Loading podcast episodes…"
         Await LoadPodcastEpisodes(url)
     End Sub
-    Private Async Function GetPodcastMetadata(feedUrl As String) As Task(Of (Title As String, Author As String, Artwork As String, Genre As String))
-        Try
-            Dim xmlString = Await App.Http.GetStringAsync(feedUrl)
-            Dim doc As XDocument = XDocument.Parse(xmlString)
-
-            Dim channel = doc.Root.<channel>.FirstOrDefault()
-            If channel Is Nothing Then Return Nothing
-
-            ' Declare namespaces
-            Dim nsItunes As XNamespace = "http://www.itunes.com/dtds/podcast-1.0.dtd"
-            Dim nsMedia As XNamespace = "http://search.yahoo.com/mrss/"
-            Dim nsDc As XNamespace = "http://purl.org/dc/elements/1.1/"
-
-            ' Title (always present)
-            Dim title = channel.<title>.FirstOrDefault()?.Value
-
-            ' Author with fallbacks
-            Dim author =
-            If(channel.Element(nsItunes + "author")?.Value,
-            If(channel.Element(nsDc + "creator")?.Value,
-            If(channel.<author>.FirstOrDefault()?.Value,
-            "Unknown Author")))
-
-            ' Artwork with fallbacks
-            Dim artwork =
-            If(channel.Element(nsItunes + "image")?.Attribute("href")?.Value,
-            If(channel.Element(nsMedia + "thumbnail")?.Attribute("url")?.Value,
-            If(channel.<image>.FirstOrDefault()?.<url>.FirstOrDefault()?.Value,
-            Nothing)))
-
-            ' Genre with fallbacks
-            Dim genre =
-            If(channel.Element(nsItunes + "category")?.Attribute("text")?.Value,
-            If(channel.<category>.FirstOrDefault()?.Value,
-            "Podcast"))
-
-            Return (title, author, artwork, genre)
-
-        Catch
-            Return Nothing
-        End Try
-    End Function
 
 End Class

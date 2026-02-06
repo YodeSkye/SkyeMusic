@@ -118,7 +118,7 @@ Partial Class Directory
         ' StatusStripDirectory
         ' 
         StatusStripDirectory.Items.AddRange(New ToolStripItem() {StatusLabel, StatusProgressBar})
-        StatusStripDirectory.Location = New Point(0, 699)
+        StatusStripDirectory.Location = New Point(0, 439)
         StatusStripDirectory.Name = "StatusStripDirectory"
         StatusStripDirectory.Size = New Size(1184, 22)
         StatusStripDirectory.TabIndex = 2
@@ -141,7 +141,7 @@ Partial Class Directory
         PanelSources.Dock = DockStyle.Left
         PanelSources.Location = New Point(0, 49)
         PanelSources.Name = "PanelSources"
-        PanelSources.Size = New Size(190, 650)
+        PanelSources.Size = New Size(190, 390)
         PanelSources.TabIndex = 5
         ' 
         ' LVSources
@@ -157,7 +157,7 @@ Partial Class Directory
         LVSources.MultiSelect = False
         LVSources.Name = "LVSources"
         LVSources.Scrollable = False
-        LVSources.Size = New Size(190, 650)
+        LVSources.Size = New Size(190, 390)
         LVSources.TabIndex = 0
         LVSources.UseCompatibleStateImageBehavior = False
         ' 
@@ -178,7 +178,7 @@ Partial Class Directory
         PanelStreams.Dock = DockStyle.Fill
         PanelStreams.Location = New Point(190, 49)
         PanelStreams.Name = "PanelStreams"
-        PanelStreams.Size = New Size(994, 650)
+        PanelStreams.Size = New Size(994, 390)
         PanelStreams.TabIndex = 6
         PanelStreams.Visible = False
         ' 
@@ -193,7 +193,7 @@ Partial Class Directory
         LVStations.Location = New Point(0, 0)
         LVStations.MultiSelect = False
         LVStations.Name = "LVStations"
-        LVStations.Size = New Size(994, 650)
+        LVStations.Size = New Size(994, 390)
         LVStations.TabIndex = 0
         LVStations.UseCompatibleStateImageBehavior = False
         LVStations.View = View.Details
@@ -291,7 +291,7 @@ Partial Class Directory
         LVEpisodes.Location = New Point(0, 0)
         LVEpisodes.MultiSelect = False
         LVEpisodes.Name = "LVEpisodes"
-        LVEpisodes.Size = New Size(994, 441)
+        LVEpisodes.Size = New Size(994, 239)
         LVEpisodes.TabIndex = 1
         LVEpisodes.UseCompatibleStateImageBehavior = False
         LVEpisodes.View = View.Details
@@ -325,7 +325,7 @@ Partial Class Directory
         ' 
         CMEpisodes.Items.AddRange(New ToolStripItem() {CMIEpisodePlay, CMIEpisodeAddToPlaylist, CMIEpisodeDownload, CMIEpisodeAddToFavorites, CMIEpisodeRemoveFromFavorites, CMIEpisodeCopyURL})
         CMEpisodes.Name = "CMEpisodes"
-        CMEpisodes.Size = New Size(199, 158)
+        CMEpisodes.Size = New Size(199, 136)
         ' 
         ' CMIEpisodePlay
         ' 
@@ -378,7 +378,7 @@ Partial Class Directory
         LVPodcasts.Location = New Point(0, 0)
         LVPodcasts.MultiSelect = False
         LVPodcasts.Name = "LVPodcasts"
-        LVPodcasts.Size = New Size(994, 205)
+        LVPodcasts.Size = New Size(994, 147)
         LVPodcasts.SmallImageList = ILPodcasts
         LVPodcasts.TabIndex = 0
         LVPodcasts.UseCompatibleStateImageBehavior = False
@@ -456,15 +456,15 @@ Partial Class Directory
         ' SplitContainerPodcasts.Panel2
         ' 
         SplitContainerPodcasts.Panel2.Controls.Add(LVEpisodes)
-        SplitContainerPodcasts.Size = New Size(994, 650)
-        SplitContainerPodcasts.SplitterDistance = 205
+        SplitContainerPodcasts.Size = New Size(994, 390)
+        SplitContainerPodcasts.SplitterDistance = 147
         SplitContainerPodcasts.TabIndex = 7
         SplitContainerPodcasts.Visible = False
         ' 
         ' Directory
         ' 
         AutoScaleMode = AutoScaleMode.None
-        ClientSize = New Size(1184, 721)
+        ClientSize = New Size(1184, 461)
         Controls.Add(SplitContainerPodcasts)
         Controls.Add(PanelStreams)
         Controls.Add(PanelSources)
