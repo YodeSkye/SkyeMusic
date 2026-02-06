@@ -87,6 +87,9 @@ Public Class Directory
         CMEpisodes.Font = CurrentTheme.BaseFont
         CMIStreamPlay.Font = New Font(CurrentTheme.BaseFont, FontStyle.Bold)
         CMIEpisodePlay.Font = New Font(CurrentTheme.BaseFont, FontStyle.Bold)
+        SplitContainerPodcasts.BackColor = Color.FromArgb(50, 50, 50)
+        SplitContainerPodcasts.SplitterWidth = 8
+        SplitContainerPodcasts.Cursor = Cursors.SizeNS
 
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.DirectorySize.Height >= 0 Then Me.Size = App.DirectorySize
@@ -159,6 +162,12 @@ Public Class Directory
     End Function
 
     ' Control Events
+    Private Sub SplitContainerPodcasts_MouseEnter(sender As Object, e As EventArgs) Handles SplitContainerPodcasts.MouseEnter
+        SplitContainerPodcasts.BackColor = Color.FromArgb(80, 80, 80)
+    End Sub
+    Private Sub SplitContainerPodcasts_MouseLeave(sender As Object, e As EventArgs) Handles SplitContainerPodcasts.MouseLeave
+        SplitContainerPodcasts.BackColor = Color.FromArgb(50, 50, 50)
+    End Sub
     Private Sub LVSources_MouseDown(sender As Object, e As MouseEventArgs) Handles LVSources.MouseDown
         ' Find the item under the mouse
         suppressSelection = True
@@ -646,8 +655,7 @@ Public Class Directory
                 ILPodcasts.Images.Add(My.Resources.ImageApplePodcasts96)
             End If
 
-            Dim item As New ListViewItem("")
-            item.ImageIndex = index
+            Dim item As New ListViewItem(String.Empty) With {.ImageIndex = index}
             item.SubItems.Add(title)
             item.SubItems.Add(author)
             item.SubItems.Add(genre)
@@ -709,6 +717,7 @@ Public Class Directory
                 StatusLabel.Text = $"Loaded {Favorites.Count} favorite stations."
             Case "Add Podcast Feed"
                 TxtBoxSearch.PlaceholderText = "< Enter RSS Feed URL >"
+                StatusLabel.Text = String.Empty
                 SetPanels(source)
                 ShowManualFeedDialog()
             Case "Add Stream To Playlist"
@@ -1013,48 +1022,48 @@ Public Class Directory
             Case "Radio Browser"
                 PanelStreams.Enabled = True
                 PanelStreams.Visible = True
-                PanelPodcasts.Enabled = False
+                SplitContainerPodcasts.Enabled = False
                 PanelStreams.BringToFront()
             Case "SomaFM"
                 PanelStreams.Enabled = True
                 PanelStreams.Visible = True
-                PanelPodcasts.Enabled = False
+                SplitContainerPodcasts.Enabled = False
                 PanelStreams.BringToFront()
             Case "Radio Paradise"
                 PanelStreams.Enabled = True
                 PanelStreams.Visible = True
-                PanelPodcasts.Enabled = False
+                SplitContainerPodcasts.Enabled = False
                 PanelStreams.BringToFront()
             Case "Apple Podcasts"
                 PanelStreams.Enabled = False
-                PanelPodcasts.Enabled = True
-                PanelPodcasts.Visible = True
-                PanelPodcasts.BringToFront()
+                SplitContainerPodcasts.Enabled = True
+                SplitContainerPodcasts.Visible = True
+                SplitContainerPodcasts.BringToFront()
             Case "Favorites"
                 PanelStreams.Enabled = True
                 PanelStreams.Visible = True
-                PanelPodcasts.Enabled = False
+                SplitContainerPodcasts.Enabled = False
                 PanelStreams.BringToFront()
             Case "Add Podcast Feed"
                 PanelStreams.Enabled = False
-                PanelPodcasts.Enabled = True
-                PanelPodcasts.Visible = True
-                PanelPodcasts.BringToFront()
+                SplitContainerPodcasts.Enabled = True
+                SplitContainerPodcasts.Visible = True
+                SplitContainerPodcasts.BringToFront()
             Case "Add Stream To Playlist"
                 PanelStreams.Visible = False
                 PanelStreams.Enabled = False
-                PanelPodcasts.Visible = False
-                PanelPodcasts.Enabled = False
+                SplitContainerPodcasts.Visible = False
+                SplitContainerPodcasts.Enabled = False
             Case "Import Playlist"
                 PanelStreams.Visible = False
                 PanelStreams.Enabled = False
-                PanelPodcasts.Visible = False
-                PanelPodcasts.Enabled = False
+                SplitContainerPodcasts.Visible = False
+                SplitContainerPodcasts.Enabled = False
             Case Else
                 PanelStreams.Visible = False
                 PanelStreams.Enabled = False
-                PanelPodcasts.Visible = False
-                PanelPodcasts.Enabled = False
+                SplitContainerPodcasts.Visible = False
+                SplitContainerPodcasts.Enabled = False
         End Select
     End Sub
     Private Sub AutoSizeStationsColumn(col As ColumnHeader, Optional maxWidth As Integer = 0)
@@ -1319,7 +1328,7 @@ Public Class Directory
     Private Async Function OpenPodcastFavorite(entry As StreamEntry) As Task
         ' Switch UI to podcast mode
         SetPanels("Apple Podcasts")
-        PanelPodcasts.Visible = True
+        SplitContainerPodcasts.Visible = True
         PanelStreams.Visible = False
 
         ' Clear lists
@@ -1733,11 +1742,13 @@ Public Class Directory
         End Try
     End Function
     Private Async Sub ShowManualFeedDialog()
-        Dim url = InputBox("Enter the RSS feed URL:", "Add Podcast Feed")
+        Dim url = InputBox("Enter the RSS Feed URL:", "Add Podcast Feed")
         If String.IsNullOrWhiteSpace(url) Then
             StatusLabel.Text = "No feed entered."
             Return
         End If
+
+        StatusLabel.Text = "Loading Feed…"
 
         LVPodcasts.Items.Clear()
         LVEpisodes.Items.Clear()
@@ -1768,8 +1779,7 @@ Public Class Directory
         ILPodcasts.Images.Add(ResizeImage(img, ILPodcasts.ImageSize))
 
         ' Add the podcast entry
-        Dim item As New ListViewItem("")
-        item.ImageIndex = 0
+        Dim item As New ListViewItem(String.Empty) With {.ImageIndex = 0}
         item.SubItems.Add(title)
         item.SubItems.Add(author)
         item.SubItems.Add(genre)

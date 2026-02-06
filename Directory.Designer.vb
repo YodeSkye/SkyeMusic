@@ -50,7 +50,6 @@ Partial Class Directory
         CMIStreamAddToFavorites = New ToolStripMenuItem()
         CMIStreamRemoveFromFavorites = New ToolStripMenuItem()
         CMIStreamCopyStreamURL = New ToolStripMenuItem()
-        PanelPodcasts = New Panel()
         LVEpisodes = New ListView()
         ColEpisodesTitle = New ColumnHeader()
         ColEpisodesDuration = New ColumnHeader()
@@ -74,14 +73,18 @@ Partial Class Directory
         CMIPodcastsAddToFavorites = New ToolStripMenuItem()
         CMIPodcastsRemoveFromFavorites = New ToolStripMenuItem()
         ILPodcasts = New ImageList(components)
+        SplitContainerPodcasts = New SplitContainer()
         PanelSearch.SuspendLayout()
         StatusStripDirectory.SuspendLayout()
         PanelSources.SuspendLayout()
         PanelStreams.SuspendLayout()
         CMStations.SuspendLayout()
-        PanelPodcasts.SuspendLayout()
         CMEpisodes.SuspendLayout()
         CMPodcasts.SuspendLayout()
+        CType(SplitContainerPodcasts, ComponentModel.ISupportInitialize).BeginInit()
+        SplitContainerPodcasts.Panel1.SuspendLayout()
+        SplitContainerPodcasts.Panel2.SuspendLayout()
+        SplitContainerPodcasts.SuspendLayout()
         SuspendLayout()
         ' 
         ' PanelSearch
@@ -278,27 +281,16 @@ Partial Class Directory
         CMIStreamCopyStreamURL.Size = New Size(198, 22)
         CMIStreamCopyStreamURL.Text = "Copy URL"
         ' 
-        ' PanelPodcasts
-        ' 
-        PanelPodcasts.Controls.Add(LVEpisodes)
-        PanelPodcasts.Controls.Add(LVPodcasts)
-        PanelPodcasts.Dock = DockStyle.Fill
-        PanelPodcasts.Location = New Point(190, 49)
-        PanelPodcasts.Name = "PanelPodcasts"
-        PanelPodcasts.Size = New Size(994, 650)
-        PanelPodcasts.TabIndex = 7
-        PanelPodcasts.Visible = False
-        ' 
         ' LVEpisodes
         ' 
         LVEpisodes.Columns.AddRange(New ColumnHeader() {ColEpisodesTitle, ColEpisodesDuration, ColEpisodesReleaseDate, ColEpisodesDescription, ColEpisodesURL})
         LVEpisodes.ContextMenuStrip = CMEpisodes
         LVEpisodes.Dock = DockStyle.Fill
         LVEpisodes.FullRowSelect = True
-        LVEpisodes.Location = New Point(0, 250)
+        LVEpisodes.Location = New Point(0, 0)
         LVEpisodes.MultiSelect = False
         LVEpisodes.Name = "LVEpisodes"
-        LVEpisodes.Size = New Size(994, 400)
+        LVEpisodes.Size = New Size(994, 441)
         LVEpisodes.TabIndex = 1
         LVEpisodes.UseCompatibleStateImageBehavior = False
         LVEpisodes.View = View.Details
@@ -380,12 +372,12 @@ Partial Class Directory
         ' 
         LVPodcasts.Columns.AddRange(New ColumnHeader() {ColPodcastsArtwork, ColPodcastsTitle, ColPodcastsAuthor, ColPodcastsGenre, ColPodcastsURL})
         LVPodcasts.ContextMenuStrip = CMPodcasts
-        LVPodcasts.Dock = DockStyle.Top
+        LVPodcasts.Dock = DockStyle.Fill
         LVPodcasts.FullRowSelect = True
         LVPodcasts.Location = New Point(0, 0)
         LVPodcasts.MultiSelect = False
         LVPodcasts.Name = "LVPodcasts"
-        LVPodcasts.Size = New Size(994, 250)
+        LVPodcasts.Size = New Size(994, 205)
         LVPodcasts.SmallImageList = ILPodcasts
         LVPodcasts.TabIndex = 0
         LVPodcasts.UseCompatibleStateImageBehavior = False
@@ -442,11 +434,30 @@ Partial Class Directory
         ILPodcasts.ImageSize = New Size(24, 24)
         ILPodcasts.TransparentColor = Color.Transparent
         ' 
+        ' SplitContainerPodcasts
+        ' 
+        SplitContainerPodcasts.Dock = DockStyle.Fill
+        SplitContainerPodcasts.Location = New Point(190, 49)
+        SplitContainerPodcasts.Name = "SplitContainerPodcasts"
+        SplitContainerPodcasts.Orientation = Orientation.Horizontal
+        ' 
+        ' SplitContainerPodcasts.Panel1
+        ' 
+        SplitContainerPodcasts.Panel1.Controls.Add(LVPodcasts)
+        ' 
+        ' SplitContainerPodcasts.Panel2
+        ' 
+        SplitContainerPodcasts.Panel2.Controls.Add(LVEpisodes)
+        SplitContainerPodcasts.Size = New Size(994, 650)
+        SplitContainerPodcasts.SplitterDistance = 205
+        SplitContainerPodcasts.TabIndex = 7
+        SplitContainerPodcasts.Visible = False
+        ' 
         ' Directory
         ' 
         AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(1184, 721)
-        Controls.Add(PanelPodcasts)
+        Controls.Add(SplitContainerPodcasts)
         Controls.Add(PanelStreams)
         Controls.Add(PanelSources)
         Controls.Add(StatusStripDirectory)
@@ -466,9 +477,12 @@ Partial Class Directory
         PanelSources.ResumeLayout(False)
         PanelStreams.ResumeLayout(False)
         CMStations.ResumeLayout(False)
-        PanelPodcasts.ResumeLayout(False)
         CMEpisodes.ResumeLayout(False)
         CMPodcasts.ResumeLayout(False)
+        SplitContainerPodcasts.Panel1.ResumeLayout(False)
+        SplitContainerPodcasts.Panel2.ResumeLayout(False)
+        CType(SplitContainerPodcasts, ComponentModel.ISupportInitialize).EndInit()
+        SplitContainerPodcasts.ResumeLayout(False)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -498,7 +512,6 @@ Partial Class Directory
     Friend WithEvents ILSources As ImageList
     Friend WithEvents CMIStreamAddToFavorites As ToolStripMenuItem
     Friend WithEvents CMIStreamRemoveFromFavorites As ToolStripMenuItem
-    Friend WithEvents PanelPodcasts As Panel
     Friend WithEvents LVPodcasts As ListView
     Friend WithEvents LVEpisodes As ListView
     Friend WithEvents CMEpisodes As ContextMenuStrip
@@ -523,4 +536,5 @@ Partial Class Directory
     Friend WithEvents CMIPodcastsAddToFavorites As ToolStripMenuItem
     Friend WithEvents CMIPodcastsRemoveFromFavorites As ToolStripMenuItem
     Friend WithEvents StatusProgressBar As ToolStripProgressBar
+    Friend WithEvents SplitContainerPodcasts As SplitContainer
 End Class
