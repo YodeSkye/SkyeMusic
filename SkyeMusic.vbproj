@@ -105,11 +105,11 @@
   <ItemGroup>
     <PackageReference Include="LibVLCSharp.WinForms" Version="3.9.5" />
     <PackageReference Include="MetaBrainz.MusicBrainz" Version="7.0.0" />
-    <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="7.0.0" />
+    <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="7.1.0" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="SkyeLibrary" Version="1.4.7" />
-    <PackageReference Include="Syncfusion.Tools.Windows" Version="32.1.25" />
+    <PackageReference Include="SkyeLibrary" Version="1.4.10" />
+    <PackageReference Include="Syncfusion.Tools.Windows" Version="32.2.3" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23" />

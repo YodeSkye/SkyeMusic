@@ -1,5 +1,4 @@
 ﻿
-Imports System.DirectoryServices.ActiveDirectory
 Imports System.IO
 Imports System.Text
 Imports LibVLCSharp.Shared
@@ -2675,38 +2674,45 @@ Public Class Player
             .Text = "Title",
             .Width = 300}
         LVPlaylist.Columns.Add(header)
+        LVPlaylist.EditableColumns.Add(False)
         header = New ColumnHeader With {
             .Name = "Path",
             .Text = "Path",
             .Width = 550}
         LVPlaylist.Columns.Add(header)
+        LVPlaylist.EditableColumns.Add(False)
         header = New ColumnHeader With {
             .Name = "Rating",
             .Text = "Rating",
             .Width = 70,
             .TextAlign = HorizontalAlignment.Center}
         LVPlaylist.Columns.Add(header)
+        LVPlaylist.EditableColumns.Add(False)
         header = New ColumnHeader With {
             .Name = "PlayCount",
             .Text = "Plays",
             .Width = 60,
             .TextAlign = HorizontalAlignment.Center}
         LVPlaylist.Columns.Add(header)
+        LVPlaylist.EditableColumns.Add(False)
         header = New ColumnHeader With {
             .Name = "LastPlayed",
             .Text = "Last Played",
             .Width = 180}
         LVPlaylist.Columns.Add(header)
+        LVPlaylist.EditableColumns.Add(False)
         header = New ColumnHeader With {
             .Name = "FirstPlayed",
             .Text = "First Played",
             .Width = 180}
         LVPlaylist.Columns.Add(header)
+        LVPlaylist.EditableColumns.Add(False)
         header = New ColumnHeader With {
             .Name = "Added",
             .Text = "Added",
             .Width = 180}
         LVPlaylist.Columns.Add(header)
+        LVPlaylist.EditableColumns.Add(False)
         header = Nothing
 
         ' More Form Initialization
@@ -5665,7 +5671,7 @@ Public Class Player
 
         'Initialize
         Dim MyField As Reflection.PropertyInfo = MyToolStrip.GetType().GetProperty("ToolTip", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
-        Dim MyToolTip As ToolTip = CType(MyField.GetValue(MyToolStrip), ToolTip)
+        Dim MyToolTip As System.Windows.Forms.ToolTip = CType(MyField.GetValue(MyToolStrip), System.Windows.Forms.ToolTip)
 
         'Configure ToolTip
         MyToolTip.OwnerDraw = True
@@ -5674,7 +5680,7 @@ Public Class Player
         AddHandler MyToolTip.Popup,
             Sub(sender, e)
                 Dim s As SizeF
-                s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), TipPlaylistFont)
+                s = TextRenderer.MeasureText(CType(sender, System.Windows.Forms.ToolTip).GetToolTip(e.AssociatedControl), TipPlaylistFont)
                 s.Width += 14
                 s.Height += 16
                 e.ToolTipSize = s.ToSize
