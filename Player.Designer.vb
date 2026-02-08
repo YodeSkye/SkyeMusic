@@ -106,6 +106,7 @@ Partial Class Player
         TimerLyrics = New Timer(components)
         TipPlayer = New Skye.UI.ToolTip(components)
         PanelVisualizer = New Panel()
+        TimerStreamMeta = New Timer(components)
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -671,6 +672,7 @@ Partial Class Player
         LVPlaylist.AllowDrop = True
         LVPlaylist.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         LVPlaylist.ContextMenuStrip = CMPlaylist
+        LVPlaylist.EditableColumns = CType(resources.GetObject("LVPlaylist.EditableColumns"), List(Of Boolean))
         LVPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LVPlaylist.InsertionLineColor = Color.Teal
         LVPlaylist.Location = New Point(437, 27)
@@ -809,6 +811,10 @@ Partial Class Player
         PanelVisualizer.TabIndex = 40
         TipPlayer.SetToolTipImage(PanelVisualizer, Nothing)
         ' 
+        ' TimerStreamMeta
+        ' 
+        TimerStreamMeta.Interval = 3000
+        ' 
         ' Player
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -941,4 +947,5 @@ Partial Class Player
     Friend WithEvents CMIEditTag As ToolStripMenuItem
     Friend WithEvents MIMiniPlayer As ToolStripMenuItem
     Friend WithEvents MIDirectory As ToolStripMenuItem
+    Friend WithEvents TimerStreamMeta As Timer
 End Class

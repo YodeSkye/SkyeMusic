@@ -1,16 +1,18 @@
 ﻿
 Imports System.IO
+Imports System.Net.Http
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
 Imports NAudio.Wave
+Imports Newtonsoft.Json.Linq
 Imports Skye
 Imports Skye.Contracts
 Imports SkyeMusic.My
 
 Public Class Player
 
-    'Declarations
+    ' Declarations
     Friend Enum PlayStates
         Playing
         Paused
@@ -48,7 +50,7 @@ Public Class Player
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
 
-    'Sort Orders
+    ' Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
     Private PlaylistPathSort As SortOrder = SortOrder.None
     Private PlaylistRatingSort As SortOrder = SortOrder.None
@@ -57,7 +59,7 @@ Public Class Player
     Private PlaylistFirstPlayedSort As SortOrder = SortOrder.None
     Private PlaylistAddedSort As SortOrder = SortOrder.None
 
-    'Lyrics
+    ' Lyrics
     Public Class TimedLyric
         Public Property Time As TimeSpan
         Public Property Text As String
@@ -69,7 +71,7 @@ Public Class Player
     Private LyricsSynced As List(Of TimedLyric) 'Lyrics for synced lyrics
     Private LastLyricsIndex As Integer = -1 'Last index used for synced lyrics
 
-    'FullScreen
+    ' FullScreen
     Private frmFullScreen As Form 'Fullscreen Form
     Private fullscreenOriginalParent As Control 'Original Parent Control of VLC Viewer
     Private fullscreenOriginalBounds As Rectangle 'Original Bounds of VLC Viewer
@@ -84,7 +86,7 @@ Public Class Player
         End Set
     End Property
 
-    'Watcher Property
+    ' Watcher Property
     Private _watchernotification As String
     <System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)>
     Friend Property WatcherNotification As String
@@ -97,7 +99,7 @@ Public Class Player
         End Set
     End Property
 
-    'Player Interface
+    ' Player Interface
     Private _player As Skye.Contracts.IMediaPlayer 'Media Player Interface
     Private VLCHook As VLCViewerHook 'Hook for VLC Viewer Control
     Public Class VLCPlayer
@@ -332,7 +334,73 @@ Public Class Player
         Return IntPtr.Zero
     End Function
 
-    'Visualizer Interface
+    ' Now Playing
+    Friend NowPlaying As New NowPlayingService()
+    Friend Class NowPlayingService
+        Public Event Changed(newValue As String)
+
+        Private _text As String = ""
+
+        Public Property Text As String
+            Get
+                Return _text
+            End Get
+            Set(value As String)
+                If _text <> value Then
+                    _text = value
+                    RaiseEvent Changed(value)
+                End If
+            End Set
+        End Property
+    End Class
+    Friend Interface IMetadataProvider
+        Function GetNowPlayingAsync(streamUrl As String) As Task(Of String)
+    End Interface
+    Friend Class SomaFMMetadataProvider
+        Implements IMetadataProvider
+
+        Public Async Function GetNowPlayingAsync(streamUrl As String) As Task(Of String) _
+            Implements IMetadataProvider.GetNowPlayingAsync
+
+            Try
+                ' Extract channel ID
+                Dim parts = streamUrl.Split("/"c)
+                Dim last = parts(parts.Length - 1)
+                Dim channelId = last.Split("-"c)(0).ToLower()
+
+                Dim apiUrl = $"https://somafm.com/songs/{channelId}.json"
+
+                Using client As New HttpClient()
+                    Dim json = Await client.GetStringAsync(apiUrl)
+                    Dim data = JObject.Parse(json)
+
+                    Dim song = data("songs")(0)
+
+                    ' Prefer explicit artist + title if available
+                    Dim artist = song("artist")?.ToString()
+                    Dim title = song("title")?.ToString()
+
+                    ' Inline space removal
+                    If App.Settings.PlaylistTitleRemoveSpaces Then
+                        If Not String.IsNullOrWhiteSpace(artist) Then artist = artist.Replace(" ", "")
+                        If Not String.IsNullOrWhiteSpace(title) Then title = title.Replace(" ", "")
+                    End If
+
+                    If Not String.IsNullOrWhiteSpace(artist) Then
+                        Return $"{artist}{App.Settings.PlaylistTitleSeparator}{title}"
+                    End If
+
+                    Return title
+                End Using
+
+            Catch
+                Return Nothing
+            End Try
+        End Function
+
+    End Class
+
+    ' Visualizer Interface
     Friend Visualizer As Boolean = False 'Indicates if the visualizer is active
     Friend VisualizerHost As VisualizerHostClass 'Host for Visualizers
     Private VisualizerEngine As VisualizerAudioEngine 'Audio Engine for Visualizers
@@ -2747,6 +2815,9 @@ Public Class Player
         ' Disable Mouse Wheel support for TrackBar
         AddHandler TrackBarPosition.MouseWheel, AddressOf TrackBarPosition_MouseWheel
 
+        'Now Playing Handler
+        AddHandler NowPlaying.Changed, AddressOf OnNowPlayingChanged
+
     End Sub
     Private Sub Player_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         TopMost = False
@@ -2766,7 +2837,7 @@ Public Class Player
         End If
     End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnReverse.KeyDown, BtnPlay.KeyDown, BtnForward.KeyDown, TrackBarPosition.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
-        If Not TxtBoxPlaylistSearch.Focused Then
+        If Not TxtBoxPlaylistSearch.Focused And Not LVPlaylist.EditableColumns(0) Then
             If e.Alt Then
             ElseIf e.Control Then
                 Select Case e.KeyCode
@@ -3267,6 +3338,9 @@ Public Class Player
         SetPlaylistCountText()
         AlbumArtIndex = 0
     End Sub
+    Private Sub LVPlaylist_AfterEdit(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVPlaylist.AfterEdit
+        LVPlaylist.EditableColumns(0) = False
+    End Sub
     Private Sub Panel_DoubleClick(sender As Object, e As EventArgs) Handles PanelMedia.DoubleClick, PanelVisualizer.DoubleClick
         ToggleMaximized()
     End Sub
@@ -3531,19 +3605,22 @@ Public Class Player
         LVPlaylist.Items.Clear()
     End Sub
     Private Sub CMIEditTitle_Click(sender As Object, e As EventArgs) Handles CMIEditTitle.Click
-        Dim frmEditTitle As New PlayerEditTitle With {
-            .NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text}
-        frmEditTitle.ShowDialog(Me)
-        If frmEditTitle.DialogResult = DialogResult.OK Then
-            If frmEditTitle.NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text Then
-                Debug.Print("Edit Title Cancelled, New Title Same As Old Title")
-            Else
-                LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text = frmEditTitle.NewTitle
-                Debug.Print("Title of " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " Updated to " + frmEditTitle.NewTitle)
-            End If
-        Else
-            Debug.Print("Edit Title Cancelled")
-        End If
+        Dim lvi = LVPlaylist.SelectedItems(0)
+        LVPlaylist.EditableColumns(0) = True
+        LVPlaylist.EditSubItem(lvi, 0)
+        'Dim frmEditTitle As New PlayerEditTitle With {
+        '    .NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text}
+        'frmEditTitle.ShowDialog(Me)
+        'If frmEditTitle.DialogResult = DialogResult.OK Then
+        '    If frmEditTitle.NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text Then
+        '        Debug.Print("Edit Title Cancelled, New Title Same As Old Title")
+        '    Else
+        '        LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text = frmEditTitle.NewTitle
+        '        Debug.Print("Title of " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " Updated to " + frmEditTitle.NewTitle)
+        '    End If
+        'Else
+        '    Debug.Print("Edit Title Cancelled")
+        'End If
     End Sub
     Private Sub CMIShowCurrentClick(sender As Object, e As EventArgs) Handles CMIShowCurrent.Click
         Dim item As ListViewItem
@@ -3965,6 +4042,23 @@ Public Class Player
         MeterPeakLeft = MeterDecayLeft
         MeterPeakRight = MeterDecayRight
     End Sub
+    Private Sub OnNowPlayingChanged(nptext As String)
+        If Not CurrentMediaType = App.MediaSourceTypes.Stream Then Exit Sub
+        If Not _player.Duration = 0 Then Exit Sub
+
+        ' Update title bar
+        Text = My.Application.Info.Title & " - " & nptext
+
+        ' Update Tray Icon
+        Skye.Common.Trunc(Application.Info.Title & " - " & nptext, 127)
+
+        ' Fire your existing MiniPlayer event
+        RaiseEvent TitleChanged(nptext)
+
+        ' Show Toast
+        ShowNowPlayingToast(nptext)
+
+    End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
         If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             Dim leftScaled As Single = MeterPeakLeft * 100.0F
@@ -4037,6 +4131,14 @@ Public Class Player
         Else
             LblMedia.Text = String.Empty
         End If
+    End Sub
+    Private Sub TimerStreamMeta_Tick(sender As Object, e As EventArgs) Handles TimerStreamMeta.Tick
+        If Not PlayState = PlayStates.Playing Then Exit Sub
+        If Not CurrentMediaType = App.MediaSourceTypes.Stream Then Exit Sub
+        If Not _player.Duration = 0 Then Exit Sub
+
+        PollStreamMetadata()
+
     End Sub
 
     'Methods
@@ -4124,6 +4226,42 @@ Public Class Player
             Return 0
         End If
     End Function
+    Private Async Sub PollStreamMetadata()
+        Dim url As String = _player.Path
+        If String.IsNullOrWhiteSpace(url) Then Exit Sub
+
+        ' --- SOMAFM METADATA PROVIDER ---
+        If url.Contains("somafm.com") Then
+            Dim provider As New SomaFMMetadataProvider()
+            Dim np = Await provider.GetNowPlayingAsync(url)
+            If Not String.IsNullOrWhiteSpace(np) Then
+                Debug.Print("SomaFM Metadata: " & np)
+                If NowPlaying.Text <> np Then
+                    NowPlaying.Text = np
+                End If
+                Exit Sub
+            End If
+        End If
+        ' --------------------------------
+
+        ' --- VLC METADATA FALLBACK ---
+        Dim vlc = TryCast(_player, VLCPlayer)
+        If vlc Is Nothing Then Exit Sub
+        Dim media = vlc.MediaPlayer.Media()
+        If media Is Nothing Then Exit Sub
+        Try
+            Await media.Parse(MediaParseOptions.ParseNetwork)
+            Dim np As String = media.Meta(MetadataType.NowPlaying)
+            If String.IsNullOrWhiteSpace(np) Then Exit Sub
+            Debug.Print("Polled Stream Metadata: " & np)
+            If NowPlaying.Text <> np Then
+                NowPlaying.Text = np
+            End If
+        Catch ex As Exception
+        End Try
+        ' ------------------------------
+
+    End Sub
     Private Sub ShowNowPlayingToast(songtext As String)
         If App.Settings.ShowNowPlayingToast Then
             Dim npo As New Skye.UI.ToastOptions With {
@@ -5148,9 +5286,10 @@ Public Class Player
         ShowPosition()
         HasLyrics = False
         HasLyricsSynced = False
+        TimerStreamMeta.Stop()
         Select Case CurrentMediaType
             Case App.MediaSourceTypes.AudioCD
-                    ' not implemented
+                ' not implemented
             Case App.MediaSourceTypes.Stream
                 Dim path As String = _player.Path.TrimEnd("/"c)
                 Dim lvi = LVPlaylist.FindItemWithText(path, True, 0)
@@ -5163,6 +5302,7 @@ Public Class Player
                     Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
                     App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
                 End If
+                TimerStreamMeta.Start()
             Case App.MediaSourceTypes.File
                 Dim lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
                 If lvi Is Nothing Then
