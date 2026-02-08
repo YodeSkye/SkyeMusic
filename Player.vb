@@ -4043,9 +4043,6 @@ Public Class Player
         MeterPeakRight = MeterDecayRight
     End Sub
     Private Sub OnNowPlayingChanged(nptext As String)
-        If Not CurrentMediaType = App.MediaSourceTypes.Stream Then Exit Sub
-        If Not _player.Duration = 0 Then Exit Sub
-
         Dim title As String = nptext.Split("@"c)(0).Trim()
         Dim fullTitle As String = title & " @ " & _player.Path.TrimEnd("/"c)
 
@@ -5267,7 +5264,7 @@ Public Class Player
         ' - UI transitions (fullscreen, hooks) must be marshaled and timed carefully
         ' - Avoid cross-thread reparenting or teardown collisions
         PlayState = PlayStates.Playing
-
+        Debug.Print("OnPlay")
         'Update The Histories
         UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed for uniformity.
         If PausedAt IsNot Nothing Then
@@ -5286,7 +5283,6 @@ Public Class Player
         If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.SetPlayState()
         TrackBarPosition.Maximum = CInt(_player.Duration * TrackBarScale)
         If Not TrackBarPosition.Enabled AndAlso Not CurrentMediaType = App.MediaSourceTypes.Stream Then TrackBarPosition.Enabled = True
-        'LblDuration.Text = FormatDuration(_player.Duration) 'Moved to OnPlaybackStarted Handler to fix duration 00:00 on some files.
         ShowPosition()
         HasLyrics = False
         HasLyricsSynced = False
@@ -5326,6 +5322,7 @@ Public Class Player
     End Sub
     Private Sub OnPause()
         PlayState = PlayStates.Paused
+        'Debug.Print("OnPause")
         If PausedAt Is Nothing Then
             PausedAt = DateTime.Now
             Debug.Print("Paused at: " & PausedAt.ToString())
@@ -5335,6 +5332,8 @@ Public Class Player
     End Sub
     Private Sub OnStop()
         PlayState = PlayStates.Stopped
+        'Debug.Print("OnStop")
+        TimerStreamMeta.Stop()
         App.StopHistoryUpdates()
 
         'Save Song Play Data and reset
