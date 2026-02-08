@@ -4046,17 +4046,21 @@ Public Class Player
         If Not CurrentMediaType = App.MediaSourceTypes.Stream Then Exit Sub
         If Not _player.Duration = 0 Then Exit Sub
 
+        Dim title As String = nptext.Split("@"c)(0).Trim()
+        Dim fullTitle As String = title & " @ " & _player.Path.TrimEnd("/"c)
+
         ' Update title bar
-        Text = My.Application.Info.Title & " - " & nptext
+        Text = My.Application.Info.Title & " - " & fullTitle
 
         ' Update Tray Icon
-        Skye.Common.Trunc(Application.Info.Title & " - " & nptext, 127)
+        App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title & " - " & title, 127)
 
         ' Fire your existing MiniPlayer event
-        RaiseEvent TitleChanged(nptext)
+        PlaylistCurrentText = title
+        RaiseEvent TitleChanged(title)
 
         ' Show Toast
-        ShowNowPlayingToast(nptext)
+        ShowNowPlayingToast(title)
 
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
