@@ -360,7 +360,7 @@ Public Class Player
         Implements IMetadataProvider
 
         Public Async Function GetNowPlayingAsync(streamUrl As String) As Task(Of String) _
-            Implements IMetadataProvider.GetNowPlayingAsync
+        Implements IMetadataProvider.GetNowPlayingAsync
 
             Try
                 ' Extract channel ID
@@ -370,28 +370,25 @@ Public Class Player
 
                 Dim apiUrl = $"https://somafm.com/songs/{channelId}.json"
 
-                Using client As New HttpClient()
-                    Dim json = Await client.GetStringAsync(apiUrl)
-                    Dim data = JObject.Parse(json)
+                ' Use your global HttpClient
+                Dim json = Await App.Http.GetStringAsync(apiUrl)
+                Dim data = JObject.Parse(json)
 
-                    Dim song = data("songs")(0)
+                Dim song = data("songs")(0)
 
-                    ' Prefer explicit artist + title if available
-                    Dim artist = song("artist")?.ToString()
-                    Dim title = song("title")?.ToString()
+                Dim artist = song("artist")?.ToString()
+                Dim title = song("title")?.ToString()
 
-                    ' Inline space removal
-                    If App.Settings.PlaylistTitleRemoveSpaces Then
-                        If Not String.IsNullOrWhiteSpace(artist) Then artist = artist.Replace(" ", "")
-                        If Not String.IsNullOrWhiteSpace(title) Then title = title.Replace(" ", "")
-                    End If
+                If App.Settings.PlaylistTitleRemoveSpaces Then
+                    If Not String.IsNullOrWhiteSpace(artist) Then artist = artist.Replace(" ", "")
+                    If Not String.IsNullOrWhiteSpace(title) Then title = title.Replace(" ", "")
+                End If
 
-                    If Not String.IsNullOrWhiteSpace(artist) Then
-                        Return $"{artist}{App.Settings.PlaylistTitleSeparator}{title}"
-                    End If
+                If Not String.IsNullOrWhiteSpace(artist) Then
+                    Return $"{artist}{App.Settings.PlaylistTitleSeparator}{title}"
+                End If
 
-                    Return title
-                End Using
+                Return title
 
             Catch
                 Return Nothing
@@ -399,7 +396,6 @@ Public Class Player
         End Function
 
     End Class
-
     ' Visualizer Interface
     Friend Visualizer As Boolean = False 'Indicates if the visualizer is active
     Friend VisualizerHost As VisualizerHostClass 'Host for Visualizers
