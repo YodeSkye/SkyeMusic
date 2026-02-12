@@ -396,6 +396,7 @@ Public Class Player
         End Function
 
     End Class
+
     ' Visualizer Interface
     Friend Visualizer As Boolean = False 'Indicates if the visualizer is active
     Friend VisualizerHost As VisualizerHostClass 'Host for Visualizers
@@ -3333,6 +3334,26 @@ Public Class Player
     Private Sub LVPlaylist_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVPlaylist.SelectedIndexChanged
         SetPlaylistCountText()
         AlbumArtIndex = 0
+    End Sub
+    Private Sub LVPlaylist_BeforeEdit(item As ListViewItem, subItemIndex As Integer, ByRef cancel As Boolean) Handles LVPlaylist.BeforeEdit
+        item.SubItems(subItemIndex).Tag = item.SubItems(subItemIndex).Text
+    End Sub
+    Private Sub LVPlaylist_SubItemEdited(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVPlaylist.SubItemEdited
+
+        ' Only enforce uniqueness on the Name column
+        If subItemIndex <> 0 Then Exit Sub
+
+        Dim trimmed = newValue.Trim()
+
+        ' Empty names are not allowed
+        If trimmed = String.Empty Then
+            item.SubItems(subItemIndex).Text = item.SubItems(subItemIndex).Tag.ToString()
+            Exit Sub
+        End If
+
+        ' If valid, update the Tag to the new value
+        item.SubItems(subItemIndex).Tag = trimmed
+
     End Sub
     Private Sub LVPlaylist_AfterEdit(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVPlaylist.AfterEdit
         LVPlaylist.EditableColumns(0) = False
