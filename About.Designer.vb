@@ -41,6 +41,7 @@ Partial Class About
         LLblSponsorPayPal = New LinkLabel()
         LblSponsorMe = New Label()
         LblUpdateAvailable = New Skye.UI.Label()
+        LLblSkyeMusic = New LinkLabel()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -48,7 +49,7 @@ Partial Class About
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipAbout.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(160, 421)
+        BtnOK.Location = New Point(160, 541)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
         BtnOK.TabIndex = 50
@@ -77,7 +78,7 @@ Partial Class About
         LLblMicrosoft.Image = My.Resources.Resources.ImageAttributionMicrosoft16
         LLblMicrosoft.ImageAlign = ContentAlignment.MiddleLeft
         LLblMicrosoft.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblMicrosoft.Location = New Point(12, 112)
+        LLblMicrosoft.Location = New Point(12, 190)
         LLblMicrosoft.Name = "LLblMicrosoft"
         LLblMicrosoft.Size = New Size(94, 23)
         LLblMicrosoft.TabIndex = 3
@@ -93,7 +94,7 @@ Partial Class About
         TipAbout.SetImage(LLblSyncFusion, Nothing)
         LLblSyncFusion.Image = My.Resources.Resources.ImageAttributionSyncFusion24
         LLblSyncFusion.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSyncFusion.Location = New Point(218, 144)
+        LLblSyncFusion.Location = New Point(218, 222)
         LLblSyncFusion.Name = "LLblSyncFusion"
         LLblSyncFusion.Size = New Size(107, 23)
         LLblSyncFusion.TabIndex = 4
@@ -108,7 +109,7 @@ Partial Class About
         LLblIcons8.Image = My.Resources.Resources.ImageAttributionIcons816
         LLblIcons8.ImageAlign = ContentAlignment.MiddleLeft
         LLblIcons8.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblIcons8.Location = New Point(288, 184)
+        LLblIcons8.Location = New Point(288, 262)
         LLblIcons8.Name = "LLblIcons8"
         LLblIcons8.Size = New Size(70, 23)
         LLblIcons8.TabIndex = 7
@@ -124,7 +125,7 @@ Partial Class About
         TipAbout.SetImage(LLblTagLibSharp, Nothing)
         LLblTagLibSharp.ImageAlign = ContentAlignment.MiddleLeft
         LLblTagLibSharp.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblTagLibSharp.Location = New Point(27, 183)
+        LLblTagLibSharp.Location = New Point(27, 261)
         LLblTagLibSharp.Name = "LLblTagLibSharp"
         LLblTagLibSharp.Size = New Size(67, 23)
         LLblTagLibSharp.TabIndex = 6
@@ -137,7 +138,7 @@ Partial Class About
         ' 
         LblVersion.Font = New Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LblVersion, Nothing)
-        LblVersion.Location = New Point(12, 364)
+        LblVersion.Location = New Point(12, 442)
         LblVersion.Name = "LblVersion"
         LblVersion.Size = New Size(360, 23)
         LblVersion.TabIndex = 7
@@ -150,7 +151,7 @@ Partial Class About
         BtnChangeLog.Anchor = AnchorStyles.Bottom
         BtnChangeLog.Image = My.Resources.Resources.ImageChangeLog32
         TipAbout.SetImage(BtnChangeLog, Nothing)
-        BtnChangeLog.Location = New Point(324, 437)
+        BtnChangeLog.Location = New Point(324, 557)
         BtnChangeLog.Name = "BtnChangeLog"
         BtnChangeLog.Size = New Size(48, 48)
         BtnChangeLog.TabIndex = 100
@@ -173,7 +174,7 @@ Partial Class About
         TipAbout.SetImage(LLblVLCSharp, Nothing)
         LLblVLCSharp.ImageAlign = ContentAlignment.MiddleLeft
         LLblVLCSharp.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblVLCSharp.Location = New Point(149, 112)
+        LLblVLCSharp.Location = New Point(149, 190)
         LLblVLCSharp.Name = "LLblVLCSharp"
         LLblVLCSharp.Size = New Size(96, 23)
         LLblVLCSharp.TabIndex = 101
@@ -189,7 +190,7 @@ Partial Class About
         TipAbout.SetImage(LLblNAudio, Nothing)
         LLblNAudio.ImageAlign = ContentAlignment.MiddleLeft
         LLblNAudio.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblNAudio.Location = New Point(293, 112)
+        LLblNAudio.Location = New Point(293, 190)
         LLblNAudio.Name = "LLblNAudio"
         LLblNAudio.Size = New Size(79, 23)
         LLblNAudio.TabIndex = 102
@@ -205,7 +206,7 @@ Partial Class About
         TipAbout.SetImage(LLblSQLite, Nothing)
         LLblSQLite.Image = My.Resources.Resources.ImageAttributionSQLite
         LLblSQLite.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSQLite.Location = New Point(97, 142)
+        LLblSQLite.Location = New Point(97, 220)
         LLblSQLite.Name = "LLblSQLite"
         LLblSQLite.Size = New Size(79, 27)
         LLblSQLite.TabIndex = 103
@@ -219,7 +220,7 @@ Partial Class About
         TipAbout.SetImage(LLblMusicBrainz, Nothing)
         LLblMusicBrainz.Image = My.Resources.Resources.ImageAttributionMusicBrainz
         LLblMusicBrainz.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblMusicBrainz.Location = New Point(122, 176)
+        LLblMusicBrainz.Location = New Point(122, 254)
         LLblMusicBrainz.Name = "LLblMusicBrainz"
         LLblMusicBrainz.Size = New Size(138, 38)
         LLblMusicBrainz.TabIndex = 104
@@ -232,7 +233,7 @@ Partial Class About
         TipAbout.SetImage(LLblSponsorGitHub, Nothing)
         LLblSponsorGitHub.ImageAlign = ContentAlignment.MiddleLeft
         LLblSponsorGitHub.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSponsorGitHub.Location = New Point(53, 291)
+        LLblSponsorGitHub.Location = New Point(53, 369)
         LLblSponsorGitHub.Name = "LLblSponsorGitHub"
         LLblSponsorGitHub.Size = New Size(164, 30)
         LLblSponsorGitHub.TabIndex = 105
@@ -247,7 +248,7 @@ Partial Class About
         TipAbout.SetImage(LLblSponsorPayPal, Nothing)
         LLblSponsorPayPal.ImageAlign = ContentAlignment.MiddleLeft
         LLblSponsorPayPal.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSponsorPayPal.Location = New Point(245, 291)
+        LLblSponsorPayPal.Location = New Point(245, 369)
         LLblSponsorPayPal.Name = "LLblSponsorPayPal"
         LLblSponsorPayPal.Size = New Size(85, 30)
         LLblSponsorPayPal.TabIndex = 106
@@ -260,7 +261,7 @@ Partial Class About
         ' 
         LblSponsorMe.Font = New Font("Segoe UI", 15.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LblSponsorMe, Nothing)
-        LblSponsorMe.Location = New Point(12, 256)
+        LblSponsorMe.Location = New Point(12, 334)
         LblSponsorMe.Name = "LblSponsorMe"
         LblSponsorMe.Size = New Size(360, 31)
         LblSponsorMe.TabIndex = 107
@@ -272,7 +273,7 @@ Partial Class About
         ' 
         LblUpdateAvailable.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LblUpdateAvailable, Nothing)
-        LblUpdateAvailable.Location = New Point(12, 387)
+        LblUpdateAvailable.Location = New Point(12, 465)
         LblUpdateAvailable.Name = "LblUpdateAvailable"
         LblUpdateAvailable.Size = New Size(360, 23)
         LblUpdateAvailable.TabIndex = 108
@@ -281,11 +282,29 @@ Partial Class About
         LblUpdateAvailable.TextAlign = ContentAlignment.TopCenter
         LblUpdateAvailable.Visible = False
         ' 
+        ' LLblSkyeMusic
+        ' 
+        LLblSkyeMusic.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblSkyeMusic.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAbout.SetImage(LLblSkyeMusic, Nothing)
+        LLblSkyeMusic.Image = My.Resources.Resources.ImageAppRed16
+        LLblSkyeMusic.ImageAlign = ContentAlignment.MiddleLeft
+        LLblSkyeMusic.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblSkyeMusic.Location = New Point(134, 112)
+        LLblSkyeMusic.Name = "LLblSkyeMusic"
+        LLblSkyeMusic.Size = New Size(111, 23)
+        LLblSkyeMusic.TabIndex = 109
+        LLblSkyeMusic.TabStop = True
+        LLblSkyeMusic.Text = "Home Page"
+        TipAbout.SetText(LLblSkyeMusic, Nothing)
+        LLblSkyeMusic.TextAlign = ContentAlignment.TopRight
+        ' 
         ' About
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(384, 497)
+        ClientSize = New Size(384, 617)
+        Controls.Add(LLblSkyeMusic)
         Controls.Add(LblSponsorMe)
         Controls.Add(LLblSponsorPayPal)
         Controls.Add(LLblSponsorGitHub)
@@ -332,4 +351,5 @@ Partial Class About
     Friend WithEvents LLblSponsorPayPal As LinkLabel
     Friend WithEvents LblSponsorMe As Label
     Friend WithEvents LblUpdateAvailable As Skye.UI.Label
+    Friend WithEvents LLblSkyeMusic As LinkLabel
 End Class

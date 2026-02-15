@@ -95,6 +95,15 @@ Public Class About
             WriteToLog("Cannot Open Update Link" & vbCr & ex.Message)
         End Try
     End Sub
+    Private Sub LLblSkyeMusic_MouseEnter(sender As Object, e As EventArgs) Handles LLblSkyeMusic.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LLblSkyeMusic_MouseLeave(sender As Object, e As EventArgs) Handles LLblSkyeMusic.MouseLeave
+        ResetCursor()
+    End Sub
+    Private Sub LLblSkyeMusic_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSkyeMusic.MouseClick
+        OpenLink(App.AttributionSkye)
+    End Sub
     Private Sub LLblMicrosoft_MouseEnter(sender As Object, e As EventArgs) Handles LLblMicrosoft.MouseEnter
         Cursor = Cursors.Hand
     End Sub
@@ -226,6 +235,7 @@ Public Class About
             LblSponsorMe.ForeColor = App.CurrentTheme.AccentTextColor
             LblVersion.ForeColor = App.CurrentTheme.AccentTextColor
             LblUpdateAvailable.ForeColor = App.CurrentTheme.AccentTextColor
+            LLblSkyeMusic.LinkColor = App.CurrentTheme.AccentTextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.AccentTextColor
             LLblVLCSharp.LinkColor = App.CurrentTheme.AccentTextColor
             LLblNAudio.LinkColor = App.CurrentTheme.AccentTextColor
@@ -240,6 +250,7 @@ Public Class About
             LblSponsorMe.ForeColor = App.CurrentTheme.TextColor
             LblVersion.ForeColor = App.CurrentTheme.TextColor
             LblUpdateAvailable.ForeColor = App.CurrentTheme.TextColor
+            LLblSkyeMusic.LinkColor = App.CurrentTheme.TextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.TextColor
             LLblVLCSharp.LinkColor = App.CurrentTheme.TextColor
             LLblNAudio.LinkColor = App.CurrentTheme.TextColor
@@ -249,6 +260,7 @@ Public Class About
             LLblSponsorGitHub.LinkColor = App.CurrentTheme.TextColor
             LLblSponsorPayPal.LinkColor = App.CurrentTheme.TextColor
         End If
+        LLblSkyeMusic.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblMicrosoft.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblVLCSharp.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblNAudio.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
