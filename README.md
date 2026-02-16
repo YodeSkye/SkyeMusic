@@ -21,7 +21,7 @@ Support the project: https://github.com/sponsors/YodeSkye
 
 # Using from the repo:
 
-## 📥 Installing SkyeLibrary from a Local `.nupkg` File
+## 📥 Installing SkyeLibrary from a Local `.nupkg` File (included in the repo)
 
 After cloning this repo:
 
