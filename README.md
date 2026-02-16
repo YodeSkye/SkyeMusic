@@ -23,7 +23,8 @@ Support the project: https://github.com/sponsors/YodeSkye
 
 ## 📥 Installing SkyeLibrary from a Local `.nupkg` File (included in the repo)
 
-After cloning this repo:
+SkyeClip depends on SkyeLibrary, which is included as a .nupkg file in this repository.
+To install it (After cloning this repo):
 
 1. Open **Visual Studio**
 2. Go to **Tools > NuGet Package Manager > Package Manager Console**
