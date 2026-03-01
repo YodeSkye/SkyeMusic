@@ -264,11 +264,21 @@ Namespace My
         Friend Enum Themes
             BlueAccent
             PinkAccent
+            EmeraldAccent
+            VioletAccent
+            AmberAccent
+            TealAccent
+            HighContrast
             Light
             Dark
             DarkPink
-            Pink
-            Red
+            Blossom
+            CrimsonEmber
+            MidnightBlue
+            ForestGreen
+            SolarGold
+            Amethyst
+            Glacier
         End Enum
         Friend Structure ThemeProperties
             Public IsAccent As Boolean
@@ -336,6 +346,111 @@ Namespace My
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
             .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
             .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
+        Private ReadOnly EmeraldAccentTheme As New ThemeProperties With {
+            .IsAccent = True,
+            .BackColor = Color.FromArgb(255, 35, 35, 35),
+            .TextColor = Color.MediumSpringGreen,
+            .HoverColor = Color.FromArgb(255, 80, 255, 180),
+            .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
+            .ButtonBackColor = Color.FromArgb(255, 0, 180, 120),
+            .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
+        Private ReadOnly VioletAccentTheme As New ThemeProperties With {
+            .IsAccent = True,
+            .BackColor = Color.FromArgb(255, 35, 35, 35),
+            .TextColor = Color.MediumOrchid,
+            .HoverColor = Color.Plum,
+            .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
+            .ButtonBackColor = Color.MediumOrchid,
+            .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
+        Private ReadOnly AmberAccentTheme As New ThemeProperties With {
+            .IsAccent = True,
+            .BackColor = Color.FromArgb(255, 35, 35, 35),
+            .TextColor = Color.Gold,
+            .HoverColor = Color.FromArgb(255, 255, 215, 100),
+            .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
+            .ButtonBackColor = Color.FromArgb(255, 255, 170, 0),
+            .ButtonTextColor = Color.Black,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerBlackPlay,
+            .PlayerPause = Resources.ImagePlayerBlackPause,
+            .PlayerStop = Resources.ImagePlayerBlackStop,
+            .PlayerNext = Resources.ImagePlayerBlackNext,
+            .PlayerPrevious = Resources.ImagePlayerBlackPrevious,
+            .PlayerFastForward = Resources.ImagePlayerBlackFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerBlackFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
+        Private ReadOnly TealAccentTheme As New ThemeProperties With {
+            .IsAccent = True,
+            .BackColor = Color.FromArgb(255, 35, 35, 35),
+            .TextColor = Color.MediumTurquoise,
+            .HoverColor = Color.FromArgb(255, 120, 240, 220),
+            .ControlBackColor = Color.FromArgb(255, 35, 35, 35),
+            .ButtonBackColor = Color.FromArgb(255, 0, 160, 160),
+            .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
+        Private ReadOnly HighContrastTheme As New ThemeProperties With {
+            .IsAccent = False,
+            .BackColor = Color.Black,
+            .TextColor = Color.White,
+            .HoverColor = Color.FromArgb(255, 40, 40, 40),
+            .ControlBackColor = Color.Black,
+            .ButtonBackColor = Color.FromArgb(255, 255, 0, 0),
+            .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = Color.Gray,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
         Private ReadOnly LightTheme As New ThemeProperties With {
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 241, 240, 240), 'SystemColors.Control = 240,240,240, set to avoid transparency issues in ToolTipEX
@@ -396,7 +511,7 @@ Namespace My
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
             .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
             .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
-        Private ReadOnly PinkTheme As New ThemeProperties With {
+        Private ReadOnly BlossomTheme As New ThemeProperties With {
             .IsAccent = False,
             .BackColor = Color.Pink,
             .TextColor = Color.DeepPink,
@@ -416,7 +531,7 @@ Namespace My
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
             .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
             .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
-        Friend ReadOnly RedTheme As New ThemeProperties With { 'Used by Splash Screen
+        Friend ReadOnly CrimsonEmberTheme As New ThemeProperties With { 'Used by Splash Screen
             .IsAccent = False,
             .BackColor = Color.FromArgb(255, 128, 13, 13),
             .TextColor = Color.AntiqueWhite,
@@ -436,6 +551,111 @@ Namespace My
             .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
             .BaseFont = New Font("Segoe UI", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
             .SubBaseFont = New Font("Segoe UI", 11.0F, FontStyle.Regular, GraphicsUnit.Point)}
+        Private ReadOnly MidnightBlueTheme As New ThemeProperties With {
+            .IsAccent = False,
+            .BackColor = Color.FromArgb(255, 20, 24, 33),
+            .TextColor = Color.FromArgb(220, 230, 245),
+            .HoverColor = Color.FromArgb(255, 35, 45, 60),
+            .ControlBackColor = Color.FromArgb(255, 20, 24, 33),
+            .ButtonBackColor = Color.FromArgb(255, 45, 55, 75),
+            .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
+        Private ReadOnly ForestGreenTheme As New ThemeProperties With {
+            .IsAccent = False,
+            .BackColor = Color.FromArgb(255, 28, 38, 32),
+            .TextColor = Color.FromArgb(200, 240, 220),
+            .HoverColor = Color.FromArgb(255, 40, 55, 48),
+            .ControlBackColor = Color.FromArgb(255, 28, 38, 32),
+            .ButtonBackColor = Color.FromArgb(255, 50, 80, 65),
+            .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
+        Private ReadOnly SolarGoldTheme As New ThemeProperties With {
+            .IsAccent = False,
+            .BackColor = Color.FromArgb(255, 250, 247, 235),
+            .TextColor = Color.FromArgb(60, 50, 30),
+            .HoverColor = Color.FromArgb(255, 255, 252, 240),
+            .ControlBackColor = Color.FromArgb(255, 255, 252, 240),
+            .ButtonBackColor = Color.FromArgb(255, 230, 200, 80),
+            .ButtonTextColor = Color.Black,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = Color.Gray,
+            .PlayerPlay = Resources.ImagePlayerBlackPlay,
+            .PlayerPause = Resources.ImagePlayerBlackPause,
+            .PlayerStop = Resources.ImagePlayerBlackStop,
+            .PlayerNext = Resources.ImagePlayerBlackNext,
+            .PlayerPrevious = Resources.ImagePlayerBlackPrevious,
+            .PlayerFastForward = Resources.ImagePlayerBlackFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerBlackFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
+        Private ReadOnly AmethystTheme As New ThemeProperties With {
+            .IsAccent = False,
+            .BackColor = Color.FromArgb(255, 32, 24, 45),
+            .TextColor = Color.FromArgb(220, 200, 255),
+            .HoverColor = Color.FromArgb(255, 50, 40, 70),
+            .ControlBackColor = Color.FromArgb(255, 32, 24, 45),
+            .ButtonBackColor = Color.FromArgb(255, 70, 50, 110),
+            .ButtonTextColor = Color.White,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = SystemColors.InactiveCaption,
+            .PlayerPlay = Resources.ImagePlayerWhitePlay,
+            .PlayerPause = Resources.ImagePlayerWhitePause,
+            .PlayerStop = Resources.ImagePlayerWhiteStop,
+            .PlayerNext = Resources.ImagePlayerWhiteNext,
+            .PlayerPrevious = Resources.ImagePlayerWhitePrevious,
+            .PlayerFastForward = Resources.ImagePlayerWhiteFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerWhiteFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
+        Private ReadOnly GlacierTheme As New ThemeProperties With {
+            .IsAccent = False,
+            .BackColor = Color.FromArgb(255, 235, 245, 255),
+            .TextColor = Color.FromArgb(30, 50, 70),
+            .HoverColor = Color.FromArgb(255, 245, 250, 255),
+            .ControlBackColor = Color.FromArgb(255, 245, 250, 255),
+            .ButtonBackColor = Color.FromArgb(255, 200, 220, 240),
+            .ButtonTextColor = Color.Black,
+            .AccentTextColor = Color.White,
+            .InactiveTitleBarColor = Color.FromArgb(255, 243, 243, 243),
+            .InactiveSearchTextColor = Color.Gray,
+            .PlayerPlay = Resources.ImagePlayerBlackPlay,
+            .PlayerPause = Resources.ImagePlayerBlackPause,
+            .PlayerStop = Resources.ImagePlayerBlackStop,
+            .PlayerNext = Resources.ImagePlayerBlackNext,
+            .PlayerPrevious = Resources.ImagePlayerBlackPrevious,
+            .PlayerFastForward = Resources.ImagePlayerBlackFastForward,
+            .PlayerFastReverse = Resources.ImagePlayerBlackFastReverse,
+            .BaseFont = New Font("Segoe UI", 12.0F),
+            .SubBaseFont = New Font("Segoe UI", 11.0F)
+        }
 
         ' Database
         Friend Class PlayData
@@ -546,7 +766,7 @@ Namespace My
             ' App
             Friend Shared SuspendOnSessionChange As Boolean = True 'Flag that indicates whether the application should suspend playback and minimize when the session changes (e.g., screen saver starts, screen locks).
             Friend Shared SaveWindowMetrics As Boolean = False 'Flag that indicates whether to save and restore window positions and sizes.
-            Friend Shared Theme As Themes = Themes.Red 'The current theme of the application.
+            Friend Shared Theme As Themes = Themes.CrimsonEmber 'The current theme of the application.
             Friend Shared DirectoryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
             Friend Shared DirectorySize As New Size(-1, -1)
             Friend Shared LogLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -790,8 +1010,8 @@ Namespace My
                     HistoryViewMaxRecords = CUShort(Val(RegKey.GetValue("HistoryViewMaxRecords", 25.ToString)))
 
                     ' General App Settings
-                    Try : Settings.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.Red.ToString).ToString), App.Themes)
-                    Catch : Settings.Theme = App.Themes.Red
+                    Try : Settings.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.CrimsonEmber.ToString).ToString), App.Themes)
+                    Catch : Settings.Theme = App.Themes.CrimsonEmber
                     End Try
                     Select Case RegKey.GetValue("ShowTrayIcon", "False").ToString
                         Case "True", "1" : Settings.ShowTrayIcon = True
@@ -1848,6 +2068,359 @@ Namespace My
             WatcherDoWork(workItems)
 
         End Sub
+
+        'History Handlers
+        Private Sub TimerHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerHistoryUpdate.Tick
+            TimerHistoryUpdate.Stop()
+            UpdateHistory()
+        End Sub
+        Private Sub TimerRandomHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerRandomHistoryUpdate.Tick
+            TimerRandomHistoryUpdate.Stop()
+            UpdateRandomHistory()
+        End Sub
+        Private Sub TimerHistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerHistoryAutoSave.Tick
+            If HistoryChanged Then
+                HistoryChanged = False
+                SaveHistory()
+            End If
+        End Sub
+
+        'History Methods
+        Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)
+            'Check if in the history already
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex < 0 Then
+                'If not in the history, add it
+                Dim newsong As New Song With {
+                    .Path = songorstream,
+                    .InLibrary = False,
+                    .PlayCount = 0,
+                    .Added = DateTime.Now,
+                    .FirstPlayed = Nothing,
+                    .LastPlayed = Nothing,
+                    .Rating = 0}
+                If stream Then
+                    newsong.SourceType = MediaSourceTypes.Stream
+                Else
+                    newsong.SourceType = MediaSourceTypes.File
+                End If
+                History.Add(newsong)
+                HistoryChanged = True
+                Debug.Print("Added " + songorstream + " to history")
+            End If
+        End Sub
+        Friend Sub AddToHistoryFromLibrary(songorstream As String)
+            'Check if in the history already
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex >= 0 Then
+                'If it is in the history, update the InLibrary flag if necessary
+                If Not History(existingindex).InLibrary Then
+                    Dim existingsong As Song = History(existingindex)
+                    existingsong.InLibrary = True
+                    History(existingindex) = existingsong
+                    'Debug.Print("Updated InLibrary flag for " + songorstream)
+                End If
+            Else
+                'If not in the history, add it with InLibrary flag set to True
+                Dim newsong As New Song With {
+                    .Path = songorstream,
+                    .InLibrary = True,
+                    .SourceType = MediaSourceTypes.File,
+                    .PlayCount = 0,
+                    .Added = DateTime.Now,
+                    .FirstPlayed = Nothing,
+                    .LastPlayed = Nothing,
+                    .Rating = 0}
+                History.Add(newsong)
+                Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
+            End If
+            HistoryChanged = True
+        End Sub
+        Friend Sub ClearHistoryInLibraryFlag()
+            If History.Count > 0 Then
+                'Clear the InLibrary flag for all songs in the history
+                For index As Integer = 0 To History.Count - 1
+                    If History(index).InLibrary Then
+                        Dim song As Song = History(index)
+                        song.InLibrary = False
+                        History(index) = song
+                    End If
+                Next
+                Debug.Print("Cleared History InLibrary Flag")
+            End If
+        End Sub
+        Friend Sub PruneHistory()
+            Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
+
+            'Find songs with invalid file types
+            Dim invalidfiletypelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not ExtensionDictionary.ContainsKey(IO.Path.GetExtension(p.Path).ToLower()) AndAlso Not p.SourceType = MediaSourceTypes.Stream)
+            Debug.Print("Pruning History InvalidsOnly..." + invalidfiletypelist.Count.ToString + " items found so far...")
+            For Each s As Song In invalidfiletypelist
+                History.Remove(s)
+            Next
+
+            'Find songs that are not in the library and don't exist
+            Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
+            Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
+
+            'Find streams that are not in the playlist
+            Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.SourceType = MediaSourceTypes.Stream)
+            Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
+            For Each s As Song In streamlist
+                If s.SourceType = MediaSourceTypes.Stream AndAlso Player.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
+                    Debug.Print(s.Path + " found in playlist")
+                    prunelist.Remove(s)
+                End If
+            Next
+
+            'Prune History
+            For Each s As Song In prunelist
+                History.Remove(s)
+            Next
+            Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
+            Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
+            WriteToLog("History Pruned (" + prunelist.Count.ToString + ")")
+            streamlist = Nothing
+            prunelist = Nothing
+        End Sub
+        Friend Sub UpdateHistory(songorstream As String)
+            TimerHistoryUpdate.Stop()
+            If Settings.HistoryUpdateInterval = 0 Then
+                TimerHistoryUpdate.Tag = songorstream
+                UpdateHistory()
+                Return
+            Else
+                TimerHistoryUpdate.Interval = Settings.HistoryUpdateInterval * 1000
+                TimerHistoryUpdate.Tag = songorstream
+                TimerHistoryUpdate.Start()
+            End If
+        End Sub
+        Private Sub UpdateHistory()
+            Dim songorstream As String = CStr(TimerHistoryUpdate.Tag)
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex >= 0 Then
+                Dim existingsong As Song = History(existingindex)
+                existingsong.PlayCount += CUShort(1)
+                If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
+                existingsong.LastPlayed = DateTime.Now
+                History(existingindex) = existingsong
+                'Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
+                WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
+                Player.UpdateHistoryInPlaylist(songorstream)
+            Else
+                'Debug.Print("Song not found in history: " + songorstream)
+            End If
+            HistoryTotalPlayedSongs += CUInt(1)
+            'Debug.Print("Total Play Count = " & HistoryTotalPlayedSongs.ToString & ", " & HistoryTotalPlayedSongsThisSession & " this Session")
+            App.SongPlayData.IsValid = True
+            HistoryChanged = True
+        End Sub
+        Friend Sub UpdateRandomHistory(songorstream As String)
+            TimerRandomHistoryUpdate.Stop()
+            If Settings.RandomHistoryUpdateInterval = 0 Then
+                TimerRandomHistoryUpdate.Tag = songorstream
+                UpdateRandomHistory()
+                Return
+            Else
+                TimerRandomHistoryUpdate.Interval = Settings.RandomHistoryUpdateInterval * 1000
+                TimerRandomHistoryUpdate.Tag = songorstream
+                TimerRandomHistoryUpdate.Start()
+            End If
+        End Sub
+        Private Sub UpdateRandomHistory()
+            Dim songorstream As String = CStr(TimerRandomHistoryUpdate.Tag)
+            Player.AddToRandomHistory(songorstream)
+        End Sub
+        Friend Sub StopHistoryUpdates()
+            TimerHistoryUpdate.Stop()
+            TimerRandomHistoryUpdate.Stop()
+            'Debug.Print("History Update Timers Stopped")
+        End Sub
+        Friend Sub SetHistoryAutoSaveTimer()
+            TimerHistoryAutoSave.Stop()
+            TimerHistoryAutoSave.Interval = Settings.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
+            TimerHistoryAutoSave.Start()
+            'Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
+        End Sub
+        Friend Function GetHistorySnapshot() As List(Of Song)
+            SyncLock History
+                Return History.ToList()
+            End SyncLock
+        End Function
+
+        'Database Methods
+        Private Sub LoadPlayHistoryDatabase()
+            If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
+                My.Computer.FileSystem.CreateDirectory(App.UserPath)
+            End If
+
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+
+            'Create the database file if it doesn't exist
+            If Not File.Exists(DatabasePath) Then
+                SQLiteConnection.CreateFile(DatabasePath)
+            End If
+
+            'Create the Plays table if needed
+            Using connection As New SQLiteConnection(connectionString)
+                connection.Open()
+                Dim createTableSql As String = "
+                    CREATE TABLE IF NOT EXISTS Plays (
+                        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Path TEXT NOT NULL,
+                        StartPlayTime DATETIME NOT NULL,
+                        StopPlayTime DATETIME NOT NULL,
+                        Duration INTEGER NOT NULL,
+                        PlayTrigger TEXT NOT NULL
+                    );"
+                Using command As New SQLiteCommand(createTableSql, connection)
+                    command.ExecuteNonQuery()
+                End Using
+            End Using
+
+        End Sub
+        Friend Sub LogPlayHistory(path As String, startTime As DateTime, stopTime As DateTime, durationSeconds As Integer, trigger As PlayTriggers)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            If durationSeconds < 0 Then WriteToLog("LogPlayHistory Duration was less than zero (" & durationSeconds.ToString & "), for " & path)
+            If durationSeconds <= 0 Then durationSeconds = CInt((stopTime - startTime).TotalSeconds)
+            Dim insertSql As String = "INSERT INTO Plays (Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger) VALUES (@Path, @Start, @Stop, @Duration, @Trigger);"
+
+            Using connection As New SQLiteConnection(connectionString)
+                connection.Open()
+                Using command As New SQLiteCommand(insertSql, connection)
+                    command.Parameters.AddWithValue("@Path", path)
+                    command.Parameters.AddWithValue("@Start", startTime)
+                    command.Parameters.AddWithValue("@Stop", stopTime)
+                    command.Parameters.AddWithValue("@Duration", durationSeconds)
+                    command.Parameters.AddWithValue("@Trigger", trigger.ToString)
+                    command.ExecuteNonQuery()
+                End Using
+            End Using
+
+        End Sub
+        Friend Function GetPlayHistoryTable() As DataTable
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim dt As New DataTable()
+
+            Try
+                Using conn As New SQLiteConnection(connectionString)
+                    conn.Open()
+
+                    Dim query As String = "SELECT * FROM Plays ORDER BY StartPlayTime DESC"
+                    Using cmd As New SQLiteCommand(query, conn)
+                        Using adapter As New SQLiteDataAdapter(cmd)
+                            adapter.Fill(dt)
+                        End Using
+                    End Using
+
+                End Using
+            Catch ex As Exception
+                Debug.Print("Error loading play history: " & ex.Message)
+            End Try
+
+            Return dt
+        End Function
+        Friend Function DeletePlayHistoryById(recordId As Integer) As Boolean
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Try
+                Using conn As New SQLiteConnection(connectionString)
+                    conn.Open()
+
+                    Dim query As String = "DELETE FROM Plays WHERE Id = @Id"
+                    Using cmd As New SQLiteCommand(query, conn)
+                        cmd.Parameters.AddWithValue("@Id", recordId)
+                        Dim rowsAffected As Integer = cmd.ExecuteNonQuery()
+                        Return rowsAffected > 0
+                    End Using
+
+                End Using
+
+            Catch ex As Exception
+                Debug.Print("Error deleting play record: " & ex.Message)
+                Return False
+            End Try
+        End Function
+        Friend Function GetSessionStats() As (Count As Integer, Duration As TimeSpan)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim count As Integer = 0
+            Dim duration As TimeSpan = TimeSpan.Zero
+
+            Using conn As New SQLiteConnection(connectionString)
+                conn.Open()
+
+                'Count plays this session
+                Dim countQuery As String = "SELECT COUNT(*) FROM Plays WHERE StartPlayTime >= @SessionStart"
+                Using cmd As New SQLiteCommand(countQuery, conn)
+                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
+                    count = Convert.ToInt32(cmd.ExecuteScalar())
+                End Using
+
+                'Sum duration this session
+                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays WHERE StartPlayTime >= @SessionStart"
+                Using cmd As New SQLiteCommand(durationQuery, conn)
+                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
+                    Dim totalSecondsObj = cmd.ExecuteScalar()
+                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
+                    duration = TimeSpan.FromSeconds(totalSeconds)
+                End Using
+            End Using
+
+            Return (count, duration)
+        End Function
+        Friend Function GetLifetimeStats() As (Count As Integer, Duration As TimeSpan)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim count As Integer = 0
+            Dim duration As TimeSpan = TimeSpan.Zero
+
+            Using conn As New SQLiteConnection(connectionString)
+                conn.Open()
+
+                ' Count all plays
+                Dim countQuery As String = "SELECT COUNT(*) FROM Plays"
+                Using cmd As New SQLiteCommand(countQuery, conn)
+                    count = Convert.ToInt32(cmd.ExecuteScalar())
+                End Using
+
+                ' Sum all durations
+                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays"
+                Using cmd As New SQLiteCommand(durationQuery, conn)
+                    Dim totalSecondsObj = cmd.ExecuteScalar()
+                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
+                    duration = TimeSpan.FromSeconds(totalSeconds)
+                End Using
+            End Using
+
+            Return (count, duration)
+        End Function
+        Friend Function GetPlays() As List(Of PlayRecord)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim plays As New List(Of PlayRecord)
+
+            Using conn As New SQLiteConnection(connectionString)
+                conn.Open()
+
+                Dim sql = "SELECT ID, Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger 
+                   FROM Plays 
+                   ORDER BY StartPlayTime ASC"
+
+                Using cmd As New SQLiteCommand(sql, conn)
+                    Using rdr As SQLiteDataReader = cmd.ExecuteReader()
+                        While rdr.Read()
+                            plays.Add(New PlayRecord With {
+                                .ID = rdr.GetInt32(0),
+                                .Path = rdr.GetString(1),
+                                .StartPlayTime = DateTime.Parse(rdr.GetString(2)),
+                                .StopPlayTime = DateTime.Parse(rdr.GetString(3)),
+                                .Duration = rdr.GetInt32(4),
+                                .PlayTrigger = rdr.GetString(5)
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            Return plays
+        End Function
 
         'Methods
         Friend Sub Initialize()
@@ -3395,18 +3968,38 @@ Namespace My
                     Return BlueAccentTheme
                 Case Themes.PinkAccent
                     Return PinkAccentTheme
+                Case Themes.EmeraldAccent
+                    Return EmeraldAccentTheme
+                Case Themes.VioletAccent
+                    Return VioletAccentTheme
+                Case Themes.AmberAccent
+                    Return AmberAccentTheme
+                Case Themes.TealAccent
+                    Return TealAccentTheme
+                Case Themes.HighContrast
+                    Return HighContrastTheme
                 Case Themes.Light
                     Return LightTheme
                 Case Themes.Dark
                     Return DarkTheme
                 Case Themes.DarkPink
                     Return DarkPinkTheme
-                Case Themes.Pink
-                    Return PinkTheme
-                Case Themes.Red
-                    Return RedTheme
+                Case Themes.Blossom
+                    Return BlossomTheme
+                Case Themes.CrimsonEmber
+                    Return CrimsonEmberTheme
+                Case Themes.MidnightBlue
+                    Return MidnightBlueTheme
+                Case Themes.ForestGreen
+                    Return ForestGreenTheme
+                Case Themes.SolarGold
+                    Return SolarGoldTheme
+                Case Themes.Amethyst
+                    Return AmethystTheme
+                Case Themes.Glacier
+                    Return GlacierTheme
                 Case Else
-                    Return RedTheme
+                    Return CrimsonEmberTheme
             End Select
         End Function
         Friend Sub ThemeMenu(cm As ToolStrip)
@@ -3483,359 +4076,6 @@ Namespace My
             Catch
                 Return False
             End Try
-        End Function
-
-        'History Handlers
-        Private Sub TimerHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerHistoryUpdate.Tick
-            TimerHistoryUpdate.Stop()
-            UpdateHistory()
-        End Sub
-        Private Sub TimerRandomHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerRandomHistoryUpdate.Tick
-            TimerRandomHistoryUpdate.Stop()
-            UpdateRandomHistory()
-        End Sub
-        Private Sub TimerHistoryAutoSave_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerHistoryAutoSave.Tick
-            If HistoryChanged Then
-                HistoryChanged = False
-                SaveHistory()
-            End If
-        End Sub
-
-        'History Methods
-        Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)
-            'Check if in the history already
-            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
-            If existingindex < 0 Then
-                'If not in the history, add it
-                Dim newsong As New Song With {
-                    .Path = songorstream,
-                    .InLibrary = False,
-                    .PlayCount = 0,
-                    .Added = DateTime.Now,
-                    .FirstPlayed = Nothing,
-                    .LastPlayed = Nothing,
-                    .Rating = 0}
-                If stream Then
-                    newsong.SourceType = MediaSourceTypes.Stream
-                Else
-                    newsong.SourceType = MediaSourceTypes.File
-                End If
-                History.Add(newsong)
-                HistoryChanged = True
-                Debug.Print("Added " + songorstream + " to history")
-            End If
-        End Sub
-        Friend Sub AddToHistoryFromLibrary(songorstream As String)
-            'Check if in the history already
-            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
-            If existingindex >= 0 Then
-                'If it is in the history, update the InLibrary flag if necessary
-                If Not History(existingindex).InLibrary Then
-                    Dim existingsong As Song = History(existingindex)
-                    existingsong.InLibrary = True
-                    History(existingindex) = existingsong
-                    'Debug.Print("Updated InLibrary flag for " + songorstream)
-                End If
-            Else
-                'If not in the history, add it with InLibrary flag set to True
-                Dim newsong As New Song With {
-                    .Path = songorstream,
-                    .InLibrary = True,
-                    .SourceType = MediaSourceTypes.File,
-                    .PlayCount = 0,
-                    .Added = DateTime.Now,
-                    .FirstPlayed = Nothing,
-                    .LastPlayed = Nothing,
-                    .Rating = 0}
-                History.Add(newsong)
-                Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
-            End If
-            HistoryChanged = True
-        End Sub
-        Friend Sub ClearHistoryInLibraryFlag()
-            If History.Count > 0 Then
-                'Clear the InLibrary flag for all songs in the history
-                For index As Integer = 0 To History.Count - 1
-                    If History(index).InLibrary Then
-                        Dim song As Song = History(index)
-                        song.InLibrary = False
-                        History(index) = song
-                    End If
-                Next
-                Debug.Print("Cleared History InLibrary Flag")
-            End If
-        End Sub
-        Friend Sub PruneHistory()
-            Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
-
-            'Find songs with invalid file types
-            Dim invalidfiletypelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not ExtensionDictionary.ContainsKey(IO.Path.GetExtension(p.Path).ToLower()) AndAlso Not p.SourceType = MediaSourceTypes.Stream)
-            Debug.Print("Pruning History InvalidsOnly..." + invalidfiletypelist.Count.ToString + " items found so far...")
-            For Each s As Song In invalidfiletypelist
-                History.Remove(s)
-            Next
-
-            'Find songs that are not in the library and don't exist
-            Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
-            Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
-
-            'Find streams that are not in the playlist
-            Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.SourceType = MediaSourceTypes.Stream)
-            Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
-            For Each s As Song In streamlist
-                If s.SourceType = MediaSourceTypes.Stream AndAlso Player.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
-                    Debug.Print(s.Path + " found in playlist")
-                    prunelist.Remove(s)
-                End If
-            Next
-
-            'Prune History
-            For Each s As Song In prunelist
-                History.Remove(s)
-            Next
-            Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
-            Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
-            WriteToLog("History Pruned (" + prunelist.Count.ToString + ")")
-            streamlist = Nothing
-            prunelist = Nothing
-        End Sub
-        Friend Sub UpdateHistory(songorstream As String)
-            TimerHistoryUpdate.Stop()
-            If Settings.HistoryUpdateInterval = 0 Then
-                TimerHistoryUpdate.Tag = songorstream
-                UpdateHistory()
-                Return
-            Else
-                TimerHistoryUpdate.Interval = Settings.HistoryUpdateInterval * 1000
-                TimerHistoryUpdate.Tag = songorstream
-                TimerHistoryUpdate.Start()
-            End If
-        End Sub
-        Private Sub UpdateHistory()
-            Dim songorstream As String = CStr(TimerHistoryUpdate.Tag)
-            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
-            If existingindex >= 0 Then
-                Dim existingsong As Song = History(existingindex)
-                existingsong.PlayCount += CUShort(1)
-                If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
-                existingsong.LastPlayed = DateTime.Now
-                History(existingindex) = existingsong
-                'Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
-                WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
-                Player.UpdateHistoryInPlaylist(songorstream)
-            Else
-                'Debug.Print("Song not found in history: " + songorstream)
-            End If
-            HistoryTotalPlayedSongs += CUInt(1)
-            'Debug.Print("Total Play Count = " & HistoryTotalPlayedSongs.ToString & ", " & HistoryTotalPlayedSongsThisSession & " this Session")
-            App.SongPlayData.IsValid = True
-            HistoryChanged = True
-        End Sub
-        Friend Sub UpdateRandomHistory(songorstream As String)
-            TimerRandomHistoryUpdate.Stop()
-            If Settings.RandomHistoryUpdateInterval = 0 Then
-                TimerRandomHistoryUpdate.Tag = songorstream
-                UpdateRandomHistory()
-                Return
-            Else
-                TimerRandomHistoryUpdate.Interval = Settings.RandomHistoryUpdateInterval * 1000
-                TimerRandomHistoryUpdate.Tag = songorstream
-                TimerRandomHistoryUpdate.Start()
-            End If
-        End Sub
-        Private Sub UpdateRandomHistory()
-            Dim songorstream As String = CStr(TimerRandomHistoryUpdate.Tag)
-            Player.AddToRandomHistory(songorstream)
-        End Sub
-        Friend Sub StopHistoryUpdates()
-            TimerHistoryUpdate.Stop()
-            TimerRandomHistoryUpdate.Stop()
-            'Debug.Print("History Update Timers Stopped")
-        End Sub
-        Friend Sub SetHistoryAutoSaveTimer()
-            TimerHistoryAutoSave.Stop()
-            TimerHistoryAutoSave.Interval = Settings.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
-            TimerHistoryAutoSave.Start()
-            'Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
-        End Sub
-        Friend Function GetHistorySnapshot() As List(Of Song)
-            SyncLock History
-                Return History.ToList()
-            End SyncLock
-        End Function
-
-        'Database Methods
-        Private Sub LoadPlayHistoryDatabase()
-            If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
-                My.Computer.FileSystem.CreateDirectory(App.UserPath)
-            End If
-
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-
-            'Create the database file if it doesn't exist
-            If Not File.Exists(DatabasePath) Then
-                SQLiteConnection.CreateFile(DatabasePath)
-            End If
-
-            'Create the Plays table if needed
-            Using connection As New SQLiteConnection(connectionString)
-                connection.Open()
-                Dim createTableSql As String = "
-                    CREATE TABLE IF NOT EXISTS Plays (
-                        ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Path TEXT NOT NULL,
-                        StartPlayTime DATETIME NOT NULL,
-                        StopPlayTime DATETIME NOT NULL,
-                        Duration INTEGER NOT NULL,
-                        PlayTrigger TEXT NOT NULL
-                    );"
-                Using command As New SQLiteCommand(createTableSql, connection)
-                    command.ExecuteNonQuery()
-                End Using
-            End Using
-
-        End Sub
-        Friend Sub LogPlayHistory(path As String, startTime As DateTime, stopTime As DateTime, durationSeconds As Integer, trigger As PlayTriggers)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            If durationSeconds < 0 Then WriteToLog("LogPlayHistory Duration was less than zero (" & durationSeconds.ToString & "), for " & path)
-            If durationSeconds <= 0 Then durationSeconds = CInt((stopTime - startTime).TotalSeconds)
-            Dim insertSql As String = "INSERT INTO Plays (Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger) VALUES (@Path, @Start, @Stop, @Duration, @Trigger);"
-
-            Using connection As New SQLiteConnection(connectionString)
-                connection.Open()
-                Using command As New SQLiteCommand(insertSql, connection)
-                    command.Parameters.AddWithValue("@Path", path)
-                    command.Parameters.AddWithValue("@Start", startTime)
-                    command.Parameters.AddWithValue("@Stop", stopTime)
-                    command.Parameters.AddWithValue("@Duration", durationSeconds)
-                    command.Parameters.AddWithValue("@Trigger", trigger.ToString)
-                    command.ExecuteNonQuery()
-                End Using
-            End Using
-
-        End Sub
-        Friend Function GetPlayHistoryTable() As DataTable
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Dim dt As New DataTable()
-
-            Try
-                Using conn As New SQLiteConnection(connectionString)
-                    conn.Open()
-
-                    Dim query As String = "SELECT * FROM Plays ORDER BY StartPlayTime DESC"
-                    Using cmd As New SQLiteCommand(query, conn)
-                        Using adapter As New SQLiteDataAdapter(cmd)
-                            adapter.Fill(dt)
-                        End Using
-                    End Using
-
-                End Using
-            Catch ex As Exception
-                Debug.Print("Error loading play history: " & ex.Message)
-            End Try
-
-            Return dt
-        End Function
-        Friend Function DeletePlayHistoryById(recordId As Integer) As Boolean
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Try
-                Using conn As New SQLiteConnection(connectionString)
-                    conn.Open()
-
-                    Dim query As String = "DELETE FROM Plays WHERE Id = @Id"
-                    Using cmd As New SQLiteCommand(query, conn)
-                        cmd.Parameters.AddWithValue("@Id", recordId)
-                        Dim rowsAffected As Integer = cmd.ExecuteNonQuery()
-                        Return rowsAffected > 0
-                    End Using
-
-                End Using
-
-            Catch ex As Exception
-                Debug.Print("Error deleting play record: " & ex.Message)
-                Return False
-            End Try
-        End Function
-        Friend Function GetSessionStats() As (Count As Integer, Duration As TimeSpan)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Dim count As Integer = 0
-            Dim duration As TimeSpan = TimeSpan.Zero
-
-            Using conn As New SQLiteConnection(connectionString)
-                conn.Open()
-
-                'Count plays this session
-                Dim countQuery As String = "SELECT COUNT(*) FROM Plays WHERE StartPlayTime >= @SessionStart"
-                Using cmd As New SQLiteCommand(countQuery, conn)
-                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
-                    count = Convert.ToInt32(cmd.ExecuteScalar())
-                End Using
-
-                'Sum duration this session
-                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays WHERE StartPlayTime >= @SessionStart"
-                Using cmd As New SQLiteCommand(durationQuery, conn)
-                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
-                    Dim totalSecondsObj = cmd.ExecuteScalar()
-                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
-                    duration = TimeSpan.FromSeconds(totalSeconds)
-                End Using
-            End Using
-
-            Return (count, duration)
-        End Function
-        Friend Function GetLifetimeStats() As (Count As Integer, Duration As TimeSpan)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Dim count As Integer = 0
-            Dim duration As TimeSpan = TimeSpan.Zero
-
-            Using conn As New SQLiteConnection(connectionString)
-                conn.Open()
-
-                ' Count all plays
-                Dim countQuery As String = "SELECT COUNT(*) FROM Plays"
-                Using cmd As New SQLiteCommand(countQuery, conn)
-                    count = Convert.ToInt32(cmd.ExecuteScalar())
-                End Using
-
-                ' Sum all durations
-                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays"
-                Using cmd As New SQLiteCommand(durationQuery, conn)
-                    Dim totalSecondsObj = cmd.ExecuteScalar()
-                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
-                    duration = TimeSpan.FromSeconds(totalSeconds)
-                End Using
-            End Using
-
-            Return (count, duration)
-        End Function
-        Friend Function GetPlays() As List(Of PlayRecord)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Dim plays As New List(Of PlayRecord)
-
-            Using conn As New SQLiteConnection(connectionString)
-                conn.Open()
-
-                Dim sql = "SELECT ID, Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger 
-                   FROM Plays 
-                   ORDER BY StartPlayTime ASC"
-
-                Using cmd As New SQLiteCommand(sql, conn)
-                    Using rdr As SQLiteDataReader = cmd.ExecuteReader()
-                        While rdr.Read()
-                            plays.Add(New PlayRecord With {
-                                .ID = rdr.GetInt32(0),
-                                .Path = rdr.GetString(1),
-                                .StartPlayTime = DateTime.Parse(rdr.GetString(2)),
-                                .StopPlayTime = DateTime.Parse(rdr.GetString(3)),
-                                .Duration = rdr.GetInt32(4),
-                                .PlayTrigger = rdr.GetString(5)
-                            })
-                        End While
-                    End Using
-                End Using
-            End Using
-
-            Return plays
         End Function
 
     End Module
