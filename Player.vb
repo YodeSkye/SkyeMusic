@@ -3531,8 +3531,8 @@ Public Class Player
             CMIPlaylistRemove.Enabled = False
             CMIEditTitle.Enabled = False
             CMIRating.Enabled = False
-            CMIViewInLibrary.Enabled = False
-            CMIEditTag.Enabled = False
+            CMIViewInLibrary.Visible = False
+            CMIEditTag.Visible = False
             CMIEditTag.Text = "Edit Tag"
             CMIPlaylistRemove.Text = CMIPlaylistRemove.Text.TrimEnd(App.TrimEndSearch)
             CMICopyTitle.ToolTipText = String.Empty
@@ -3549,8 +3549,8 @@ Public Class Player
             CMIPlaylistRemove.Enabled = True
             CMIEditTitle.Enabled = True
             CMIRating.Enabled = True
-            CMIViewInLibrary.Enabled = True
-            CMIEditTag.Enabled = True
+            CMIViewInLibrary.Visible = True
+            CMIEditTag.Visible = True
             If LVPlaylist.SelectedItems.Count = 1 Then
                 CMIEditTag.Text = "Edit Tag"
             Else
@@ -3589,6 +3589,34 @@ Public Class Player
                     CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Regular)
                     CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Bold)
             End Select
+            Dim selectedItem As ListViewItem = LVPlaylist.SelectedItems(0)
+            Dim selectedPath As String = selectedItem.SubItems(LVPlaylist.Columns("Path").Index).Text
+            Dim historySong As Song = App.History.FirstOrDefault(Function(h) String.Equals(h.Path, selectedPath, StringComparison.OrdinalIgnoreCase))
+            If historySong Is Nothing Then
+                CMIViewInLibrary.Visible = False
+                CMIEditTag.Visible = False
+                CMIHelperApp1.Visible = False
+                CMIHelperApp2.Visible = False
+                CMIOpenLocation.Visible = False
+                TSSeparatorExternalTools.Visible = False
+            Else
+                Dim src As MediaSourceTypes = historySong.SourceType
+                If src = App.MediaSourceTypes.File Then
+                    CMIViewInLibrary.Visible = True
+                    CMIEditTag.Visible = True
+                    CMIHelperApp1.Visible = True
+                    CMIHelperApp2.Visible = True
+                    CMIOpenLocation.Visible = True
+                    TSSeparatorExternalTools.Visible = True
+                Else
+                    CMIViewInLibrary.Visible = False
+                    CMIEditTag.Visible = False
+                    CMIHelperApp1.Visible = False
+                    CMIHelperApp2.Visible = False
+                    CMIOpenLocation.Visible = False
+                    TSSeparatorExternalTools.Visible = False
+                End If
+            End If
         Else
             CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Regular)
             CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Regular)
@@ -3640,9 +3668,9 @@ Public Class Player
         'End If
     End Sub
     Private Sub CMIShowCurrentClick(sender As Object, e As EventArgs) Handles CMIShowCurrent.Click
-        Dim item As ListViewItem
+        Dim item As ListViewItem = Nothing
         Try
-            item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+            If _player.Path IsNot Nothing Then item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
             If item IsNot Nothing Then
                 LVPlaylist.SelectedItems.Clear()
                 item.Selected = True
