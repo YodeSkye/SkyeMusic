@@ -5277,20 +5277,46 @@ Public Class Player
                     PlayQueued()
                 Else
                     If LVPlaylist.Items.Count > 0 Then
-                        Dim item As ListViewItem = Nothing
-                        If _player.HasMedia Then LVPlaylist.FindItemWithText(_player.Path, True, 0)
-                        Dim newindex As Integer
+                        'Dim item As ListViewItem = Nothing
+                        'If _player.HasMedia Then
+                        '    item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+                        'End If
+                        'Dim newindex As Integer
+                        'If RandomHistoryFull() Then RandomHistory.Clear()
+                        'If item Is Nothing Then
+                        '    newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
+                        'Else
+                        '    If LVPlaylist.Items.Count = 1 Then
+                        '        newindex = 0
+                        '    Else
+                        '        Do
+                        '            newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
+                        '        Loop Until newindex <> item.Index And Not RandomHistory.Contains(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
+                        '    End If
+                        'End If
                         If RandomHistoryFull() Then RandomHistory.Clear()
-                        If item Is Nothing Then
-                            newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
+                        Dim newindex As Integer
+                        If LVPlaylist.Items.Count = 1 Then
+                            newindex = 0
                         Else
-                            If LVPlaylist.Items.Count = 1 Then
-                                newindex = 0
-                            Else
-                                Do
-                                    newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
-                                Loop Until newindex <> item.Index And Not RandomHistory.Contains(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                            End If
+                            'Do
+                            '    newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
+                            '    Dim path = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                            '    Dim isInHistory = RandomHistory.Contains(path)
+                            '    If Not isInHistory Then Exit Do
+                            'Loop
+                            Dim attempts As Integer = 0
+                            Dim maxAttempts As Integer = LVPlaylist.Items.Count * 2
+                            Do
+                                newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
+                                Dim path = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                                If Not RandomHistory.Contains(path) Then Exit Do
+                                attempts += 1
+                                If attempts >= maxAttempts Then
+                                    RandomHistory.Clear()
+                                    Exit Do
+                                End If
+                            Loop
                         End If
                         If IsStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                             PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
