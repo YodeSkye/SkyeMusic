@@ -409,12 +409,14 @@ Partial Class Player
         ' 
         ' MIVisualizers
         ' 
+        MIVisualizers.Image = My.Resources.Resources.ImageVisualizer16
         MIVisualizers.Name = "MIVisualizers"
         MIVisualizers.Size = New Size(203, 24)
         MIVisualizers.Text = "Visualizer"
         ' 
         ' MIMiniPlayer
         ' 
+        MIMiniPlayer.Image = My.Resources.Resources.ImageMiniPlayer16
         MIMiniPlayer.Name = "MIMiniPlayer"
         MIMiniPlayer.Size = New Size(203, 24)
         MIMiniPlayer.Text = "MiniPlayer"

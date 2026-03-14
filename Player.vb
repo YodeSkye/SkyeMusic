@@ -5805,17 +5805,22 @@ Public Class Player
         End If
     End Sub
     Private Sub SetActiveTitleBarColor()
-        If IsFocused And CurrentAccentColor <> Nothing Then
-            MenuPlayer.BackColor = CurrentAccentColor
-            TxtBoxPlaylistSearch.BackColor = CurrentAccentColor
-            'Debug.Print("Player Active Title Bar Color Set: " + CurrentAccentColor.ToString)
+        If IsFocused Then
+            If App.CurrentTheme.IsAccent Then
+                If CurrentAccentColor <> Nothing Then
+                    MenuPlayer.BackColor = CurrentAccentColor
+                    TxtBoxPlaylistSearch.BackColor = CurrentAccentColor
+                End If
+            Else
+                MenuPlayer.BackColor = App.CurrentTheme.BackColor
+                TxtBoxPlaylistSearch.BackColor = App.CurrentTheme.BackColor
+            End If
         End If
     End Sub
     Private Sub SetInactiveTitleBarColor()
         If Not IsFocused Then
             MenuPlayer.BackColor = App.CurrentTheme.InactiveTitleBarColor
             TxtBoxPlaylistSearch.BackColor = App.CurrentTheme.InactiveTitleBarColor
-            'Debug.Print("Player InActive Title Bar Color Set")
         End If
     End Sub
     Private Sub SetTheme()
