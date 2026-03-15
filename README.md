@@ -17,6 +17,10 @@ A modern Windows media player built with **LibVLCSharp** and **WinForms**, featu
 
 Support the project: https://github.com/sponsors/YodeSkye
 
+## Issues
+Found a bug or have a feature request?  
+[Open an issue on GitHub](https://github.com/YodeSkye/SkyeMusic/issues).
+
 ---
 
 # Using from the repo:
