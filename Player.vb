@@ -2480,15 +2480,15 @@ Public Class Player
                 Dim density As Double = 0.75                     ' softer MiniMode look
                 Dim aspect As Double = Width / Math.Max(1, Height)
                 Dim aspectFactor As Double = If(aspect > 1.3, 1.0, 0.8)
-                maxParticles = CInt(Math.Max(80, (baseCount * density * aspectFactor) + audioBoost))
+                maxParticles = CInt(Math.Max(300, (baseCount * density * aspectFactor) + audioBoost))
                 bloomRadius = Math.Max(1, App.Settings.Visualizers.ParticleNebulaBloomRadius \ 2)
                 bloomIntensity = App.Settings.Visualizers.ParticleNebulaBloomIntensity * 0.5F
                 trailAlpha = App.Settings.Visualizers.ParticleNebulaTrailAlpha * 0.5F
                 trailFade = True
-                sizeScale = App.Settings.Visualizers.ParticleNebulaSizeScale * 0.5F
-                velocityScale = App.Settings.Visualizers.ParticleNebulaVelocityScale * 0.4F
-                swirlStrength = App.Settings.Visualizers.ParticleNebulaSwirlStrength * 0.5F
-                fadeRate = App.Settings.Visualizers.ParticleNebulaFadeRate * 0.7F
+                sizeScale = App.Settings.Visualizers.ParticleNebulaSizeScale * 0.7F '0.5F
+                velocityScale = App.Settings.Visualizers.ParticleNebulaVelocityScale * 0.6F '0.4F
+                swirlStrength = App.Settings.Visualizers.ParticleNebulaSwirlStrength * 0.7F '0.5F
+                fadeRate = App.Settings.Visualizers.ParticleNebulaFadeRate * 0.9F '0.7F
             Else
                 ' Full mode uses user settings
                 maxParticles = Integer.MaxValue
@@ -2584,14 +2584,14 @@ Public Class Player
             Dim sampleRate As Integer = 44100
 
             For i As Integer = 0 To barCount - 1
-                Dim magnitude As Single = audioData(i)
                 Dim freq As Double = (i * sampleRate) / (2.0 * barCount)
+                Dim magnitude As Single = audioData(i) * GetFreqWeight(freq)
                 Dim maxFreq As Double = sampleRate / 2.0
 
                 ' MiniMode reduces spawn probability
                 Dim spawnChance As Double = magnitude * App.Settings.Visualizers.ParticleNebulaSpawnMultiplier
                 If Settings.VisualizerMiniMode AndAlso App.Settings.Visualizers.ParticleNebulaAllowMiniMode Then
-                    spawnChance *= 0.4
+                    spawnChance *= 0.7 '0.4
                 End If
 
                 If rand.NextDouble() < spawnChance Then
@@ -2611,6 +2611,15 @@ Public Class Player
                 End If
             Next
         End Sub
+        Private Function GetFreqWeight(freq As Double) As Single
+            ' Normalize 0–1
+            Dim x As Double = freq / 20000.0
+
+            ' Emphasize mids/highs with a gentle S-curve
+            Dim weight As Double = 0.8 + (Math.Pow(x, 0.35) * 2.0)
+
+            Return CSng(weight)
+        End Function
         Private Function GetColorForFrequency(freq As Double, maxFreq As Double) As Color
             If App.Settings.Visualizers.ParticleNebulaRainbowColors Then
                 ' Map frequency to hue (0–360)

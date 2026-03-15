@@ -911,7 +911,6 @@ Namespace My
                 Public Property ParticleNebulaShowBloom As Boolean = False ' Whether to Draw Bloom Effect.
                 Public Property ParticleNebulaBloomIntensity As Single = 0.5F ' 0.1 – 2.0 *10 ' Bloom Brightness Multiplier.
                 Public Property ParticleNebulaBloomRadius As Integer = 2 ' 1 – 5 *1 ' How Many Extra Bloom Rings to Draw.
-
             End Class
 
             Friend Shared Sub Load()
