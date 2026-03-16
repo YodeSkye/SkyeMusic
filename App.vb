@@ -911,6 +911,7 @@ Namespace My
                 Public Property ParticleNebulaShowBloom As Boolean = False ' Whether to Draw Bloom Effect.
                 Public Property ParticleNebulaBloomIntensity As Single = 0.5F ' 0.1 – 2.0 *10 ' Bloom Brightness Multiplier.
                 Public Property ParticleNebulaBloomRadius As Integer = 2 ' 1 – 5 *1 ' How Many Extra Bloom Rings to Draw.
+                Public Property ParticleNebulaHighFrequencyBoost As Single = 1.0F ' 0.5 - 3.0 *10 ' Boost for High Frequency Bands, which can be overpowered by bass. Higher values increase the influence of highs on particle behavior and color.
             End Class
 
             Friend Shared Sub Load()
@@ -1144,6 +1145,7 @@ Namespace My
                     End Select
                     Visualizers.ParticleNebulaSizeScale = CInt(Val(RegSubKey.GetValue("ParticleNebulaSizeScale", 20.ToString)))
                     Visualizers.ParticleNebulaSpawnMultiplier = CSng(Val(RegSubKey.GetValue("ParticleNebulaSpawnMultiplier", 2.0F.ToString)))
+                    Visualizers.ParticleNebulaHighFrequencyBoost = CSng(Val(RegSubKey.GetValue("ParticleNebulaHighFrequencyBoost", 1.0F.ToString)))
                     Visualizers.ParticleNebulaSwirlBias = CSng(Val(RegSubKey.GetValue("ParticleNebulaSwirlBias", 0.0F.ToString)))
                     Visualizers.ParticleNebulaSwirlStrength = CSng(Val(RegSubKey.GetValue("ParticleNebulaSwirlStrength", 0.15F.ToString)))
                     Visualizers.ParticleNebulaTrailAlpha = CSng(Val(RegSubKey.GetValue("ParticleNebulaTrailAlpha", 0.5F.ToString)))
@@ -1296,6 +1298,7 @@ Namespace My
                     RegSubKey.SetValue("ParticleNebulaShowTrails", Settings.Visualizers.ParticleNebulaShowTrails.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ParticleNebulaSizeScale", Settings.Visualizers.ParticleNebulaSizeScale.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ParticleNebulaSpawnMultiplier", Settings.Visualizers.ParticleNebulaSpawnMultiplier.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaHighFrequencyBoost", Settings.Visualizers.ParticleNebulaHighFrequencyBoost.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ParticleNebulaSwirlBias", Settings.Visualizers.ParticleNebulaSwirlBias.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ParticleNebulaSwirlStrength", Settings.Visualizers.ParticleNebulaSwirlStrength.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ParticleNebulaTrailAlpha", Settings.Visualizers.ParticleNebulaTrailAlpha.ToString, Microsoft.Win32.RegistryValueKind.String)

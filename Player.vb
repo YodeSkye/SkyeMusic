@@ -2480,7 +2480,7 @@ Public Class Player
                 Dim density As Double = 0.75                     ' softer MiniMode look
                 Dim aspect As Double = Width / Math.Max(1, Height)
                 Dim aspectFactor As Double = If(aspect > 1.3, 1.0, 0.8)
-                maxParticles = CInt(Math.Max(300, (baseCount * density * aspectFactor) + audioBoost))
+                maxParticles = CInt(Math.Max(1000, (baseCount * density * aspectFactor) + audioBoost))
                 bloomRadius = Math.Max(1, App.Settings.Visualizers.ParticleNebulaBloomRadius \ 2)
                 bloomIntensity = App.Settings.Visualizers.ParticleNebulaBloomIntensity * 0.5F
                 trailAlpha = App.Settings.Visualizers.ParticleNebulaTrailAlpha * 0.5F
@@ -2618,7 +2618,7 @@ Public Class Player
             ' Emphasize mids/highs with a gentle S-curve
             Dim weight As Double = 0.8 + (Math.Pow(x, 0.35) * 2.0)
 
-            Return CSng(weight)
+            Return CSng(weight * App.Settings.Visualizers.ParticleNebulaHighFrequencyBoost)
         End Function
         Private Function GetColorForFrequency(freq As Double, maxFreq As Double) As Color
             If App.Settings.Visualizers.ParticleNebulaRainbowColors Then

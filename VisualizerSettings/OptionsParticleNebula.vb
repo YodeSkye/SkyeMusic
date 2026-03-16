@@ -52,7 +52,11 @@ Public Class OptionsParticleNebula
     End Sub
     Private Sub TBSpawnMultiplier_ValueChanged(sender As Object, e As EventArgs) Handles TBSpawnMultiplier.ValueChanged
         If IsInitializing Then Exit Sub
-        App.Settings.Visualizers.ParticleNebulaSpawnMultiplier = CSng(TBSpawnMultiplier.Value / 10)
+        Settings.Visualizers.ParticleNebulaSpawnMultiplier = CSng(TBSpawnMultiplier.Value / 10)
+    End Sub
+    Private Sub TBHighFrequencyBoost_ValueChanged(sender As Object, e As EventArgs) Handles TBHighFrequencyBoost.ValueChanged
+        If IsInitializing Then Exit Sub
+        Settings.Visualizers.ParticleNebulaHighFrequencyBoost = CSng(TBHighFrequencyBoost.Value / 10)
     End Sub
     Private Sub TBSwirlBias_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlBias.ValueChanged
         If IsInitializing Then Exit Sub
@@ -108,6 +112,7 @@ Public Class OptionsParticleNebula
         ChkBoxAllowMiniMode.Checked = App.Settings.Visualizers.ParticleNebulaAllowMiniMode
         TBSizeScale.Value = App.Settings.Visualizers.ParticleNebulaSizeScale
         TBSpawnMultiplier.Value = CInt(App.Settings.Visualizers.ParticleNebulaSpawnMultiplier * 10)
+        TBHighFrequencyBoost.Value = CInt(App.Settings.Visualizers.ParticleNebulaHighFrequencyBoost * 10)
         TBSwirlBias.Value = CInt((App.Settings.Visualizers.ParticleNebulaSwirlBias + 1) * 100)
         TBSwirlStrength.Value = CInt(App.Settings.Visualizers.ParticleNebulaSwirlStrength * 100)
         TBTrailAlpha.Value = CInt(App.Settings.Visualizers.ParticleNebulaTrailAlpha * 100)
@@ -167,6 +172,11 @@ Public Class OptionsParticleNebula
         TBSpawnMultiplier.PushedButtonEndColor = App.CurrentTheme.TextColor
         TBSpawnMultiplier.TrackBarGradientStart = App.CurrentTheme.BackColor
         TBSpawnMultiplier.TrackBarGradientEnd = App.CurrentTheme.TextColor
+        TBHighFrequencyBoost.ButtonColor = App.CurrentTheme.ButtonBackColor
+        TBHighFrequencyBoost.HighlightedButtonColor = App.CurrentTheme.TextColor
+        TBHighFrequencyBoost.PushedButtonEndColor = App.CurrentTheme.TextColor
+        TBHighFrequencyBoost.TrackBarGradientStart = App.CurrentTheme.BackColor
+        TBHighFrequencyBoost.TrackBarGradientEnd = App.CurrentTheme.TextColor
         TBSwirlBias.ButtonColor = App.CurrentTheme.ButtonBackColor
         TBSwirlBias.HighlightedButtonColor = App.CurrentTheme.TextColor
         TBSwirlBias.PushedButtonEndColor = App.CurrentTheme.TextColor
@@ -193,6 +203,7 @@ Public Class OptionsParticleNebula
         LblFadeRate.ForeColor = forecolor
         LblSizeScale.ForeColor = forecolor
         LblSpawnMultiplier.ForeColor = forecolor
+        LblHighFrequencyBoost.ForeColor = forecolor
         LblSwirlBias.ForeColor = forecolor
         LblSwirlStrength.ForeColor = forecolor
         LblTrailAlpha.ForeColor = forecolor

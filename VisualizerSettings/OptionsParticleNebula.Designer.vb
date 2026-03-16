@@ -50,6 +50,8 @@ Partial Class OptionsParticleNebula
         LblTrailAlpha = New Skye.UI.Label()
         TipParticleNebula = New Skye.UI.ToolTip(components)
         ChkBoxAllowMiniMode = New CheckBox()
+        TBHighFrequencyBoost = New Syncfusion.Windows.Forms.Tools.TrackBarEx(5, 30)
+        LblHighFrequencyBoost = New Skye.UI.Label()
         SuspendLayout()
         ' 
         ' CoBoxActivePalettePreset
@@ -58,7 +60,7 @@ Partial Class OptionsParticleNebula
         CoBoxActivePalettePreset.FlatStyle = FlatStyle.Flat
         CoBoxActivePalettePreset.Location = New Point(8, 29)
         CoBoxActivePalettePreset.Name = "CoBoxActivePalettePreset"
-        CoBoxActivePalettePreset.Size = New Size(200, 29)
+        CoBoxActivePalettePreset.Size = New Size(161, 29)
         CoBoxActivePalettePreset.TabIndex = 10
         TipParticleNebula.SetToolTip(CoBoxActivePalettePreset, "Selected Color Palette.")
         TipParticleNebula.SetToolTipImage(CoBoxActivePalettePreset, Nothing)
@@ -94,7 +96,7 @@ Partial Class OptionsParticleNebula
         TBSpawnMultiplier.BackColor = Color.Transparent
         TBSpawnMultiplier.BeforeTouchSize = New Size(20, 280)
         TBSpawnMultiplier.LargeChange = 10
-        TBSpawnMultiplier.Location = New Point(261, 46)
+        TBSpawnMultiplier.Location = New Point(214, 43)
         TBSpawnMultiplier.Margin = New Padding(4)
         TBSpawnMultiplier.Name = "TBSpawnMultiplier"
         TBSpawnMultiplier.Orientation = Orientation.Vertical
@@ -109,7 +111,7 @@ Partial Class OptionsParticleNebula
         ' 
         ' LblSpawnMultiplier
         ' 
-        LblSpawnMultiplier.Location = New Point(230, -3)
+        LblSpawnMultiplier.Location = New Point(183, -6)
         LblSpawnMultiplier.Name = "LblSpawnMultiplier"
         LblSpawnMultiplier.Size = New Size(83, 56)
         LblSpawnMultiplier.TabIndex = 180
@@ -176,7 +178,7 @@ Partial Class OptionsParticleNebula
         TBVelocityScale.BackColor = Color.Transparent
         TBVelocityScale.BeforeTouchSize = New Size(20, 280)
         TBVelocityScale.LargeChange = 25
-        TBVelocityScale.Location = New Point(328, 46)
+        TBVelocityScale.Location = New Point(358, 43)
         TBVelocityScale.Margin = New Padding(4)
         TBVelocityScale.Name = "TBVelocityScale"
         TBVelocityScale.Orientation = Orientation.Vertical
@@ -191,7 +193,7 @@ Partial Class OptionsParticleNebula
         ' 
         ' LblVelocityScale
         ' 
-        LblVelocityScale.Location = New Point(308, -3)
+        LblVelocityScale.Location = New Point(338, -6)
         LblVelocityScale.Name = "LblVelocityScale"
         LblVelocityScale.Size = New Size(62, 56)
         LblVelocityScale.TabIndex = 189
@@ -204,7 +206,7 @@ Partial Class OptionsParticleNebula
         TBFadeRate.BackColor = Color.Transparent
         TBFadeRate.BeforeTouchSize = New Size(20, 280)
         TBFadeRate.LargeChange = 25
-        TBFadeRate.Location = New Point(424, 46)
+        TBFadeRate.Location = New Point(454, 43)
         TBFadeRate.Margin = New Padding(4)
         TBFadeRate.Name = "TBFadeRate"
         TBFadeRate.Orientation = Orientation.Vertical
@@ -221,7 +223,7 @@ Partial Class OptionsParticleNebula
         ' 
         TBSizeScale.BackColor = Color.Transparent
         TBSizeScale.BeforeTouchSize = New Size(20, 280)
-        TBSizeScale.Location = New Point(377, 46)
+        TBSizeScale.Location = New Point(407, 43)
         TBSizeScale.Margin = New Padding(4)
         TBSizeScale.Name = "TBSizeScale"
         TBSizeScale.Orientation = Orientation.Vertical
@@ -236,7 +238,7 @@ Partial Class OptionsParticleNebula
         ' 
         ' LblSizeScale
         ' 
-        LblSizeScale.Location = New Point(363, -3)
+        LblSizeScale.Location = New Point(393, -6)
         LblSizeScale.Name = "LblSizeScale"
         LblSizeScale.Size = New Size(50, 56)
         LblSizeScale.TabIndex = 191
@@ -246,7 +248,7 @@ Partial Class OptionsParticleNebula
         ' 
         ' LblFadeRate
         ' 
-        LblFadeRate.Location = New Point(411, -3)
+        LblFadeRate.Location = New Point(441, -6)
         LblFadeRate.Name = "LblFadeRate"
         LblFadeRate.Size = New Size(47, 56)
         LblFadeRate.TabIndex = 193
@@ -259,7 +261,7 @@ Partial Class OptionsParticleNebula
         TBSwirlBias.BackColor = Color.Transparent
         TBSwirlBias.BeforeTouchSize = New Size(20, 280)
         TBSwirlBias.LargeChange = 25
-        TBSwirlBias.Location = New Point(539, 46)
+        TBSwirlBias.Location = New Point(565, 46)
         TBSwirlBias.Margin = New Padding(4)
         TBSwirlBias.Name = "TBSwirlBias"
         TBSwirlBias.Orientation = Orientation.Vertical
@@ -276,7 +278,7 @@ Partial Class OptionsParticleNebula
         ' 
         TBSwirlStrength.BackColor = Color.Transparent
         TBSwirlStrength.BeforeTouchSize = New Size(20, 280)
-        TBSwirlStrength.Location = New Point(479, 46)
+        TBSwirlStrength.Location = New Point(509, 43)
         TBSwirlStrength.Margin = New Padding(4)
         TBSwirlStrength.Name = "TBSwirlStrength"
         TBSwirlStrength.Orientation = Orientation.Vertical
@@ -291,7 +293,7 @@ Partial Class OptionsParticleNebula
         ' 
         ' LblSwirlStrength
         ' 
-        LblSwirlStrength.Location = New Point(455, -3)
+        LblSwirlStrength.Location = New Point(485, -6)
         LblSwirlStrength.Name = "LblSwirlStrength"
         LblSwirlStrength.Size = New Size(69, 56)
         LblSwirlStrength.TabIndex = 195
@@ -301,7 +303,7 @@ Partial Class OptionsParticleNebula
         ' 
         ' LblSwirlBias
         ' 
-        LblSwirlBias.Location = New Point(526, -3)
+        LblSwirlBias.Location = New Point(552, -3)
         LblSwirlBias.Name = "LblSwirlBias"
         LblSwirlBias.Size = New Size(47, 56)
         LblSwirlBias.TabIndex = 197
@@ -412,10 +414,39 @@ Partial Class OptionsParticleNebula
         TipParticleNebula.SetToolTipImage(ChkBoxAllowMiniMode, Nothing)
         ChkBoxAllowMiniMode.UseVisualStyleBackColor = False
         ' 
+        ' TBHighFrequencyBoost
+        ' 
+        TBHighFrequencyBoost.BackColor = Color.Transparent
+        TBHighFrequencyBoost.BeforeTouchSize = New Size(20, 280)
+        TBHighFrequencyBoost.Location = New Point(286, 43)
+        TBHighFrequencyBoost.Margin = New Padding(4)
+        TBHighFrequencyBoost.Name = "TBHighFrequencyBoost"
+        TBHighFrequencyBoost.Orientation = Orientation.Vertical
+        TBHighFrequencyBoost.ShowFocusRect = False
+        TBHighFrequencyBoost.Size = New Size(20, 280)
+        TBHighFrequencyBoost.TabIndex = 204
+        TBHighFrequencyBoost.TabStop = False
+        TBHighFrequencyBoost.TimerInterval = 100
+        TipParticleNebula.SetToolTip(TBHighFrequencyBoost, "Nebula Density. Higher = More Particles.")
+        TipParticleNebula.SetToolTipImage(TBHighFrequencyBoost, Nothing)
+        TBHighFrequencyBoost.Value = 30
+        ' 
+        ' LblHighFrequencyBoost
+        ' 
+        LblHighFrequencyBoost.Location = New Point(257, -6)
+        LblHighFrequencyBoost.Name = "LblHighFrequencyBoost"
+        LblHighFrequencyBoost.Size = New Size(83, 56)
+        LblHighFrequencyBoost.TabIndex = 205
+        LblHighFrequencyBoost.Text = "High Freq Boost"
+        LblHighFrequencyBoost.TextAlign = ContentAlignment.MiddleCenter
+        TipParticleNebula.SetToolTipImage(LblHighFrequencyBoost, Nothing)
+        ' 
         ' OptionsParticleNebula
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
+        Controls.Add(TBHighFrequencyBoost)
+        Controls.Add(LblHighFrequencyBoost)
         Controls.Add(ChkBoxAllowMiniMode)
         Controls.Add(TBBloomRadius)
         Controls.Add(TBBloomIntensity)
@@ -478,5 +509,7 @@ Partial Class OptionsParticleNebula
     Friend WithEvents LblTrailAlpha As Skye.UI.Label
     Friend WithEvents TipParticleNebula As Skye.UI.ToolTip
     Friend WithEvents ChkBoxAllowMiniMode As CheckBox
+    Friend WithEvents TBHighFrequencyBoost As Syncfusion.Windows.Forms.Tools.TrackBarEx
+    Friend WithEvents LblHighFrequencyBoost As Skye.UI.Label
 
 End Class
