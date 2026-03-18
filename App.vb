@@ -2978,32 +2978,52 @@ Namespace My
                 Skye.UI.Toast.ShowToast(toastoptions)
             End If
         End Sub
-        Friend Sub HelperApp1(filename As String)
-            If filename IsNot String.Empty Then
-                If IO.File.Exists(filename) Then
+        Friend Sub HelperApp1(filenames As List(Of String))
+            If filenames IsNot Nothing AndAlso filenames.Count > 0 Then
+                ' Filter to only existing files
+                Dim existingFiles As New List(Of String)
+                For Each filename As String In filenames
+                    If IO.File.Exists(filename) Then
+                        existingFiles.Add(filename)
+                    End If
+                Next
+                If existingFiles.Count > 0 Then
+                    ' Build arguments with quoted file paths
+                    Dim args As String = String.Join(" ", existingFiles.Select(Function(f) """" + f + """"))
                     Dim pInfo As New ProcessStartInfo With {
                         .UseShellExecute = False,
                         .FileName = Settings.HelperApp1Path,
-                        .Arguments = """" + filename + """"}
+                        .Arguments = args}
                     Try
                         Diagnostics.Process.Start(pInfo)
-                        WriteToLog(Settings.HelperApp1Name + " Opened (" + filename + ")")
+                        Dim fileList As String = If(existingFiles.Count = 1, existingFiles(0), existingFiles.Count.ToString + " files")
+                        WriteToLog(Settings.HelperApp1Name + " Opened (" + fileList + ")")
                     Catch ex As Exception
                         WriteToLog("Cannot Open " + Settings.HelperApp1Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
                     End Try
                 End If
             End If
         End Sub
-        Friend Sub HelperApp2(filename As String)
-            If filename IsNot String.Empty Then
-                If IO.File.Exists(filename) Then
+        Friend Sub HelperApp2(filenames As List(Of String))
+            If filenames IsNot Nothing AndAlso filenames.Count > 0 Then
+                ' Filter to only existing files
+                Dim existingFiles As New List(Of String)
+                For Each filename As String In filenames
+                    If IO.File.Exists(filename) Then
+                        existingFiles.Add(filename)
+                    End If
+                Next
+                If existingFiles.Count > 0 Then
+                    ' Build arguments with quoted file paths
+                    Dim args As String = String.Join(" ", existingFiles.Select(Function(f) """" + f + """"))
                     Dim pInfo As New Diagnostics.ProcessStartInfo With {
                         .UseShellExecute = False,
                         .FileName = Settings.HelperApp2Path,
-                        .Arguments = """" + filename + """"}
+                        .Arguments = args}
                     Try
                         Diagnostics.Process.Start(pInfo)
-                        WriteToLog(Settings.HelperApp2Name + " Opened (" + filename + ")")
+                        Dim fileList As String = If(existingFiles.Count = 1, existingFiles(0), existingFiles.Count.ToString + " files")
+                        WriteToLog(Settings.HelperApp2Name + " Opened (" + fileList + ")")
                     Catch ex As Exception
                         WriteToLog("Cannot Open " + Settings.HelperApp2Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
                     End Try

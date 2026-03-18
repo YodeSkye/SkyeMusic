@@ -409,8 +409,6 @@ Public Class Library
         End Select
     End Sub
     Private Sub CMLibraryOpening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMLibrary.Opening
-        CMIHelperApp1.Text = "Open with " + App.Settings.HelperApp1Name
-        CMIHelperApp2.Text = "Open with " + App.Settings.HelperApp2Name
         If LVLibrary.Groups.Count = 0 Then
             CMIAddGroupToPlaylist.Visible = False
             CMICollapseGroup.Visible = False
@@ -475,11 +473,15 @@ Public Class Library
                     CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Bold)
             End Select
             If File.Exists(App.Settings.HelperApp1Path) Then
+                CMIHelperApp1.Text = "Open with " + App.Settings.HelperApp1Name
+                CMIHelperApp1.Image = Skye.WinAPI.GetApplicationIcon(App.Settings.HelperApp1Path).ToBitmap
                 CMIHelperApp1.Visible = True
             Else
                 CMIHelperApp1.Visible = False
             End If
             If File.Exists(App.Settings.HelperApp2Path) Then
+                CMIHelperApp2.Text = "Open with " + App.Settings.HelperApp2Name
+                CMIHelperApp2.Image = Skye.WinAPI.GetApplicationIcon(App.Settings.HelperApp2Path).ToBitmap
                 CMIHelperApp2.Visible = True
             Else
                 CMIHelperApp2.Visible = False
@@ -641,10 +643,22 @@ Public Class Library
         End If
     End Sub
     Private Sub CMIHelperApp1Click(sender As Object, e As EventArgs) Handles CMIHelperApp1.Click
-        If LVLibrary.SelectedItems.Count > 0 Then App.HelperApp1(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+        If LVLibrary.SelectedItems.Count > 0 Then
+            Dim selectedFiles As New List(Of String)
+            For Each item As ListViewItem In LVLibrary.SelectedItems
+                selectedFiles.Add(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
+            Next
+            App.HelperApp1(selectedFiles)
+        End If
     End Sub
     Private Sub CMIHelperApp2Click(sender As Object, e As EventArgs) Handles CMIHelperApp2.Click
-        If LVLibrary.SelectedItems.Count > 0 Then App.HelperApp2(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+        If LVLibrary.SelectedItems.Count > 0 Then
+            Dim selectedFiles As New List(Of String)
+            For Each item As ListViewItem In LVLibrary.SelectedItems
+                selectedFiles.Add(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
+            Next
+            App.HelperApp2(selectedFiles)
+        End If
     End Sub
     Private Sub CMIOpenLocationClick(sender As Object, e As EventArgs) Handles CMIOpenLocation.Click
         If LVLibrary.SelectedItems.Count > 0 Then App.OpenFileLocation(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)

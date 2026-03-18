@@ -3527,8 +3527,6 @@ Public Class Player
             Dim tiptext As String = App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)?.ToString
             If TipPlaylist IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(tiptext) Then TipPlaylist.ShowTooltipAt(New Point(CMPlaylist.Location.X, CMPlaylist.Location.Y - 37), tiptext)
         End If
-        'CMIHelperApp1.Text = "Open with " + App.Settings.HelperApp1Name
-        'CMIHelperApp2.Text = "Open with " + App.Settings.HelperApp2Name
         If LVPlaylist.Items.Count = 0 Then
             CMIClearPlaylist.Enabled = False
             CMIShowCurrent.Enabled = False
@@ -3573,20 +3571,6 @@ Public Class Player
             CMICopyTitle.Enabled = True
             CMICopyFileName.Enabled = True
             CMICopyFilePath.Enabled = True
-            'If IO.File.Exists(App.Settings.HelperApp1Path) Then
-            '    CMIHelperApp1.Text = "Open with " + App.Settings.HelperApp1Name
-            '    CMIHelperApp1.Image = Skye.WinAPI.GetApplicationIcon(App.Settings.HelperApp1Path).ToBitmap
-            '    CMIHelperApp1.Visible = True
-            'Else
-            '    CMIHelperApp1.Visible = False
-            'End If
-            'If IO.File.Exists(App.Settings.HelperApp2Path) Then
-            '    CMIHelperApp2.Text = "Open with " + App.Settings.HelperApp2Name
-            '    CMIHelperApp2.Image = Skye.WinAPI.GetApplicationIcon(App.Settings.HelperApp2Path).ToBitmap
-            '    CMIHelperApp2.Visible = True
-            'Else
-            '    CMIHelperApp2.Visible = False
-            'End If
             CMIOpenLocation.Visible = True
             TSSeparatorExternalTools.Visible = True
         End If
@@ -3631,8 +3615,6 @@ Public Class Player
                     Else
                         CMIHelperApp2.Visible = False
                     End If
-                    'CMIHelperApp1.Visible = True
-                    'CMIHelperApp2.Visible = True
                     CMIOpenLocation.Visible = True
                     TSSeparatorExternalTools.Visible = True
                 Else
@@ -3763,10 +3745,22 @@ Public Class Player
         EditTags()
     End Sub
     Private Sub CMIHelperApp1Click(sender As Object, e As EventArgs) Handles CMIHelperApp1.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then App.HelperApp1(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            Dim selectedFiles As New List(Of String)
+            For Each item As ListViewItem In LVPlaylist.SelectedItems
+                selectedFiles.Add(item.SubItems(LVPlaylist.Columns("Path").Index).Text)
+            Next
+            App.HelperApp1(selectedFiles)
+        End If
     End Sub
     Private Sub CMIHelperApp2Click(sender As Object, e As EventArgs) Handles CMIHelperApp2.Click
-        If LVPlaylist.SelectedItems.Count > 0 Then App.HelperApp2(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
+        If LVPlaylist.SelectedItems.Count > 0 Then
+            Dim selectedFiles As New List(Of String)
+            For Each item As ListViewItem In LVPlaylist.SelectedItems
+                selectedFiles.Add(item.SubItems(LVPlaylist.Columns("Path").Index).Text)
+            Next
+            App.HelperApp2(selectedFiles)
+        End If
     End Sub
     Private Sub CMIOpenLocationClick(sender As Object, e As EventArgs) Handles CMIOpenLocation.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.OpenFileLocation(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
