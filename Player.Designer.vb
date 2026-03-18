@@ -270,13 +270,11 @@ Partial Class Player
         ' 
         ' CMIHelperApp1
         ' 
-        CMIHelperApp1.Image = My.Resources.Resources.ImageSkyeTag
         CMIHelperApp1.Name = "CMIHelperApp1"
         CMIHelperApp1.Size = New Size(216, 26)
         ' 
         ' CMIHelperApp2
         ' 
-        CMIHelperApp2.Image = My.Resources.Resources.ImageMP3Tag16
         CMIHelperApp2.Name = "CMIHelperApp2"
         CMIHelperApp2.Size = New Size(216, 26)
         ' 

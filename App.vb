@@ -1037,10 +1037,10 @@ Namespace My
                     Settings.LogLocation.Y = CInt(Val(RegKey.GetValue("LogLocationY", (-1).ToString)))
                     Settings.LogSize.Width = CInt(Val(RegKey.GetValue("LogSizeX", (-1).ToString)))
                     Settings.LogSize.Height = CInt(Val(RegKey.GetValue("LogSizeY", (-1).ToString)))
-                    Settings.HelperApp1Name = RegKey.GetValue("HelperApp1Name", "SkyeTag").ToString
-                    Settings.HelperApp1Path = RegKey.GetValue("HelperApp1Path", "C:\Program Files\SkyeApps\SkyeTag.exe").ToString
-                    Settings.HelperApp2Name = RegKey.GetValue("HelperApp2Name", "MP3Tag").ToString
-                    Settings.HelperApp2Path = RegKey.GetValue("HelperApp2Path", "C:\Program Files\Mp3tag\Mp3tag.exe").ToString
+                    Settings.HelperApp1Name = RegKey.GetValue("HelperApp1Name", String.Empty).ToString
+                    Settings.HelperApp1Path = RegKey.GetValue("HelperApp1Path", String.Empty).ToString
+                    Settings.HelperApp2Name = RegKey.GetValue("HelperApp2Name", String.Empty).ToString
+                    Settings.HelperApp2Path = RegKey.GetValue("HelperApp2Path", String.Empty).ToString
                     Settings.ChangeLogLastVersionShown = RegKey.GetValue("ChangeLogLastVersionShown", String.Empty).ToString
                     Dim dt As DateTime
                     If DateTime.TryParse(CStr(RegKey.GetValue("LastUpdateCheck", String.Empty)), dt) Then
