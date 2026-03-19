@@ -330,7 +330,7 @@ Public Class Options
     End Sub
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown, TxtBoxHistoryUpdateInterval.KeyDown, TxtBoxRandomHistoryUpdateInterval.KeyDown, TxtBoxStatusMessageDisplayTime.KeyDown
         If e.KeyCode = Keys.Enter Then
-            e.Handled = True
+            e.SuppressKeyPress = True
             Validate()
         End If
     End Sub
@@ -373,6 +373,8 @@ Public Class Options
         End If
     End Sub
     Private Sub TxtBoxHelperApp1PathValidated(sender As Object, e As EventArgs) Handles TxtBoxHelperApp1Path.Validated
+        TipOptions.HideTooltip()
+        TipError.HideTooltip()
         If App.Settings.HelperApp1Path = TxtBoxHelperApp1Path.Text Then
             TxtBoxHelperApp1Path.ForeColor = App.CurrentTheme.TextColor
         Else
@@ -383,6 +385,7 @@ Public Class Options
                 Debug.Print("TxtBoxHelperApp1PathValidated")
             Else
                 TxtBoxHelperApp1Path.ForeColor = Color.Red
+                TipError.ShowTooltipAt(TxtBoxHelperApp1Path.PointToScreen(New Point(0, TxtBoxHelperApp1Path.Height)), "Invalid Path", SystemIcons.Error.ToBitmap)
             End If
         End If
     End Sub
@@ -394,6 +397,8 @@ Public Class Options
         End If
     End Sub
     Private Sub TxtBoxHelperApp2PathValidated(sender As Object, e As EventArgs) Handles TxtBoxHelperApp2Path.Validated
+        TipOptions.HideTooltip()
+        TipError.HideTooltip()
         If App.Settings.HelperApp2Path = TxtBoxHelperApp2Path.Text Then
             TxtBoxHelperApp2Path.ForeColor = App.CurrentTheme.TextColor
         Else
@@ -404,6 +409,7 @@ Public Class Options
                 Debug.Print("TxtBoxHelperApp2PathValidated")
             Else
                 TxtBoxHelperApp2Path.ForeColor = Color.Red
+                TipError.ShowTooltipAt(TxtBoxHelperApp2Path.PointToScreen(New Point(0, TxtBoxHelperApp2Path.Height)), "Invalid Path", SystemIcons.Error.ToBitmap)
             End If
         End If
     End Sub
@@ -758,9 +764,12 @@ Public Class Options
         BtnHistorySaveNow.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnHistoryPrune.BackColor = App.CurrentTheme.ButtonBackColor
         BtnHistoryPrune.ForeColor = App.CurrentTheme.ButtonTextColor
-        TipOptionsEX.BackColor = App.CurrentTheme.BackColor
-        TipOptionsEX.ForeColor = App.CurrentTheme.TextColor
-        TipOptionsEX.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipOptions.BackColor = App.CurrentTheme.BackColor
+        TipOptions.ForeColor = App.CurrentTheme.TextColor
+        TipOptions.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipError.BackColor = App.CurrentTheme.BackColor
+        TipError.ForeColor = App.CurrentTheme.TextColor
+        TipError.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         Debug.Print("Options Theme Set")
     End Sub
