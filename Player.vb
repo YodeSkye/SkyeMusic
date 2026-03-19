@@ -1,6 +1,5 @@
 ﻿
 Imports System.IO
-Imports System.Net.Http
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
@@ -5536,7 +5535,7 @@ Public Class Player
             End If
         End If
     End Sub
-    Friend Sub ShowMediaNew()
+    Friend Sub ShowMedia()
         If Not _player.HasMedia Then
             ApplyDisplayMode(DisplayMode.None, Nothing)
             Exit Sub
@@ -5571,83 +5570,9 @@ Public Class Player
 
         ApplyDisplayMode(mode, tlfile)
     End Sub
-    Private Sub ApplyDisplayMode(mode As DisplayMode, tlfile As TagLib.File)
-
-        ' Hide everything first
-        PicBoxAlbumArt.Visible = False
-        PicBoxAlbumArt.Image = Nothing
-        RTBLyrics.Visible = False
-        VLCViewer.Visible = False
-        PanelVisualizer.Visible = False
-        VisualizerEngine?.Stop()
-        App.FrmMiniPlayer?.SetAlbumArt(Nothing)
-
-        Select Case mode
-        ' ------------------------------
-        ' LYRICS MODE
-        ' ------------------------------
-            Case DisplayMode.Lyrics
-                If WindowState = FormWindowState.Maximized Then
-                    RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 20, FontStyle.Regular)
-                Else
-                    RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 12, FontStyle.Regular)
-                End If
-
-                If HasLyricsSynced Then
-                    RTBLyrics.Lines = LyricsSynced.Select(Function(l) l.Text).ToArray()
-                Else
-                    RTBLyrics.Text = LyricsText
-                End If
-
-                RTBLyrics.SetAlignment(HorizontalAlignment.Center)
-                RTBLyrics.Visible = True
-        ' ------------------------------
-        ' ALBUM ART MODE
-        ' ------------------------------
-            Case DisplayMode.AlbumArt
-                Try
-                    Dim pic = tlfile.Tag.Pictures(AlbumArtIndex).Data.Data
-                    Using ms As New IO.MemoryStream(pic)
-                        Dim img As Image = Image.FromStream(ms)
-                        PicBoxAlbumArt.Image = img
-                        PicBoxAlbumArt.Visible = True
-                        App.FrmMiniPlayer?.SetAlbumArt(img)
-                    End Using
-                Catch ex As Exception
-                    WriteToLog("Error loading album art: " & ex.Message)
-                    PicBoxAlbumArt.Visible = False
-                    App.FrmMiniPlayer?.SetAlbumArt(Nothing)
-                End Try
-        ' ------------------------------
-        ' VIDEO MODE
-        ' ------------------------------
-            Case DisplayMode.Video
-                VideoSetSize()
-                VLCViewer.Visible = True
-                App.FrmMiniPlayer?.SetAlbumArt(Nothing)
-        ' ------------------------------
-        ' VISUALIZER MODE
-        ' ------------------------------
-            Case DisplayMode.Visualizer
-                VisualizerHost.Activate(App.Settings.Visualizer)
-                VisualizerEngine?.Start()
-                PanelVisualizer.Visible = True
-                PanelVisualizer.BringToFront()
-        ' ------------------------------
-        ' NONE (no media)
-        ' ------------------------------
-            Case DisplayMode.None
-                ' Everything stays hidden
-
-        End Select
-
-        ' Lyrics menu visibility
-        MILyrics.Visible = HasLyrics
-
-    End Sub
-    Friend Sub ShowMedia()
-        ShowMediaNew()
-        Exit Sub
+    Private Sub ShowMediaOld()
+        'ShowMediaNew()
+        'Exit Sub
         If _player.HasMedia Then
             Dim tlfile As TagLib.File
             Try
@@ -5763,6 +5688,83 @@ Public Class Player
             PanelVisualizer.Visible = False
             VisualizerEngine?.Stop()
         End If
+    End Sub
+    Private Sub ApplyDisplayMode(mode As DisplayMode, tlfile As TagLib.File)
+
+        ' Hide everything first
+        PicBoxAlbumArt.Visible = False
+        PicBoxAlbumArt.Image = Nothing
+        RTBLyrics.Visible = False
+        VLCViewer.Visible = False
+        PanelVisualizer.Visible = False
+        VisualizerEngine?.Stop()
+        App.FrmMiniPlayer?.SetAlbumArt(Nothing)
+
+        Select Case mode
+        ' ------------------------------
+        ' LYRICS MODE
+        ' ------------------------------
+            Case DisplayMode.Lyrics
+                If WindowState = FormWindowState.Maximized Then
+                    RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 20, FontStyle.Regular)
+                Else
+                    RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 12, FontStyle.Regular)
+                End If
+
+                If HasLyricsSynced Then
+                    RTBLyrics.Lines = LyricsSynced.Select(Function(l) l.Text).ToArray()
+                Else
+                    RTBLyrics.Text = LyricsText
+                End If
+
+                RTBLyrics.SetAlignment(HorizontalAlignment.Center)
+                RTBLyrics.Visible = True
+        ' ------------------------------
+        ' ALBUM ART MODE
+        ' ------------------------------
+            Case DisplayMode.AlbumArt
+                Try
+                    If AlbumArtIndex > tlfile.Tag.Pictures.Count - 1 Then AlbumArtIndex = 0
+                    Dim picbytes = tlfile.Tag.Pictures(AlbumArtIndex).Data.Data
+                    Using ms As New IO.MemoryStream(picbytes)
+                        Dim img As Image = Image.FromStream(ms)
+                        PicBoxAlbumArt.Image = img
+                        PicBoxAlbumArt.Visible = True
+                        App.FrmMiniPlayer?.SetAlbumArt(img)
+                        AlbumArtCount = CByte(tlfile.Tag.Pictures.Count)
+                        PicBoxAlbumArt.Invalidate()
+                    End Using
+                Catch ex As Exception
+                    WriteToLog("Error loading album art: " & ex.Message)
+                    PicBoxAlbumArt.Visible = False
+                    App.FrmMiniPlayer?.SetAlbumArt(Nothing)
+                End Try
+       ' ------------------------------
+        ' VIDEO MODE
+        ' ------------------------------
+            Case DisplayMode.Video
+                VideoSetSize()
+                VLCViewer.Visible = True
+                App.FrmMiniPlayer?.SetAlbumArt(Nothing)
+        ' ------------------------------
+        ' VISUALIZER MODE
+        ' ------------------------------
+            Case DisplayMode.Visualizer
+                VisualizerHost.Activate(App.Settings.Visualizer)
+                VisualizerEngine?.Start()
+                PanelVisualizer.Visible = True
+                PanelVisualizer.BringToFront()
+        ' ------------------------------
+        ' NONE (no media)
+        ' ------------------------------
+            Case DisplayMode.None
+                ' Everything stays hidden
+
+        End Select
+
+        ' Lyrics menu visibility
+        MILyrics.Visible = HasLyrics
+
     End Sub
 
     'FullScreen
