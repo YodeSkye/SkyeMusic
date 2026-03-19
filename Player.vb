@@ -18,6 +18,13 @@ Public Class Player
         Paused
         Stopped
     End Enum
+    Private Enum DisplayMode
+        None
+        Lyrics
+        AlbumArt
+        Video
+        Visualizer
+    End Enum
     Public Structure PlaylistItemType
         Public Title As String
         Public Path As String
@@ -5529,7 +5536,118 @@ Public Class Player
             End If
         End If
     End Sub
+    Friend Sub ShowMediaNew()
+        If Not _player.HasMedia Then
+            ApplyDisplayMode(DisplayMode.None, Nothing)
+            Exit Sub
+        End If
+
+        Dim isStream As Boolean = (CurrentMediaType = App.MediaSourceTypes.Stream)
+        Dim ext As String = Path.GetExtension(_player.Path)
+        Dim isAudio As Boolean = App.AudioExtensionDictionary.ContainsKey(ext)
+        Dim isVideo As Boolean = App.VideoExtensionDictionary.ContainsKey(ext)
+        Dim tlfile As TagLib.File = Nothing
+        If isAudio AndAlso Not isStream Then
+            Try
+                tlfile = TagLib.File.Create(_player.Path)
+            Catch
+                tlfile = Nothing
+            End Try
+        End If
+        Dim hasAlbumArt As Boolean = (tlfile IsNot Nothing AndAlso tlfile.Tag.Pictures IsNot Nothing AndAlso tlfile.Tag.Pictures.Length > 0)
+
+        Dim mode As DisplayMode
+        If Visualizer Then
+            mode = DisplayMode.Visualizer
+        ElseIf Lyrics AndAlso Not isStream Then
+            mode = DisplayMode.Lyrics
+        ElseIf isVideo Then
+            mode = DisplayMode.Video
+        ElseIf isAudio AndAlso hasAlbumArt Then
+            mode = DisplayMode.AlbumArt
+        Else
+            mode = DisplayMode.Visualizer
+        End If
+
+        ApplyDisplayMode(mode, tlfile)
+    End Sub
+    Private Sub ApplyDisplayMode(mode As DisplayMode, tlfile As TagLib.File)
+
+        ' Hide everything first
+        PicBoxAlbumArt.Visible = False
+        PicBoxAlbumArt.Image = Nothing
+        RTBLyrics.Visible = False
+        VLCViewer.Visible = False
+        PanelVisualizer.Visible = False
+        VisualizerEngine?.Stop()
+        App.FrmMiniPlayer?.SetAlbumArt(Nothing)
+
+        Select Case mode
+        ' ------------------------------
+        ' LYRICS MODE
+        ' ------------------------------
+            Case DisplayMode.Lyrics
+                If WindowState = FormWindowState.Maximized Then
+                    RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 20, FontStyle.Regular)
+                Else
+                    RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 12, FontStyle.Regular)
+                End If
+
+                If HasLyricsSynced Then
+                    RTBLyrics.Lines = LyricsSynced.Select(Function(l) l.Text).ToArray()
+                Else
+                    RTBLyrics.Text = LyricsText
+                End If
+
+                RTBLyrics.SetAlignment(HorizontalAlignment.Center)
+                RTBLyrics.Visible = True
+        ' ------------------------------
+        ' ALBUM ART MODE
+        ' ------------------------------
+            Case DisplayMode.AlbumArt
+                Try
+                    Dim pic = tlfile.Tag.Pictures(AlbumArtIndex).Data.Data
+                    Using ms As New IO.MemoryStream(pic)
+                        Dim img As Image = Image.FromStream(ms)
+                        PicBoxAlbumArt.Image = img
+                        PicBoxAlbumArt.Visible = True
+                        App.FrmMiniPlayer?.SetAlbumArt(img)
+                    End Using
+                Catch ex As Exception
+                    WriteToLog("Error loading album art: " & ex.Message)
+                    PicBoxAlbumArt.Visible = False
+                    App.FrmMiniPlayer?.SetAlbumArt(Nothing)
+                End Try
+        ' ------------------------------
+        ' VIDEO MODE
+        ' ------------------------------
+            Case DisplayMode.Video
+                VideoSetSize()
+                VLCViewer.Visible = True
+                App.FrmMiniPlayer?.SetAlbumArt(Nothing)
+        ' ------------------------------
+        ' VISUALIZER MODE
+        ' ------------------------------
+            Case DisplayMode.Visualizer
+                VisualizerHost.Activate(App.Settings.Visualizer)
+                VisualizerEngine?.Start()
+                PanelVisualizer.Visible = True
+                PanelVisualizer.BringToFront()
+        ' ------------------------------
+        ' NONE (no media)
+        ' ------------------------------
+            Case DisplayMode.None
+                ' Everything stays hidden
+
+        End Select
+
+        ' Lyrics menu visibility
+        MILyrics.Visible = HasLyrics
+
+    End Sub
     Friend Sub ShowMedia()
+        ShowMediaNew()
+        Exit Sub
         If _player.HasMedia Then
             Dim tlfile As TagLib.File
             Try
@@ -5618,6 +5736,7 @@ Public Class Player
                         VLCViewer.Visible = True
                     End If
                 End If
+                If CurrentMediaType = App.MediaSourceTypes.Stream Then App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                 If Visualizer OrElse (Not VLCViewer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse CurrentMediaType = App.MediaSourceTypes.Stream Then 'Show Visualizer
                     Debug.Print("Showing Visualizer...")
                     VLCViewer.Visible = False
