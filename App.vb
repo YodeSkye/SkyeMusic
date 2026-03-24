@@ -117,7 +117,7 @@ Namespace My
             End Function
 
         End Class
-        Public Class SongView 'Wrapper for your serialized Song History data to provide easy access to metadata and present on Stats form
+        Public Class SongView 'Wrapper for your serialized Song History data to provide easy access to metadata and present on History form
             Public Property Data As Song   'The original serialized Song History data
 
             'Metadata fields (resolved fresh each time you build SongView)
@@ -138,21 +138,46 @@ Namespace My
 
             Private Sub LoadMetadata()
                 Try
-                    If IO.File.Exists(Data.Path) Then
-                        Using f = TagLib.File.Create(Data.Path)
-                            Artist = If(f.Tag.Performers.Length > 0, f.Tag.Performers(0), "")
-                            Title = If(String.IsNullOrEmpty(f.Tag.Title),
-                               IO.Path.GetFileNameWithoutExtension(Data.Path),
-                               f.Tag.Title)
-                            Album = f.Tag.Album
-                            Genre = If(f.Tag.Genres.Length > 0, f.Tag.Genres(0), "")
-                            Year = f.Tag.Year
-                            Duration = f.Properties.Duration
-                        End Using
-                    Else
-                        'Fallbacks if file is missing
+                    If Data.SourceType = MediaSourceTypes.Stream Then
+                        'For streams, we can't read metadata from a file, so we use the path as the title and leave other fields blank.
+                        'Debug.Print("Loading metadata for stream: " + Data.Path)
+                        Dim titleFromPlaylist = Player.GetPlaylistTitleByPath(Data.Path)
+                        If titleFromPlaylist IsNot Nothing Then
+                            Title = titleFromPlaylist
+                            'Debug.Print("Found title from playlist: " + Title)
+                        Else
+                            Title = Data.Path   'fallback
+                        End If
                         Artist = String.Empty
-                        Title = IO.Path.GetFileNameWithoutExtension(Data.Path)
+                        Album = String.Empty
+                        Genre = String.Empty
+                        Year = 0
+                        Duration = TimeSpan.Zero
+                    ElseIf Data.SourceType = MediaSourceTypes.File Then
+                        If IO.File.Exists(Data.Path) Then
+                            Using f = TagLib.File.Create(Data.Path)
+                                Artist = If(f.Tag.Performers.Length > 0, f.Tag.Performers(0), "")
+                                Title = If(String.IsNullOrEmpty(f.Tag.Title),
+                                   IO.Path.GetFileNameWithoutExtension(Data.Path),
+                                   f.Tag.Title)
+                                Album = f.Tag.Album
+                                Genre = If(f.Tag.Genres.Length > 0, f.Tag.Genres(0), "")
+                                Year = f.Tag.Year
+                                Duration = f.Properties.Duration
+                            End Using
+                        Else
+                            'Fallbacks if file is missing
+                            Artist = String.Empty
+                            Title = IO.Path.GetFileNameWithoutExtension(Data.Path)
+                            Album = String.Empty
+                            Genre = String.Empty
+                            Year = 0
+                            Duration = TimeSpan.Zero
+                        End If
+                    Else
+                        'For other source types, we can't read metadata from a file, so we use the path as the title and leave other fields blank.
+                        Artist = String.Empty
+                        Title = Data.Path
                         Album = String.Empty
                         Genre = String.Empty
                         Year = 0

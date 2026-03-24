@@ -1,5 +1,6 @@
 ﻿
 Imports System.Drawing
+Imports System.IO
 Imports System.Numerics
 Imports System.Threading
 Imports System.Windows.Forms.DataVisualization.Charting
@@ -309,7 +310,9 @@ Public Class History
         Dim snapshot As List(Of App.Song) = App.GetHistorySnapshot
         PBLoading.Maximum = snapshot.Count
         For Each s As App.Song In snapshot
-            list.Add(New App.SongView(s))
+            Dim newsong = New App.SongView(s)
+            list.Add(newsong)
+            'Debug.WriteLine($"Loaded history for: {newsong.Title} - {newsong.Artist}")
             Try : PBLoading.Value += 1 : Catch : End Try
             Application.DoEvents()
         Next
@@ -347,11 +350,7 @@ Public Class History
                 End If
                 For Each v As App.SongView In sortedViews
                     Dim lvi As ListViewItem
-                    If App.IsUrl(v.Data.Path) Then
-                        lvi = New ListViewItem(v.Data.Path)
-                    Else
-                        lvi = New ListViewItem(v.Title)
-                    End If
+                    lvi = New ListViewItem(v.Title)
                     lvi.SubItems.Add(v.Artist)
                     lvi.SubItems.Add(v.Album)
                     lvi.SubItems.Add(v.Genre)
@@ -372,7 +371,18 @@ Public Class History
                     views.GroupBy(Function(v)
                                       Dim artistName As String = v.Artist
                                       If String.IsNullOrWhiteSpace(v.Artist) Then
-                                          Return "Video"
+                                          If v.Data.SourceType = App.MediaSourceTypes.Stream Then
+                                              Return "Stream"
+                                          ElseIf v.Data.SourceType = App.MediaSourceTypes.File Then
+                                              If App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(v.Data.Path)) Then
+                                                  Return "Video"
+                                              Else
+                                                  Return "Unknown Artist"
+                                              End If
+                                          Else
+                                              'Add CD Support Here if/when implemented
+                                              Return "Unknown Artist"
+                                          End If
                                       Else
                                           Return v.Artist
                                       End If
@@ -380,10 +390,10 @@ Public Class History
                          .Select(Function(g) New MostPlayedArtistsList With {
                              .Artist = g.Key,
                              .PlayCount = g.Sum(Function(v) v.Data.PlayCount),
-                             .LastPlayed = g.Max(Function(v) v.Data.LastPlayed)
-                         }) _
+                             .LastPlayed = g.Max(Function(v) v.Data.LastPlayed)}) _
                          .OrderByDescending(Function(x) x.PlayCount) _
                          .ThenByDescending(Function(x) x.LastPlayed)
+                artistGroups = artistGroups.Where(Function(g) g.PlayCount > 0)
 
                 If CurrentViewMaxRecords > 0 Then
                     artistGroups = artistGroups.Take(CurrentViewMaxRecords)
@@ -410,11 +420,7 @@ Public Class History
                 End If
                 For Each v As App.SongView In sortedViews
                     Dim lvi As ListViewItem
-                    If App.IsUrl(v.Data.Path) Then
-                        lvi = New ListViewItem(v.Data.Path)
-                    Else
-                        lvi = New ListViewItem(v.Title)
-                    End If
+                    lvi = New ListViewItem(v.Title)
                     lvi.SubItems.Add(v.Artist)
                     lvi.SubItems.Add(v.Album)
                     lvi.SubItems.Add(v.Genre)
@@ -441,11 +447,7 @@ Public Class History
 
                 For Each v As App.SongView In sortedViews
                     Dim lvi As ListViewItem
-                    If App.IsUrl(v.Data.Path) Then
-                        lvi = New ListViewItem(v.Data.Path)
-                    Else
-                        lvi = New ListViewItem(v.Title)
-                    End If
+                    lvi = New ListViewItem(v.Title)
                     lvi.SubItems.Add(v.Artist)
                     lvi.SubItems.Add(v.Album)
                     lvi.SubItems.Add(v.Genre)
@@ -470,11 +472,7 @@ Public Class History
                 End If
                 For Each v As App.SongView In sortedViews
                     Dim lvi As ListViewItem
-                    If App.IsUrl(v.Data.Path) Then
-                        lvi = New ListViewItem(v.Data.Path)
-                    Else
-                        lvi = New ListViewItem(v.Title)
-                    End If
+                    lvi = New ListViewItem(v.Title)
                     lvi.SubItems.Add(v.Artist)
                     lvi.SubItems.Add(v.Album)
                     lvi.SubItems.Add(v.Genre)
@@ -717,13 +715,35 @@ Public Class History
             Case ChartView.Artists
                 ' Build artist dataset from views
                 Dim artistCounts As IEnumerable(Of MostPlayedArtistsList) =
-                    views.GroupBy(Function(v) If(String.IsNullOrWhiteSpace(v.Artist), "Video", v.Artist.Trim())) _
-                         .Select(Function(g) New MostPlayedArtistsList With {
-                             .Artist = g.Key,
-                             .PlayCount = g.Count(),
-                             .LastPlayed = g.Max(Function(v) v.Data.LastPlayed)
-                         }) _
-                         .OrderByDescending(Function(x) x.PlayCount)
+                    views.GroupBy(Function(v)
+                                      'Real artist?
+                                      If Not String.IsNullOrWhiteSpace(v.Artist) Then
+                                          Return v.Artist.Trim()
+                                      End If
+                                      'Stream?
+                                      If v.Data.SourceType = App.MediaSourceTypes.Stream Then
+                                          Return "Stream"
+                                      End If
+                                      'File: check if video
+                                      If v.Data.SourceType = App.MediaSourceTypes.File Then
+                                          Dim ext As String = Path.GetExtension(v.Data.Path).ToLowerInvariant()
+                                          If App.VideoExtensionDictionary.ContainsKey(ext) Then
+                                              Return "Video"
+                                          Else
+                                              Debug.Print("UNKNOWN ARTIST FILE: " & v.Title & " | " & v.Data.Path & " | EXT=" & ext)
+                                              Return "Unknown Artist"
+                                          End If
+                                      End If
+                                      'Audio CD or anything else
+                                      Debug.Print("UNKNOWN ARTIST (OTHER TYPE): " & v.Title & " | " & v.Data.Path)
+                                      Return "Unknown Artist"
+                                  End Function) _
+                        .Select(Function(g) New MostPlayedArtistsList With {
+                                                 .Artist = g.Key,
+                                                 .PlayCount = g.Count(),
+                                                 .LastPlayed = g.Max(Function(v) v.Data.LastPlayed)
+                                             }) _
+                        .OrderByDescending(Function(x) x.PlayCount)
 
                 ' Apply limit if set
                 If CurrentViewMaxRecords > 0 Then
@@ -773,7 +793,27 @@ Public Class History
             Case ChartView.ArtistWordCloud
                 ' Build artist dataset from views
                 Dim artistCounts As IEnumerable(Of MostPlayedArtistsList) =
-                    views.GroupBy(Function(v) If(String.IsNullOrWhiteSpace(v.Artist), "Video", v.Artist.Trim())) _
+                    views.GroupBy(Function(v)
+                                      'Real artist?
+                                      If Not String.IsNullOrWhiteSpace(v.Artist) Then
+                                          Return v.Artist.Trim()
+                                      End If
+                                      'Stream?
+                                      If v.Data.SourceType = App.MediaSourceTypes.Stream Then
+                                          Return "Stream"
+                                      End If
+                                      'File: check if video
+                                      If v.Data.SourceType = App.MediaSourceTypes.File Then
+                                          Dim ext As String = Path.GetExtension(v.Data.Path).ToLowerInvariant()
+                                          If App.VideoExtensionDictionary.ContainsKey(ext) Then
+                                              Return "Video"
+                                          Else
+                                              Return "Unknown Artist"
+                                          End If
+                                      End If
+                                      'Audio CD or anything else
+                                      Return "Unknown Artist"
+                                  End Function) _
                          .Select(Function(g) New MostPlayedArtistsList With {
                              .Artist = g.Key,
                              .PlayCount = g.Count(),
@@ -997,8 +1037,11 @@ Public Class History
                 ' Add points from history
                 For Each s In songs
                     Dim pointIdx = series.Points.AddXY(s.Rating, s.PlayCount)
-                    ' Optional: label with filename or stars
-                    series.Points(pointIdx).Label = IO.Path.GetFileNameWithoutExtension(s.Path)
+                    If s.SourceType = App.MediaSourceTypes.Stream Then
+                        series.Points(pointIdx).Label = Player.GetPlaylistTitleByPath(s.Path)
+                    Else
+                        series.Points(pointIdx).Label = IO.Path.GetFileNameWithoutExtension(s.Path)
+                    End If
                 Next
 
                 chart.Series.Clear()

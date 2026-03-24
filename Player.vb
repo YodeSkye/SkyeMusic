@@ -5027,6 +5027,18 @@ Public Class Player
         ClearPlaylistTitles()
         Return currentsort
     End Function
+    Friend Function GetPlaylistTitleByPath(path As String) As String
+        Dim titleIndex As Integer = LVPlaylist.Columns("Title").Index
+        Dim pathIndex As Integer = LVPlaylist.Columns("Path").Index
+
+        For Each item As ListViewItem In LVPlaylist.Items
+            If String.Equals(item.SubItems(pathIndex).Text, path, StringComparison.OrdinalIgnoreCase) Then
+                Return item.SubItems(titleIndex).Text
+            End If
+        Next
+
+        Return Nothing
+    End Function
 
     'Queue
     Friend Sub QueuePath(path As String)
