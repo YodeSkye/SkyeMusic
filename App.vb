@@ -1,7 +1,9 @@
 ﻿
 Imports System.Data.SQLite
 Imports System.IO
+Imports System.Net
 Imports System.Net.Http
+Imports System.Net.Sockets
 Imports Microsoft.Win32
 Imports Windows.Win32.UI.Input
 
@@ -235,6 +237,7 @@ Namespace My
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
         Friend ReadOnly Http As New HttpClient()
         Friend DirectoryLastSelectedSource As Integer = -1 'DirectoryLastSelectedSource stores the last selected source in the Directory form.
+        Private Property CompanionServerRunning As Boolean = False 'CompanionServerRunning is a flag that indicates whether the companion server is currently running.
 
         ' HotKeys
         Private Structure HotKey
@@ -785,6 +788,67 @@ Namespace My
         End Function
         Friend ParticleNebulaActivePalette As ParticleNebulaPalette = ParticleNebulaGetPalette(ParticleNebulaPalettePresets.Cosmic)
 
+        ' Companion Server
+        Public Class CompanionControlServerClass
+            Private _listener As TcpListener
+            Private _running As Boolean = False
+
+            Public Sub Start(port As Integer)
+                If _running Then Exit Sub
+
+                _listener = New TcpListener(IPAddress.Loopback, port)
+                _listener.Start()
+                _running = True
+                Task.Run(AddressOf ListenLoop)
+            End Sub
+            Public Sub [Stop]()
+                If Not _running Then Exit Sub
+
+                _running = False
+                _listener.Stop()
+            End Sub
+
+            Private Async Function ListenLoop() As Task
+                While _running
+                    Try
+                        Dim client = Await _listener.AcceptTcpClientAsync()
+                        HandleClient(client)
+                    Catch
+                        ' Listener stopped
+                    End Try
+                End While
+            End Function
+            Private Sub HandleClient(client As TcpClient)
+                Task.Run(Async Function()
+                             Using client
+                                 Using stream = client.GetStream()
+                                     Using reader As New StreamReader(stream)
+                                         Dim command = Await reader.ReadLineAsync()
+                                         ProcessCommand(command)
+                                     End Using
+                                 End Using
+                             End Using
+                         End Function)
+            End Sub
+            Private Sub ProcessCommand(cmd As String)
+                Select Case cmd.ToLowerInvariant()
+                    Case "play"
+                        Player.TogglePlay()
+                    Case "pause"
+                        Player.TogglePlay()
+                    Case "toggle"
+                        Player.TogglePlay()
+                    Case "stop"
+                        Player.StopPlay()
+                    Case "next"
+                        Player.PlayNext()
+                    Case "previous"
+                        Player.PlayPrevious()
+                End Select
+            End Sub
+        End Class
+        Private ReadOnly CompanionControlServer As New CompanionControlServerClass()
+
         ' Settings
         Friend Class Settings
 
@@ -805,6 +869,7 @@ Namespace My
             Friend Shared MinimizeToTray As Boolean = False
             Friend Shared LastUpdateCheck As DateTime = DateTime.MinValue
             Friend Shared LatestKnownVersion As String = String.Empty
+            Friend Shared EnableCompanionServer As Boolean = False
 
             ' Player
             Friend Shared PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -2449,6 +2514,25 @@ Namespace My
             Return plays
         End Function
 
+        ' Companion Server
+        Public Sub SetCompanionServer()
+            If Settings.EnableCompanionServer AndAlso Not CompanionServerRunning Then
+                ' Start Companion Server
+                CompanionControlServer.Start(5050)
+
+                Debug.Print("<< COMPANION SERVER STARTED >>")
+                WriteToLog("Companion Server Started...")
+                CompanionServerRunning = True
+            ElseIf Not Settings.EnableCompanionServer AndAlso CompanionServerRunning Then
+                ' Stop Companion Server
+                CompanionControlServer.Stop()
+
+                Debug.Print("<< COMPANION SERVER STOPPED >>")
+                WriteToLog("...Companion Server Stopped")
+                CompanionServerRunning = False
+            End If
+        End Sub
+
         'Methods
         Friend Sub Initialize()
             WriteToLog(My.Application.Info.ProductName + " Started")
@@ -2608,6 +2692,8 @@ Namespace My
             WatcherWorkTimer.AutoReset = False
             SetWatchers()
 
+            SetCompanionServer()
+
         End Sub
         Friend Sub Finalize()
             UnRegisterHotKeys()
@@ -2692,7 +2778,7 @@ Namespace My
                             Case Else
                                 History = If(data.History, New List(Of Song))
                                 HistoryTotalPlayedSongs = data.TotalPlayedSongs
-                                App.WriteToLog("Loaded Schema version " & data.SchemaVersion & " (Unknown, using defaults for new fields)")
+                                App.WriteToLog("Loaded Schema version " & data.SchemaVersion & " (Unknown, Using defaults For New fields)")
                         End Select
                         App.WriteToLog("History Loaded (Schema v" & data.SchemaVersion & ") (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
                         Exit Sub
