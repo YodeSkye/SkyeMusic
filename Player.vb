@@ -5270,7 +5270,6 @@ Public Class Player
         End Select
     End Sub
     Friend Sub PlayNext()
-        'Stream = False
         StopPlay()
         LyricsOff()
         Select Case App.Settings.PlayMode

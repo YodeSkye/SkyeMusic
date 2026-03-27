@@ -39,5 +39,6 @@ Namespace My
                 Return True
             End If
         End Function
+
     End Class
 End Namespace

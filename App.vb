@@ -790,13 +790,18 @@ Namespace My
 
         ' Companion Server
         Public Class CompanionControlServerClass
+            Private ReadOnly _player As Player
             Private _listener As TcpListener
             Private _running As Boolean = False
+
+            Public Sub New(player As Player)
+                _player = player
+            End Sub
 
             Public Sub Start(port As Integer)
                 If _running Then Exit Sub
 
-                _listener = New TcpListener(IPAddress.Loopback, port)
+                _listener = New TcpListener(IPAddress.Any, port)
                 _listener.Start()
                 _running = True
                 Task.Run(AddressOf ListenLoop)
@@ -831,23 +836,25 @@ Namespace My
                          End Function)
             End Sub
             Private Sub ProcessCommand(cmd As String)
-                Select Case cmd.ToLowerInvariant()
-                    Case "play"
-                        Player.TogglePlay()
-                    Case "pause"
-                        Player.TogglePlay()
-                    Case "toggle"
-                        Player.TogglePlay()
-                    Case "stop"
-                        Player.StopPlay()
-                    Case "next"
-                        Player.PlayNext()
-                    Case "previous"
-                        Player.PlayPrevious()
-                End Select
+                _player.BeginInvoke(Sub()
+                                        Select Case cmd.ToLowerInvariant()
+                                            Case "play"
+                                                _player.TogglePlay()
+                                            Case "pause"
+                                                _player.TogglePlay()
+                                            Case "toggle"
+                                                _player.TogglePlay()
+                                            Case "stop"
+                                                _player.StopPlay()
+                                            Case "next"
+                                                _player.PlayNext()
+                                            Case "previous"
+                                                _player.PlayPrevious()
+                                        End Select
+                                    End Sub)
             End Sub
         End Class
-        Private ReadOnly CompanionControlServer As New CompanionControlServerClass()
+        Private CompanionControlServer As CompanionControlServerClass
 
         ' Settings
         Friend Class Settings
@@ -869,7 +876,7 @@ Namespace My
             Friend Shared MinimizeToTray As Boolean = False
             Friend Shared LastUpdateCheck As DateTime = DateTime.MinValue
             Friend Shared LatestKnownVersion As String = String.Empty
-            Friend Shared EnableCompanionServer As Boolean = False
+            Friend Shared EnableCompanionServer As Boolean = True
 
             ' Player
             Friend Shared PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -2692,6 +2699,7 @@ Namespace My
             WatcherWorkTimer.AutoReset = False
             SetWatchers()
 
+            CompanionControlServer = New CompanionControlServerClass(Player)
             SetCompanionServer()
 
         End Sub
