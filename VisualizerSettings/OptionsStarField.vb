@@ -29,7 +29,7 @@ Public Class OptionsStarField
         App.Settings.Visualizers.StarFieldStarCount = CInt(TxtBoxStarCount.Text)
         App.Settings.Visualizers.StarFieldStarCount = Math.Max(100, Math.Min(2000, App.Settings.Visualizers.StarFieldStarCount))
         TxtBoxStarCount.Text = App.Settings.Visualizers.StarFieldStarCount.ToString
-        Player.VisualizerHost.SetStarFieldStarCount(App.Settings.Visualizers.StarFieldStarCount)
+        App.FrmPlayer.VisualizerHost.SetStarFieldStarCount(App.Settings.Visualizers.StarFieldStarCount)
     End Sub
     Private Sub TBBaseSpeed_ValueChanged(sender As Object, e As EventArgs) Handles TBBaseSpeed.ValueChanged
         If IsInitializing Then Exit Sub

@@ -165,7 +165,7 @@ Public Class Library
 
     End Sub
     Private Sub Library_Activated(sender As Object, e As EventArgs) Handles MyBase.Activated
-        Player.WatcherNotification = String.Empty
+        App.FrmPlayer.WatcherNotification = String.Empty
     End Sub
     Private Sub Library_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         e.Cancel = True
@@ -503,15 +503,11 @@ Public Class Library
             LblStatus.Text = "Adding Selected Songs to Playlist..."
             LblStatus.Visible = True
             LblStatus.Refresh()
-            'Player.LVPlaylist.Visible = False
-            'Player.LVPlaylist.SuspendLayout()
-            Player.LVPlaylist.BeginUpdate()
+            App.FrmPlayer.LVPlaylist.BeginUpdate()
             For Each item As ListViewItem In LVLibrary.SelectedItems
                 AddToPlaylist(item)
             Next
-            Player.LVPlaylist.EndUpdate()
-            'Player.LVPlaylist.ResumeLayout()
-            'Player.LVPlaylist.Visible = True
+            App.FrmPlayer.LVPlaylist.EndUpdate()
             LblStatus.Visible = False
             App.WriteToLog("Selected Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
@@ -521,15 +517,11 @@ Public Class Library
         LblStatus.Text = "Adding All Songs to Playlist..."
         LblStatus.Visible = True
         LblStatus.Refresh()
-        'Player.LVPlaylist.Visible = False
-        'Player.LVPlaylist.SuspendLayout()
-        Player.LVPlaylist.BeginUpdate()
+        App.FrmPlayer.LVPlaylist.BeginUpdate()
         For Each item As ListViewItem In LVLibrary.Items
             AddToPlaylist(item)
         Next
-        Player.LVPlaylist.EndUpdate()
-        'Player.LVPlaylist.ResumeLayout()
-        'Player.LVPlaylist.Visible = True
+        App.FrmPlayer.LVPlaylist.EndUpdate()
         LblStatus.Visible = False
         App.WriteToLog("Full Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
     End Sub
@@ -541,9 +533,7 @@ Public Class Library
             LblStatus.Text = "Adding Group to Playlist..."
             LblStatus.Visible = True
             LblStatus.Refresh()
-            'Player.LVPlaylist.Visible = False
-            'Player.LVPlaylist.SuspendLayout()
-            Player.LVPlaylist.BeginUpdate()
+            App.FrmPlayer.LVPlaylist.BeginUpdate()
 
             'Get group name from selected list view item
             Dim groupname As String
@@ -576,9 +566,7 @@ Public Class Library
             Next
 
             'Finalize
-            Player.LVPlaylist.EndUpdate()
-            'Player.LVPlaylist.ResumeLayout()
-            'Player.LVPlaylist.Visible = True
+            App.FrmPlayer.LVPlaylist.EndUpdate()
             LblStatus.Visible = False
             App.WriteToLog(LibraryGroupBy.ToString + " Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
@@ -949,10 +937,10 @@ Public Class Library
         LblStatus.Visible = False
         SetLibraryCountText()
         If Settings.WatcherUpdateLibrary Or Settings.WatcherUpdatePlaylist Then
-            If paths.Count > 0 Then Player.WatcherNotification = "Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs")
+            If paths.Count > 0 Then App.FrmPlayer.WatcherNotification = "Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs")
             App.WriteToLog("Library Watcher Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs"))
         Else
-            If paths.Count > 0 Then Player.WatcherNotification = If(paths.Count = 1, "Song Update Available", "Song Updates Available: " & paths.Count.ToString)
+            If paths.Count > 0 Then App.FrmPlayer.WatcherNotification = If(paths.Count = 1, "Song Update Available", "Song Updates Available: " & paths.Count.ToString)
             App.WriteToLog("Library Watcher " & If(paths.Count = 1, "Update Available", "Updates Available: " & paths.Count.ToString))
         End If
         Debug.Print("Library Watcher Work Complete: " & paths.Count.ToString)
@@ -1076,19 +1064,19 @@ Public Class Library
     End Sub
     Private Sub Play()
         If LVLibrary.SelectedItems.Count > 0 Then
-            Player.PlayFromLibrary(App.FormatPlaylistTitle(LVLibrary.SelectedItems(0)), LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+            App.FrmPlayer.PlayFromLibrary(App.FormatPlaylistTitle(LVLibrary.SelectedItems(0)), LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
         End If
     End Sub
     Private Sub Queue()
         If LVLibrary.SelectedItems.Count > 0 Then
-            Player.QueuePath(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
+            App.FrmPlayer.QueuePath(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
         End If
     End Sub
     Private Sub AddToPlaylist(item As ListViewItem)
-        Player.AddToPlaylistFromLibrary(App.FormatPlaylistTitle(item), item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
+        App.FrmPlayer.AddToPlaylistFromLibrary(App.FormatPlaylistTitle(item), item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
     End Sub
     Private Sub RemoveFromPlaylist(path As String)
-        Player.RemoveFromPlaylistFromLibrary(path)
+        App.FrmPlayer.RemoveFromPlaylistFromLibrary(path)
     End Sub
     Private Sub SaveLibrary()
         If LVLibrary.Items.Count = 0 Then

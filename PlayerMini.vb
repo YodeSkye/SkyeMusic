@@ -31,7 +31,7 @@ Public Class PlayerMini
         SetTheme()
         Size = New Size(100, 144)
         Text = My.Application.Info.Title & " Mini Player"
-        LblTitle.Text = Player.PlaylistCurrentText
+        LblTitle.Text = App.FrmPlayer.PlaylistCurrentText
         ResetMarquee()
         MarqueeTimer.Start()
 #If DEBUG Then
@@ -51,13 +51,13 @@ Public Class PlayerMini
             Top = wa.Bottom - Height
         End If
 #End If
-        AddHandler Player.TitleChanged, AddressOf OnTitleChanged
+        AddHandler App.FrmPlayer.TitleChanged, AddressOf OnTitleChanged
 
-        If Player.MiniPlayerVisualizer Is Nothing Then
-            Dim vType = Player.VisualizerHost.GetTypeFromName(App.Settings.Visualizer)
-            Player.MiniPlayerVisualizer = CType(Activator.CreateInstance(vType), Player.IVisualizer)
+        If App.FrmPlayer.MiniPlayerVisualizer Is Nothing Then
+            Dim vType = App.FrmPlayer.VisualizerHost.GetTypeFromName(App.Settings.Visualizer)
+            FrmPlayer.MiniPlayerVisualizer = CType(Activator.CreateInstance(vType), Player.IVisualizer)
         End If
-        AttachVisualizer(Player.MiniPlayerVisualizer)
+        AttachVisualizer(App.FrmPlayer.MiniPlayerVisualizer)
 
         AddHandler topmostTimer.Tick, AddressOf EnforceTopMost
         topmostTimer.Start()
@@ -65,7 +65,7 @@ Public Class PlayerMini
     End Sub
     Private Sub PlayerMini_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If topmostTimer IsNot Nothing Then topmostTimer.Stop()
-        Player.MiniPlayerVisualizer = Nothing
+        App.FrmPlayer.MiniPlayerVisualizer = Nothing
     End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnPlay.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
         If e.Alt Then
@@ -75,7 +75,7 @@ Public Class PlayerMini
                     If e.Shift Then App.ShowDevTools()
                 Case Keys.Space
                     e.SuppressKeyPress = True
-                    Player.StopPlay()
+                    App.FrmPlayer.StopPlay()
             End Select
         ElseIf e.Shift Then
         Else
@@ -94,7 +94,7 @@ Public Class PlayerMini
                 '    Player.UpdatePosition(True, 10)
                 Case Keys.Space
                     e.SuppressKeyPress = True
-                    Player.TogglePlay()
+                    App.FrmPlayer.TogglePlay()
                 Case Keys.OemQuestion
                 Case Keys.PageUp
                 Case Keys.PageDown
@@ -103,13 +103,13 @@ Public Class PlayerMini
                 Case Keys.Insert
                 Case Keys.M
                     e.SuppressKeyPress = True
-                    Player.ToggleMute()
+                    App.FrmPlayer.ToggleMute()
                 Case Keys.N
                     e.SuppressKeyPress = True
-                    Player.PlayNext()
+                    App.FrmPlayer.PlayNext()
                 Case Keys.B
                     e.SuppressKeyPress = True
-                    Player.PlayPrevious()
+                    App.FrmPlayer.PlayPrevious()
                 Case Keys.L
                     e.SuppressKeyPress = True
                     App.ShowLibrary()
@@ -118,7 +118,7 @@ Public Class PlayerMini
                     App.ShowDirectory()
                 Case Keys.V
                     e.SuppressKeyPress = True
-                    Player.ToggleVisualizer()
+                    App.FrmPlayer.ToggleVisualizer()
             End Select
         End If
     End Sub
@@ -164,10 +164,10 @@ Public Class PlayerMini
     Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
         Select Case keyData
             Case Keys.Left
-                Player.UpdatePosition(False, 10)
+                App.FrmPlayer.UpdatePosition(False, 10)
                 Return True
             Case Keys.Right
-                Player.UpdatePosition(True, 10)
+                App.FrmPlayer.UpdatePosition(True, 10)
                 Return True
         End Select
         Return MyBase.ProcessCmdKey(msg, keyData)
@@ -204,19 +204,19 @@ Public Class PlayerMini
 
     ' Control Events
     Private Sub BtnPlay_Click(sender As Object, e As EventArgs) Handles BtnPlay.Click
-        Player.TogglePlay()
+        App.FrmPlayer.TogglePlay()
         SetPlayState()
     End Sub
     Private Sub BtnStop_Click(sender As Object, e As EventArgs) Handles BtnStop.Click
-        Player.StopPlay()
+        App.FrmPlayer.StopPlay()
         SetPlayState()
     End Sub
     Private Sub BtnPrevious_Click(sender As Object, e As EventArgs) Handles BtnPrevious.Click
-        Player.PlayPrevious()
+        App.FrmPlayer.PlayPrevious()
         SetPlayState()
     End Sub
     Private Sub BtnNext_Click(sender As Object, e As EventArgs) Handles BtnNext.Click
-        Player.PlayNext()
+        App.FrmPlayer.PlayNext()
         SetPlayState()
     End Sub
     Private Sub Visualizer_MouseClick(sender As Object, e As MouseEventArgs)
@@ -246,10 +246,10 @@ Public Class PlayerMini
 
     ' Methods
     Friend Sub SetPlayState()
-        Select Case Player.PlayState
-            Case Player.PlayStates.Playing
+        Select Case App.FrmPlayer.PlayState
+            Case App.PlayStates.Playing
                 BtnPlay.Image = ImagePause
-            Case Player.PlayStates.Paused, Player.PlayStates.Stopped
+            Case App.PlayStates.Paused, App.PlayStates.Stopped
                 BtnPlay.Image = ImagePlay
         End Select
     End Sub
@@ -259,7 +259,7 @@ Public Class PlayerMini
             PanelVisualizer.BringToFront()
         Else
             PicBoxAlbumArt.Image = App.ResizeImage(img, PicBoxAlbumArt.Width)
-            If Player.Visualizer Then
+            If App.FrmPlayer.Visualizer Then
                 PanelVisualizer.BringToFront()
             Else
                 PicBoxAlbumArt.BringToFront()
@@ -272,10 +272,10 @@ Public Class PlayerMini
     Friend Sub AttachVisualizer(v As Player.IVisualizer)
 
         ' Stop old mini visualizer
-        Player.MiniPlayerVisualizer?.Stop()
+        App.FrmPlayer.MiniPlayerVisualizer?.Stop()
 
         ' Replace reference
-        Player.MiniPlayerVisualizer = v
+        App.FrmPlayer.MiniPlayerVisualizer = v
 
         ' Attach UI
         Dim ctrl = v.DockedControl
@@ -298,7 +298,7 @@ Public Class PlayerMini
         App.ThemeMenu(menu)
 
         ' Loop through available visualizers
-        For Each vizName In Player.VisualizerHost.GetVisualizerNames()
+        For Each vizName In App.FrmPlayer.VisualizerHost.GetVisualizerNames()
             Dim item As New ToolStripMenuItem(vizName) With {
             .Font = menu.Font
         }
@@ -314,10 +314,10 @@ Public Class PlayerMini
                 App.Settings.Visualizer = vizName
 
                 ' Reload main player visualizer
-                Player.ShowMedia()
+                App.FrmPlayer.ShowMedia()
 
                 ' Reload mini visualizer
-                Dim vType = Player.VisualizerHost.GetTypeFromName(vizName)
+                Dim vType = App.FrmPlayer.VisualizerHost.GetTypeFromName(vizName)
                 Dim miniV = CType(Activator.CreateInstance(vType), Player.IVisualizer)
                 Me.AttachVisualizer(miniV)
                 miniV.Start()

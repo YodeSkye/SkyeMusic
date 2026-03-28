@@ -199,7 +199,7 @@ Public Class PlayerQueue
                     End If
                 Next
                 SaveLVToQueue()
-                Player.SetPlaylistCountText()
+                App.FrmPlayer.SetPlaylistCountText()
             End If
             files.Clear()
         End If
@@ -260,15 +260,15 @@ Public Class PlayerQueue
         Close()
     End Sub
     Private Sub BtnPrune_Click(sender As Object, e As EventArgs) Handles BtnPrune.Click
-        Player.PruneQueue()
+        App.FrmPlayer.PruneQueue()
         Populate()
     End Sub
 
     'Procedures
     Private Sub Populate()
         LVQueue.Items.Clear()
-        For Each s As String In Player.Queue
-            Dim playlistlvi As ListViewItem = Player.LVPlaylist.FindItemWithText(s, True, 0)
+        For Each s As String In App.FrmPlayer.Queue
+            Dim playlistlvi As ListViewItem = App.FrmPlayer.LVPlaylist.FindItemWithText(s, True, 0)
             Dim lvi As New ListViewItem
             If playlistlvi Is Nothing Then
                 lvi.SubItems(0).Text = "Not Found In Playlist"
@@ -282,9 +282,9 @@ Public Class PlayerQueue
         LVQueue.Columns(1).Width = -2
     End Sub
     Private Sub SaveLVToQueue()
-        Player.Queue.Clear()
+        App.FrmPlayer.Queue.Clear()
         For Each lvi As ListViewItem In LVQueue.Items
-            Player.Queue.Add(lvi.SubItems(1).Text)
+            App.FrmPlayer.Queue.Add(lvi.SubItems(1).Text)
         Next
     End Sub
     Private Sub RemoveFromQueue()
@@ -301,7 +301,7 @@ Public Class PlayerQueue
             indices.Reverse()
 
             For Each index As Integer In indices
-                Player.RemoveFromQueue(index)
+                App.FrmPlayer.RemoveFromQueue(index)
             Next
 
             Populate()

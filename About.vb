@@ -73,7 +73,7 @@ Public Class About
     End Sub
     Private Sub LblVersion_DoubleClick(sender As Object, e As EventArgs) Handles LblVersion.DoubleClick
         Dim classname As New System.Text.StringBuilder(256)
-        Dim length As Integer = Skye.WinAPI.GetClassName(Player.Handle, classname, classname.Capacity)
+        Dim length As Integer = Skye.WinAPI.GetClassName(App.FrmPlayer.Handle, classname, classname.Capacity)
         If length > 0 Then
             My.Computer.Clipboard.SetText(classname.ToString.TrimEnd(Chr(0), CChar(" "))) 'Remove null terminator & trailing spaces from class name
             Debug.Print(classname.ToString.TrimEnd(Chr(0), CChar(" ")))

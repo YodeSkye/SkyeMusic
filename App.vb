@@ -57,11 +57,20 @@ Namespace My
             Linear
             Random
         End Enum
+        Friend Enum PlayStates
+            Playing
+            Paused
+            Stopped
+        End Enum
         Friend Enum PlaylistActions
             Play
             Queue
             SelectOnly
         End Enum
+        Public Structure PlaylistItemType
+            Public Title As String
+            Public Path As String
+        End Structure
         Friend Enum FormatFileSizeUnits
             Auto
             Bytes
@@ -143,7 +152,7 @@ Namespace My
                     If Data.SourceType = MediaSourceTypes.Stream Then
                         'For streams, we can't read metadata from a file, so we use the path as the title and leave other fields blank.
                         'Debug.Print("Loading metadata for stream: " + Data.Path)
-                        Dim titleFromPlaylist = Player.GetPlaylistTitleByPath(Data.Path)
+                        Dim titleFromPlaylist = FrmPlayer.GetPlaylistTitleByPath(Data.Path)
                         If titleFromPlaylist IsNot Nothing Then
                             Title = titleFromPlaylist
                             'Debug.Print("Found title from playlist: " + Title)
@@ -200,6 +209,7 @@ Namespace My
         Friend ExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
         Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
         Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
+        Friend FrmPlayer As Player 'FmrPlayer is the main player window that provides advanced playback controls and displays detailed information about the currently playing media.
         Friend FrmMiniPlayer As PlayerMini 'FrmMiniPlayer is the mini player window that provides basic playback controls.
         Friend FrmLibrary As Library 'FrmLibrary is the main library window that displays the media library.
         Friend FrmDirectory As Directory 'FrmDirectory is the internet radio directory window that allows users to browse and play internet radio stations.
@@ -854,7 +864,7 @@ Namespace My
                                     End Sub)
             End Sub
         End Class
-        Private CompanionControlServer As CompanionControlServerClass
+        Friend CompanionControlServer As CompanionControlServerClass
 
         ' Settings
         Friend Class Settings
@@ -1421,8 +1431,8 @@ Namespace My
         Friend Interface IPlaylistIOFormat
             ReadOnly Property Name As String
             ReadOnly Property FileExtension As String
-            Function Import(path As String) As List(Of Player.PlaylistItemType)
-            Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType))
+            Function Import(path As String) As List(Of PlaylistItemType)
+            Sub Export(path As String, items As IEnumerable(Of PlaylistItemType))
         End Interface
         Private MustInherit Class PlaylistIOFormatM3UBase
             Implements IPlaylistIOFormat
@@ -1430,8 +1440,8 @@ Namespace My
             Public MustOverride ReadOnly Property Name As String Implements IPlaylistIOFormat.Name
             Public MustOverride ReadOnly Property FileExtension As String Implements IPlaylistIOFormat.FileExtension
 
-            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
-                Dim items As New List(Of Player.PlaylistItemType)
+            Public Function Import(path As String) As List(Of PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of PlaylistItemType)
                 Dim pendingTitle As String = Nothing
 
                 For Each line In IO.File.ReadAllLines(path, System.Text.Encoding.UTF8)
@@ -1447,14 +1457,14 @@ Namespace My
                     ElseIf Not line.StartsWith("#") Then
                         ' This is a file path
                         Dim title = If(pendingTitle, IO.Path.GetFileNameWithoutExtension(line))
-                        items.Add(New Player.PlaylistItemType With {.Path = line, .Title = title})
+                        items.Add(New PlaylistItemType With {.Path = line, .Title = title})
                         pendingTitle = Nothing
                     End If
                 Next
 
                 Return items
             End Function
-            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+            Public Sub Export(path As String, items As IEnumerable(Of PlaylistItemType)) Implements IPlaylistIOFormat.Export
                 Using writer As New IO.StreamWriter(path, False, System.Text.Encoding.UTF8)
                     writer.WriteLine("#EXTM3U")
                     For Each item In items
@@ -1490,8 +1500,8 @@ Namespace My
                 End Get
             End Property
 
-            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
-                Dim items As New List(Of Player.PlaylistItemType)
+            Public Function Import(path As String) As List(Of PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of PlaylistItemType)
 
                 'Dictionary to hold grouped entries
                 Dim files As New Dictionary(Of Integer, String)
@@ -1516,12 +1526,12 @@ Namespace My
                     If String.IsNullOrEmpty(titleVal) Then
                         titleVal = IO.Path.GetFileNameWithoutExtension(pathVal)
                     End If
-                    items.Add(New Player.PlaylistItemType With {.Path = pathVal, .Title = titleVal})
+                    items.Add(New PlaylistItemType With {.Path = pathVal, .Title = titleVal})
                 Next
 
                 Return items
             End Function
-            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+            Public Sub Export(path As String, items As IEnumerable(Of PlaylistItemType)) Implements IPlaylistIOFormat.Export
                 Using writer As New IO.StreamWriter(path, False, System.Text.Encoding.UTF8)
                     writer.WriteLine("[playlist]")
                     Dim index As Integer = 1
@@ -1551,8 +1561,8 @@ Namespace My
                 End Get
             End Property
 
-            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
-                Dim items As New List(Of Player.PlaylistItemType)
+            Public Function Import(path As String) As List(Of PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of PlaylistItemType)
                 Dim doc As XDocument = XDocument.Load(path)
                 Dim ns As XNamespace = "http://xspf.org/ns/0/"
 
@@ -1571,13 +1581,13 @@ Namespace My
                             title = IO.Path.GetFileNameWithoutExtension(pathVal)
                         End If
 
-                        items.Add(New Player.PlaylistItemType With {.Path = pathVal, .Title = title})
+                        items.Add(New PlaylistItemType With {.Path = pathVal, .Title = title})
                     End If
                 Next
 
                 Return items
             End Function
-            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+            Public Sub Export(path As String, items As IEnumerable(Of PlaylistItemType)) Implements IPlaylistIOFormat.Export
                 Dim ns As XNamespace = "http://xspf.org/ns/0/"
                 Dim doc As New XDocument(
             New XElement(ns + "playlist",
@@ -1610,8 +1620,8 @@ Namespace My
                 End Get
             End Property
 
-            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
-                Dim items As New List(Of Player.PlaylistItemType)
+            Public Function Import(path As String) As List(Of PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of PlaylistItemType)
                 Dim doc As XDocument = XDocument.Load(path)
 
                 'WPL uses no namespace, so we can just query elements directly
@@ -1619,13 +1629,13 @@ Namespace My
                     Dim src = mediaelement.Attribute("src")?.Value
                     If Not String.IsNullOrEmpty(src) Then
                         Dim title = IO.Path.GetFileNameWithoutExtension(src)
-                        items.Add(New Player.PlaylistItemType With {.Path = src, .Title = title})
+                        items.Add(New PlaylistItemType With {.Path = src, .Title = title})
                     End If
                 Next
 
                 Return items
             End Function
-            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+            Public Sub Export(path As String, items As IEnumerable(Of PlaylistItemType)) Implements IPlaylistIOFormat.Export
                 Dim doc As New XDocument(
                     New XElement("smil",
                     New XElement("head",
@@ -1662,8 +1672,8 @@ Namespace My
                 End Get
             End Property
 
-            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
-                Dim items As New List(Of Player.PlaylistItemType)
+            Public Function Import(path As String) As List(Of PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of PlaylistItemType)
                 Dim doc As XDocument = XDocument.Load(path)
 
                 For Each entry In doc.Descendants("entry")
@@ -1673,13 +1683,13 @@ Namespace My
                         If String.IsNullOrEmpty(title) Then
                             title = IO.Path.GetFileNameWithoutExtension(href)
                         End If
-                        items.Add(New Player.PlaylistItemType With {.Path = href, .Title = title})
+                        items.Add(New PlaylistItemType With {.Path = href, .Title = title})
                     End If
                 Next
 
                 Return items
             End Function
-            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+            Public Sub Export(path As String, items As IEnumerable(Of PlaylistItemType)) Implements IPlaylistIOFormat.Export
                 Dim doc As New XDocument(
                     New XElement("asx",
                     New XAttribute("version", "3.0"),
@@ -1707,17 +1717,17 @@ Namespace My
                 End Get
             End Property
 
-            Public Function Import(path As String) As List(Of Player.PlaylistItemType) Implements IPlaylistIOFormat.Import
-                Dim items As New List(Of Player.PlaylistItemType)
+            Public Function Import(path As String) As List(Of PlaylistItemType) Implements IPlaylistIOFormat.Import
+                Dim items As New List(Of PlaylistItemType)
                 Dim json = IO.File.ReadAllText(path, System.Text.Encoding.UTF8)
                 Dim options As New System.Text.Json.JsonSerializerOptions With {
                     .PropertyNameCaseInsensitive = True,
                     .IncludeFields = True}
-                Dim parsed = System.Text.Json.JsonSerializer.Deserialize(Of List(Of Player.PlaylistItemType))(json, options)
+                Dim parsed = System.Text.Json.JsonSerializer.Deserialize(Of List(Of PlaylistItemType))(json, options)
                 If parsed IsNot Nothing Then items.AddRange(parsed)
                 Return items
             End Function
-            Public Sub Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) Implements IPlaylistIOFormat.Export
+            Public Sub Export(path As String, items As IEnumerable(Of PlaylistItemType)) Implements IPlaylistIOFormat.Export
                 Dim options As New System.Text.Json.JsonSerializerOptions With {
                     .WriteIndented = True,
                     .IncludeFields = True}
@@ -1735,20 +1745,20 @@ Namespace My
                 New PlaylistIOFormatWPL(),
                 New PlaylistIOFormatASX(),
                 New PlaylistIOFormatJSON()}       'Add new formats here later
-            Public Shared Function Import(path As String) As List(Of Player.PlaylistItemType)
+            Public Shared Function Import(path As String) As List(Of PlaylistItemType)
                 Dim fmt = Formats.FirstOrDefault(Function(f) path.EndsWith(f.FileExtension, StringComparison.OrdinalIgnoreCase))
                 If fmt Is Nothing Then
                     WriteToLog("Playlist Import: Unknown Playlist Format")
-                    Return New List(Of Player.PlaylistItemType)
+                    Return New List(Of PlaylistItemType)
                 End If
                 Try
                     Return fmt.Import(path)
                 Catch ex As Exception
                     WriteToLog($"{fmt.Name} Import Failed ({If(String.IsNullOrEmpty(path), "<no path provided>", path)}): {ex.Message}")
-                    Return New List(Of Player.PlaylistItemType)
+                    Return New List(Of PlaylistItemType)
                 End Try
             End Function
-            Public Shared Function Export(path As String, items As IEnumerable(Of Player.PlaylistItemType)) As Boolean
+            Public Shared Function Export(path As String, items As IEnumerable(Of PlaylistItemType)) As Boolean
                 Dim fmt = Formats.FirstOrDefault(Function(f) path.EndsWith(f.FileExtension, StringComparison.OrdinalIgnoreCase))
                 If fmt Is Nothing Then
                     WriteToLog("Playlist Export: Unknown Playlist Format")
@@ -1972,11 +1982,11 @@ Namespace My
         ' Control Events
         Private Sub NIApp_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
             Dim miPlay As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlay"), ToolStripMenuItem)
-            Select Case Player.PlayState
-                Case Player.PlayStates.Playing
+            Select Case FrmPlayer.PlayState
+                Case PlayStates.Playing
                     miPlay.Text = "Pause"
                     miPlay.Image = ResizeImage(CurrentTheme.PlayerPause, 16)
-                Case Player.PlayStates.Paused, Player.PlayStates.Stopped
+                Case PlayStates.Paused, PlayStates.Stopped
                     miPlay.Text = "Play"
                     miPlay.Image = ResizeImage(CurrentTheme.PlayerPlay, 16)
             End Select
@@ -1986,17 +1996,6 @@ Namespace My
             miPrevious.Image = ResizeImage(CurrentTheme.PlayerPrevious, 16)
             Dim miNext As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MINext"), ToolStripMenuItem)
             miNext.Image = ResizeImage(CurrentTheme.PlayerNext, 16)
-            'Select Case PlayMode
-            '    Case App.PlayModes.None, PlayModes.Repeat
-            '        miPrevious.ToolTipText = String.Empty
-            '        miNext.ToolTipText = String.Empty
-            '    Case App.PlayModes.Linear
-            '        miPrevious.ToolTipText = "Previous Song In Playlist"
-            '        miNext.ToolTipText = "Next Song In Playlist"
-            '    Case App.PlayModes.Random
-            '        miPrevious.ToolTipText = "Previous Song Played"
-            '        miNext.ToolTipText = "Next Random Song"
-            'End Select
         End Sub
         Private Sub NIApp_MouseUp(sender As Object, e As MouseEventArgs)
             If e.Button = MouseButtons.Left Then
@@ -2008,28 +2007,28 @@ Namespace My
         Private Sub NIApp_MIPlay_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    Player.TogglePlay()
+                    FrmPlayer.TogglePlay()
                 Case MouseButtons.Right
             End Select
         End Sub
         Private Sub NIApp_MIStop_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    Player.StopPlay()
+                    FrmPlayer.StopPlay()
                 Case MouseButtons.Right
             End Select
         End Sub
         Private Sub NIApp_MIPrevious_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    Player.PlayPrevious()
+                    FrmPlayer.PlayPrevious()
                 Case MouseButtons.Right
             End Select
         End Sub
         Private Sub NIApp_MINext_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    Player.PlayNext()
+                    FrmPlayer.PlayNext()
                 Case MouseButtons.Right
             End Select
         End Sub
@@ -2044,11 +2043,11 @@ Namespace My
             Select Case e.Button
                 Case MouseButtons.Left
                     If FrmMiniPlayer Is Nothing Then
-                        Select Case Player.WindowState
+                        Select Case FrmPlayer.WindowState
                             Case FormWindowState.Normal, FormWindowState.Maximized
-                                Player.BringToFront()
+                                FrmPlayer.BringToFront()
                             Case FormWindowState.Minimized
-                                Player.TogglePlayer()
+                                FrmPlayer.TogglePlayer()
                         End Select
                     Else
                         SetMiniPlayer()
@@ -2087,7 +2086,7 @@ Namespace My
         Private Sub NIApp_MIExit_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    Player.ExitApp()
+                    FrmPlayer.ExitApp()
                 Case MouseButtons.Right
             End Select
         End Sub
@@ -2099,7 +2098,7 @@ Namespace My
             Select Case clickCount
                 Case 1
                     ' Single-click
-                    Player.TogglePlayer()
+                    FrmPlayer.TogglePlayer()
                 Case >= 2
                     ' Double-click (or more)
                     SetMiniPlayer()
@@ -2266,7 +2265,7 @@ Namespace My
             Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.SourceType = MediaSourceTypes.Stream)
             Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
             For Each s As Song In streamlist
-                If s.SourceType = MediaSourceTypes.Stream AndAlso Player.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
+                If s.SourceType = MediaSourceTypes.Stream AndAlso FrmPlayer.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
                     Debug.Print(s.Path + " found in playlist")
                     prunelist.Remove(s)
                 End If
@@ -2305,7 +2304,7 @@ Namespace My
                 History(existingindex) = existingsong
                 'Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
                 WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
-                Player.UpdateHistoryInPlaylist(songorstream)
+                FrmPlayer.UpdateHistoryInPlaylist(songorstream)
             Else
                 'Debug.Print("Song not found in history: " + songorstream)
             End If
@@ -2328,7 +2327,7 @@ Namespace My
         End Sub
         Private Sub UpdateRandomHistory()
             Dim songorstream As String = CStr(TimerRandomHistoryUpdate.Tag)
-            Player.AddToRandomHistory(songorstream)
+            FrmPlayer.AddToRandomHistory(songorstream)
         End Sub
         Friend Sub StopHistoryUpdates()
             TimerHistoryUpdate.Stop()
@@ -2541,7 +2540,7 @@ Namespace My
         End Sub
 
         'Methods
-        Friend Sub Initialize()
+        Friend Sub InitializePreStartup()
             WriteToLog(My.Application.Info.ProductName + " Started")
 
             Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
@@ -2561,6 +2560,8 @@ Namespace My
             CurrentTheme = GetCurrentThemeProperties()
             LoadHistory()
             LoadPlayHistoryDatabase()
+            GenerateHotKeyList()
+            SetHistoryAutoSaveTimer()
 
             ' Setup Dictionaries
 #Region "            Audio Types"
@@ -2635,12 +2636,6 @@ Namespace My
             VideoExtensionDictionary.Add(".flv", "Flash Video")
 #End Region
 
-            FrmLibrary = New Library With {
-                .Opacity = 0} 'This is done to initialize the form on startup, but keep it hidden from the user, to prevent null reference errors when the FileSystemWatcher fires and the user hasn't opened the form yet.
-            FrmLibrary.Show()
-            FrmLibrary.Hide()
-            FrmLibrary.Opacity = 1
-
             ' Notify Icon
             NIApp.Icon = My.Resources.IconSkyeMusicRed
             NIApp.Text = My.Application.Info.Title
@@ -2689,9 +2684,17 @@ Namespace My
             AddHandler cm.Opening, AddressOf NIApp_Opening
             NIApp.ContextMenuStrip = cm
 
-            GenerateHotKeyList()
+        End Sub
+        Friend Sub InitializePostStartup()
+
             RegisterHotKeys()
-            SetHistoryAutoSaveTimer()
+
+            FrmLibrary = New Library With {
+                    .Opacity = 0} 'This is done to initialize the form on startup, but keep it hidden from the user, to prevent null reference errors when the FileSystemWatcher fires and the user hasn't opened the form yet.
+            FrmLibrary.Show()
+            FrmLibrary.Hide()
+            FrmLibrary.Opacity = 1
+
             TimerScreenSaverWatcher.Interval = 1000
             TimerScreenSaverWatcher.Start()
             AddHandler Microsoft.Win32.SystemEvents.SessionSwitch, AddressOf SessionSwitchHandler 'SessionSwitchHandler is a handler for session switch events, sets the ScreenLocked flag, and acts accordingly.
@@ -2699,7 +2702,7 @@ Namespace My
             WatcherWorkTimer.AutoReset = False
             SetWatchers()
 
-            CompanionControlServer = New CompanionControlServerClass(Player)
+            CompanionControlServer = New CompanionControlServerClass(FrmPlayer)
             SetCompanionServer()
 
         End Sub
@@ -2823,11 +2826,11 @@ Namespace My
             HotKeys.Add(HotKeyNext)
             HotKeys.Add(HotKeyPrevious)
         End Sub
-        Private Sub RegisterHotKeys()
+        Friend Sub RegisterHotKeys()
             Dim status As Boolean
             For Each key As HotKey In HotKeys
                 If Not key.Key = Keys.None Then
-                    status = Skye.WinAPI.RegisterHotKey(Player.Handle, key.WinID, key.KeyMod, key.KeyCode)
+                    status = Skye.WinAPI.RegisterHotKey(FrmPlayer.Handle, key.WinID, key.KeyMod, key.KeyCode)
                     'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
                     WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
                 End If
@@ -2837,7 +2840,7 @@ Namespace My
             Dim status As Boolean
             For Each key As HotKey In HotKeys
                 If Not key.Key = Keys.None Then
-                    status = Skye.WinAPI.UnregisterHotKey(Player.Handle, key.WinID)
+                    status = Skye.WinAPI.UnregisterHotKey(FrmPlayer.Handle, key.WinID)
                     'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
                     WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
                 End If
@@ -2846,17 +2849,17 @@ Namespace My
         Friend Sub PerformHotKeyAction(hotkey As Integer)
             Select Case hotkey
                 Case HotKeyPlay.WinID
-                    Player.TogglePlay()
+                    FrmPlayer.TogglePlay()
                 Case HotKeyStop.WinID
-                    Player.StopPlay()
+                    FrmPlayer.StopPlay()
                 Case HotKeyNext.WinID
-                    Player.PlayNext()
+                    FrmPlayer.PlayNext()
                 Case HotKeyPrevious.WinID
-                    Player.PlayPrevious()
+                    FrmPlayer.PlayPrevious()
             End Select
         End Sub
         Private Sub SessionSuspended() 'SessionSuspended is called when the screensaver is activated or the screen is locked.
-            If ScreenLocked OrElse ScreenSaverActive Then Player.Suspend()
+            If ScreenLocked OrElse ScreenSaverActive Then FrmPlayer.Suspend()
         End Sub
         Friend Sub WriteToLog(logtext As String)
             Static fInfo As IO.FileInfo
@@ -2929,16 +2932,16 @@ Namespace My
                 Settings.VisualizerMiniMode = True
                 FrmMiniPlayer = New PlayerMini
                 FrmMiniPlayer.Show()
-                Player.Hide()
-                Player.LyricsOff()
-                Player.ShowMedia()
+                FrmPlayer.Hide()
+                FrmPlayer.LyricsOff()
+                FrmPlayer.ShowMedia()
                 FrmMiniPlayer.Activate()
             Else
                 Settings.VisualizerMiniMode = False
                 FrmMiniPlayer.Close()
                 FrmMiniPlayer = Nothing
-                Player.Show()
-                Player.ShowMedia()
+                FrmPlayer.Show()
+                FrmPlayer.ShowMedia()
             End If
         End Sub
         Friend Sub ShowDevTools()

@@ -12,11 +12,6 @@ Imports SkyeMusic.My
 Public Class Player
 
     ' Declarations
-    Friend Enum PlayStates
-        Playing
-        Paused
-        Stopped
-    End Enum
     Private Enum DisplayMode
         None
         Lyrics
@@ -24,10 +19,6 @@ Public Class Player
         Video
         Visualizer
     End Enum
-    Public Structure PlaylistItemType
-        Public Title As String
-        Public Path As String
-    End Structure
     Private MeterAudioCapture As WasapiLoopbackCapture 'Audio Capture for Meters
     Private MeterPeakLeft, MeterPeakRight, MeterDecayLeft, MeterDecayRight As Single 'Meter Values
     Private mMove As Boolean = False 'For Moving the Form
@@ -407,7 +398,7 @@ Public Class Player
     Friend Visualizer As Boolean = False 'Indicates if the visualizer is active
     Friend VisualizerHost As VisualizerHostClass 'Host for Visualizers
     Private VisualizerEngine As VisualizerAudioEngine 'Audio Engine for Visualizers
-    Friend Shared MiniPlayerVisualizer As IVisualizer
+    Friend MiniPlayerVisualizer As IVisualizer
     Private Sub VisualizerOn() 'Turn on the Visualizer
         If Not Visualizer Then
             Visualizer = True
@@ -478,7 +469,7 @@ Public Class Player
             End If
         End Sub
         Private Sub OnMouseDoubleClick(sender As Object, e As MouseEventArgs)
-            Player.ToggleMaximized()
+            App.FrmPlayer.ToggleMaximized()
             ownerForm.LVPlaylist.Focus()
         End Sub
 
@@ -521,7 +512,7 @@ Public Class Player
 
             ' Create a separate instance for the mini player
             Dim miniV = CType(Activator.CreateInstance(v.GetType()), IVisualizer)
-            MiniPlayerVisualizer = miniV
+            App.FrmPlayer.MiniPlayerVisualizer = miniV
             ' If the mini player is open, attach it
             If App.FrmMiniPlayer IsNot Nothing AndAlso Not App.FrmMiniPlayer.IsDisposed Then
                 App.FrmMiniPlayer.AttachVisualizer(miniV)
@@ -680,7 +671,7 @@ Public Class Player
 
             ' Feed raw waveform to oscilloscope
             visualizerHost.FeedWaveform(samples)
-            MiniPlayerVisualizer?.UpdateWaveform(samples)
+            App.FrmPlayer.MiniPlayerVisualizer?.UpdateWaveform(samples)
 
             ' Apply FFT
             Dim fftSize = 1024
@@ -704,7 +695,7 @@ Public Class Player
 
             ' Feed spectrum to analyzers
             visualizerHost.FeedAudio(magnitudes)
-            MiniPlayerVisualizer?.Update(magnitudes)
+            App.FrmPlayer.MiniPlayerVisualizer?.Update(magnitudes)
         End Sub
     End Class
     Private Class VisualizerRainbowBar
@@ -2833,6 +2824,7 @@ Public Class Player
     End Sub
     Private Sub Player_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         TopMost = False
+
         If App.GetSimpleVersion() <> Settings.ChangeLogLastVersionShown Then
             Settings.ChangeLogLastVersionShown = App.GetSimpleVersion()
             App.Settings.Save()
@@ -2847,6 +2839,13 @@ Public Class Player
                                End With
                            End Sub)
         End If
+
+        TimerPosition.Start()
+        TimerMeter.Start()
+        TimerLyrics.Start()
+
+        App.InitializePostStartup()
+
     End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnReverse.KeyDown, BtnPlay.KeyDown, BtnForward.KeyDown, TrackBarPosition.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
         If Not TxtBoxPlaylistSearch.Focused And Not LVPlaylist.EditableColumns(0) Then
@@ -2982,7 +2981,7 @@ Public Class Player
             MeterAudioCapture.Dispose()
             MeterAudioCapture = Nothing
         End If
-        My.Finalize()
+        App.Finalize()
     End Sub
 
     'Control Events
@@ -4133,7 +4132,7 @@ Public Class Player
 
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
-        If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
+        If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             Dim leftScaled As Single = MeterPeakLeft * 100.0F
             Dim rightScaled As Single = MeterPeakRight * 100.0F
             Dim leftVal As Integer = CInt(Math.Max(PEXLeft.Minimum, Math.Min(PEXLeft.Maximum, leftScaled)))
@@ -4143,7 +4142,7 @@ Public Class Player
         End If
     End Sub
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
-        If _player.HasMedia AndAlso PlayState = PlayStates.Playing Then ShowPosition()
+        If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing Then ShowPosition()
     End Sub
     Private Sub TimerShowMedia_Tick(sender As Object, e As EventArgs) Handles TimerShowMedia.Tick
         TimerShowMedia.Stop()
@@ -4156,7 +4155,7 @@ Public Class Player
         SetPlaylistCountText()
     End Sub
     Private Sub TimerLyrics_Tick(sender As Object, e As EventArgs) Handles TimerLyrics.Tick
-        If _player.HasMedia AndAlso PlayState = PlayStates.Playing AndAlso HasLyricsSynced Then
+        If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing AndAlso HasLyricsSynced Then
 
             Dim pos As TimeSpan = TimeSpan.FromSeconds(_player.Position)
 
@@ -5547,7 +5546,7 @@ Public Class Player
         End If
     End Sub
     Friend Sub ShowMedia()
-        If Not _player.HasMedia Then
+        If _player Is Nothing OrElse Not _player.HasMedia Then
             ApplyDisplayMode(DisplayMode.None, Nothing)
             Exit Sub
         End If

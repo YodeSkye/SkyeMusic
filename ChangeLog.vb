@@ -26,8 +26,8 @@ Public Class ChangeLog
     End Sub
     Private Sub ChangeLog_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
         If Not About.Visible Then
-            Player.Activate()
-            Player.BringToFront()
+            App.FrmPlayer.Activate()
+            App.FrmPlayer.BringToFront()
         End If
     End Sub
     Private Sub ChangeLog_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown

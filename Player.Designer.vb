@@ -313,7 +313,6 @@ Partial Class Player
         ' 
         ' TimerPosition
         ' 
-        TimerPosition.Enabled = True
         TimerPosition.Interval = 1000
         ' 
         ' BtnReverse
@@ -744,7 +743,6 @@ Partial Class Player
         ' 
         ' TimerMeter
         ' 
-        TimerMeter.Enabled = True
         TimerMeter.Interval = 20
         ' 
         ' VLCViewer
@@ -795,7 +793,6 @@ Partial Class Player
         ' 
         ' TimerLyrics
         ' 
-        TimerLyrics.Enabled = True
         ' 
         ' TipPlayer
         ' 

@@ -1038,7 +1038,7 @@ Public Class History
                 For Each s In songs
                     Dim pointIdx = series.Points.AddXY(s.Rating, s.PlayCount)
                     If s.SourceType = App.MediaSourceTypes.Stream Then
-                        series.Points(pointIdx).Label = Player.GetPlaylistTitleByPath(s.Path)
+                        series.Points(pointIdx).Label = App.FrmPlayer.GetPlaylistTitleByPath(s.Path)
                     Else
                         series.Points(pointIdx).Label = IO.Path.GetFileNameWithoutExtension(s.Path)
                     End If
@@ -1058,7 +1058,7 @@ Public Class History
         If queuelist.Count > 0 Then
             Dim pathindex = LVHistory.Columns("Path").Index
             For Each lvi As ListViewItem In queuelist
-                Player.QueuePath(lvi.SubItems(pathindex).Text)
+                App.FrmPlayer.QueuePath(lvi.SubItems(pathindex).Text)
             Next
         End If
     End Sub
@@ -1070,7 +1070,7 @@ Public Class History
             For Each lvi As ListViewItem In addlist
                 paths.Add(lvi.SubItems(pathindex).Text)
             Next
-            Player.AddToPlaylistFromHistory(paths)
+            App.FrmPlayer.AddToPlaylistFromHistory(paths)
         End If
     End Sub
     Private Sub SetShowAll()

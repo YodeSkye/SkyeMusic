@@ -6,7 +6,7 @@ Public Class PlayerAddStream
     'Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
-    Friend NewStream As Player.PlaylistItemType
+    Friend NewStream As App.PlaylistItemType
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)

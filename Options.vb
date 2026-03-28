@@ -42,14 +42,14 @@ Public Class Options
         CoBoxPlayMode.Items.Add("Shuffle")
         CoBoxPlayMode.SelectedIndex = App.Settings.PlayMode
         CoBoxVisualizers.Items.Clear()
-        For Each vis In Player.VisualizerHost.GetVisualizerNames
+        For Each vis In App.FrmPlayer.VisualizerHost.GetVisualizerNames
             CoBoxVisualizers.Items.Add(vis)
         Next
-        CoBoxVisualizers.SelectedItem = Settings.Visualizer
+        CoBoxVisualizers.SelectedItem = App.Settings.Visualizer
         CoBoxPlaylistDefaultAction.Items.Clear()
         CoBoxPlaylistDefaultAction.Items.Add(PlaylistActions.Play.ToString)
         CoBoxPlaylistDefaultAction.Items.Add(PlaylistActions.Queue.ToString)
-        CoBoxPlaylistDefaultAction.SelectedIndex = Settings.PlaylistDefaultAction
+        CoBoxPlaylistDefaultAction.SelectedIndex = App.Settings.PlaylistDefaultAction
         CoBoxPlaylistSearchAction.Items.Clear()
         CoBoxPlaylistSearchAction.Items.Add(PlaylistActions.Play.ToString)
         CoBoxPlaylistSearchAction.Items.Add(PlaylistActions.Queue.ToString)
@@ -162,7 +162,7 @@ Public Class Options
     End Sub
     Private Sub Options_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.Settings.Save()
-        Player.ShowPlayMode()
+        App.FrmPlayer.ShowPlayMode()
     End Sub
     Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, GrBoxTime.MouseDown, LblTitleFormat.MouseDown, LblTitleSeparator.MouseDown, LblVideoIdentifier.MouseDown, LblSongPlayMode.MouseDown, LblDefaultPlaylistAction.MouseDown, LblPlaylistSearchAction.MouseDown, LblTheme.MouseDown, LblHelperApp2Path.MouseDown, LblHelperApp2Name.MouseDown, LblHelperApp1Path.MouseDown, LblHelperApp1Name.MouseDown, TCOptions.MouseDown, TPApp.MouseDown, TPPlayer.MouseDown, TPPlaylist.MouseDown, TPLibrary.MouseDown, LblHistoryAutoSaveInterval1.MouseDown, LblHistoryAutoSaveInterval2.MouseDown, LblLibrarySearchFolders.MouseDown, LblHistoryUpdateInterval1.MouseDown, LblHistoryUpdateInterval2.MouseDown, LblPlaylistFormatting.MouseDown, TPVisualizers.MouseDown
         Dim cSender As Control
@@ -221,7 +221,7 @@ Public Class Options
         Close()
     End Sub
     Private Sub BtnPrunePlaylist_Click(sender As Object, e As EventArgs) Handles BtnPrunePlaylist.Click
-        Player.PrunePlaylist()
+        App.FrmPlayer.PrunePlaylist()
         SetPrunePlaylistButtonText()
     End Sub
     Private Sub BtnHistoryPrune_Click(sender As Object, e As EventArgs) Handles BtnHistoryPrune.Click
@@ -268,11 +268,11 @@ Public Class Options
     End Sub
     Private Sub RadBtnElapsedClick(sender As Object, e As EventArgs) Handles RadBtnElapsed.Click
         App.Settings.PlayerPositionShowElapsed = True
-        Player.SetTipPlayer()
+        App.FrmPlayer.SetTipPlayer()
     End Sub
     Private Sub RadBtnRemainingClick(sender As Object, e As EventArgs) Handles RadBtnRemaining.Click
         App.Settings.PlayerPositionShowElapsed = False
-        Player.SetTipPlayer()
+        App.FrmPlayer.SetTipPlayer()
     End Sub
     Private Sub RadBtnNPT_Click(sender As Object, e As EventArgs) Handles RadBtnNPTTopLeft.Click, RadBtnNPTMiddleLeft.Click, RadBtnNPTBottomLeft.Click, RadBtnNPTBottomCenter.Click, RadBtnNPTMiddleCenter.Click, RadBtnNPTTopCenter.Click, RadBtnNPTTopRight.Click, RadBtnNPTMiddleRight.Click, RadBtnNPTBottomRight.Click
         Dim radbtn As RadioButton = CType(sender, RadioButton)
@@ -290,12 +290,12 @@ Public Class Options
     End Sub
     Private Sub CoBoxPlayMode_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlayMode.SelectionChangeCommitted
         App.Settings.PlayMode = CType(CoBoxPlayMode.SelectedIndex, App.PlayModes)
-        If App.Settings.PlayMode = PlayModes.Random Then Player.RandomHistoryClear()
-        Player.SetTipPlayer()
+        If App.Settings.PlayMode = PlayModes.Random Then App.FrmPlayer.RandomHistoryClear()
+        App.FrmPlayer.SetTipPlayer()
     End Sub
     Private Sub CoBoxVisualizers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxVisualizers.SelectedIndexChanged
         App.Settings.Visualizer = CoBoxVisualizers.SelectedItem.ToString
-        Player.ShowMedia()
+        App.FrmPlayer.ShowMedia()
         SetVisualizerSettingsPage()
     End Sub
     Private Sub CoBoxPlaylistDefaultAction_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistDefaultAction.SelectionChangeCommitted
@@ -322,8 +322,8 @@ Public Class Options
         App.FrmLibrary.SetColors()
         App.FrmLibrary.ReThemeMenus()
         App.ReThemeTrayMenu()
-        Player.ReThemeMenus()
-        Player.SetColors()
+        App.FrmPlayer.ReThemeMenus()
+        App.FrmPlayer.SetColors()
     End Sub
     Private Sub CoBoxPlaylistTitleFormat_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistTitleFormat.SelectionChangeCommitted
         App.Settings.PlaylistTitleFormat = CType(CoBoxPlaylistTitleFormat.SelectedIndex, App.PlaylistTitleFormats)
@@ -575,8 +575,8 @@ Public Class Options
         App.SetWatchers()
     End Sub
     Private Sub SetPrunePlaylistButtonText()
-        BtnPrunePlaylist.Text = BtnPrunePlaylist.Text.TrimEnd(App.TrimEndSearch) + " (" + Player.LVPlaylist.Items.Count.ToString + ")"
-        BtnPrunePlaylist.Enabled = (Player.LVPlaylist.Items.Count > 0)
+        BtnPrunePlaylist.Text = BtnPrunePlaylist.Text.TrimEnd(App.TrimEndSearch) + " (" + App.FrmPlayer.LVPlaylist.Items.Count.ToString + ")"
+        BtnPrunePlaylist.Enabled = (App.FrmPlayer.LVPlaylist.Items.Count > 0)
     End Sub
     Private Sub SetPruneHistoryButtonText()
         BtnHistoryPrune.Text = BtnHistoryPrune.Text.TrimEnd(App.TrimEndSearch) + " (" + App.History.Count.ToString + ")"

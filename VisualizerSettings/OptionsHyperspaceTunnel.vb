@@ -29,7 +29,7 @@ Public Class OptionsHyperspaceTunnel
         App.Settings.Visualizers.HyperspaceTunnelParticleCount = CInt(TxtBoxParticleCount.Text)
         App.Settings.Visualizers.HyperspaceTunnelParticleCount = Math.Max(100, Math.Min(5000, App.Settings.Visualizers.HyperspaceTunnelParticleCount))
         TxtBoxParticleCount.Text = App.Settings.Visualizers.HyperspaceTunnelParticleCount.ToString
-        Player.VisualizerHost.SetHyperspaceTunnelParticleCount(App.Settings.Visualizers.HyperspaceTunnelParticleCount)
+        App.FrmPlayer.VisualizerHost.SetHyperspaceTunnelParticleCount(App.Settings.Visualizers.HyperspaceTunnelParticleCount)
     End Sub
     Private Sub TBSwirlSpeedBase_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedBase.ValueChanged
         If IsInitializing Then Exit Sub

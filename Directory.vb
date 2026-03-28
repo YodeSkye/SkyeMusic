@@ -237,7 +237,7 @@ Public Class Directory
             Return
         End If
 
-        Player.PlayFromDirectory(title, url)
+        App.FrmPlayer.PlayFromDirectory(title, url)
     End Sub
     Private Sub LVStations_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVStations.ColumnClick
         ' Remove arrow from previous sort column
@@ -321,7 +321,7 @@ Public Class Directory
         Dim item = LVEpisodes.SelectedItems(0)
         Dim title = item.Text
         Dim url = CStr(item.Tag)
-        Player.PlayFromDirectory(title, url)
+        App.FrmPlayer.PlayFromDirectory(title, url)
     End Sub
     Private Sub LVEpisodes_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVEpisodes.ColumnClick
         ' Remove arrow from previous sort column
@@ -386,7 +386,7 @@ Public Class Directory
             Return
         End If
 
-        Player.PlayFromDirectory(title, url)
+        App.FrmPlayer.PlayFromDirectory(title, url)
     End Sub
     Private Async Sub CMIAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIStreamAddToPlaylist.Click
         If LVStations.SelectedItems.Count = 0 Then Return
@@ -399,7 +399,7 @@ Public Class Directory
             Return
         End If
 
-        Player.AddToPlaylistFromDirectory(title, url)
+        App.FrmPlayer.AddToPlaylistFromDirectory(title, url)
     End Sub
     Private Async Sub CMIAddToFavorites_Click(sender As Object, e As EventArgs) Handles CMIStreamAddToFavorites.Click
         If LVStations.SelectedItems.Count = 0 Then Exit Sub
@@ -532,14 +532,14 @@ Public Class Directory
         Dim item = LVEpisodes.SelectedItems(0)
         Dim title = item.Text
         Dim url = CStr(item.Tag)
-        Player.PlayFromDirectory(title, url)
+        App.FrmPlayer.PlayFromDirectory(title, url)
     End Sub
     Private Sub CMIEpisodeAddToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIEpisodeAddToPlaylist.Click
         If LVEpisodes.SelectedItems.Count = 0 Then Return
         Dim item = LVEpisodes.SelectedItems(0)
         Dim title = item.Text
         Dim url = CStr(item.Tag)
-        Player.AddToPlaylistFromDirectory(title, url)
+        App.FrmPlayer.AddToPlaylistFromDirectory(title, url)
     End Sub
     Private Async Sub CMIEpisodeDownload_Click(sender As Object, e As EventArgs) Handles CMIEpisodeDownload.Click
         If LVEpisodes.SelectedItems.Count = 0 Then Return
@@ -752,12 +752,12 @@ Public Class Directory
                 TxtBoxSearch.PlaceholderText = String.Empty
                 SetPanels(source)
                 StatusLabel.Text = "Select a source to begin."
-                Player.OpenURL()
+                App.FrmPlayer.OpenURL()
             Case "Import Playlist"
                 TxtBoxSearch.PlaceholderText = String.Empty
                 SetPanels(source)
                 StatusLabel.Text = "Select a source to begin."
-                Player.OpenPlaylist()
+                App.FrmPlayer.OpenPlaylist()
             Case Else
                 TxtBoxSearch.PlaceholderText = String.Empty
                 SetPanels(source)
