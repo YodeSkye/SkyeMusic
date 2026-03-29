@@ -77,7 +77,7 @@ Public Class Help
             BackColor = c
         End If
         ResumeLayout()
-        Debug.Print("Help Accent Color Set")
+        'Debug.Print("Help Accent Color Set")
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
@@ -85,7 +85,7 @@ Public Class Help
             BackColor = App.CurrentTheme.BackColor
         End If
         ResumeLayout()
-        Debug.Print("Help Theme Set")
+        'Debug.Print("Help Theme Set")
     End Sub
 
 End Class

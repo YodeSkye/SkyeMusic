@@ -202,7 +202,7 @@ Public Class Options
 
     ' Control Events
     Private Sub TCOptions_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TCOptions.SelectedIndexChanged
-        Debug.Print(TCOptions.SelectedTab.Name)
+        'Debug.Print(TCOptions.SelectedTab.Name)
         Select Case TCOptions.SelectedTab.Name
             Case "TPApp"
                 CoBoxTheme.Focus()
@@ -361,7 +361,7 @@ Public Class Options
             End Try
             TxtBoxStatusMessageDisplayTime.Text = interval.ToString
             TxtBoxStatusMessageDisplayTime.SelectAll()
-            Debug.Print("TxtBoxStatusMessageDisplayTime_Validated")
+            'Debug.Print("TxtBoxStatusMessageDisplayTime_Validated")
             App.Settings.PlaylistStatusMessageDisplayTime = interval
         End If
     End Sub
@@ -369,7 +369,7 @@ Public Class Options
         If Not Settings.HelperApp1Name = TxtBoxHelperApp1Name.Text Then
             Settings.HelperApp1Name = TxtBoxHelperApp1Name.Text
             TxtBoxHelperApp1Name.SelectAll()
-            Debug.Print("TxtBoxHelperApp1NameValidated")
+            'Debug.Print("TxtBoxHelperApp1NameValidated")
         End If
     End Sub
     Private Sub TxtBoxHelperApp1PathValidated(sender As Object, e As EventArgs) Handles TxtBoxHelperApp1Path.Validated
@@ -382,7 +382,7 @@ Public Class Options
                 App.Settings.HelperApp1Path = TxtBoxHelperApp1Path.Text
                 TxtBoxHelperApp1Path.ForeColor = App.CurrentTheme.TextColor
                 TxtBoxHelperApp1Path.SelectAll()
-                Debug.Print("TxtBoxHelperApp1PathValidated")
+                'Debug.Print("TxtBoxHelperApp1PathValidated")
             Else
                 TxtBoxHelperApp1Path.ForeColor = Color.Red
                 TipError.ShowTooltipAt(TxtBoxHelperApp1Path.PointToScreen(New Point(0, TxtBoxHelperApp1Path.Height)), "Invalid Path", SystemIcons.Error.ToBitmap)
@@ -393,7 +393,7 @@ Public Class Options
         If Not Settings.HelperApp2Name = TxtBoxHelperApp2Name.Text Then
             Settings.HelperApp2Name = TxtBoxHelperApp2Name.Text
             TxtBoxHelperApp2Name.SelectAll()
-            Debug.Print("TxtBoxHelperApp2NameValidated")
+            'Debug.Print("TxtBoxHelperApp2NameValidated")
         End If
     End Sub
     Private Sub TxtBoxHelperApp2PathValidated(sender As Object, e As EventArgs) Handles TxtBoxHelperApp2Path.Validated
@@ -406,7 +406,7 @@ Public Class Options
                 App.Settings.HelperApp2Path = TxtBoxHelperApp2Path.Text
                 TxtBoxHelperApp2Path.ForeColor = App.CurrentTheme.TextColor
                 TxtBoxHelperApp2Path.SelectAll()
-                Debug.Print("TxtBoxHelperApp2PathValidated")
+                'Debug.Print("TxtBoxHelperApp2PathValidated")
             Else
                 TxtBoxHelperApp2Path.ForeColor = Color.Red
                 TipError.ShowTooltipAt(TxtBoxHelperApp2Path.PointToScreen(New Point(0, TxtBoxHelperApp2Path.Height)), "Invalid Path", SystemIcons.Error.ToBitmap)
@@ -426,7 +426,7 @@ Public Class Options
             End Try
             TxtBoxRandomHistoryUpdateInterval.Text = interval.ToString
             TxtBoxRandomHistoryUpdateInterval.SelectAll()
-            Debug.Print("TxtBoxRandomHistoryUpdateInterval_Validated")
+            'Debug.Print("TxtBoxRandomHistoryUpdateInterval_Validated")
             App.Settings.RandomHistoryUpdateInterval = interval
         End If
     End Sub
@@ -443,7 +443,7 @@ Public Class Options
             End Try
             TxtBoxHistoryUpdateInterval.Text = interval.ToString
             TxtBoxHistoryUpdateInterval.SelectAll()
-            Debug.Print("TxtBoxHistoryUpdateInterval_Validated")
+            'Debug.Print("TxtBoxHistoryUpdateInterval_Validated")
             Settings.HistoryUpdateInterval = interval
         End If
     End Sub
@@ -462,7 +462,7 @@ Public Class Options
             End Try
             TxtBoxHistoryAutoSaveInterval.Text = interval.ToString
             TxtBoxHistoryAutoSaveInterval.SelectAll()
-            Debug.Print("TxtBoxHistoryAutoSaveInterval_Validated")
+            'Debug.Print("TxtBoxHistoryAutoSaveInterval_Validated")
             App.Settings.HistoryAutoSaveInterval = interval
             App.SetHistoryAutoSaveTimer()
         End If
@@ -653,7 +653,7 @@ Public Class Options
             TCOptions.TabPanelBackColor = c
         End If
         ResumeLayout()
-        Debug.Print("Options Accent Color Set")
+        'Debug.Print("Options Accent Color Set")
     End Sub
     Private Sub ApplyAccentForCurrentVisualizerSettingsPanel()
         If PanelVisualizers.Controls.Count = 0 Then Exit Sub
@@ -771,7 +771,7 @@ Public Class Options
         TipError.ForeColor = App.CurrentTheme.TextColor
         TipError.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
-        Debug.Print("Options Theme Set")
+        'Debug.Print("Options Theme Set")
     End Sub
     Private Sub ReThemeMenus()
         App.ThemeMenu(CMLibrarySearchFolders)

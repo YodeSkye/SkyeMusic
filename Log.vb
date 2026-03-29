@@ -219,9 +219,9 @@ Public Class Log
                 TxBxSearch.BackColor = CurrentAccentColor
             End If
             ResumeLayout()
-            Debug.Print("Log Accent Color Set")
+            'Debug.Print("Log Accent Color Set")
             Skye.WinAPI.RedrawWindow(Me.Handle, IntPtr.Zero, IntPtr.Zero, Skye.WinAPI.RDW_INVALIDATE Or Skye.WinAPI.RDW_ERASE Or Skye.WinAPI.RDW_FRAME Or Skye.WinAPI.RDW_ALLCHILDREN Or Skye.WinAPI.RDW_UPDATENOW)
-            Debug.Print("Log Repainted")
+            'Debug.Print("Log Repainted")
         End If
     End Sub
     Private Sub SetTheme()
@@ -244,7 +244,7 @@ Public Class Log
         TipLog.BorderColor = App.CurrentTheme.ButtonBackColor
         If TxBxSearch.Text = LogSearchTitle Then TxBxSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
         ResumeLayout()
-        Debug.Print("Log Theme Set")
+        'Debug.Print("Log Theme Set")
     End Sub
     Friend Sub SetColors() 'Used By Options Form
         SetAccentColor(True)

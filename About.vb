@@ -226,7 +226,7 @@ Public Class About
             BackColor = c
         End If
         ResumeLayout()
-        Debug.Print("About Accent Color Set")
+        'Debug.Print("About Accent Color Set")
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
@@ -272,7 +272,7 @@ Public Class About
         TipAbout.ForeColor = App.CurrentTheme.TextColor
         TipAbout.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
-        Debug.Print("About Theme Set")
+        'Debug.Print("About Theme Set")
     End Sub
 
 End Class

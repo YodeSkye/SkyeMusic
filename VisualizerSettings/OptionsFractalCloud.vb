@@ -22,17 +22,17 @@ Public Class OptionsFractalCloud
     Private Sub TBSwirlSpeedBase_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedBase.ValueChanged
         If IsInitializing Then Exit Sub
         App.Settings.Visualizers.FractalCloudSwirlSpeedBase = CDbl(TBSwirlSpeedBase.Value / 1000)
-        Debug.Print("Fractal Cloud Swirl Speed Base set to " & App.Settings.Visualizers.FractalCloudSwirlSpeedBase.ToString)
+        'Debug.Print("Fractal Cloud Swirl Speed Base set to " & App.Settings.Visualizers.FractalCloudSwirlSpeedBase.ToString)
     End Sub
     Private Sub TBPeakDecaySpeed_ValueChanged(sender As Object, e As EventArgs) Handles TBSwirlSpeedAudioFactor.ValueChanged
         If IsInitializing Then Exit Sub
         App.Settings.Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(TBSwirlSpeedAudioFactor.Value)
-        Debug.Print("Fractal Cloud Swirl Speed Audio Factor set to " & App.Settings.Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString)
+        'Debug.Print("Fractal Cloud Swirl Speed Audio Factor set to " & App.Settings.Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString)
     End Sub
     Private Sub TBPeakThickness_ValueChanged(sender As Object, e As EventArgs) Handles TBTimeIncrement.ValueChanged
         If IsInitializing Then Exit Sub
         App.Settings.Visualizers.FractalCloudTimeIncrement = CDbl(TBTimeIncrement.Value / 1000)
-        Debug.Print("Fractal Cloud Time Increment set to " & App.Settings.Visualizers.FractalCloudTimeIncrement.ToString)
+        'Debug.Print("Fractal Cloud Time Increment set to " & App.Settings.Visualizers.FractalCloudTimeIncrement.ToString)
     End Sub
 
     ' Methods

@@ -2998,7 +2998,7 @@ Public Class Player
         End If
     End Sub
     Private Sub VLCViewer_RightClick(clientPoint As Point)
-        Debug.Print("Show Context Menu")
+        'Debug.Print("Show Context Menu")
     End Sub
     Private Sub LVPlaylist_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles LVPlaylist.DrawColumnHeader
         Static b As Rectangle
@@ -4307,7 +4307,7 @@ Public Class Player
             Dim provider As New SomaFMMetadataProvider()
             Dim np = Await provider.GetNowPlayingAsync(url)
             If Not String.IsNullOrWhiteSpace(np) Then
-                Debug.Print("SomaFM Metadata: " & np)
+                'Debug.Print("SomaFM Metadata: " & np)
                 If NowPlaying.Text <> np Then
                     NowPlaying.Text = np
                 End If
@@ -4325,7 +4325,7 @@ Public Class Player
             Await media.Parse(MediaParseOptions.ParseNetwork)
             Dim np As String = media.Meta(MetadataType.NowPlaying)
             If String.IsNullOrWhiteSpace(np) Then Exit Sub
-            Debug.Print("Polled Stream Metadata: " & np)
+            'Debug.Print("Polled Stream Metadata: " & np)
             If NowPlaying.Text <> np Then
                 NowPlaying.Text = np
             End If
@@ -4439,7 +4439,7 @@ Public Class Player
             ListBoxPlaylistSearch.Visible = False
             ListBoxPlaylistSearch.Items.Clear()
             PlaylistSearchItems.Clear()
-            Debug.Print("Playlist Search Reset")
+            'Debug.Print("Playlist Search Reset")
         End If
     End Sub
     Private Sub ToggleMaximized()
@@ -4452,7 +4452,7 @@ Public Class Player
     End Sub
     Friend Sub Suspend() 'Called when the user locks the screen or activates the screen saver
         If App.Settings.SuspendOnSessionChange Then
-            Debug.Print("Suspending...")
+            'Debug.Print("Suspending...")
             StopPlay()
             Me.WindowState = FormWindowState.Minimized
             App.WriteToLog("App Suspended @ " & Now)
@@ -4681,13 +4681,13 @@ Public Class Player
                 LVPlaylist.SelectedIndices.Add(LVPlaylist.FindItemWithText(frmAddStream.NewStream.Title).Index)
                 'Play Stream
                 PlayStream(newstream)
-                Debug.Print("New Stream Added (" + newstream + ")")
+                'Debug.Print("New Stream Added (" + newstream + ")")
             Else
-                Debug.Print("Invalid Stream")
+                'Debug.Print("Invalid Stream")
                 WriteToLog("Invalid Stream, New Stream Not Added")
             End If
         Else
-            Debug.Print("Add Stream Cancelled")
+            'Debug.Print("Add Stream Cancelled")
         End If
     End Sub
     Private Sub AddToPlaylistFromFile()
@@ -5372,18 +5372,17 @@ Public Class Player
         ' - UI transitions (fullscreen, hooks) must be marshaled and timed carefully
         ' - Avoid cross-thread reparenting or teardown collisions
         PlayState = PlayStates.Playing
-        Debug.Print("OnPlay")
         'Update The Histories
         UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed for uniformity.
         If PausedAt IsNot Nothing Then
             Dim pausedDuration = DateTime.Now - PausedAt.Value
             TotalPausedDuration += pausedDuration
             PausedAt = Nothing
-            Debug.Print("Resumed, total paused: " & TotalPausedDuration.TotalSeconds & "s")
+            'Debug.Print("Resumed, total paused: " & TotalPausedDuration.TotalSeconds & "s")
         End If
         If App.SongPlayData.StartPlayTime = DateTime.MinValue Then 'Because of OnPlay happening on seek.
             App.SongPlayData.Path = _player.Path.TrimEnd("/"c)
-            Debug.Print("showing Play Data Path: " & App.SongPlayData.Path)
+            'Debug.Print("showing Play Data Path: " & App.SongPlayData.Path)
             App.SongPlayData.StartPlayTime = Now
         End If
 
@@ -5433,7 +5432,7 @@ Public Class Player
         'Debug.Print("OnPause")
         If PausedAt Is Nothing Then
             PausedAt = DateTime.Now
-            Debug.Print("Paused at: " & PausedAt.ToString())
+            'Debug.Print("Paused at: " & PausedAt.ToString())
         End If
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
         If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.SetPlayState()
@@ -5449,7 +5448,7 @@ Public Class Player
             Dim finalPause = DateTime.Now - PausedAt.Value
             TotalPausedDuration += finalPause
             PausedAt = Nothing
-            Debug.Print("Final pause added: total paused: " & TotalPausedDuration.TotalSeconds & "s")
+            'Debug.Print("Final pause added: total paused: " & TotalPausedDuration.TotalSeconds & "s")
         End If
         App.SongPlayData.StopPlayTime = Now
         If App.SongPlayData.IsValid Then App.LogPlayHistory(App.SongPlayData.Path, App.SongPlayData.StartPlayTime, App.SongPlayData.StopPlayTime, CInt((App.SongPlayData.StopPlayTime - App.SongPlayData.StartPlayTime - TotalPausedDuration).TotalSeconds), App.SongPlayData.PlayTrigger)
@@ -5517,12 +5516,12 @@ Public Class Player
     End Sub
     Friend Sub ToggleMute()
         If Mute Then
-            Debug.Print("Enabling Sound")
+            'Debug.Print("Enabling Sound")
             _player.Volume = 100
             BtnMute.Image = Resources.ImagePlayerSound
             Mute = False
         Else
-            Debug.Print("Disabling Sound")
+            'Debug.Print("Disabling Sound")
             _player.Volume = 0
             BtnMute.Image = Resources.ImagePlayerSoundMute
             Mute = True
@@ -5596,7 +5595,7 @@ Public Class Player
                 tlfile = Nothing
             End Try
             If Lyrics AndAlso Not CurrentMediaType = App.MediaSourceTypes.Stream Then 'Show Lyrics
-                Debug.Print("Showing Lyrics...")
+                'Debug.Print("Showing Lyrics...")
                 PicBoxAlbumArt.Visible = False
                 PicBoxAlbumArt.Image = Nothing
                 LblMedia.Visible = False
@@ -5639,7 +5638,7 @@ Public Class Player
                                 PicBoxAlbumArt.Image = Nothing
                                 App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                             Else
-                                Debug.Print("Showing Album Art...")
+                                'Debug.Print("Showing Album Art...")
                                 If AlbumArtIndex + 1 > tlfile.Tag.Pictures.Count Then AlbumArtIndex = 0
                                 Dim ms As New IO.MemoryStream(tlfile.Tag.Pictures(AlbumArtIndex).Data.Data)
                                 Try
@@ -5660,7 +5659,7 @@ Public Class Player
                             End If
                         End If
                     ElseIf App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then 'Show Video
-                        Debug.Print("Showing Video...")
+                        'Debug.Print("Showing Video...")
                         PicBoxAlbumArt.Visible = False
                         PicBoxAlbumArt.Image = Nothing
                         App.FrmMiniPlayer?.SetAlbumArt(Nothing)
@@ -5673,7 +5672,7 @@ Public Class Player
                 End If
                 If CurrentMediaType = App.MediaSourceTypes.Stream Then App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                 If Visualizer OrElse (Not VLCViewer.Visible AndAlso Not PicBoxAlbumArt.Visible) OrElse CurrentMediaType = App.MediaSourceTypes.Stream Then 'Show Visualizer
-                    Debug.Print("Showing Visualizer...")
+                    'Debug.Print("Showing Visualizer...")
                     VLCViewer.Visible = False
                     PicBoxAlbumArt.Visible = False
                     PicBoxAlbumArt.Image = Nothing
@@ -5858,7 +5857,7 @@ Public Class Player
             LyricsSynced = ParseLRC(lyrics)
             HasLyrics = True
             HasLyricsSynced = True
-            Debug.Print("Loaded Synced Lyrics from " + lrcPath)
+            'Debug.Print("Loaded Synced Lyrics from " + lrcPath)
             Exit Sub
         End If
 
@@ -5866,7 +5865,7 @@ Public Class Player
         If IO.File.Exists(txtPath) Then
             LyricsText = IO.File.ReadAllText(txtPath)
             HasLyrics = True
-            Debug.Print("Loaded Lyrics from " + txtPath)
+            'Debug.Print("Loaded Lyrics from " + txtPath)
             Exit Sub
         End If
 
@@ -5876,11 +5875,11 @@ Public Class Player
                 If Not String.IsNullOrEmpty(f.Tag.Lyrics) Then
                     LyricsText = f.Tag.Lyrics
                     HasLyrics = True
-                    Debug.Print("Loaded Lyrics from metadata for " + songPath)
+                    'Debug.Print("Loaded Lyrics from metadata for " + songPath)
                 End If
             End Using
         Catch ex As Exception
-            Debug.Print("Error loading lyrics from metadata for " + songPath + vbCr + ex.Message)
+            'Debug.Print("Error loading lyrics from metadata for " + songPath + vbCr + ex.Message)
         End Try
     End Sub
     Private Function ParseLRC(lrcContent As String) As List(Of TimedLyric)

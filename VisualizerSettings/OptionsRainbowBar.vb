@@ -120,7 +120,7 @@ Public Class OptionsRainbowBar
             ChkBoxAllowMiniMode.BackColor = c
         End If
         ResumeLayout()
-        Debug.Print("Options Rainbow Bar Accent Color Set")
+        'Debug.Print("Options Rainbow Bar Accent Color Set")
     End Sub
     Private Sub SetTheme()
         Static forecolor As Color

@@ -82,7 +82,7 @@ Public Class ChangeLog
             BackColor = c
         End If
         ResumeLayout()
-        Debug.Print("Help Accent Color Set")
+        'Debug.Print("Help Accent Color Set")
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
@@ -90,7 +90,7 @@ Public Class ChangeLog
             BackColor = App.CurrentTheme.BackColor
         End If
         ResumeLayout()
-        Debug.Print("ChangeLog Theme Set")
+        'Debug.Print("ChangeLog Theme Set")
     End Sub
 
 End Class

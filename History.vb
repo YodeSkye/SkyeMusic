@@ -1206,7 +1206,7 @@ Public Class History
             BackColor = c
         End If
         ResumeLayout()
-        Debug.Print("History Accent Color Set")
+        'Debug.Print("History Accent Color Set")
     End Sub
     Private Sub SetTheme()
         SuspendLayout()
@@ -1271,7 +1271,7 @@ Public Class History
         BtnLists.ForeColor = App.CurrentTheme.ButtonTextColor
 
         ResumeLayout()
-        Debug.Print("History Theme Set")
+        'Debug.Print("History Theme Set")
     End Sub
     Friend Sub ReThemeMenus()
         App.ThemeMenu(CMHistoryView)

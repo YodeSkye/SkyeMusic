@@ -209,15 +209,6 @@ Namespace My
         Friend ExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
         Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
         Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
-        Friend FrmPlayer As Player 'FmrPlayer is the main player window that provides advanced playback controls and displays detailed information about the currently playing media.
-        Friend FrmMiniPlayer As PlayerMini 'FrmMiniPlayer is the mini player window that provides basic playback controls.
-        Friend FrmLibrary As Library 'FrmLibrary is the main library window that displays the media library.
-        Friend FrmDirectory As Directory 'FrmDirectory is the internet radio directory window that allows users to browse and play internet radio stations.
-        Friend FrmHistory As History 'FrmHistory is the history window that displays the playback history and statistics.
-        Friend FrmTagEditor As TagEditor 'FrmTagEditor is the tag editor window that allows users to edit metadata tags of media files.
-        Friend FrmLog As Log 'FrmLog is the log window that displays the application log.
-        Friend FrmDevTools As DevTools 'FrmDevTools is the developer tools window that provides debugging and database access features.
-        Friend NIApp As New NotifyIcon 'NIApp is the system tray icon for the application.
         Private clickCount As Integer = 0
         Private WithEvents NIAppClickTimer As New Timer With {.Interval = SystemInformation.DoubleClickTime}
         Private WithEvents TimerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
@@ -248,6 +239,21 @@ Namespace My
         Friend ReadOnly Http As New HttpClient()
         Friend DirectoryLastSelectedSource As Integer = -1 'DirectoryLastSelectedSource stores the last selected source in the Directory form.
         Private Property CompanionServerRunning As Boolean = False 'CompanionServerRunning is a flag that indicates whether the companion server is currently running.
+
+        ' Forms & Tray
+        Friend FrmPlayer As Player 'FmrPlayer is the main player window that provides advanced playback controls and displays detailed information about the currently playing media.
+        Friend FrmMiniPlayer As PlayerMini 'FrmMiniPlayer is the mini player window that provides basic playback controls.
+        Friend FrmLibrary As Library 'FrmLibrary is the main library window that displays the media library.
+        Friend FrmDirectory As Directory 'FrmDirectory is the internet radio directory window that allows users to browse and play internet radio stations.
+        Friend FrmHistory As History 'FrmHistory is the history window that displays the playback history and statistics.
+        Friend FrmOptions As Options 'FrmOptions is the options window that allows users to customize various settings of the application.
+        Friend FrmTagEditor As TagEditor 'FrmTagEditor is the tag editor window that allows users to edit metadata tags of media files.
+        Friend FrmLog As Log 'FrmLog is the log window that displays the application log.
+        Friend FrmAbout As About 'FrmAbout is the about window that provides information about the application, its developers, and its open-source nature.
+        Friend FrmChangeLog As ChangeLog 'FrmChangeLog is the change log window that displays a log of changes and updates made to the application across different versions.
+        Friend FrmHelp As Help 'FrmHelp is the help window that provides user guides, FAQs, and support resources for the application.
+        Friend FrmDevTools As DevTools 'FrmDevTools is the developer tools window that provides debugging and database access features.
+        Friend NIApp As New NotifyIcon 'NIApp is the system tray icon for the application.
 
         ' HotKeys
         Private Structure HotKey
@@ -808,14 +814,28 @@ Namespace My
                 _player = player
             End Sub
 
-            Public Sub Start(port As Integer)
-                If _running Then Exit Sub
+            Public Function Start(port As Integer) As Boolean
+                If _running Then Return True
 
-                _listener = New TcpListener(IPAddress.Any, port)
-                _listener.Start()
-                _running = True
-                Task.Run(AddressOf ListenLoop)
-            End Sub
+                Try
+                    _listener = New TcpListener(IPAddress.Any, port)
+                    _listener.Start()
+                    _running = True
+                    Task.Run(AddressOf ListenLoop)
+                    Return True
+                Catch ex As SocketException When ex.SocketErrorCode = SocketError.AddressAlreadyInUse
+                    ' Port is already in use — log and continue
+                    App.WriteToLog("Companion Server Failed to Start: Port " & port & " already in use.")
+                    _running = False
+                    Return False
+                Catch ex As Exception
+                    ' Unexpected error — log it
+                    App.WriteToLog("Companion Server Failed to Start: " & ex.Message)
+                    _running = False
+                    Return False
+                End Try
+
+            End Function
             Public Sub [Stop]()
                 If Not _running Then Exit Sub
 
@@ -887,6 +907,7 @@ Namespace My
             Friend Shared LastUpdateCheck As DateTime = DateTime.MinValue
             Friend Shared LatestKnownVersion As String = String.Empty
             Friend Shared EnableCompanionServer As Boolean = True
+            Friend Shared CompanionServerPort As Integer = 5050
 
             ' Player
             Friend Shared PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -2524,15 +2545,17 @@ Namespace My
         Public Sub SetCompanionServer()
             If Settings.EnableCompanionServer AndAlso Not CompanionServerRunning Then
                 ' Start Companion Server
-                CompanionControlServer.Start(5050)
-
-                Debug.Print("<< COMPANION SERVER STARTED >>")
-                WriteToLog("Companion Server Started...")
-                CompanionServerRunning = True
+                If CompanionControlServer.Start(Settings.CompanionServerPort) Then
+                    Debug.Print("<< COMPANION SERVER STARTED >>")
+                    WriteToLog("Companion Server Started...")
+                    CompanionServerRunning = True
+                Else
+                    Debug.Print("<< COMPANION SERVER FAILED TO START >>")
+                    CompanionServerRunning = False
+                End If
             ElseIf Not Settings.EnableCompanionServer AndAlso CompanionServerRunning Then
                 ' Stop Companion Server
                 CompanionControlServer.Stop()
-
                 Debug.Print("<< COMPANION SERVER STOPPED >>")
                 WriteToLog("...Companion Server Stopped")
                 CompanionServerRunning = False
@@ -2967,11 +2990,6 @@ Namespace My
                 FrmLibrary.Show()
             End If
         End Sub
-        Private Sub HideLibrary()
-            If FrmLibrary IsNot Nothing AndAlso Not FrmLibrary.IsDisposed Then
-                FrmLibrary.Hide()
-            End If
-        End Sub
         Friend Sub ShowDirectory()
             If FrmDirectory Is Nothing OrElse FrmDirectory.IsDisposed Then
                 FrmDirectory = New Directory
@@ -2984,11 +3002,6 @@ Namespace My
                 Else
                     FrmDirectory.Show()
                 End If
-            End If
-        End Sub
-        Private Sub HideDirectory()
-            If FrmDirectory IsNot Nothing AndAlso Not FrmDirectory.IsDisposed Then
-                FrmDirectory.Close()
             End If
         End Sub
         Friend Sub ShowHistory()
@@ -3005,21 +3018,26 @@ Namespace My
                 End If
             End If
         End Sub
-        Private Sub HideHistory()
-            If FrmHistory IsNot Nothing AndAlso Not FrmHistory.IsDisposed Then
-                FrmHistory.Close()
-            End If
-        End Sub
-        Friend Sub ShowOptions(Optional showcentered As Boolean = False)
-            If Options.Visible Then
-                Options.BringToFront()
-            Else
-                If showcentered Then
-                    Options.StartPosition = FormStartPosition.CenterScreen
+        Friend Sub ShowOptions(Optional showcenterscreen As Boolean = False)
+            If FrmOptions Is Nothing OrElse FrmOptions.IsDisposed Then
+                FrmOptions = New Options
+                If showcenterscreen Then
+                    FrmOptions.StartPosition = FormStartPosition.CenterScreen
                 Else
-                    Options.StartPosition = FormStartPosition.CenterParent
+                    FrmOptions.StartPosition = FormStartPosition.CenterParent
                 End If
-                Options.ShowDialog()
+                FrmOptions.ShowDialog()
+            Else
+                If FrmOptions.Visible Then
+                    FrmOptions.BringToFront()
+                Else
+                    If showcenterscreen Then
+                        FrmOptions.StartPosition = FormStartPosition.CenterScreen
+                    Else
+                        FrmOptions.StartPosition = FormStartPosition.CenterParent
+                    End If
+                    FrmOptions.ShowDialog()
+                End If
             End If
         End Sub
         Friend Sub ShowHelp(Optional showcentered As Boolean = False)

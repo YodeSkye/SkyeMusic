@@ -110,7 +110,7 @@ Public Class InputDialog
         If App.CurrentTheme.IsAccent Then
             BackColor = c
         End If
-        Debug.Print("Player Accent Color Set")
+        'Debug.Print("Player Accent Color Set")
     End Sub
     Private Sub SetTheme()
         If App.CurrentTheme.IsAccent Then
