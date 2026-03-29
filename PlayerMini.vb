@@ -228,7 +228,7 @@ Public Class PlayerMini
 
     ' Handlers
     Private Sub OnTitleChanged(newTitle As String)
-        If IsDisposed Then Return
+        If IsDisposed Then Exit Sub
         LblTitle.Text = newTitle
         ResetMarquee()
     End Sub

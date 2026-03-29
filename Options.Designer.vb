@@ -72,11 +72,14 @@ Partial Class Options
         LblHistoryAutoSaveInterval2 = New Skye.UI.Label()
         TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        TxtBoxCompanionServerPort = New Skye.UI.NumericTextBox()
+        CkBoxEnableCompanionServer = New CheckBox()
         CkBoxShowTrayIcon = New CheckBox()
         CkBoxMinimizeToTray = New CheckBox()
         LblHelperApp2Path = New Skye.UI.Label()
         LblHelperApp2Name = New Skye.UI.Label()
         LblHelperApp1Path = New Skye.UI.Label()
+        LblCompanionServerPort = New Skye.UI.Label()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         GrBoxShowNowPlayingToast = New GroupBox()
         RadBtnNPTBottomRight = New RadioButton()
@@ -584,7 +587,7 @@ Partial Class Options
         TxtBoxHistoryAutoSaveInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipError.SetImage(TxtBoxHistoryAutoSaveInterval, Nothing)
         TipOptions.SetImage(TxtBoxHistoryAutoSaveInterval, Nothing)
-        TxtBoxHistoryAutoSaveInterval.Location = New Point(148, 301)
+        TxtBoxHistoryAutoSaveInterval.Location = New Point(148, 285)
         TxtBoxHistoryAutoSaveInterval.Name = "TxtBoxHistoryAutoSaveInterval"
         TxtBoxHistoryAutoSaveInterval.ShortcutsEnabled = False
         TxtBoxHistoryAutoSaveInterval.Size = New Size(61, 29)
@@ -599,7 +602,7 @@ Partial Class Options
         BtnHistorySaveNow.Image = My.Resources.Resources.ImageSave32
         TipOptions.SetImage(BtnHistorySaveNow, My.Resources.Resources.ImageSave32)
         BtnHistorySaveNow.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistorySaveNow.Location = New Point(267, 293)
+        BtnHistorySaveNow.Location = New Point(267, 277)
         BtnHistorySaveNow.Name = "BtnHistorySaveNow"
         BtnHistorySaveNow.Size = New Size(120, 40)
         BtnHistorySaveNow.TabIndex = 44
@@ -615,10 +618,10 @@ Partial Class Options
         BtnHistoryPrune.Image = My.Resources.Resources.ImagePrune32
         TipOptions.SetImage(BtnHistoryPrune, My.Resources.Resources.ImagePrune32)
         BtnHistoryPrune.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistoryPrune.Location = New Point(587, 293)
+        BtnHistoryPrune.Location = New Point(587, 277)
         BtnHistoryPrune.Name = "BtnHistoryPrune"
         BtnHistoryPrune.Size = New Size(218, 40)
-        BtnHistoryPrune.TabIndex = 90
+        BtnHistoryPrune.TabIndex = 80
         TipOptions.SetText(BtnHistoryPrune, resources.GetString("BtnHistoryPrune.Text"))
         TipError.SetText(BtnHistoryPrune, Nothing)
         BtnHistoryPrune.Text = "Prune History"
@@ -749,7 +752,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval1.Font = New Font("Segoe UI", 12F)
         TipError.SetImage(LblHistoryAutoSaveInterval1, Nothing)
         TipOptions.SetImage(LblHistoryAutoSaveInterval1, Nothing)
-        LblHistoryAutoSaveInterval1.Location = New Point(13, 304)
+        LblHistoryAutoSaveInterval1.Location = New Point(13, 288)
         LblHistoryAutoSaveInterval1.Name = "LblHistoryAutoSaveInterval1"
         LblHistoryAutoSaveInterval1.Size = New Size(139, 21)
         LblHistoryAutoSaveInterval1.TabIndex = 143
@@ -764,7 +767,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval2.Font = New Font("Segoe UI", 12F)
         TipError.SetImage(LblHistoryAutoSaveInterval2, Nothing)
         TipOptions.SetImage(LblHistoryAutoSaveInterval2, Nothing)
-        LblHistoryAutoSaveInterval2.Location = New Point(206, 304)
+        LblHistoryAutoSaveInterval2.Location = New Point(206, 288)
         LblHistoryAutoSaveInterval2.Name = "LblHistoryAutoSaveInterval2"
         LblHistoryAutoSaveInterval2.Size = New Size(66, 21)
         LblHistoryAutoSaveInterval2.TabIndex = 144
@@ -798,6 +801,8 @@ Partial Class Options
         ' TPApp
         ' 
         TPApp.BorderStyle = BorderStyle.Fixed3D
+        TPApp.Controls.Add(TxtBoxCompanionServerPort)
+        TPApp.Controls.Add(CkBoxEnableCompanionServer)
         TPApp.Controls.Add(CkBoxShowTrayIcon)
         TPApp.Controls.Add(CkBoxMinimizeToTray)
         TPApp.Controls.Add(CkBoxSaveWindowMetrics)
@@ -819,6 +824,7 @@ Partial Class Options
         TPApp.Controls.Add(LblHistoryAutoSaveInterval1)
         TPApp.Controls.Add(LblHistoryAutoSaveInterval2)
         TPApp.Controls.Add(LblTheme)
+        TPApp.Controls.Add(LblCompanionServerPort)
         TipError.SetImage(TPApp, Nothing)
         TipOptions.SetImage(TPApp, Nothing)
         TPApp.Image = Nothing
@@ -832,6 +838,34 @@ Partial Class Options
         TipOptions.SetText(TPApp, Nothing)
         TPApp.Text = " App "
         TPApp.ThemesEnabled = False
+        ' 
+        ' TxtBoxCompanionServerPort
+        ' 
+        TipError.SetImage(TxtBoxCompanionServerPort, Nothing)
+        TipOptions.SetImage(TxtBoxCompanionServerPort, Nothing)
+        TxtBoxCompanionServerPort.Location = New Point(744, 374)
+        TxtBoxCompanionServerPort.Name = "TxtBoxCompanionServerPort"
+        TxtBoxCompanionServerPort.Size = New Size(61, 29)
+        TxtBoxCompanionServerPort.TabIndex = 99
+        TipError.SetText(TxtBoxCompanionServerPort, Nothing)
+        TipOptions.SetText(TxtBoxCompanionServerPort, "Companion App Server Port #")
+        TxtBoxCompanionServerPort.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' CkBoxEnableCompanionServer
+        ' 
+        CkBoxEnableCompanionServer.AutoSize = True
+        CkBoxEnableCompanionServer.FlatStyle = FlatStyle.Flat
+        CkBoxEnableCompanionServer.Font = New Font("Segoe UI", 12F)
+        TipOptions.SetImage(CkBoxEnableCompanionServer, Nothing)
+        TipError.SetImage(CkBoxEnableCompanionServer, Nothing)
+        CkBoxEnableCompanionServer.Location = New Point(496, 376)
+        CkBoxEnableCompanionServer.Name = "CkBoxEnableCompanionServer"
+        CkBoxEnableCompanionServer.Size = New Size(206, 25)
+        CkBoxEnableCompanionServer.TabIndex = 98
+        TipError.SetText(CkBoxEnableCompanionServer, Nothing)
+        TipOptions.SetText(CkBoxEnableCompanionServer, "Enable or disable the Companion App Server")
+        CkBoxEnableCompanionServer.Text = "Enable Companion Server"
+        CkBoxEnableCompanionServer.UseVisualStyleBackColor = True
         ' 
         ' CkBoxShowTrayIcon
         ' 
@@ -906,6 +940,21 @@ Partial Class Options
         TipOptions.SetText(LblHelperApp1Path, Nothing)
         LblHelperApp1Path.Text = "Path to Helper App 1"
         TipError.SetText(LblHelperApp1Path, Nothing)
+        ' 
+        ' LblCompanionServerPort
+        ' 
+        LblCompanionServerPort.AutoSize = True
+        LblCompanionServerPort.Font = New Font("Segoe UI", 12F)
+        TipError.SetImage(LblCompanionServerPort, Nothing)
+        TipOptions.SetImage(LblCompanionServerPort, Nothing)
+        LblCompanionServerPort.Location = New Point(709, 378)
+        LblCompanionServerPort.Name = "LblCompanionServerPort"
+        LblCompanionServerPort.Size = New Size(38, 21)
+        LblCompanionServerPort.TabIndex = 148
+        TipOptions.SetText(LblCompanionServerPort, Nothing)
+        LblCompanionServerPort.Text = "Port"
+        TipError.SetText(LblCompanionServerPort, Nothing)
+        LblCompanionServerPort.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' TPPlayer
         ' 
@@ -1496,4 +1545,7 @@ Partial Class Options
     Friend WithEvents RadBtnNPTMiddleCenter As RadioButton
     Friend WithEvents RadBtnNPTMiddleLeft As RadioButton
     Friend WithEvents TipError As Skye.UI.ToolTipEX
+    Friend WithEvents CkBoxEnableCompanionServer As CheckBox
+    Friend WithEvents LblCompanionServerPort As Skye.UI.Label
+    Friend WithEvents TxtBoxCompanionServerPort As Skye.UI.NumericTextBox
 End Class

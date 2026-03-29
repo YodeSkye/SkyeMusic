@@ -157,6 +157,8 @@ Public Class Options
         TxtBoxRandomHistoryUpdateInterval.Text = Settings.RandomHistoryUpdateInterval.ToString
         TxtBoxHistoryUpdateInterval.Text = Settings.HistoryUpdateInterval.ToString
         TxtBoxHistoryAutoSaveInterval.Text = Settings.HistoryAutoSaveInterval.ToString
+        CkBoxEnableCompanionServer.Checked = Settings.EnableCompanionServer
+        TxtBoxCompanionServerPort.Text = Settings.CompanionServerPort.ToString
         SetPrunePlaylistButtonText()
         SetPruneHistoryButtonText()
     End Sub
@@ -463,8 +465,8 @@ Public Class Options
             TxtBoxHistoryAutoSaveInterval.Text = interval.ToString
             TxtBoxHistoryAutoSaveInterval.SelectAll()
             'Debug.Print("TxtBoxHistoryAutoSaveInterval_Validated")
-            App.Settings.HistoryAutoSaveInterval = interval
-            App.SetHistoryAutoSaveTimer()
+            Settings.HistoryAutoSaveInterval = interval
+            SetHistoryAutoSaveTimer()
         End If
     End Sub
     Private Sub CkBoxShowNowPlayingToast_Click(sender As Object, e As EventArgs) Handles CkBoxShowNowPlayingToast.Click
@@ -650,6 +652,7 @@ Public Class Options
             CkBoxWatchFoldersUpdatePlaylist.BackColor = c
             CkBoxShowTrayIcon.BackColor = c
             CkBoxMinimizeToTray.BackColor = c
+            CkBoxEnableCompanionServer.BackColor = c
             TCOptions.TabPanelBackColor = c
         End If
         ResumeLayout()
@@ -680,6 +683,7 @@ Public Class Options
             CkBoxWatchFoldersUpdatePlaylist.BackColor = App.CurrentTheme.BackColor
             CkBoxShowTrayIcon.BackColor = App.CurrentTheme.BackColor
             CkBoxMinimizeToTray.BackColor = App.CurrentTheme.BackColor
+            CkBoxEnableCompanionServer.BackColor = App.CurrentTheme.BackColor
             TCOptions.TabPanelBackColor = App.CurrentTheme.BackColor
             forecolor = App.CurrentTheme.TextColor
         End If
@@ -742,6 +746,7 @@ Public Class Options
         CkBoxWatchFoldersUpdateLibrary.ForeColor = forecolor
         CkBoxWatchFoldersUpdatePlaylist.ForeColor = forecolor
         CkBoxPlaylistRemoveSpaces.ForeColor = forecolor
+        CkBoxEnableCompanionServer.ForeColor = forecolor
         LblHelperApp1Name.ForeColor = forecolor
         LblHelperApp1Path.ForeColor = forecolor
         LblHelperApp2Name.ForeColor = forecolor
@@ -752,12 +757,15 @@ Public Class Options
         LblHistoryUpdateInterval2.ForeColor = forecolor
         LblHistoryAutoSaveInterval1.ForeColor = forecolor
         LblHistoryAutoSaveInterval2.ForeColor = forecolor
+        LblCompanionServerPort.ForeColor = forecolor
         TxtBoxRandomHistoryUpdateInterval.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxRandomHistoryUpdateInterval.ForeColor = App.CurrentTheme.TextColor
         TxtBoxHistoryUpdateInterval.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxHistoryUpdateInterval.ForeColor = App.CurrentTheme.TextColor
         TxtBoxHistoryAutoSaveInterval.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxHistoryAutoSaveInterval.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxCompanionServerPort.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxCompanionServerPort.ForeColor = App.CurrentTheme.TextColor
         BtnPrunePlaylist.BackColor = App.CurrentTheme.ButtonBackColor
         BtnPrunePlaylist.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnHistorySaveNow.BackColor = App.CurrentTheme.ButtonBackColor
