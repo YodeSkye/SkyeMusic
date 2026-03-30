@@ -2828,16 +2828,17 @@ Public Class Player
         If App.GetSimpleVersion() <> Settings.ChangeLogLastVersionShown Then
             Settings.ChangeLogLastVersionShown = App.GetSimpleVersion()
             App.Settings.Save()
-            Me.BeginInvoke(Sub()
-                               With New ChangeLog
-                                   .TopMost = True
-                                   .Show()
-                                   .Activate()
-                                   .TopMost = False
-                                   .Visible = False
-                                   .ShowDialog()
-                               End With
-                           End Sub)
+            Me.BeginInvoke(Sub() App.ShowChangeLog(True))
+            'Me.BeginInvoke(Sub()
+            '                   With New ChangeLog
+            '                       .TopMost = True
+            '                       .Show()
+            '                       .Activate()
+            '                       .TopMost = False
+            '                       .Visible = False
+            '                       .ShowDialog()
+            '                   End With
+            '               End Sub)
         End If
 
         TimerPosition.Start()

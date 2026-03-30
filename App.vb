@@ -911,7 +911,7 @@ Namespace My
             Friend Shared MinimizeToTray As Boolean = False
             Friend Shared LastUpdateCheck As DateTime = DateTime.MinValue
             Friend Shared LatestKnownVersion As String = String.Empty
-            Friend Shared EnableCompanionServer As Boolean = True
+            Friend Shared EnableCompanionServer As Boolean = False
             Friend Shared CompanionServerPort As Integer = 5050
 
             ' Player
@@ -1182,6 +1182,8 @@ Namespace My
                         Settings.LastUpdateCheck = DateTime.MinValue
                     End If
                     Settings.LatestKnownVersion = RegKey.GetValue("LatestKnownVersion", String.Empty).ToString
+                    Settings.EnableCompanionServer = Skye.Common.RegistryHelper.GetBool("EnableCompanionServer", False)
+                    Settings.CompanionServerPort = Skye.Common.RegistryHelper.GetInt("CompanionServerPort", 5050)
 
                     ' Visualizer Settings
                     Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
@@ -1372,6 +1374,8 @@ Namespace My
                     RegKey.SetValue("ChangeLogLastVersionShown", Settings.ChangeLogLastVersionShown, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("LastUpdateCheck", Settings.LastUpdateCheck.ToString("o"), Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("LatestKnownVersion", Settings.LatestKnownVersion, Microsoft.Win32.RegistryValueKind.String)
+                    Skye.Common.RegistryHelper.SetBool("EnableCompanionServer", Settings.EnableCompanionServer)
+                    Skye.Common.RegistryHelper.SetInt("CompanionServerPort", Settings.CompanionServerPort)
 
                     ' Visualizer Settings
                     RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
@@ -2737,6 +2741,7 @@ Namespace My
 
         End Sub
         Friend Sub Finalize()
+            SetCompanionServer(True) 'Ensure Companion Server is stopped
             UnRegisterHotKeys()
             If FrmLog IsNot Nothing AndAlso FrmLog.Visible Then FrmLog.Close()
             If FrmDirectory IsNot Nothing AndAlso FrmDirectory.Visible Then FrmDirectory.Close()
@@ -3094,19 +3099,34 @@ Namespace My
             ShowLog(True)
         End Sub
         Friend Sub ShowAbout(Optional showcentered As Boolean = False)
-            If About.Visible Then
-                About.BringToFront()
+            If FrmAbout Is Nothing OrElse FrmAbout.IsDisposed Then
+                FrmAbout = New About
+            End If
+            If FrmAbout.Visible Then
+                FrmAbout.BringToFront()
             Else
                 If showcentered Then
-                    About.StartPosition = FormStartPosition.CenterScreen
+                    FrmAbout.StartPosition = FormStartPosition.CenterScreen
                 Else
-                    About.StartPosition = FormStartPosition.CenterParent
+                    FrmAbout.StartPosition = FormStartPosition.CenterParent
                 End If
-                About.ShowDialog()
+                FrmAbout.ShowDialog()
             End If
         End Sub
-        Friend Sub ShowChangeLog()
-            ChangeLog.ShowDialog()
+        Friend Sub ShowChangeLog(Optional showcentered As Boolean = False)
+            If FrmChangeLog Is Nothing OrElse FrmChangeLog.IsDisposed Then
+                FrmChangeLog = New ChangeLog
+            End If
+            If FrmChangeLog.Visible Then
+                FrmChangeLog.BringToFront()
+            Else
+                If showcentered Then
+                    FrmChangeLog.StartPosition = FormStartPosition.CenterScreen
+                Else
+                    FrmChangeLog.StartPosition = FormStartPosition.CenterParent
+                End If
+                FrmChangeLog.ShowDialog()
+            End If
         End Sub
         Friend Sub ShowToast(title As String, message As String)
             If Settings.ShowNowPlayingToast Then
