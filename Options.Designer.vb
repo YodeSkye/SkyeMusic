@@ -845,6 +845,7 @@ Partial Class Options
         TipOptions.SetImage(TxtBoxCompanionServerPort, Nothing)
         TxtBoxCompanionServerPort.Location = New Point(744, 374)
         TxtBoxCompanionServerPort.Name = "TxtBoxCompanionServerPort"
+        TxtBoxCompanionServerPort.ShortcutsEnabled = False
         TxtBoxCompanionServerPort.Size = New Size(61, 29)
         TxtBoxCompanionServerPort.TabIndex = 99
         TipError.SetText(TxtBoxCompanionServerPort, Nothing)

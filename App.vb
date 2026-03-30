@@ -806,6 +806,7 @@ Namespace My
 
         ' Companion Server
         Public Class CompanionControlServerClass
+
             Private ReadOnly _player As Player
             Private _listener As TcpListener
             Private _running As Boolean = False
@@ -842,14 +843,17 @@ Namespace My
                 _running = False
                 _listener.Stop()
             End Sub
-
             Private Async Function ListenLoop() As Task
                 While _running
                     Try
                         Dim client = Await _listener.AcceptTcpClientAsync()
                         HandleClient(client)
-                    Catch
-                        ' Listener stopped
+                    Catch ex As Exception
+                        If Not _running Then Exit While
+                        ' This is the normal shutdown/restart exception – do NOT log it
+                        If ex.Message.Contains("The I/O operation has been aborted because of either a thread exit or an application request.") Then Continue While
+                        ' Anything else is a real error
+                        App.WriteToLog("Companion Server Listener Error: " & ex.Message)
                     End Try
                 End While
             End Function
@@ -883,6 +887,7 @@ Namespace My
                                         End Select
                                     End Sub)
             End Sub
+
         End Class
         Friend CompanionControlServer As CompanionControlServerClass
 
@@ -2542,23 +2547,25 @@ Namespace My
         End Function
 
         ' Companion Server
-        Public Sub SetCompanionServer()
+        Public Sub SetCompanionServer(Optional forcestop As Boolean = False)
             If Settings.EnableCompanionServer AndAlso Not CompanionServerRunning Then
                 ' Start Companion Server
                 If CompanionControlServer.Start(Settings.CompanionServerPort) Then
                     Debug.Print("<< COMPANION SERVER STARTED >>")
-                    WriteToLog("Companion Server Started...")
+                    WriteToLog("Companion Server Started on Port " & Settings.CompanionServerPort)
                     CompanionServerRunning = True
                 Else
                     Debug.Print("<< COMPANION SERVER FAILED TO START >>")
                     CompanionServerRunning = False
                 End If
-            ElseIf Not Settings.EnableCompanionServer AndAlso CompanionServerRunning Then
+            ElseIf Not Settings.EnableCompanionServer OrElse forcestop Then
                 ' Stop Companion Server
-                CompanionControlServer.Stop()
-                Debug.Print("<< COMPANION SERVER STOPPED >>")
-                WriteToLog("...Companion Server Stopped")
-                CompanionServerRunning = False
+                If CompanionServerRunning Then
+                    CompanionControlServer.Stop()
+                    Debug.Print("<< COMPANION SERVER STOPPED >>")
+                    WriteToLog("Companion Server Stopped")
+                    CompanionServerRunning = False
+                End If
             End If
         End Sub
 

@@ -159,6 +159,10 @@ Public Class Options
         TxtBoxHistoryAutoSaveInterval.Text = Settings.HistoryAutoSaveInterval.ToString
         CkBoxEnableCompanionServer.Checked = Settings.EnableCompanionServer
         TxtBoxCompanionServerPort.Text = Settings.CompanionServerPort.ToString
+        If Not Settings.EnableCompanionServer Then
+            LblCompanionServerPort.Enabled = False
+            TxtBoxCompanionServerPort.Enabled = False
+        End If
         SetPrunePlaylistButtonText()
         SetPruneHistoryButtonText()
     End Sub
@@ -330,7 +334,7 @@ Public Class Options
     Private Sub CoBoxPlaylistTitleFormat_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistTitleFormat.SelectionChangeCommitted
         App.Settings.PlaylistTitleFormat = CType(CoBoxPlaylistTitleFormat.SelectedIndex, App.PlaylistTitleFormats)
     End Sub
-    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown, TxtBoxHistoryUpdateInterval.KeyDown, TxtBoxRandomHistoryUpdateInterval.KeyDown, TxtBoxStatusMessageDisplayTime.KeyDown
+    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown, TxtBoxHistoryUpdateInterval.KeyDown, TxtBoxRandomHistoryUpdateInterval.KeyDown, TxtBoxStatusMessageDisplayTime.KeyDown, TxtBoxCompanionServerPort.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
             Validate()
@@ -339,7 +343,7 @@ Public Class Options
     Private Sub TxtBoxNumbersOnly_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles TxtBoxHistoryAutoSaveInterval.KeyPress, TxtBoxHistoryUpdateInterval.KeyPress, TxtBoxRandomHistoryUpdateInterval.KeyPress, TxtBoxStatusMessageDisplayTime.KeyPress
         If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
     End Sub
-    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxPlaylistTitleSeparator.PreviewKeyDown, TxtBoxPlaylistVideoIdentifier.PreviewKeyDown, MyBase.PreviewKeyDown, TxtBoxHelperApp1Path.PreviewKeyDown, TxtBoxHelperApp1Name.PreviewKeyDown, TxtBoxHelperApp2Name.PreviewKeyDown, TxtBoxHelperApp2Path.PreviewKeyDown, TxtBoxHistoryAutoSaveInterval.PreviewKeyDown, TxtBoxHistoryUpdateInterval.PreviewKeyDown, TxtBoxRandomHistoryUpdateInterval.PreviewKeyDown, TxtBoxStatusMessageDisplayTime.PreviewKeyDown
+    Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxPlaylistTitleSeparator.PreviewKeyDown, TxtBoxPlaylistVideoIdentifier.PreviewKeyDown, MyBase.PreviewKeyDown, TxtBoxHelperApp1Path.PreviewKeyDown, TxtBoxHelperApp1Name.PreviewKeyDown, TxtBoxHelperApp2Name.PreviewKeyDown, TxtBoxHelperApp2Path.PreviewKeyDown, TxtBoxHistoryAutoSaveInterval.PreviewKeyDown, TxtBoxHistoryUpdateInterval.PreviewKeyDown, TxtBoxRandomHistoryUpdateInterval.PreviewKeyDown, TxtBoxStatusMessageDisplayTime.PreviewKeyDown, TxtBoxCompanionServerPort.PreviewKeyDown
         CMTxtBox.ShortcutKeys(CType(sender, TextBox), e)
     End Sub
     Private Sub TxtBoxPlaylistTitleSeparatorValidated(sender As Object, e As EventArgs) Handles TxtBoxPlaylistTitleSeparator.Validated
@@ -469,6 +473,32 @@ Public Class Options
             SetHistoryAutoSaveTimer()
         End If
     End Sub
+    Private Sub TxtBoxCompanionServerPort_Validated(sender As Object, e As EventArgs) Handles TxtBoxCompanionServerPort.Validated
+        Dim value As Integer
+        ' TryParse avoids exceptions and keeps things calm
+        If Integer.TryParse(TxtBoxCompanionServerPort.Text, value) Then
+            ' Validate range (choose the range you want)
+            If value >= 1024 AndAlso value <= 49151 Then
+                ' Only update if changed
+                If Settings.CompanionServerPort <> value Then
+                    Settings.CompanionServerPort = value
+                    TxtBoxCompanionServerPort.SelectAll()
+                    If Settings.EnableCompanionServer Then
+                        SetCompanionServer(True)
+                        SetCompanionServer()
+                    End If
+                End If
+            Else
+                ' Out of range → restore previous value
+                TxtBoxCompanionServerPort.Text = Settings.CompanionServerPort.ToString()
+                TxtBoxCompanionServerPort.SelectAll()
+            End If
+        Else
+            ' Not a number → restore previous value
+            TxtBoxCompanionServerPort.Text = Settings.CompanionServerPort.ToString()
+            TxtBoxCompanionServerPort.SelectAll()
+        End If
+    End Sub
     Private Sub CkBoxShowNowPlayingToast_Click(sender As Object, e As EventArgs) Handles CkBoxShowNowPlayingToast.Click
         App.Settings.ShowNowPlayingToast = Not App.Settings.ShowNowPlayingToast
         If App.Settings.ShowNowPlayingToast Then
@@ -505,6 +535,18 @@ Public Class Options
     End Sub
     Private Sub CkBoxMinimizeToTray_Click(sender As Object, e As EventArgs) Handles CkBoxMinimizeToTray.Click, CkBoxMinimizeToTray.Click
         App.Settings.MinimizeToTray = CkBoxMinimizeToTray.Checked
+    End Sub
+    Private Sub CkBoxEnableCompanionServer_Click(sender As Object, e As EventArgs) Handles CkBoxEnableCompanionServer.Click
+        Settings.EnableCompanionServer = Not Settings.EnableCompanionServer
+        Select Case Settings.EnableCompanionServer
+            Case True
+                LblCompanionServerPort.Enabled = True
+                TxtBoxCompanionServerPort.Enabled = True
+            Case False
+                LblCompanionServerPort.Enabled = False
+                TxtBoxCompanionServerPort.Enabled = False
+        End Select
+        SetCompanionServer()
     End Sub
     Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
         If e.Alt Then
