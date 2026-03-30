@@ -3506,7 +3506,7 @@ Public Class Player
         MILibrary.ForeColor = App.CurrentTheme.AccentTextColor
     End Sub
     Private Sub MIShowHelpClick(sender As Object, e As EventArgs) Handles MIShowHelp.Click
-        ShowHelp()
+        ShowHelp(Me)
     End Sub
     Private Sub MIShowLogClick(sender As Object, e As EventArgs) Handles MIShowLog.Click
         If App.FrmLog Is Nothing Then

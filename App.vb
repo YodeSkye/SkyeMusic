@@ -2109,7 +2109,7 @@ Namespace My
         Private Sub NIApp_MIHelp_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    ShowHelp(True)
+                    ShowHelp(Nothing, True)
                 Case MouseButtons.Right
             End Select
         End Sub
@@ -3052,16 +3052,20 @@ Namespace My
                 End If
             End If
         End Sub
-        Friend Sub ShowHelp(Optional showcentered As Boolean = False)
-            If Help.Visible Then
-                Help.BringToFront()
+        Friend Sub ShowHelp(owner As System.Windows.Forms.Form, Optional showcentered As Boolean = False)
+            If FrmHelp Is Nothing OrElse FrmHelp.IsDisposed Then
+                FrmHelp = New Help
+            End If
+            If FrmHelp.Visible Then
+                FrmHelp.BringToFront()
             Else
                 If showcentered Then
-                    Help.StartPosition = FormStartPosition.CenterScreen
+                    FrmHelp.StartPosition = FormStartPosition.CenterScreen
                 Else
-                    Help.StartPosition = FormStartPosition.CenterParent
+                    FrmHelp.StartPosition = FormStartPosition.CenterParent
                 End If
-                Help.ShowDialog()
+                FrmHelp.Owner = owner
+                FrmHelp.Show()
             End If
         End Sub
         Friend Sub ShowLog(Optional refresh As Boolean = False)
@@ -3091,7 +3095,6 @@ Namespace My
             Else
                 FrmLog.BTNDeleteLog.Visible = False
             End If
-            'FRMLog.RTBLog.ReadOnly = True
             FrmLog.BTNOK.Select()
         End Sub
         Friend Sub DeleteLog()

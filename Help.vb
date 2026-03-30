@@ -25,6 +25,13 @@ Public Class Help
         SetAccentColor()
         SetTheme()
     End Sub
+    Private Sub Help_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
+        If Owner IsNot Nothing AndAlso StartPosition = FormStartPosition.CenterParent Then
+            StartPosition = FormStartPosition.Manual
+            Left = Owner.Left + (Owner.Width - Width) \ 2
+            Top = Owner.Top + (Owner.Height - Height) \ 2
+        End If
+    End Sub
     Private Sub Help_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
