@@ -810,6 +810,8 @@ Namespace My
             Private ReadOnly _player As Player
             Private _listener As TcpListener
             Private _running As Boolean = False
+            Private ReadOnly _clients As New List(Of TcpClient)
+            Private ReadOnly _clientLock As New Object()
 
             Public Sub New(player As Player)
                 _player = player
@@ -824,13 +826,13 @@ Namespace My
                     _running = True
                     Task.Run(AddressOf ListenLoop)
                     Return True
+
                 Catch ex As SocketException When ex.SocketErrorCode = SocketError.AddressAlreadyInUse
-                    ' Port is already in use — log and continue
                     App.WriteToLog("Companion Server Failed to Start: Port " & port & " already in use.")
                     _running = False
                     Return False
+
                 Catch ex As Exception
-                    ' Unexpected error — log it
                     App.WriteToLog("Companion Server Failed to Start: " & ex.Message)
                     _running = False
                     Return False
@@ -841,42 +843,68 @@ Namespace My
                 If Not _running Then Exit Sub
 
                 _running = False
-                _listener.Stop()
+                Try
+                    _listener.Stop()
+                Catch
+                End Try
+                ' Close all clients
+                SyncLock _clientLock
+                    For Each c In _clients
+                        Try : c.Close() : Catch : End Try
+                    Next
+                    _clients.Clear()
+                End SyncLock
+
             End Sub
             Private Async Function ListenLoop() As Task
                 While _running
                     Try
                         Dim client = Await _listener.AcceptTcpClientAsync()
+                        AddClient(client)
                         HandleClient(client)
                     Catch ex As Exception
                         If Not _running Then Exit While
-                        ' This is the normal shutdown/restart exception – do NOT log it
-                        If ex.Message.Contains("The I/O operation has been aborted because of either a thread exit or an application request.") Then Continue While
-                        ' Anything else is a real error
+                        If ex.Message.Contains("The I/O operation has been aborted") Then Continue While ' Normal shutdown exception thrown when TcpListener.Stop() aborts the pending Accept call. This is expected behavior and not an error, so we ignore it.
                         App.WriteToLog("Companion Server Listener Error: " & ex.Message)
                     End Try
                 End While
             End Function
+            Private Sub AddClient(client As TcpClient)
+                SyncLock _clientLock
+                    _clients.Add(client)
+                End SyncLock
+            End Sub
+            Private Sub RemoveClient(client As TcpClient)
+                SyncLock _clientLock
+                    _clients.Remove(client)
+                End SyncLock
+                Try : client.Close() : Catch : End Try
+            End Sub
             Private Sub HandleClient(client As TcpClient)
                 Task.Run(Async Function()
                              Using client
-                                 Using stream = client.GetStream()
-                                     Using reader As New StreamReader(stream)
-                                         Dim command = Await reader.ReadLineAsync()
-                                         ProcessCommand(command)
-                                     End Using
-                                 End Using
+                                 Try
+                                     Dim stream = client.GetStream()
+                                     Dim reader As New StreamReader(stream)
+
+                                     While _running AndAlso client.Connected
+                                         Dim cmd = Await reader.ReadLineAsync()
+
+                                         If cmd Is Nothing Then Exit While
+
+                                         ProcessCommand(cmd)
+                                     End While
+                                 Catch
+                                     ' Client died — normal
+                                 End Try
+                                 RemoveClient(client)
                              End Using
                          End Function)
             End Sub
             Private Sub ProcessCommand(cmd As String)
                 _player.BeginInvoke(Sub()
                                         Select Case cmd.ToLowerInvariant()
-                                            Case "play"
-                                                _player.TogglePlay()
-                                            Case "pause"
-                                                _player.TogglePlay()
-                                            Case "toggle"
+                                            Case "play", "pause", "toggle"
                                                 _player.TogglePlay()
                                             Case "stop"
                                                 _player.StopPlay()
@@ -886,6 +914,18 @@ Namespace My
                                                 _player.PlayPrevious()
                                         End Select
                                     End Sub)
+            End Sub
+            Public Sub Broadcast(message As String)
+                SyncLock _clientLock
+                    For Each c In _clients.ToList()
+                        Try
+                            Dim writer As New StreamWriter(c.GetStream()) With {.AutoFlush = True}
+                            writer.WriteLine(message)
+                        Catch
+                            _clients.Remove(c)
+                        End Try
+                    Next
+                End SyncLock
             End Sub
 
         End Class
