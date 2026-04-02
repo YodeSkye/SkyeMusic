@@ -2829,16 +2829,6 @@ Public Class Player
             Settings.ChangeLogLastVersionShown = App.GetSimpleVersion()
             App.Settings.Save()
             Me.BeginInvoke(Sub() App.ShowChangeLog(True))
-            'Me.BeginInvoke(Sub()
-            '                   With New ChangeLog
-            '                       .TopMost = True
-            '                       .Show()
-            '                       .Activate()
-            '                       .TopMost = False
-            '                       .Visible = False
-            '                       .ShowDialog()
-            '                   End With
-            '               End Sub)
         End If
 
         TimerPosition.Start()
@@ -4131,6 +4121,8 @@ Public Class Player
         ' Show Toast
         ShowNowPlayingToast(title)
 
+        'Broadcast
+
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
         If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
@@ -4308,7 +4300,6 @@ Public Class Player
             Dim provider As New SomaFMMetadataProvider()
             Dim np = Await provider.GetNowPlayingAsync(url)
             If Not String.IsNullOrWhiteSpace(np) Then
-                'Debug.Print("SomaFM Metadata: " & np)
                 If NowPlaying.Text <> np Then
                     NowPlaying.Text = np
                 End If
