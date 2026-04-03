@@ -921,6 +921,7 @@ Namespace My
                         Try
                             Dim writer As New StreamWriter(c.GetStream()) With {.AutoFlush = True}
                             writer.WriteLine(message)
+                            Debug.WriteLine("Sent to Companion Client: " & message)
                         Catch
                             _clients.Remove(c)
                         End Try
@@ -2591,7 +2592,7 @@ Namespace My
         End Function
 
         ' Companion Server
-        Public Sub SetCompanionServer(Optional forcestop As Boolean = False)
+        Friend Sub SetCompanionServer(Optional forcestop As Boolean = False)
             If Settings.EnableCompanionServer AndAlso Not CompanionServerRunning Then
                 ' Start Companion Server
                 If CompanionControlServer.Start(Settings.CompanionServerPort) Then
@@ -2611,6 +2612,13 @@ Namespace My
                     CompanionServerRunning = False
                 End If
             End If
+        End Sub
+        Friend Sub BroadcastNowPlaying()
+            Try
+                If CompanionServerRunning Then CompanionControlServer.Broadcast(FrmPlayer.BuildNowPlayingMessage())
+            Catch ex As Exception
+                WriteToLog("BroadcastNowPlaying Error: " & ex.Message)
+            End Try
         End Sub
 
         'Methods

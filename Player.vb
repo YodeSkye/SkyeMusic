@@ -29,6 +29,7 @@ Public Class Player
     Private IsFocused As Boolean = True 'Indicates if the player is focused
     Private AlbumArtCount As Byte = 0 'Number of album art available
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
+    Private AlbumArt As Image = Nothing 'Current Album Art
     Private TrackBarScale As Int16 = 100 'TrackBar Scale for Position
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
     Private PlaylistSearchTitle As String 'Title for Playlist Search
@@ -4142,6 +4143,7 @@ Public Class Player
         ShowMedia()
         If Mute Then ToggleMute()
         ShowNowPlayingToast(PlaylistCurrentText)
+        App.BroadcastNowPlaying()
     End Sub
     Private Sub TimerStatus_Tick(sender As Object, e As EventArgs) Handles TimerStatus.Tick
         TimerStatus.Stop()
@@ -5428,6 +5430,7 @@ Public Class Player
         End If
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
         If App.FrmMiniPlayer IsNot Nothing Then App.FrmMiniPlayer.SetPlayState()
+        App.BroadcastNowPlaying()
     End Sub
     Private Sub OnStop()
         PlayState = PlayStates.Stopped
@@ -5469,6 +5472,7 @@ Public Class Player
         ResetLblPositionText()
         If FullScreen Then FullScreen = False
         VLCViewer.Visible = False
+        App.BroadcastNowPlaying()
     End Sub
     Private Sub ShowPosition()
         Try
@@ -5555,6 +5559,21 @@ Public Class Player
             End Try
         End If
         Dim hasAlbumArt As Boolean = (tlfile IsNot Nothing AndAlso tlfile.Tag.Pictures IsNot Nothing AndAlso tlfile.Tag.Pictures.Length > 0)
+        If hasAlbumArt Then
+            Try
+                Dim picbytes = tlfile.Tag.Pictures(0).Data.Data
+                Using ms As New IO.MemoryStream(picbytes)
+                    Using tmpimg As Image = Image.FromStream(ms)
+                        AlbumArt = CType(tmpimg.Clone, Image)
+                    End Using
+                End Using
+            Catch ex As Exception
+                AlbumArt = Nothing
+                WriteToLog("Error loading album art for Companion Server: " & ex.Message)
+            End Try
+        Else
+            AlbumArt = Nothing
+        End If
 
         Dim mode As DisplayMode
         If Visualizer Then
@@ -5927,6 +5946,69 @@ Public Class Player
             MILyrics.BackColor = Color.Transparent
         End If
     End Sub
+
+    ' Companion Server
+    Friend Function BuildNowPlayingMessage() As String
+        Try
+            Dim state As String = PlayState.ToString
+            Dim currentTitle As String = NowPlaying.Text ' Currently playing metadata (may differ from file metadata)
+            Dim path As String = If(_player.Path.TrimEnd("/"c), String.Empty)
+            Dim title As String = String.Empty
+            Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(path, True, 0)
+            If lvi IsNot Nothing Then title = lvi.SubItems(LVPlaylist.Columns("Title").Index).Text
+            Dim duration As Integer = SafeSeconds(_player.Duration)
+            Dim position As Integer = SafeSeconds(_player.Position)
+            Dim artworkBase64 As String = String.Empty
+            If AlbumArt IsNot Nothing Then
+                Try
+                    ' Force-convert to a 32-bit ARGB bitmap
+                    Using bmp As New Bitmap(AlbumArt.Width, AlbumArt.Height, Imaging.PixelFormat.Format32bppArgb)
+                        Using g As Graphics = Graphics.FromImage(bmp)
+                            g.DrawImage(AlbumArt, 0, 0, AlbumArt.Width, AlbumArt.Height)
+                        End Using
+                        Using ms As New MemoryStream()
+                            bmp.Save(ms, Imaging.ImageFormat.Png)
+                            artworkBase64 = Convert.ToBase64String(ms.ToArray())
+                        End Using
+                    End Using
+
+                Catch ex As Exception
+                    artworkBase64 = String.Empty
+                    WriteToLog("Artwork encode error: " & ex.Message)
+                End Try
+            End If
+            'If AlbumArt IsNot Nothing Then
+            '    Try
+            '        Using ms As New MemoryStream()
+            '            AlbumArt.Save(ms, Imaging.ImageFormat.Png)
+            '            artworkBase64 = Convert.ToBase64String(ms.ToArray())
+            '        End Using
+            '    Catch
+            '        artworkBase64 = String.Empty
+            '    End Try
+            'End If
+
+            ' Build the message
+            Return String.Join("|", {
+                "NOWPLAYING",
+                state,
+                currentTitle,
+                title,
+                path,
+                duration.ToString(),
+                position.ToString(),
+                artworkBase64
+            })
+
+        Catch ex As Exception
+            App.WriteToLog("BuildNowPlayingMessage Error: " & ex.Message)
+            Return "NOWPLAYING|ERROR"
+        End Try
+    End Function
+    Private Function SafeSeconds(value As Double) As Integer
+        If Double.IsNaN(value) OrElse Double.IsInfinity(value) OrElse value < 0 Then Return 0
+        Return CInt(Math.Floor(value))
+    End Function
 
     'Themes
     Private Sub SetAccentColor(Optional force As Boolean = False)
