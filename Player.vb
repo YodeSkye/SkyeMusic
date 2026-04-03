@@ -5954,7 +5954,8 @@ Public Class Player
         Try
             Dim state As String = PlayState.ToString
             Dim currentTitle As String = NowPlaying.Text ' Currently playing metadata (may differ from file metadata)
-            Dim path As String = If(_player.Path.TrimEnd("/"c), String.Empty)
+            Dim path As String = String.Empty
+            If _player IsNot Nothing And _player.HasMedia Then path = _player.Path.TrimEnd("/"c)
             Dim title As String = String.Empty
             Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(path, True, 0)
             If lvi IsNot Nothing Then title = lvi.SubItems(LVPlaylist.Columns("Title").Index).Text
@@ -5979,16 +5980,6 @@ Public Class Player
                     WriteToLog("Artwork encode error: " & ex.Message)
                 End Try
             End If
-            'If AlbumArt IsNot Nothing Then
-            '    Try
-            '        Using ms As New MemoryStream()
-            '            AlbumArt.Save(ms, Imaging.ImageFormat.Png)
-            '            artworkBase64 = Convert.ToBase64String(ms.ToArray())
-            '        End Using
-            '    Catch
-            '        artworkBase64 = String.Empty
-            '    End Try
-            'End If
 
             ' Build the message
             Return String.Join("|", {

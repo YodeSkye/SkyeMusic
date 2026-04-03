@@ -912,6 +912,8 @@ Namespace My
                                                 _player.PlayNext()
                                             Case "previous"
                                                 _player.PlayPrevious()
+                                            Case "nowplaying"
+                                                BroadcastNowPlaying()
                                         End Select
                                     End Sub)
             End Sub
