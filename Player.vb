@@ -4123,6 +4123,7 @@ Public Class Player
         ShowNowPlayingToast(title)
 
         'Broadcast
+        App.BroadcastNowPlaying()
 
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
@@ -5417,7 +5418,8 @@ Public Class Player
                 End If
                 LoadLyrics(_player.Path)
         End Select
-        RaiseEvent TitleChanged(PlaylistCurrentText)
+        'RaiseEvent TitleChanged(PlaylistCurrentText)
+        NowPlaying.Text = PlaylistCurrentText
 
         TimerShowMedia.Start()
     End Sub
