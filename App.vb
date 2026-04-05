@@ -826,12 +826,10 @@ Namespace My
                     _running = True
                     Task.Run(AddressOf ListenLoop)
                     Return True
-
                 Catch ex As SocketException When ex.SocketErrorCode = SocketError.AddressAlreadyInUse
                     App.WriteToLog("Companion Server Failed to Start: Port " & port & " already in use.")
                     _running = False
                     Return False
-
                 Catch ex As Exception
                     App.WriteToLog("Companion Server Failed to Start: " & ex.Message)
                     _running = False
