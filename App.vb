@@ -844,6 +844,10 @@ Namespace My
                     _listener.Stop()
                 Catch
                 End Try
+
+                Broadcast("serverclosing")
+                System.Threading.Thread.Sleep(100)
+
                 ' Close all clients
                 SyncLock _clientLock
                     For Each c In _clients
@@ -899,8 +903,12 @@ Namespace My
                          End Function)
             End Sub
             Private Sub ProcessCommand(cmd As String)
+                Dim parts = cmd.Split("|"c, 2)
+                Dim command = parts(0).ToLowerInvariant()
+                Dim payload As String = If(parts.Length > 1, parts(1), String.Empty)
+
                 _player.BeginInvoke(Sub()
-                                        Select Case cmd.ToLowerInvariant()
+                                        Select Case command
                                             Case "play", "pause", "toggle"
                                                 _player.TogglePlay()
                                             Case "stop"
@@ -911,6 +919,12 @@ Namespace My
                                                 _player.PlayPrevious()
                                             Case "nowplaying"
                                                 BroadcastNowPlaying()
+                                            Case "hello"
+                                                ' update client with current device name when they connect
+                                            Case "playpath"
+                                                FrmPlayer.PlayFromCompanion(payload)
+                                            Case ""
+                                                ' ignore empty lines
                                         End Select
                                     End Sub)
             End Sub

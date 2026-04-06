@@ -5150,7 +5150,6 @@ Public Class Player
             If IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                 PlayStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
             Else
-                'Stream = False
                 PlayFile(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayFromPlaylist")
             End If
         End If
@@ -5196,6 +5195,28 @@ Public Class Player
         End If
         StopPlay()
         PlayStream(realUrl)
+    End Sub
+    Friend Sub PlayFromCompanion(path As String)
+        If Not String.IsNullOrWhiteSpace(path) Then
+            LyricsOff()
+            StopPlay()
+            If App.IsUrl(path) Then
+                path = NormalizeUrl(path)
+                PlayStream(path)
+            Else
+                PlayFile(path, "PlayFromCompanion")
+            End If
+            Dim item As ListViewItem
+            Try
+                item = LVPlaylist.FindItemWithText(path, True, 0)
+                If item IsNot Nothing Then
+                    LVPlaylist.SelectedItems.Clear()
+                    item.Selected = True
+                    item.EnsureVisible()
+                End If
+            Catch
+            End Try
+        End If
     End Sub
     Friend Sub PlayPrevious()
         'Stream = False
