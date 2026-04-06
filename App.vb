@@ -809,7 +809,7 @@ Namespace My
             Private ReadOnly _player As Player
             Private _listener As TcpListener
             Private _running As Boolean = False
-            Private ReadOnly _clients As New List(Of TcpClient)
+            Private ReadOnly _clients As New List(Of CompanionClientInfo)
             Private ReadOnly _clientLock As New Object()
 
             Public Sub New(player As Player)
@@ -850,8 +850,8 @@ Namespace My
 
                 ' Close all clients
                 SyncLock _clientLock
-                    For Each c In _clients
-                        Try : c.Close() : Catch : End Try
+                    For Each info In _clients
+                        Try : info.Client.Close() : Catch : End Try
                     Next
                     _clients.Clear()
                 End SyncLock
@@ -862,7 +862,11 @@ Namespace My
                     Try
                         Dim client = Await _listener.AcceptTcpClientAsync()
                         AddClient(client)
-                        HandleClient(client)
+                        Dim info As CompanionClientInfo
+                        SyncLock _clientLock
+                            info = _clients.Last()
+                        End SyncLock
+                        HandleClient(info)
                     Catch ex As Exception
                         If Not _running Then Exit While
                         If ex.Message.Contains("The I/O operation has been aborted") Then Continue While ' Normal shutdown exception thrown when TcpListener.Stop() aborts the pending Accept call. This is expected behavior and not an error, so we ignore it.
@@ -872,40 +876,43 @@ Namespace My
             End Function
             Private Sub AddClient(client As TcpClient)
                 SyncLock _clientLock
-                    _clients.Add(client)
+                    _clients.Add(New CompanionClientInfo With {.Client = client})
                 End SyncLock
             End Sub
             Private Sub RemoveClient(client As TcpClient)
                 SyncLock _clientLock
-                    _clients.Remove(client)
+                    Dim info = _clients.FirstOrDefault(Function(x) x.Client Is client)
+                    If info IsNot Nothing Then _clients.Remove(info)
                 End SyncLock
                 Try : client.Close() : Catch : End Try
             End Sub
-            Private Sub HandleClient(client As TcpClient)
+            Private Sub HandleClient(info As CompanionClientInfo)
                 Task.Run(Async Function()
-                             Using client
+                             Using info.Client
                                  Try
-                                     Dim stream = client.GetStream()
+                                     Dim stream = info.Client.GetStream()
                                      Dim reader As New StreamReader(stream)
 
-                                     While _running AndAlso client.Connected
+                                     While _running AndAlso info.Client.Connected
                                          Dim cmd = Await reader.ReadLineAsync()
 
                                          If cmd Is Nothing Then Exit While
 
-                                         ProcessCommand(cmd)
+                                         ProcessCommand(info, cmd)
                                      End While
                                  Catch
                                      ' Client died — normal
                                  End Try
-                                 RemoveClient(client)
+                                 RemoveClient(info.Client)
                              End Using
                          End Function)
             End Sub
-            Private Sub ProcessCommand(cmd As String)
+            Private Sub ProcessCommand(info As CompanionClientInfo, cmd As String)
                 Dim parts = cmd.Split("|"c, 2)
                 Dim command = parts(0).ToLowerInvariant()
                 Dim payload As String = If(parts.Length > 1, parts(1), String.Empty)
+
+                Debug.WriteLine($"[CLIENT] IP={info.IP}, Name={info.Name}, ConnectedAt={info.ConnectedAt}, LastMessageAt={info.LastMessageAt}, Cmd={cmd}")
 
                 _player.BeginInvoke(Sub()
                                         Select Case command
@@ -920,7 +927,7 @@ Namespace My
                                             Case "nowplaying"
                                                 BroadcastNowPlaying()
                                             Case "hello"
-                                                ' update client with current device name when they connect
+                                                info.Name = payload
                                             Case "playpath"
                                                 FrmPlayer.PlayFromCompanion(payload)
                                             Case ""
@@ -930,18 +937,33 @@ Namespace My
             End Sub
             Public Sub Broadcast(message As String)
                 SyncLock _clientLock
-                    For Each c In _clients.ToList()
+                    For Each info In _clients.ToList()
                         Try
-                            Dim writer As New StreamWriter(c.GetStream()) With {.AutoFlush = True}
+                            Dim writer As New StreamWriter(info.Client.GetStream()) With {.AutoFlush = True}
                             writer.WriteLine(message)
                             Debug.WriteLine("Sent to Companion Client: " & message)
                         Catch
-                            _clients.Remove(c)
+                            _clients.Remove(info)
                         End Try
                     Next
                 End SyncLock
             End Sub
 
+        End Class
+        Public Class CompanionClientInfo
+            Public Property Client As TcpClient
+            Public Property Name As String = "< Unknown >"
+            Public Property ConnectedAt As DateTime = DateTime.Now
+            Public Property LastMessageAt As DateTime = DateTime.Now
+            Public ReadOnly Property IP As String
+                Get
+                    Try
+                        Return CType(Client.Client.RemoteEndPoint, IPEndPoint).Address.ToString()
+                    Catch
+                        Return String.Empty
+                    End Try
+                End Get
+            End Property
         End Class
         Friend CompanionControlServer As CompanionControlServerClass
 
