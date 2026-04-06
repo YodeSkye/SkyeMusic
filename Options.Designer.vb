@@ -849,7 +849,7 @@ Partial Class Options
         TxtBoxCompanionServerPort.Size = New Size(61, 29)
         TxtBoxCompanionServerPort.TabIndex = 99
         TipError.SetText(TxtBoxCompanionServerPort, Nothing)
-        TipOptions.SetText(TxtBoxCompanionServerPort, "Companion App Server Port #")
+        TipOptions.SetText(TxtBoxCompanionServerPort, "Companion App Server Port Number")
         TxtBoxCompanionServerPort.TextAlign = HorizontalAlignment.Center
         ' 
         ' CkBoxEnableCompanionServer
@@ -864,7 +864,7 @@ Partial Class Options
         CkBoxEnableCompanionServer.Size = New Size(206, 25)
         CkBoxEnableCompanionServer.TabIndex = 98
         TipError.SetText(CkBoxEnableCompanionServer, Nothing)
-        TipOptions.SetText(CkBoxEnableCompanionServer, "Enable or disable the Companion App Server")
+        TipOptions.SetText(CkBoxEnableCompanionServer, "Set In Code")
         CkBoxEnableCompanionServer.Text = "Enable Companion Server"
         CkBoxEnableCompanionServer.UseVisualStyleBackColor = True
         ' 

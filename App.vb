@@ -5,7 +5,6 @@ Imports System.Net
 Imports System.Net.Http
 Imports System.Net.Sockets
 Imports Microsoft.Win32
-Imports Windows.Win32.UI.Input
 
 Namespace My
 
@@ -238,7 +237,7 @@ Namespace My
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
         Friend ReadOnly Http As New HttpClient()
         Friend DirectoryLastSelectedSource As Integer = -1 'DirectoryLastSelectedSource stores the last selected source in the Directory form.
-        Private Property CompanionServerRunning As Boolean = False 'CompanionServerRunning is a flag that indicates whether the companion server is currently running.
+        Friend Property CompanionServerRunning As Boolean = False 'CompanionServerRunning is a flag that indicates whether the companion server is currently running.
 
         ' Forms & Tray
         Friend FrmPlayer As Player 'FmrPlayer is the main player window that provides advanced playback controls and displays detailed information about the currently playing media.
@@ -2612,6 +2611,7 @@ Namespace My
                     CompanionServerRunning = False
                 End If
             End If
+            FrmOptions?.UpdateCompanionServerTooltip()
         End Sub
         Friend Sub BroadcastNowPlaying()
             Try
@@ -2620,6 +2620,18 @@ Namespace My
                 WriteToLog("BroadcastNowPlaying Error: " & ex.Message)
             End Try
         End Sub
+        Public Function GetServerIPv4() As String
+            Dim host = Dns.GetHostName()
+            Dim entry = Dns.GetHostEntry(host)
+
+            For Each ip In entry.AddressList
+                If ip.AddressFamily = AddressFamily.InterNetwork Then
+                    Return ip.ToString()
+                End If
+            Next
+
+            Return "0.0.0.0" ' fallback if no IPv4 found
+        End Function
 
         'Methods
         Friend Sub InitializePreStartup()

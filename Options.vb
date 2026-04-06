@@ -165,6 +165,7 @@ Public Class Options
         End If
         SetPrunePlaylistButtonText()
         SetPruneHistoryButtonText()
+        UpdateCompanionServerTooltip()
     End Sub
     Private Sub Options_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.Settings.Save()
@@ -671,6 +672,13 @@ Public Class Options
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
         End Select
+    End Sub
+    Friend Sub UpdateCompanionServerTooltip()
+        TipOptions.HideTooltip()
+        Dim ip As String = App.GetServerIPv4()
+        TipOptions.SetText(CkBoxEnableCompanionServer,
+            $"Enable or Disable the Companion App Server{vbCr}" &
+            $"The Companion Server is currently {If(App.CompanionServerRunning, "ENABLED", "DISABLED")} on {ip}")
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
