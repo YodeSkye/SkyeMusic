@@ -1,6 +1,7 @@
 ﻿
 Imports System.IO
 Imports System.Text
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.Window
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
 Imports NAudio.Wave
@@ -3430,6 +3431,12 @@ Public Class Player
         Else
             MIViewQueue.Enabled = True
         End If
+        If App.CompanionServerRunning Then
+            MIViewClients.Visible = True
+            MIViewClients.Text = MIViewClients.Text.TrimEnd(App.TrimEndSearch) + " (" + App.CompanionControlServer.ClientCount.ToString + ")"
+        Else
+            MIViewClients.Visible = False
+        End If
     End Sub
     Private Sub MIView_DropDownClosed(sender As Object, e As EventArgs) Handles MIView.DropDownClosed
         If Not MIView.Selected Then MIView.ForeColor = App.CurrentTheme.AccentTextColor
@@ -3449,6 +3456,12 @@ Public Class Player
     End Sub
     Private Sub MIViewHistory_Click(sender As Object, e As EventArgs) Handles MIViewHistory.Click
         App.ShowHistory()
+    End Sub
+    Private Sub MIViewClients_Click(sender As Object, e As EventArgs) Handles MIViewClients.Click
+        Dim frm As New CompanionClients
+        frm.Show()
+        frm.Left = App.FrmPlayer.Left + (App.FrmPlayer.Width - frm.Width) \ 2
+        frm.Top = App.FrmPlayer.Top + (App.FrmPlayer.Height - frm.Height) \ 2
     End Sub
     Private Sub MIOptionsClick(sender As Object, e As EventArgs) Handles MIOptions.Click
         ShowOptions()

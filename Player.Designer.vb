@@ -72,6 +72,7 @@ Partial Class Player
         MIDirectory = New ToolStripMenuItem()
         MIViewHistory = New ToolStripMenuItem()
         ToolStripSeparator5 = New ToolStripSeparator()
+        MIViewClients = New ToolStripMenuItem()
         MIOptions = New ToolStripMenuItem()
         MIVisualizer = New ToolStripMenuItem()
         MILyrics = New ToolStripMenuItem()
@@ -390,7 +391,7 @@ Partial Class Player
         ' 
         ' MIView
         ' 
-        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIVisualizers, MIMiniPlayer, ToolStripSeparator2, MIViewQueue, MIDirectory, MIViewHistory, ToolStripSeparator5, MIOptions})
+        MIView.DropDownItems.AddRange(New ToolStripItem() {MIFullscreen, MIVisualizers, MIMiniPlayer, ToolStripSeparator2, MIViewQueue, MIDirectory, MIViewHistory, ToolStripSeparator5, MIViewClients, MIOptions})
         MIView.ForeColor = SystemColors.HighlightText
         MIView.Image = My.Resources.Resources.ImageView
         MIView.Name = "MIView"
@@ -448,6 +449,13 @@ Partial Class Player
         ' 
         ToolStripSeparator5.Name = "ToolStripSeparator5"
         ToolStripSeparator5.Size = New Size(200, 6)
+        ' 
+        ' MIViewClients
+        ' 
+        MIViewClients.Image = My.Resources.Resources.ImageNetwork16
+        MIViewClients.Name = "MIViewClients"
+        MIViewClients.Size = New Size(203, 24)
+        MIViewClients.Text = "Clients"
         ' 
         ' MIOptions
         ' 
@@ -945,4 +953,5 @@ Partial Class Player
     Friend WithEvents MIMiniPlayer As ToolStripMenuItem
     Friend WithEvents MIDirectory As ToolStripMenuItem
     Friend WithEvents TimerStreamMeta As Timer
+    Friend WithEvents MIViewClients As ToolStripMenuItem
 End Class

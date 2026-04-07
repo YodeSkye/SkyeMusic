@@ -804,19 +804,26 @@ Namespace My
         Friend ParticleNebulaActivePalette As ParticleNebulaPalette = ParticleNebulaGetPalette(ParticleNebulaPalettePresets.Cosmic)
 
         ' Companion Server
-        Public Class CompanionControlServerClass
+        Friend Class CompanionControlServerClass
 
             Private ReadOnly _player As Player
             Private _listener As TcpListener
             Private _running As Boolean = False
             Private ReadOnly _clients As New List(Of CompanionClientInfo)
             Private ReadOnly _clientLock As New Object()
+            Friend ReadOnly Property ClientCount As Integer
+                Get
+                    SyncLock _clientLock
+                        Return _clients.Count
+                    End SyncLock
+                End Get
+            End Property
 
-            Public Sub New(player As Player)
+            Friend Sub New(player As Player)
                 _player = player
             End Sub
 
-            Public Function Start(port As Integer) As Boolean
+            Friend Function Start(port As Integer) As Boolean
                 If _running Then Return True
 
                 Try
@@ -836,7 +843,7 @@ Namespace My
                 End Try
 
             End Function
-            Public Sub [Stop]()
+            Friend Sub [Stop]()
                 If Not _running Then Exit Sub
 
                 _running = False
@@ -898,6 +905,8 @@ Namespace My
 
                                          If cmd Is Nothing Then Exit While
 
+                                         info.LastMessageAt = DateTime.Now
+
                                          ProcessCommand(info, cmd)
                                      End While
                                  Catch
@@ -935,7 +944,7 @@ Namespace My
                                         End Select
                                     End Sub)
             End Sub
-            Public Sub Broadcast(message As String)
+            Friend Sub Broadcast(message As String)
                 SyncLock _clientLock
                     For Each info In _clients.ToList()
                         Try
@@ -948,9 +957,15 @@ Namespace My
                     Next
                 End SyncLock
             End Sub
+            Friend Function GetClients() As List(Of CompanionClientInfo)
+                SyncLock _clientLock
+                    ' Return a shallow copy so UI can't modify the real list
+                    Return _clients.ToList()
+                End SyncLock
+            End Function
 
         End Class
-        Public Class CompanionClientInfo
+        Friend Class CompanionClientInfo
             Public Property Client As TcpClient
             Public Property Name As String = "< Unknown >"
             Public Property ConnectedAt As DateTime = DateTime.Now
