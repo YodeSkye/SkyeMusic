@@ -963,6 +963,10 @@ Namespace My
                     Return _clients.ToList()
                 End SyncLock
             End Function
+            Friend Sub DisconnectClient(info As CompanionClientInfo)
+                If info Is Nothing Then Exit Sub
+                RemoveClient(info.Client)
+            End Sub
 
         End Class
         Friend Class CompanionClientInfo

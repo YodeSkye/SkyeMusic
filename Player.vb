@@ -3433,7 +3433,13 @@ Public Class Player
         End If
         If App.CompanionServerRunning Then
             MIViewClients.Visible = True
-            MIViewClients.Text = MIViewClients.Text.TrimEnd(App.TrimEndSearch) + " (" + App.CompanionControlServer.ClientCount.ToString + ")"
+            Dim clients = App.CompanionControlServer.ClientCount
+            MIViewClients.Text = MIViewClients.Text.TrimEnd(App.TrimEndSearch) + " (" + clients.ToString + ")"
+            If clients = 0 Then
+                MIViewClients.Enabled = False
+            Else
+                MIViewClients.Enabled = True
+            End If
         Else
             MIViewClients.Visible = False
         End If

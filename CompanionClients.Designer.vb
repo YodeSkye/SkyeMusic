@@ -22,17 +22,26 @@ Partial Class CompanionClients
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(CompanionClients))
         LVClients = New Skye.UI.ListViewEX()
         DeviceName = New ColumnHeader()
         IPAddress = New ColumnHeader()
         ConnectedAt = New ColumnHeader()
         LastMessage = New ColumnHeader()
+        CMClients = New ContextMenuStrip(components)
+        CMIDisconnect = New ToolStripMenuItem()
+        CMICopyDeviceName = New ToolStripMenuItem()
+        CMICopyIP = New ToolStripMenuItem()
+        CMIRefresh = New ToolStripMenuItem()
+        TimerRefresh = New Timer(components)
+        CMClients.SuspendLayout()
         SuspendLayout()
         ' 
         ' LVClients
         ' 
         LVClients.Columns.AddRange(New ColumnHeader() {DeviceName, IPAddress, ConnectedAt, LastMessage})
+        LVClients.ContextMenuStrip = CMClients
         LVClients.Dock = DockStyle.Fill
         LVClients.EditableColumns = CType(resources.GetObject("LVClients.EditableColumns"), List(Of Boolean))
         LVClients.FullRowSelect = True
@@ -67,6 +76,45 @@ Partial Class CompanionClients
         LastMessage.TextAlign = HorizontalAlignment.Center
         LastMessage.Width = 180
         ' 
+        ' CMClients
+        ' 
+        CMClients.Items.AddRange(New ToolStripItem() {CMIDisconnect, CMICopyDeviceName, CMICopyIP, CMIRefresh})
+        CMClients.Name = "CMClients"
+        CMClients.Size = New Size(181, 114)
+        ' 
+        ' CMIDisconnect
+        ' 
+        CMIDisconnect.Image = My.Resources.Resources.ImageNetwork16
+        CMIDisconnect.Name = "CMIDisconnect"
+        CMIDisconnect.Size = New Size(180, 22)
+        CMIDisconnect.Text = "Disconnect"
+        ' 
+        ' CMICopyDeviceName
+        ' 
+        CMICopyDeviceName.Image = My.Resources.Resources.ImageCopy16
+        CMICopyDeviceName.Name = "CMICopyDeviceName"
+        CMICopyDeviceName.Size = New Size(180, 22)
+        CMICopyDeviceName.Text = "Copy Device Name"
+        ' 
+        ' CMICopyIP
+        ' 
+        CMICopyIP.Image = My.Resources.Resources.ImageCopy16
+        CMICopyIP.Name = "CMICopyIP"
+        CMICopyIP.Size = New Size(180, 22)
+        CMICopyIP.Text = "Copy IP Address"
+        ' 
+        ' CMIRefresh
+        ' 
+        CMIRefresh.Image = My.Resources.Resources.ImageRefresh16
+        CMIRefresh.Name = "CMIRefresh"
+        CMIRefresh.Size = New Size(180, 22)
+        CMIRefresh.Text = "Refresh"
+        ' 
+        ' TimerRefresh
+        ' 
+        TimerRefresh.Enabled = True
+        TimerRefresh.Interval = 3000
+        ' 
         ' CompanionClients
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
@@ -79,6 +127,7 @@ Partial Class CompanionClients
         Name = "CompanionClients"
         StartPosition = FormStartPosition.CenterParent
         Text = "Companion Clients"
+        CMClients.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
 
@@ -87,4 +136,10 @@ Partial Class CompanionClients
     Friend WithEvents IPAddress As ColumnHeader
     Friend WithEvents ConnectedAt As ColumnHeader
     Friend WithEvents LastMessage As ColumnHeader
+    Friend WithEvents CMClients As ContextMenuStrip
+    Friend WithEvents TimerRefresh As Timer
+    Friend WithEvents CMIDisconnect As ToolStripMenuItem
+    Friend WithEvents CMICopyDeviceName As ToolStripMenuItem
+    Friend WithEvents CMICopyIP As ToolStripMenuItem
+    Friend WithEvents CMIRefresh As ToolStripMenuItem
 End Class
