@@ -319,7 +319,8 @@ Public Class Options
         SetTheme()
         ReThemeMenus()
         App.InvokeThemeChanged()
-        App.FrmMiniPlayer?.SetColors()
+        App.FrmCompanionClients?.SetColors()
+        App.FrmCompanionClients?.ReThemeMenus()
         App.FrmLog?.SetColors()
         App.FrmLog?.ReThemeMenus()
         App.FrmHistory?.SetColors()
@@ -329,6 +330,7 @@ Public Class Options
         App.FrmLibrary.SetColors()
         App.FrmLibrary.ReThemeMenus()
         App.ReThemeTrayMenu()
+        App.FrmMiniPlayer?.SetColors()
         App.FrmPlayer.ReThemeMenus()
         App.FrmPlayer.SetColors()
     End Sub

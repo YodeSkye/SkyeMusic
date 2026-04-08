@@ -3464,10 +3464,10 @@ Public Class Player
         App.ShowHistory()
     End Sub
     Private Sub MIViewClients_Click(sender As Object, e As EventArgs) Handles MIViewClients.Click
-        Dim frm As New CompanionClients
-        frm.Show()
-        frm.Left = App.FrmPlayer.Left + (App.FrmPlayer.Width - frm.Width) \ 2
-        frm.Top = App.FrmPlayer.Top + (App.FrmPlayer.Height - frm.Height) \ 2
+        App.FrmCompanionClients = New CompanionClients
+        App.FrmCompanionClients.Show()
+        App.FrmCompanionClients.Left = App.FrmPlayer.Left + (App.FrmPlayer.Width - App.FrmCompanionClients.Width) \ 2
+        App.FrmCompanionClients.Top = App.FrmPlayer.Top + (App.FrmPlayer.Height - App.FrmCompanionClients.Height) \ 2
     End Sub
     Private Sub MIOptionsClick(sender As Object, e As EventArgs) Handles MIOptions.Click
         ShowOptions()

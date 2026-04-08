@@ -251,6 +251,7 @@ Namespace My
         Friend FrmAbout As About 'FrmAbout is the about window that provides information about the application, its developers, and its open-source nature.
         Friend FrmChangeLog As ChangeLog 'FrmChangeLog is the change log window that displays a log of changes and updates made to the application across different versions.
         Friend FrmHelp As Help 'FrmHelp is the help window that provides user guides, FAQs, and support resources for the application.
+        Friend FrmCompanionClients As CompanionClients 'FrmCompanionClients is the companion clients window that allows users to manage and monitor connected companion devices.
         Friend FrmDevTools As DevTools 'FrmDevTools is the developer tools window that provides debugging and database access features.
         Friend NIApp As New NotifyIcon 'NIApp is the system tray icon for the application.
 

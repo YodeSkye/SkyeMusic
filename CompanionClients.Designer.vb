@@ -40,15 +40,19 @@ Partial Class CompanionClients
         ' 
         ' LVClients
         ' 
+        LVClients.AllowColumnReorder = True
         LVClients.Columns.AddRange(New ColumnHeader() {DeviceName, IPAddress, ConnectedAt, LastMessage})
         LVClients.ContextMenuStrip = CMClients
         LVClients.Dock = DockStyle.Fill
         LVClients.EditableColumns = CType(resources.GetObject("LVClients.EditableColumns"), List(Of Boolean))
         LVClients.FullRowSelect = True
+        LVClients.HeaderStyle = ColumnHeaderStyle.Nonclickable
         LVClients.InsertionLineColor = Color.Teal
         LVClients.Location = New Point(0, 0)
+        LVClients.MultiSelect = False
         LVClients.Name = "LVClients"
-        LVClients.Size = New Size(609, 168)
+        LVClients.OwnerDraw = True
+        LVClients.Size = New Size(659, 168)
         LVClients.TabIndex = 0
         LVClients.UseCompatibleStateImageBehavior = False
         LVClients.View = View.Details
@@ -56,7 +60,7 @@ Partial Class CompanionClients
         ' DeviceName
         ' 
         DeviceName.Text = "Device Name"
-        DeviceName.Width = 125
+        DeviceName.Width = 175
         ' 
         ' IPAddress
         ' 
@@ -78,36 +82,37 @@ Partial Class CompanionClients
         ' 
         ' CMClients
         ' 
+        CMClients.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMClients.Items.AddRange(New ToolStripItem() {CMIDisconnect, CMICopyDeviceName, CMICopyIP, CMIRefresh})
         CMClients.Name = "CMClients"
-        CMClients.Size = New Size(181, 114)
+        CMClients.Size = New Size(188, 92)
         ' 
         ' CMIDisconnect
         ' 
         CMIDisconnect.Image = My.Resources.Resources.ImageNetwork16
         CMIDisconnect.Name = "CMIDisconnect"
-        CMIDisconnect.Size = New Size(180, 22)
+        CMIDisconnect.Size = New Size(187, 22)
         CMIDisconnect.Text = "Disconnect"
         ' 
         ' CMICopyDeviceName
         ' 
         CMICopyDeviceName.Image = My.Resources.Resources.ImageCopy16
         CMICopyDeviceName.Name = "CMICopyDeviceName"
-        CMICopyDeviceName.Size = New Size(180, 22)
+        CMICopyDeviceName.Size = New Size(187, 22)
         CMICopyDeviceName.Text = "Copy Device Name"
         ' 
         ' CMICopyIP
         ' 
         CMICopyIP.Image = My.Resources.Resources.ImageCopy16
         CMICopyIP.Name = "CMICopyIP"
-        CMICopyIP.Size = New Size(180, 22)
+        CMICopyIP.Size = New Size(187, 22)
         CMICopyIP.Text = "Copy IP Address"
         ' 
         ' CMIRefresh
         ' 
         CMIRefresh.Image = My.Resources.Resources.ImageRefresh16
         CMIRefresh.Name = "CMIRefresh"
-        CMIRefresh.Size = New Size(180, 22)
+        CMIRefresh.Size = New Size(187, 22)
         CMIRefresh.Text = "Refresh"
         ' 
         ' TimerRefresh
@@ -119,11 +124,12 @@ Partial Class CompanionClients
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(609, 168)
+        ClientSize = New Size(659, 168)
         Controls.Add(LVClients)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(4)
+        MaximizeBox = False
         Name = "CompanionClients"
         StartPosition = FormStartPosition.CenterParent
         Text = "Companion Clients"
