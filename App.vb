@@ -2700,8 +2700,10 @@ Namespace My
 
             'Initialize SkyeLibrary RegistryHelper
 #If DEBUG Then
+            Skye.Common.Log.Initialize(My.Application.Info.ProductName + "DEV")
             Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName + "DEV" 'Use separate registry key for debug builds
 #Else
+            Skye.Common.Log.Initialize(My.Application.Info.ProductName)
             Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName 'Use standard registry key for release builds
 #End If
 
