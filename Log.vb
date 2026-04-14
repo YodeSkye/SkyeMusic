@@ -1,11 +1,13 @@
 ﻿
+Imports Skye.UI.Log
+
 Public Class Log
 
     ' Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
     Private CurrentAccentColor As Color 'Current Windows Accent Color
-    Private LogSearchTitle As String
+    Private LogViewerColors As New Skye.UI.Log.LogViewerControl.LogViewerColors
     Private DeleteLogConfirm As Boolean = False
     Private WithEvents TimerDeleteLog As New Timer
 
@@ -24,7 +26,6 @@ Public Class Log
     End Sub
     Private Sub Log_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = My.Application.Info.Title + " Log"
-        LogSearchTitle = TxBxSearch.Text
         TimerDeleteLog.Interval = 5000
         SetAccentColor()
         SetTheme()
@@ -77,16 +78,14 @@ Public Class Log
         End If
     End Sub
     Private Sub Log_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
-        If Not TxBxSearch.Focused Then
-            If e.KeyData = Keys.Escape Then Me.Close()
-        End If
+        If e.KeyData = Keys.Escape Then Close()
     End Sub
     Private Sub Log_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick
         ToggleMaximized()
     End Sub
 
     ' Control Events
-    Private Sub RTBLog_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles RTBLog.PreviewKeyDown
+    Private Sub RTBLog_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs)
         RTBCMLog.ShortcutKeys(CType(sender, RichTextBox), e)
     End Sub
     Private Sub LBLLogInfo_DoubleClick(sender As Object, e As EventArgs) Handles LBLLogInfo.DoubleClick
@@ -95,76 +94,15 @@ Public Class Log
     Private Sub BTNOK_Click(sender As Object, e As EventArgs) Handles BTNOK.Click
         Close()
     End Sub
-    Private Sub BTNRefreshLog_Click(sender As Object, e As EventArgs) Handles BTNRefreshLog.Click
+    Private Sub BTNRefreshLog_Click(sender As Object, e As EventArgs)
         SetDeleteLogConfirm(True)
-        App.ShowLog(True)
+        ShowLog(True)
     End Sub
     Private Sub BTNDeleteLog_Click(sender As Object, e As EventArgs) Handles BTNDeleteLog.Click
         If DeleteLogConfirm Then
             App.DeleteLog()
         End If
         SetDeleteLogConfirm()
-    End Sub
-    Private Sub TxBxSearch_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TxBxSearch.KeyPress
-        Select Case e.KeyChar
-            Case Convert.ToChar(Keys.Escape)
-                ResetRTBLogFind()
-                RTBLog.Focus()
-                e.Handled = True
-        End Select
-    End Sub
-    Private Sub TxBxSearch_Enter(sender As Object, e As EventArgs) Handles TxBxSearch.Enter
-        If TxBxSearch.Text = LogSearchTitle Then TxBxSearch.ResetText()
-    End Sub
-    Private Sub TxBxSearch_Leave(sender As Object, e As EventArgs) Handles TxBxSearch.Leave
-        TxBxSearch.Text = LogSearchTitle
-        TxBxSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
-    End Sub
-    Private Sub TxBxSearch_TextChanged(sender As Object, e As EventArgs) Handles TxBxSearch.TextChanged
-        If TxBxSearch.Text Is String.Empty Or RTBLog.Focused Then
-            ResetRTBLogFind()
-        ElseIf TxBxSearch.Text.Length <= 4 Then
-            If App.CurrentTheme.IsAccent Then
-                TxBxSearch.ForeColor = App.CurrentTheme.AccentTextColor
-            Else
-                TxBxSearch.ForeColor = App.CurrentTheme.TextColor
-            End If
-            ResetRTBLogFind()
-        ElseIf Not TxBxSearch.Text = LogSearchTitle AndAlso TxBxSearch.Text.Length > 4 AndAlso IsHandleCreated Then
-            Debug.Print("Searching Log...")
-            LblStatus.Visible = True
-            LblStatus.Refresh()
-            Dim foundindex As Integer
-            Dim searchtext As String = RTBLog.Text
-            ResetRTBLogFind()
-            'Try To Find First Occurrence
-            foundindex = searchtext.IndexOf(TxBxSearch.Text, 0, StringComparison.CurrentCultureIgnoreCase)
-            If foundindex < 0 Then
-                TxBxSearch.ForeColor = Color.Red
-            Else
-                If App.CurrentTheme.IsAccent Then
-                    TxBxSearch.ForeColor = App.CurrentTheme.AccentTextColor
-                Else
-                    TxBxSearch.ForeColor = App.CurrentTheme.TextColor
-                End If
-                RTBLog.Select(foundindex, 0)
-                RTBLog.ScrollToCaret()
-            End If
-            Do Until foundindex < 0
-                'Highlight Current Match
-                RTBLog.SelectionStart = foundindex
-                RTBLog.SelectionLength = TxBxSearch.Text.Length
-                If App.CurrentTheme.IsAccent Then
-                    RTBLog.SelectionBackColor = App.CurrentTheme.AccentTextColor
-                Else
-                    RTBLog.SelectionBackColor = App.CurrentTheme.TextColor
-                End If
-                RTBLog.SelectionColor = App.CurrentTheme.BackColor
-                'Try To Find Next Occurrence
-                foundindex = searchtext.IndexOf(TxBxSearch.Text, foundindex + TxBxSearch.Text.Length, StringComparison.CurrentCultureIgnoreCase)
-            Loop
-            LblStatus.Visible = False
-        End If
     End Sub
 
     ' Handlers
@@ -180,15 +118,6 @@ Public Class Log
             Case FormWindowState.Maximized
                 WindowState = FormWindowState.Normal
         End Select
-    End Sub
-    Private Sub ResetRTBLogFind()
-        RTBLog.SelectAll()
-        RTBLog.SelectionBackColor = App.CurrentTheme.BackColor
-        RTBLog.SelectionColor = App.CurrentTheme.TextColor
-        RTBLog.DeselectAll()
-        RTBLog.SelectionStart = RTBLog.TextLength
-        RTBLog.SelectionLength = 0
-        RTBLog.ScrollToCaret()
     End Sub
     Private Sub SetDeleteLogConfirm(Optional forcereset As Boolean = False)
         If DeleteLogConfirm Or forcereset Then
@@ -216,7 +145,7 @@ Public Class Log
             SuspendLayout()
             If App.CurrentTheme.IsAccent Then
                 BackColor = CurrentAccentColor
-                TxBxSearch.BackColor = CurrentAccentColor
+                LogViewerColors.TextBoxBack = CurrentAccentColor
             End If
             ResumeLayout()
             'Debug.Print("Log Accent Color Set")
@@ -230,19 +159,22 @@ Public Class Log
             LBLLogInfo.ForeColor = App.CurrentTheme.AccentTextColor
         Else
             BackColor = App.CurrentTheme.BackColor
-            TxBxSearch.BackColor = App.CurrentTheme.BackColor
+            LogViewerColors.TextBoxBack = App.CurrentTheme.BackColor
             LBLLogInfo.ForeColor = App.CurrentTheme.TextColor
         End If
-        RTBLog.BackColor = App.CurrentTheme.BackColor
-        RTBLog.ForeColor = App.CurrentTheme.TextColor
         BTNDeleteLog.BackColor = App.CurrentTheme.ButtonBackColor
         BTNDeleteLog.ForeColor = App.CurrentTheme.TextColor
-        BTNRefreshLog.BackColor = App.CurrentTheme.ButtonBackColor
-        BTNRefreshLog.ForeColor = App.CurrentTheme.TextColor
         TipLog.BackColor = App.CurrentTheme.BackColor
         TipLog.ForeColor = App.CurrentTheme.TextColor
         TipLog.BorderColor = App.CurrentTheme.ButtonBackColor
-        If TxBxSearch.Text = LogSearchTitle Then TxBxSearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
+        LogViewerColors.Back = App.CurrentTheme.BackColor
+        LogViewerColors.Fore = App.CurrentTheme.TextColor
+        LogViewerColors.ButtonBack = App.CurrentTheme.ButtonBackColor
+        LogViewerColors.ButtonFore = App.CurrentTheme.TextColor
+        LogViewerColors.TooltipBack = App.CurrentTheme.BackColor
+        LogViewerColors.TooltipFore = App.CurrentTheme.TextColor
+        LogViewerColors.TooltipBorder = App.CurrentTheme.ButtonBackColor
+        LogViewer.ApplyColors(LogViewerColors)
         ResumeLayout()
         'Debug.Print("Log Theme Set")
     End Sub

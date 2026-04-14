@@ -3190,26 +3190,24 @@ Namespace My
             If refresh AndAlso FrmLog IsNot Nothing Then
                 FrmLog.BringToFront()
                 FrmLog.Focus()
+                FrmLog.LogViewer.RefreshContent()
             Else
                 FrmLog = New Log
                 FrmLog.Show()
             End If
-            Dim logtext As String = String.Empty
-            Dim lines As Integer = 0
-            FrmLog.RTBLog.Clear()
-            Try
-                logtext = IO.File.ReadAllText(Skye.Common.Log.LogFilePath)
-            Catch
-            Finally
-            End Try
-            FrmLog.RTBLog.AppendText(logtext)
+            'Dim logtext As String = String.Empty
+            'FrmLog.RTBLog.Clear()
+            'Try
+            '    logtext = IO.File.ReadAllText(Skye.Common.Log.LogFilePath)
+            'Catch
+            'Finally
+            'End Try
+            'FrmLog.RTBLog.AppendText(logtext)
             FrmLog.LBLLogInfo.Text = Skye.Common.Log.LogFilePath
-            If FrmLog.RTBLog.Lines.Count > 0 AndAlso FrmLog.RTBLog.Lines(0).Length > 0 Then lines = FrmLog.RTBLog.GetLineFromCharIndex(FrmLog.RTBLog.Text.Length)
-            FrmLog.LBLLogInfo.Text += " (" + lines.ToString + IIf(lines = 1, " Line", " Lines").ToString + ")"
-            If lines > 0 Then
+            'If FrmLog.LogViewer.Lines.Count > 0 AndAlso FrmLog.RTBLog.Lines(0).Length > 0 Then lines = FrmLog.RTBLog.GetLineFromCharIndex(FrmLog.RTBLog.Text.Length)
+            FrmLog.LBLLogInfo.Text += " (" + Skye.Common.Log.LineCount.ToString + IIf(Skye.Common.Log.LineCount = 1, " Line", " Lines").ToString + ")"
+            If Skye.Common.Log.LineCount > 0 Then
                 FrmLog.BTNDeleteLog.Visible = True
-                FrmLog.BTNRefreshLog.Visible = True
-                FrmLog.RTBLog.ScrollToCaret()
             Else
                 FrmLog.BTNDeleteLog.Visible = False
             End If
