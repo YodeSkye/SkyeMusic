@@ -82,7 +82,7 @@ Partial Class Log
         ' 
         ' LogViewer
         ' 
-        LogViewer.Dock = DockStyle.Top
+        LogViewer.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LogViewer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LogViewer.Location = New Point(0, 0)
         LogViewer.Margin = New Padding(4)
