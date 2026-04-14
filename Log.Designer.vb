@@ -48,7 +48,7 @@ Partial Class Log
         BTNOK.Size = New Size(64, 64)
         BTNOK.TabIndex = 3
         TipLog.SetToolTip(BTNOK, "Close Window")
-        TipLog.SetToolTipImage(BTNOK, Nothing)
+        TipLog.SetToolTipImage(BTNOK, My.Resources.Resources.ImageOK)
         BTNOK.UseVisualStyleBackColor = True
         ' 
         ' BTNDeleteLog
@@ -60,7 +60,7 @@ Partial Class Log
         BTNDeleteLog.Size = New Size(48, 48)
         BTNDeleteLog.TabIndex = 2
         TipLog.SetToolTip(BTNDeleteLog, "Delete Log")
-        TipLog.SetToolTipImage(BTNDeleteLog, Nothing)
+        TipLog.SetToolTipImage(BTNDeleteLog, My.Resources.Resources.ImageDeleteLog32)
         BTNDeleteLog.UseVisualStyleBackColor = True
         ' 
         ' LBLLogInfo

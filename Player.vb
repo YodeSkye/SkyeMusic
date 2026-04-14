@@ -5622,6 +5622,8 @@ Public Class Player
             mode = DisplayMode.Visualizer
         ElseIf Lyrics AndAlso Not isStream Then
             mode = DisplayMode.Lyrics
+        ElseIf isVideo AndAlso App.PlayerIsMiniMode Then
+            mode = DisplayMode.Visualizer
         ElseIf isVideo Then
             mode = DisplayMode.Video
         ElseIf isAudio AndAlso hasAlbumArt Then
@@ -5629,8 +5631,8 @@ Public Class Player
         Else
             mode = DisplayMode.Visualizer
         End If
-
         ApplyDisplayMode(mode, tlfile)
+
     End Sub
     Private Sub ShowMediaOld()
         'ShowMediaNew()

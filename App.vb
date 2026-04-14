@@ -237,6 +237,7 @@ Namespace My
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
         Friend ReadOnly Http As New HttpClient()
         Friend DirectoryLastSelectedSource As Integer = -1 'DirectoryLastSelectedSource stores the last selected source in the Directory form.
+        Friend Property PlayerIsMiniMode As Boolean
 
         ' Forms & Tray
         Friend FrmPlayer As Player 'FmrPlayer is the main player window that provides advanced playback controls and displays detailed information about the currently playing media.
@@ -3087,6 +3088,7 @@ Namespace My
                 FrmMiniPlayer.Show()
                 FrmPlayer.Hide()
                 FrmPlayer.LyricsOff()
+                PlayerIsMiniMode = True
                 FrmPlayer.ShowMedia()
                 FrmMiniPlayer.Activate()
             Else
@@ -3094,6 +3096,7 @@ Namespace My
                 FrmMiniPlayer.Close()
                 FrmMiniPlayer = Nothing
                 FrmPlayer.Show()
+                PlayerIsMiniMode = False
                 FrmPlayer.ShowMedia()
             End If
         End Sub
