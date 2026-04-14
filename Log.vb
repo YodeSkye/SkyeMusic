@@ -1,5 +1,6 @@
 ﻿
 Imports Skye.UI.Log
+Imports Syncfusion.Windows.Forms.Tools
 
 Public Class Log
 
@@ -169,6 +170,8 @@ Public Class Log
         TipLog.BorderColor = App.CurrentTheme.ButtonBackColor
         LogViewerColors.Back = App.CurrentTheme.BackColor
         LogViewerColors.Fore = App.CurrentTheme.TextColor
+        LogViewerColors.TextBoxBack = App.CurrentTheme.BackColor
+        LogViewerColors.TextBoxFore = App.CurrentTheme.TextColor
         LogViewerColors.ButtonBack = App.CurrentTheme.ButtonBackColor
         LogViewerColors.ButtonFore = App.CurrentTheme.TextColor
         LogViewerColors.TooltipBack = App.CurrentTheme.BackColor
