@@ -2698,7 +2698,7 @@ Public Class Player
                     End Select
             End Select
         Catch ex As Exception
-            App.WriteToLog("Player WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("Player WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             If m.Msg <> Skye.WinAPI.WM_GET_CUSTOM_DATA Then MyBase.WndProc(m)
         End Try
@@ -3284,7 +3284,7 @@ Public Class Player
                 End If
             Next
             If mediafiles.Count > 0 Then
-                WriteToLog("Player Drag&Drop Media Performed (" + mediafiles.Count.ToString + " " + IIf(mediafiles.Count = 1, "File", "Files").ToString + ")")
+                Skye.Common.Log.Write("Player Drag&Drop Media Performed (" + mediafiles.Count.ToString + " " + IIf(mediafiles.Count = 1, "File", "Files").ToString + ")")
                 Dim lvi As ListViewItem
                 Dim clientpoint = LVPlaylist.PointToClient(New System.Drawing.Point(e.X, e.Y))
                 Dim itemover = LVPlaylist.GetItemAt(clientpoint.X, clientpoint.Y)
@@ -3331,7 +3331,7 @@ Public Class Player
                 itemover = Nothing
             End If
             If playlistfiles.Count > 0 Then
-                WriteToLog("Player Drag&Drop Playlist Performed (" + playlistfiles.Count.ToString + " " + IIf(playlistfiles.Count = 1, "File", "Files").ToString + ")")
+                Skye.Common.Log.Write("Player Drag&Drop Playlist Performed (" + playlistfiles.Count.ToString + " " + IIf(playlistfiles.Count = 1, "File", "Files").ToString + ")")
                 For Each file In playlistfiles
                     MergePlaylistFromFile(file)
                 Next
@@ -4469,7 +4469,7 @@ Public Class Player
             'Debug.Print("Suspending...")
             StopPlay()
             Me.WindowState = FormWindowState.Minimized
-            App.WriteToLog("App Suspended @ " & Now)
+            Skye.Common.Log.Write("App Suspended @ " & Now)
         End If
     End Sub
     Private Sub CheckMove(ByRef location As Point)
@@ -4504,14 +4504,14 @@ Public Class Player
             file.Dispose()
             reader = Nothing
             If items Is Nothing Then
-                App.WriteToLog("Playlist Not Loaded: File not valid (" + App.PlaylistPath + ")")
+                Skye.Common.Log.Write("Playlist Not Loaded: File not valid (" + App.PlaylistPath + ")")
             Else
                 items.Clear()
                 items = Nothing
-                App.WriteToLog("Playlist Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                Skye.Common.Log.Write("Playlist Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             End If
         Else
-            App.WriteToLog("Playlist Not Loaded: File does not exist")
+            Skye.Common.Log.Write("Playlist Not Loaded: File does not exist")
         End If
         SetPlaylistCountText()
     End Sub
@@ -4539,7 +4539,7 @@ Public Class Player
             writer = Nothing
             items.Clear()
             items = Nothing
-            App.WriteToLog("Playlist Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            Skye.Common.Log.Write("Playlist Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
     End Sub
     Friend Sub OpenPlaylist()
@@ -4614,10 +4614,10 @@ Public Class Player
                 End If
             Next
             ShowStatusMessage("Playlist Loaded Successfully (" & items.Count.ToString & ")")
-            App.WriteToLog("Imported Playlist from " & filename)
+            Skye.Common.Log.Write("Imported Playlist from " & filename)
         Catch ex As Exception
             ShowStatusMessage("Error Loading Playlist")
-            App.WriteToLog("Error Importing Playlist from " & filename & vbCr & ex.Message)
+            Skye.Common.Log.Write("Error Importing Playlist from " & filename & vbCr & ex.Message)
         End Try
 
         format = Nothing
@@ -4665,10 +4665,10 @@ Public Class Player
         Try
             format.Export(filename, items)
             ShowStatusMessage("Playlist Successfully Saved")
-            App.WriteToLog("Exported Playlist to " & filename)
+            Skye.Common.Log.Write("Exported Playlist to " & filename)
         Catch ex As Exception
             ShowStatusMessage("Error Saving Playlist")
-            App.WriteToLog("Error Exporting Playlist to " & filename & vbCr & ex.Message)
+            Skye.Common.Log.Write("Error Exporting Playlist to " & filename & vbCr & ex.Message)
         End Try
 
         format = Nothing
@@ -4698,7 +4698,7 @@ Public Class Player
                 'Debug.Print("New Stream Added (" + newstream + ")")
             Else
                 'Debug.Print("Invalid Stream")
-                WriteToLog("Invalid Stream, New Stream Not Added")
+                Skye.Common.Log.Write("Invalid Stream, New Stream Not Added")
             End If
         Else
             'Debug.Print("Add Stream Cancelled")
@@ -4965,7 +4965,7 @@ Public Class Player
         Next
         Debug.Print("Playlist Pruned (" + prunelist.Count.ToString + ")")
         Debug.Print("Pruning Playlist Complete..." + LVPlaylist.Items.Count.ToString + " total playlist items.")
-        WriteToLog("Playlist Pruned (" + prunelist.Count.ToString + ")")
+        Skye.Common.Log.Write("Playlist Pruned (" + prunelist.Count.ToString + ")")
 
         prunelist = Nothing
         SetPlaylistCountText()
@@ -5088,7 +5088,7 @@ Public Class Player
             Queue.Remove(item)
         Next
         SetPlaylistCountText()
-        App.WriteToLog("Queue Pruned (" + count.ToString + ")")
+        Skye.Common.Log.Write("Queue Pruned (" + count.ToString + ")")
     End Sub
     Private Sub PlayQueued()
         If Queue.Count > 0 Then
@@ -5138,10 +5138,10 @@ Public Class Player
                 '''OnPlay()
                 TrackBarPosition.Enabled = False
                 TrackBarPosition.Value = 0
-                App.WriteToLog("Playing " + url + " (PlayStream)")
+                Skye.Common.Log.Write("Playing " + url + " (PlayStream)")
                 RandomHistoryAdd(url)
             Catch
-                App.WriteToLog("Cannot Play Stream, Invalid URL: " + url)
+                Skye.Common.Log.Write("Cannot Play Stream, Invalid URL: " + url)
             End Try
         End If
     End Sub
@@ -5155,10 +5155,10 @@ Public Class Player
                     LblPosition.Text = String.Empty
                     LblDuration.Text = String.Empty
                 End If
-                App.WriteToLog("Playing " + path + " (" + source + ")")
+                Skye.Common.Log.Write("Playing " + path + " (" + source + ")")
                 RandomHistoryAdd(path)
             Catch
-                App.WriteToLog("Cannot Play File, Invalid Path: " + path + " (" + source + ")")
+                Skye.Common.Log.Write("Cannot Play File, Invalid Path: " + path + " (" + source + ")")
             End Try
         End If
     End Sub
@@ -5611,7 +5611,7 @@ Public Class Player
                 End Using
             Catch ex As Exception
                 AlbumArt = Nothing
-                WriteToLog("Error loading album art for Companion Server: " & ex.Message)
+                Skye.Common.Log.Write("Error loading album art for Companion Server: " & ex.Message)
             End Try
         Else
             AlbumArt = Nothing
@@ -5644,7 +5644,7 @@ Public Class Player
                     tlfile = TagLib.File.Create(_player.Path)
                 End If
             Catch ex As Exception
-                WriteToLog("TagLib Error while Showing Media, Cannot read from file: " + _player.Path + Chr(13) + ex.Message)
+                Skye.Common.Log.Write("TagLib Error while Showing Media, Cannot read from file: " + _player.Path + Chr(13) + ex.Message)
                 tlfile = Nothing
             End Try
             If Lyrics AndAlso Not CurrentMediaType = App.MediaSourceTypes.Stream Then 'Show Lyrics
@@ -5700,7 +5700,7 @@ Public Class Player
                                     App.FrmMiniPlayer?.SetAlbumArt(img)
                                     PicBoxAlbumArt.Visible = True
                                 Catch ex As Exception
-                                    WriteToLog("Error Loading Album Art for " + _player.Path + vbCr + ex.Message)
+                                    Skye.Common.Log.Write("Error Loading Album Art for " + _player.Path + vbCr + ex.Message)
                                     PicBoxAlbumArt.Visible = False
                                     PicBoxAlbumArt.Image = Nothing
                                     App.FrmMiniPlayer?.SetAlbumArt(Nothing)
@@ -5797,7 +5797,7 @@ Public Class Player
                         PicBoxAlbumArt.Invalidate()
                     End Using
                 Catch ex As Exception
-                    WriteToLog("Error loading album art: " & ex.Message)
+                    Skye.Common.Log.Write("Error loading album art: " & ex.Message)
                     PicBoxAlbumArt.Visible = False
                     App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                 End Try
@@ -6017,7 +6017,7 @@ Public Class Player
 
                 Catch ex As Exception
                     artworkBase64 = String.Empty
-                    WriteToLog("Artwork encode error: " & ex.Message)
+                    Skye.Common.Log.Write("Artwork encode error: " & ex.Message)
                 End Try
             End If
 
@@ -6034,7 +6034,7 @@ Public Class Player
             })
 
         Catch ex As Exception
-            App.WriteToLog("BuildNowPlayingMessage Error: " & ex.Message)
+            Skye.Common.Log.Write("BuildNowPlayingMessage Error: " & ex.Message)
             Return "NOWPLAYING|ERROR"
         End Try
     End Function

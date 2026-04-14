@@ -66,7 +66,7 @@ Public Class Library
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            App.WriteToLog("About WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("About WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
@@ -509,7 +509,7 @@ Public Class Library
             Next
             App.FrmPlayer.LVPlaylist.EndUpdate()
             LblStatus.Visible = False
-            App.WriteToLog("Selected Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            Skye.Common.Log.Write("Selected Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
     End Sub
     Private Sub CMIAddAllToPlaylistClick(sender As Object, e As EventArgs) Handles CMIAddAllToPlaylist.Click
@@ -523,7 +523,7 @@ Public Class Library
         Next
         App.FrmPlayer.LVPlaylist.EndUpdate()
         LblStatus.Visible = False
-        App.WriteToLog("Full Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        Skye.Common.Log.Write("Full Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
     End Sub
     Private Sub CMIAddGroupToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddGroupToPlaylist.Click
         If LVLibrary.SelectedItems.Count > 0 Then
@@ -568,7 +568,7 @@ Public Class Library
             'Finalize
             App.FrmPlayer.LVPlaylist.EndUpdate()
             LblStatus.Visible = False
-            App.WriteToLog(LibraryGroupBy.ToString + " Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            Skye.Common.Log.Write(LibraryGroupBy.ToString + " Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
         End If
     End Sub
@@ -938,10 +938,10 @@ Public Class Library
         SetLibraryCountText()
         If Settings.WatcherUpdateLibrary Or Settings.WatcherUpdatePlaylist Then
             If paths.Count > 0 Then App.FrmPlayer.WatcherNotification = "Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs")
-            App.WriteToLog("Library Watcher Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs"))
+            Skye.Common.Log.Write("Library Watcher Update Complete: " & paths.Count.ToString & " " & If(paths.Count = 1, "Song", "Songs"))
         Else
             If paths.Count > 0 Then App.FrmPlayer.WatcherNotification = If(paths.Count = 1, "Song Update Available", "Song Updates Available: " & paths.Count.ToString)
-            App.WriteToLog("Library Watcher " & If(paths.Count = 1, "Update Available", "Updates Available: " & paths.Count.ToString))
+            Skye.Common.Log.Write("Library Watcher " & If(paths.Count = 1, "Update Available", "Updates Available: " & paths.Count.ToString))
         End If
         Debug.Print("Library Watcher Work Complete: " & paths.Count.ToString)
     End Sub
@@ -965,7 +965,7 @@ Public Class Library
             Try
                 tlfile = TagLib.File.Create(path)
             Catch ex As Exception
-                WriteToLog("TagLib Error while Creating Library Item, Cannot read from file: " + path + Chr(13) + ex.Message)
+                Skye.Common.Log.Write("TagLib Error while Creating Library Item, Cannot read from file: " + path + Chr(13) + ex.Message)
                 tlfile = Nothing
             End Try
             If tlfile Is Nothing Then
@@ -1040,7 +1040,7 @@ Public Class Library
                         files.AddRange(IO.Directory.GetFiles(folder, "*", IO.SearchOption.TopDirectoryOnly))
                     End If
                 Catch ex As Exception
-                    WriteToLog("Error while Searching Folder: " + folder + Chr(13) + ex.Message)
+                    Skye.Common.Log.Write("Error while Searching Folder: " + folder + Chr(13) + ex.Message)
                 End Try
                 For Each file As String In files
                     If ExtensionDictionary.ContainsKey(IO.Path.GetExtension(file).ToLower) Then
@@ -1056,7 +1056,7 @@ Public Class Library
             LblStatus.Visible = False
             ShowAlbumArt()
             SetLibraryCountText()
-            App.WriteToLog("Folders Searched (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            Skye.Common.Log.Write("Folders Searched (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         Else
             LVLibrary.Items.Clear()
             SetLibraryCountText()
@@ -1117,7 +1117,7 @@ Public Class Library
             writer = Nothing
             items.Clear()
             items = Nothing
-            App.WriteToLog("Library Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            Skye.Common.Log.Write("Library Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
     End Sub
     Private Sub LoadLibrary()
@@ -1165,14 +1165,14 @@ Public Class Library
             file.Dispose()
             reader = Nothing
             If items Is Nothing Then
-                App.WriteToLog("Library Not Loaded: File not valid (" + App.LibraryPath + ")")
+                Skye.Common.Log.Write("Library Not Loaded: File not valid (" + App.LibraryPath + ")")
             Else
                 items.Clear()
                 items = Nothing
-                App.WriteToLog("Library Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                Skye.Common.Log.Write("Library Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             End If
         Else
-            App.WriteToLog("Library Not Loaded: File does not exist")
+            Skye.Common.Log.Write("Library Not Loaded: File does not exist")
         End If
         SetLibraryCountText()
     End Sub
@@ -1182,7 +1182,7 @@ Public Class Library
             Try
                 tlfile = TagLib.File.Create(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
             Catch ex As Exception
-                WriteToLog("TagLib Error while Showing Album Art, Cannot read from file: " + LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text + Chr(13) + ex.Message)
+                Skye.Common.Log.Write("TagLib Error while Showing Album Art, Cannot read from file: " + LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text + Chr(13) + ex.Message)
                 tlfile = Nothing
             End Try
             If tlfile Is Nothing Then
@@ -1198,7 +1198,7 @@ Public Class Library
                         PicBoxAlbumArt.Image = Image.FromStream(ms)
                         PicBoxAlbumArt.Visible = True
                     Catch ex As Exception
-                        WriteToLog("Error Loading Album Art for " + LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text + vbCr + ex.Message)
+                        Skye.Common.Log.Write("Error Loading Album Art for " + LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text + vbCr + ex.Message)
                         PicBoxAlbumArt.Visible = False
                     End Try
                     ms.Dispose()
@@ -1366,7 +1366,7 @@ Public Class Library
 
         'Finalize
         LVLibrary.Visible = True
-        App.WriteToLog("Songs Grouped By " + LibraryGroupBy.ToString + " (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        Skye.Common.Log.Write("Songs Grouped By " + LibraryGroupBy.ToString + " (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
     End Sub
     Private Function GetLibraryGroupIndex(groupname As String) As Int16

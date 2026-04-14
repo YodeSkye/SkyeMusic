@@ -37,7 +37,7 @@ Public Class TagEditorOnline
                     End If
             End Select
         Catch ex As Exception
-            My.App.WriteToLog("TagEditorOnline WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("TagEditorOnline WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
@@ -190,9 +190,9 @@ Public Class TagEditorOnline
                             Case ".bmp"
                                 PicBoxArt.Image.Save(frmSave.GetFilename, ImageFormat.Bmp)
                         End Select
-                        App.WriteToLog("Saved online cover art to " + frmSave.GetFilename)
+                        Skye.Common.Log.Write("Saved online cover art to " + frmSave.GetFilename)
                     Catch ex As Exception
-                        App.WriteToLog("Error saving online cover art to " + frmSave.GetFilename + vbCr + ex.Message)
+                        Skye.Common.Log.Write("Error saving online cover art to " + frmSave.GetFilename + vbCr + ex.Message)
                     End Try
                 End If
             End If

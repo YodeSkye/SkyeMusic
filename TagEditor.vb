@@ -55,7 +55,7 @@ Public Class TagEditor
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            App.WriteToLog("TagEditor WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("TagEditor WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
@@ -440,7 +440,7 @@ Public Class TagEditor
                     End If
                 Catch ex As Exception
                     TipInfo.HideTooltip()
-                    App.WriteToLog("Tag Editor Error Loading Image From File: " & ex.Message)
+                    Skye.Common.Log.Write("Tag Editor Error Loading Image From File: " & ex.Message)
                     TipStatus.ShowTooltipAtCursor("Error loading image from file.", SystemIcons.Error.ToBitmap)
                 End Try
             End If
@@ -511,7 +511,7 @@ Public Class TagEditor
                                 End Using
                                 TipStatus.ShowTooltipAtCursor("Image Exported Successfully", SystemIcons.Information.ToBitmap)
                             Catch ex As Exception
-                                App.WriteToLog("Tag Editor Error Exporting Artwork Image: " & ex.Message)
+                                Skye.Common.Log.Write("Tag Editor Error Exporting Artwork Image: " & ex.Message)
                                 TipStatus.ShowTooltipAtCursor("Error Exporting Image", SystemIcons.Error.ToBitmap)
                             End Try
                         End If
@@ -588,7 +588,7 @@ Public Class TagEditor
                             addedCount += 1
                         End Using
                     Catch ex As Exception
-                        WriteToLog("Tag Editor Error loading image from drag and drop: " & file & vbCrLf & ex.Message)
+                        Skye.Common.Log.Write("Tag Editor Error loading image from drag and drop: " & file & vbCrLf & ex.Message)
                     End Try
                 End If
             Next
@@ -640,7 +640,7 @@ Public Class TagEditor
                 Try
                     tlfile = TagLib.File.Create(path)
                 Catch ex As Exception
-                    WriteToLog("TagLib Error while Editing Tag, Cannot read from file: " + path + Chr(13) + ex.Message)
+                    Skye.Common.Log.Write("TagLib Error while Editing Tag, Cannot read from file: " + path + Chr(13) + ex.Message)
                     removelist.Add(path)
                     tlfile = Nothing
                 End Try
@@ -874,13 +874,13 @@ Public Class TagEditor
                 savedCount += 1
             Catch ioEx As IO.IOException ' File is locked or in use
                 failedPaths.Add(path)
-                WriteToLog("File In Use, Cannot Save Tag: " & path & vbCrLf & ioEx.Message)
+                Skye.Common.Log.Write("File In Use, Cannot Save Tag: " & path & vbCrLf & ioEx.Message)
             Catch unauthEx As UnauthorizedAccessException ' No permission or locked
                 failedPaths.Add(path)
-                WriteToLog("Access Denied While Saving Tag: " & path & vbCrLf & unauthEx.Message)
+                Skye.Common.Log.Write("Access Denied While Saving Tag: " & path & vbCrLf & unauthEx.Message)
             Catch ex As Exception ' Generic fallback
                 failedPaths.Add(path)
-                WriteToLog("TagLib Error While Saving Tag, Cannot Write To File: " & path & vbCrLf & ex.Message)
+                Skye.Common.Log.Write("TagLib Error While Saving Tag, Cannot Write To File: " & path & vbCrLf & ex.Message)
             End Try
         Next
 
@@ -1036,7 +1036,7 @@ Public Class TagEditor
                     End If
                 End Using
             Catch ex As Exception
-                WriteToLog("TagLib Error while reading pictures in AggregatePictures: " & path & vbCrLf & ex.Message)
+                Skye.Common.Log.Write("TagLib Error while reading pictures in AggregatePictures: " & path & vbCrLf & ex.Message)
             End Try
         Next
 

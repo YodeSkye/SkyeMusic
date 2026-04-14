@@ -17,7 +17,7 @@ Public Class Log
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            App.WriteToLog("Log WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("Log WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
@@ -90,7 +90,7 @@ Public Class Log
         RTBCMLog.ShortcutKeys(CType(sender, RichTextBox), e)
     End Sub
     Private Sub LBLLogInfo_DoubleClick(sender As Object, e As EventArgs) Handles LBLLogInfo.DoubleClick
-        App.OpenFileLocation(App.LogPath)
+        App.OpenFileLocation(Skye.Common.Log.LogFilePath)
     End Sub
     Private Sub BTNOK_Click(sender As Object, e As EventArgs) Handles BTNOK.Click
         Close()

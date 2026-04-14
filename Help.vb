@@ -14,7 +14,7 @@ Public Class Help
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            App.WriteToLog("Help WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("Help WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try

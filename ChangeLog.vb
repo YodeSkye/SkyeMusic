@@ -13,7 +13,7 @@ Public Class ChangeLog
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            App.WriteToLog("ChangeLog WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("ChangeLog WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try

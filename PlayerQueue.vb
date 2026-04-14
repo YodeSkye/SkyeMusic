@@ -16,7 +16,7 @@ Public Class PlayerQueue
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            My.App.WriteToLog("Queue WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("Queue WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
@@ -180,7 +180,7 @@ Public Class PlayerQueue
                 If Computer.FileSystem.FileExists(s) AndAlso App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(s)) Then files.Add(s)
             Next
             If files.Count > 0 Then
-                WriteToLog("Queue Drag&Drop Performed (" + files.Count.ToString + " " + IIf(files.Count = 1, "File", "Files").ToString + ")")
+                Skye.Common.Log.Write("Queue Drag&Drop Performed (" + files.Count.ToString + " " + IIf(files.Count = 1, "File", "Files").ToString + ")")
                 Dim lvi As ListViewItem
                 Dim clientpoint = LVQueue.PointToClient(New System.Drawing.Point(e.X, e.Y))
                 Dim itemover = LVQueue.GetItemAt(clientpoint.X, clientpoint.Y)

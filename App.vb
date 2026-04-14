@@ -237,7 +237,6 @@ Namespace My
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
         Friend ReadOnly Http As New HttpClient()
         Friend DirectoryLastSelectedSource As Integer = -1 'DirectoryLastSelectedSource stores the last selected source in the Directory form.
-        Friend Property CompanionServerRunning As Boolean = False 'CompanionServerRunning is a flag that indicates whether the companion server is currently running.
 
         ' Forms & Tray
         Friend FrmPlayer As Player 'FmrPlayer is the main player window that provides advanced playback controls and displays detailed information about the currently playing media.
@@ -285,7 +284,7 @@ Namespace My
         ' Paths
         Friend ReadOnly UserPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" 'UserPath is the base path for user-specific files.
 #If DEBUG Then
-        Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt" 'LogPath is the path to the log file.
+        'Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt" 'LogPath is the path to the log file.
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName + "DEV" 'RegPath is the path to the registry key where application settings are stored.
         Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
@@ -294,7 +293,7 @@ Namespace My
         Friend ReadOnly DirectoryFavoritesPath As String = UserPath + My.Application.Info.ProductName + "DirectoryFavoritesDEV.json" 'DirectoryFavoritesPath is the path to the Directory Favorites JSON file.
         Friend ReadOnly DownloadPath As String = UserPath + "DownloadsDEV\" 'DownloadPath is the path to the Downloads folder.
 #Else
-        Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "Log.txt" 'LogPath is the path to the log file.
+        'Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "Log.txt" 'LogPath is the path to the log file.
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName 'RegPath is the path to the registry key where application settings are stored.
         Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
@@ -805,6 +804,7 @@ Namespace My
         Friend ParticleNebulaActivePalette As ParticleNebulaPalette = ParticleNebulaGetPalette(ParticleNebulaPalettePresets.Cosmic)
 
         ' Companion Server
+        Friend Property CompanionServerRunning As Boolean = False 'CompanionServerRunning is a flag that indicates whether the companion server is currently running.
         Friend Class CompanionControlServerClass
 
             Private ReadOnly _player As Player
@@ -834,11 +834,11 @@ Namespace My
                     Task.Run(AddressOf ListenLoop)
                     Return True
                 Catch ex As SocketException When ex.SocketErrorCode = SocketError.AddressAlreadyInUse
-                    App.WriteToLog("Companion Server Failed to Start: Port " & port & " already in use.")
+                    Skye.Common.Log.Write("Companion Server Failed to Start: Port " & port & " already in use.")
                     _running = False
                     Return False
                 Catch ex As Exception
-                    App.WriteToLog("Companion Server Failed to Start: " & ex.Message)
+                    Skye.Common.Log.Write("Companion Server Failed to Start: " & ex.Message)
                     _running = False
                     Return False
                 End Try
@@ -878,7 +878,7 @@ Namespace My
                     Catch ex As Exception
                         If Not _running Then Exit While
                         If ex.Message.Contains("The I/O operation has been aborted") Then Continue While ' Normal shutdown exception thrown when TcpListener.Stop() aborts the pending Accept call. This is expected behavior and not an error, so we ignore it.
-                        App.WriteToLog("Companion Server Listener Error: " & ex.Message)
+                        Skye.Common.Log.Write("Companion Server Listener Error: " & ex.Message)
                     End Try
                 End While
             End Function
@@ -1386,9 +1386,9 @@ Namespace My
                     RegSubKey.Dispose()
                     RegKey.Close()
                     RegKey.Dispose()
-                    App.WriteToLog("Options Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                    Skye.Common.Log.Write("Options Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
                 Catch ex As Exception
-                    WriteToLog("Error Loading Options" + vbCr + ex.Message)
+                    Skye.Common.Log.Write("Error Loading Options" + vbCr + ex.Message)
                 End Try
             End Sub
             Friend Shared Sub LoadDebug()
@@ -1542,9 +1542,9 @@ Namespace My
                     RegSubKey.Dispose()
                     RegKey.Close()
                     RegKey.Dispose()
-                    App.WriteToLog("Options Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                    Skye.Common.Log.Write("Options Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
                 Catch ex As Exception
-                    WriteToLog("Error Saving Options" + vbCr + ex.Message)
+                    Skye.Common.Log.Write("Error Saving Options" + vbCr + ex.Message)
                 End Try
             End Sub
 
@@ -1874,27 +1874,27 @@ Namespace My
             Public Shared Function Import(path As String) As List(Of PlaylistItemType)
                 Dim fmt = Formats.FirstOrDefault(Function(f) path.EndsWith(f.FileExtension, StringComparison.OrdinalIgnoreCase))
                 If fmt Is Nothing Then
-                    WriteToLog("Playlist Import: Unknown Playlist Format")
+                    Skye.Common.Log.Write("Playlist Import: Unknown Playlist Format")
                     Return New List(Of PlaylistItemType)
                 End If
                 Try
                     Return fmt.Import(path)
                 Catch ex As Exception
-                    WriteToLog($"{fmt.Name} Import Failed ({If(String.IsNullOrEmpty(path), "<no path provided>", path)}): {ex.Message}")
+                    Skye.Common.Log.Write($"{fmt.Name} Import Failed ({If(String.IsNullOrEmpty(path), "<no path provided>", path)}): {ex.Message}")
                     Return New List(Of PlaylistItemType)
                 End Try
             End Function
             Public Shared Function Export(path As String, items As IEnumerable(Of PlaylistItemType)) As Boolean
                 Dim fmt = Formats.FirstOrDefault(Function(f) path.EndsWith(f.FileExtension, StringComparison.OrdinalIgnoreCase))
                 If fmt Is Nothing Then
-                    WriteToLog("Playlist Export: Unknown Playlist Format")
+                    Skye.Common.Log.Write("Playlist Export: Unknown Playlist Format")
                     Return False
                 End If
                 Try
                     fmt.Export(path, items)
                     Return True
                 Catch ex As Exception
-                    WriteToLog($"{fmt.Name} Export Failed ({If(String.IsNullOrEmpty(path), "<no path provided>", path)}): {ex.Message}")
+                    Skye.Common.Log.Write($"{fmt.Name} Export Failed ({If(String.IsNullOrEmpty(path), "<no path provided>", path)}): {ex.Message}")
                     Return False
                 End Try
             End Function
@@ -2240,14 +2240,14 @@ Namespace My
                     If Not ScreenSaverActive Then
                         ScreenSaverActive = True
                         Debug.Print("ScreenSaver Activated @ " + Now.ToString)
-                        WriteToLog("ScreenSaver Activated @ " + Now.ToString)
+                        Skye.Common.Log.Write("ScreenSaver Activated @ " + Now.ToString)
                         SessionSuspended()
                     End If
                 Case False
                     If ScreenSaverActive Then
                         ScreenSaverActive = False
                         Debug.Print("ScreenSaver Deactivated @ " + Now.ToString)
-                        WriteToLog("ScreenSaver Deactivated @ " + Now.ToString)
+                        Skye.Common.Log.Write("ScreenSaver Deactivated @ " + Now.ToString)
                     End If
             End Select
         End Sub
@@ -2256,12 +2256,12 @@ Namespace My
                 Case Microsoft.Win32.SessionSwitchReason.SessionLock
                     ScreenLocked = True
                     Debug.Print("Screen Locked @ " & Now)
-                    WriteToLog("Screen Locked @ " & Now)
+                    Skye.Common.Log.Write("Screen Locked @ " & Now)
                     SessionSuspended()
                 Case Microsoft.Win32.SessionSwitchReason.SessionUnlock
                     ScreenLocked = False
                     Debug.Print("Screen Unlocked @ " & Now)
-                    WriteToLog("Screen Unlocked @ " & Now)
+                    Skye.Common.Log.Write("Screen Unlocked @ " & Now)
             End Select
         End Sub
         Private Sub Watcher_Created(sender As Object, e As FileSystemEventArgs)
@@ -2403,7 +2403,7 @@ Namespace My
             Next
             Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
             Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
-            WriteToLog("History Pruned (" + prunelist.Count.ToString + ")")
+            Skye.Common.Log.Write("History Pruned (" + prunelist.Count.ToString + ")")
             streamlist = Nothing
             prunelist = Nothing
         End Sub
@@ -2429,7 +2429,7 @@ Namespace My
                 existingsong.LastPlayed = DateTime.Now
                 History(existingindex) = existingsong
                 'Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
-                WriteToLog("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
+                Skye.Common.Log.Write("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
                 FrmPlayer.UpdateHistoryInPlaylist(songorstream)
             Else
                 'Debug.Print("Song not found in history: " + songorstream)
@@ -2505,7 +2505,7 @@ Namespace My
         End Sub
         Friend Sub LogPlayHistory(path As String, startTime As DateTime, stopTime As DateTime, durationSeconds As Integer, trigger As PlayTriggers)
             Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            If durationSeconds < 0 Then WriteToLog("LogPlayHistory Duration was less than zero (" & durationSeconds.ToString & "), for " & path)
+            If durationSeconds < 0 Then Skye.Common.Log.Write("LogPlayHistory Duration was less than zero (" & durationSeconds.ToString & "), for " & path)
             If durationSeconds <= 0 Then durationSeconds = CInt((stopTime - startTime).TotalSeconds)
             Dim insertSql As String = "INSERT INTO Plays (Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger) VALUES (@Path, @Start, @Stop, @Duration, @Trigger);"
 
@@ -2652,7 +2652,7 @@ Namespace My
                 ' Start Companion Server
                 If CompanionControlServer.Start(Settings.CompanionServerPort) Then
                     Debug.Print("<< COMPANION SERVER STARTED >>")
-                    WriteToLog("Companion Server Started on Port " & Settings.CompanionServerPort)
+                    Skye.Common.Log.Write("Companion Server Started on Port " & Settings.CompanionServerPort)
                     CompanionServerRunning = True
                 Else
                     Debug.Print("<< COMPANION SERVER FAILED TO START >>")
@@ -2663,7 +2663,7 @@ Namespace My
                 If CompanionServerRunning Then
                     CompanionControlServer.Stop()
                     Debug.Print("<< COMPANION SERVER STOPPED >>")
-                    WriteToLog("Companion Server Stopped")
+                    Skye.Common.Log.Write("Companion Server Stopped")
                     CompanionServerRunning = False
                 End If
             End If
@@ -2673,7 +2673,7 @@ Namespace My
             Try
                 If CompanionServerRunning Then CompanionControlServer.Broadcast(FrmPlayer.BuildNowPlayingMessage())
             Catch ex As Exception
-                WriteToLog("BroadcastNowPlaying Error: " & ex.Message)
+                Skye.Common.Log.Write("BroadcastNowPlaying Error: " & ex.Message)
             End Try
         End Sub
         Public Function GetServerIPv4() As String
@@ -2691,21 +2691,21 @@ Namespace My
 
         'Methods
         Friend Sub InitializePreStartup()
-            WriteToLog(My.Application.Info.ProductName + " Started")
+#If DEBUG Then
+            Skye.Common.Log.Initialize(My.Application.Info.ProductName + "DEV") ' Use separate log file for debug builds to prevent debug logs from being mixed with release logs
+            Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName + "DEV" ' Use separate registry key for debug builds
+#Else
+            Skye.Common.Log.Initialize(My.Application.Info.ProductName) ' Use standard log file for release builds
+            Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName ' Use standard registry key for release builds
+#End If
+            Skye.Common.Log.Write(My.Application.Info.ProductName + " Started")
 
-            Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
-            LicenseKey.RegisterSyncfusionLicense()
-            LibVLCSharp.Shared.Core.Initialize() 'Initialize LibVLCSharp
-            Http.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic/1.0")
+            Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) ' Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
+            LicenseKey.RegisterSyncfusionLicense() ' Register Syncfusion License, required to use Syncfusion controls, which are used in the Player form for the SeekBar.
+            LibVLCSharp.Shared.Core.Initialize() ' Initialize LibVLCSharp, required to use the LibVLCSharp library for music playback.
+            Http.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic/1.0") ' Set default User-Agent for HttpClient, used for fetching metadata from online sources, and for the Companion Server API.
 
             'Initialize SkyeLibrary RegistryHelper
-#If DEBUG Then
-            Skye.Common.Log.Initialize(My.Application.Info.ProductName + "DEV")
-            Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName + "DEV" 'Use separate registry key for debug builds
-#Else
-            Skye.Common.Log.Initialize(My.Application.Info.ProductName)
-            Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName 'Use standard registry key for release builds
-#End If
 
             Settings.Load()
             Settings.LoadDebug()
@@ -2868,7 +2868,7 @@ Namespace My
             SaveHistory()
             Settings.Save()
             SetWatchers(True) 'Dispose watchers
-            My.App.WriteToLog(My.Application.Info.ProductName + " Closed")
+            Skye.Common.Log.Write(My.Application.Info.ProductName + " Closed")
         End Sub
         Friend Sub CheckForUpdatesIfNeeded()
             Dim last = Settings.LastUpdateCheck.Date
@@ -2908,7 +2908,7 @@ Namespace My
                 End Using
 
                 Debug.Print("History Saved")
-                App.WriteToLog("History Saved (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
+                Skye.Common.Log.Write("History Saved (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
             End If
         End Sub
         Private Sub LoadHistory()
@@ -2942,9 +2942,9 @@ Namespace My
                             Case Else
                                 History = If(data.History, New List(Of Song))
                                 HistoryTotalPlayedSongs = data.TotalPlayedSongs
-                                App.WriteToLog("Loaded Schema version " & data.SchemaVersion & " (Unknown, Using defaults For New fields)")
+                                Skye.Common.Log.Write("Loaded Schema version " & data.SchemaVersion & " (Unknown, Using defaults For New fields)")
                         End Select
-                        App.WriteToLog("History Loaded (Schema v" & data.SchemaVersion & ") (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
+                        Skye.Common.Log.Write("History Loaded (Schema v" & data.SchemaVersion & ") (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
                         Exit Sub
                     Catch
                         'Fall back to old format (just a List(Of Song))
@@ -2957,17 +2957,17 @@ Namespace My
                     Try
                         History = DirectCast(listReader.Deserialize(file), List(Of Song))
                         HistoryTotalPlayedSongs = 0
-                        App.WriteToLog("History Loaded (Legacy Format) (" &
+                        Skye.Common.Log.Write("History Loaded (Legacy Format) (" &
                                Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
                     Catch
                         History = New List(Of Song)
                         HistoryTotalPlayedSongs = 0
-                        App.WriteToLog("History Not Loaded: File not valid (" & HistoryPath & ")")
+                        Skye.Common.Log.Write("History Not Loaded: File not valid (" & HistoryPath & ")")
                     End Try
                 End Using
 
             Else
-                App.WriteToLog("History Not Loaded: File does not exist")
+                Skye.Common.Log.Write("History Not Loaded: File does not exist")
                 History = New List(Of Song)
                 HistoryTotalPlayedSongs = 0
             End If
@@ -2985,7 +2985,7 @@ Namespace My
                 If Not key.Key = Keys.None Then
                     status = Skye.WinAPI.RegisterHotKey(FrmPlayer.Handle, key.WinID, key.KeyMod, key.KeyCode)
                     'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
-                    WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
+                    Skye.Common.Log.Write("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
                 End If
             Next
         End Sub
@@ -2995,7 +2995,7 @@ Namespace My
                 If Not key.Key = Keys.None Then
                     status = Skye.WinAPI.UnregisterHotKey(FrmPlayer.Handle, key.WinID)
                     'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
-                    WriteToLog("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
+                    Skye.Common.Log.Write("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
                 End If
             Next
         End Sub
@@ -3014,24 +3014,24 @@ Namespace My
         Private Sub SessionSuspended() 'SessionSuspended is called when the screensaver is activated or the screen is locked.
             If ScreenLocked OrElse ScreenSaverActive Then FrmPlayer.Suspend()
         End Sub
-        Friend Sub WriteToLog(logtext As String)
-            Static fInfo As IO.FileInfo
-            Try
-                fInfo = New IO.FileInfo(LogPath)
-                If fInfo.Exists AndAlso fInfo.Length >= 1000000 Then IO.File.Move(LogPath, LogPath.Insert(LogPath.Length - 4, "Backup@" + My.Computer.Clock.LocalTime.ToString("yyyyMMdd") + "@" + My.Computer.Clock.LocalTime.ToString("HHmmss")))
-                'IO.File.AppendAllText(LogPath, IIf(String.IsNullOrEmpty(logtext), String.Empty, My.Computer.Clock.LocalTime.ToString("yyyy/MM/dd") + " @ " + My.Computer.Clock.LocalTime.ToString("HH:mm:ss") + " --> " + logtext + Chr(13)).ToString)
-                If Not String.IsNullOrEmpty(logtext) Then IO.File.AppendAllText(LogPath, My.Computer.Clock.LocalTime.ToString("yyyy/MM/dd") + " @ " + My.Computer.Clock.LocalTime.ToString("HH:mm:ss") + " --> " + logtext + Chr(13))
-            Catch
-            Finally : fInfo = Nothing
-            End Try
-        End Sub
+        'Friend Sub Skye.Common.Log.Write(logtext As String)
+        '    Static fInfo As IO.FileInfo
+        '    Try
+        '        fInfo = New IO.FileInfo(LogPath)
+        '        If fInfo.Exists AndAlso fInfo.Length >= 1000000 Then IO.File.Move(LogPath, LogPath.Insert(LogPath.Length - 4, "Backup@" + My.Computer.Clock.LocalTime.ToString("yyyyMMdd") + "@" + My.Computer.Clock.LocalTime.ToString("HHmmss")))
+        '        'IO.File.AppendAllText(LogPath, IIf(String.IsNullOrEmpty(logtext), String.Empty, My.Computer.Clock.LocalTime.ToString("yyyy/MM/dd") + " @ " + My.Computer.Clock.LocalTime.ToString("HH:mm:ss") + " --> " + logtext + Chr(13)).ToString)
+        '        If Not String.IsNullOrEmpty(logtext) Then IO.File.AppendAllText(LogPath, My.Computer.Clock.LocalTime.ToString("yyyy/MM/dd") + " @ " + My.Computer.Clock.LocalTime.ToString("HH:mm:ss") + " --> " + logtext + Chr(13))
+        '    Catch
+        '    Finally : fInfo = Nothing
+        '    End Try
+        'End Sub
         Friend Sub SetWatchers(Optional forcestop As Boolean = False)
 
             'Clear existing watchers
             For Each watcher In Watchers
                 watcher.EnableRaisingEvents = False
                 watcher.Dispose()
-                App.WriteToLog("Watcher Stopped: " & watcher.Path)
+                Skye.Common.Log.Write("Watcher Stopped: " & watcher.Path)
                 Debug.WriteLine("Watcher Stopped: " & watcher.Path)
             Next
             Watchers.Clear()
@@ -3048,7 +3048,7 @@ Namespace My
                     AddHandler watcher.Changed, AddressOf Watcher_Changed
                     Watchers.Add(watcher)
                     watcher.EnableRaisingEvents = True
-                    App.WriteToLog("Watching Folder: " & folder)
+                    Skye.Common.Log.Write("Watching Folder: " & folder)
                     Debug.WriteLine("Watching Folder: " & folder)
                 Next
             End If
@@ -3198,12 +3198,12 @@ Namespace My
             Dim lines As Integer = 0
             FrmLog.RTBLog.Clear()
             Try
-                logtext = IO.File.ReadAllText(LogPath)
+                logtext = IO.File.ReadAllText(Skye.Common.Log.LogFilePath)
             Catch
             Finally
             End Try
             FrmLog.RTBLog.AppendText(logtext)
-            FrmLog.LBLLogInfo.Text = LogPath
+            FrmLog.LBLLogInfo.Text = Skye.Common.Log.LogFilePath
             If FrmLog.RTBLog.Lines.Count > 0 AndAlso FrmLog.RTBLog.Lines(0).Length > 0 Then lines = FrmLog.RTBLog.GetLineFromCharIndex(FrmLog.RTBLog.Text.Length)
             FrmLog.LBLLogInfo.Text += " (" + lines.ToString + IIf(lines = 1, " Line", " Lines").ToString + ")"
             If lines > 0 Then
@@ -3216,7 +3216,8 @@ Namespace My
             FrmLog.BTNOK.Select()
         End Sub
         Friend Sub DeleteLog()
-            If IO.File.Exists(LogPath) Then IO.File.Delete(LogPath)
+            'If IO.File.Exists(Skye.Common.Log.LogFilePath) Then IO.File.Delete(Skye.Common.Log.LogFilePath)
+            Skye.Common.Log.Clear()
             ShowLog(True)
         End Sub
         Friend Sub ShowAbout(Optional showcentered As Boolean = False)
@@ -3285,9 +3286,9 @@ Namespace My
                     Try
                         Diagnostics.Process.Start(pInfo)
                         Dim fileList As String = If(existingFiles.Count = 1, existingFiles(0), existingFiles.Count.ToString + " files")
-                        WriteToLog(Settings.HelperApp1Name + " Opened (" + fileList + ")")
+                        Skye.Common.Log.Write(Settings.HelperApp1Name + " Opened (" + fileList + ")")
                     Catch ex As Exception
-                        WriteToLog("Cannot Open " + Settings.HelperApp1Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
+                        Skye.Common.Log.Write("Cannot Open " + Settings.HelperApp1Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
                     End Try
                 End If
             End If
@@ -3311,9 +3312,9 @@ Namespace My
                     Try
                         Diagnostics.Process.Start(pInfo)
                         Dim fileList As String = If(existingFiles.Count = 1, existingFiles(0), existingFiles.Count.ToString + " files")
-                        WriteToLog(Settings.HelperApp2Name + " Opened (" + fileList + ")")
+                        Skye.Common.Log.Write(Settings.HelperApp2Name + " Opened (" + fileList + ")")
                     Catch ex As Exception
-                        WriteToLog("Cannot Open " + Settings.HelperApp2Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
+                        Skye.Common.Log.Write("Cannot Open " + Settings.HelperApp2Name + " (" + pInfo.FileName + " " + pInfo.Arguments + ")" + vbCr + ex.Message)
                     End Try
                 End If
             End If
@@ -3323,9 +3324,9 @@ Namespace My
                 .Arguments = "/SELECT," + """" + filename + """"}
             Try
                 Process.Start(psi)
-                WriteToLog("File Location Opened (" + filename + ")")
+                Skye.Common.Log.Write("File Location Opened (" + filename + ")")
             Catch ex As Exception
-                WriteToLog("Error Opening File Location (" + filename + ")" + vbCr + ex.Message)
+                Skye.Common.Log.Write("Error Opening File Location (" + filename + ")" + vbCr + ex.Message)
             End Try
         End Sub
         Friend Sub PlayWithWindows(filename As String)
@@ -3336,9 +3337,9 @@ Namespace My
                         .FileName = filename}
                     Try
                         Diagnostics.Process.Start(pInfo)
-                        WriteToLog("Played In Windows (" + filename + ")")
+                        Skye.Common.Log.Write("Played In Windows (" + filename + ")")
                     Catch ex As Exception
-                        WriteToLog("Cannot Play In Windows (" + pInfo.FileName + ")" + vbCr + ex.Message)
+                        Skye.Common.Log.Write("Cannot Play In Windows (" + pInfo.FileName + ")" + vbCr + ex.Message)
                     End Try
                 End If
             End If
@@ -3350,7 +3351,7 @@ Namespace My
                 Try
                     tlfile = TagLib.File.Create(filePath)
                 Catch ex As Exception
-                    WriteToLog("TagLib Error while Formatting Playlist Title, Cannot read from file: " + filePath + Chr(13) + ex.Message)
+                    Skye.Common.Log.Write("TagLib Error while Formatting Playlist Title, Cannot read from file: " + filePath + Chr(13) + ex.Message)
                     tlfile = Nothing
                 End Try
             End If

@@ -20,7 +20,7 @@ Public Class InputDialog
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            My.App.WriteToLog("EditTitle WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("EditTitle WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try

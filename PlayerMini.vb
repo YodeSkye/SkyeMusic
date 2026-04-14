@@ -20,7 +20,7 @@ Public Class PlayerMini
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            App.WriteToLog("MiniPlayer WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("MiniPlayer WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try

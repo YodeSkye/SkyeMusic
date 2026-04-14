@@ -22,7 +22,7 @@ Public Class TagEditorOnlineSave
                     End If
             End Select
         Catch ex As Exception
-            My.App.WriteToLog("TagEditorOnlineSave WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("TagEditorOnlineSave WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try

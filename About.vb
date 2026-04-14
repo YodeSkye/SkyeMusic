@@ -13,7 +13,7 @@ Public Class About
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            App.WriteToLog("About WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("About WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
@@ -92,7 +92,7 @@ Public Class About
                 .UseShellExecute = True
             })
         Catch ex As Exception
-            WriteToLog("Cannot Open Update Link" & vbCr & ex.Message)
+            Skye.Common.Log.Write("Cannot Open Update Link" & vbCr & ex.Message)
         End Try
     End Sub
     Private Sub LLblSkyeMusic_MouseEnter(sender As Object, e As EventArgs) Handles LLblSkyeMusic.MouseEnter
@@ -197,7 +197,7 @@ Public Class About
         Try
             Diagnostics.Process.Start(pInfo)
         Catch ex As Exception
-            WriteToLog("Cannot Open " & target & vbCr & ex.Message)
+            Skye.Common.Log.Write("Cannot Open " & target & vbCr & ex.Message)
         End Try
     End Sub
     Private Sub ShowUpdateLabelIfNeeded(latest As String)

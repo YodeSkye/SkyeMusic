@@ -18,7 +18,7 @@ Public Class PlayerAddStream
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            My.App.WriteToLog("AddStream WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("AddStream WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try

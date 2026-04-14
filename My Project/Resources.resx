@@ -626,7 +626,7 @@ Skye Music v0.8\par
 \cf2\b Improvements\par
 \cf0\b0\f4\u10003?\f0  History saving upgraded with Schema versioning for easier future updates, while maintaining backward compatibility.\par
 \f4\u10003?\f0  Centralized Import Logic. Shared method now powers both dialog and drag &amp; drop workflows.\par
-\f4\u10003?\f0  Cleaner Diagnostics. WriteToLog now tracks media vs playlist drops.\par
+\f4\u10003?\f0  Cleaner Diagnostics. Skye.Common.Log.Write now tracks media vs playlist drops.\par
 \f4\u10003?\f0  Laid the foundation for transition to VLC Media Player as the media engine for Skye Music.\par
 \par
 \cf2\b Fixes\par

@@ -31,7 +31,7 @@ Public Class Directory
                     SetAccentColor()
             End Select
         Catch ex As Exception
-            App.WriteToLog("Help WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("Help WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
@@ -926,7 +926,7 @@ Public Class Directory
                 Next
 
             Catch ex As Exception
-                App.WriteToLog("Playlist explode failed: " & ex.ToString())
+                Skye.Common.Log.Write("Playlist explode failed: " & ex.ToString())
             End Try
         Next
 
@@ -1218,7 +1218,7 @@ Public Class Directory
             End If
         Catch
             Favorites = New List(Of FavoriteEntry)
-            WriteToLog("Failed to load Directory Favorites.")
+            Skye.Common.Log.Write("Failed to load Directory Favorites.")
         End Try
 
         ' --- AUTOCLEAN ---
@@ -1240,7 +1240,7 @@ Public Class Directory
             Dim json = JsonConvert.SerializeObject(Favorites, Formatting.Indented)
             IO.File.WriteAllText(DirectoryFavoritesPath, json)
         Catch
-            WriteToLog("Failed to save Directory Favorites.")
+            Skye.Common.Log.Write("Failed to save Directory Favorites.")
         End Try
     End Sub
     Private Function AddFavorite(fav As FavoriteEntry) As Boolean
@@ -1509,7 +1509,7 @@ Public Class Directory
                 Dim json = Await App.Http.GetStringAsync("https://api.somafm.com/channels.json")
                 Return ParseStations(json)
             Catch ex As Exception
-                App.WriteToLog("SomaFM Error: " & ex.ToString())
+                Skye.Common.Log.Write("SomaFM Error: " & ex.ToString())
                 Return New List(Of StreamEntry)
             End Try
         End Function
@@ -1807,7 +1807,7 @@ Public Class Directory
 
         Catch ex As Exception
             StatusProgressBar.Visible = False
-            App.WriteToLog("Podcast Episode Download Error:" & vbCrLf & ex.ToString())
+            Skye.Common.Log.Write("Podcast Episode Download Error:" & vbCrLf & ex.ToString())
             Return Nothing
         End Try
     End Function
@@ -1842,7 +1842,7 @@ Public Class Directory
             Catch ex As HttpRequestException When ex.Message.Contains("No such host")
                 ' Artwork host is invalid; ignore
             Catch ex As Exception
-                App.WriteToLog("Podcast Artwork Download Error: " & vbCr & ex.ToString())
+                Skye.Common.Log.Write("Podcast Artwork Download Error: " & vbCr & ex.ToString())
             End Try
         End If
         ILPodcasts.Images.Clear()

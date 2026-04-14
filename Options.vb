@@ -19,7 +19,7 @@ Public Class Options
                     ApplyAccentForCurrentVisualizerSettingsPanel()
             End Select
         Catch ex As Exception
-            App.WriteToLog("Options WndProc Handler Error" + Chr(13) + ex.ToString)
+            Skye.Common.Log.Write("Options WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
             MyBase.WndProc(m)
         End Try
