@@ -22,6 +22,7 @@ Public Class Player
     End Enum
     Private MeterAudioCapture As WasapiLoopbackCapture 'Audio Capture for Meters
     Private MeterPeakLeft, MeterPeakRight, MeterDecayLeft, MeterDecayRight As Single 'Meter Values
+    Private MeterLastUpdate As DateTime = DateTime.MinValue
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
@@ -2713,9 +2714,10 @@ Public Class Player
         _player.Volume = 100
 
         ' For Meters
-        MeterAudioCapture = New WasapiLoopbackCapture()
-        AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
-        MeterAudioCapture.StartRecording()
+        RestartMeterCapture()
+        'MeterAudioCapture = New WasapiLoopbackCapture()
+        'AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
+        'MeterAudioCapture.StartRecording()
 
         ' For Visualizers
         VisualizerHost = New VisualizerHostClass(Me, PanelVisualizer)
@@ -4062,6 +4064,7 @@ Public Class Player
         ' Let fullscreen collapse naturally — cleanup happens safely elsewhere, in OnPlaybackStarted.
     End Sub
     Private Sub OnMeterDataAvailable(sender As Object, e As WaveInEventArgs)
+        MeterLastUpdate = DateTime.Now
         Dim wf = MeterAudioCapture.WaveFormat
         Dim channels As Integer = wf.Channels
         If channels <> 2 Then
@@ -4146,6 +4149,11 @@ Public Class Player
 
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
+        If (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 500 Then
+            Skye.Common.Log.Write("Audio Meter Data Stale, Resetting Peaks")
+            RestartMeterCapture()
+            Return
+        End If
         If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             Dim leftScaled As Single = MeterPeakLeft * 100.0F
             Dim rightScaled As Single = MeterPeakRight * 100.0F
@@ -4364,6 +4372,17 @@ Public Class Player
             }
             Skye.UI.Toast.ShowToast(npo)
         End If
+    End Sub
+    Private Sub RestartMeterCapture()
+        Try
+            MeterAudioCapture?.StopRecording()
+            MeterAudioCapture?.Dispose()
+        Catch
+        End Try
+
+        MeterAudioCapture = New WasapiLoopbackCapture()
+        AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
+        MeterAudioCapture.StartRecording()
     End Sub
     Friend Sub TogglePlayer()
         Static lastState As FormWindowState
