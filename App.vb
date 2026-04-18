@@ -925,26 +925,32 @@ Namespace My
 
                 Debug.WriteLine($"[CLIENT] IP={info.IP}, Name={info.Name}, ConnectedAt={info.ConnectedAt}, LastMessageAt={info.LastMessageAt}, Cmd={cmd}")
 
-                _player.BeginInvoke(Sub()
-                                        Select Case command
-                                            Case "play", "pause", "toggle"
-                                                _player.TogglePlay()
-                                            Case "stop"
-                                                _player.StopPlay()
-                                            Case "next"
-                                                _player.PlayNext()
-                                            Case "previous"
-                                                _player.PlayPrevious()
-                                            Case "nowplaying"
-                                                BroadcastNowPlaying()
-                                            Case "hello"
-                                                info.Name = payload
-                                            Case "playpath"
-                                                FrmPlayer.PlayFromCompanion(payload)
-                                            Case ""
-                                                ' ignore empty lines
-                                        End Select
-                                    End Sub)
+                Select Case command
+                    Case "nowplaying"
+                        BroadcastNowPlaying()
+                        Return
+                    Case "hello"
+                        info.Name = payload
+                        Return
+                    Case String.Empty
+                        Return
+                    Case Else
+                        _player.BeginInvoke(Sub()
+                                                Select Case command
+                                                    Case "play", "pause", "toggle"
+                                                        _player.TogglePlay()
+                                                    Case "stop"
+                                                        _player.StopPlay()
+                                                    Case "next"
+                                                        _player.PlayNext()
+                                                    Case "previous"
+                                                        _player.PlayPrevious()
+                                                    Case "playpath"
+                                                        FrmPlayer.PlayFromCompanion(payload)
+                                                End Select
+                                            End Sub)
+
+                End Select
             End Sub
             Friend Sub Broadcast(message As String)
                 SyncLock _clientLock
@@ -2672,7 +2678,23 @@ Namespace My
         End Sub
         Friend Sub BroadcastNowPlaying()
             Try
-                If CompanionServerRunning Then CompanionControlServer.Broadcast(FrmPlayer.BuildNowPlayingMessage())
+                If Not CompanionServerRunning Then Exit Sub
+
+                ' Build the message on the UI thread (fast)
+                Dim msg As String = Nothing
+                FrmPlayer.Invoke(Sub()
+                                     msg = FrmPlayer.BuildNowPlayingMessage()
+                                 End Sub)
+
+                ' Do the blocking network send on a background thread
+                Task.Run(Sub()
+                             Try
+                                 CompanionControlServer.Broadcast(msg)
+                             Catch ex As Exception
+                                 Skye.Common.Log.Write("BroadcastNowPlaying Task Error: " & ex.Message)
+                             End Try
+                         End Sub)
+
             Catch ex As Exception
                 Skye.Common.Log.Write("BroadcastNowPlaying Error: " & ex.Message)
             End Try
