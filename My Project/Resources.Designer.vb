@@ -941,6 +941,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property ImagePlayerSound16() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImagePlayerSound16", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property ImagePlayerSoundMute() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImagePlayerSoundMute", resourceCulture)

@@ -103,7 +103,7 @@ Public Class PlayerMini
                 Case Keys.Insert
                 Case Keys.M
                     e.SuppressKeyPress = True
-                    App.FrmPlayer.ToggleMute()
+                    App.SetSystemMute(Not App.CurrentMute)
                 Case Keys.N
                     e.SuppressKeyPress = True
                     App.FrmPlayer.PlayNext()

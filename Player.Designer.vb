@@ -85,7 +85,6 @@ Partial Class Player
         TimerShowMedia = New Timer(components)
         BtnForward = New Button()
         BtnStop = New Button()
-        BtnMute = New Button()
         BtnNext = New Button()
         PEXLeft = New Skye.UI.ProgressEX()
         PEXRight = New Skye.UI.ProgressEX()
@@ -107,6 +106,7 @@ Partial Class Player
         TimerLyrics = New Timer(components)
         TipPlayer = New Skye.UI.ToolTip(components)
         PanelVisualizer = New Panel()
+        BtnVolume = New VolumeButton()
         TimerStreamMeta = New Timer(components)
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
@@ -552,19 +552,6 @@ Partial Class Player
         TipPlayer.SetToolTipImage(BtnStop, Nothing)
         BtnStop.UseVisualStyleBackColor = False
         ' 
-        ' BtnMute
-        ' 
-        BtnMute.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        BtnMute.BackColor = Color.Transparent
-        BtnMute.Image = My.Resources.Resources.ImagePlayerSound
-        BtnMute.Location = New Point(375, 399)
-        BtnMute.Name = "BtnMute"
-        BtnMute.Size = New Size(50, 50)
-        BtnMute.TabIndex = 11
-        BtnMute.TabStop = False
-        TipPlayer.SetToolTipImage(BtnMute, Nothing)
-        BtnMute.UseVisualStyleBackColor = False
-        ' 
         ' BtnNext
         ' 
         BtnNext.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
@@ -816,6 +803,22 @@ Partial Class Player
         PanelVisualizer.TabIndex = 40
         TipPlayer.SetToolTipImage(PanelVisualizer, Nothing)
         ' 
+        ' BtnVolume
+        ' 
+        BtnVolume.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
+        BtnVolume.BarBackColor = Color.FromArgb(CByte(60), CByte(60), CByte(60))
+        BtnVolume.BarFillColor = Color.FromArgb(CByte(0), CByte(120), CByte(215))
+        BtnVolume.IconImage = My.Resources.Resources.ImagePlayerSound16
+        BtnVolume.Location = New Point(375, 399)
+        BtnVolume.MuteXColor = Color.Red
+        BtnVolume.Name = "BtnVolume"
+        BtnVolume.Size = New Size(50, 50)
+        BtnVolume.TabIndex = 41
+        BtnVolume.TextColor = Color.OrangeRed
+        TipPlayer.SetToolTip(BtnVolume, "System Volume Control")
+        TipPlayer.SetToolTipImage(BtnVolume, My.Resources.Resources.ImagePlayerSound16)
+        BtnVolume.UseVisualStyleBackColor = True
+        ' 
         ' TimerStreamMeta
         ' 
         TimerStreamMeta.Interval = 3000
@@ -824,6 +827,7 @@ Partial Class Player
         ' 
         AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(1011, 461)
+        Controls.Add(BtnVolume)
         Controls.Add(PanelVisualizer)
         Controls.Add(RTBLyrics)
         Controls.Add(VLCViewer)
@@ -835,7 +839,6 @@ Partial Class Player
         Controls.Add(BtnPrevious)
         Controls.Add(TxtBoxPlaylistSearch)
         Controls.Add(BtnNext)
-        Controls.Add(BtnMute)
         Controls.Add(BtnStop)
         Controls.Add(BtnForward)
         Controls.Add(BtnReverse)
@@ -885,7 +888,6 @@ Partial Class Player
     Friend WithEvents TimerShowMedia As Timer
     Friend WithEvents BtnForward As Button
     Friend WithEvents BtnStop As Button
-    Friend WithEvents BtnMute As Button
     Friend WithEvents BtnNext As Button
     Friend WithEvents PEXLeft As Skye.UI.ProgressEX
     Friend WithEvents PEXRight As Skye.UI.ProgressEX
@@ -954,4 +956,5 @@ Partial Class Player
     Friend WithEvents MIDirectory As ToolStripMenuItem
     Friend WithEvents TimerStreamMeta As Timer
     Friend WithEvents MIViewClients As ToolStripMenuItem
+    Friend WithEvents BtnVolume As VolumeButton
 End Class

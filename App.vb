@@ -1,5 +1,7 @@
 ﻿
+Imports System.ComponentModel
 Imports System.Data.SQLite
+Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports System.Net
 Imports System.Net.Http
@@ -812,6 +814,27 @@ Namespace My
         Private _lastVol As Integer = -1
         Private _lastMute As Boolean = False
         Private _audioEndpoint As MMDevice
+        Friend ReadOnly Property CurrentVolumePercent As Integer
+            Get
+                If _audioEndpoint Is Nothing Then Return 0
+                Try
+                    Dim scalar = _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar
+                    Return CInt(Math.Round(scalar * 100))
+                Catch
+                    Return 0
+                End Try
+            End Get
+        End Property
+        Friend ReadOnly Property CurrentMute As Boolean
+            Get
+                If _audioEndpoint Is Nothing Then Return False
+                Try
+                    Return _audioEndpoint.AudioEndpointVolume.Mute
+                Catch
+                    Return False
+                End Try
+            End Get
+        End Property
         Friend Event SystemVolumeChanged(newVolume As Integer)
         Friend Event SystemMuteChanged(isMuted As Boolean)
 
@@ -942,6 +965,36 @@ Namespace My
                         Return
                     Case "hello"
                         info.Name = payload
+                        Return
+                    Case "vol"
+                        ' Client wants current system volume (0–100)
+                        Try
+                            Broadcast($"VOL|{CurrentVolumePercent}")
+                        Catch
+                            ' ignore or log if endpoint is unavailable
+                        End Try
+                        Return
+                    Case "mute"
+                        ' Client wants current system mute state (true/false)
+                        Try
+                            Broadcast($"MUTE|{CurrentMute}")
+                        Catch
+                            ' ignore or log if endpoint is unavailable
+                        End Try
+                        Return
+                    Case "volset"
+                        ' Client is setting system volume (0–100)
+                        Dim newVol As Integer
+                        If Integer.TryParse(payload, newVol) Then
+                            SetSystemVolume(newVol)
+                        End If
+                        Return
+                    Case "muteset"
+                        ' Client is setting mute state (true/false)
+                        Dim newMute As Boolean
+                        If Boolean.TryParse(payload, newMute) Then
+                            SetSystemMute(newMute)
+                        End If
                         Return
                     Case String.Empty
                         Return
@@ -2235,7 +2288,7 @@ Namespace My
             End Select
         End Sub
 
-        'Handlers
+        ' Handlers
         Private Sub NIAppClickTimer_Tick(sender As Object, e As EventArgs) Handles NIAppClickTimer.Tick
             NIAppClickTimer.Stop()
 
@@ -2310,8 +2363,6 @@ Namespace My
             WatcherDoWork(workItems)
 
         End Sub
-
-        'History Handlers
         Private Sub TimerHistoryUpdate_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerHistoryUpdate.Tick
             TimerHistoryUpdate.Stop()
             UpdateHistory()
@@ -2326,8 +2377,18 @@ Namespace My
                 SaveHistory()
             End If
         End Sub
+        Private Sub OnSystemVolumeChanged(newVolume As Integer)
+            If CompanionServerRunning Then
+                CompanionControlServer.Broadcast($"VOL|{newVolume}")
+            End If
+        End Sub
+        Private Sub OnSystemMuteChanged(isMuted As Boolean)
+            If CompanionServerRunning Then
+                CompanionControlServer.Broadcast($"MUTE|{isMuted.ToString().ToLower()}")
+            End If
+        End Sub
 
-        'History Methods
+        ' History Methods
         Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)
             'Check if in the history already
             Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
@@ -2490,7 +2551,7 @@ Namespace My
             End SyncLock
         End Function
 
-        'Database Methods
+        ' Database Methods
         Private Sub LoadPlayHistoryDatabase()
             If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                 My.Computer.FileSystem.CreateDirectory(App.UserPath)
@@ -2792,7 +2853,7 @@ Namespace My
             Return "0.0.0.0" ' fallback if no IPv4 found
         End Function
 
-        'Methods
+        ' Methods
         Friend Sub InitializePreStartup()
 #If DEBUG Then
             Skye.Common.Log.Initialize(My.Application.Info.ProductName + "DEV") ' Use separate log file for debug builds to prevent debug logs from being mixed with release logs
@@ -2960,6 +3021,8 @@ Namespace My
             Dim dev As New MMDeviceEnumerator()
             _audioEndpoint = dev.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)
             StartSystemVolumeMonitor()
+            AddHandler SystemVolumeChanged, AddressOf OnSystemVolumeChanged
+            AddHandler SystemMuteChanged, AddressOf OnSystemMuteChanged
 
             CompanionControlServer = New CompanionControlServerClass(FrmPlayer)
             SetCompanionServer()
@@ -4497,5 +4560,238 @@ Namespace My
         End Function
 
     End Module
+
+    <ToolboxItem(True)>
+    <DefaultEvent("Click")>
+    Public Class VolumeButton
+        Inherits Button
+
+        ' Declarations
+        Private Const BAR_WIDTH As Integer = 10
+        Private Const ICON_SIZE As Integer = 16
+        Private Const ICON_PADDING As Integer = 6
+        Private _volumePercent As Integer = 0
+        Private _isMuted As Boolean = False
+        Private _iconImage As Image = Nothing
+        Private _barBackColor As Color = Color.FromArgb(60, 60, 60)
+        Private _barFillColor As Color = Color.FromArgb(0, 120, 215)
+        Private _muteXColor As Color = Color.Red
+        Private _textColor As Color = Color.White
+
+        ' Designer Properties
+        <Category("Volume"),
+     Description("Current volume percent (0-100)."),
+     DefaultValue(0)>
+        Public Property VolumePercent As Integer
+            Get
+                Return _volumePercent
+            End Get
+            Set(value As Integer)
+                Dim v = Math.Max(0, Math.Min(100, value))
+                If _volumePercent <> v Then
+                    _volumePercent = v
+                    Me.Invalidate()
+                End If
+            End Set
+        End Property
+        <Category("Volume"),
+     Description("Whether the system is muted."),
+     DefaultValue(False)>
+        Public Property IsMuted As Boolean
+            Get
+                Return _isMuted
+            End Get
+            Set(value As Boolean)
+                If _isMuted <> value Then
+                    _isMuted = value
+                    Me.Invalidate()
+                End If
+            End Set
+        End Property
+        <Category("Appearance"),
+     Description("16x16 icon drawn in the upper-left."),
+     Browsable(True),
+     DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)>
+        Public Property IconImage As Image
+            Get
+                Return _iconImage
+            End Get
+            Set(value As Image)
+                _iconImage = value
+                Me.Invalidate()
+            End Set
+        End Property
+        <Category("Appearance"),
+     Description("Background color of the volume bar."),
+     Browsable(True),
+     DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)>
+        Public Property BarBackColor As Color
+            Get
+                Return _barBackColor
+            End Get
+            Set(value As Color)
+                _barBackColor = value
+                Me.Invalidate()
+            End Set
+        End Property
+        <Category("Appearance"),
+     Description("Fill color of the volume bar."),
+     Browsable(True),
+     DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)>
+        Public Property BarFillColor As Color
+            Get
+                Return _barFillColor
+            End Get
+            Set(value As Color)
+                _barFillColor = value
+                Me.Invalidate()
+            End Set
+        End Property
+        <Category("Appearance"),
+     Description("Color of the mute X overlay."),
+     Browsable(True),
+     DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)>
+        Public Property MuteXColor As Color
+            Get
+                Return _muteXColor
+            End Get
+            Set(value As Color)
+                _muteXColor = value
+                Me.Invalidate()
+            End Set
+        End Property
+        <Category("Appearance"),
+     Description("Color of the percent text."),
+     Browsable(True),
+     DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)>
+        Public Property TextColor As Color
+            Get
+                Return _textColor
+            End Get
+            Set(value As Color)
+                _textColor = value
+                Me.Invalidate()
+            End Set
+        End Property
+
+        ' Control Events
+        Public Sub New()
+            Me.DoubleBuffered = True
+            Me.FlatStyle = FlatStyle.Standard
+        End Sub
+        Protected Overrides Sub OnMouseWheel(e As MouseEventArgs)
+            MyBase.OnMouseWheel(e)
+
+            If DesignMode Then Exit Sub
+
+            If e.Delta > 0 Then
+                VolumePercent = Math.Min(100, VolumePercent + 2)
+            Else
+                VolumePercent = Math.Max(0, VolumePercent - 2)
+            End If
+
+            App.SetSystemVolume(VolumePercent)
+        End Sub
+        Protected Overrides Sub OnClick(e As EventArgs)
+            MyBase.OnClick(e)
+
+            If DesignMode Then Exit Sub
+
+            IsMuted = Not IsMuted
+            App.SetSystemMute(IsMuted)
+        End Sub
+        Protected Overrides Sub OnPaint(pe As PaintEventArgs)
+            MyBase.OnPaint(pe)
+
+            Dim g = pe.Graphics
+            g.SmoothingMode = SmoothingMode.AntiAlias
+            g.TextRenderingHint = Drawing.Text.TextRenderingHint.ClearTypeGridFit
+            Dim rect = Me.ClientRectangle
+
+            ' Draw Icon
+            If _iconImage IsNot Nothing Then
+                g.DrawImage(_iconImage, ICON_PADDING, ICON_PADDING, ICON_SIZE, ICON_SIZE)
+            End If
+
+            ' Bar Rectangle
+            Dim barRight = rect.Right - 6
+            Dim barLeft = barRight - BAR_WIDTH
+            Dim barTop = ICON_PADDING
+            Dim barBottom = rect.Bottom - ICON_PADDING
+            Dim barRect As New Rectangle(barLeft, barTop, BAR_WIDTH, barBottom - barTop)
+
+            ' Bar Background
+            Using backBrush As New SolidBrush(_barBackColor)
+                Dim path = RoundedRect(barRect, 4)
+                g.FillPath(backBrush, path)
+            End Using
+
+            ' Bar Fill
+            If Not _isMuted AndAlso _volumePercent > 0 Then
+                Dim fillHeight As Integer = CInt((_volumePercent / 100.0F) * barRect.Height)
+                Dim fillRect As New Rectangle(barRect.Left + 1, barRect.Bottom - fillHeight + 1, BAR_WIDTH - 2, fillHeight - 2)
+
+                Using fillBrush As New SolidBrush(_barFillColor)
+                    ' Clip drawing to the bar rectangle so arcs can't overflow
+                    Dim oldClip = g.Clip
+                    g.SetClip(barRect)
+
+                    Dim path = RoundedRect(fillRect, 4)
+                    g.FillPath(fillBrush, path)
+
+                    g.Clip = oldClip
+                End Using
+            End If
+
+            ' Percent Text
+            Dim percentText As String
+            Dim percentFont As Font
+            If _isMuted Then
+                percentText = "0%"
+                percentFont = New Font(Me.Font.FontFamily, Me.Font.Size - 2.0F, Me.Font.Style)
+            ElseIf _volumePercent >= 100 Then
+                percentText = "MAX"
+                percentFont = New Font(Me.Font.FontFamily, Me.Font.Size - 3.5F, FontStyle.Bold)
+            Else
+                percentText = _volumePercent.ToString() & "%"
+                percentFont = New Font(Me.Font.FontFamily, Me.Font.Size - 2.0F, Me.Font.Style)
+            End If
+            Using percentFont
+                Using textBrush As New SolidBrush(_textColor)
+                    Dim textSize = g.MeasureString(percentText, percentFont)
+                    Dim textX As Single = barLeft - textSize.Width + 1
+                    Dim textY As Single = (rect.Height - textSize.Height) / 1.3F
+                    g.DrawString(percentText, percentFont, textBrush, textX, textY)
+                End Using
+            End Using
+
+            ' --- Draw Mute X ---
+            If _isMuted Then
+                Using p As New Pen(_muteXColor, 6)
+                    p.StartCap = LineCap.Round
+                    p.EndCap = LineCap.Round
+
+                    g.DrawLine(p, rect.Left + 8, rect.Top + 8, rect.Right - 8, rect.Bottom - 8)
+                    g.DrawLine(p, rect.Left + 8, rect.Bottom - 8, rect.Right - 8, rect.Top + 8)
+                End Using
+            End If
+
+        End Sub
+
+        ' Methods
+        Private Function RoundedRect(r As Rectangle, radius As Integer) As GraphicsPath
+            Dim path As New GraphicsPath()
+            Dim d = radius * 2
+
+            path.AddArc(r.X, r.Y, d, d, 180, 90)
+            path.AddArc(r.Right - d, r.Y, d, d, 270, 90)
+            path.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90)
+            path.AddArc(r.X, r.Bottom - d, d, d, 90, 90)
+            path.CloseFigure()
+
+            Return path
+        End Function
+
+    End Class
 
 End Namespace

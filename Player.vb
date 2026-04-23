@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿
+Imports System.IO
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
@@ -2714,9 +2715,15 @@ Public Class Player
         ' For Meters
         RestartMeterCapture()
 
-        'MeterAudioCapture = New WasapiLoopbackCapture()
-        'AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
-        'MeterAudioCapture.StartRecording()
+        ' Volume
+        AddHandler App.SystemVolumeChanged,
+            Sub(v)
+                BtnVolume.VolumePercent = v
+            End Sub
+        AddHandler App.SystemMuteChanged,
+            Sub(m)
+                BtnVolume.IsMuted = m
+            End Sub
 
         ' For Visualizers
         VisualizerHost = New VisualizerHostClass(Me, PanelVisualizer)
@@ -2804,7 +2811,6 @@ Public Class Player
         TipPlayer.SetToolTip(BtnStop, "Stop Playing")
         TipPlayer.SetToolTip(BtnReverse, "Skip Backward")
         TipPlayer.SetToolTip(BtnForward, "Skip Forward")
-        TipPlayer.SetToolTip(BtnMute, "Mute")
         TipPlayer.SetToolTip(LblDuration, "Song Duration")
         SetTipPlayer()
         CustomDrawCMToolTip(CMPlaylist)
@@ -2883,7 +2889,7 @@ Public Class Player
                         FullScreen = Not FullScreen
                     Case Keys.M
                         e.SuppressKeyPress = True
-                        ToggleMute()
+                        App.SetSystemMute(Not App.CurrentMute)
                     Case Keys.N
                         e.SuppressKeyPress = True
                         PlayNext()
@@ -2910,8 +2916,8 @@ Public Class Player
         ToggleMaximized()
     End Sub
     Private Sub Player_SizeChanged(sender As Object, e As EventArgs) Handles MyBase.SizeChanged
-        PEXLeft.Size = New Size(BtnMute.Location.X + BtnMute.Width - PEXLeft.Left, PEXLeft.Height)
-        PEXRight.Size = New Size(BtnMute.Location.X + BtnMute.Width - PEXRight.Left, PEXRight.Height)
+        PEXLeft.Size = New Size(BtnVolume.Location.X + BtnVolume.Width - PEXLeft.Left, PEXLeft.Height)
+        PEXRight.Size = New Size(BtnVolume.Location.X + BtnVolume.Width - PEXRight.Left, PEXRight.Height)
         VideoSetSize()
     End Sub
     Private Sub Player_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, MenuPlayer.MouseDown, LblPlaylistCount.MouseDown, LblDuration.MouseDown, PEXLeft.MouseDown, PEXRight.MouseDown
@@ -3961,10 +3967,6 @@ Public Class Player
         PlayNext()
         LVPlaylist.Focus()
     End Sub
-    Private Sub BtnMuteMouseDown(sender As Object, e As MouseEventArgs) Handles BtnMute.MouseDown
-        ToggleMute()
-        LVPlaylist.Focus()
-    End Sub
     Private Sub TrackBarPosition_MouseDown(sender As Object, e As MouseEventArgs) Handles TrackBarPosition.MouseDown
         If PlayState = PlayStates.Playing Then TogglePlay()
     End Sub
@@ -4168,7 +4170,7 @@ Public Class Player
     Private Sub TimerShowMedia_Tick(sender As Object, e As EventArgs) Handles TimerShowMedia.Tick
         TimerShowMedia.Stop()
         ShowMedia()
-        If Mute Then ToggleMute()
+        'If Mute Then ToggleMute()
         ShowNowPlayingToast(PlaylistCurrentText)
         App.BroadcastNowPlaying()
     End Sub
@@ -5570,19 +5572,6 @@ Public Class Player
             LVPlaylist.Focus()
         End If
     End Sub
-    Friend Sub ToggleMute()
-        If Mute Then
-            'Debug.Print("Enabling Sound")
-            _player.Volume = 100
-            BtnMute.Image = Resources.ImagePlayerSound
-            Mute = False
-        Else
-            'Debug.Print("Disabling Sound")
-            _player.Volume = 0
-            BtnMute.Image = Resources.ImagePlayerSoundMute
-            Mute = True
-        End If
-    End Sub
     Private Sub VideoSetSize()
         If _player IsNot Nothing AndAlso _player.HasMedia AndAlso App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
             If _player.VideoHeight / _player.VideoWidth > PanelMedia.Height / PanelMedia.Width Then
@@ -6131,7 +6120,12 @@ Public Class Player
         BtnForward.BackColor = App.CurrentTheme.ButtonBackColor
         BtnPrevious.BackColor = App.CurrentTheme.ButtonBackColor
         BtnNext.BackColor = App.CurrentTheme.ButtonBackColor
-        BtnMute.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnVolume.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnVolume.ForeColor = App.CurrentTheme.ButtonTextColor
+        BtnVolume.MuteXColor = Color.Firebrick
+        BtnVolume.TextColor = App.CurrentTheme.ButtonTextColor
+        BtnVolume.BarBackColor = App.CurrentTheme.BackColor
+        BtnVolume.BarFillColor = App.CurrentTheme.TextColor
         PEXLeft.DrawingColor = App.CurrentTheme.TextColor
         PEXRight.DrawingColor = App.CurrentTheme.TextColor
         TrackBarPosition.ButtonColor = App.CurrentTheme.ButtonBackColor
