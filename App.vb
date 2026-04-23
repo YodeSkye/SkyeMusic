@@ -4,7 +4,9 @@ Imports System.IO
 Imports System.Net
 Imports System.Net.Http
 Imports System.Net.Sockets
+Imports System.Threading
 Imports Microsoft.Win32
+Imports NAudio.CoreAudioApi
 
 Namespace My
 
@@ -209,11 +211,11 @@ Namespace My
         Friend AudioExtensionDictionary As New Dictionary(Of String, String) 'AudioExtensionDictionary is a dictionary that maps audio file extensions to their respective media types.
         Friend VideoExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
         Private clickCount As Integer = 0
-        Private WithEvents NIAppClickTimer As New Timer With {.Interval = SystemInformation.DoubleClickTime}
-        Private WithEvents TimerHistoryAutoSave As New Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
-        Private WithEvents TimerHistoryUpdate As New Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
-        Private WithEvents TimerRandomHistoryUpdate As New Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
-        Private WithEvents TimerScreenSaverWatcher As New Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
+        Private WithEvents NIAppClickTimer As New System.Windows.Forms.Timer With {.Interval = SystemInformation.DoubleClickTime}
+        Private WithEvents TimerHistoryAutoSave As New System.Windows.Forms.Timer 'HistoryAutoSaveTimer is a timer that automatically saves the history at regular intervals.
+        Private WithEvents TimerHistoryUpdate As New System.Windows.Forms.Timer 'HistoryUpdate is a timer that allows for a delay in the updating of the Play Count.
+        Private WithEvents TimerRandomHistoryUpdate As New System.Windows.Forms.Timer 'RandomHistoryUpdate is a timer that allows for a delay in the adding of a song to the random history.
+        Private WithEvents TimerScreenSaverWatcher As New System.Windows.Forms.Timer 'ScreenSaverWatcher is a timer that checks the state of the screensaver, sets the ScreenSaverActive flag, and acts accordingly.
         Private ReadOnly Watchers As New List(Of System.IO.FileSystemWatcher) 'Watchers is a set of file system watchers that monitors changes in the library folders.
         Private WithEvents WatcherWorkTimer As New Timers.Timer(1000) 'WatcherWorkTimer is a timer that debounces file system watcher events to prevent multiple rapid events from being processed.
         Private ReadOnly WatcherWorkList As New Collections.Generic.List(Of String) 'WatcherWorkList is a list of files that have been changed, created, deleted, or renamed by the file system watchers.
@@ -803,6 +805,15 @@ Namespace My
             End Select
         End Function
         Friend ParticleNebulaActivePalette As ParticleNebulaPalette = ParticleNebulaGetPalette(ParticleNebulaPalettePresets.Cosmic)
+
+        ' Volume Monitor
+        Private _volCts As CancellationTokenSource
+        Private _volTimer As PeriodicTimer
+        Private _lastVol As Integer = -1
+        Private _lastMute As Boolean = False
+        Private _audioEndpoint As MMDevice
+        Friend Event SystemVolumeChanged(newVolume As Integer)
+        Friend Event SystemMuteChanged(isMuted As Boolean)
 
         ' Companion Server
         Friend Property CompanionServerRunning As Boolean = False 'CompanionServerRunning is a flag that indicates whether the companion server is currently running.
@@ -2653,6 +2664,75 @@ Namespace My
             Return plays
         End Function
 
+        ' Volume
+        Private Async Sub StartSystemVolumeMonitor()
+            ' Cancel any previous monitor if it exists
+            If _volCts IsNot Nothing Then
+                Try : _volCts.Cancel() : Catch : End Try
+            End If
+
+            _volCts = New CancellationTokenSource()
+            _volTimer = New PeriodicTimer(TimeSpan.FromMilliseconds(100))
+
+            ' Reset last-known values so first tick always fires events
+            _lastVol = -1
+            _lastMute = Not _audioEndpoint.AudioEndpointVolume.Mute
+
+            Dim ct = _volCts.Token
+
+            Try
+                While Await _volTimer.WaitForNextTickAsync(ct)
+
+                    ' Read system volume + mute
+                    Dim vol As Integer = CInt(_audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar * 100)
+                    Dim mute As Boolean = _audioEndpoint.AudioEndpointVolume.Mute
+
+                    ' Detect volume change
+                    If vol <> _lastVol Then
+                        _lastVol = vol
+                        RaiseEvent SystemVolumeChanged(vol)
+                    End If
+
+                    ' Detect mute change
+                    If mute <> _lastMute Then
+                        _lastMute = mute
+                        RaiseEvent SystemMuteChanged(mute)
+                    End If
+
+                End While
+
+            Catch ex As OperationCanceledException
+                ' Normal shutdown — ignore
+            Catch ex As Exception
+                ' Optional: log or handle unexpected errors
+            End Try
+        End Sub
+        Friend Sub SetSystemVolume(newVolume As Integer)
+            If _audioEndpoint Is Nothing Then Exit Sub
+
+            ' Clamp 0–100
+            If newVolume < 0 Then newVolume = 0
+            If newVolume > 100 Then newVolume = 100
+
+            ' Convert to scalar (0.0–1.0)
+            Dim scalar As Single = CSng(newVolume / 100.0F)
+
+            Try
+                _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar = scalar
+            Catch
+                ' Optional: log or ignore
+            End Try
+        End Sub
+        Friend Sub SetSystemMute(isMuted As Boolean)
+            If _audioEndpoint Is Nothing Then Exit Sub
+
+            Try
+                _audioEndpoint.AudioEndpointVolume.Mute = isMuted
+            Catch
+                ' Optional: log or ignore
+            End Try
+        End Sub
+
         ' Companion Server
         Friend Sub SetCompanionServer(Optional forcestop As Boolean = False)
             If Settings.EnableCompanionServer AndAlso Not CompanionServerRunning Then
@@ -2876,6 +2956,10 @@ Namespace My
 
             WatcherWorkTimer.AutoReset = False
             SetWatchers()
+
+            Dim dev As New MMDeviceEnumerator()
+            _audioEndpoint = dev.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)
+            StartSystemVolumeMonitor()
 
             CompanionControlServer = New CompanionControlServerClass(FrmPlayer)
             SetCompanionServer()

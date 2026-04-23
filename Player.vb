@@ -1,7 +1,5 @@
-﻿
-Imports System.IO
+﻿Imports System.IO
 Imports System.Text
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement.Window
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
 Imports NAudio.Wave
@@ -2715,6 +2713,7 @@ Public Class Player
 
         ' For Meters
         RestartMeterCapture()
+
         'MeterAudioCapture = New WasapiLoopbackCapture()
         'AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
         'MeterAudioCapture.StartRecording()
