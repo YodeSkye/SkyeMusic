@@ -39,7 +39,7 @@ Partial Class PlayerMini
         PicBoxAlbumArt.Location = New Point(3, 23)
         PicBoxAlbumArt.Name = "PicBoxAlbumArt"
         PicBoxAlbumArt.Size = New Size(94, 94)
-        PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.CenterImage
+        PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.Zoom
         PicBoxAlbumArt.TabIndex = 1
         PicBoxAlbumArt.TabStop = False
         ' 

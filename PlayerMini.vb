@@ -258,7 +258,7 @@ Public Class PlayerMini
             PicBoxAlbumArt.Image = Nothing
             PanelVisualizer.BringToFront()
         Else
-            PicBoxAlbumArt.Image = App.ResizeImage(img, PicBoxAlbumArt.Width)
+            PicBoxAlbumArt.Image = img
             If App.FrmPlayer.Visualizer Then
                 PanelVisualizer.BringToFront()
             Else
