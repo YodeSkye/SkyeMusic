@@ -24,6 +24,7 @@ Public Class Player
     Private MeterLastUpdate As DateTime = DateTime.MinValue
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
+    Private _hidefromTaskSwitcher As Boolean = False ' Used by Player to hide from Task Switcher View when minimize to tray is enabled
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
     Private Mute As Boolean = False 'True if the player is muted
@@ -2658,6 +2659,15 @@ Public Class Player
     End Class
 
     'Form Events                    
+    Protected Overrides ReadOnly Property CreateParams As CreateParams
+        Get
+            Dim cp = MyBase.CreateParams
+            If _hidefromTaskSwitcher Then
+                cp.ExStyle = cp.ExStyle Or Skye.WinAPI.WS_EX_TOOLWINDOW
+            End If
+            Return cp
+        End Get
+    End Property
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
@@ -2957,12 +2967,21 @@ Public Class Player
         Select Case WindowState
             Case FormWindowState.Minimized
                 If App.Settings.ShowTrayIcon AndAlso App.Settings.MinimizeToTray Then
+                    _hidefromTaskSwitcher = True
                     ShowInTaskbar = False
+                    If Not Visible Then RecreateHandle() ' Only recreate handle when NOT visible → no blinking
+                Else
+                    _hidefromTaskSwitcher = False
+                    ShowInTaskbar = True
+                    If Not Visible Then RecreateHandle() ' Only recreate handle when NOT visible → no blinking
                 End If
             Case FormWindowState.Normal, FormWindowState.Maximized
+                _hidefromTaskSwitcher = False
                 ShowInTaskbar = True
+                If Not Visible Then RecreateHandle() ' Only recreate handle when NOT visible → no blinking
         End Select
     End Sub
+
     Private Sub Player_Deactivate(sender As Object, e As EventArgs) Handles MyBase.Deactivate
         ResetTxtBoxPlaylistSearch()
         LVPlaylist.Select()
@@ -4483,6 +4502,25 @@ Public Class Player
             'Debug.Print("Playlist Search Reset")
         End If
     End Sub
+    Private Sub SetVolumeToolTip()
+        If TipVolume IsNot Nothing Then
+            TipVolume?.HideTooltip()
+            TipVolume?.Dispose()
+            TipVolume = Nothing
+        End If
+
+        TipVolume = New Skye.UI.ToolTipEX(components) With {
+            .BackColor = App.CurrentTheme.BackColor,
+            .ForeColor = App.CurrentTheme.TextColor,
+            .BorderColor = App.CurrentTheme.ButtonBackColor,
+            .Font = TipPlaylistFont,
+            .ShadowAlpha = 200,
+            .FadeInRate = 0,
+            .FadeOutRate = 0,
+            .HideDelay = 1000000,
+            .ShowDelay = 1000
+        }
+    End Sub
     Private Sub ToggleMaximized()
         Select Case WindowState
             Case FormWindowState.Normal, FormWindowState.Minimized
@@ -5017,26 +5055,6 @@ Public Class Player
             .ShowDelay = 1000
         }
     End Sub
-    Private Sub SetVolumeToolTip()
-        If TipVolume IsNot Nothing Then
-            TipVolume?.HideTooltip()
-            TipVolume?.Dispose()
-            TipVolume = Nothing
-        End If
-
-        TipVolume = New Skye.UI.ToolTipEX(components) With {
-            .BackColor = App.CurrentTheme.BackColor,
-            .ForeColor = App.CurrentTheme.TextColor,
-            .BorderColor = App.CurrentTheme.ButtonBackColor,
-            .Font = TipPlaylistFont,
-            .ShadowAlpha = 200,
-            .FadeInRate = 0,
-            .FadeOutRate = 0,
-            .HideDelay = 1000000,
-            .ShowDelay = 1000
-        }
-    End Sub
-
     Friend Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()
         LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString
