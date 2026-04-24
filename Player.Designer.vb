@@ -815,8 +815,7 @@ Partial Class Player
         BtnVolume.Size = New Size(50, 50)
         BtnVolume.TabIndex = 41
         BtnVolume.TextColor = Color.OrangeRed
-        TipPlayer.SetToolTip(BtnVolume, "System Volume Control")
-        TipPlayer.SetToolTipImage(BtnVolume, My.Resources.Resources.ImagePlayerSound16)
+        TipPlayer.SetToolTipImage(BtnVolume, Nothing)
         BtnVolume.UseVisualStyleBackColor = True
         ' 
         ' TimerStreamMeta

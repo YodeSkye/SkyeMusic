@@ -45,6 +45,7 @@ Public Class Player
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
     Private TipPlaylistFont As New Font("Segoe UI", 12) 'Font for Playlist Tooltip
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
+    Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
@@ -3967,6 +3968,12 @@ Public Class Player
         PlayNext()
         LVPlaylist.Focus()
     End Sub
+    Private Sub BtnVolume_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnVolume.MouseDown
+        If e.Button = MouseButtons.Right Then
+            SetVolumeToolTip()
+            TipVolume.ShowTooltipAtCursor("System Volume" & vbCr & "Use MouseWheel to change volume.", Resources.ImagePlayerSound16)
+        End If
+    End Sub
     Private Sub TrackBarPosition_MouseDown(sender As Object, e As MouseEventArgs) Handles TrackBarPosition.MouseDown
         If PlayState = PlayStates.Playing Then TogglePlay()
     End Sub
@@ -5010,6 +5017,26 @@ Public Class Player
             .ShowDelay = 1000
         }
     End Sub
+    Private Sub SetVolumeToolTip()
+        If TipVolume IsNot Nothing Then
+            TipVolume?.HideTooltip()
+            TipVolume?.Dispose()
+            TipVolume = Nothing
+        End If
+
+        TipVolume = New Skye.UI.ToolTipEX(components) With {
+            .BackColor = App.CurrentTheme.BackColor,
+            .ForeColor = App.CurrentTheme.TextColor,
+            .BorderColor = App.CurrentTheme.ButtonBackColor,
+            .Font = TipPlaylistFont,
+            .ShadowAlpha = 200,
+            .FadeInRate = 0,
+            .FadeOutRate = 0,
+            .HideDelay = 1000000,
+            .ShowDelay = 1000
+        }
+    End Sub
+
     Friend Sub SetPlaylistCountText()
         LblPlaylistCount.ResetText()
         LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString

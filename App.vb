@@ -954,43 +954,47 @@ Namespace My
             End Sub
             Private Sub ProcessCommand(info As CompanionClientInfo, cmd As String)
                 Dim parts = cmd.Split("|"c, 2)
-                Dim command = parts(0).ToLowerInvariant()
+                Dim command = parts(0).ToUpperInvariant()
                 Dim payload As String = If(parts.Length > 1, parts(1), String.Empty)
 
                 Debug.WriteLine($"[CLIENT] IP={info.IP}, Name={info.Name}, ConnectedAt={info.ConnectedAt}, LastMessageAt={info.LastMessageAt}, Cmd={cmd}")
 
                 Select Case command
-                    Case "nowplaying"
+                    Case "NOWPLAYING"
                         BroadcastNowPlaying()
                         Return
-                    Case "hello"
+                    Case "HELLO"
                         info.Name = payload
                         Return
-                    Case "vol"
+                    Case "VOL"
                         ' Client wants current system volume (0–100)
+                        'Skye.Common.Log.Write($"Companion Client '{info.Name}' requested current volume level. ({cmd})")
                         Try
-                            Broadcast($"VOL|{CurrentVolumePercent}")
+                            Broadcast($"vol|{CurrentVolumePercent}")
                         Catch
                             ' ignore or log if endpoint is unavailable
                         End Try
                         Return
-                    Case "mute"
+                    Case "MUTE"
                         ' Client wants current system mute state (true/false)
+                        'Skye.Common.Log.Write($"Companion Client '{info.Name}' requested current mute setting. ({cmd})")
                         Try
-                            Broadcast($"MUTE|{CurrentMute}")
+                            Broadcast($"mute|{CurrentMute}")
                         Catch
                             ' ignore or log if endpoint is unavailable
                         End Try
                         Return
-                    Case "volset"
+                    Case "VOLSET"
                         ' Client is setting system volume (0–100)
+                        'Skye.Common.Log.Write($"Companion Client '{info.Name}' requested to set volume to {payload}. ({cmd})")
                         Dim newVol As Integer
                         If Integer.TryParse(payload, newVol) Then
                             SetSystemVolume(newVol)
                         End If
                         Return
-                    Case "muteset"
+                    Case "MUTESET"
                         ' Client is setting mute state (true/false)
+                        'Skye.Common.Log.Write($"Companion Client '{info.Name}' requested to set mute state to {payload}. ({cmd})")
                         Dim newMute As Boolean
                         If Boolean.TryParse(payload, newMute) Then
                             SetSystemMute(newMute)
@@ -1001,15 +1005,15 @@ Namespace My
                     Case Else
                         _player.BeginInvoke(Sub()
                                                 Select Case command
-                                                    Case "play", "pause", "toggle"
+                                                    Case "PLAY", "PAUSE", "TOGGLE"
                                                         _player.TogglePlay()
-                                                    Case "stop"
+                                                    Case "STOP"
                                                         _player.StopPlay()
-                                                    Case "next"
+                                                    Case "NEXT"
                                                         _player.PlayNext()
-                                                    Case "previous"
+                                                    Case "PREVIOUS"
                                                         _player.PlayPrevious()
-                                                    Case "playpath"
+                                                    Case "PLAYPATH"
                                                         FrmPlayer.PlayFromCompanion(payload)
                                                 End Select
                                             End Sub)
