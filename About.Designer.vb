@@ -164,7 +164,8 @@ Partial Class About
         TipAbout.FadeOutRate = 25
         TipAbout.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.HideDelay = 1000
-        TipAbout.ShadowAlpha = 200
+        TipAbout.ShadowAlpha = 0
+        TipAbout.ShadowThickness = 0
         TipAbout.ShowDelay = 1000
         ' 
         ' LLblVLCSharp

@@ -44,7 +44,6 @@ Public Class Player
     Private PausedAt As DateTime? = Nothing 'Used by Plays Database System to track when the player was paused.
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero 'Used by Plays Database System to track total paused duration.
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
-    Private TipPlaylistFont As New Font("Segoe UI", 12) 'Font for Playlist Tooltip
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
@@ -2981,7 +2980,6 @@ Public Class Player
                 If Not Visible Then RecreateHandle() ' Only recreate handle when NOT visible → no blinking
         End Select
     End Sub
-
     Private Sub Player_Deactivate(sender As Object, e As EventArgs) Handles MyBase.Deactivate
         ResetTxtBoxPlaylistSearch()
         LVPlaylist.Select()
@@ -4513,11 +4511,12 @@ Public Class Player
             .BackColor = App.CurrentTheme.BackColor,
             .ForeColor = App.CurrentTheme.TextColor,
             .BorderColor = App.CurrentTheme.ButtonBackColor,
-            .Font = TipPlaylistFont,
-            .ShadowAlpha = 200,
+            .Font = App.TipFont,
+            .ShadowAlpha = 0,
+            .ShadowThickness = 0,
             .FadeInRate = 0,
             .FadeOutRate = 0,
-            .HideDelay = 1000000,
+            .HideDelay = 5000,
             .ShowDelay = 1000
         }
     End Sub
@@ -5047,8 +5046,9 @@ Public Class Player
             .BackColor = App.CurrentTheme.BackColor,
             .ForeColor = App.CurrentTheme.TextColor,
             .BorderColor = App.CurrentTheme.ButtonBackColor,
-            .Font = TipPlaylistFont,
-            .ShadowAlpha = 200,
+            .Font = App.TipFont,
+            .ShadowAlpha = 150,
+            .ShadowThickness = 2,
             .FadeInRate = 0,
             .FadeOutRate = 0,
             .HideDelay = 1000000,
@@ -6216,7 +6216,7 @@ Public Class Player
         AddHandler MyToolTip.Popup,
             Sub(sender, e)
                 Dim s As SizeF
-                s = TextRenderer.MeasureText(CType(sender, System.Windows.Forms.ToolTip).GetToolTip(e.AssociatedControl), TipPlaylistFont)
+                s = TextRenderer.MeasureText(CType(sender, System.Windows.Forms.ToolTip).GetToolTip(e.AssociatedControl), App.TipFont)
                 s.Width += 14
                 s.Height += 16
                 e.ToolTipSize = s.ToSize
@@ -6232,12 +6232,12 @@ Public Class Player
                 g.FillRectangle(brbg, e.Bounds)
 
                 'Draw border
-                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(TipPlaylistFont.Size / 4)) 'Scale border thickness with font
+                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
                     g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
                 End Using
 
                 'Draw text
-                TextRenderer.DrawText(g, e.ToolTipText, TipPlaylistFont, New Point(7, 7), App.CurrentTheme.TextColor)
+                TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
 
                 'Finalize
                 brbg.Dispose()
