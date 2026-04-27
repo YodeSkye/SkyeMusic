@@ -1413,7 +1413,8 @@ Partial Class Options
         TipOptions.FadeOutRate = 25
         TipOptions.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipOptions.HideDelay = 1000
-        TipOptions.ShadowAlpha = 200
+        TipOptions.ShadowAlpha = 0
+        TipOptions.ShadowThickness = 0
         TipOptions.ShowDelay = 1000
         ' 
         ' TipError
@@ -1422,7 +1423,8 @@ Partial Class Options
         TipError.FadeOutRate = 25
         TipError.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipError.HideDelay = 5000
-        TipError.ShadowAlpha = 200
+        TipError.ShadowAlpha = 0
+        TipError.ShadowThickness = 0
         TipError.ShowDelay = 1000
         ' 
         ' Options

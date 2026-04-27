@@ -125,11 +125,13 @@ Public Class Log
             TimerDeleteLog.Stop()
             DeleteLogConfirm = False
             Me.BTNDeleteLog.BackColor = App.CurrentTheme.ButtonBackColor
-            TipLog.Hide(BTNDeleteLog)
+            TipLogEX.HideTooltip()
+            TipLogEX.HideDelay = 1000
         Else
             DeleteLogConfirm = True
             Me.BTNDeleteLog.BackColor = Color.Red
-            TipLog.Show("Are You Sure?", Me, PointToClient(MousePosition))
+            TipLogEX.HideDelay = 5000
+            TipLogEX.ShowTooltipAtCursor("Are You Sure?", My.Resources.ImageChangeLog32)
             TimerDeleteLog.Start()
         End If
     End Sub
@@ -165,9 +167,9 @@ Public Class Log
         End If
         BTNDeleteLog.BackColor = App.CurrentTheme.ButtonBackColor
         BTNDeleteLog.ForeColor = App.CurrentTheme.TextColor
-        TipLog.BackColor = App.CurrentTheme.BackColor
-        TipLog.ForeColor = App.CurrentTheme.TextColor
-        TipLog.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipLogEX.BackColor = App.CurrentTheme.BackColor
+        TipLogEX.ForeColor = App.CurrentTheme.TextColor
+        TipLogEX.BorderColor = App.CurrentTheme.ButtonBackColor
         LogViewerColors.Back = App.CurrentTheme.BackColor
         LogViewerColors.Fore = App.CurrentTheme.TextColor
         LogViewerColors.TextBoxBack = App.CurrentTheme.BackColor

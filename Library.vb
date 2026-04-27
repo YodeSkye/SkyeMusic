@@ -1385,9 +1385,9 @@ Public Class Library
             Dim h As String = App.History.Find(Function(p) p.Path = (LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)).ToStringFull
             LblHistory.Text = GenerateEllipsis(LblHistory.CreateGraphics(), h, LblHistory.Font, LblHistory.Size.Width)
             If LblHistory.Text = h Then
-                TipLibrary.SetToolTip(LblHistory, Nothing)
+                TipLibraryEX.SetText(LblHistory, Nothing)
             Else
-                TipLibrary.SetToolTip(LblHistory, h)
+                TipLibraryEX.SetText(LblHistory, h)
             End If
             LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             If IO.File.Exists(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text) Then
@@ -1418,9 +1418,9 @@ Public Class Library
                         h = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
                         LblExtType.Text = GenerateEllipsis(LblExtType.CreateGraphics(), h, LblExtType.Font, LblExtType.Size.Width)
                         If LblExtType.Text = h Then
-                            TipLibrary.SetToolTip(LblExtType, Nothing)
+                            TipLibraryEX.SetText(LblExtType, Nothing)
                         Else
-                            TipLibrary.SetToolTip(LblExtType, h)
+                            TipLibraryEX.SetText(LblExtType, h)
                         End If
                     End Using
                 Catch
@@ -1503,9 +1503,9 @@ Public Class Library
         RadBtnGroupByType.ForeColor = App.CurrentTheme.ButtonTextColor
         RadBtnGroupByNone.BackColor = App.CurrentTheme.ButtonBackColor
         RadBtnGroupByNone.ForeColor = App.CurrentTheme.ButtonTextColor
-        TipLibrary.BackColor = App.CurrentTheme.BackColor
-        TipLibrary.ForeColor = App.CurrentTheme.TextColor
-        TipLibrary.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipLibraryEX.BackColor = App.CurrentTheme.BackColor
+        TipLibraryEX.ForeColor = App.CurrentTheme.TextColor
+        TipLibraryEX.BorderColor = App.CurrentTheme.ButtonBackColor
         If TxbxLibrarySearch.Text = LibrarySearchTitle Then TxbxLibrarySearch.ForeColor = App.CurrentTheme.InactiveSearchTextColor
         LblLibraryCounts.ForeColor = forecolor
         LblHistory.ForeColor = forecolor
@@ -1524,7 +1524,6 @@ Public Class Library
     Friend Sub ReThemeMenus()
         App.ThemeMenu(CMLibrary)
     End Sub
-
     Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
 
         'Initialize
