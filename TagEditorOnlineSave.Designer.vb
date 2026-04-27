@@ -126,7 +126,7 @@ Partial Class TagEditorOnlineSave
         ' BtnLocation
         ' 
         BtnLocation.Image = Resources.Resources.imageSelectFolder16
-        tipInfo.SetImage(BtnLocation, Nothing)
+        tipInfo.SetImage(BtnLocation, Resources.Resources.imageSelectFolder16)
         BtnLocation.Location = New Point(394, 84)
         BtnLocation.Margin = New Padding(4)
         BtnLocation.Name = "BtnLocation"
@@ -138,7 +138,7 @@ Partial Class TagEditorOnlineSave
         ' BtnSave
         ' 
         BtnSave.Image = Resources.Resources.ImageSave32
-        tipInfo.SetImage(BtnSave, Nothing)
+        tipInfo.SetImage(BtnSave, Resources.Resources.ImageSave32)
         BtnSave.ImageAlign = ContentAlignment.MiddleLeft
         BtnSave.Location = New Point(14, 288)
         BtnSave.Margin = New Padding(4)
@@ -188,13 +188,13 @@ Partial Class TagEditorOnlineSave
         ' 
         ' tipInfo
         ' 
-        tipInfo.BackColor = Color.White
-        tipInfo.BorderColor = Color.Gainsboro
         tipInfo.FadeInRate = 25
         tipInfo.FadeOutRate = 25
-        tipInfo.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        tipInfo.ShowBorder = False
-        tipInfo.ShowDelay = 100
+        tipInfo.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        tipInfo.HideDelay = 1000
+        tipInfo.ShadowAlpha = 0
+        tipInfo.ShadowThickness = 0
+        tipInfo.ShowDelay = 1000
         ' 
         ' TagEditorOnlineSave
         ' 

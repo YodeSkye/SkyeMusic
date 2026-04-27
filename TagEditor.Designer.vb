@@ -190,7 +190,13 @@ Partial Class TagEditor
         ' 
         ' TipInfo
         ' 
+        TipInfo.FadeInRate = 25
+        TipInfo.FadeOutRate = 25
         TipInfo.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipInfo.HideDelay = 1000
+        TipInfo.ShadowAlpha = 0
+        TipInfo.ShadowThickness = 0
+        TipInfo.ShowDelay = 1000
         ' 
         ' btnArtistKeepOriginal
         ' 
@@ -707,8 +713,13 @@ Partial Class TagEditor
         ' 
         ' TipStatus
         ' 
+        TipStatus.FadeInRate = 25
+        TipStatus.FadeOutRate = 25
         TipStatus.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipStatus.HideDelay = 5000
+        TipStatus.ShadowAlpha = 0
+        TipStatus.ShadowThickness = 0
+        TipStatus.ShowDelay = 250
         ' 
         ' TagEditor
         ' 

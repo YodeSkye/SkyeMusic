@@ -46,6 +46,7 @@ Partial Class PlayerQueue
         CMQueue.Items.AddRange(New ToolStripItem() {CMIMoveTop, CMIMoveUp, CMIMoveDown, CMIMoveBottom, CMIRemove})
         CMQueue.Name = "CMQueue"
         CMQueue.Size = New Size(194, 134)
+        TipQueue.SetText(CMQueue, Nothing)
         ' 
         ' CMIMoveTop
         ' 
@@ -86,8 +87,8 @@ Partial Class PlayerQueue
         ' BtnOK
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
-        TipQueue.SetImage(BtnOK, Nothing)
         BtnOK.Image = My.Resources.Resources.ImageOK
+        TipQueue.SetImage(BtnOK, Nothing)
         BtnOK.Location = New Point(360, 185)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -98,8 +99,8 @@ Partial Class PlayerQueue
         ' BtnPrune
         ' 
         BtnPrune.Anchor = AnchorStyles.Bottom
-        TipQueue.SetImage(BtnPrune, My.Resources.Resources.ImagePrune32)
         BtnPrune.Image = My.Resources.Resources.ImagePrune32
+        TipQueue.SetImage(BtnPrune, My.Resources.Resources.ImagePrune32)
         BtnPrune.Location = New Point(724, 201)
         BtnPrune.Name = "BtnPrune"
         BtnPrune.Size = New Size(48, 48)
@@ -113,7 +114,8 @@ Partial Class PlayerQueue
         TipQueue.FadeOutRate = 25
         TipQueue.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipQueue.HideDelay = 1000
-        TipQueue.ShadowAlpha = 200
+        TipQueue.ShadowAlpha = 0
+        TipQueue.ShadowThickness = 0
         TipQueue.ShowDelay = 1000
         ' 
         ' LVQueue
@@ -122,6 +124,7 @@ Partial Class PlayerQueue
         LVQueue.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         LVQueue.Columns.AddRange(New ColumnHeader() {ColumnHeader3, ColumnHeader4})
         LVQueue.ContextMenuStrip = CMQueue
+        LVQueue.EditableColumns = CType(resources.GetObject("LVQueue.EditableColumns"), List(Of Boolean))
         LVQueue.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LVQueue.FullRowSelect = True
         LVQueue.HeaderStyle = ColumnHeaderStyle.Nonclickable
@@ -132,6 +135,7 @@ Partial Class PlayerQueue
         LVQueue.OwnerDraw = True
         LVQueue.Size = New Size(760, 158)
         LVQueue.TabIndex = 0
+        TipQueue.SetText(LVQueue, Nothing)
         LVQueue.UseCompatibleStateImageBehavior = False
         LVQueue.View = View.Details
         ' 
@@ -159,6 +163,7 @@ Partial Class PlayerQueue
         MinimumSize = New Size(800, 300)
         Name = "PlayerQueue"
         StartPosition = FormStartPosition.CenterParent
+        TipQueue.SetText(Me, Nothing)
         Text = "Queue"
         CMQueue.ResumeLayout(False)
         ResumeLayout(False)

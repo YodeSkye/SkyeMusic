@@ -79,7 +79,7 @@ Partial Class TagEditorOnline
         ' 
         BtnOK.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         BtnOK.Image = My.Resources.Resources.ImageOK
-        tipInfo.SetImage(BtnOK, Nothing)
+        tipInfo.SetImage(BtnOK, My.Resources.Resources.ImageOK)
         BtnOK.Location = New Point(548, 201)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -181,15 +181,17 @@ Partial Class TagEditorOnline
         tipInfo.BorderColor = Color.Gainsboro
         tipInfo.FadeInRate = 25
         tipInfo.FadeOutRate = 25
-        tipInfo.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        tipInfo.ShowBorder = False
-        tipInfo.ShowDelay = 100
+        tipInfo.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        tipInfo.HideDelay = 1000
+        tipInfo.ShadowAlpha = 0
+        tipInfo.ShadowThickness = 0
+        tipInfo.ShowDelay = 1000
         ' 
         ' BtnSaveImage
         ' 
         BtnSaveImage.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         BtnSaveImage.Image = My.Resources.Resources.ImageSave32
-        tipInfo.SetImage(BtnSaveImage, Nothing)
+        tipInfo.SetImage(BtnSaveImage, My.Resources.Resources.ImageSave32)
         BtnSaveImage.Location = New Point(406, 217)
         BtnSaveImage.Name = "BtnSaveImage"
         BtnSaveImage.Size = New Size(48, 48)
