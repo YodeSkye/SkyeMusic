@@ -4519,7 +4519,7 @@ Namespace My
                         ' Clamp horizontally using working area
                         Dim wa As Rectangle = Screen.FromPoint(pos).WorkingArea
                         If pos.X + tipWidth > wa.Right Then
-                            pos.X = itemScreenRect.Left - tipWidth - 6
+                            pos.X = itemScreenRect.Left - tipWidth
                         End If
 
                         tip.ShowTooltipAt(pos, it.ToolTipText)
