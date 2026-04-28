@@ -77,6 +77,7 @@ Partial Class Library
         TipLibraryEX.SetImage(CMLibrary, Nothing)
         CMLibrary.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIAddToPlaylist, CMIAddAllToPlaylist, ToolStripSeparator1, CMIAddGroupToPlaylist, CMICollapseGroup, CMIExpandAllGroups, CMISeparatorGroupBy, CMIEditTag, CMISeparatorEditTag, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, ToolStripSeparator2, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMLibrary.Name = "CMLibrary"
+        CMLibrary.ShowItemToolTips = False
         CMLibrary.Size = New Size(229, 424)
         TipLibraryEX.SetText(CMLibrary, Nothing)
         ' 

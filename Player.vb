@@ -46,6 +46,7 @@ Public Class Player
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
+    Private TipCMPlaylist As Skye.UI.ToolTipEX ' Tooltip for Context Menu of Playlist
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
@@ -2817,13 +2818,30 @@ Public Class Player
         ShowPlayMode()
 
         ' Set ToolTips
-        TipPlayer.SetToolTip(BtnPlay, "Play / Pause")
-        TipPlayer.SetToolTip(BtnStop, "Stop Playing")
-        TipPlayer.SetToolTip(BtnReverse, "Skip Backward")
-        TipPlayer.SetToolTip(BtnForward, "Skip Forward")
-        TipPlayer.SetToolTip(LblDuration, "Song Duration")
+        'TipPlayer.SetToolTip(BtnPlay, "Play / Pause")
+        'TipPlayer.SetToolTip(BtnStop, "Stop Playing")
+        'TipPlayer.SetToolTip(BtnReverse, "Skip Backward")
+        'TipPlayer.SetToolTip(BtnForward, "Skip Forward")
+        'TipPlayer.SetToolTip(LblDuration, "Song Duration")
+        TipPlayerEX.SetText(BtnPlay, "Play / Pause")
+        TipPlayerEX.SetText(BtnStop, "Stop Playing")
+        TipPlayerEX.SetText(BtnReverse, "Skip Backward")
+        TipPlayerEX.SetText(BtnForward, "Skip Forward")
+        TipPlayerEX.SetText(LblDuration, "Song Duration")
         SetTipPlayer()
-        CustomDrawCMToolTip(CMPlaylist)
+        TipCMPlaylist = New Skye.UI.ToolTipEX(components) With {
+            .BackColor = App.CurrentTheme.BackColor,
+            .ForeColor = App.CurrentTheme.TextColor,
+            .BorderColor = App.CurrentTheme.ButtonBackColor,
+            .Font = App.TipFont,
+            .ShadowAlpha = 0,
+            .ShadowThickness = 0,
+            .FadeInRate = 25,
+            .FadeOutRate = 25,
+            .HideDelay = 5000,
+            .ShowDelay = 250
+        }
+        App.HookTSItemsForCMTooltip(CMPlaylist, TipCMPlaylist)
 
         ' Place the window where it was last time
 #If DEBUG Then
@@ -4456,20 +4474,20 @@ Public Class Player
     Friend Sub SetTipPlayer()
         Select Case App.Settings.PlayMode
             Case App.PlayModes.None, PlayModes.Repeat
-                TipPlayer.SetToolTip(BtnPrevious, String.Empty)
-                TipPlayer.SetToolTip(BtnNext, String.Empty)
+                TipPlayerEX.SetText(BtnPrevious, String.Empty)
+                TipPlayerEX.SetText(BtnNext, String.Empty)
             Case App.PlayModes.Linear
-                TipPlayer.SetToolTip(BtnPrevious, "Previous Song In Playlist")
-                TipPlayer.SetToolTip(BtnNext, "Next Song In Playlist")
+                TipPlayerEX.SetText(BtnPrevious, "Previous Song In Playlist")
+                TipPlayerEX.SetText(BtnNext, "Next Song In Playlist")
             Case App.PlayModes.Random
-                TipPlayer.SetToolTip(BtnPrevious, "Previous Song Played")
-                TipPlayer.SetToolTip(BtnNext, "Next Random Song")
+                TipPlayerEX.SetText(BtnPrevious, "Previous Song Played")
+                TipPlayerEX.SetText(BtnNext, "Next Random Song")
         End Select
         Select Case App.Settings.PlayerPositionShowElapsed
             Case True
-                TipPlayer.SetToolTip(LblPosition, "Elapsed Time")
+                TipPlayerEX.SetText(LblPosition, "Elapsed Time")
             Case False
-                TipPlayer.SetToolTip(LblPosition, "Time Remaining")
+                TipPlayerEX.SetText(LblPosition, "Time Remaining")
         End Select
     End Sub
     Private Sub ShowStatusMessage(msg As String)
@@ -6187,9 +6205,9 @@ Public Class Player
         BtnPrevious.Image = App.CurrentTheme.PlayerPrevious
         BtnForward.Image = App.CurrentTheme.PlayerFastForward
         BtnReverse.Image = App.CurrentTheme.PlayerFastReverse
-        TipPlayer.BackColor = App.CurrentTheme.BackColor
-        TipPlayer.ForeColor = App.CurrentTheme.TextColor
-        TipPlayer.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipPlayerEX.BackColor = App.CurrentTheme.BackColor
+        TipPlayerEX.ForeColor = App.CurrentTheme.TextColor
+        TipPlayerEX.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         'Debug.Print("Player Theme Set")
     End Sub
@@ -6203,48 +6221,48 @@ Public Class Player
         App.ThemeMenu(CMRatings)
         VisualizerHost.SetVisualizersMenu()
     End Sub
-    Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
+    'Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
 
-        'Initialize
-        Dim MyField As Reflection.PropertyInfo = MyToolStrip.GetType().GetProperty("ToolTip", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
-        Dim MyToolTip As System.Windows.Forms.ToolTip = CType(MyField.GetValue(MyToolStrip), System.Windows.Forms.ToolTip)
+    '    'Initialize
+    '    Dim MyField As Reflection.PropertyInfo = MyToolStrip.GetType().GetProperty("ToolTip", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
+    '    Dim MyToolTip As System.Windows.Forms.ToolTip = CType(MyField.GetValue(MyToolStrip), System.Windows.Forms.ToolTip)
 
-        'Configure ToolTip
-        MyToolTip.OwnerDraw = True
+    '    'Configure ToolTip
+    '    MyToolTip.OwnerDraw = True
 
-        'Draw
-        AddHandler MyToolTip.Popup,
-            Sub(sender, e)
-                Dim s As SizeF
-                s = TextRenderer.MeasureText(CType(sender, System.Windows.Forms.ToolTip).GetToolTip(e.AssociatedControl), App.TipFont)
-                s.Width += 14
-                s.Height += 16
-                e.ToolTipSize = s.ToSize
-            End Sub
-        AddHandler MyToolTip.Draw,
-            Sub(sender, e)
+    '    'Draw
+    '    AddHandler MyToolTip.Popup,
+    '        Sub(sender, e)
+    '            Dim s As SizeF
+    '            s = TextRenderer.MeasureText(CType(sender, System.Windows.Forms.ToolTip).GetToolTip(e.AssociatedControl), App.TipFont)
+    '            s.Width += 14
+    '            s.Height += 16
+    '            e.ToolTipSize = s.ToSize
+    '        End Sub
+    '    AddHandler MyToolTip.Draw,
+    '        Sub(sender, e)
 
-                'Declarations
-                Dim g As Graphics = e.Graphics
+    '            'Declarations
+    '            Dim g As Graphics = e.Graphics
 
-                'Draw background
-                Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
-                g.FillRectangle(brbg, e.Bounds)
+    '            'Draw background
+    '            Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
+    '            g.FillRectangle(brbg, e.Bounds)
 
-                'Draw border
-                Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
-                    g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
-                End Using
+    '            'Draw border
+    '            Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
+    '                g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
+    '            End Using
 
-                'Draw text
-                TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
+    '            'Draw text
+    '            TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
 
-                'Finalize
-                brbg.Dispose()
-                g.Dispose()
+    '            'Finalize
+    '            brbg.Dispose()
+    '            g.Dispose()
 
-            End Sub
+    '        End Sub
 
-    End Sub
+    'End Sub
 
 End Class

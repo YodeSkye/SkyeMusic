@@ -9,6 +9,7 @@ Imports System.Net.Sockets
 Imports System.Threading
 Imports Microsoft.Win32
 Imports NAudio.CoreAudioApi
+Imports Skye.UI
 
 Namespace My
 
@@ -4492,6 +4493,42 @@ Namespace My
         End Sub
         Friend Sub ReThemeTrayMenu()
             If Settings.ShowTrayIcon Then ThemeMenu(NIApp.ContextMenuStrip)
+        End Sub
+        Friend Sub HookTSItemsForCMTooltip(ts As ToolStrip, tip As ToolTipEX)
+            For Each item As ToolStripItem In ts.Items
+                AddHandler item.MouseEnter,
+                    Sub(sender, e)
+                        Dim it = CType(sender, ToolStripItem)
+                        If String.IsNullOrWhiteSpace(it.ToolTipText) Then Exit Sub
+
+                        ' Get item bounds in screen coordinates
+                        Dim itemScreenRect As Rectangle = New Rectangle(
+                            ts.PointToScreen(it.Bounds.Location),
+                            it.Bounds.Size
+                        )
+
+                        ' Measure tooltip size
+                        Dim textSize As Size = TextRenderer.MeasureText(it.ToolTipText, tip.Font)
+                        Dim tipWidth As Integer = textSize.Width + tip.TextPadding * 2
+                        Dim tipHeight As Integer = textSize.Height + tip.TextPadding * 2
+
+                        ' Default: show to the right of the item
+                        Dim pos As Point = New Point(itemScreenRect.Right + 1,
+                                                     itemScreenRect.Top + (itemScreenRect.Height - tipHeight) \ 2 - 1)
+
+                        ' Clamp horizontally using working area
+                        Dim wa As Rectangle = Screen.FromPoint(pos).WorkingArea
+                        If pos.X + tipWidth > wa.Right Then
+                            pos.X = itemScreenRect.Left - tipWidth - 6
+                        End If
+
+                        tip.ShowTooltipAt(pos, it.ToolTipText)
+                    End Sub
+                AddHandler item.MouseLeave,
+                    Sub(sender, e)
+                        tip.HideTooltip()
+                    End Sub
+            Next
         End Sub
         Public Function TintIcon(baseIcon As Image, color As Color) As Image
             Dim bmp As New Bitmap(baseIcon.Width, baseIcon.Height)
