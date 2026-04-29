@@ -842,6 +842,7 @@ Namespace My
 
         ' Companion Server
         Friend Property CompanionServerRunning As Boolean = False 'CompanionServerRunning is a flag that indicates whether the companion server is currently running.
+        Friend _playlistJson As String = "[]"
         Friend Class CompanionControlServerClass
 
             Private ReadOnly _player As Player
@@ -863,6 +864,7 @@ Namespace My
 
             Friend Function Start(port As Integer) As Boolean
                 If _running Then Return True
+                Player.BuildPlaylistJson() ' Ensure playlist JSON is built before accepting any client connections that might request it.
 
                 Try
                     _listener = New TcpListener(IPAddress.Any, port)
@@ -1002,6 +1004,8 @@ Namespace My
                             SetSystemMute(newMute)
                         End If
                         Return
+                    Case "PLAYLIST"
+                        SendToClient(info, "PLAYLIST|" & _playlistJson)
                     Case String.Empty
                         Return
                     Case Else
@@ -1016,7 +1020,7 @@ Namespace My
                                                     Case "PREVIOUS"
                                                         _player.PlayPrevious()
                                                     Case "PLAYPATH"
-                                                        FrmPlayer.PlayFromCompanion(payload)
+                                                        _player.PlayFromCompanion(payload)
                                                 End Select
                                             End Sub)
 
@@ -1034,6 +1038,18 @@ Namespace My
                         End Try
                     Next
                 End SyncLock
+            End Sub
+            Friend Sub SendToClient(info As CompanionClientInfo, message As String)
+                Try
+                    Dim writer As New StreamWriter(info.Client.GetStream()) With {.AutoFlush = True}
+                    writer.WriteLine(message)
+                    Debug.WriteLine("Sent to Companion Client " & info.Name & ": " & message)
+                Catch
+                    ' Remove dead client
+                    SyncLock _clientLock
+                        _clients.Remove(info)
+                    End SyncLock
+                End Try
             End Sub
             Friend Function GetClients() As List(Of CompanionClientInfo)
                 SyncLock _clientLock
@@ -4515,10 +4531,7 @@ Namespace My
         Private Sub ShowTSItemTooltip(ts As ToolStrip, it As ToolStripItem, tip As ToolTipEX)
 
             ' Get item bounds in screen coordinates
-            Dim itemScreenRect As Rectangle = New Rectangle(
-        ts.PointToScreen(it.Bounds.Location),
-        it.Bounds.Size
-    )
+            Dim itemScreenRect As New Rectangle(ts.PointToScreen(it.Bounds.Location), it.Bounds.Size)
 
             ' Measure tooltip size
             Dim textSize As Size = TextRenderer.MeasureText(it.ToolTipText, tip.Font)
@@ -4526,8 +4539,7 @@ Namespace My
             Dim tipHeight As Integer = textSize.Height + tip.TextPadding * 2
 
             ' Default: show to the right of the item
-            Dim pos As Point = New Point(itemScreenRect.Right + 1,
-                                 itemScreenRect.Top + (itemScreenRect.Height - tipHeight) \ 2 - 1)
+            Dim pos As New Point(itemScreenRect.Right + 1, itemScreenRect.Top + (itemScreenRect.Height - tipHeight) \ 2 - 1)
 
             ' Clamp horizontally using working area
             Dim wa As Rectangle = Screen.FromPoint(pos).WorkingArea

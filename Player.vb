@@ -50,6 +50,7 @@ Public Class Player
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
+    Friend Event PlaylistChanged()
 
     ' Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -3407,6 +3408,7 @@ Public Class Player
     End Sub
     Private Sub LVPlaylist_AfterEdit(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVPlaylist.AfterEdit
         LVPlaylist.EditableColumns(0) = False
+        RaiseEvent PlaylistChanged()
     End Sub
     Private Sub Panel_DoubleClick(sender As Object, e As EventArgs) Handles PanelMedia.DoubleClick, PanelVisualizer.DoubleClick
         ToggleMaximized()
@@ -3716,24 +3718,12 @@ Public Class Player
     End Sub
     Private Sub CMIClearPlaylistClick(sender As Object, e As EventArgs) Handles CMIClearPlaylist.Click
         LVPlaylist.Items.Clear()
+        RaiseEvent PlaylistChanged()
     End Sub
     Private Sub CMIEditTitle_Click(sender As Object, e As EventArgs) Handles CMIEditTitle.Click
         Dim lvi = LVPlaylist.SelectedItems(0)
         LVPlaylist.EditableColumns(0) = True
         LVPlaylist.EditSubItem(lvi, 0)
-        'Dim frmEditTitle As New PlayerEditTitle With {
-        '    .NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text}
-        'frmEditTitle.ShowDialog(Me)
-        'If frmEditTitle.DialogResult = DialogResult.OK Then
-        '    If frmEditTitle.NewTitle = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text Then
-        '        Debug.Print("Edit Title Cancelled, New Title Same As Old Title")
-        '    Else
-        '        LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Title").Index).Text = frmEditTitle.NewTitle
-        '        Debug.Print("Title of " + LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text + " Updated to " + frmEditTitle.NewTitle)
-        '    End If
-        'Else
-        '    Debug.Print("Edit Title Cancelled")
-        'End If
     End Sub
     Private Sub CMIShowCurrentClick(sender As Object, e As EventArgs) Handles CMIShowCurrent.Click
         Dim item As ListViewItem = Nothing
@@ -4189,6 +4179,13 @@ Public Class Player
 
         'Broadcast
         App.BroadcastNowPlaying()
+
+    End Sub
+    Private Sub OnPlaylistChanged() Handles Me.PlaylistChanged
+        If Not App.Settings.EnableCompanionServer Then Exit Sub
+
+        BuildPlaylistJson()
+        App.CompanionControlServer.Broadcast("PLAYLIST_CHANGED")
 
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
@@ -4697,6 +4694,7 @@ Public Class Player
             Next
             ShowStatusMessage("Playlist Loaded Successfully (" & items.Count.ToString & ")")
             Skye.Common.Log.Write("Imported Playlist from " & filename)
+            RaiseEvent PlaylistChanged()
         Catch ex As Exception
             ShowStatusMessage("Error Loading Playlist")
             Skye.Common.Log.Write("Error Importing Playlist from " & filename & vbCr & ex.Message)
@@ -4825,6 +4823,7 @@ Public Class Player
                     End If
                 End If
             Next
+            RaiseEvent PlaylistChanged()
             lvi = Nothing
         End If
         SetPlaylistCountText()
@@ -4869,6 +4868,7 @@ Public Class Player
         End If
         SetPlaylistCountText()
         lvi = Nothing
+        RaiseEvent PlaylistChanged()
     End Sub
     Friend Sub AddToPlaylistFromDirectory(title As String, stream As String)
         Dim realUrl As String = NormalizeUrl(stream)
@@ -4952,6 +4952,7 @@ Public Class Player
                 If LVPlaylist.Items.Count = 0 Then ClearPlaylistTitles()
                 If RandomHistoryIndex > RandomHistory.Count - 1 Then RandomHistoryIndex = RandomHistory.Count - 1
             End If
+            RaiseEvent PlaylistChanged()
         End If
     End Sub
     Friend Sub RemoveFromPlaylistFromLibrary(filename As String)
@@ -5007,6 +5008,18 @@ Public Class Player
             RandomHistoryIndex = RandomHistory.Count
             'Debug.Print("Added " + songorstream + " to Random History")
         End If
+    End Sub
+    Friend Sub BuildPlaylistJson()
+        Dim items As New List(Of App.PlaylistItemType)
+
+        For Each li As ListViewItem In LVPlaylist.Items
+            items.Add(New App.PlaylistItemType With {
+                .Title = li.Text,
+                .Path = li.SubItems(1).Text
+            })
+        Next
+
+        App._playlistJson = System.Text.Json.JsonSerializer.Serialize(items)
     End Sub
     Private Function NormalizeUrl(url As String) As String
         Try
