@@ -841,6 +841,10 @@ Namespace My
         Friend Event SystemMuteChanged(isMuted As Boolean)
 
         ' Companion Server
+        Friend Class CompanionPlaylistItem
+            Public Property Title As String
+            Public Property Path As String
+        End Class
         Friend Property CompanionServerRunning As Boolean = False 'CompanionServerRunning is a flag that indicates whether the companion server is currently running.
         Friend _playlistJson As String = "[]"
         Friend Class CompanionControlServerClass
@@ -864,7 +868,7 @@ Namespace My
 
             Friend Function Start(port As Integer) As Boolean
                 If _running Then Return True
-                Player.BuildPlaylistJson() ' Ensure playlist JSON is built before accepting any client connections that might request it.
+                _player.BuildPlaylistJson() ' Ensure playlist JSON is built before accepting any client connections that might request it.
 
                 Try
                     _listener = New TcpListener(IPAddress.Any, port)

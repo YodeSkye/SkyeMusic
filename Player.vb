@@ -3278,6 +3278,7 @@ Public Class Player
                 End If
             End If
             PlaylistItemMove = Nothing
+            RaiseEvent PlaylistChanged()
         End If
         PlaylistItemMove = Nothing
         Cursor = Cursors.Default
@@ -4959,7 +4960,10 @@ Public Class Player
         If LVPlaylist.Items.Count > 0 Then
             Dim lvi As ListViewItem
             lvi = LVPlaylist.FindItemWithText(filename, True, 0)
-            If lvi IsNot Nothing Then LVPlaylist.Items.Remove(lvi)
+            If lvi IsNot Nothing Then
+                LVPlaylist.Items.Remove(lvi)
+                RaiseEvent PlaylistChanged()
+            End If
             SetPlaylistCountText()
         End If
     End Sub
@@ -5010,16 +5014,19 @@ Public Class Player
         End If
     End Sub
     Friend Sub BuildPlaylistJson()
-        Dim items As New List(Of App.PlaylistItemType)
+        Dim items As New List(Of App.CompanionPlaylistItem)
 
         For Each li As ListViewItem In LVPlaylist.Items
-            items.Add(New App.PlaylistItemType With {
-                .Title = li.Text,
-                .Path = li.SubItems(1).Text
+            items.Add(New App.CompanionPlaylistItem With {
+                .Title = li.SubItems(LVPlaylist.Columns("Title").Index).Text,
+                .Path = li.SubItems(LVPlaylist.Columns("Path").Index).Text
             })
+            'Debug.Print("Added to Playlist JSON: " + li.SubItems(LVPlaylist.Columns("Title").Index).Text + " (" + li.SubItems(LVPlaylist.Columns("Path").Index).Text + ")")
         Next
 
         App._playlistJson = System.Text.Json.JsonSerializer.Serialize(items)
+        'Debug.Print(App._playlistJson)
+
     End Sub
     Private Function NormalizeUrl(url As String) As String
         Try
@@ -5151,17 +5158,8 @@ Public Class Player
 
     'Queue
     Friend Sub QueuePath(path As String)
-        'Dim found As Boolean = False
-        'For Each s As String In Queue
-        '    If s = path Then
-        '        found = True
-        '        Exit For
-        '    End If
-        'Next
-        'If Not found Then
         Queue.Add(path)
         SetPlaylistCountText()
-        'End If
     End Sub
     Friend Sub RemoveFromQueue(path As String)
         Queue.Remove(path)
@@ -5287,6 +5285,7 @@ Public Class Player
             End If
             SetPlaylistCountText()
             lvi = Nothing
+            RaiseEvent PlaylistChanged()
         Else
             If Not existingitem.SubItems(LVPlaylist.Columns("Title").Index).Text = title Then
                 Dim i As Integer = existingitem.Index
