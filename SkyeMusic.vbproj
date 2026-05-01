@@ -68,7 +68,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
     </Compile>
-    <Compile Update="My Project\Resources.Designer.vb">
+    <Compile Update="Resources.Designer.vb">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
@@ -76,7 +76,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="My Project\Resources.resx">
+    <EmbeddedResource Update="Resources.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
