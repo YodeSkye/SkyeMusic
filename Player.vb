@@ -25,6 +25,7 @@ Public Class Player
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Private _hidefromTaskSwitcher As Boolean = False ' Used by Player to hide from Task Switcher View when minimize to tray is enabled
+    Private _lastRealState As FormWindowState = FormWindowState.Normal
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
     Private Mute As Boolean = False 'True if the player is muted
@@ -2676,10 +2677,15 @@ Public Class Player
                     'Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
                     App.PerformHotKeyAction(m.WParam.ToInt32)
                 Case WinAPI.WM_SYSCOMMAND
-                    If m.WParam.ToInt32() = WinAPI.SC_MINIMIZE Then
-                        If CMPlaylist IsNot Nothing AndAlso CMPlaylist.Visible Then
-                            WinAPI.PostMessage(CMPlaylist.Handle, WinAPI.WM_CLOSE, IntPtr.Zero, IntPtr.Zero) 'Closes the Playlist Context Menu on minimize so it doesn't linger upon restore.
-                            'If TipPlaylist IsNot Nothing Then TipPlaylist.HideTooltip()
+                    Dim cmd As Integer = m.WParam.ToInt32() And &HFFF0
+                    If cmd = WinAPI.SC_MINIMIZE Then
+                        If App.Settings.ShowTrayIcon AndAlso App.Settings.MinimizeToTray Then
+                            ' Close playlist menu if open
+                            If CMPlaylist IsNot Nothing AndAlso CMPlaylist.Visible Then
+                                WinAPI.PostMessage(CMPlaylist.Handle, WinAPI.WM_CLOSE, IntPtr.Zero, IntPtr.Zero)
+                            End If
+                            MinimizeToTray()
+                            Return ' <-- CRITICAL: prevents ghost titlebar
                         End If
                     End If
                 Case Skye.WinAPI.WM_ACTIVATE
@@ -2980,27 +2986,6 @@ Public Class Player
             App.Settings.PlayerLocation = Location
         End If
     End Sub
-    Private Sub Player_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
-        If Visible AndAlso WindowState = FormWindowState.Normal Then
-            App.Settings.PlayerSize = Size
-        End If
-        Select Case WindowState
-            Case FormWindowState.Minimized
-                If App.Settings.ShowTrayIcon AndAlso App.Settings.MinimizeToTray Then
-                    _hidefromTaskSwitcher = True
-                    ShowInTaskbar = False
-                    If Not Visible Then RecreateHandle() ' Only recreate handle when NOT visible → no blinking
-                Else
-                    _hidefromTaskSwitcher = False
-                    ShowInTaskbar = True
-                    If Not Visible Then RecreateHandle() ' Only recreate handle when NOT visible → no blinking
-                End If
-            Case FormWindowState.Normal, FormWindowState.Maximized
-                _hidefromTaskSwitcher = False
-                ShowInTaskbar = True
-                If Not Visible Then RecreateHandle() ' Only recreate handle when NOT visible → no blinking
-        End Select
-    End Sub
     Private Sub Player_Deactivate(sender As Object, e As EventArgs) Handles MyBase.Deactivate
         ResetTxtBoxPlaylistSearch()
         LVPlaylist.Select()
@@ -3225,6 +3210,7 @@ Public Class Player
                             LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ▲"
                     End Select
             End Select
+            RaiseEvent PlaylistChanged()
         End If
     End Sub
     Private Sub LVPlaylist_DoubleClick(sender As Object, e As EventArgs) Handles LVPlaylist.DoubleClick
@@ -4428,14 +4414,44 @@ Public Class Player
         MeterAudioCapture.StartRecording()
     End Sub
     Friend Sub TogglePlayer()
-        Static lastState As FormWindowState
-        Select Case WindowState
-            Case FormWindowState.Normal, FormWindowState.Maximized
-                lastState = WindowState
-                WindowState = FormWindowState.Minimized
-            Case FormWindowState.Minimized
-                WindowState = lastState
-        End Select
+        ' If MiniPlayer is active, single-click should hide MiniPlayer, not restore Player
+        If PlayerIsMiniMode Then
+            SetMiniPlayer() ' this exits mini mode (hides MiniPlayer)
+            Return
+        End If
+
+        ' Normal toggle behavior
+        If FrmPlayer.Visible Then
+            MinimizeToTray()
+        Else
+            RestoreFromTray()
+        End If
+    End Sub
+    Private Sub MinimizeToTray()
+        ' Remember the real state (Normal or Maximized)
+        If WindowState = FormWindowState.Normal OrElse WindowState = FormWindowState.Maximized Then
+            _lastRealState = WindowState
+        End If
+
+        ' If maximized, normalize BEFORE hiding to avoid fullscreen glitch
+        If WindowState = FormWindowState.Maximized Then
+            WindowState = FormWindowState.Normal
+        End If
+
+        _hidefromTaskSwitcher = True
+        ShowInTaskbar = False
+        Visible = False
+        RecreateHandle()
+    End Sub
+    Friend Sub RestoreFromTray()
+        _hidefromTaskSwitcher = False
+        ShowInTaskbar = True
+        Visible = True
+
+        ' Restore the REAL state
+        WindowState = _lastRealState
+
+        Activate()
     End Sub
     Friend Sub ExitApp()
         Close()

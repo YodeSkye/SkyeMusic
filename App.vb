@@ -2265,15 +2265,10 @@ Namespace My
         Private Sub NIApp_MIPlayer_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    If FrmMiniPlayer Is Nothing Then
-                        Select Case FrmPlayer.WindowState
-                            Case FormWindowState.Normal, FormWindowState.Maximized
-                                FrmPlayer.BringToFront()
-                            Case FormWindowState.Minimized
-                                FrmPlayer.TogglePlayer()
-                        End Select
+                    If PlayerIsMiniMode Then
+                        SetMiniPlayer() ' MiniPlayer is active → switch back to full player
                     Else
-                        SetMiniPlayer()
+                        FrmPlayer.TogglePlayer() ' Full player mode → toggle tray visibility
                     End If
                 Case MouseButtons.Right
             End Select
@@ -3267,21 +3262,38 @@ Namespace My
         End Sub
         Friend Sub SetMiniPlayer()
             If FrmMiniPlayer Is Nothing OrElse FrmMiniPlayer.IsDisposed Then
+
+                ' ENTER MINI MODE
+                PlayerIsMiniMode = True
                 Settings.VisualizerMiniMode = True
+
+                ' Hide main player completely
+                FrmPlayer.Visible = False
+
+                ' Create and show mini player
                 FrmMiniPlayer = New PlayerMini
                 FrmMiniPlayer.Show()
-                FrmPlayer.Hide()
-                FrmPlayer.LyricsOff()
-                PlayerIsMiniMode = True
-                FrmPlayer.ShowMedia()
                 FrmMiniPlayer.Activate()
+
+                FrmPlayer.LyricsOff()
+                FrmPlayer.ShowMedia()
+
             Else
+
+                ' EXIT MINI MODE
+                PlayerIsMiniMode = False
                 Settings.VisualizerMiniMode = False
+
+                ' Close mini player
                 FrmMiniPlayer.Close()
                 FrmMiniPlayer = Nothing
-                FrmPlayer.Show()
-                PlayerIsMiniMode = False
+
+                ' Restore main player
+                FrmPlayer.Visible = True
+                FrmPlayer.RestoreFromTray()
+
                 FrmPlayer.ShowMedia()
+
             End If
         End Sub
         Friend Sub ShowDevTools()
