@@ -2908,6 +2908,8 @@ Public Class Player
                         e.SuppressKeyPress = True
                         TogglePlay()
                     Case Keys.OemQuestion
+                        e.SuppressKeyPress = True
+                        ShowNowPlayingToast(PlaylistCurrentText)
                     Case Keys.PageUp
                     Case Keys.PageDown
                     Case Keys.Home
@@ -4210,8 +4212,8 @@ Public Class Player
     Private Sub TimerShowMedia_Tick(sender As Object, e As EventArgs) Handles TimerShowMedia.Tick
         TimerShowMedia.Stop()
         ShowMedia()
-        'If Mute Then ToggleMute()
         ShowNowPlayingToast(PlaylistCurrentText)
+        NowPlaying.Text = PlaylistCurrentText
         App.BroadcastNowPlaying()
     End Sub
     Private Sub TimerStatus_Tick(sender As Object, e As EventArgs) Handles TimerStatus.Tick
@@ -4397,7 +4399,7 @@ Public Class Player
         ' ------------------------------
 
     End Sub
-    Private Sub ShowNowPlayingToast(songtext As String)
+    Friend Sub ShowNowPlayingToast(songtext As String)
         If App.Settings.ShowNowPlayingToast Then
             Dim npo As New Skye.UI.ToastOptions With {
                 .Title = "Now Playing",
@@ -5501,7 +5503,9 @@ Public Class Player
         ' - LibVLC creates/destroys native windows asynchronously
         ' - UI transitions (fullscreen, hooks) must be marshaled and timed carefully
         ' - Avoid cross-thread reparenting or teardown collisions
+
         PlayState = PlayStates.Playing
+
         'Update The Histories
         UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed for uniformity.
         If PausedAt IsNot Nothing Then
@@ -5553,10 +5557,10 @@ Public Class Player
                 End If
                 LoadLyrics(_player.Path)
         End Select
-        'RaiseEvent TitleChanged(PlaylistCurrentText)
-        NowPlaying.Text = PlaylistCurrentText
+        'NowPlaying.Text = PlaylistCurrentText
 
         TimerShowMedia.Start()
+
     End Sub
     Private Sub OnPause()
         PlayState = PlayStates.Paused

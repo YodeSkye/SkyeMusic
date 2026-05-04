@@ -86,16 +86,12 @@ Public Class PlayerMini
                     App.SetMiniPlayer()
                 Case Keys.End
                 Case Keys.Up
-                'Case Keys.Left
-                '    e.SuppressKeyPress = True
-                '    Player.UpdatePosition(False, 10)
-                'Case Keys.Right
-                '    e.SuppressKeyPress = True
-                '    Player.UpdatePosition(True, 10)
                 Case Keys.Space
                     e.SuppressKeyPress = True
                     App.FrmPlayer.TogglePlay()
                 Case Keys.OemQuestion
+                    e.SuppressKeyPress = True
+                    App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
                 Case Keys.PageUp
                 Case Keys.PageDown
                 Case Keys.Home

@@ -5,7 +5,8 @@
 \cf0\fs24 Released ? 2026\cf1\par
 \fs28\par
 \cf2\fs24 New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  SkyeMusic now includes full system\f2\_\f0 level volume control, making it easier to keep your listening experience consistent no matter where you adjust it. The app now stays perfectly in sync with your computer\rquote s volume, whether you change it using hardware keys, the Windows taskbar, or inside SkyeMusic itself. Mute and volume changes update instantly and feel smoother and more responsive, giving you a more natural and predictable audio experience. This update replaces the old player\f2\_\f0 only mute behavior with a true system\f2\_\f0 wide approach, so SkyeMusic always reflects the real volume of your device. Also added volume support to the Companion App Server\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Show Now Playing toast on '?' key press from both Player and MiniPlayer.\f1\par
+\'a3\'ab\f0  SkyeMusic now includes full system\f2\_\f0 level volume control, making it easier to keep your listening experience consistent no matter where you adjust it. The app now stays perfectly in sync with your computer\rquote s volume, whether you change it using hardware keys, the Windows taskbar, or inside SkyeMusic itself. Mute and volume changes update instantly and feel smoother and more responsive, giving you a more natural and predictable audio experience. This update replaces the old player\f2\_\f0 only mute behavior with a true system\f2\_\f0 wide approach, so SkyeMusic always reflects the real volume of your device. Also added volume support to the Companion App Server\par
 \f1\'a3\'ab\f0  Added support for the SkyeMusic Companion App, allowing Android phones and tablets and other Windows devices on your network to control playback on your PC, view Now Playing information, and eventually view the Playlist and stream audio.\f1\par
 \cf1\b\f0\lang9\par
 \cf2 Improvements\par
@@ -19,7 +20,8 @@
 \f3\lang9\u10003? \f4\lang1033 Player menu background now matches current theme if not in Accent mode.\f5\lang9\par
 \par
 \cf2\b\f0 Fixes\par
-\cf0\b0\f3\u10005?\f4\lang1033  Fixed a UI freezing problem when Companion Server is on and the network is slow. Properly threaded the Companion Server.\f5\lang9\par
+\cf0\b0\f3\u10005?\f4\lang1033  Stopped the toast from blinking when shown by solving a player lifecycle issue.\f3\lang9\par
+\u10005?\f4\lang1033  Fixed a UI freezing problem when Companion Server is on and the network is slow. Properly threaded the Companion Server.\f5\lang9\par
 \f3\u10005?\f4\lang1033  \f5\lang9 Resolved an issue where the audio meters could freeze mid\_update due to\f4\lang1033  \f5\lang9 NAudio\rquote s capture thread stalling. The app now monitors for stalled audio input and restarts the capture automatically, keeping the meters alive and accurate.\par
 \f3\u10005?\f4\lang1033  Fixed an issue where the visualizer wouldn't start in minimode if a video was playing.\f5\lang9\par
 \f3\u10005?\f4\lang1033  Fixed \f5\lang9 metadata handling for streams in \f4\lang1033 H\f5\lang9 istory\f4\lang1033 . \f5\lang9 Improve\f4\lang1033 d\f5\lang9  labeling and overall user experience with clearer, more consistent metadata display.\par
