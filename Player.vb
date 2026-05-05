@@ -6082,35 +6082,21 @@ Public Class Player
     Friend Function BuildNowPlayingMessage() As String
         Try
             Dim state As String = PlayState.ToString
-            Dim currentTitle As String = NowPlaying.Text ' Currently playing metadata (may differ from file metadata)
-            Dim path As String = String.Empty
-            If _player IsNot Nothing And _player.HasMedia Then path = _player.Path.TrimEnd("/"c)
-            Dim title As String = String.Empty
+            Dim currentTitle As String = NowPlaying.Text
+            Dim path As String = If(_player?.HasMedia, _player.Path.TrimEnd("/"c), "")
+            Dim title As String = ""
             Dim lvi As ListViewItem = LVPlaylist.FindItemWithText(path, True, 0)
-            If lvi IsNot Nothing Then title = lvi.SubItems(LVPlaylist.Columns("Title").Index).Text
+            If lvi IsNot Nothing Then
+                title = lvi.SubItems(LVPlaylist.Columns("Title").Index).Text
+            End If
             Dim duration As Integer = SafeSeconds(_player.Duration)
             Dim position As Integer = SafeSeconds(_player.Position)
-            Dim artworkBase64 As String = String.Empty
+            ' ARTWORK NORMALIZATION
+            Dim artworkBase64 As String = ""
             If AlbumArt IsNot Nothing Then
-                Try
-                    ' Force-convert to a 32-bit ARGB bitmap
-                    Using bmp As New Bitmap(AlbumArt.Width, AlbumArt.Height, Imaging.PixelFormat.Format32bppArgb)
-                        Using g As Graphics = Graphics.FromImage(bmp)
-                            g.DrawImage(AlbumArt, 0, 0, AlbumArt.Width, AlbumArt.Height)
-                        End Using
-                        Using ms As New MemoryStream()
-                            bmp.Save(ms, Imaging.ImageFormat.Png)
-                            artworkBase64 = Convert.ToBase64String(ms.ToArray())
-                        End Using
-                    End Using
-
-                Catch ex As Exception
-                    artworkBase64 = String.Empty
-                    Skye.Common.Log.Write("Artwork encode error: " & ex.Message)
-                End Try
+                artworkBase64 = NormalizeArtwork(AlbumArt)
             End If
 
-            ' Build the message
             Return String.Join("|", {
                 "NOWPLAYING",
                 state,
@@ -6121,7 +6107,6 @@ Public Class Player
                 position.ToString(),
                 artworkBase64
             })
-
         Catch ex As Exception
             Skye.Common.Log.Write("BuildNowPlayingMessage Error: " & ex.Message)
             Return "NOWPLAYING|ERROR"
@@ -6144,7 +6129,34 @@ Public Class Player
     End Sub
     Private Function SafeSeconds(value As Double) As Integer
         If Double.IsNaN(value) OrElse Double.IsInfinity(value) OrElse value < 0 Then Return 0
+
         Return CInt(Math.Floor(value))
+    End Function
+    Private Function NormalizeArtwork(src As Image) As String
+        If src Is Nothing Then Return ""
+
+        Const maxSize As Integer = 1024
+        Dim w As Integer = src.Width
+        Dim h As Integer = src.Height
+        Dim scale As Double = Math.Min(maxSize / w, maxSize / h)
+        If scale > 1 Then scale = 1 ' Don't upscale
+        Dim newW As Integer = CInt(w * scale)
+        Dim newH As Integer = CInt(h * scale)
+
+        Using bmp As New Bitmap(newW, newH)
+            Using g As Graphics = Graphics.FromImage(bmp)
+                g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+                g.DrawImage(src, 0, 0, newW, newH)
+            End Using
+            Using ms As New MemoryStream()
+                Dim enc = Imaging.ImageCodecInfo.GetImageEncoders().First(Function(c) c.FormatID = Imaging.ImageFormat.Jpeg.Guid)
+                Dim ep As New Imaging.EncoderParameters(1)
+                ep.Param(0) = New Imaging.EncoderParameter(Imaging.Encoder.Quality, 85L)
+
+                bmp.Save(ms, enc, ep)
+                Return Convert.ToBase64String(ms.ToArray())
+            End Using
+        End Using
     End Function
 
     'Themes
