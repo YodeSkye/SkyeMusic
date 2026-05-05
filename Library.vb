@@ -1082,9 +1082,9 @@ Public Class Library
         End If
     End Sub
     Private Sub Queue()
-        If LVLibrary.SelectedItems.Count > 0 Then
-            App.FrmPlayer.QueuePath(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
-        End If
+        For Each item As ListViewItem In LVLibrary.SelectedItems
+            App.FrmPlayer.QueuePath(item.SubItems(LVLibrary.Columns("FilePath").Index).Text)
+        Next
     End Sub
     Private Sub AddToPlaylist(item As ListViewItem)
         App.FrmPlayer.AddToPlaylistFromLibrary(App.FormatPlaylistTitle(item), item.SubItems(LVLibrary.Columns("FilePath").Index).Text)

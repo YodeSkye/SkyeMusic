@@ -477,7 +477,7 @@ Partial Class Options
         CoBoxPlaylistDefaultAction.Name = "CoBoxPlaylistDefaultAction"
         CoBoxPlaylistDefaultAction.Size = New Size(178, 29)
         CoBoxPlaylistDefaultAction.TabIndex = 250
-        TipOptions.SetText(CoBoxPlaylistDefaultAction, "Choose what happens when you double-click a song in the playlist.")
+        TipOptions.SetText(CoBoxPlaylistDefaultAction, "Choose what happens when you double-click a song in the Playlist or the Library.")
         TipError.SetText(CoBoxPlaylistDefaultAction, Nothing)
         ' 
         ' CoBoxPlaylistSearchAction
