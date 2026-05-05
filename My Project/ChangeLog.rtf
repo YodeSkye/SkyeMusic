@@ -10,7 +10,8 @@
 \f1\'a3\'ab\f0  Added support for the SkyeMusic Companion App, allowing Android phones and tablets and other Windows devices on your network to control playback on your PC, view Now Playing information, and eventually view the Playlist and stream audio.\f1\par
 \cf1\b\f0\lang9\par
 \cf2 Improvements\par
-\cf0\b0\f3\u10003?\f4\lang1033  The logging system has been upgraded with safer and more predictable file operations and a redesigned Log Viewer\f5 . The search engine has been completely rewritten to use a bottom\_up scanning approach with reliable previous/next navigation and clearer \ldblquote not found\rdblquote  feedback, making it far easier to analyze large logs.\f4  Log Rotation for large log files has also been implemented.\par
+\cf0\b0\f3\u10003?\f4\lang1033  Better Companion Server album art performance: Artwork is now resized and optimized before sending, so album covers load faster and more reliably on all clients. This fixes an issue where artwork would sometimes not show on the Companion client, even though the song had valid artwork.\par
+\f3\lang9\u10003?\f4\lang1033  The logging system has been upgraded with safer and more predictable file operations and a redesigned Log Viewer\f5 . The search engine has been completely rewritten to use a bottom\_up scanning approach with reliable previous/next navigation and clearer \ldblquote not found\rdblquote  feedback, making it far easier to analyze large logs.\f4  Log Rotation for large log files has also been implemented.\par
 \f3\lang9\u10003?\f4\lang1033  \f5\lang9 Better handling of multiple devices connected at the same time\f4\lang1033 .\par
 \f3\lang9\u10003?\f4\lang1033  \f5\lang9 More reliable device connections and smoother communication between the\f4\lang1033  Companion\f5\lang9  \f4\lang1033 A\f5\lang9 pp and your PC\f4\lang1033 .\f5\lang9\par
 \f3\u10003?\f4\lang1033  Made improvements to the media logic so switching between audio, video, visualizer, and lyrics happens more smoothly and with less blinking.\f5\lang9\par
@@ -20,8 +21,8 @@
 \f3\lang9\u10003? \f4\lang1033 Player menu background now matches current theme if not in Accent mode.\f5\lang9\par
 \par
 \cf2\b\f0 Fixes\par
-\cf0\b0\f3\u10005?\f4\lang1033  Fixed a ghost title bar issue with the Player window when minimized to tray. Created a better state system and changed the way the window is "minimized".\f3\lang9\par
-\u10005?\f4\lang1033  Stopped the toast from blinking when shown by solving a player lifecycle issue.\f5\lang9\par
+\cf0\b0\f3\u10005?\f4\lang1033  Fixed a ghost title bar issue with the Player window when minimized to tray. Created a better state system and changed the way the window is "minimized".\f5\lang9\par
+\f3\u10005?\f4\lang1033  Stopped the toast from blinking when shown by solving a player lifecycle issue.\f5\lang9\par
 \f3\u10005?\f4\lang1033  Fixed a UI freezing problem when Companion Server is on and the network is slow. Properly threaded the Companion Server.\f5\lang9\par
 \f3\u10005?\f4\lang1033  \f5\lang9 Resolved an issue where the audio meters could freeze mid\_update due to\f4\lang1033  \f5\lang9 NAudio\rquote s capture thread stalling. The app now monitors for stalled audio input and restarts the capture automatically, keeping the meters alive and accurate.\par
 \f3\u10005?\f4\lang1033  Fixed an issue where the visualizer wouldn't start in minimode if a video was playing.\f5\lang9\par

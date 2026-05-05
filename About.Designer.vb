@@ -42,6 +42,7 @@ Partial Class About
         LblSponsorMe = New Label()
         LblUpdateAvailable = New Skye.UI.Label()
         LLblSkyeMusic = New LinkLabel()
+        LLblSkyeMusicCompanion = New LinkLabel()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -291,7 +292,7 @@ Partial Class About
         LLblSkyeMusic.Image = My.Resources.Resources.ImageAppRed16
         LLblSkyeMusic.ImageAlign = ContentAlignment.MiddleLeft
         LLblSkyeMusic.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSkyeMusic.Location = New Point(134, 114)
+        LLblSkyeMusic.Location = New Point(134, 102)
         LLblSkyeMusic.Name = "LLblSkyeMusic"
         LLblSkyeMusic.Size = New Size(111, 23)
         LLblSkyeMusic.TabIndex = 109
@@ -300,11 +301,29 @@ Partial Class About
         TipAbout.SetText(LLblSkyeMusic, Nothing)
         LLblSkyeMusic.TextAlign = ContentAlignment.TopRight
         ' 
+        ' LLblSkyeMusicCompanion
+        ' 
+        LLblSkyeMusicCompanion.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblSkyeMusicCompanion.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAbout.SetImage(LLblSkyeMusicCompanion, Nothing)
+        LLblSkyeMusicCompanion.Image = My.Resources.Resources.ImageAppRed16
+        LLblSkyeMusicCompanion.ImageAlign = ContentAlignment.MiddleLeft
+        LLblSkyeMusicCompanion.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblSkyeMusicCompanion.Location = New Point(36, 125)
+        LLblSkyeMusicCompanion.Name = "LLblSkyeMusicCompanion"
+        LLblSkyeMusicCompanion.Size = New Size(313, 23)
+        LLblSkyeMusicCompanion.TabIndex = 110
+        LLblSkyeMusicCompanion.TabStop = True
+        LLblSkyeMusicCompanion.Text = "Companion Client (Windows && Android)"
+        TipAbout.SetText(LLblSkyeMusicCompanion, Nothing)
+        LLblSkyeMusicCompanion.TextAlign = ContentAlignment.TopRight
+        ' 
         ' About
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(384, 617)
+        Controls.Add(LLblSkyeMusicCompanion)
         Controls.Add(LLblSkyeMusic)
         Controls.Add(LblSponsorMe)
         Controls.Add(LLblSponsorPayPal)
@@ -353,4 +372,5 @@ Partial Class About
     Friend WithEvents LblSponsorMe As Label
     Friend WithEvents LblUpdateAvailable As Skye.UI.Label
     Friend WithEvents LLblSkyeMusic As LinkLabel
+    Friend WithEvents LLblSkyeMusicCompanion As LinkLabel
 End Class

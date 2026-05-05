@@ -104,6 +104,15 @@ Public Class About
     Private Sub LLblSkyeMusic_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSkyeMusic.MouseClick
         OpenLink(App.AttributionSkye)
     End Sub
+    Private Sub LLblSkyeMusicCompanion_MouseEnter(sender As Object, e As EventArgs) Handles LLblSkyeMusicCompanion.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LLblSkyeMusicCompanion_MouseLeave(sender As Object, e As EventArgs) Handles LLblSkyeMusicCompanion.MouseLeave
+        ResetCursor()
+    End Sub
+    Private Sub LLblSkyeMusicCompanion_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSkyeMusicCompanion.MouseClick
+        OpenLink(App.AttributionCompanion)
+    End Sub
     Private Sub LLblMicrosoft_MouseEnter(sender As Object, e As EventArgs) Handles LLblMicrosoft.MouseEnter
         Cursor = Cursors.Hand
     End Sub
@@ -236,6 +245,7 @@ Public Class About
             LblVersion.ForeColor = App.CurrentTheme.AccentTextColor
             LblUpdateAvailable.ForeColor = App.CurrentTheme.AccentTextColor
             LLblSkyeMusic.LinkColor = App.CurrentTheme.AccentTextColor
+            LLblSkyeMusicCompanion.LinkColor = App.CurrentTheme.AccentTextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.AccentTextColor
             LLblVLCSharp.LinkColor = App.CurrentTheme.AccentTextColor
             LLblNAudio.LinkColor = App.CurrentTheme.AccentTextColor
@@ -251,6 +261,7 @@ Public Class About
             LblVersion.ForeColor = App.CurrentTheme.TextColor
             LblUpdateAvailable.ForeColor = App.CurrentTheme.TextColor
             LLblSkyeMusic.LinkColor = App.CurrentTheme.TextColor
+            LLblSkyeMusicCompanion.LinkColor = App.CurrentTheme.TextColor
             LLblMicrosoft.LinkColor = App.CurrentTheme.TextColor
             LLblVLCSharp.LinkColor = App.CurrentTheme.TextColor
             LLblNAudio.LinkColor = App.CurrentTheme.TextColor
@@ -261,6 +272,7 @@ Public Class About
             LLblSponsorPayPal.LinkColor = App.CurrentTheme.TextColor
         End If
         LLblSkyeMusic.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
+        LLblSkyeMusicCompanion.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblMicrosoft.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblVLCSharp.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
         LLblNAudio.ActiveLinkColor = App.CurrentTheme.ButtonBackColor
