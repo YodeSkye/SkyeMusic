@@ -5031,21 +5031,6 @@ Public Class Player
             'Debug.Print("Added " + songorstream + " to Random History")
         End If
     End Sub
-    Friend Sub BuildPlaylistJson()
-        Dim items As New List(Of App.CompanionPlaylistItem)
-
-        For Each li As ListViewItem In LVPlaylist.Items
-            items.Add(New App.CompanionPlaylistItem With {
-                .Title = li.SubItems(LVPlaylist.Columns("Title").Index).Text,
-                .Path = li.SubItems(LVPlaylist.Columns("Path").Index).Text
-            })
-            'Debug.Print("Added to Playlist JSON: " + li.SubItems(LVPlaylist.Columns("Title").Index).Text + " (" + li.SubItems(LVPlaylist.Columns("Path").Index).Text + ")")
-        Next
-
-        App._playlistJson = System.Text.Json.JsonSerializer.Serialize(items)
-        'Debug.Print(App._playlistJson)
-
-    End Sub
     Private Function NormalizeUrl(url As String) As String
         Try
             Dim u = New Uri(url)
@@ -6142,6 +6127,21 @@ Public Class Player
             Return "NOWPLAYING|ERROR"
         End Try
     End Function
+    Friend Sub BuildPlaylistJson()
+        Dim items As New List(Of App.CompanionPlaylistItem)
+
+        For Each li As ListViewItem In LVPlaylist.Items
+            items.Add(New App.CompanionPlaylistItem With {
+                .Title = li.SubItems(LVPlaylist.Columns("Title").Index).Text,
+                .Path = li.SubItems(LVPlaylist.Columns("Path").Index).Text
+            })
+            'Debug.Print("Added to Playlist JSON: " + li.SubItems(LVPlaylist.Columns("Title").Index).Text + " (" + li.SubItems(LVPlaylist.Columns("Path").Index).Text + ")")
+        Next
+
+        App._playlistJson = System.Text.Json.JsonSerializer.Serialize(items)
+        'Debug.Print(App._playlistJson)
+
+    End Sub
     Private Function SafeSeconds(value As Double) As Integer
         If Double.IsNaN(value) OrElse Double.IsInfinity(value) OrElse value < 0 Then Return 0
         Return CInt(Math.Floor(value))
