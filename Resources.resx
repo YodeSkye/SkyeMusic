@@ -197,7 +197,7 @@
     <value>My Project\ImagePlayerSound.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="HelpRT" xml:space="preserve">
-    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset1 Segoe UI Symbol;}{\f5\fnil\fcharset0 Segoe UI Symbol;}{\f6\fnil Segoe UI Symbol;}}
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil Segoe UI Symbol;}{\f5\fnil\fcharset0 Segoe UI Symbol;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 Skye Music Help\par
@@ -205,7 +205,8 @@
 \cf2\f1\fs24 Player Shortcuts &amp; Functions\par
 \cf0 &lt;Spacebar&gt; \b0 Toggle Play/Pause\par
 \b &lt;Ctrl&gt;+&lt;Spacebar&gt; \b0 Stop\par
-\b &lt;M&gt; \b0 Toggle Mute\par
+\b &lt;/?&gt; \b0 Show Toast\b\par
+&lt;M&gt; \b0 Toggle System Mute\par
 \b &lt;Left Arrow&gt;\b0  Fast Reverse\par
 \b &lt;Right Arrow&gt; \b0 Fast Forward\par
 \b &lt;B&gt; \b0 Previous Song\par
@@ -223,6 +224,13 @@
 \b &lt;Left-Click&gt; \b0 on the Tray Icon to minimize the app, optionally minimizing to the Tray.\b\par
 &lt;Left\f2\_\f1\lang1033 C\f2\lang9 lick\f1\lang1033 &gt;\f2\lang9  \b0\f1\lang1033 on \f2\lang9 the album art to cycle to the next image (only applies if multiple images are available).\f1\lang1033  \f2\lang9 A small number badge in the upper\_right corner of the album art indicates how many images are associated with the current song.\f1\par
 \b &lt;Double-Click&gt; \b0 on either Album Art, the Visualizer, or the Video will maximize the window or return it to a normal state.\par
+\par
+\cf2\b System Volume Button\cf0\b0\par
+The Volume button lets you adjust your computer\rquote s system volume directly from inside SkyeMusic. Instead of changing only player mute, this button now controls the actual Windows volume level, so everything you hear on your device stays consistent. The button shows the current system volume, and the wheel on your mouse changes the volume when you hover over it. Any changes you make here apply instantly to your whole system, not just the app.\par
+\par
+The button also includes a quick mute toggle. If you need to silence everything immediately, you can tap the button and Windows will mute all audio at once. Tapping it again restores your previous volume level. SkyeMusic stays in sync with your computer, so if you change the volume using your keyboard or the taskbar, the button updates automatically to match whatever the system is doing.\par
+\par
+This makes volume control feel more natural and predictable, especially when switching between apps or using hardware keys. The button always reflects the real system state, so what you see is exactly what you hear.\par
 \par
 \cf2\b Playlist Shortcuts\cf0\b0\fs28\par
 \b\fs24 &lt;Up Arrow&gt; \b0 Select Up\par
@@ -327,10 +335,17 @@ Notes\par
 \cf2\b\f1 Stream Metadata Support\cf0\b0\f4\par
 Skye\f5\lang1033  \f4\lang9 Music can display \ldblquote Now Playing\rdblquote  information for many online radio stations. When a station provides track metadata, Skye\f5\lang1033  \f4\lang9 Music automatically reads and updates it while you listen.\par
 \par
-Some stations, such as SomaFM, publish their track information separately from the audio stream. Skye\f5\lang1033  \f4\lang9 Music includes built\f6\_in support for these stations and will show artist and title information whenever it\rquote s available.\par
+Some stations, such as SomaFM, publish their track information separately from the audio stream. Skye\f5\lang1033  \f4\lang9 Music includes built\_in support for these stations and will show artist and title information whenever it\rquote s available.\par
 \par
-If a station does not provide metadata, or provides only partial information, Skye\f5\lang1033  \f6\lang9 Music will simply display the station \f5\lang1033 title and URL from the playlist\f6\lang9  instead. This behavior is normal and depends entirely on what the station broadcasts.\f2\par
+If a station does not provide metadata, or provides only partial information, Skye\f5\lang1033  \f4\lang9 Music will simply display the station \f5\lang1033 title and URL from the playlist\f4\lang9  instead. This behavior is normal and depends entirely on what the station broadcasts.\f2\par
 \par
+\cf2\b\f1 Companion Server\cf0\b0\f4\par
+\f2 SkyeMusic includes a built\_in Companion Server that lets you control playback from other \f1\lang1033 Android or Windows \f2\lang9 device\f1\lang1033 s\f2\lang9  using the SkyeMusic Companion App. When enabled, your PC will accept connections from \f1\lang1033 other devices \f2\lang9 on your local network.\f1\lang1033\par
+\par
+\f2\lang9 Connected devices appear in the Companion Clients window\f1\lang1033  accessed through the View menu. T\f2\lang9 here you can view basic information about each device, copy its name or IP address, or disconnect it if needed.\par
+\par
+The Companion Server is optional and can be turned on or off at any time in Settings\f1\lang1033 .\par
+\f2\lang9\par
 }
  </value>
   </data>
@@ -467,48 +482,78 @@ If a station does not provide metadata, or provides only partial information, Sk
     <value>My Project\ImageMoveUp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ChangeLogRT" xml:space="preserve">
-    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset0 Segoe UI Symbol;}{\f3\fnil Segoe UI Symbol;}{\f4\fnil\fcharset1 Segoe UI Symbol;}{\f5\fnil Segoe UI;}{\f6\fnil\fcharset1 Cambria Math;}}
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil\fcharset1 Cambria Math;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont6\mwrapIndent1440 }\viewkind4\uc1 
-\pard\cf1\b\f0\fs28\lang9 Skye Music v1.4 What's New\par
+\pard\cf1\b\f0\fs28\lang9 Skye Music v1.5 What's New\par
+\cf0\fs24 Released May 2026\cf1\par
+\fs28\par
+\cf2\fs24 New Features\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Added a link in About to download the Companion Client.\f1\par
+\'a3\'ab\f0  Show Now Playing toast on '?' key press from both Player and MiniPlayer.\f1\par
+\'a3\'ab\f0  SkyeMusic now includes full system\f2\_\f0 level volume control, making it easier to keep your listening experience consistent no matter where you adjust it. The app now stays perfectly in sync with your computer\rquote s volume, whether you change it using hardware keys, the Windows taskbar, or inside SkyeMusic itself. Mute and volume changes update instantly and feel smoother and more responsive, giving you a more natural and predictable audio experience. This update replaces the old player\f2\_\f0 only mute behavior with a true system\f2\_\f0 wide approach, so SkyeMusic always reflects the real volume of your device. Also added volume support to the Companion App Server\par
+\f1\'a3\'ab\f0  Added support for the SkyeMusic Companion App, allowing Android phones and tablets and other Windows devices on your network to control playback on your PC, view Now Playing information, view the Playlist and eventually stream audio.\f1\par
+\cf1\b\f0\lang9\par
+\cf2 Improvements\par
+\cf0\b0\f3\u10003?\f4\lang1033  Faster, more reliable album art: Artwork is now normalized and optimized before sending to Companion clients, fixing cases where artwork failed to appear and improving load speed.\par
+\f3\lang9\u10003?\f4\lang1033  Logging overhaul: Safer file operations, a redesigned Log Viewer, a rewritten search engine with reliable next/previous navigation, clearer \ldblquote not found\rdblquote  feedback, and automatic log rotation for large files.\par
+\f3\lang9\u10003?\f4\lang1033  \f5\lang9 Improved handling of multiple connected devices.\f4\lang1033\par
+\f3\lang9\u10003?\f4\lang1033  \f5\lang9 More reliable device connections and smoother communication between the\f4\lang1033  Companion\f5\lang9  \f4\lang1033 A\f5\lang9 pp and your PC\f4\lang1033 .\f5\lang9\par
+\f3\u10003?\f4\lang1033  Smoother transitions when switching between audio, video, visualizer, and lyrics modes.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Improved how Helper Apps are handled and allowed for multiple selections to be passed to the app. Updated the UI.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Improved high/mid frequency response in Particle Nebula Visualizer, making all color bands more vibrant. High Frequency Boost was added as a setting.\f5\lang9\par
+\f3\u10003? \f4\lang1033 Updated and Added several icons.\par
+\f3\lang9\u10003? \f4\lang1033 Player menu background now matches current theme if not in Accent mode.\f5\lang9\par
+\par
+\cf2\b\f0 Fixes\par
+\cf0\b0\f3\u10005?\f4\lang1033  Fixed a ghost title bar issue when minimizing the Player to tray by redesigning the window state system.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Stopped the toast from blinking when shown by resolving a player lifecycle issue.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed a UI freeze when Companion Server was enabled on slow networks by properly threading the server.\f5\lang9\par
+\f3\u10005?\f4\lang1033  \f5\lang9 Resolved an issue where the audio meters could freeze mid\_update due to\f4\lang1033  \f5\lang9 NAudio\rquote s capture thread stalling. The app now monitors for stalled audio input and restarts the capture automatically, keeping the meters alive and accurate.\par
+\f3\u10005?\f4\lang1033  Fixed an issue where the visualizer wouldn't start in minimode if a video was playing.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Improved metadata handling for streams in History with clearer, more consistent labeling.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed several shuffle play bugs.\par
+\cf1\b\f0\fs28\lang9\par
+\fs24 Skye Music v1.4\fs28\par
 \cf0\fs24 Released February 2026\cf1\par
 \fs28\par
 \cf2\fs24 New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Favorites support for podcasts and feeds\f1\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Added more Themes, also renamed two, if your theme doesn't load, simply reselect it in Options.\f1\par
+\'a3\'ab\f0  Added Favorites support for podcasts and feeds\f1\par
 \'a3\'ab\f0  Added manual RSS feed import for any podcast URL\f1\par
 \'a3\'ab\f0  Podcast Support. Skye Music now includes full podcast browsing and playback. Explore podcasts from supported directories, view artwork and metadata, stream episodes instantly, or download them for offline listening. Manual RSS feed import is also supported, allowing you to add any podcast feed URL directly.\par
 \f1\'a3\'ab\f0  Added Favorites as a Stream Source.\par
-\f1\'a3\'ab\f0  \f2 Added Radio Paradise to list of Stream Sources.\f3\lang9\par
+\f1\'a3\'ab\f0  \f4 Added Radio Paradise to list of Stream Sources.\f5\lang9\par
 \f0\lang1033\par
 \cf2\b\lang9 Improvements\par
-\cf0\b0\f4\u10003? Enhanced \f2\lang1033 Stream M\f3\lang9 etadata \f2\lang1033 S\f3\lang9 upport: \f2\lang1033 The Player now reads metadata embedded in the stream or, when available, retrieves track information from external metadata feeds. Metadata availability varies by station and broadcast format; some stations provide detailed artist and title information, while others provide none at all. When no metadata is available, the playlist entry continues to serve as the stream\rquote s title.\f3\lang9\par
-\f4\u10003?\f2\lang1033  Unified Stream &amp; Podcast Directory for a cleaner, more consistent experience.\f3\lang9\par
-\f4\u10003?\f2\lang1033  Reworked the UI of the Stream Directory.\f3\lang9\par
+\cf0\b0\f3\u10003? Enhanced \f4\lang1033 Stream M\f5\lang9 etadata \f4\lang1033 S\f5\lang9 upport: \f4\lang1033 The Player now reads metadata embedded in the stream or, when available, retrieves track information from external metadata feeds. Metadata availability varies by station and broadcast format; some stations provide detailed artist and title information, while others provide none at all. When no metadata is available, the playlist entry continues to serve as the stream\rquote s title.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Unified Stream &amp; Podcast Directory for a cleaner, more consistent experience.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Reworked the UI of the Stream Directory.\f5\lang9\par
 \par
 \cf2\b\f0 Fixes\par
-\cf0\b0\f4\u10005?\f2\lang1033  Resolved an issue where the Mini Player could lose its TopMost status.\f3\lang9\par
+\cf0\b0\f3\u10005?\f4\lang1033  Resolved an issue where the Mini Player could lose its TopMost status.\f5\lang9\par
 \cf1\b\f0\fs28\par
 \fs24 Skye Music v1.3\fs28\par
 \cf0\fs24 Released January 2026\cf1\par
 \b0\par
 \cf2\b New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  Directory: Skye Music now includes a full Stream Directory, a complete in\f5\_app browser for discovering and playing online radio stations\f0 , making it easier than ever to find and play online radio. Browse stations by name, tags, country, format, or bitrate; and pick from multiple stream options with a simple dropdown. Everything loads fast and stays out of your way. See the Help window in app for details.\f1\par
-\'a3\'ab\f0  MiniPlayer: A compact, always\f5\_\f0 on\f5\_\f0 top version of Skye Music designed for quick access and minimal screen space. Includes essential playback controls, album art, and a fully integrated visualizer panel. Visualizers now support a dedicated MiniMode, providing simplified, optimized visuals tailored for small windows. Each visualizer can enable or disable MiniMode individually through its settings.\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Directory: Skye Music now includes a full Stream Directory, a complete in\f2\_app browser for discovering and playing online radio stations\f0 , making it easier than ever to find and play online radio. Browse stations by name, tags, country, format, or bitrate; and pick from multiple stream options with a simple dropdown. Everything loads fast and stays out of your way. See the Help window in app for details.\f1\par
+\'a3\'ab\f0  MiniPlayer: A compact, always\f2\_\f0 on\f2\_\f0 top version of Skye Music designed for quick access and minimal screen space. Includes essential playback controls, album art, and a fully integrated visualizer panel. Visualizers now support a dedicated MiniMode, providing simplified, optimized visuals tailored for small windows. Each visualizer can enable or disable MiniMode individually through its settings.\par
 \f1\'a3\'ab\f0  Skye Music now lets you know when a new version is available. The About screen performs a quiet daily check and displays an upgrade notice right under the version number.\f1\par
 \'a3\'ab\f0  Added Theming to all context menus, the Tray menu, and the Player menu strip.\cf1\b\lang9\par
 \par
 \cf2 Improvements\par
-\cf0\b0\f4\u10003?\f2\lang1033  Multiples of the same song are now allowed in the Queue.\f3\lang9\par
-\f4\u10003?\f0  Library file\f5\_watcher alerts now appear in the Playlist status text instead of the Library menu.\f3\par
-\f4\u10003?\f0  Changed the behavior of the Tray context menu options to open the Player, Library, and History. Removed the toggle so now clicking simply shows the window.\cf2\b\par
+\cf0\b0\f3\u10003?\f4\lang1033  Multiples of the same song are now allowed in the Queue.\f5\lang9\par
+\f3\u10003?\f0  Library file\f2\_watcher alerts now appear in the Playlist status text instead of the Library menu.\f5\par
+\f3\u10003?\f0  Changed the behavior of the Tray context menu options to open the Player, Library, and History. Removed the toggle so now clicking simply shows the window.\cf2\b\par
 \par
 Fixes\par
-\cf0\b0\f4\u10005?\f2\lang1033  Fixed a bug where window locations weren't showing correctly after Saving Metrics.\f3\lang9\par
-\f4\u10005?\f2\lang1033  \f3\lang9 Fixed an issue where radio streams would not play after restarting the app. Older history entries were missing information needed to identify streams. Skye\f2\lang1033  \f3\lang9 Music now automatically repairs these entries so streams load and play correctly.\par
-\f4\u10005?\f2\lang1033  Fixed an overflow when assigning the song title to the Tray icon.\f3\lang9\par
-\f4\u10005?\f2\lang1033  Fixed an issue preventing the MinimizeToTray option from saving.\f3\lang9\par
-\f4\u10005?\f2\lang1033  The Playlist selection no longer jumps away when using the arrow keys to navigate the list.\f3\lang9\par
-\f4\u10005?\f2\lang1033  The Tray Icon now loads after the app is initialized, as intended.\cf2\b\f0\lang9\par
+\cf0\b0\f3\u10005?\f4\lang1033  Fixed a bug where window locations weren't showing correctly after Saving Metrics.\f5\lang9\par
+\f3\u10005?\f4\lang1033  \f5\lang9 Fixed an issue where radio streams would not play after restarting the app. Older history entries were missing information needed to identify streams. Skye\f4\lang1033  \f5\lang9 Music now automatically repairs these entries so streams load and play correctly.\par
+\f3\u10005?\f4\lang1033  Fixed an overflow when assigning the song title to the Tray icon.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed an issue preventing the MinimizeToTray option from saving.\f5\lang9\par
+\f3\u10005?\f4\lang1033  The Playlist selection no longer jumps away when using the arrow keys to navigate the list.\f5\lang9\par
+\f3\u10005?\f4\lang1033  The Tray Icon now loads after the app is initialized, as intended.\cf2\b\f0\lang9\par
 \cf1\par
 Skye Music v1.2\fs28\par
 \cf0\b0\fs24 Released December 2025\b\par
@@ -521,28 +566,28 @@ Skye Music v1.2\fs28\par
 \'a3\'ab\f0  Julia Fractal Visualizer. Introduces a dynamic fractal effect based on Julia set mathematics. The visualizer continually evolves and morphs in real time, producing intricate, organic patterns that respond to audio input.\lang9\par
 \cf1\b\fs28\par
 \cf2\fs24 Improvements\par
-\cf0\b0\f4\u10003?\f2\lang1033  Updated the About window with the latest project attributions.\f3\lang9\par
-\f4\u10003?\f2\lang1033  Tag Editor can now be opened directly from the Playlist.\par
-\f4\lang9\u10003?\f2\lang1033  Added tooltips to Classic Spectrum Analyzer's settings page.\f3\lang9\par
-\f4\u10003?\f2\lang1033  Changed "Added Not Played" History List to "Forgotten Songs" and included songs not played for over a year.\f3\lang9\par
-\f4\u10003?\f2\lang1033  Refactored History to include a Source Type field to track the type of media: File, Stream, or AudioCD\par
-\f4\lang9\u10003?\f2\lang1033  Refactored the Player to track the media being played by Source Type.\cf1\b\f0\fs28\lang9\par
+\cf0\b0\f3\u10003?\f4\lang1033  Updated the About window with the latest project attributions.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Tag Editor can now be opened directly from the Playlist.\par
+\f3\lang9\u10003?\f4\lang1033  Added tooltips to Classic Spectrum Analyzer's settings page.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Changed "Added Not Played" History List to "Forgotten Songs" and included songs not played for over a year.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Refactored History to include a Source Type field to track the type of media: File, Stream, or AudioCD\par
+\f3\lang9\u10003?\f4\lang1033  Refactored the Player to track the media being played by Source Type.\cf1\b\f0\fs28\lang9\par
 \par
 \cf2\fs24 Fixes\par
-\cf0\b0\f4\u10005?\f2\lang1033  Fixed issue with a blank window being shown when there was no album art.\f3\lang9\par
-\f4\u10005?\f2\lang1033  Fixed cursor "blinking" issue on Help, Log, and What's New.\f3\lang9\par
-\f4\u10005?\f2\lang1033  Fixed when changing system Accent Color, the Visualizers Settings Pages didn't update the background color.\f3\lang9\par
-\f4\u10005?\f2\lang1033  Fixed errors when using the context menu in Log, Help, and What's New.\f3\lang9\par
-\f4\u10005?\f2\lang1033  Fixed when the File Watcher adds new files to the Library or Playlist, they were not adding to History as well.\f3\lang9\par
-\f4\u10005?\f2\lang1033  Fixed when Lyrics text was too big for the Media Label multiple lines were shown. Ellipsis now shows again.\f3\lang9\par
-\f4\u10005?\f2\lang1033  Fixed crashing when minimizing while using Oscilloscope Visualizer.\par
+\cf0\b0\f3\u10005?\f4\lang1033  Fixed issue with a blank window being shown when there was no album art.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed cursor "blinking" issue on Help, Log, and What's New.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed when changing system Accent Color, the Visualizers Settings Pages didn't update the background color.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed errors when using the context menu in Log, Help, and What's New.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed when the File Watcher adds new files to the Library or Playlist, they were not adding to History as well.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed when Lyrics text was too big for the Media Label multiple lines were shown. Ellipsis now shows again.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed crashing when minimizing while using Oscilloscope Visualizer.\par
 \cf1\b\f0\fs28\lang9\par
 \fs24 Skye Music v1.1\fs28\par
 \cf0\b0\fs24 Released November 2025\par
 \cf2\b\par
 New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Particle Nebula Visualizer. Swirling clouds, glowing bloom halos, and reactive trails create a cosmic, music\f5\_\f0 driven effect.\f1\par
-\'a3\'ab\f0  Added Circular Spectrum Visualizer, a spoke\f5\_\f0 style frequency display radiating bars around a central ring, with configurable gain, smoothing, and weighting modes.\f1\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Particle Nebula Visualizer. Swirling clouds, glowing bloom halos, and reactive trails create a cosmic, music\f2\_\f0 driven effect.\f1\par
+\'a3\'ab\f0  Added Circular Spectrum Visualizer, a spoke\f2\_\f0 style frequency display radiating bars around a central ring, with configurable gain, smoothing, and weighting modes.\f1\par
 \'a3\'ab\f0  Added Oscilloscope Visualizer, technical lines blazing across the screen, with stereo mode and glow trails.\f1\par
 \'a3\'ab\f0  Added Classic Spectrum Analyzer Visualizer, made to feel like the classic Winamp spectrum bars.\par
 \f1\'a3\'ab\f0  Added Star Field Visualizer, a gentle flow of stars set to music.\f1\par
@@ -557,60 +602,60 @@ New Features\par
 \'a3\'ab\f0\lang9  Created a hidden DevTools form for viewing the raw History and Plays databases.\par
 \cf1\b\fs28\par
 \cf2\fs24 Improvements\par
-\cf0\b0\f4\u10003?\f2\lang1033  Refactored to Visual Studio 2026. This involved some minor tweaking and style improvements. Still running on .NET 9.0. Planning to upgrade to .NET 10.0 in the coming months.\f3\lang9\par
-\f4\u10003?\f2\lang1033  Refactored Visualizer system. Created a panel to dock the Visualizer Host. Removed old timer and picturebox system.\f3\lang9\par
-\f4\u10003?\f2\lang1033  \f0 Refactored Meters to use NAudio instead of CoreAudio. Meters run at a 20fps rate with smooth drop offs.\cf2\b\lang9\par
-\cf0\b0\f4\u10003?\f2\lang1033  Refactored tooltips throughout the app to overcome ToolTipEX's deficiencies. In some cases this meant strictly controlling ToolTipEX's life-cycle, in other cases completely swapping to another component. This should solve the disappearing tooltips issue.\f3\lang9\par
-\f4\u10003?\f2\lang1033  Improved History &amp; Statistics loading and data logic.\par
-\f4\lang9\u10003?\f2\lang1033  Improved History &amp; Statistics UI\f3\lang9\par
-\f4\u10003?\f0  Began implementing a new tooltip system to avoid ToolTipEX implementation problems.\par
+\cf0\b0\f3\u10003?\f4\lang1033  Refactored to Visual Studio 2026. This involved some minor tweaking and style improvements. Still running on .NET 9.0. Planning to upgrade to .NET 10.0 in the coming months.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Refactored Visualizer system. Created a panel to dock the Visualizer Host. Removed old timer and picturebox system.\f5\lang9\par
+\f3\u10003?\f4\lang1033  \f0 Refactored Meters to use NAudio instead of CoreAudio. Meters run at a 20fps rate with smooth drop offs.\cf2\b\lang9\par
+\cf0\b0\f3\u10003?\f4\lang1033  Refactored tooltips throughout the app to overcome ToolTipEX's deficiencies. In some cases this meant strictly controlling ToolTipEX's life-cycle, in other cases completely swapping to another component. This should solve the disappearing tooltips issue.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Improved History &amp; Statistics loading and data logic.\par
+\f3\lang9\u10003?\f4\lang1033  Improved History &amp; Statistics UI\f5\lang9\par
+\f3\u10003?\f0  Began implementing a new tooltip system to avoid ToolTipEX implementation problems.\par
 \cf1\b\fs28\par
 \cf2\fs24 Fixes\par
-\cf0\b0\f4\u10005?\f2\lang1033  Fixed potential crashing during History loading caused by concurrent background updates to history data.\f3\lang9\par
-\f4\u10005?\f2\lang1033  Removed Core Audio because of conflicts with NAudio, which is needed for new Visualizer system.\f3\lang9\par
-\f4\u10005?\f2\lang1033  Fixed various bugs in History &amp; Statistics.\f3\lang9\par
-\f4\u10005? \f2\lang1033 Fixed lyrics display error when loading plain text or metadata lyrics and published hotfix.\cf1\b\f0\fs28\lang9\par
+\cf0\b0\f3\u10005?\f4\lang1033  Fixed potential crashing during History loading caused by concurrent background updates to history data.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Removed Core Audio because of conflicts with NAudio, which is needed for new Visualizer system.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed various bugs in History &amp; Statistics.\f5\lang9\par
+\f3\u10005? \f4\lang1033 Fixed lyrics display error when loading plain text or metadata lyrics and published hotfix.\cf1\b\f0\fs28\lang9\par
 \par
 \fs24 Skye Music v1.0\par
-This upgrade marks a major milestone in SkyeMusic\f5\rquote\f0 s playback architecture \f5\emdash  smoother, smarter, and built to last.\par
+This upgrade marks a major milestone in SkyeMusic\f2\rquote\f0 s playback architecture \f2\emdash  smoother, smarter, and built to last.\par
 \cf0\b0\f0 Released November 2025\cf1\b\fs28\par
 \par
 \cf2\fs24 New Features\par
 \cf0\b0\f1\lang1033\'a3\'ab\f0\lang9 Implemented a Plays Database using SQLite to track the actual plays per track and their duration.\par
-\f1\lang1033\'a3\'ab\f0\lang9 Full synced lyrics view with RichTextBox display. Current lyric line now bolded in real time with smooth switching between album\f5\_art view (single line) and full\_lyrics view\f0\lang1033 . Requires a matching '.LRC' file alongside the audio file for synced audio.\lang9\par
+\f1\lang1033\'a3\'ab\f0\lang9 Full synced lyrics view with RichTextBox display. Current lyric line now bolded in real time with smooth switching between album\f2\_art view (single line) and full\_lyrics view\f0\lang1033 . Requires a matching '.LRC' file alongside the audio file for synced audio.\lang9\par
 \f1\lang1033\'a3\'ab\f0\lang9 History &amp; Statistics page\par
   \f6\u8594?\f0  \lang9 Added play stats: most played song, total songs, total duration\par
-  \f6\u8594?\f0  \lang9 Added 7\f5\_column list view (Title, Artist, Album, Genre, Plays, Last Played, Path)\par
-  \f6\u8594?\f0  \f5\lang9 Added multiple views: Most Played, Recently Played, Favorites\par
-  \f6\u8594?\f0  \f5\lang9 Added integrated charts: Genre Pie, Genre Polar, Genre Pareto, Artist Bar, Artist Word Cloud\par
-  \f6\u8594?\f0  \f5\lang9 Applied theme\_aware styling to charts and list view\par
-  \f6\u8594?\f0  \f5\lang9 Added context menu actions: Queue selected, Add selected to playlist\par
+  \f6\u8594?\f0  \lang9 Added 7\f2\_column list view (Title, Artist, Album, Genre, Plays, Last Played, Path)\par
+  \f6\u8594?\f0  \f2\lang9 Added multiple views: Most Played, Recently Played, Favorites\par
+  \f6\u8594?\f0  \f2\lang9 Added integrated charts: Genre Pie, Genre Polar, Genre Pareto, Artist Bar, Artist Word Cloud\par
+  \f6\u8594?\f0  \f2\lang9 Applied theme\_aware styling to charts and list view\par
+  \f6\u8594?\f0  \f2\lang9 Added context menu actions: Queue selected, Add selected to playlist\par
 \f1\lang1033\'a3\'ab\f0\lang9 A Text Label has been added where the Album Art button was located. This may be used in the future for song information or a lyrics display.\par
 \f1\lang1033\'a3\'ab\f0\lang9 Full VLC Integration. Replaced legacy Windows Media Player(WMP) with modern LibVLC backend for improved format support and performance.\par
-\f1\lang1033\'a3\'ab\f0\lang9 Custom Fullscreen Mode. Implemented fullscreen support from scratch, tailored for VLC\f5\rquote\f0 s rendering model.\par
+\f1\lang1033\'a3\'ab\f0\lang9 Custom Fullscreen Mode. Implemented fullscreen support from scratch, tailored for VLC\f2\rquote\f0 s rendering model.\par
 \cf2\b\par
 Improvements\par
-\cf0\b0\f4\u10003?\f0  Refactored Plays Database PlayTrigger logic:\par
+\cf0\b0\f3\u10003?\f0  Refactored Plays Database PlayTrigger logic:\par
     \f6\u8594?\f0  Defaulted to Manual unless AutoTrigger flag is set\par
     \f6\u8594?\f0  Simplified intent tracking across playback paths\par
     \f6\u8594?\f0  Logging now includes accurate trigger context\par
     \f6\u8594?\f0  This change makes play history smarter without complicating playback flow.\lang9\par
-\f4\u10003?\f0  \lang1033 Lyrics support includes '.LRC' files, plain text files, and metadata from the song file itself.\par
-\f4\lang9\u10003?\f0  \lang1033 Cycle through Album Art simply by left-clicking the Art. The Album Art button has been removed.\par
-\f4\lang9\u10003?\f0  Audio Playback Update. Improved stability by aligning with system audio settings. Tip: For best results, set your playback device to 16\f5\_bit, 44.1 kHz (CD Quality).\f0\lang1033  \f5\lang9 This matches most music files and avoids unnecessary resampling that can cause static.\f0\par
-\f4\u10003?\f0  Hook Reliability. Improved timing and resilience of mouse hook attachment to VLC\f5\rquote\f0 s native window.\par
-\f4\u10003?\f0  Playback Lifecycle Management. Smoothed transitions between playback states to prevent UI hangs and race conditions.\par
-\f4\u10003?\f0  FullScreen Usage and Stability Overhaul. Added keyboard shortcuts and uniform click events to fullscreen functionality. Increased stability and reliability of fullscreen mode.\par
+\f3\u10003?\f0  \lang1033 Lyrics support includes '.LRC' files, plain text files, and metadata from the song file itself.\par
+\f3\lang9\u10003?\f0  \lang1033 Cycle through Album Art simply by left-clicking the Art. The Album Art button has been removed.\par
+\f3\lang9\u10003?\f0  Audio Playback Update. Improved stability by aligning with system audio settings. Tip: For best results, set your playback device to 16\f2\_bit, 44.1 kHz (CD Quality).\f0\lang1033  \f2\lang9 This matches most music files and avoids unnecessary resampling that can cause static.\f0\par
+\f3\u10003?\f0  Hook Reliability. Improved timing and resilience of mouse hook attachment to VLC\f2\rquote\f0 s native window.\par
+\f3\u10003?\f0  Playback Lifecycle Management. Smoothed transitions between playback states to prevent UI hangs and race conditions.\par
+\f3\u10003?\f0  FullScreen Usage and Stability Overhaul. Added keyboard shortcuts and uniform click events to fullscreen functionality. Increased stability and reliability of fullscreen mode.\par
 \cf2\b\par
 Fixes\par
-\cf0\b0\f4\u10005? \f2\lang1033 Fixed lyrics sync problem in Lyrics View.\f3\lang9\par
-\f4\u10005? Fixed repeat mode bug\f2\lang1033 , \f3\lang9 playback now restarts correctly at end of song\par
-\f4\u10005?\f0  Fixed RichTextBox cursor flicker by subclassing and overriding WM_SETCURSOR\par
-\f4\u10005?\f0  MPEG playback timing issue stabilized. A\f5 dded a startup timer to safely grab video dimensions and toggle mute, eliminating divide\_by\_zero and silent playback quirks.\f0\par
-\f4\u10005?\f0  Fixed errors when loading history and statistics page and user interacts by clicking a button or closing prematurely.\par
-\f4\u10005?\f0  Ensured all UI updates are safely marshaled to the main thread\par
-\f4\u10005?\f0  Various FullScreen Lifecylce and Stability fixes.\par
-\f4\u10005?\f0  File System Watcher now updates Playlist Count when removing files.\par
+\cf0\b0\f3\u10005? \f4\lang1033 Fixed lyrics sync problem in Lyrics View.\f5\lang9\par
+\f3\u10005? Fixed repeat mode bug\f4\lang1033 , \f5\lang9 playback now restarts correctly at end of song\par
+\f3\u10005?\f0  Fixed RichTextBox cursor flicker by subclassing and overriding WM_SETCURSOR\par
+\f3\u10005?\f0  MPEG playback timing issue stabilized. A\f2 dded a startup timer to safely grab video dimensions and toggle mute, eliminating divide\_by\_zero and silent playback quirks.\f0\par
+\f3\u10005?\f0  Fixed errors when loading history and statistics page and user interacts by clicking a button or closing prematurely.\par
+\f3\u10005?\f0  Ensured all UI updates are safely marshaled to the main thread\par
+\f3\u10005?\f0  Various FullScreen Lifecylce and Stability fixes.\par
+\f3\u10005?\f0  File System Watcher now updates Playlist Count when removing files.\par
 \cf1\b\par
 Skye Music v0.8\par
 \cf0\b0 Released October 2025\par
@@ -624,14 +669,14 @@ Skye Music v0.8\par
 \f1\lang1033\'a3\'ab\f0\lang9 Status Messages. These will provide the user with valuable information about actions performed and provide feedback for automated processes. They will appear under the Playlist and disappear automatically. A new setting was added to the Playlist section to control how long they appear or if they appear at all.\par
 \par
 \cf2\b Improvements\par
-\cf0\b0\f4\u10003?\f0  History saving upgraded with Schema versioning for easier future updates, while maintaining backward compatibility.\par
-\f4\u10003?\f0  Centralized Import Logic. Shared method now powers both dialog and drag &amp; drop workflows.\par
-\f4\u10003?\f0  Cleaner Diagnostics. Skye.Common.Log.Write now tracks media vs playlist drops.\par
-\f4\u10003?\f0  Laid the foundation for transition to VLC Media Player as the media engine for Skye Music.\par
+\cf0\b0\f3\u10003?\f0  History saving upgraded with Schema versioning for easier future updates, while maintaining backward compatibility.\par
+\f3\u10003?\f0  Centralized Import Logic. Shared method now powers both dialog and drag &amp; drop workflows.\par
+\f3\u10003?\f0  Cleaner Diagnostics. WriteToLog now tracks media vs playlist drops.\par
+\f3\u10003?\f0  Laid the foundation for transition to VLC Media Player as the media engine for Skye Music.\par
 \par
 \cf2\b Fixes\par
-\cf0\b0\f4\u10005?\f0  Tooltip lifecycle stabilized.\par
-\f4\u10005?\f0  Normalized web URLs for consistency and future VLC support by removing ending "/" characters. Windows Media Player adds this character automatically.\par
+\cf0\b0\f3\u10005?\f0  Tooltip lifecycle stabilized.\par
+\f3\u10005?\f0  Normalized web URLs for consistency and future VLC support by removing ending "/" characters. Windows Media Player adds this character automatically.\par
 \par
 \cf1\b\fs28 Thank you for using Skye Music!\cf0\b0\fs24\par
 }
