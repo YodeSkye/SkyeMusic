@@ -26,6 +26,7 @@ Public Class Player
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Private _hidefromTaskSwitcher As Boolean = False ' Used by Player to hide from Task Switcher View when minimize to tray is enabled
     Private _lastRealState As FormWindowState = FormWindowState.Normal
+    Private _lastStaleMeterLog As DateTime = DateTime.MinValue
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
     Private Mute As Boolean = False 'True if the player is muted
@@ -4178,10 +4179,20 @@ Public Class Player
 
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
+        'If (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 500 Then
+        '    Skye.Common.Log.Write("Audio Meter Data Stale, Resetting Peaks")
+        '    RestartMeterCapture()
+        '    Return
+        'End If
         If (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 500 Then
-            Skye.Common.Log.Write("Audio Meter Data Stale, Resetting Peaks")
+            If _lastStaleMeterLog = DateTime.MinValue Then
+                Skye.Common.Log.Write("Audio Meter Data Stale, Resetting Peaks")
+                _lastStaleMeterLog = DateTime.Now
+            End If
             RestartMeterCapture()
             Return
+        Else
+            _lastStaleMeterLog = DateTime.MinValue
         End If
         If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             Dim leftScaled As Single = MeterPeakLeft * 100.0F
