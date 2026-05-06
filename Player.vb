@@ -4443,13 +4443,13 @@ Public Class Player
         Visible = False
         RecreateHandle()
     End Sub
-    Friend Sub RestoreFromTray()
+    Friend Sub RestoreFromTray(optional ignorewindowstate As Boolean = false)
         _hidefromTaskSwitcher = False
         ShowInTaskbar = True
         Visible = True
 
         ' Restore the REAL state
-        WindowState = _lastRealState
+        If Not ignorewindowstate Then WindowState = _lastRealState
 
         Activate()
     End Sub

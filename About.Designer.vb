@@ -79,7 +79,7 @@ Partial Class About
         LLblMicrosoft.Image = My.Resources.Resources.ImageAttributionMicrosoft16
         LLblMicrosoft.ImageAlign = ContentAlignment.MiddleLeft
         LLblMicrosoft.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblMicrosoft.Location = New Point(12, 194)
+        LLblMicrosoft.Location = New Point(12, 209)
         LLblMicrosoft.Name = "LLblMicrosoft"
         LLblMicrosoft.Size = New Size(94, 23)
         LLblMicrosoft.TabIndex = 3
@@ -95,7 +95,7 @@ Partial Class About
         TipAbout.SetImage(LLblSyncFusion, Nothing)
         LLblSyncFusion.Image = My.Resources.Resources.ImageAttributionSyncFusion24
         LLblSyncFusion.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSyncFusion.Location = New Point(218, 226)
+        LLblSyncFusion.Location = New Point(218, 241)
         LLblSyncFusion.Name = "LLblSyncFusion"
         LLblSyncFusion.Size = New Size(107, 23)
         LLblSyncFusion.TabIndex = 4
@@ -110,7 +110,7 @@ Partial Class About
         LLblIcons8.Image = My.Resources.Resources.ImageAttributionIcons816
         LLblIcons8.ImageAlign = ContentAlignment.MiddleLeft
         LLblIcons8.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblIcons8.Location = New Point(288, 266)
+        LLblIcons8.Location = New Point(288, 281)
         LLblIcons8.Name = "LLblIcons8"
         LLblIcons8.Size = New Size(70, 23)
         LLblIcons8.TabIndex = 7
@@ -126,7 +126,7 @@ Partial Class About
         TipAbout.SetImage(LLblTagLibSharp, Nothing)
         LLblTagLibSharp.ImageAlign = ContentAlignment.MiddleLeft
         LLblTagLibSharp.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblTagLibSharp.Location = New Point(27, 265)
+        LLblTagLibSharp.Location = New Point(27, 280)
         LLblTagLibSharp.Name = "LLblTagLibSharp"
         LLblTagLibSharp.Size = New Size(67, 23)
         LLblTagLibSharp.TabIndex = 6
@@ -176,7 +176,7 @@ Partial Class About
         TipAbout.SetImage(LLblVLCSharp, Nothing)
         LLblVLCSharp.ImageAlign = ContentAlignment.MiddleLeft
         LLblVLCSharp.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblVLCSharp.Location = New Point(149, 194)
+        LLblVLCSharp.Location = New Point(149, 209)
         LLblVLCSharp.Name = "LLblVLCSharp"
         LLblVLCSharp.Size = New Size(96, 23)
         LLblVLCSharp.TabIndex = 101
@@ -192,7 +192,7 @@ Partial Class About
         TipAbout.SetImage(LLblNAudio, Nothing)
         LLblNAudio.ImageAlign = ContentAlignment.MiddleLeft
         LLblNAudio.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblNAudio.Location = New Point(293, 194)
+        LLblNAudio.Location = New Point(293, 209)
         LLblNAudio.Name = "LLblNAudio"
         LLblNAudio.Size = New Size(79, 23)
         LLblNAudio.TabIndex = 102
@@ -208,7 +208,7 @@ Partial Class About
         TipAbout.SetImage(LLblSQLite, Nothing)
         LLblSQLite.Image = My.Resources.Resources.ImageAttributionSQLite
         LLblSQLite.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSQLite.Location = New Point(97, 224)
+        LLblSQLite.Location = New Point(97, 239)
         LLblSQLite.Name = "LLblSQLite"
         LLblSQLite.Size = New Size(79, 27)
         LLblSQLite.TabIndex = 103
@@ -222,7 +222,7 @@ Partial Class About
         TipAbout.SetImage(LLblMusicBrainz, Nothing)
         LLblMusicBrainz.Image = My.Resources.Resources.ImageAttributionMusicBrainz
         LLblMusicBrainz.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblMusicBrainz.Location = New Point(122, 258)
+        LLblMusicBrainz.Location = New Point(122, 273)
         LLblMusicBrainz.Name = "LLblMusicBrainz"
         LLblMusicBrainz.Size = New Size(138, 38)
         LLblMusicBrainz.TabIndex = 104
@@ -235,7 +235,7 @@ Partial Class About
         TipAbout.SetImage(LLblSponsorGitHub, Nothing)
         LLblSponsorGitHub.ImageAlign = ContentAlignment.MiddleLeft
         LLblSponsorGitHub.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSponsorGitHub.Location = New Point(53, 378)
+        LLblSponsorGitHub.Location = New Point(53, 384)
         LLblSponsorGitHub.Name = "LLblSponsorGitHub"
         LLblSponsorGitHub.Size = New Size(164, 30)
         LLblSponsorGitHub.TabIndex = 105
@@ -250,7 +250,7 @@ Partial Class About
         TipAbout.SetImage(LLblSponsorPayPal, Nothing)
         LLblSponsorPayPal.ImageAlign = ContentAlignment.MiddleLeft
         LLblSponsorPayPal.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSponsorPayPal.Location = New Point(245, 378)
+        LLblSponsorPayPal.Location = New Point(245, 384)
         LLblSponsorPayPal.Name = "LLblSponsorPayPal"
         LLblSponsorPayPal.Size = New Size(85, 30)
         LLblSponsorPayPal.TabIndex = 106
@@ -263,7 +263,7 @@ Partial Class About
         ' 
         LblSponsorMe.Font = New Font("Segoe UI", 15.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LblSponsorMe, Nothing)
-        LblSponsorMe.Location = New Point(12, 343)
+        LblSponsorMe.Location = New Point(12, 349)
         LblSponsorMe.Name = "LblSponsorMe"
         LblSponsorMe.Size = New Size(360, 31)
         LblSponsorMe.TabIndex = 107
@@ -289,34 +289,34 @@ Partial Class About
         LLblSkyeMusic.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         LLblSkyeMusic.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LLblSkyeMusic, Nothing)
-        LLblSkyeMusic.Image = My.Resources.Resources.ImageAppRed16
+        LLblSkyeMusic.Image = My.Resources.Resources.ImageAppRed32
         LLblSkyeMusic.ImageAlign = ContentAlignment.MiddleLeft
         LLblSkyeMusic.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSkyeMusic.Location = New Point(134, 102)
+        LLblSkyeMusic.Location = New Point(127, 93)
         LLblSkyeMusic.Name = "LLblSkyeMusic"
-        LLblSkyeMusic.Size = New Size(111, 23)
+        LLblSkyeMusic.Size = New Size(130, 32)
         LLblSkyeMusic.TabIndex = 109
         LLblSkyeMusic.TabStop = True
         LLblSkyeMusic.Text = "Home Page"
         TipAbout.SetText(LLblSkyeMusic, Nothing)
-        LLblSkyeMusic.TextAlign = ContentAlignment.TopRight
+        LLblSkyeMusic.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' LLblSkyeMusicCompanion
         ' 
         LLblSkyeMusicCompanion.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         LLblSkyeMusicCompanion.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LLblSkyeMusicCompanion, Nothing)
-        LLblSkyeMusicCompanion.Image = My.Resources.Resources.ImageAppRed16
+        LLblSkyeMusicCompanion.Image = My.Resources.Resources.ImageCompanion
         LLblSkyeMusicCompanion.ImageAlign = ContentAlignment.MiddleLeft
         LLblSkyeMusicCompanion.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSkyeMusicCompanion.Location = New Point(36, 125)
+        LLblSkyeMusicCompanion.Location = New Point(27, 125)
         LLblSkyeMusicCompanion.Name = "LLblSkyeMusicCompanion"
-        LLblSkyeMusicCompanion.Size = New Size(313, 23)
+        LLblSkyeMusicCompanion.Size = New Size(331, 32)
         LLblSkyeMusicCompanion.TabIndex = 110
         LLblSkyeMusicCompanion.TabStop = True
         LLblSkyeMusicCompanion.Text = "Companion Client (Windows && Android)"
         TipAbout.SetText(LLblSkyeMusicCompanion, Nothing)
-        LLblSkyeMusicCompanion.TextAlign = ContentAlignment.TopRight
+        LLblSkyeMusicCompanion.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' About
         ' 

@@ -191,6 +191,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property ImageAppRed32() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImageAppRed32", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property ImageAttributionGitHub() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageAttributionGitHub", resourceCulture)
@@ -304,6 +314,16 @@ Namespace My.Resources
         Friend ReadOnly Property ImageCollapse16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageCollapse16", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImageCompanion() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImageCompanion", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

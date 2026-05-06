@@ -2205,6 +2205,12 @@ Namespace My
 
         ' Control Events
         Private Sub NIApp_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
+            Dim miPlayer As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlayer"), ToolStripMenuItem)
+            If FrmPlayer.Visible Then
+                miPlayer.Checked = True
+            Else
+                miPlayer.Checked = False
+            End If
             Dim miPlay As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlay"), ToolStripMenuItem)
             Select Case FrmPlayer.PlayState
                 Case PlayStates.Playing
@@ -3291,7 +3297,7 @@ Namespace My
 
                 ' Restore main player
                 FrmPlayer.Visible = True
-                FrmPlayer.RestoreFromTray()
+                FrmPlayer.RestoreFromTray(True)
 
                 FrmPlayer.ShowMedia()
 
