@@ -86,14 +86,15 @@ Public Class About
         Cursor = Cursors.Default
     End Sub
     Private Sub LblUpdateAvailable_Click(sender As Object, e As EventArgs) Handles LblUpdateAvailable.Click
-        Try
-            Process.Start(New ProcessStartInfo With {
-                .FileName = "https://github.com/yodeskye/SkyeMusic/releases/latest",
-                .UseShellExecute = True
-            })
-        Catch ex As Exception
-            Skye.Common.Log.Write("Cannot Open Update Link" & vbCr & ex.Message)
-        End Try
+        'Try
+        '    Process.Start(New ProcessStartInfo With {
+        '        .FileName = "https://github.com/yodeskye/SkyeMusic/releases/latest",
+        '        .UseShellExecute = True
+        '    })
+        'Catch ex As Exception
+        '    Skye.Common.Log.Write("Cannot Open Update Link" & vbCr & ex.Message)
+        'End Try
+        OpenLink(App.AttributionUpdate)
     End Sub
     Private Sub LLblSkyeMusic_MouseEnter(sender As Object, e As EventArgs) Handles LLblSkyeMusic.MouseEnter
         Cursor = Cursors.Hand
@@ -214,7 +215,7 @@ Public Class About
             LblUpdateAvailable.Visible = False
             Exit Sub
         End If
-        If IsNewerVersion(latest) Then
+        If App.IsNewerVersion(latest) Then
             LblUpdateAvailable.Text = $"Update Available: v{latest}"
             LblUpdateAvailable.Visible = True
         Else

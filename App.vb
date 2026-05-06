@@ -229,6 +229,7 @@ Namespace My
         Friend ReadOnly AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
         Friend ReadOnly TrimEndSearch() As Char = {CChar(" "), CChar("("), CChar(")"), CChar("0"), CChar("1"), CChar("2"), CChar("3"), CChar("4"), CChar("5"), CChar("6"), CChar("7"), CChar("8"), CChar("9")} 'TrimEndSearch is a string used to trim whitespace characters from the end of strings.
         Friend ReadOnly AttributionSkye As String = "https://github.com/YodeSkye/SkyeMusic" ' AttributionSkye is the URL for the Skye Music project.
+        Friend ReadOnly AttributionUpdate As String = "https://github.com/YodeSkye/SkyeMusic/releases/latest" ' AttributionUpdate is the URL for the latest release of Skye Music, where users can download updates and view change logs.
         Friend ReadOnly AttributionCompanion As String = "https://github.com/YodeSkye/SkyeMusicCompanion/releases" ' AttributionCompanion is the download URL for the Companion Client.
         Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
         Friend ReadOnly AttributionVLC As String = "https://docs.videolan.me/libvlcsharp/" 'AttributionVLC is the URL for VLCSharp, which provides media playback capabilities in the application.

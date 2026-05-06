@@ -103,13 +103,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibVLCSharp.WinForms" Version="3.9.7" />
+    <PackageReference Include="LibVLCSharp.WinForms" Version="3.9.7.1" />
     <PackageReference Include="MetaBrainz.MusicBrainz" Version="8.0.1" />
     <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="7.1.0" />
     <PackageReference Include="NAudio" Version="2.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="SkyeLibrary" Version="1.4.44" />
-    <PackageReference Include="Syncfusion.Tools.Windows" Version="33.1.49" />
+    <PackageReference Include="SkyeLibrary" Version="1.4.52" />
+    <PackageReference Include="Syncfusion.Tools.Windows" Version="33.2.5" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23.1" />
