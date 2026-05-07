@@ -3,7 +3,7 @@ Imports System.IO
 
 Public Class Library
 
-    'Declarations
+    ' DECLARATIONS
     Private Enum LibraryGroupMode
         None
         Genre
@@ -60,7 +60,7 @@ Public Class Library
     Private TipLibraryEX As Skye.UI.ToolTipEX ' Tooltip for library items that shows extended information about the file.
     Private TipCMLibrary As Skye.UI.ToolTipEX ' Tooltip for context menu that shows extended information about the menu item.
 
-    'Form Events
+    ' FORM EVENTS
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
@@ -236,7 +236,7 @@ Public Class Library
         ToggleMaximized()
     End Sub
 
-    'Control Events
+    ' CONTROL EVENTS
     Private Sub LVLibrary_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles LVLibrary.DrawColumnHeader
         Dim b As Rectangle = e.Bounds
         'Draw Background
@@ -1406,7 +1406,7 @@ Public Class Library
             Dim h As String = App.History.Find(Function(p) p.Path = (LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)).ToStringFull
             LblHistory.Text = GenerateEllipsis(LblHistory.CreateGraphics(), h, LblHistory.Font, LblHistory.Size.Width)
             If LblHistory.Text = h Then
-                TipLibraryEX.SetText(LblHistory, Nothing)
+                TipLibraryEX.SetText(LblHistory, String.Empty)
             Else
                 TipLibraryEX.SetText(LblHistory, h)
             End If
@@ -1439,7 +1439,7 @@ Public Class Library
                         h = tlFile.Properties.MediaTypes.ToString + " (" + tlFile.Properties.Description + ")"
                         LblExtType.Text = GenerateEllipsis(LblExtType.CreateGraphics(), h, LblExtType.Font, LblExtType.Size.Width)
                         If LblExtType.Text = h Then
-                            TipLibraryEX.SetText(LblExtType, Nothing)
+                            TipLibraryEX.SetText(LblExtType, String.Empty)
                         Else
                             TipLibraryEX.SetText(LblExtType, h)
                         End If
@@ -1490,6 +1490,9 @@ Public Class Library
             .ShowDelay = 250,
             .HideDelay = 250
         }
+
+        TipLibraryEX.SetText(LblHistory, "No Text")
+        TipLibraryEX.SetText(LblExtType, "No Text")
 
     End Sub
 
