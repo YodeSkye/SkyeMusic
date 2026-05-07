@@ -57,7 +57,8 @@ Public Class Library
     Private LibraryGroups As New Collections.Generic.List(Of LibraryGroup)
     Private IsTextBoxLibrarySearch As Boolean = False
     Private FrmArtViewer As ArtViewer
-    Private TipCMLibrary As Skye.UI.ToolTipEX
+    Private TipLibraryEX As Skye.UI.ToolTipEX ' Tooltip for library items that shows extended information about the file.
+    Private TipCMLibrary As Skye.UI.ToolTipEX ' Tooltip for context menu that shows extended information about the menu item.
 
     'Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -71,6 +72,12 @@ Public Class Library
         Finally
             MyBase.WndProc(m)
         End Try
+    End Sub
+    Protected Overrides Sub OnHandleCreated(e As EventArgs)
+        MyBase.OnHandleCreated(e)
+        If Me.IsDisposed OrElse Me.Disposing Then Return
+
+        InitTipLibrary()
     End Sub
     Private Sub Library_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
@@ -885,7 +892,7 @@ Public Class Library
         ToggleMaximized()
     End Sub
 
-    'Procedures
+    ' METHODS
     Friend Overloads Sub Show(filename As String)
         If Not String.IsNullOrWhiteSpace(filename) Then
             LVLibrary.SelectedItems.Clear()
@@ -1468,6 +1475,24 @@ Public Class Library
                 WindowState = FormWindowState.Normal
         End Select
     End Sub
+    Private Sub InitTipLibrary()
+        If TipLibraryEX IsNot Nothing Then
+            TipLibraryEX.Dispose()
+            TipLibraryEX = Nothing
+        End If
+
+        TipLibraryEX = New Skye.UI.ToolTipEX With {
+            .Font = App.TipFont,
+            .ShadowAlpha = 0,
+            .ShadowThickness = 0,
+            .FadeInRate = 25,
+            .FadeOutRate = 25,
+            .ShowDelay = 250,
+            .HideDelay = 250
+        }
+
+    End Sub
+
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
@@ -1538,48 +1563,5 @@ Public Class Library
     Friend Sub ReThemeMenus()
         App.ThemeMenu(CMLibrary)
     End Sub
-    'Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
-
-    '    'Initialize
-    '    Dim MyField As Reflection.PropertyInfo = MyToolStrip.GetType().GetProperty("ToolTip", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
-    '    Dim MyToolTip As ToolTip = CType(MyField.GetValue(MyToolStrip), ToolTip)
-
-    '    'Configure ToolTip
-    '    MyToolTip.OwnerDraw = True
-
-    '    'Draw
-    '    AddHandler MyToolTip.Popup,
-    '        Sub(sender, e)
-    '            Dim s As SizeF
-    '            s = TextRenderer.MeasureText(CType(sender, ToolTip).GetToolTip(e.AssociatedControl), Me.Font)
-    '            s.Width += 14
-    '            s.Height += 16
-    '            e.ToolTipSize = s.ToSize
-    '        End Sub
-    '    AddHandler MyToolTip.Draw,
-    '        Sub(sender, e)
-
-    '            'Declarations
-    '            Dim g As Graphics = e.Graphics
-
-    '            'Draw background
-    '            Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
-    '            g.FillRectangle(brbg, e.Bounds)
-
-    '            'Draw border
-    '            Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(Me.Font.Size / 4)) 'Scale border thickness with font
-    '                g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
-    '            End Using
-
-    '            'Draw text
-    '            TextRenderer.DrawText(g, e.ToolTipText, Me.Font, New Point(7, 7), App.CurrentTheme.TextColor)
-
-    '            'Finalize
-    '            brbg.Dispose()
-    '            g.Dispose()
-
-    '        End Sub
-
-    'End Sub
 
 End Class

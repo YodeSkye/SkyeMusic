@@ -7,6 +7,7 @@ Imports NAudio.Wave
 Imports Newtonsoft.Json.Linq
 Imports Skye
 Imports Skye.Contracts
+Imports Skye.UI
 Imports SkyeMusic.My
 
 Public Class Player
@@ -24,6 +25,7 @@ Public Class Player
     Private MeterLastUpdate As DateTime = DateTime.MinValue
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
+    Private TipPlayerEX As Skye.UI.ToolTipEX 'Tooltip for Player Controls
     Private _hidefromTaskSwitcher As Boolean = False ' Used by Player to hide from Task Switcher View when minimize to tray is enabled
     Private _lastRealState As FormWindowState = FormWindowState.Normal
     Private _lastStaleMeterLog As DateTime = DateTime.MinValue
@@ -2722,6 +2724,12 @@ Public Class Player
             If m.Msg <> Skye.WinAPI.WM_GET_CUSTOM_DATA Then MyBase.WndProc(m)
         End Try
     End Sub
+    Protected Overrides Sub OnHandleCreated(e As EventArgs)
+        MyBase.OnHandleCreated(e)
+        If Me.IsDisposed OrElse Me.Disposing Then Return
+
+        InitTipPlayer()
+    End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         ' Player Engine
@@ -2815,27 +2823,7 @@ Public Class Player
         LVPlaylist.EditableColumns.Add(False)
         header = Nothing
 
-        ' More Form Initialization
-        SetAccentColor()
-        SetTheme()
-        App.ThemeMenu(MenuPlayer)
-        App.ThemeMenu(CMPlaylist)
-        App.ThemeMenu(CMRatings)
-        LoadPlaylist()
-        ClearPlaylistTitles()
-        ShowPlayMode()
-
         ' Set ToolTips
-        'TipPlayer.SetToolTip(BtnPlay, "Play / Pause")
-        'TipPlayer.SetToolTip(BtnStop, "Stop Playing")
-        'TipPlayer.SetToolTip(BtnReverse, "Skip Backward")
-        'TipPlayer.SetToolTip(BtnForward, "Skip Forward")
-        'TipPlayer.SetToolTip(LblDuration, "Song Duration")
-        TipPlayerEX.SetText(BtnPlay, "Play / Pause")
-        TipPlayerEX.SetText(BtnStop, "Stop Playing")
-        TipPlayerEX.SetText(BtnReverse, "Skip Backward")
-        TipPlayerEX.SetText(BtnForward, "Skip Forward")
-        TipPlayerEX.SetText(LblDuration, "Song Duration")
         SetTipPlayer()
         TipCMPlaylist = New Skye.UI.ToolTipEX(components) With {
             .BackColor = App.CurrentTheme.BackColor,
@@ -2850,6 +2838,16 @@ Public Class Player
             .ShowDelay = 250
         }
         App.HookTSItemsForCMTooltip(CMPlaylist, TipCMPlaylist)
+
+        ' More Form Initialization
+        SetAccentColor()
+        SetTheme()
+        App.ThemeMenu(MenuPlayer)
+        App.ThemeMenu(CMPlaylist)
+        App.ThemeMenu(CMRatings)
+        LoadPlaylist()
+        ClearPlaylistTitles()
+        ShowPlayMode()
 
         ' Place the window where it was last time
 #If DEBUG Then
@@ -4497,6 +4495,29 @@ Public Class Player
             Case PlayModes.Random
                 MIPlayMode.Text = "Shuffle"
         End Select
+    End Sub
+    Private Sub InitTipPlayer()
+        If TipPlayerEX IsNot Nothing Then
+            TipPlayerEX.Dispose()
+            TipPlayerEX = Nothing
+        End If
+
+        TipPlayerEX = New Skye.UI.ToolTipEX With {
+            .Font = App.TipFont,
+            .ShadowAlpha = 0,
+            .ShadowThickness = 0,
+            .FadeInRate = 25,
+            .FadeOutRate = 25,
+            .ShowDelay = 500,
+            .HideDelay = 500
+        }
+
+        TipPlayerEX.SetText(BtnPlay, "Play / Pause")
+        TipPlayerEX.SetText(BtnStop, "Stop Playing")
+        TipPlayerEX.SetText(BtnReverse, "Skip Backward")
+        TipPlayerEX.SetText(BtnForward, "Skip Forward")
+        TipPlayerEX.SetText(LblDuration, "Song Duration")
+
     End Sub
     Friend Sub SetTipPlayer()
         Select Case App.Settings.PlayMode
