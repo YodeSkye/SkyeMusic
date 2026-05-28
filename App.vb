@@ -1027,6 +1027,8 @@ Namespace My
                                                         _player.PlayPrevious()
                                                     Case "PLAYPATH"
                                                         _player.PlayFromCompanion(payload)
+                                                    Case "QUEUEPATH"
+                                                        _player.QueuePath(payload)
                                                 End Select
                                             End Sub)
 

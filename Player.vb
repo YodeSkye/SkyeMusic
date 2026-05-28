@@ -4973,17 +4973,7 @@ Public Class Player
     End Sub
     Private Sub QueueFromPlaylist()
         If LVPlaylist.SelectedItems.Count > 0 Then
-            'Dim found As Boolean = False
-            'For Each s As String In Queue
-            '    If s = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text Then
-            '        found = True
-            '        Exit For
-            '    End If
-            'Next
-            'If Not found Then
-            'Queue.Add(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
             QueuePath(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
-            'End If
         End If
     End Sub
     Private Sub PlaylistRemoveItems()
