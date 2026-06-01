@@ -86,8 +86,6 @@ Partial Class Player
         BtnForward = New Button()
         BtnStop = New Button()
         BtnNext = New Button()
-        PEXLeft = New Skye.UI.ProgressEX()
-        PEXRight = New Skye.UI.ProgressEX()
         PicBoxAlbumArt = New PictureBox()
         TxtBoxPlaylistSearch = New TextBox()
         ListBoxPlaylistSearch = New ListBox()
@@ -107,6 +105,8 @@ Partial Class Player
         PanelVisualizer = New Panel()
         BtnVolume = New VolumeButton()
         TimerStreamMeta = New Timer(components)
+        PEXLeft = New Skye.UI.DataBarEX()
+        PEXRight = New Skye.UI.DataBarEX()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -556,38 +556,6 @@ Partial Class Player
         BtnNext.TabStop = False
         BtnNext.UseVisualStyleBackColor = False
         ' 
-        ' PEXLeft
-        ' 
-        PEXLeft.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        PEXLeft.BackColor = Color.Transparent
-        PEXLeft.DrawingColor = Color.DodgerBlue
-        PEXLeft.DrawingColorMode = Skye.UI.ProgressEX.ColorDrawModes.Smooth
-        PEXLeft.Location = New Point(12, 352)
-        PEXLeft.MaximumSize = New Size(Integer.MaxValue, 40)
-        PEXLeft.MinimumSize = New Size(50, 5)
-        PEXLeft.Name = "PEXLeft"
-        PEXLeft.PercentageMode = Skye.UI.ProgressEX.PercentageDrawModes.None
-        PEXLeft.Size = New Size(385, 5)
-        PEXLeft.Step = 1
-        PEXLeft.TabIndex = 17
-        PEXLeft.TabStop = False
-        ' 
-        ' PEXRight
-        ' 
-        PEXRight.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        PEXRight.BackColor = Color.Transparent
-        PEXRight.DrawingColor = Color.DodgerBlue
-        PEXRight.DrawingColorMode = Skye.UI.ProgressEX.ColorDrawModes.Smooth
-        PEXRight.Location = New Point(12, 389)
-        PEXRight.MaximumSize = New Size(Integer.MaxValue, 40)
-        PEXRight.MinimumSize = New Size(50, 5)
-        PEXRight.Name = "PEXRight"
-        PEXRight.PercentageMode = Skye.UI.ProgressEX.PercentageDrawModes.None
-        PEXRight.Size = New Size(385, 5)
-        PEXRight.Step = 1
-        PEXRight.TabIndex = 18
-        PEXRight.TabStop = False
-        ' 
         ' PicBoxAlbumArt
         ' 
         PicBoxAlbumArt.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
@@ -792,6 +760,30 @@ Partial Class Player
         ' 
         TimerStreamMeta.Interval = 3000
         ' 
+        ' PEXLeft
+        ' 
+        PEXLeft.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        PEXLeft.BarBackColor = Color.Transparent
+        PEXLeft.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
+        PEXLeft.InnerHighlight = True
+        PEXLeft.Location = New Point(18, 350)
+        PEXLeft.Name = "PEXLeft"
+        PEXLeft.Size = New Size(401, 8)
+        PEXLeft.TabIndex = 42
+        PEXLeft.TrailingGlow = True
+        ' 
+        ' PEXRight
+        ' 
+        PEXRight.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        PEXRight.BarBackColor = Color.Transparent
+        PEXRight.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
+        PEXRight.InnerHighlight = True
+        PEXRight.Location = New Point(18, 387)
+        PEXRight.Name = "PEXRight"
+        PEXRight.Size = New Size(401, 8)
+        PEXRight.TabIndex = 43
+        PEXRight.TrailingGlow = True
+        ' 
         ' Player
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -812,13 +804,13 @@ Partial Class Player
         Controls.Add(BtnForward)
         Controls.Add(BtnReverse)
         Controls.Add(BtnPlay)
-        Controls.Add(PEXLeft)
-        Controls.Add(PEXRight)
         Controls.Add(MenuPlayer)
         Controls.Add(PanelMedia)
         Controls.Add(LblPlaylistCount)
-        Controls.Add(TrackBarPosition)
+        Controls.Add(PEXRight)
+        Controls.Add(PEXLeft)
         Controls.Add(LblMedia)
+        Controls.Add(TrackBarPosition)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         ForeColor = SystemColors.HighlightText
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -857,8 +849,6 @@ Partial Class Player
     Friend WithEvents BtnForward As Button
     Friend WithEvents BtnStop As Button
     Friend WithEvents BtnNext As Button
-    Friend WithEvents PEXLeft As Skye.UI.ProgressEX
-    Friend WithEvents PEXRight As Skye.UI.ProgressEX
     Friend WithEvents PicBoxAlbumArt As System.Windows.Forms.PictureBox
     Friend WithEvents TxtBoxPlaylistSearch As TextBox
     Friend WithEvents ListBoxPlaylistSearch As ListBox
@@ -924,4 +914,6 @@ Partial Class Player
     Friend WithEvents TimerStreamMeta As Timer
     Friend WithEvents MIViewClients As ToolStripMenuItem
     Friend WithEvents BtnVolume As VolumeButton
+    Friend WithEvents PEXLeft As Skye.UI.DataBarEX
+    Friend WithEvents PEXRight As Skye.UI.DataBarEX
 End Class

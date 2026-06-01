@@ -2952,8 +2952,8 @@ Public Class Player
         ToggleMaximized()
     End Sub
     Private Sub Player_SizeChanged(sender As Object, e As EventArgs) Handles MyBase.SizeChanged
-        PEXLeft.Size = New Size(BtnVolume.Location.X + BtnVolume.Width - PEXLeft.Left, PEXLeft.Height)
-        PEXRight.Size = New Size(BtnVolume.Location.X + BtnVolume.Width - PEXRight.Left, PEXRight.Height)
+        'PEXLeft.Size = New Size(BtnVolume.Location.X + BtnVolume.Width - PEXLeft.Left, PEXLeft.Height)
+        'PEXRight.Size = New Size(BtnVolume.Location.X + BtnVolume.Width - PEXRight.Left, PEXRight.Height)
         VideoSetSize()
     End Sub
     Private Sub Player_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, MenuPlayer.MouseDown, LblPlaylistCount.MouseDown, LblDuration.MouseDown, PEXLeft.MouseDown, PEXRight.MouseDown
@@ -4177,11 +4177,6 @@ Public Class Player
 
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
-        'If (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 500 Then
-        '    Skye.Common.Log.Write("Audio Meter Data Stale, Resetting Peaks")
-        '    RestartMeterCapture()
-        '    Return
-        'End If
         If (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 500 Then
             If _lastStaleMeterLog = DateTime.MinValue Then
                 Skye.Common.Log.Write("Audio Meter Data Stale, Resetting Peaks")
@@ -4195,8 +4190,8 @@ Public Class Player
         If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             Dim leftScaled As Single = MeterPeakLeft * 100.0F
             Dim rightScaled As Single = MeterPeakRight * 100.0F
-            Dim leftVal As Integer = CInt(Math.Max(PEXLeft.Minimum, Math.Min(PEXLeft.Maximum, leftScaled)))
-            Dim rightVal As Integer = CInt(Math.Max(PEXRight.Minimum, Math.Min(PEXRight.Maximum, rightScaled)))
+            Dim leftVal As Integer = CInt(Math.Max(0, Math.Min(PEXLeft.Maximum, leftScaled)))
+            Dim rightVal As Integer = CInt(Math.Max(0, Math.Min(PEXRight.Maximum, rightScaled)))
             PEXLeft.Value = leftVal
             PEXRight.Value = rightVal
         End If
@@ -6136,8 +6131,8 @@ Public Class Player
         BtnVolume.TextColor = App.CurrentTheme.ButtonTextColor
         BtnVolume.BarBackColor = App.CurrentTheme.BackColor
         BtnVolume.BarFillColor = App.CurrentTheme.TextColor
-        PEXLeft.DrawingColor = App.CurrentTheme.TextColor
-        PEXRight.DrawingColor = App.CurrentTheme.TextColor
+        PEXLeft.BarColor = App.CurrentTheme.TextColor
+        PEXRight.BarColor = App.CurrentTheme.TextColor
         TrackBarPosition.ButtonColor = App.CurrentTheme.ButtonBackColor
         TrackBarPosition.HighlightedButtonColor = App.CurrentTheme.ButtonBackColor
         TrackBarPosition.PushedButtonEndColor = App.CurrentTheme.TextColor
