@@ -81,6 +81,8 @@ Partial Class Options
         LblHelperApp1Path = New Skye.UI.Label()
         LblCompanionServerPort = New Skye.UI.Label()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        CkBoxPlayerShowMeterVert = New CheckBox()
+        CkBoxPlayerShowMeterHoro = New CheckBox()
         GrBoxShowNowPlayingToast = New GroupBox()
         RadBtnNPTBottomRight = New RadioButton()
         RadBtnNPTBottomCenter = New RadioButton()
@@ -960,6 +962,8 @@ Partial Class Options
         ' TPPlayer
         ' 
         TPPlayer.BorderStyle = BorderStyle.Fixed3D
+        TPPlayer.Controls.Add(CkBoxPlayerShowMeterVert)
+        TPPlayer.Controls.Add(CkBoxPlayerShowMeterHoro)
         TPPlayer.Controls.Add(GrBoxShowNowPlayingToast)
         TPPlayer.Controls.Add(CkBoxShowNowPlayingToast)
         TPPlayer.Controls.Add(TxtBoxRandomHistoryUpdateInterval)
@@ -984,6 +988,36 @@ Partial Class Options
         TipOptions.SetText(TPPlayer, Nothing)
         TPPlayer.Text = " Player "
         TPPlayer.ThemesEnabled = False
+        ' 
+        ' CkBoxPlayerShowMeterVert
+        ' 
+        CkBoxPlayerShowMeterVert.AutoSize = True
+        CkBoxPlayerShowMeterVert.FlatStyle = FlatStyle.Flat
+        TipOptions.SetImage(CkBoxPlayerShowMeterVert, Nothing)
+        TipError.SetImage(CkBoxPlayerShowMeterVert, Nothing)
+        CkBoxPlayerShowMeterVert.Location = New Point(529, 209)
+        CkBoxPlayerShowMeterVert.Name = "CkBoxPlayerShowMeterVert"
+        CkBoxPlayerShowMeterVert.Size = New Size(226, 25)
+        CkBoxPlayerShowMeterVert.TabIndex = 162
+        TipError.SetText(CkBoxPlayerShowMeterVert, Nothing)
+        TipOptions.SetText(CkBoxPlayerShowMeterVert, Nothing)
+        CkBoxPlayerShowMeterVert.Text = "Show Meters with Album Art"
+        CkBoxPlayerShowMeterVert.UseVisualStyleBackColor = True
+        ' 
+        ' CkBoxPlayerShowMeterHoro
+        ' 
+        CkBoxPlayerShowMeterHoro.AutoSize = True
+        CkBoxPlayerShowMeterHoro.FlatStyle = FlatStyle.Flat
+        TipOptions.SetImage(CkBoxPlayerShowMeterHoro, Nothing)
+        TipError.SetImage(CkBoxPlayerShowMeterHoro, Nothing)
+        CkBoxPlayerShowMeterHoro.Location = New Point(529, 178)
+        CkBoxPlayerShowMeterHoro.Name = "CkBoxPlayerShowMeterHoro"
+        CkBoxPlayerShowMeterHoro.Size = New Size(279, 25)
+        CkBoxPlayerShowMeterHoro.TabIndex = 160
+        TipError.SetText(CkBoxPlayerShowMeterHoro, Nothing)
+        TipOptions.SetText(CkBoxPlayerShowMeterHoro, Nothing)
+        CkBoxPlayerShowMeterHoro.Text = "Show Standard Meters while Playing"
+        CkBoxPlayerShowMeterHoro.UseVisualStyleBackColor = True
         ' 
         ' GrBoxShowNowPlayingToast
         ' 
@@ -1551,4 +1585,6 @@ Partial Class Options
     Friend WithEvents CkBoxEnableCompanionServer As CheckBox
     Friend WithEvents LblCompanionServerPort As Skye.UI.Label
     Friend WithEvents TxtBoxCompanionServerPort As Skye.UI.NumericTextBox
+    Friend WithEvents CkBoxPlayerShowMeterHoro As CheckBox
+    Friend WithEvents CkBoxPlayerShowMeterVert As CheckBox
 End Class

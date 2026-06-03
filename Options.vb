@@ -132,6 +132,8 @@ Public Class Options
         Else
             GrBoxShowNowPlayingToast.Enabled = False
         End If
+        CkBoxPlayerShowMeterHoro.Checked = Settings.PlayerMetersShowHorizontal
+        CkBoxPlayerShowMeterVert.Checked = Settings.PlayerMetersShowVertical
         CkBoxLibrarySearchSubFolders.Checked = Settings.LibrarySearchSubFolders
         CkBoxWatchFolders.Checked = Settings.WatcherEnabled
         CkBoxWatchFoldersUpdateLibrary.Checked = Settings.WatcherUpdateLibrary
@@ -510,6 +512,16 @@ Public Class Options
             GrBoxShowNowPlayingToast.Enabled = False
         End If
     End Sub
+    Private Sub CkBoxPlayerShowMeterHoro_Click(sender As Object, e As EventArgs) Handles CkBoxPlayerShowMeterHoro.Click
+        App.Settings.PlayerMetersShowHorizontal = Not App.Settings.PlayerMetersShowHorizontal
+        FrmPlayer.SetTimerMeter()
+        FrmPlayer.ShowMedia()
+    End Sub
+    Private Sub CkBoxPlayerShowMeterVert_Click(sender As Object, e As EventArgs) Handles CkBoxPlayerShowMeterVert.Click
+        App.Settings.PlayerMetersShowVertical = Not App.Settings.PlayerMetersShowVertical
+        FrmPlayer.SetTimerMeter()
+        FrmPlayer.ShowMedia()
+    End Sub
     Private Sub CkBoxPlaylistRemoveSpacesClick(sender As Object, e As EventArgs) Handles CkBoxPlaylistRemoveSpaces.Click
         App.Settings.PlaylistTitleRemoveSpaces = Not App.Settings.PlaylistTitleRemoveSpaces
     End Sub
@@ -698,6 +710,8 @@ Public Class Options
             GrBoxShowNowPlayingToast.BackColor = c
             RadBtnRemaining.BackColor = c
             CkBoxShowNowPlayingToast.BackColor = c
+            CkBoxPlayerShowMeterHoro.BackColor = c
+            CkBoxPlayerShowMeterVert.BackColor = c
             CkBoxLibrarySearchSubFolders.BackColor = c
             CkBoxWatchFolders.BackColor = c
             CkBoxWatchFoldersUpdateLibrary.BackColor = c
@@ -729,6 +743,8 @@ Public Class Options
             GrBoxShowNowPlayingToast.BackColor = App.CurrentTheme.BackColor
             RadBtnRemaining.BackColor = App.CurrentTheme.BackColor
             CkBoxShowNowPlayingToast.BackColor = App.CurrentTheme.BackColor
+            CkBoxPlayerShowMeterHoro.BackColor = App.CurrentTheme.BackColor
+            CkBoxPlayerShowMeterVert.BackColor = App.CurrentTheme.BackColor
             CkBoxLibrarySearchSubFolders.BackColor = App.CurrentTheme.BackColor
             CkBoxWatchFolders.BackColor = App.CurrentTheme.BackColor
             CkBoxWatchFoldersUpdateLibrary.BackColor = App.CurrentTheme.BackColor
@@ -789,6 +805,8 @@ Public Class Options
         lblStatusMessageDisplayTime1.ForeColor = forecolor
         lblStatusMessageDisplayTime2.ForeColor = forecolor
         CkBoxShowNowPlayingToast.ForeColor = forecolor
+        CkBoxPlayerShowMeterHoro.ForeColor = forecolor
+        CkBoxPlayerShowMeterVert.ForeColor = forecolor
         CkBoxSaveWindowMetrics.ForeColor = forecolor
         CkBoxShowTrayIcon.ForeColor = forecolor
         CkBoxMinimizeToTray.ForeColor = forecolor

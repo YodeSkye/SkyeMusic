@@ -1263,6 +1263,8 @@ Namespace My
                         Case "False", "0" : PlayerPositionShowElapsed = False
                         Case Else : PlayerPositionShowElapsed = True
                     End Select
+                    Settings.PlayerMetersShowHorizontal = Skye.Common.RegistryHelper.GetBool("PlayerMetersShowHorizontal", True)
+                    Settings.PlayerMetersShowVertical = Skye.Common.RegistryHelper.GetBool("PlayerMetersShowVertical", False)
                     Try : Settings.PlayMode = CType([Enum].Parse(GetType(App.PlayModes), RegKey.GetValue("PlayMode", App.PlayModes.Random.ToString).ToString), PlayModes)
                     Catch : Settings.PlayMode = App.PlayModes.Random
                     End Try
@@ -1499,8 +1501,8 @@ Namespace My
                 'WatcherEnabled = True
                 'WatcherUpdateLibrary = True
                 'WatcherUpdatePlaylist = True
-                PlayerMetersShowHorizontal = True
-                PlayerMetersShowVertical = True
+                'PlayerMetersShowHorizontal = True
+                'PlayerMetersShowVertical = True
 #End If
             End Sub
             Friend Shared Sub Save()
@@ -1517,6 +1519,8 @@ Namespace My
                     Skye.Common.RegistryHelper.SetInt("PlayerMiniLocationX", PlayerMiniLocation.X)
                     Skye.Common.RegistryHelper.SetInt("PlayerMiniLocationY", PlayerMiniLocation.Y)
                     RegKey.SetValue("PlayerPositionShowElapsed", Settings.PlayerPositionShowElapsed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    Skye.Common.RegistryHelper.SetBool("PlayerMetersShowHorizontal", Settings.PlayerMetersShowHorizontal)
+                    Skye.Common.RegistryHelper.SetBool("PlayerMetersShowVertical", Settings.PlayerMetersShowVertical)
                     RegKey.SetValue("PlayMode", Settings.PlayMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("ShowNowPlayingToast", Settings.ShowNowPlayingToast.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("NowPlayingToastLocation", Settings.NowPlayingToastLocation.ToString, Microsoft.Win32.RegistryValueKind.String)
