@@ -745,25 +745,27 @@ Partial Class Player
         ' 
         ' DBEXVertRight
         ' 
+        DBEXVertRight.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
         DBEXVertRight.BarBackColor = Color.Transparent
         DBEXVertRight.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
         DBEXVertRight.InnerHighlight = True
         DBEXVertRight.Location = New Point(422, 28)
         DBEXVertRight.Name = "DBEXVertRight"
         DBEXVertRight.Orientation = Skye.UI.DataBarEX.OrientationMode.VerticalUp
-        DBEXVertRight.Size = New Size(10, 293)
+        DBEXVertRight.Size = New Size(10, 296)
         DBEXVertRight.TabIndex = 1
         DBEXVertRight.TrailingGlow = True
         ' 
         ' DBEXVertLeft
         ' 
+        DBEXVertLeft.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left
         DBEXVertLeft.BarBackColor = Color.Transparent
         DBEXVertLeft.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
         DBEXVertLeft.InnerHighlight = True
         DBEXVertLeft.Location = New Point(3, 28)
         DBEXVertLeft.Name = "DBEXVertLeft"
         DBEXVertLeft.Orientation = Skye.UI.DataBarEX.OrientationMode.VerticalUp
-        DBEXVertLeft.Size = New Size(10, 293)
+        DBEXVertLeft.Size = New Size(10, 296)
         DBEXVertLeft.TabIndex = 0
         DBEXVertLeft.TrailingGlow = True
         ' 

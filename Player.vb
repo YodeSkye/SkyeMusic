@@ -5754,9 +5754,6 @@ Public Class Player
         App.FrmMiniPlayer?.SetAlbumArt(Nothing)
 
         Select Case mode
-        ' ------------------------------
-        ' LYRICS MODE
-        ' ------------------------------
             Case DisplayMode.Lyrics
                 If WindowState = FormWindowState.Maximized Then
                     RTBLyrics.Font = New Font(RTBLyrics.Font.FontFamily, 20, FontStyle.Regular)
@@ -5772,9 +5769,6 @@ Public Class Player
 
                 RTBLyrics.SetAlignment(HorizontalAlignment.Center)
                 RTBLyrics.Visible = True
-        ' ------------------------------
-        ' ALBUM ART MODE
-        ' ------------------------------
             Case DisplayMode.AlbumArt
                 Try
                     If AlbumArtIndex > tlfile.Tag.Pictures.Count - 1 Then AlbumArtIndex = 0
@@ -5787,6 +5781,12 @@ Public Class Player
                         AlbumArtCount = CByte(tlfile.Tag.Pictures.Count)
                         PicBoxAlbumArt.Invalidate()
                         If App.Settings.PlayerMetersShowVertical Then
+                            DBEXVertLeft.Parent = PicBoxAlbumArt
+                            DBEXVertRight.Parent = PicBoxAlbumArt
+                            DBEXVertLeft.Location = New Point(0, 0)
+                            DBEXVertLeft.Height = PicBoxAlbumArt.ClientSize.Height
+                            DBEXVertRight.Location = New Point(PicBoxAlbumArt.ClientSize.Width - DBEXVertRight.Width, 0)
+                            DBEXVertRight.Height = PicBoxAlbumArt.ClientSize.Height
                             DBEXVertLeft.Visible = True
                             DBEXVertRight.Visible = True
                         End If
@@ -5796,27 +5796,17 @@ Public Class Player
                     PicBoxAlbumArt.Visible = False
                     App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                 End Try
-        ' ------------------------------
-        ' VIDEO MODE
-        ' ------------------------------
             Case DisplayMode.Video
                 VideoSetSize()
                 VLCViewer.Visible = True
                 App.FrmMiniPlayer?.SetAlbumArt(Nothing)
-        ' ------------------------------
-        ' VISUALIZER MODE
-        ' ------------------------------
             Case DisplayMode.Visualizer
                 VisualizerHost.Activate(App.Settings.Visualizer)
                 VisualizerEngine?.Start()
                 PanelVisualizer.Visible = True
                 PanelVisualizer.BringToFront()
-        ' ------------------------------
-        ' NONE (no media)
-        ' ------------------------------
             Case DisplayMode.None
                 ' Everything stays hidden
-
         End Select
 
         ' Lyrics menu visibility
