@@ -103,10 +103,12 @@ Partial Class Player
         TimerStatus = New Timer(components)
         TimerLyrics = New Timer(components)
         PanelVisualizer = New Panel()
+        DBEXVertRight = New Skye.UI.DataBarEX()
+        DBEXVertLeft = New Skye.UI.DataBarEX()
         BtnVolume = New VolumeButton()
         TimerStreamMeta = New Timer(components)
-        PEXLeft = New Skye.UI.DataBarEX()
-        PEXRight = New Skye.UI.DataBarEX()
+        DBEXLeft = New Skye.UI.DataBarEX()
+        DBEXRight = New Skye.UI.DataBarEX()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -333,7 +335,6 @@ Partial Class Player
         MenuPlayer.Name = "MenuPlayer"
         MenuPlayer.Size = New Size(1011, 28)
         MenuPlayer.TabIndex = 12
-        MenuPlayer.Text = "MenuStrip1"
         ' 
         ' MIFile
         ' 
@@ -742,6 +743,30 @@ Partial Class Player
         PanelVisualizer.Size = New Size(434, 294)
         PanelVisualizer.TabIndex = 40
         ' 
+        ' DBEXVertRight
+        ' 
+        DBEXVertRight.BarBackColor = Color.Transparent
+        DBEXVertRight.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
+        DBEXVertRight.InnerHighlight = True
+        DBEXVertRight.Location = New Point(422, 28)
+        DBEXVertRight.Name = "DBEXVertRight"
+        DBEXVertRight.Orientation = Skye.UI.DataBarEX.OrientationMode.VerticalUp
+        DBEXVertRight.Size = New Size(10, 293)
+        DBEXVertRight.TabIndex = 1
+        DBEXVertRight.TrailingGlow = True
+        ' 
+        ' DBEXVertLeft
+        ' 
+        DBEXVertLeft.BarBackColor = Color.Transparent
+        DBEXVertLeft.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
+        DBEXVertLeft.InnerHighlight = True
+        DBEXVertLeft.Location = New Point(3, 28)
+        DBEXVertLeft.Name = "DBEXVertLeft"
+        DBEXVertLeft.Orientation = Skye.UI.DataBarEX.OrientationMode.VerticalUp
+        DBEXVertLeft.Size = New Size(10, 293)
+        DBEXVertLeft.TabIndex = 0
+        DBEXVertLeft.TrailingGlow = True
+        ' 
         ' BtnVolume
         ' 
         BtnVolume.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
@@ -760,34 +785,36 @@ Partial Class Player
         ' 
         TimerStreamMeta.Interval = 3000
         ' 
-        ' PEXLeft
+        ' DBEXLeft
         ' 
-        PEXLeft.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        PEXLeft.BarBackColor = Color.Transparent
-        PEXLeft.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
-        PEXLeft.InnerHighlight = True
-        PEXLeft.Location = New Point(18, 350)
-        PEXLeft.Name = "PEXLeft"
-        PEXLeft.Size = New Size(401, 8)
-        PEXLeft.TabIndex = 42
-        PEXLeft.TrailingGlow = True
+        DBEXLeft.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        DBEXLeft.BarBackColor = Color.Transparent
+        DBEXLeft.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
+        DBEXLeft.InnerHighlight = True
+        DBEXLeft.Location = New Point(18, 350)
+        DBEXLeft.Name = "DBEXLeft"
+        DBEXLeft.Size = New Size(401, 8)
+        DBEXLeft.TabIndex = 42
+        DBEXLeft.TrailingGlow = True
         ' 
-        ' PEXRight
+        ' DBEXRight
         ' 
-        PEXRight.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        PEXRight.BarBackColor = Color.Transparent
-        PEXRight.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
-        PEXRight.InnerHighlight = True
-        PEXRight.Location = New Point(18, 387)
-        PEXRight.Name = "PEXRight"
-        PEXRight.Size = New Size(401, 8)
-        PEXRight.TabIndex = 43
-        PEXRight.TrailingGlow = True
+        DBEXRight.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        DBEXRight.BarBackColor = Color.Transparent
+        DBEXRight.BarGradient = Skye.UI.DataBarEX.GradientMode.Micro
+        DBEXRight.InnerHighlight = True
+        DBEXRight.Location = New Point(18, 387)
+        DBEXRight.Name = "DBEXRight"
+        DBEXRight.Size = New Size(401, 8)
+        DBEXRight.TabIndex = 43
+        DBEXRight.TrailingGlow = True
         ' 
         ' Player
         ' 
         AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(1011, 461)
+        Controls.Add(DBEXVertLeft)
+        Controls.Add(DBEXVertRight)
         Controls.Add(BtnVolume)
         Controls.Add(PanelVisualizer)
         Controls.Add(RTBLyrics)
@@ -807,8 +834,8 @@ Partial Class Player
         Controls.Add(MenuPlayer)
         Controls.Add(PanelMedia)
         Controls.Add(LblPlaylistCount)
-        Controls.Add(PEXRight)
-        Controls.Add(PEXLeft)
+        Controls.Add(DBEXRight)
+        Controls.Add(DBEXLeft)
         Controls.Add(LblMedia)
         Controls.Add(TrackBarPosition)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -914,6 +941,8 @@ Partial Class Player
     Friend WithEvents TimerStreamMeta As Timer
     Friend WithEvents MIViewClients As ToolStripMenuItem
     Friend WithEvents BtnVolume As VolumeButton
-    Friend WithEvents PEXLeft As Skye.UI.DataBarEX
-    Friend WithEvents PEXRight As Skye.UI.DataBarEX
+    Friend WithEvents DBEXLeft As Skye.UI.DataBarEX
+    Friend WithEvents DBEXRight As Skye.UI.DataBarEX
+    Friend WithEvents DBEXVertLeft As Skye.UI.DataBarEX
+    Friend WithEvents DBEXVertRight As Skye.UI.DataBarEX
 End Class

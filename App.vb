@@ -1116,6 +1116,8 @@ Namespace My
             Friend Shared PlayerSize As New Size(-1, -1)
             Friend Shared PlayerMiniLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
             Friend Shared PlayerPositionShowElapsed As Boolean = True
+            Friend Shared PlayerMetersShowHorizontal As Boolean = True
+            Friend Shared PlayerMetersShowVertical As Boolean = False
             Friend Shared PlayMode As PlayModes = PlayModes.Random
             Friend Shared ShowNowPlayingToast As Boolean = True
             Friend Shared NowPlayingToastLocation As Skye.UI.ToastLocation = Skye.UI.ToastLocation.TopRight
@@ -1497,6 +1499,8 @@ Namespace My
                 'WatcherEnabled = True
                 'WatcherUpdateLibrary = True
                 'WatcherUpdatePlaylist = True
+                PlayerMetersShowHorizontal = True
+                PlayerMetersShowVertical = True
 #End If
             End Sub
             Friend Shared Sub Save()

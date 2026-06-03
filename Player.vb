@@ -2875,7 +2875,7 @@ Public Class Player
         End If
 
         TimerPosition.Start()
-        TimerMeter.Start()
+        SetTimerMeter()
         TimerLyrics.Start()
 
         App.InitializePostStartup()
@@ -2952,11 +2952,9 @@ Public Class Player
         ToggleMaximized()
     End Sub
     Private Sub Player_SizeChanged(sender As Object, e As EventArgs) Handles MyBase.SizeChanged
-        'PEXLeft.Size = New Size(BtnVolume.Location.X + BtnVolume.Width - PEXLeft.Left, PEXLeft.Height)
-        'PEXRight.Size = New Size(BtnVolume.Location.X + BtnVolume.Width - PEXRight.Left, PEXRight.Height)
         VideoSetSize()
     End Sub
-    Private Sub Player_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, MenuPlayer.MouseDown, LblPlaylistCount.MouseDown, LblDuration.MouseDown, PEXLeft.MouseDown, PEXRight.MouseDown
+    Private Sub Player_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, MenuPlayer.MouseDown, LblPlaylistCount.MouseDown, LblDuration.MouseDown, DBEXLeft.MouseDown, DBEXRight.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -2968,7 +2966,7 @@ Public Class Player
             End If
         End If
     End Sub
-    Private Sub Player_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, MenuPlayer.MouseMove, LblPlaylistCount.MouseMove, LblDuration.MouseMove, PEXLeft.MouseMove, PEXRight.MouseMove
+    Private Sub Player_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PicBoxAlbumArt.MouseMove, MenuPlayer.MouseMove, LblPlaylistCount.MouseMove, LblDuration.MouseMove, DBEXLeft.MouseMove, DBEXRight.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -2976,7 +2974,7 @@ Public Class Player
             Location = mPosition
         End If
     End Sub
-    Private Sub Player_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp, MenuPlayer.MouseUp, LblPlaylistCount.MouseUp, LblDuration.MouseUp, PEXLeft.MouseUp, PEXRight.MouseUp
+    Private Sub Player_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PicBoxAlbumArt.MouseUp, MenuPlayer.MouseUp, LblPlaylistCount.MouseUp, LblDuration.MouseUp, DBEXLeft.MouseUp, DBEXRight.MouseUp
         mMove = False
     End Sub
     Private Sub Player_Move(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Move
@@ -4072,8 +4070,8 @@ Public Class Player
         PlayState = PlayStates.Stopped
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
         TrackBarPosition.Value = 0
-        PEXLeft.Value = 0
-        PEXRight.Value = 0
+        DBEXLeft.Value = 0
+        DBEXRight.Value = 0
         ResetLblPositionText()
         If Not App.Settings.PlayMode = App.PlayModes.None Then
             AutoNext = True
@@ -4190,10 +4188,12 @@ Public Class Player
         If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
             Dim leftScaled As Single = MeterPeakLeft * 100.0F
             Dim rightScaled As Single = MeterPeakRight * 100.0F
-            Dim leftVal As Integer = CInt(Math.Max(0, Math.Min(PEXLeft.Maximum, leftScaled)))
-            Dim rightVal As Integer = CInt(Math.Max(0, Math.Min(PEXRight.Maximum, rightScaled)))
-            PEXLeft.Value = leftVal
-            PEXRight.Value = rightVal
+            Dim leftVal As Integer = CInt(Math.Max(0, Math.Min(DBEXLeft.Maximum, leftScaled)))
+            Dim rightVal As Integer = CInt(Math.Max(0, Math.Min(DBEXRight.Maximum, rightScaled)))
+            DBEXLeft.Value = leftVal
+            DBEXRight.Value = rightVal
+            DBEXVertLeft.Value = leftVal
+            DBEXVertRight.Value = rightVal
         End If
     End Sub
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
@@ -4447,7 +4447,7 @@ Public Class Player
         Visible = False
         RecreateHandle()
     End Sub
-    Friend Sub RestoreFromTray(optional ignorewindowstate As Boolean = false)
+    Friend Sub RestoreFromTray(Optional ignorewindowstate As Boolean = False)
         _hidefromTaskSwitcher = False
         ShowInTaskbar = True
         Visible = True
@@ -5626,8 +5626,8 @@ Public Class Player
         BtnPlay.Image = App.CurrentTheme.PlayerPlay
         TrackBarPosition.Value = 0
         TrackBarPosition.Enabled = False
-        PEXLeft.Value = 0
-        PEXRight.Value = 0
+        DBEXLeft.Value = 0
+        DBEXRight.Value = 0
         ResetLblPositionText()
         If FullScreen Then FullScreen = False
         VLCViewer.Visible = False
@@ -5743,6 +5743,10 @@ Public Class Player
         ' Hide everything first
         PicBoxAlbumArt.Visible = False
         PicBoxAlbumArt.Image = Nothing
+        DBEXVertLeft.Visible = False
+        DBEXVertRight.Visible = False
+        DBEXVertLeft.Value = 0
+        DBEXVertRight.Value = 0
         RTBLyrics.Visible = False
         VLCViewer.Visible = False
         PanelVisualizer.Visible = False
@@ -5782,13 +5786,17 @@ Public Class Player
                         App.FrmMiniPlayer?.SetAlbumArt(img)
                         AlbumArtCount = CByte(tlfile.Tag.Pictures.Count)
                         PicBoxAlbumArt.Invalidate()
+                        If App.Settings.PlayerMetersShowVertical Then
+                            DBEXVertLeft.Visible = True
+                            DBEXVertRight.Visible = True
+                        End If
                     End Using
                 Catch ex As Exception
                     Skye.Common.Log.Write("Error loading album art: " & ex.Message)
                     PicBoxAlbumArt.Visible = False
                     App.FrmMiniPlayer?.SetAlbumArt(Nothing)
                 End Try
-       ' ------------------------------
+        ' ------------------------------
         ' VIDEO MODE
         ' ------------------------------
             Case DisplayMode.Video
@@ -5814,6 +5822,25 @@ Public Class Player
         ' Lyrics menu visibility
         MILyrics.Visible = HasLyrics
 
+    End Sub
+
+    'Meters
+    Friend Sub SetTimerMeter()
+        TimerMeter.Stop()
+        DBEXLeft.Visible = False
+        DBEXRight.Visible = False
+        DBEXLeft.Value = 0
+        DBEXRight.Value = 0
+        DBEXVertLeft.Visible = False
+        DBEXVertRight.Visible = False
+        DBEXVertLeft.Value = 0
+        DBEXVertRight.Value = 0
+
+        If App.Settings.PlayerMetersShowHorizontal Or App.Settings.PlayerMetersShowVertical Then TimerMeter.Start()
+        If App.Settings.PlayerMetersShowHorizontal Then
+            DBEXLeft.Visible = True
+            DBEXRight.Visible = True
+        End If
     End Sub
 
     'FullScreen
@@ -6131,8 +6158,10 @@ Public Class Player
         BtnVolume.TextColor = App.CurrentTheme.ButtonTextColor
         BtnVolume.BarBackColor = App.CurrentTheme.BackColor
         BtnVolume.BarFillColor = App.CurrentTheme.TextColor
-        PEXLeft.BarColor = App.CurrentTheme.TextColor
-        PEXRight.BarColor = App.CurrentTheme.TextColor
+        DBEXLeft.BarColor = App.CurrentTheme.TextColor
+        DBEXRight.BarColor = App.CurrentTheme.TextColor
+        DBEXVertLeft.BarColor = App.CurrentTheme.TextColor
+        DBEXVertRight.BarColor = App.CurrentTheme.TextColor
         TrackBarPosition.ButtonColor = App.CurrentTheme.ButtonBackColor
         TrackBarPosition.HighlightedButtonColor = App.CurrentTheme.ButtonBackColor
         TrackBarPosition.PushedButtonEndColor = App.CurrentTheme.TextColor
@@ -6163,48 +6192,5 @@ Public Class Player
         App.ThemeMenu(CMRatings)
         VisualizerHost.SetVisualizersMenu()
     End Sub
-    'Private Sub CustomDrawCMToolTip(MyToolStrip As ToolStrip)
-
-    '    'Initialize
-    '    Dim MyField As Reflection.PropertyInfo = MyToolStrip.GetType().GetProperty("ToolTip", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
-    '    Dim MyToolTip As System.Windows.Forms.ToolTip = CType(MyField.GetValue(MyToolStrip), System.Windows.Forms.ToolTip)
-
-    '    'Configure ToolTip
-    '    MyToolTip.OwnerDraw = True
-
-    '    'Draw
-    '    AddHandler MyToolTip.Popup,
-    '        Sub(sender, e)
-    '            Dim s As SizeF
-    '            s = TextRenderer.MeasureText(CType(sender, System.Windows.Forms.ToolTip).GetToolTip(e.AssociatedControl), App.TipFont)
-    '            s.Width += 14
-    '            s.Height += 16
-    '            e.ToolTipSize = s.ToSize
-    '        End Sub
-    '    AddHandler MyToolTip.Draw,
-    '        Sub(sender, e)
-
-    '            'Declarations
-    '            Dim g As Graphics = e.Graphics
-
-    '            'Draw background
-    '            Dim brbg As New SolidBrush(App.CurrentTheme.BackColor)
-    '            g.FillRectangle(brbg, e.Bounds)
-
-    '            'Draw border
-    '            Using p As New Pen(App.CurrentTheme.ButtonBackColor, CInt(App.TipFont.Size / 4)) 'Scale border thickness with font
-    '                g.DrawRectangle(p, 0, 0, e.Bounds.Width - 1, e.Bounds.Height - 1)
-    '            End Using
-
-    '            'Draw text
-    '            TextRenderer.DrawText(g, e.ToolTipText, App.TipFont, New Point(7, 7), App.CurrentTheme.TextColor)
-
-    '            'Finalize
-    '            brbg.Dispose()
-    '            g.Dispose()
-
-    '        End Sub
-
-    'End Sub
 
 End Class
