@@ -119,7 +119,7 @@ Public Class Player
 
         Public Sub New(_invoker As Form)
             Dim args As String() = {
-                "--aout=wasapi",               '"--aout=directsound",          'force DirectSound output
+                "--aout=directsound",               ' wasapi or directsound"
                 "--no-audio-time-stretch",     'can reduce distortion on pitch correction
                 "--audio-resampler=soxr",      'higher quality resampler
                 "--file-caching=1000",         '1 second buffer for local files
@@ -5813,7 +5813,10 @@ Public Class Player
         MILyrics.Visible = HasLyrics
 
     End Sub
-
+    Friend Sub SetPlayerVolume(volumepercent As Integer)
+        _player.Volume = volumepercent
+        'Debug.WriteLine("Internal VLC volume = " & DirectCast(_player, VLCPlayer).MediaPlayer.Volume)
+    End Sub
     'Meters
     Friend Sub SetTimerMeter()
         TimerMeter.Stop()

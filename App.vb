@@ -2811,6 +2811,7 @@ Namespace My
             If _audioEndpoint Is Nothing Then Exit Sub
 
             ' Clamp 0–100
+            Dim newVolumeBoost As Integer = Math.Max(100, Math.Min(150, newVolume))
             If newVolume < 0 Then newVolume = 0
             If newVolume > 100 Then newVolume = 100
 
@@ -2818,7 +2819,8 @@ Namespace My
             Dim scalar As Single = CSng(newVolume / 100.0F)
 
             Try
-                _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar = scalar
+                FrmPlayer.SetPlayerVolume(newVolumeBoost) ' Update the player volume (boosted)
+                _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar = scalar ' Update the system volume (0.0–1.0)
             Catch
                 ' Optional: log or ignore
             End Try
@@ -4661,17 +4663,17 @@ Namespace My
         Private _barFillColor As Color = Color.FromArgb(0, 120, 215)
         Private _muteXColor As Color = Color.Red
         Private _textColor As Color = Color.White
+        Private _maxStickCount As Integer = 4 ' how many ticks to stick at 100
+        Private _maxStickCurrent As Integer = 0
 
         ' Designer Properties
-        <Category("Volume"),
-     Description("Current volume percent (0-100)."),
-     DefaultValue(0)>
+        <Category("Volume"), Description("Current volume percent (0-100, 150 with boost)."), DefaultValue(0)>
         Public Property VolumePercent As Integer
             Get
                 Return _volumePercent
             End Get
             Set(value As Integer)
-                Dim v = Math.Max(0, Math.Min(100, value))
+                Dim v = Math.Max(0, Math.Min(150, value))
                 If _volumePercent <> v Then
                     _volumePercent = v
                     Me.Invalidate()
@@ -4765,16 +4767,39 @@ Namespace My
         End Sub
         Protected Overrides Sub OnMouseWheel(e As MouseEventArgs)
             MyBase.OnMouseWheel(e)
-
             If DesignMode Then Exit Sub
 
+            Dim newVol As Integer = VolumePercent
+
             If e.Delta > 0 Then
-                VolumePercent = Math.Min(100, VolumePercent + 2)
+                ' Scrolling UP
+                If newVol < 100 Then
+                    ' Normal increase below 100
+                    newVol = Math.Min(100, newVol + 2)
+                    _maxStickCurrent = 0
+                ElseIf newVol = 100 Then
+                    ' We are at 100 → stick here for a few ticks
+                    _maxStickCurrent += 1
+                    If _maxStickCurrent < _maxStickCount Then
+                        ' Stay at 100
+                        newVol = 100
+                    Else
+                        ' Stick time over → allow boost
+                        newVol = 102
+                    End If
+                Else
+                    ' Already above 100 → normal boost increments
+                    newVol = Math.Min(150, newVol + 2)
+                End If
+
             Else
-                VolumePercent = Math.Max(0, VolumePercent - 2)
+                ' Scrolling DOWN
+                newVol = Math.Max(0, newVol - 2)
+                _maxStickCurrent = 0
             End If
 
-            App.SetSystemVolume(VolumePercent)
+            VolumePercent = newVol
+            App.SetSystemVolume(newVol)
         End Sub
         Protected Overrides Sub OnClick(e As EventArgs)
             MyBase.OnClick(e)
@@ -4864,12 +4889,15 @@ Namespace My
             If _isMuted Then
                 percentText = "0%"
                 percentFont = New Font(Me.Font.FontFamily, Me.Font.Size - 2.0F, Me.Font.Style)
-            ElseIf _volumePercent >= 100 Then
+            ElseIf _volumePercent = 100 Then
                 percentText = "MAX"
                 percentFont = New Font(Me.Font.FontFamily, Me.Font.Size - 3.5F, FontStyle.Bold)
-            Else
+            ElseIf _volumePercent < 100 Then
                 percentText = _volumePercent.ToString() & "%"
                 percentFont = New Font(Me.Font.FontFamily, Me.Font.Size - 2.0F, Me.Font.Style)
+            Else
+                percentText = "+" & (_volumePercent - 100).ToString
+                percentFont = New Font(Me.Font.FontFamily, Me.Font.Size - 2.0F, FontStyle.Bold)
             End If
             Using percentFont
                 Using textBrush As New SolidBrush(_textColor)
