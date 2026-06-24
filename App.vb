@@ -4651,7 +4651,7 @@ Namespace My
         Inherits Button
 
         ' Declarations
-        Private Const BAR_WIDTH As Integer = 10
+        Private Const BAR_WIDTH As Integer = 9
         Private Const ICON_SIZE As Integer = 16
         Private Const ICON_PADDING As Integer = 6
         Private _volumePercent As Integer = 0
@@ -4810,19 +4810,50 @@ Namespace My
                 g.FillPath(backBrush, path)
             End Using
 
+            '' Bar Fill
+            'If Not _isMuted AndAlso _volumePercent > 0 Then
+            '    Dim fillHeight As Integer = CInt((_volumePercent / 100.0F) * barRect.Height)
+            '    Dim fillRect As New Rectangle(barRect.Left + 1, barRect.Bottom - fillHeight + 1, BAR_WIDTH - 2, fillHeight - 2)
+
+            '    Using fillBrush As New SolidBrush(_barFillColor)
+            '        ' Clip drawing to the bar rectangle so arcs can't overflow
+            '        Dim oldClip = g.Clip
+            '        g.SetClip(barRect)
+
+            '        Dim path = RoundedRect(fillRect, 4)
+            '        g.FillPath(fillBrush, path)
+
+            '        g.Clip = oldClip
+            '    End Using
+            'End If
+
             ' Bar Fill
             If Not _isMuted AndAlso _volumePercent > 0 Then
-                Dim fillHeight As Integer = CInt((_volumePercent / 100.0F) * barRect.Height)
-                Dim fillRect As New Rectangle(barRect.Left + 1, barRect.Bottom - fillHeight + 1, BAR_WIDTH - 2, fillHeight - 2)
+                Dim visualPercent As Integer = Math.Min(_volumePercent, 100)
+                Dim fillHeight As Integer = CInt((visualPercent / 100.0F) * barRect.Height)
+                Dim w As Integer = BAR_WIDTH - 2
+                Dim h As Integer = fillHeight
+                Dim x As Integer = barRect.Left + 1
+                Dim y As Integer = barRect.Bottom - h
 
                 Using fillBrush As New SolidBrush(_barFillColor)
-                    ' Clip drawing to the bar rectangle so arcs can't overflow
                     Dim oldClip = g.Clip
                     g.SetClip(barRect)
-
-                    Dim path = RoundedRect(fillRect, 4)
-                    g.FillPath(fillBrush, path)
-
+                    If h < w Then
+                        ' --- CIRCLE MODE ---
+                        Dim d As Integer = Math.Min(h, w)
+                        ' Force odd diameter to prevent wiggle
+                        If d Mod 2 = 0 Then d -= 1
+                        Dim cx As Integer = x + (w - d) \ 2
+                        Dim cy As Integer = barRect.Bottom - d
+                        g.FillEllipse(fillBrush, cx, cy, d, d)
+                    Else
+                        ' --- CAPSULE MODE ---
+                        Dim radius As Integer = w
+                        Dim fillRect As New Rectangle(x, y, w, h)
+                        Dim path As GraphicsPath = Capsule(fillRect)
+                        g.FillPath(fillBrush, path)
+                    End If
                     g.Clip = oldClip
                 End Using
             End If
@@ -4843,7 +4874,7 @@ Namespace My
             Using percentFont
                 Using textBrush As New SolidBrush(_textColor)
                     Dim textSize = g.MeasureString(percentText, percentFont)
-                    Dim textX As Single = barLeft - textSize.Width + 1
+                    Dim textX As Single = barLeft - textSize.Width
                     Dim textY As Single = (rect.Height - textSize.Height) / 1.3F
                     g.DrawString(percentText, percentFont, textBrush, textX, textY)
                 End Using
@@ -4871,6 +4902,27 @@ Namespace My
             path.AddArc(r.Right - d, r.Y, d, d, 270, 90)
             path.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90)
             path.AddArc(r.X, r.Bottom - d, d, d, 90, 90)
+            path.CloseFigure()
+
+            Return path
+        End Function
+        Private Function Capsule(rect As Rectangle) As GraphicsPath
+            Dim path As New GraphicsPath()
+
+            If rect.Height > rect.Width Then
+                ' Vertical capsule
+                Dim r As Integer = rect.Width
+                path.AddArc(rect.X, rect.Y, r, r, 180, 180)
+                path.AddArc(rect.X, rect.Bottom - r, r, r, 0, 180)
+            ElseIf rect.Width > rect.Height Then
+                ' Horizontal capsule
+                Dim r As Integer = rect.Height
+                path.AddArc(rect.X, rect.Y, r, r, 90, 180)
+                path.AddArc(rect.Right - r, rect.Y, r, r, 270, 180)
+            Else
+                ' Perfect circle
+                path.AddEllipse(rect)
+            End If
             path.CloseFigure()
 
             Return path
