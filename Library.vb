@@ -970,7 +970,7 @@ Public Class Library
     Private Function CreateLibraryItem(path As String) As ListViewItem
         Dim item As ListViewItem = Nothing
         Dim tlfile As TagLib.File
-        If App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(path)) Then
+        If App.ExtensionDictionary.ContainsKey(IO.Path.GetExtension(path).ToLower) Then
             item = New ListViewItem
             'Keep this in sync with number of columns set in Load Event
             item.SubItems.Add(String.Empty)
@@ -1055,6 +1055,7 @@ Public Class Library
             LVLibrary.BeginUpdate()
             LVLibrary.Items.Clear()
             For Each folder As String In Settings.LibrarySearchFolders
+                files.Clear()
                 Try
                     If Settings.LibrarySearchSubFolders Then
                         files.AddRange(IO.Directory.GetFiles(folder, "*", IO.SearchOption.AllDirectories))
@@ -1067,7 +1068,7 @@ Public Class Library
                 For Each file As String In files
                     If ExtensionDictionary.ContainsKey(IO.Path.GetExtension(file).ToLower) Then
                         col.Add(CreateLibraryItem(file))
-                        AddToHistoryFromLibrary(file)
+                        App.AddToHistoryFromLibrary(file)
                     End If
                 Next
                 files.Clear()
