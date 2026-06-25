@@ -1404,7 +1404,6 @@ Public Class Library
     End Sub
     Private Sub SetExtInfo()
         If LVLibrary.SelectedItems.Count > 0 Then
-
             Dim filePath As String = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text
             Dim histItem = App.History.Find(Function(p) p.Path = filePath)
             Dim h As String
@@ -1413,19 +1412,10 @@ Public Class Library
                 LblHistory.Text = GenerateEllipsis(LblHistory.CreateGraphics(), h, LblHistory.Font, LblHistory.Size.Width)
                 TipLibraryEX.SetText(LblHistory, If(LblHistory.Text = h, String.Empty, h))
             Else
-                h = "Never played"
+                h = "Never Played"
                 LblHistory.Text = h
                 TipLibraryEX.SetText(LblHistory, String.Empty)
             End If
-
-            'Dim h As String = App.History.Find(Function(p) p.Path = (LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)).ToStringFull
-            'LblHistory.Text = GenerateEllipsis(LblHistory.CreateGraphics(), h, LblHistory.Font, LblHistory.Size.Width)
-            'If LblHistory.Text = h Then
-            '    TipLibraryEX.SetText(LblHistory, String.Empty)
-            'Else
-            '    TipLibraryEX.SetText(LblHistory, h)
-            'End If
-
             LblExtTitle.Text = LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("Title").Index).Text
             If IO.File.Exists(LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text) Then
                 Dim fInfo As IO.FileInfo
