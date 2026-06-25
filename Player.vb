@@ -5630,6 +5630,8 @@ Public Class Player
         TrackBarPosition.Enabled = False
         DBEXLeft.Value = 0
         DBEXRight.Value = 0
+        DBEXVertLeft.Value = 0
+        DBEXVertRight.Value = 0
         ResetLblPositionText()
         If FullScreen Then FullScreen = False
         VLCViewer.Visible = False
