@@ -3718,7 +3718,8 @@ Public Class Player
             If item IsNot Nothing Then
                 LVPlaylist.SelectedItems.Clear()
                 item.Selected = True
-                item.EnsureVisible()
+                'item.EnsureVisible()
+                App.EnsureVisibleCentered(LVPlaylist, item.Index)
             End If
         Catch
         End Try
@@ -3939,7 +3940,8 @@ Public Class Player
     End Sub
     Private Sub ListBoxPlaylistSearchSelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBoxPlaylistSearch.SelectedIndexChanged
         If ListBoxPlaylistSearch.SelectedItems.Count = 1 Then
-            LVPlaylist.EnsureVisible(PlaylistSearchItems.Item(ListBoxPlaylistSearch.SelectedIndex).Index)
+            'LVPlaylist.EnsureVisible(PlaylistSearchItems.Item(ListBoxPlaylistSearch.SelectedIndex).Index)
+            App.EnsureVisibleCentered(LVPlaylist, PlaylistSearchItems.Item(ListBoxPlaylistSearch.SelectedIndex).Index)
             LVPlaylist.SelectedIndices.Clear()
             LVPlaylist.SelectedIndices.Add(PlaylistSearchItems.Item(ListBoxPlaylistSearch.SelectedIndex).Index)
             ResetTxtBoxPlaylistSearch()
@@ -5142,7 +5144,7 @@ Public Class Player
     End Sub
     Private Sub EnsurePlaylistItemIsVisible(index As Integer)
         If CMPlaylist.Visible Then CMPlaylist.Close()
-        LVPlaylist.EnsureVisible(index)
+        App.EnsureVisibleCentered(LVPlaylist, index)
         LVPlaylist.SelectedIndices.Clear()
         LVPlaylist.SelectedIndices.Add(index)
         LVPlaylist.Items(index).Focused = True
@@ -5346,7 +5348,7 @@ Public Class Player
                 If item IsNot Nothing Then
                     LVPlaylist.SelectedItems.Clear()
                     item.Selected = True
-                    item.EnsureVisible()
+                    App.EnsureVisibleCentered(LVPlaylist, item.Index)
                 End If
             Catch
             End Try

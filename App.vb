@@ -4461,6 +4461,25 @@ Namespace My
                 End If
             End If
         End Function
+        Public Sub EnsureVisibleCentered(lv As ListView, index As Integer)
+            If index < 0 OrElse index >= lv.Items.Count Then Exit Sub
+            If lv.View <> View.Details AndAlso lv.View <> View.List Then Exit Sub
+
+            ' Height of one item
+            Dim itemHeight As Integer = lv.GetItemRect(index).Height
+            ' How many items fit in the visible area?
+            Dim visibleCount As Integer = lv.ClientSize.Height \ itemHeight
+            ' Target top index so the item ends up centered
+            Dim targetTop As Integer = index - (visibleCount \ 2)
+            If targetTop < 0 Then targetTop = 0
+
+            lv.BeginUpdate()
+            Try
+                lv.TopItem = lv.Items(targetTop)
+            Catch
+            End Try
+            lv.EndUpdate()
+        End Sub
         Friend Function GetSimpleVersion() As String
             GetSimpleVersion = My.Application.Info.Version.Major.ToString & "." & My.Application.Info.Version.Minor.ToString
         End Function
@@ -4663,7 +4682,7 @@ Namespace My
         Private _barFillColor As Color = Color.FromArgb(0, 120, 215)
         Private _muteXColor As Color = Color.Red
         Private _textColor As Color = Color.White
-        Private _maxStickCount As Integer = 4 ' how many ticks to stick at 100
+        Private ReadOnly _maxStickCount As Integer = 4 ' how many ticks to stick at 100
         Private _maxStickCurrent As Integer = 0
 
         ' Designer Properties
@@ -4874,7 +4893,7 @@ Namespace My
                         g.FillEllipse(fillBrush, cx, cy, d, d)
                     Else
                         ' --- CAPSULE MODE ---
-                        Dim radius As Integer = w
+                        'Dim radius As Integer = w
                         Dim fillRect As New Rectangle(x, y, w, h)
                         Dim path As GraphicsPath = Capsule(fillRect)
                         g.FillPath(fillBrush, path)
