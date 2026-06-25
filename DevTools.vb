@@ -59,8 +59,15 @@ Public Class DevTools
             Next
 
             'Remove them from History
-            For Each s In rowsToDelete
-                App.History.Remove(s)
+            'For Each s In rowsToDelete
+            '    'App.History.Remove(s)
+            '    App.History.RemoveAll(Function(p) p.Path.Equals(s.Path, StringComparison.OrdinalIgnoreCase))
+            'Next
+            For Each r As DataGridViewRow In DGVHistory.SelectedRows
+                Dim idx As Integer = r.Index
+                If idx >= 0 AndAlso idx < App.History.Count Then
+                    App.History.RemoveAt(idx)
+                End If
             Next
 
             'Refresh the grid
