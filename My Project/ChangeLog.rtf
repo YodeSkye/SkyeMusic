@@ -10,11 +10,14 @@
 \f1\'a3\'ab\f2  \f0 Added optional vertical Meter Bars that display alongside Album Art. Made the standard horizontal Meter Bars optional as well, and updated the Meter Engine to run only when one or both Meter types are enabled, reducing unnecessary processing.\par
 \cf1\b\lang9\par
 \cf2 Improvements\par
-\cf0\b0\f3\u10003?\f4\lang1033  Improved the Volume Button's visuals, especially at lower percentages.\f5\lang9\par
+\cf0\b0\f3\u10003?\f4\lang1033  Playlist and Library views now keep the current item vertically centered when possible.\f3\lang9\par
+\u10003?\f4\lang1033  Improved the Volume Button's visuals, especially at lower percentages.\f5\lang9\par
 \f3\u10003?\f4\lang1033  Replaced the old meter bars with the new DataBarEX component, delivering a cleaner, more modern visual style and smoother rendering.\f1\par
 \par
 \cf2\b\f0\lang9 Fixes\par
-\cf0\b0\f3\u10005?\f4\lang1033  Skye Music now logs the \ldblquote Audio Meter Data Stale\rdblquote  event only once per occurrence instead of every meter tick. This prevents unnecessary log noise during brief audio interruptions or system wake events.\par
+\cf0\b0\f3\u10005?\f4\lang1033  The vertical Album Art meters no longer remain stuck after playback stops.\f3\lang9\par
+\u10005?\f4\lang1033  Fixed an issue where files with uppercase extensions failed to load, scan, or sync correctly by normalizing extension handling.\f3\lang9\par
+\u10005?\f4\lang1033  Skye Music now logs the \ldblquote Audio Meter Data Stale\rdblquote  event only once per occurrence instead of every meter tick. This prevents unnecessary log noise during brief audio interruptions or system wake events.\par
 \f1\par
 \cf1\b\f0\lang9 Skye Music v1.5\fs28\par
 \cf0\fs24 Released May 2026\cf1\par
