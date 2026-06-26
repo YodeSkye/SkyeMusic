@@ -1,5 +1,6 @@
 ﻿
 Imports SkyeMusic.My
+
 Public Class Help
 
     'Declarations
@@ -61,7 +62,11 @@ Public Class Help
         End If
     End Sub
     Private Sub Help_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyData = Keys.Escape Then Me.Close()
+        If e.KeyData = Keys.OemQuestion Then
+            App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
+        ElseIf e.KeyData = Keys.Escape Then
+            Close()
+        End If
     End Sub
 
     'Control Events

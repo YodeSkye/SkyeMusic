@@ -68,6 +68,11 @@ Public Class PlayerQueue
                 End If
             Case Keys.Delete
                 RemoveFromQueue()
+            Case Keys.OemQuestion
+                e.SuppressKeyPress = True
+                App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
+            Case Keys.Escape
+                Close()
         End Select
     End Sub
 

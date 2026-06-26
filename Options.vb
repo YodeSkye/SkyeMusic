@@ -206,7 +206,12 @@ Public Class Options
         End If
     End Sub
     Private Sub Options_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyData = Keys.Escape Then Close()
+        If e.KeyData = Keys.OemQuestion Then
+            e.SuppressKeyPress = True
+            App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
+        ElseIf e.KeyData = Keys.Escape Then
+            Close()
+        End If
     End Sub
 
     ' Control Events

@@ -62,6 +62,7 @@ Public Class About
     End Sub
     Private Sub About_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyData = Keys.OemQuestion Then
+            e.SuppressKeyPress = True
             App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
         ElseIf e.KeyData = Keys.Escape Then
             Close()
@@ -90,14 +91,6 @@ Public Class About
         Cursor = Cursors.Default
     End Sub
     Private Sub LblUpdateAvailable_Click(sender As Object, e As EventArgs) Handles LblUpdateAvailable.Click
-        'Try
-        '    Process.Start(New ProcessStartInfo With {
-        '        .FileName = "https://github.com/yodeskye/SkyeMusic/releases/latest",
-        '        .UseShellExecute = True
-        '    })
-        'Catch ex As Exception
-        '    Skye.Common.Log.Write("Cannot Open Update Link" & vbCr & ex.Message)
-        'End Try
         OpenLink(App.AttributionUpdate)
     End Sub
     Private Sub LLblSkyeMusic_MouseEnter(sender As Object, e As EventArgs) Handles LLblSkyeMusic.MouseEnter

@@ -229,7 +229,13 @@ Public Class Library
         End If
     End Sub
     Private Sub Library_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
-        If Not IsTextBoxLibrarySearch And e.KeyCode = Keys.Escape Then Close()
+        If e.KeyData = Keys.OemQuestion Then
+            e.SuppressKeyPress = True
+            App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
+        ElseIf e.KeyData = Keys.Escape AndAlso Not IsTextBoxLibrarySearch Then
+            Close()
+        End If
+        'If Not IsTextBoxLibrarySearch And e.KeyCode = Keys.Escape Then Close()
         IsTextBoxLibrarySearch = False
     End Sub
     Private Sub Library_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick
