@@ -219,6 +219,7 @@ Partial Class TagEditorOnline
         FormBorderStyle = FormBorderStyle.Fixed3D
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         tipInfo.SetImage(Me, Nothing)
+        KeyPreview = True
         MinimumSize = New Size(500, 561)
         Name = "TagEditorOnline"
         StartPosition = FormStartPosition.CenterParent

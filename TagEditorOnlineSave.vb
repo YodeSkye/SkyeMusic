@@ -27,11 +27,19 @@ Public Class TagEditorOnlineSave
             MyBase.WndProc(m)
         End Try
     End Sub
-    Private Sub TagEditorOnlineSave_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub Frm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetAccentColor()
         SetTheme()
         TxtBoxFilename.ContextMenuStrip = App.DummyMenu
         TxtBoxLocation.ContextMenuStrip = App.DummyMenu
+    End Sub
+    Private Sub Frm_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyData = Keys.OemQuestion Then
+            e.SuppressKeyPress = True
+            App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
+        ElseIf e.KeyData = Keys.Escape Then
+            Close()
+        End If
     End Sub
 
     ' Control Events

@@ -100,6 +100,14 @@ Public Class TagEditorOnline
     Private Sub Frm_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick, PicBoxArt.DoubleClick
         ToggleMaximized()
     End Sub
+    Private Sub Frm_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyData = Keys.OemQuestion Then
+            e.SuppressKeyPress = True
+            App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
+        ElseIf e.KeyData = Keys.Escape Then
+            Close()
+        End If
+    End Sub
 
     'Control Events
     Private Sub TxtBoxSearchPhrase_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TxtBoxSearchPhrase.KeyPress

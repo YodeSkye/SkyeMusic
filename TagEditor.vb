@@ -120,6 +120,14 @@ Public Class TagEditor
             CheckMove(Location)
         End If
     End Sub
+    Private Sub TagEditor_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyData = Keys.OemQuestion Then
+            e.SuppressKeyPress = True
+            App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
+        ElseIf e.KeyData = Keys.Escape Then
+            Close()
+        End If
+    End Sub
 
     ' Control Events
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxArtist.KeyDown, TxtBoxAlbum.KeyDown, TxtBoxTitle.KeyDown, TxtBoxYear.KeyDown, TxtBoxTracks.KeyDown, TxtBoxComments.KeyDown, TxtBoxGenre.KeyDown, TxtBoxTrack.KeyDown, TxtBoxLyrics.KeyDown

@@ -776,6 +776,7 @@ Partial Class TagEditor
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         TipStatus.SetImage(Me, Nothing)
         TipInfo.SetImage(Me, Nothing)
+        KeyPreview = True
         Margin = New Padding(4)
         MaximizeBox = False
         Name = "TagEditor"

@@ -212,6 +212,7 @@ Partial Class TagEditorOnlineSave
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.FixedDialog
         tipInfo.SetImage(Me, Nothing)
+        KeyPreview = True
         Margin = New Padding(4)
         Name = "TagEditorOnlineSave"
         StartPosition = FormStartPosition.CenterParent
