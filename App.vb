@@ -293,7 +293,6 @@ Namespace My
         ' Paths
         Friend ReadOnly UserPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" 'UserPath is the base path for user-specific files.
 #If DEBUG Then
-        'Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "LogDEV.txt" 'LogPath is the path to the log file.
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName + "DEV" 'RegPath is the path to the registry key where application settings are stored.
         Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
@@ -302,7 +301,6 @@ Namespace My
         Friend ReadOnly DirectoryFavoritesPath As String = UserPath + My.Application.Info.ProductName + "DirectoryFavoritesDEV.json" 'DirectoryFavoritesPath is the path to the Directory Favorites JSON file.
         Friend ReadOnly DownloadPath As String = UserPath + "DownloadsDEV\" 'DownloadPath is the path to the Downloads folder.
 #Else
-        'Friend ReadOnly LogPath As String = My.Computer.FileSystem.SpecialDirectories.Temp + "\" + My.Application.Info.ProductName + "Log.txt" 'LogPath is the path to the log file.
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName 'RegPath is the path to the registry key where application settings are stored.
         Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
@@ -2910,8 +2908,6 @@ Namespace My
             LibVLCSharp.Shared.Core.Initialize() ' Initialize LibVLCSharp, required to use the LibVLCSharp library for music playback.
             Http.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic/1.0") ' Set default User-Agent for HttpClient, used for fetching metadata from online sources, and for the Companion Server API.
 
-            'Initialize SkyeLibrary RegistryHelper
-
             Settings.Load()
             Settings.LoadDebug()
             CurrentTheme = GetCurrentThemeProperties()
@@ -2999,7 +2995,7 @@ Namespace My
             AddHandler NIApp.MouseUp, AddressOf NIApp_MouseUp
             Dim cm As New ContextMenuStrip()
             ThemeMenu(cm)
-            cm.Font = New Font("Segoe UI", 10.0!)
+            cm.Font = New Font("Segoe UI", 12.0!)
             Dim cmi As ToolStripMenuItem
             cmi = New ToolStripMenuItem("About " & My.Application.Info.Title, My.Resources.ImageAbout16) With {.Name = "NIApp_MIAbout"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIAbout_MouseDown

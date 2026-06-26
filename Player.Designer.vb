@@ -329,11 +329,11 @@ Partial Class Player
         ' MenuPlayer
         ' 
         MenuPlayer.BackColor = Color.Black
-        MenuPlayer.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        MenuPlayer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         MenuPlayer.Items.AddRange(New ToolStripItem() {MIFile, MIView, MIVisualizer, MILyrics, MIPlayMode, MILibrary, MIAbout})
         MenuPlayer.Location = New Point(0, 0)
         MenuPlayer.Name = "MenuPlayer"
-        MenuPlayer.Size = New Size(1011, 28)
+        MenuPlayer.Size = New Size(1011, 29)
         MenuPlayer.TabIndex = 12
         ' 
         ' MIFile
@@ -342,47 +342,47 @@ Partial Class Player
         MIFile.ForeColor = SystemColors.HighlightText
         MIFile.Image = My.Resources.Resources.ImageOpen16
         MIFile.Name = "MIFile"
-        MIFile.Size = New Size(60, 24)
+        MIFile.Size = New Size(62, 25)
         MIFile.Text = "File"
         ' 
         ' MIOpen
         ' 
         MIOpen.Image = My.Resources.Resources.ImageOpen16
         MIOpen.Name = "MIOpen"
-        MIOpen.Size = New Size(188, 24)
+        MIOpen.Size = New Size(196, 26)
         MIOpen.Text = "Open"
         ' 
         ' MIOpenURL
         ' 
         MIOpenURL.Image = My.Resources.Resources.ImageGlobe
         MIOpenURL.Name = "MIOpenURL"
-        MIOpenURL.Size = New Size(188, 24)
+        MIOpenURL.Size = New Size(196, 26)
         MIOpenURL.Text = "Open URL"
         ' 
         ' MIOpenPlaylist
         ' 
         MIOpenPlaylist.Image = My.Resources.Resources.ImageImport16
         MIOpenPlaylist.Name = "MIOpenPlaylist"
-        MIOpenPlaylist.Size = New Size(188, 24)
+        MIOpenPlaylist.Size = New Size(196, 26)
         MIOpenPlaylist.Text = "Open Playlist..."
         ' 
         ' MISavePlaylist
         ' 
         MISavePlaylist.Image = My.Resources.Resources.ImageExport16
         MISavePlaylist.Name = "MISavePlaylist"
-        MISavePlaylist.Size = New Size(188, 24)
+        MISavePlaylist.Size = New Size(196, 26)
         MISavePlaylist.Text = "Save Playlist As..."
         ' 
         ' ToolStripSeparator4
         ' 
         ToolStripSeparator4.Name = "ToolStripSeparator4"
-        ToolStripSeparator4.Size = New Size(185, 6)
+        ToolStripSeparator4.Size = New Size(193, 6)
         ' 
         ' MIExit
         ' 
         MIExit.Image = My.Resources.Resources.ImageExit
         MIExit.Name = "MIExit"
-        MIExit.Size = New Size(188, 24)
+        MIExit.Size = New Size(196, 26)
         MIExit.Text = "Exit"
         ' 
         ' MIView
@@ -391,94 +391,94 @@ Partial Class Player
         MIView.ForeColor = SystemColors.HighlightText
         MIView.Image = My.Resources.Resources.ImageView
         MIView.Name = "MIView"
-        MIView.Size = New Size(69, 24)
+        MIView.Size = New Size(72, 25)
         MIView.Text = "View"
         ' 
         ' MIFullscreen
         ' 
         MIFullscreen.Image = My.Resources.Resources.ImageFullscreen16
         MIFullscreen.Name = "MIFullscreen"
-        MIFullscreen.Size = New Size(203, 24)
+        MIFullscreen.Size = New Size(211, 26)
         MIFullscreen.Text = "Full Screen"
         ' 
         ' MIVisualizers
         ' 
         MIVisualizers.Image = My.Resources.Resources.ImageVisualizer16
         MIVisualizers.Name = "MIVisualizers"
-        MIVisualizers.Size = New Size(203, 24)
+        MIVisualizers.Size = New Size(211, 26)
         MIVisualizers.Text = "Visualizer"
         ' 
         ' MIMiniPlayer
         ' 
         MIMiniPlayer.Image = My.Resources.Resources.ImageMiniPlayer16
         MIMiniPlayer.Name = "MIMiniPlayer"
-        MIMiniPlayer.Size = New Size(203, 24)
+        MIMiniPlayer.Size = New Size(211, 26)
         MIMiniPlayer.Text = "MiniPlayer"
         ' 
         ' ToolStripSeparator2
         ' 
         ToolStripSeparator2.Name = "ToolStripSeparator2"
-        ToolStripSeparator2.Size = New Size(200, 6)
+        ToolStripSeparator2.Size = New Size(208, 6)
         ' 
         ' MIViewQueue
         ' 
         MIViewQueue.Image = My.Resources.Resources.ImagePlay
         MIViewQueue.Name = "MIViewQueue"
-        MIViewQueue.Size = New Size(203, 24)
+        MIViewQueue.Size = New Size(211, 26)
         MIViewQueue.Text = "Queue"
         ' 
         ' MIDirectory
         ' 
         MIDirectory.Image = My.Resources.Resources.ImageDirectory16
         MIDirectory.Name = "MIDirectory"
-        MIDirectory.Size = New Size(203, 24)
+        MIDirectory.Size = New Size(211, 26)
         MIDirectory.Text = "Directory"
         ' 
         ' MIViewHistory
         ' 
         MIViewHistory.Image = My.Resources.Resources.ImageHistory
         MIViewHistory.Name = "MIViewHistory"
-        MIViewHistory.Size = New Size(203, 24)
+        MIViewHistory.Size = New Size(211, 26)
         MIViewHistory.Text = "History && Statistics"
         ' 
         ' ToolStripSeparator5
         ' 
         ToolStripSeparator5.Name = "ToolStripSeparator5"
-        ToolStripSeparator5.Size = New Size(200, 6)
+        ToolStripSeparator5.Size = New Size(208, 6)
         ' 
         ' MIViewClients
         ' 
         MIViewClients.Image = My.Resources.Resources.ImageNetwork16
         MIViewClients.Name = "MIViewClients"
-        MIViewClients.Size = New Size(203, 24)
+        MIViewClients.Size = New Size(211, 26)
         MIViewClients.Text = "Clients"
         ' 
         ' MIOptions
         ' 
         MIOptions.Image = My.Resources.Resources.ImageSettings16
         MIOptions.Name = "MIOptions"
-        MIOptions.Size = New Size(203, 24)
+        MIOptions.Size = New Size(211, 26)
         MIOptions.Text = "Options"
         ' 
         ' MIVisualizer
         ' 
         MIVisualizer.Image = My.Resources.Resources.ImageVisualizer16
         MIVisualizer.Name = "MIVisualizer"
-        MIVisualizer.Size = New Size(28, 24)
+        MIVisualizer.Size = New Size(28, 25)
         ' 
         ' MILyrics
         ' 
         MILyrics.BackColor = Color.Transparent
         MILyrics.Image = My.Resources.Resources.ImageLyrics
         MILyrics.Name = "MILyrics"
-        MILyrics.Size = New Size(28, 24)
+        MILyrics.Size = New Size(28, 25)
         MILyrics.Visible = False
         ' 
         ' MIPlayMode
         ' 
         MIPlayMode.ForeColor = SystemColors.HighlightText
         MIPlayMode.Name = "MIPlayMode"
-        MIPlayMode.Size = New Size(91, 24)
+        MIPlayMode.Size = New Size(95, 25)
         MIPlayMode.Text = "Play Mode"
         ' 
         ' MILibrary
@@ -486,7 +486,7 @@ Partial Class Player
         MILibrary.ForeColor = SystemColors.HighlightText
         MILibrary.Image = My.Resources.Resources.ImageLibrary16
         MILibrary.Name = "MILibrary"
-        MILibrary.Size = New Size(82, 24)
+        MILibrary.Size = New Size(87, 25)
         MILibrary.Text = "Library"
         ' 
         ' MIAbout
@@ -495,28 +495,28 @@ Partial Class Player
         MIAbout.ForeColor = SystemColors.HighlightText
         MIAbout.Image = My.Resources.Resources.ImageAbout16
         MIAbout.Name = "MIAbout"
-        MIAbout.Size = New Size(78, 24)
+        MIAbout.Size = New Size(80, 25)
         MIAbout.Text = "About"
         ' 
         ' MIShowHelp
         ' 
         MIShowHelp.Image = My.Resources.Resources.ImageHelp16
         MIShowHelp.Name = "MIShowHelp"
-        MIShowHelp.Size = New Size(119, 24)
+        MIShowHelp.Size = New Size(122, 26)
         MIShowHelp.Text = "Help"
         ' 
         ' MIShowLog
         ' 
         MIShowLog.Image = My.Resources.Resources.ImageLog16
         MIShowLog.Name = "MIShowLog"
-        MIShowLog.Size = New Size(119, 24)
+        MIShowLog.Size = New Size(122, 26)
         MIShowLog.Text = "Log"
         ' 
         ' MIShowAbout
         ' 
         MIShowAbout.Image = My.Resources.Resources.ImageAbout16
         MIShowAbout.Name = "MIShowAbout"
-        MIShowAbout.Size = New Size(119, 24)
+        MIShowAbout.Size = New Size(122, 26)
         MIShowAbout.Text = "About"
         ' 
         ' TimerShowMedia
