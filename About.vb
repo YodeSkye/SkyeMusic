@@ -60,8 +60,12 @@ Public Class About
             CheckMove(Location)
         End If
     End Sub
-    Private Sub AboutKeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyData = Keys.Escape Then Me.Close()
+    Private Sub About_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyData = Keys.OemQuestion Then
+            App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
+        ElseIf e.KeyData = Keys.Escape Then
+            Close()
+        End If
     End Sub
 
     'Control Events

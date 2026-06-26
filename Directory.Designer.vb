@@ -149,6 +149,7 @@ Partial Class Directory
         LVSources.BorderStyle = BorderStyle.FixedSingle
         LVSources.Columns.AddRange(New ColumnHeader() {Source})
         LVSources.Dock = DockStyle.Fill
+        LVSources.EditableColumns = CType(resources.GetObject("LVSources.EditableColumns"), List(Of Boolean))
         LVSources.FullRowSelect = True
         LVSources.HeaderStyle = ColumnHeaderStyle.Nonclickable
         LVSources.InsertionLineColor = Color.Teal
@@ -188,6 +189,7 @@ Partial Class Directory
         LVStations.Columns.AddRange(New ColumnHeader() {ColStreamName, ColTags, ColFormat, ColBitrate, ColCountry, ColStatus, ColURL, ColMore})
         LVStations.ContextMenuStrip = CMStations
         LVStations.Dock = DockStyle.Fill
+        LVStations.EditableColumns = CType(resources.GetObject("LVStations.EditableColumns"), List(Of Boolean))
         LVStations.FullRowSelect = True
         LVStations.InsertionLineColor = Color.Teal
         LVStations.Location = New Point(0, 0)
@@ -472,6 +474,7 @@ Partial Class Directory
         Controls.Add(PanelSearch)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
+        KeyPreview = True
         Margin = New Padding(4)
         MinimumSize = New Size(200, 200)
         Name = "Directory"

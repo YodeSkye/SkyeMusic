@@ -4392,7 +4392,7 @@ Public Class Player
 
     End Sub
     Friend Sub ShowNowPlayingToast(songtext As String)
-        If App.Settings.ShowNowPlayingToast Then
+        If App.Settings.ShowNowPlayingToast AndAlso Not String.IsNullOrWhiteSpace(songtext) Then
             Dim npo As New Skye.UI.ToastOptions With {
                 .Title = "Now Playing",
                 .Message = songtext,

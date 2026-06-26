@@ -57,6 +57,7 @@ Partial Class ChangeLog
         Controls.Add(RTBoxChangeLog)
         Controls.Add(BtnOK)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
+        KeyPreview = True
         MinimizeBox = False
         Name = "ChangeLog"
         ShowInTaskbar = False

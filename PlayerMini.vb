@@ -1,4 +1,6 @@
 ﻿
+Imports System.ComponentModel.DataAnnotations
+
 Public Class PlayerMini
 
     'Declarations

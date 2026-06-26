@@ -144,6 +144,13 @@ Public Class Directory
             App.Settings.DirectorySize = Size
         End If
     End Sub
+    Private Sub Directory_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyData = Keys.OemQuestion Then
+            App.FrmPlayer.ShowNowPlayingToast(App.FrmPlayer.PlaylistCurrentText)
+        ElseIf e.KeyData = Keys.Escape Then
+            Close()
+        End If
+    End Sub
     Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
         ' Enter = Play
         If keyData = Keys.Enter Then
