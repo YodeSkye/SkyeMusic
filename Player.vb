@@ -5821,6 +5821,7 @@ Public Class Player
         _player.Volume = volumepercent
         'Debug.WriteLine("Internal VLC volume = " & DirectCast(_player, VLCPlayer).MediaPlayer.Volume)
     End Sub
+
     'Meters
     Friend Sub SetTimerMeter()
         TimerMeter.Stop()
