@@ -1019,6 +1019,8 @@ Namespace My
                                                         _player.TogglePlay()
                                                     Case "STOP"
                                                         _player.StopPlay()
+                                                    Case "SEEK"
+                                                        HandleSeek(payload)
                                                     Case "NEXT"
                                                         _player.PlayNext()
                                                     Case "PREVIOUS"
@@ -1066,6 +1068,26 @@ Namespace My
             Friend Sub DisconnectClient(info As CompanionClientInfo)
                 If info Is Nothing Then Exit Sub
                 RemoveClient(info.Client)
+            End Sub
+            Private Sub HandleSeek(payload As String)
+                Dim newPos As Integer
+                If Not Integer.TryParse(payload, newPos) Then Exit Sub
+
+                ' Get duration from the media player (seconds)
+                Dim durationSec As Integer = CInt(_player.GetDurationSeconds)
+
+                ' If duration is 0 (streams), just ignore seek
+                If durationSec <= 0 Then Exit Sub
+
+                ' Clamp
+                If newPos < 0 Then newPos = 0
+                If newPos > durationSec Then newPos = durationSec
+
+                ' Seek by setting Position (seconds)
+                _player.SeekToSecondsFromCompanion(newPos)
+
+                ' Broadcast updated NOWPLAYING snapshot
+                BroadcastNowPlaying()
             End Sub
 
         End Class

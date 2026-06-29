@@ -5354,6 +5354,12 @@ Public Class Player
             End Try
         End If
     End Sub
+    Friend Sub SeekToSecondsFromCompanion(sec As Integer)
+        If _player Is Nothing Then Exit Sub
+        TrackBarPosition.Value = sec * TrackBarScale
+        _player.Position = sec
+        If PlayState = PlayStates.Paused Then TogglePlay()
+    End Sub
     Friend Sub PlayPrevious()
         'Stream = False
         StopPlay()
@@ -5821,6 +5827,10 @@ Public Class Player
         _player.Volume = volumepercent
         'Debug.WriteLine("Internal VLC volume = " & DirectCast(_player, VLCPlayer).MediaPlayer.Volume)
     End Sub
+    Friend Function GetDurationSeconds() As Integer
+        If _player Is Nothing Then Return 0
+        Return CInt(_player.Duration)
+    End Function
 
     'Meters
     Friend Sub SetTimerMeter()
