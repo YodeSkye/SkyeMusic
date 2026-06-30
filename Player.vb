@@ -26,6 +26,9 @@ Public Class Player
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Private TipPlayerEX As Skye.UI.ToolTipEX 'Tooltip for Player Controls
+    Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
+    Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
+    Private TipCMPlaylist As Skye.UI.ToolTipEX ' Tooltip for Context Menu of Playlist
     Private _hidefromTaskSwitcher As Boolean = False ' Used by Player to hide from Task Switcher View when minimize to tray is enabled
     Private _lastRealState As FormWindowState = FormWindowState.Normal
     Private _lastStaleMeterLog As DateTime = DateTime.MinValue
@@ -48,9 +51,6 @@ Public Class Player
     Private PausedAt As DateTime? = Nothing 'Used by Plays Database System to track when the player was paused.
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero 'Used by Plays Database System to track total paused duration.
     Private PlaylistBoldFont As Font 'Bold font for playlist titles
-    Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
-    Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
-    Private TipCMPlaylist As Skye.UI.ToolTipEX ' Tooltip for Context Menu of Playlist
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
@@ -2724,12 +2724,12 @@ Public Class Player
             If m.Msg <> Skye.WinAPI.WM_GET_CUSTOM_DATA Then MyBase.WndProc(m)
         End Try
     End Sub
-    Protected Overrides Sub OnHandleCreated(e As EventArgs)
-        MyBase.OnHandleCreated(e)
-        If Me.IsDisposed OrElse Me.Disposing Then Return
+    'Protected Overrides Sub OnHandleCreated(e As EventArgs)
+    '    MyBase.OnHandleCreated(e)
+    '    If Me.IsDisposed OrElse Me.Disposing Then Return
 
-        InitTipPlayer()
-    End Sub
+    '    'InitTipPlayer()
+    'End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         ' Player Engine
@@ -2824,6 +2824,20 @@ Public Class Player
         header = Nothing
 
         ' Set ToolTips
+        TipPlayerEX = New Skye.UI.ToolTipEX With {
+            .Font = App.TipFont,
+            .ShadowAlpha = 0,
+            .ShadowThickness = 0,
+            .FadeInRate = 25,
+            .FadeOutRate = 25,
+            .ShowDelay = 500,
+            .HideDelay = 500
+        }
+        TipPlayerEX.SetText(BtnPlay, "Play / Pause")
+        TipPlayerEX.SetText(BtnStop, "Stop Playing")
+        TipPlayerEX.SetText(BtnReverse, "Skip Backward")
+        TipPlayerEX.SetText(BtnForward, "Skip Forward")
+        TipPlayerEX.SetText(LblDuration, "Song Duration")
         SetTipPlayer()
         TipCMPlaylist = New Skye.UI.ToolTipEX(components) With {
             .BackColor = App.CurrentTheme.BackColor,
@@ -4447,7 +4461,7 @@ Public Class Player
         _hidefromTaskSwitcher = True
         ShowInTaskbar = False
         Visible = False
-        RecreateHandle()
+        'RecreateHandle()
     End Sub
     Friend Sub RestoreFromTray(Optional ignorewindowstate As Boolean = False)
         _hidefromTaskSwitcher = False
@@ -4456,6 +4470,11 @@ Public Class Player
 
         ' Restore the REAL state
         If Not ignorewindowstate Then WindowState = _lastRealState
+
+        'TipPlayerEX.Dispose()
+        'TipPlayerEX = New Skye.UI.ToolTipEX(components)
+        'InitTipPlayer()
+        'SetTipPlayer()
 
         Activate()
     End Sub
@@ -4493,29 +4512,29 @@ Public Class Player
                 MIPlayMode.Text = "Shuffle"
         End Select
     End Sub
-    Private Sub InitTipPlayer()
-        If TipPlayerEX IsNot Nothing Then
-            TipPlayerEX.Dispose()
-            TipPlayerEX = Nothing
-        End If
+    'Private Sub InitTipPlayer()
+    '    If TipPlayerEX IsNot Nothing Then
+    '        TipPlayerEX.Dispose()
+    '        TipPlayerEX = Nothing
+    '    End If
 
-        TipPlayerEX = New Skye.UI.ToolTipEX With {
-            .Font = App.TipFont,
-            .ShadowAlpha = 0,
-            .ShadowThickness = 0,
-            .FadeInRate = 25,
-            .FadeOutRate = 25,
-            .ShowDelay = 500,
-            .HideDelay = 500
-        }
+    '    TipPlayerEX = New Skye.UI.ToolTipEX With {
+    '        .Font = App.TipFont,
+    '        .ShadowAlpha = 0,
+    '        .ShadowThickness = 0,
+    '        .FadeInRate = 25,
+    '        .FadeOutRate = 25,
+    '        .ShowDelay = 500,
+    '        .HideDelay = 500
+    '    }
 
-        TipPlayerEX.SetText(BtnPlay, "Play / Pause")
-        TipPlayerEX.SetText(BtnStop, "Stop Playing")
-        TipPlayerEX.SetText(BtnReverse, "Skip Backward")
-        TipPlayerEX.SetText(BtnForward, "Skip Forward")
-        TipPlayerEX.SetText(LblDuration, "Song Duration")
+    '    TipPlayerEX.SetText(BtnPlay, "Play / Pause")
+    '    TipPlayerEX.SetText(BtnStop, "Stop Playing")
+    '    TipPlayerEX.SetText(BtnReverse, "Skip Backward")
+    '    TipPlayerEX.SetText(BtnForward, "Skip Forward")
+    '    TipPlayerEX.SetText(LblDuration, "Song Duration")
 
-    End Sub
+    'End Sub
     Friend Sub SetTipPlayer()
         Select Case App.Settings.PlayMode
             Case App.PlayModes.None, PlayModes.Repeat
@@ -5676,6 +5695,7 @@ Public Class Player
                 End If
             End If
             ShowPosition()
+            App.BroadcastNowPlaying()
             LVPlaylist.Focus()
         End If
     End Sub
