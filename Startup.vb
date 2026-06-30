@@ -1,10 +1,13 @@
 ﻿
 Friend Class Startup
     Private Sub Startup_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Visible = False
+        WindowState = FormWindowState.Minimized
+        ShowInTaskbar = False
         App.FrmPlayer = New Player()
-        My.Application.ApplicationContext.MainForm = App.FrmPlayer
         App.FrmPlayer.Show()
-        Close()
+    End Sub
+    Protected Overrides Sub OnShown(e As EventArgs)
+        MyBase.OnShown(e)
+        Hide()
     End Sub
 End Class

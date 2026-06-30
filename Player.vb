@@ -29,8 +29,9 @@ Public Class Player
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
     Private TipCMPlaylist As Skye.UI.ToolTipEX ' Tooltip for Context Menu of Playlist
-    Private _hidefromTaskSwitcher As Boolean = False ' Used by Player to hide from Task Switcher View when minimize to tray is enabled
     Private _lastRealState As FormWindowState = FormWindowState.Normal
+    Private _lastPath As String = Nothing
+    Private _lastPosition As Double = 0
     Private _lastStaleMeterLog As DateTime = DateTime.MinValue
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
@@ -2664,20 +2665,20 @@ Public Class Player
     End Class
 
     'Form Events                    
-    Protected Overrides ReadOnly Property CreateParams As CreateParams
-        Get
-            Dim cp = MyBase.CreateParams
-            If _hidefromTaskSwitcher Then
-                cp.ExStyle = cp.ExStyle Or Skye.WinAPI.WS_EX_TOOLWINDOW
-            End If
-            Return cp
-        End Get
-    End Property
+    'Protected Overrides ReadOnly Property CreateParams As CreateParams
+    '    Get
+    '        Dim cp = MyBase.CreateParams
+    '        If _hidefromTaskSwitcher Then
+    '            cp.ExStyle = cp.ExStyle Or Skye.WinAPI.WS_EX_TOOLWINDOW
+    '        End If
+    '        Return cp
+    '    End Get
+    'End Property
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
                 Case Skye.WinAPI.WM_HOTKEY
-                    'Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
+                    Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
                     App.PerformHotKeyAction(m.WParam.ToInt32)
                 Case WinAPI.WM_SYSCOMMAND
                     Dim cmd As Integer = m.WParam.ToInt32() And &HFFF0
@@ -2733,11 +2734,12 @@ Public Class Player
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         ' Player Engine
-        _player = New VLCPlayer(Me)
-        VLCViewer.MediaPlayer = CType(_player, VLCPlayer).MediaPlayer
-        AddHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
-        AddHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
-        _player.Volume = 100
+        InitVLCPlayer()
+        '_player = New VLCPlayer(Me)
+        'VLCViewer.MediaPlayer = CType(_player, VLCPlayer).MediaPlayer
+        'AddHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
+        'AddHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
+        '_player.Volume = 100
 
         ' For Meters
         RestartMeterCapture()
@@ -3017,6 +3019,7 @@ Public Class Player
             MeterAudioCapture = Nothing
         End If
         App.Finalize()
+        Application.ApplicationContext.ExitThread()
     End Sub
 
     'Control Events
@@ -3456,7 +3459,7 @@ Public Class Player
         SavePlaylistAs()
     End Sub
     Private Sub MIExit_Click(sender As Object, e As EventArgs) Handles MIExit.Click
-        Close()
+        ExitApp()
     End Sub
     Private Sub MIView_MouseEnter(sender As Object, e As EventArgs) Handles MIView.MouseEnter
         MIView.ForeColor = Color.Black
@@ -4458,25 +4461,53 @@ Public Class Player
             WindowState = FormWindowState.Normal
         End If
 
-        _hidefromTaskSwitcher = True
+        'Dim old = TryCast(_player, VLCPlayer)
+        'If old IsNot Nothing Then
+        '    If old.HasMedia Then
+        '        _lastPath = old.Path
+        '        _lastPosition = old.Position
+        '    End If
+        'End If
+
         ShowInTaskbar = False
-        Visible = False
-        'RecreateHandle()
+        'Visible = False
+        ' Minimize first (important)
+        WindowState = FormWindowState.Minimized
+        ' Now hide the window
+        Hide()
+
+        App.RegisterHotKeys() ' because visible = false will unregister hotkeys, so we need to re-register them
+
     End Sub
     Friend Sub RestoreFromTray(Optional ignorewindowstate As Boolean = False)
-        _hidefromTaskSwitcher = False
+
+        ' Get the path and position from the current player before we reinitialize it
+        Dim old = TryCast(_player, VLCPlayer)
+        If old IsNot Nothing Then
+            If old.HasMedia Then
+                _lastPath = old.Path
+                _lastPosition = old.Position
+            End If
+        End If
+
+        Show()
         ShowInTaskbar = True
-        Visible = True
+        'Visible = True
 
         ' Restore the REAL state
         If Not ignorewindowstate Then WindowState = _lastRealState
 
-        'TipPlayerEX.Dispose()
-        'TipPlayerEX = New Skye.UI.ToolTipEX(components)
-        'InitTipPlayer()
-        'SetTipPlayer()
-
         Activate()
+
+        'everything below is because the forms handle is destroyed when the form is hidden, so we need to reinitialize vlc and hotkeys
+        App.RegisterHotKeys()
+        InitVLCPlayer()
+        Dim vlc = TryCast(_player, VLCPlayer)
+        If vlc IsNot Nothing AndAlso _lastPath IsNot Nothing Then
+            vlc.Play(_lastPath)
+            vlc.Position = _lastPosition
+        End If
+
     End Sub
     Friend Sub ExitApp()
         Close()
@@ -5242,6 +5273,31 @@ Public Class Player
     End Sub
 
     'Player
+    Private Sub InitVLCPlayer()
+        ' Dispose old player if it exists
+        If _player IsNot Nothing Then
+            Try
+                _player.Stop()
+                Dim vlccurrent = TryCast(_player, VLCPlayer)
+                vlccurrent?.Dispose()
+            Catch
+            End Try
+        End If
+
+        ' Create new VLCPlayer
+        Dim vlc = New VLCPlayer(Me)
+        _player = vlc
+
+        ' Attach to viewer
+        VLCViewer.MediaPlayer = vlc.MediaPlayer
+
+        ' Re‑wire events
+        AddHandler vlc.PlaybackStarted, AddressOf OnPlaybackStarted
+        AddHandler vlc.PlaybackEnded, AddressOf OnPlaybackEnded
+
+        ' Restore volume (or from settings)
+        vlc.Volume = 100
+    End Sub
     Friend Sub TogglePlay()
         If _player.HasMedia Then
             If PlayState = PlayStates.Playing Then
