@@ -2342,7 +2342,7 @@ Namespace My
         Private Sub NIApp_MIExit_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    FrmPlayer.ExitApp()
+                    ExitApp()
                 Case MouseButtons.Right
             End Select
         End Sub
@@ -3102,6 +3102,11 @@ Namespace My
             SetWatchers(True) 'Dispose watchers
             Skye.Common.Log.Write(My.Application.Info.ProductName + " Closed")
         End Sub
+        Friend Sub ExitApp()
+            Finalize()
+            FrmPlayer.WhenClosing()
+            Application.ApplicationContext.ExitThread()
+        End Sub
         Friend Sub CheckForUpdatesIfNeeded()
             Dim last = Settings.LastUpdateCheck.Date
             Dim today = Date.Today
@@ -3309,7 +3314,7 @@ Namespace My
                 Settings.VisualizerMiniMode = True
 
                 ' Hide main player completely
-                FrmPlayer.Visible = False
+                FrmPlayer.MinimizeToTray()
 
                 ' Create and show mini player
                 FrmMiniPlayer = New PlayerMini
@@ -3330,8 +3335,7 @@ Namespace My
                 FrmMiniPlayer = Nothing
 
                 ' Restore main player
-                FrmPlayer.Visible = True
-                FrmPlayer.RestoreFromTray(True)
+                FrmPlayer.RestoreFromTray()
 
                 FrmPlayer.ShowMedia()
 

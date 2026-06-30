@@ -28,11 +28,10 @@ Public Class Player
     Private TipPlayerEX As Skye.UI.ToolTipEX 'Tooltip for Player Controls
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
-    Private TipCMPlaylist As Skye.UI.ToolTipEX ' Tooltip for Context Menu of Playlist
-    Private _lastRealState As FormWindowState = FormWindowState.Normal
-    Private _lastPath As String = Nothing
-    Private _lastPosition As Double = 0
-    Private _lastStaleMeterLog As DateTime = DateTime.MinValue
+    Private TipCMPlaylist As Skye.UI.ToolTipEX 'Tooltip for Context Menu of Playlist
+    Private _lastRealState As FormWindowState = FormWindowState.Normal 'Last real state of the form (not minimized)
+    Private _lastStaleMeterLog As DateTime = DateTime.MinValue 'Last time the meter log was updated
+    Private _handledClose As Boolean = False 'Indicates if the close event has been handled
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
     Private Mute As Boolean = False 'True if the player is muted
@@ -2665,20 +2664,17 @@ Public Class Player
     End Class
 
     'Form Events                    
-    'Protected Overrides ReadOnly Property CreateParams As CreateParams
-    '    Get
-    '        Dim cp = MyBase.CreateParams
-    '        If _hidefromTaskSwitcher Then
-    '            cp.ExStyle = cp.ExStyle Or Skye.WinAPI.WS_EX_TOOLWINDOW
-    '        End If
-    '        Return cp
-    '    End Get
-    'End Property
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
+                Case WinAPI.WM_CLOSE
+                    If Not _handledClose Then
+                        _handledClose = True
+                        App.ExitApp()
+                    End If
+                    Return
                 Case Skye.WinAPI.WM_HOTKEY
-                    Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
+                    'Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
                     App.PerformHotKeyAction(m.WParam.ToInt32)
                 Case WinAPI.WM_SYSCOMMAND
                     Dim cmd As Integer = m.WParam.ToInt32() And &HFFF0
@@ -2691,6 +2687,11 @@ Public Class Player
                             MinimizeToTray()
                             Return ' <-- CRITICAL: prevents ghost titlebar
                         End If
+                    End If
+                    If cmd = WinAPI.SC_CLOSE Then
+                        _handledClose = True
+                        App.ExitApp()
+                        Return
                     End If
                 Case Skye.WinAPI.WM_ACTIVATE
                     Select Case m.WParam.ToInt32
@@ -2725,12 +2726,6 @@ Public Class Player
             If m.Msg <> Skye.WinAPI.WM_GET_CUSTOM_DATA Then MyBase.WndProc(m)
         End Try
     End Sub
-    'Protected Overrides Sub OnHandleCreated(e As EventArgs)
-    '    MyBase.OnHandleCreated(e)
-    '    If Me.IsDisposed OrElse Me.Disposing Then Return
-
-    '    'InitTipPlayer()
-    'End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         ' Player Engine
@@ -3002,24 +2997,6 @@ Public Class Player
     Private Sub Player_Deactivate(sender As Object, e As EventArgs) Handles MyBase.Deactivate
         ResetTxtBoxPlaylistSearch()
         LVPlaylist.Select()
-    End Sub
-    Private Sub Player_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        SavePlaylist()
-        If VLCHook IsNot Nothing Then
-            VLCHook.ReleaseHandle()
-            RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
-            RemoveHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
-            RemoveHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
-            VLCHook = Nothing
-        End If
-        If MeterAudioCapture IsNot Nothing Then
-            MeterAudioCapture.StopRecording()
-            RemoveHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
-            MeterAudioCapture.Dispose()
-            MeterAudioCapture = Nothing
-        End If
-        App.Finalize()
-        Application.ApplicationContext.ExitThread()
     End Sub
 
     'Control Events
@@ -3459,7 +3436,7 @@ Public Class Player
         SavePlaylistAs()
     End Sub
     Private Sub MIExit_Click(sender As Object, e As EventArgs) Handles MIExit.Click
-        ExitApp()
+        App.ExitApp()
     End Sub
     Private Sub MIView_MouseEnter(sender As Object, e As EventArgs) Handles MIView.MouseEnter
         MIView.ForeColor = Color.Black
@@ -4450,7 +4427,7 @@ Public Class Player
             RestoreFromTray()
         End If
     End Sub
-    Private Sub MinimizeToTray()
+    Friend Sub MinimizeToTray()
         ' Remember the real state (Normal or Maximized)
         If WindowState = FormWindowState.Normal OrElse WindowState = FormWindowState.Maximized Then
             _lastRealState = WindowState
@@ -4461,30 +4438,21 @@ Public Class Player
             WindowState = FormWindowState.Normal
         End If
 
-        'Dim old = TryCast(_player, VLCPlayer)
-        'If old IsNot Nothing Then
-        '    If old.HasMedia Then
-        '        _lastPath = old.Path
-        '        _lastPosition = old.Position
-        '    End If
-        'End If
-
         ShowInTaskbar = False
-        'Visible = False
-        ' Minimize first (important)
         WindowState = FormWindowState.Minimized
-        ' Now hide the window
         Hide()
 
-        App.RegisterHotKeys() ' because visible = false will unregister hotkeys, so we need to re-register them
+        App.RegisterHotKeys() ' because MinimizeToTray will unregister hotkeys, so we need to re-register them here so they work while minimized to the tray
 
     End Sub
-    Friend Sub RestoreFromTray(Optional ignorewindowstate As Boolean = False)
+    Friend Sub RestoreFromTray()
 
         ' Get the path and position from the current player before we reinitialize it
+        Dim _lastPath As String = Nothing
+        Dim _lastPosition As Double = 0
         Dim old = TryCast(_player, VLCPlayer)
         If old IsNot Nothing Then
-            If old.HasMedia Then
+            If old.HasMedia AndAlso PlayState <> PlayStates.Stopped Then
                 _lastPath = old.Path
                 _lastPosition = old.Position
             End If
@@ -4492,11 +4460,7 @@ Public Class Player
 
         Show()
         ShowInTaskbar = True
-        'Visible = True
-
-        ' Restore the REAL state
-        If Not ignorewindowstate Then WindowState = _lastRealState
-
+        WindowState = _lastRealState
         Activate()
 
         'everything below is because the forms handle is destroyed when the form is hidden, so we need to reinitialize vlc and hotkeys
@@ -4509,8 +4473,21 @@ Public Class Player
         End If
 
     End Sub
-    Friend Sub ExitApp()
-        Close()
+    Friend Sub WhenClosing()
+        SavePlaylist()
+        If VLCHook IsNot Nothing Then
+            VLCHook.ReleaseHandle()
+            RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
+            RemoveHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
+            RemoveHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
+            VLCHook = Nothing
+        End If
+        If MeterAudioCapture IsNot Nothing Then
+            MeterAudioCapture.StopRecording()
+            RemoveHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
+            MeterAudioCapture.Dispose()
+            MeterAudioCapture = Nothing
+        End If
     End Sub
     Private Sub EditTags()
         If LVPlaylist.SelectedItems.Count > 0 Then
@@ -4543,29 +4520,6 @@ Public Class Player
                 MIPlayMode.Text = "Shuffle"
         End Select
     End Sub
-    'Private Sub InitTipPlayer()
-    '    If TipPlayerEX IsNot Nothing Then
-    '        TipPlayerEX.Dispose()
-    '        TipPlayerEX = Nothing
-    '    End If
-
-    '    TipPlayerEX = New Skye.UI.ToolTipEX With {
-    '        .Font = App.TipFont,
-    '        .ShadowAlpha = 0,
-    '        .ShadowThickness = 0,
-    '        .FadeInRate = 25,
-    '        .FadeOutRate = 25,
-    '        .ShowDelay = 500,
-    '        .HideDelay = 500
-    '    }
-
-    '    TipPlayerEX.SetText(BtnPlay, "Play / Pause")
-    '    TipPlayerEX.SetText(BtnStop, "Stop Playing")
-    '    TipPlayerEX.SetText(BtnReverse, "Skip Backward")
-    '    TipPlayerEX.SetText(BtnForward, "Skip Forward")
-    '    TipPlayerEX.SetText(LblDuration, "Song Duration")
-
-    'End Sub
     Friend Sub SetTipPlayer()
         Select Case App.Settings.PlayMode
             Case App.PlayModes.None, PlayModes.Repeat
