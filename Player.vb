@@ -2892,6 +2892,22 @@ Public Class Player
         App.InitializePostStartup()
 
     End Sub
+    Friend Sub WhenClosing()
+        SavePlaylist()
+        If VLCHook IsNot Nothing Then
+            VLCHook.ReleaseHandle()
+            RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
+            RemoveHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
+            RemoveHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
+            VLCHook = Nothing
+        End If
+        If MeterAudioCapture IsNot Nothing Then
+            MeterAudioCapture.StopRecording()
+            RemoveHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
+            MeterAudioCapture.Dispose()
+            MeterAudioCapture = Nothing
+        End If
+    End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnReverse.KeyDown, BtnPlay.KeyDown, BtnForward.KeyDown, TrackBarPosition.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
         If Not TxtBoxPlaylistSearch.Focused And Not LVPlaylist.EditableColumns(0) Then
             If e.Alt Then
@@ -4472,22 +4488,6 @@ Public Class Player
             vlc.Position = _lastPosition
         End If
 
-    End Sub
-    Friend Sub WhenClosing()
-        SavePlaylist()
-        If VLCHook IsNot Nothing Then
-            VLCHook.ReleaseHandle()
-            RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
-            RemoveHandler VLCHook.DoubleClick, AddressOf VLCViewer_DoubleClick
-            RemoveHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
-            VLCHook = Nothing
-        End If
-        If MeterAudioCapture IsNot Nothing Then
-            MeterAudioCapture.StopRecording()
-            RemoveHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
-            MeterAudioCapture.Dispose()
-            MeterAudioCapture = Nothing
-        End If
     End Sub
     Private Sub EditTags()
         If LVPlaylist.SelectedItems.Count > 0 Then

@@ -3092,19 +3092,20 @@ Namespace My
         End Sub
         Friend Sub Finalize()
             SetCompanionServer(True) 'Ensure Companion Server is stopped
-            UnRegisterHotKeys()
+            UnRegisterHotKeys() 'Unregister all hotkeys
+            If FrmHelp IsNot Nothing AndAlso FrmHelp.Visible Then FrmHelp.Close()
             If FrmLog IsNot Nothing AndAlso FrmLog.Visible Then FrmLog.Close()
             If FrmDirectory IsNot Nothing AndAlso FrmDirectory.Visible Then FrmDirectory.Close()
             If FrmLibrary.Visible Then FrmLibrary.Close()
             FrmLibrary.Dispose()
-            SaveHistory()
-            Settings.Save()
+            SaveHistory() 'Save history to disk
+            Settings.Save() 'Save settings to disk
             SetWatchers(True) 'Dispose watchers
+            FrmPlayer.WhenClosing() 'Perform any necessary cleanup in the Player form before closing
             Skye.Common.Log.Write(My.Application.Info.ProductName + " Closed")
         End Sub
         Friend Sub ExitApp()
             Finalize()
-            FrmPlayer.WhenClosing()
             Application.ApplicationContext.ExitThread()
         End Sub
         Friend Sub CheckForUpdatesIfNeeded()
