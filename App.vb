@@ -2335,7 +2335,7 @@ Namespace My
         Private Sub NIApp_MIHelp_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    ShowHelp(Nothing, True)
+                    ShowHelp()
                 Case MouseButtons.Right
             End Select
         End Sub
@@ -3414,19 +3414,13 @@ Namespace My
                 End If
             End If
         End Sub
-        Friend Sub ShowHelp(owner As System.Windows.Forms.Form, Optional showcentered As Boolean = False)
+        Friend Sub ShowHelp()
             If FrmHelp Is Nothing OrElse FrmHelp.IsDisposed Then
                 FrmHelp = New Help
             End If
             If FrmHelp.Visible Then
                 FrmHelp.BringToFront()
             Else
-                If showcentered Then
-                    FrmHelp.StartPosition = FormStartPosition.CenterScreen
-                Else
-                    FrmHelp.StartPosition = FormStartPosition.CenterParent
-                End If
-                FrmHelp.Owner = owner
                 FrmHelp.Show()
             End If
         End Sub
@@ -3439,16 +3433,7 @@ Namespace My
                 FrmLog = New Log
                 FrmLog.Show()
             End If
-            'Dim logtext As String = String.Empty
-            'FrmLog.RTBLog.Clear()
-            'Try
-            '    logtext = IO.File.ReadAllText(Skye.Common.Log.LogFilePath)
-            'Catch
-            'Finally
-            'End Try
-            'FrmLog.RTBLog.AppendText(logtext)
             FrmLog.LBLLogInfo.Text = Skye.Common.Log.LogFilePath
-            'If FrmLog.LogViewer.Lines.Count > 0 AndAlso FrmLog.RTBLog.Lines(0).Length > 0 Then lines = FrmLog.RTBLog.GetLineFromCharIndex(FrmLog.RTBLog.Text.Length)
             FrmLog.LBLLogInfo.Text += " (" + Skye.Common.Log.LineCount.ToString + IIf(Skye.Common.Log.LineCount = 1, " Line", " Lines").ToString + ")"
             If Skye.Common.Log.LineCount > 0 Then
                 FrmLog.BTNDeleteLog.Visible = True

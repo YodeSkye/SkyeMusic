@@ -60,8 +60,7 @@ Partial Class Help
         KeyPreview = True
         MinimumSize = New Size(400, 300)
         Name = "Help"
-        ShowInTaskbar = False
-        StartPosition = FormStartPosition.CenterParent
+        StartPosition = FormStartPosition.CenterScreen
         ResumeLayout(False)
     End Sub
 
