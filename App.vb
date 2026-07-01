@@ -3315,6 +3315,7 @@ Namespace My
                 Settings.VisualizerMiniMode = True
 
                 ' Hide main player completely
+                'FrmPlayer.Visible = False
                 FrmPlayer.MinimizeToTray()
 
                 ' Create and show mini player
@@ -3336,6 +3337,7 @@ Namespace My
                 FrmMiniPlayer = Nothing
 
                 ' Restore main player
+                'FrmPlayer.Visible = True
                 FrmPlayer.RestoreFromTray()
 
                 FrmPlayer.ShowMedia()
