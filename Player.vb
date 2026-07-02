@@ -4012,7 +4012,7 @@ Public Class Player
     Private Sub BtnVolume_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnVolume.MouseDown
         If e.Button = MouseButtons.Right Then
             SetVolumeToolTip()
-            TipVolume.ShowTooltipAtCursor("System Volume" & vbCr & "Use MouseWheel to change volume.", Resources.ImagePlayerSound16)
+            TipVolume.ShowTooltipAtCursor("System Volume" & vbCr & "Use MouseWheel to change volume.", My.Resources.ImagePlayerSound16)
         End If
     End Sub
     Private Sub TrackBarPosition_MouseDown(sender As Object, e As MouseEventArgs) Handles TrackBarPosition.MouseDown

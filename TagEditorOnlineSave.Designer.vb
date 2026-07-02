@@ -125,8 +125,8 @@ Partial Class TagEditorOnlineSave
         ' 
         ' BtnLocation
         ' 
-        BtnLocation.Image = Resources.Resources.imageSelectFolder16
-        tipInfo.SetImage(BtnLocation, Resources.Resources.imageSelectFolder16)
+        BtnLocation.Image = My.Resources.imageSelectFolder16
+        tipInfo.SetImage(BtnLocation, My.Resources.imageSelectFolder16)
         BtnLocation.Location = New Point(394, 84)
         BtnLocation.Margin = New Padding(4)
         BtnLocation.Name = "BtnLocation"
@@ -137,8 +137,8 @@ Partial Class TagEditorOnlineSave
         ' 
         ' BtnSave
         ' 
-        BtnSave.Image = Resources.Resources.ImageSave32
-        tipInfo.SetImage(BtnSave, Resources.Resources.ImageSave32)
+        BtnSave.Image = My.Resources.ImageSave32
+        tipInfo.SetImage(BtnSave, My.Resources.ImageSave32)
         BtnSave.ImageAlign = ContentAlignment.MiddleLeft
         BtnSave.Location = New Point(14, 288)
         BtnSave.Margin = New Padding(4)

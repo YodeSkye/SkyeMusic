@@ -611,7 +611,7 @@ Public Class TagEditor
                     BtnArtKeepOriginal.Enabled = True
                     LblArt.Font = New Font(LblArtist.Font, FontStyle.Bold)
                 End If
-                TipStatus.ShowTooltipAtCursor(If(addedCount = 1, "Image added", addedCount.ToString & " images added"), Resources.ImageOK)
+                TipStatus.ShowTooltipAtCursor(If(addedCount = 1, "Image added", addedCount.ToString & " images added"), My.Resources.ImageOK)
             End If
         End If
     End Sub

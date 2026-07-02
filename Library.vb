@@ -149,7 +149,7 @@ Public Class Library
         SetAccentColor()
         SetTheme()
         App.ThemeMenu(CMLibrary)
-        LibraryImageList.Images.Add("AlbumArt", Resources.ImageAlbumArtSelect)
+        LibraryImageList.Images.Add("AlbumArt", My.Resources.ImageAlbumArtSelect)
         LVLibrary.SmallImageList = LibraryImageList
         PicBoxAlbumArtSmallSize = PicBoxAlbumArt.Size
         PicBoxAlbumArtLargeSize = New Size(400, 400)
@@ -282,7 +282,7 @@ Public Class Library
             End If
             e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.TextColor), b)
             If e.ColumnIndex = 0 AndAlso LVLibrary.Columns("Artist").Index = 0 Then
-                If Not String.IsNullOrEmpty(e.Item.ImageKey) Then e.Graphics.DrawImage(Resources.ImageAlbumArtSelect, New Rectangle(New Point(b.Location.X + 4, b.Location.Y + 2), New Size(16, 16)))
+                If Not String.IsNullOrEmpty(e.Item.ImageKey) Then e.Graphics.DrawImage(My.Resources.ImageAlbumArtSelect, New Rectangle(New Point(b.Location.X + 4, b.Location.Y + 2), New Size(16, 16)))
                 TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, New Font(e.Item.Font, FontStyle.Bold), e.Bounds.Size.Width - 18), New Font(e.Item.Font, FontStyle.Bold), New Point(b.Left + 18, b.Top + 2), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix Or TextFormatFlags.EndEllipsis)
             Else
                 TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, New Font(e.Item.Font, FontStyle.Bold), e.Bounds.Size.Width), New Font(e.Item.Font, FontStyle.Bold), New Point(b.Left + 2, b.Top + 2), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix Or TextFormatFlags.EndEllipsis)
