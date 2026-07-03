@@ -6,6 +6,7 @@ Imports System.IO
 Imports System.Net
 Imports System.Net.Http
 Imports System.Net.Sockets
+Imports System.Text.Json
 Imports System.Threading
 Imports Microsoft.Win32
 Imports NAudio.CoreAudioApi
@@ -71,10 +72,6 @@ Namespace My
             Queue
             SelectOnly
         End Enum
-        Public Structure PlaylistItemType
-            Public Title As String
-            Public Path As String
-        End Structure
         Friend Enum FormatFileSizeUnits
             Auto
             Bytes
@@ -87,6 +84,10 @@ Namespace My
             Stream
             AudioCD
         End Enum
+        Public Structure PlaylistItemType
+            Public Title As String
+            Public Path As String
+        End Structure
         Public Class Song
 
             Public Property Path As String ' Path to the media.
@@ -208,6 +209,22 @@ Namespace My
                     Duration = TimeSpan.Zero
                 End Try
             End Sub
+
+        End Class
+        Public Class ListViewColumnInfo
+            Public Property DisplayIndex As Integer
+            Public Property Width As Integer
+
+            Public Shared Function ToJson(list As List(Of ListViewColumnInfo)) As String
+                Return JsonSerializer.Serialize(list)
+            End Function
+            Public Shared Function FromJson(json As String) As List(Of ListViewColumnInfo)
+                If String.IsNullOrWhiteSpace(json) Then
+                    Return New List(Of ListViewColumnInfo)
+                End If
+
+                Return JsonSerializer.Deserialize(Of List(Of ListViewColumnInfo))(json)
+            End Function
 
         End Class
         Friend ExtensionDictionary As New Dictionary(Of String, String) 'ExtensionDictionary is a dictionary that maps file extensions to their respective media types.
@@ -1150,6 +1167,9 @@ Namespace My
             Friend Shared PlaylistDefaultAction As PlaylistActions = PlaylistActions.Play
             Friend Shared PlaylistSearchAction As PlaylistActions = PlaylistActions.Play
             Friend Shared PlaylistStatusMessageDisplayTime As Byte = 8 '0 - 60, 0 = Don't display status messages.
+            Friend Shared PlaylistColumns As New List(Of ListViewColumnInfo)
+            Friend Shared PlaylistSortColumn As Integer = -1 '-1 = No sort
+            Friend Shared PlaylistSortOrder As SortOrder = SortOrder.None
 
             ' Library
             Friend Shared LibraryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -1315,6 +1335,15 @@ Namespace My
                     If Settings.PlaylistStatusMessageDisplayTime > 60 Then
                         Settings.PlaylistStatusMessageDisplayTime = 60 'Limit the value to a maximum of 60 seconds
                     End If
+                    Dim json As String = Skye.Common.RegistryHelper.GetString("PlaylistColumns", "")
+                    App.Settings.PlaylistColumns = ListViewColumnInfo.FromJson(json)
+                    Settings.PlaylistSortColumn = Skye.Common.RegistryHelper.GetInt("PlaylistSortColumn", -1)
+                    Dim sortOrderString As String = Skye.Common.RegistryHelper.GetString("PlaylistSortOrder", "None")
+                    Try
+                        Settings.PlaylistSortOrder = CType([Enum].Parse(GetType(SortOrder), sortOrderString), SortOrder)
+                    Catch
+                        Settings.PlaylistSortOrder = SortOrder.None
+                    End Try
 
                     ' Library Settings
                     Settings.LibraryLocation.X = CInt(Val(RegKey.GetValue("LibraryLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))

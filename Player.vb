@@ -32,6 +32,7 @@ Public Class Player
     Private _lastRealState As FormWindowState = FormWindowState.Normal 'Last real state of the form (not minimized)
     Private _lastStaleMeterLog As DateTime = DateTime.MinValue 'Last time the meter log was updated
     Private _handledClose As Boolean = False 'Indicates if the close event has been handled
+    Private IsLoadingPlaylistColumns As Boolean = False 'Indicates if the playlist columns are being loaded
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
     Private Mute As Boolean = False 'True if the player is muted
@@ -2777,6 +2778,7 @@ Public Class Player
         TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
 
         ' Initialize Listview
+        IsLoadingPlaylistColumns = True
         Dim header As ColumnHeader
         header = New ColumnHeader With {
             .Name = "Title",
@@ -2862,6 +2864,9 @@ Public Class Player
         App.ThemeMenu(CMRatings)
         LoadPlaylist()
         ClearPlaylistTitles()
+        SetPlaylistColumns()
+        SetPlaylistSortState()
+        IsLoadingPlaylistColumns = False
         ShowPlayMode()
 
         ' Place the window where it was last time
@@ -3110,7 +3115,18 @@ Public Class Player
         End If
     End Sub
     Private Sub LVPlaylist_ColumnReordered(sender As Object, e As ColumnReorderedEventArgs) Handles LVPlaylist.ColumnReordered
-        If e.NewDisplayIndex = 0 Or e.OldDisplayIndex = 0 Then e.Cancel = True
+        ' Prevent column 0 from being moved
+        If e.NewDisplayIndex = 0 Or e.OldDisplayIndex = 0 Then
+            e.Cancel = True
+            Exit Sub
+        End If
+
+        ' Column reorder is allowed → save new layout
+        SavePlaylistColumns()
+
+    End Sub
+    Private Sub LVPlaylist_ColumnWidthChanged(sender As Object, e As ColumnWidthChangedEventArgs) Handles LVPlaylist.ColumnWidthChanged
+        SavePlaylistColumns()
     End Sub
     Private Sub LVPlaylist_KeyDown(sender As Object, e As KeyEventArgs) Handles LVPlaylist.KeyDown
         If e.Alt Then
@@ -3162,6 +3178,7 @@ Public Class Player
                             PlaylistTitleSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("Title").Index).Text = "Title ▲"
                     End Select
+                    SavePlaylistSortState(e.Column, PlaylistTitleSort)
                 Case LVPlaylist.Columns("Path").Index
                     PlaylistPathSort = ClearPlaylistSorts(PlaylistPathSort)
                     Select Case PlaylistPathSort
@@ -3174,6 +3191,7 @@ Public Class Player
                             PlaylistPathSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("Path").Index).Text = "Path ▲"
                     End Select
+                    SavePlaylistSortState(e.Column, PlaylistPathSort)
                 Case LVPlaylist.Columns("Rating").Index
                     PlaylistRatingSort = ClearPlaylistSorts(PlaylistRatingSort)
                     Select Case PlaylistRatingSort
@@ -3186,6 +3204,7 @@ Public Class Player
                             PlaylistRatingSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("Rating").Index).Text = "Rating ▲"
                     End Select
+                    SavePlaylistSortState(e.Column, PlaylistRatingSort)
                 Case LVPlaylist.Columns("PlayCount").Index
                     PlaylistPlayCountSort = ClearPlaylistSorts(PlaylistPlayCountSort)
                     Select Case PlaylistPlayCountSort
@@ -3198,6 +3217,7 @@ Public Class Player
                             PlaylistPlayCountSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("PlayCount").Index).Text = "Plays ▲"
                     End Select
+                    SavePlaylistSortState(e.Column, PlaylistPlayCountSort)
                 Case LVPlaylist.Columns("LastPlayed").Index
                     PlaylistLastPlayedSort = ClearPlaylistSorts(PlaylistLastPlayedSort)
                     Select Case PlaylistLastPlayedSort
@@ -3210,6 +3230,7 @@ Public Class Player
                             PlaylistLastPlayedSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("LastPlayed").Index).Text = "Last Played ▲"
                     End Select
+                    SavePlaylistSortState(e.Column, PlaylistLastPlayedSort)
                 Case LVPlaylist.Columns("FirstPlayed").Index
                     PlaylistFirstPlayedSort = ClearPlaylistSorts(PlaylistFirstPlayedSort)
                     Select Case PlaylistFirstPlayedSort
@@ -3222,6 +3243,7 @@ Public Class Player
                             PlaylistFirstPlayedSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("FirstPlayed").Index).Text = "First Played ▲"
                     End Select
+                    SavePlaylistSortState(e.Column, PlaylistFirstPlayedSort)
                 Case LVPlaylist.Columns("Added").Index
                     PlaylistAddedSort = ClearPlaylistSorts(PlaylistAddedSort)
                     Select Case PlaylistAddedSort
@@ -3234,6 +3256,7 @@ Public Class Player
                             PlaylistAddedSort = SortOrder.Ascending
                             LVPlaylist.Columns(LVPlaylist.Columns("Added").Index).Text = "Added ▲"
                     End Select
+                    SavePlaylistSortState(e.Column, PlaylistAddedSort)
             End Select
             RaiseEvent PlaylistChanged()
         End If
@@ -4632,6 +4655,61 @@ Public Class Player
     End Sub
 
     'Playlist
+    Private Sub SetPlaylistColumns()
+        If App.Settings.PlaylistColumns Is Nothing Then Exit Sub
+        If App.Settings.PlaylistColumns.Count = 0 Then Exit Sub
+
+        IsLoadingPlaylistColumns = True
+        Try
+            For i = 0 To App.Settings.PlaylistColumns.Count - 1
+                Dim info = App.Settings.PlaylistColumns(i)
+                LVPlaylist.Columns(i).DisplayIndex = info.DisplayIndex
+                LVPlaylist.Columns(i).Width = info.Width
+            Next
+        Catch
+        Finally
+            IsLoadingPlaylistColumns = False
+        End Try
+
+    End Sub
+    Private Sub SavePlaylistColumns()
+        If IsLoadingPlaylistColumns Then Exit Sub
+
+        App.Settings.PlaylistColumns.Clear()
+        For Each col As ColumnHeader In LVPlaylist.Columns
+            Dim info As New ListViewColumnInfo With {
+                .DisplayIndex = col.DisplayIndex,
+                .Width = col.Width
+            }
+            App.Settings.PlaylistColumns.Add(info)
+        Next
+
+        Dim json As String = ListViewColumnInfo.ToJson(App.Settings.PlaylistColumns)
+        Skye.Common.RegistryHelper.SetString("PlaylistColumns", json)
+    End Sub
+    Private Sub SetPlaylistSortState()
+        Dim col = App.Settings.PlaylistSortColumn
+        Dim order = App.Settings.PlaylistSortOrder
+        If col < 0 OrElse col >= LVPlaylist.Columns.Count Then Exit Sub
+
+        Dim header = LVPlaylist.Columns(col)
+        Select Case order
+            Case SortOrder.Ascending
+                header.Text = header.Text.Replace("▼", "").Replace("▲", "") & " ▲"
+            Case SortOrder.Descending
+                header.Text = header.Text.Replace("▼", "").Replace("▲", "") & " ▼"
+            Case SortOrder.None
+                header.Text = header.Text.Replace("▼", "").Replace("▲", "")
+        End Select
+
+    End Sub
+    Private Sub SavePlaylistSortState(columnIndex As Integer, order As SortOrder)
+        App.Settings.PlaylistSortColumn = columnIndex
+        App.Settings.PlaylistSortOrder = order
+
+        Skye.Common.RegistryHelper.SetInt("PlaylistSortColumn", columnIndex)
+        Skye.Common.RegistryHelper.SetString("PlaylistSortOrder", order.ToString)
+    End Sub
     Private Sub LoadPlaylist()
         If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
