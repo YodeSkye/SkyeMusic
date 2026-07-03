@@ -4659,17 +4659,11 @@ Public Class Player
         If App.Settings.PlaylistColumns Is Nothing Then Exit Sub
         If App.Settings.PlaylistColumns.Count = 0 Then Exit Sub
 
-        IsLoadingPlaylistColumns = True
-        Try
-            For i = 0 To App.Settings.PlaylistColumns.Count - 1
-                Dim info = App.Settings.PlaylistColumns(i)
-                LVPlaylist.Columns(i).DisplayIndex = info.DisplayIndex
-                LVPlaylist.Columns(i).Width = info.Width
-            Next
-        Catch
-        Finally
-            IsLoadingPlaylistColumns = False
-        End Try
+        For i = 0 To App.Settings.PlaylistColumns.Count - 1
+            Dim info = App.Settings.PlaylistColumns(i)
+            LVPlaylist.Columns(i).DisplayIndex = info.DisplayIndex
+            LVPlaylist.Columns(i).Width = info.Width
+        Next
 
     End Sub
     Private Sub SavePlaylistColumns()

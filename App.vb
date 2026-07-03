@@ -1170,6 +1170,9 @@ Namespace My
             Friend Shared PlaylistColumns As New List(Of ListViewColumnInfo)
             Friend Shared PlaylistSortColumn As Integer = -1 '-1 = No sort
             Friend Shared PlaylistSortOrder As SortOrder = SortOrder.None
+            Friend Shared LibraryColumns As New List(Of ListViewColumnInfo)
+            Friend Shared LibrarySortColumn As Integer = -1 '-1 = No sort
+            Friend Shared LibrarySortOrder As SortOrder = SortOrder.None
 
             ' Library
             Friend Shared LibraryLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -1343,6 +1346,15 @@ Namespace My
                         Settings.PlaylistSortOrder = CType([Enum].Parse(GetType(SortOrder), sortOrderString), SortOrder)
                     Catch
                         Settings.PlaylistSortOrder = SortOrder.None
+                    End Try
+                    json = Skye.Common.RegistryHelper.GetString("LibraryColumns", "")
+                    App.Settings.LibraryColumns = ListViewColumnInfo.FromJson(json)
+                    Settings.LibrarySortColumn = Skye.Common.RegistryHelper.GetInt("LibrarySortColumn", -1)
+                    sortOrderString = Skye.Common.RegistryHelper.GetString("LibrarySortOrder", "None")
+                    Try
+                        Settings.LibrarySortOrder = CType([Enum].Parse(GetType(SortOrder), sortOrderString), SortOrder)
+                    Catch
+                        Settings.LibrarySortOrder = SortOrder.None
                     End Try
 
                     ' Library Settings

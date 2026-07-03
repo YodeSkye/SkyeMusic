@@ -33,6 +33,7 @@ Public Class Library
     End Structure
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private IsLoadingLibraryColumns As Boolean = False 'Indicates if the library columns are being loaded
     Private AlbumArtCount As Byte = 0 'Number of album art available
     Private AlbumArtIndex As Byte = 0 'Current album art index being shown
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating single and double clicks on album art
@@ -82,6 +83,7 @@ Public Class Library
     Private Sub Library_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         'Define 12 Columns
+        IsLoadingLibraryColumns = True
         Dim header As ColumnHeader
         header = New ColumnHeader With {
             .Name = "Artist",
@@ -175,6 +177,9 @@ Public Class Library
         }
         App.HookTSItemsForCMTooltip(CMLibrary, TipCMLibrary)
         LoadLibrary()
+        SetLibraryColumns()
+        SetLibrarySortState()
+        IsLoadingLibraryColumns = False
 
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.LibrarySize.Height >= 0 Then Me.Size = App.LibrarySize
@@ -301,6 +306,12 @@ Public Class Library
             ResetExtInfo()
         End If
     End Sub
+    Private Sub LVLibrary_ColumnReordered(sender As Object, e As ColumnReorderedEventArgs) Handles LVLibrary.ColumnReordered
+        SaveLibraryColumns()
+    End Sub
+    Private Sub LVLibrary_ColumnWidthChanged(sender As Object, e As ColumnWidthChangedEventArgs) Handles LVLibrary.ColumnWidthChanged
+        SaveLibraryColumns()
+    End Sub
     Private Sub LVLibrary_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles LVLibrary.ColumnClick
         SetLibraryTitles()
         If LVLibrary.Items.Count = 0 Then
@@ -313,117 +324,126 @@ Public Class Library
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryArtistSort = SortOrder.Descending
-                            LVLibrary.Columns(e.Column).Text += " ↓"
+                            LVLibrary.Columns(e.Column).Text += " ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryArtistSort = SortOrder.Ascending
-                            LVLibrary.Columns(e.Column).Text += " ↑"
+                            LVLibrary.Columns(e.Column).Text += " ▲"
                     End Select
+                    SaveLibrarySortState(e.Column, LibraryArtistSort)
                 Case LVLibrary.Columns("Title").Index
                     Select Case LibraryTitleSort
                         Case SortOrder.Ascending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryTitleSort = SortOrder.Descending
-                            LVLibrary.Columns(e.Column).Text += " ↓"
+                            LVLibrary.Columns(e.Column).Text += " ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryTitleSort = SortOrder.Ascending
-                            LVLibrary.Columns(e.Column).Text += " ↑"
+                            LVLibrary.Columns(e.Column).Text += " ▲"
                     End Select
+                    SaveLibrarySortState(e.Column, LibraryTitleSort)
                 Case LVLibrary.Columns("Album").Index
                     Select Case LibraryAlbumSort
                         Case SortOrder.Ascending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryAlbumSort = SortOrder.Descending
-                            LVLibrary.Columns(e.Column).Text += " ↓"
+                            LVLibrary.Columns(e.Column).Text += " ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryAlbumSort = SortOrder.Ascending
-                            LVLibrary.Columns(e.Column).Text += " ↑"
+                            LVLibrary.Columns(e.Column).Text += " ▲"
                     End Select
+                    SaveLibrarySortState(e.Column, LibraryAlbumSort)
                 Case LVLibrary.Columns("Genre").Index
                     Select Case LibraryGenreSort
                         Case SortOrder.Ascending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryGenreSort = SortOrder.Descending
-                            LVLibrary.Columns(e.Column).Text += " ↓"
+                            LVLibrary.Columns(e.Column).Text += " ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryGenreSort = SortOrder.Ascending
-                            LVLibrary.Columns(e.Column).Text += " ↑"
+                            LVLibrary.Columns(e.Column).Text += " ▲"
                     End Select
+                    SaveLibrarySortState(e.Column, LibraryGenreSort)
                 Case LVLibrary.Columns("Year").Index
                     Select Case LibraryYearSort
                         Case SortOrder.Ascending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryYearSort = SortOrder.Descending
-                            LVLibrary.Columns(e.Column).Text += " ↓"
+                            LVLibrary.Columns(e.Column).Text += " ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryYearSort = SortOrder.Ascending
-                            LVLibrary.Columns(e.Column).Text += " ↑"
+                            LVLibrary.Columns(e.Column).Text += " ▲"
                     End Select
+                    SaveLibrarySortState(e.Column, LibraryYearSort)
                 Case LVLibrary.Columns("Duration").Index
                     Select Case LibraryDurationSort
                         Case SortOrder.Ascending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryDurationSort = SortOrder.Descending
-                            LVLibrary.Columns(e.Column).Text += " ↓"
+                            LVLibrary.Columns(e.Column).Text += " ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryDurationSort = SortOrder.Ascending
-                            LVLibrary.Columns(e.Column).Text += " ↑"
+                            LVLibrary.Columns(e.Column).Text += " ▲"
                     End Select
+                    SaveLibrarySortState(e.Column, LibraryDurationSort)
                 Case LVLibrary.Columns("Artists").Index
                     Select Case LibraryArtistsSort
                         Case SortOrder.Ascending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryArtistsSort = SortOrder.Descending
-                            LVLibrary.Columns(e.Column).Text += " ↓"
+                            LVLibrary.Columns(e.Column).Text += " ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryArtistsSort = SortOrder.Ascending
-                            LVLibrary.Columns(e.Column).Text += " ↑"
+                            LVLibrary.Columns(e.Column).Text += " ▲"
                     End Select
+                    SaveLibrarySortState(e.Column, LibraryArtistsSort)
                 Case LVLibrary.Columns("Comments").Index
                     Select Case LibraryCommentsSort
                         Case SortOrder.Ascending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryCommentsSort = SortOrder.Descending
-                            LVLibrary.Columns(e.Column).Text += " ↓"
+                            LVLibrary.Columns(e.Column).Text += " ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryCommentsSort = SortOrder.Ascending
-                            LVLibrary.Columns(e.Column).Text += " ↑"
+                            LVLibrary.Columns(e.Column).Text += " ▲"
                     End Select
+                    SaveLibrarySortState(e.Column, LibraryCommentsSort)
                 Case LVLibrary.Columns("FilePath").Index
                     Select Case LibraryFilenameSort
                         Case SortOrder.Ascending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Descending)
                             ClearLibrarySorts()
                             LibraryFilenameSort = SortOrder.Descending
-                            LVLibrary.Columns(e.Column).Text += " ↓"
+                            LVLibrary.Columns(e.Column).Text += " ▼"
                         Case SortOrder.None, SortOrder.Descending
                             LVLibrary.ListViewItemSorter = New App.ListViewItemStringComparer(e.Column, SortOrder.Ascending)
                             ClearLibrarySorts()
                             LibraryFilenameSort = SortOrder.Ascending
-                            LVLibrary.Columns(e.Column).Text += " ↑"
+                            LVLibrary.Columns(e.Column).Text += " ▲"
                     End Select
+                    SaveLibrarySortState(e.Column, LibraryFilenameSort)
             End Select
         End If
     End Sub
@@ -1091,6 +1111,57 @@ Public Class Library
             SetLibraryCountText()
         End If
     End Sub
+    Private Sub SetLibraryColumns()
+        If App.Settings.LibraryColumns Is Nothing Then Exit Sub
+        If App.Settings.LibraryColumns.Count = 0 Then Exit Sub
+
+        For i = 0 To App.Settings.LibraryColumns.Count - 1
+            Dim info = App.Settings.LibraryColumns(i)
+            LVLibrary.Columns(i).DisplayIndex = info.DisplayIndex
+            LVLibrary.Columns(i).Width = info.Width
+        Next
+
+    End Sub
+    Private Sub SaveLibraryColumns()
+        If IsLoadingLibraryColumns Then Exit Sub
+
+        App.Settings.LibraryColumns.Clear()
+        For Each col As ColumnHeader In LVLibrary.Columns
+            Dim info As New ListViewColumnInfo With {
+                .DisplayIndex = col.DisplayIndex,
+                .Width = col.Width
+            }
+            App.Settings.LibraryColumns.Add(info)
+        Next
+
+        Dim json As String = ListViewColumnInfo.ToJson(App.Settings.LibraryColumns)
+        Skye.Common.RegistryHelper.SetString("LibraryColumns", json)
+    End Sub
+    Private Sub SetLibrarySortState()
+        Dim col = App.Settings.LibrarySortColumn
+        Dim order = App.Settings.LibrarySortOrder
+        If col < 0 OrElse col >= LVLibrary.Columns.Count Then Exit Sub
+
+        For Each ch As ColumnHeader In LVLibrary.Columns
+            ch.Text = ch.Text.Replace("▲", "").Replace("▼", "")
+        Next
+        Dim header = LVLibrary.Columns(col)
+        Select Case order
+            Case SortOrder.Ascending
+                header.Text &= " ▲"
+            Case SortOrder.Descending
+                header.Text &= " ▼"
+            Case SortOrder.None
+        End Select
+
+    End Sub
+    Private Sub SaveLibrarySortState(columnIndex As Integer, order As SortOrder)
+        App.Settings.LibrarySortColumn = columnIndex
+        App.Settings.LibrarySortOrder = order
+
+        Skye.Common.RegistryHelper.SetInt("LibrarySortColumn", columnIndex)
+        Skye.Common.RegistryHelper.SetString("LibrarySortOrder", order.ToString)
+    End Sub
     Private Sub Play()
         If LVLibrary.SelectedItems.Count > 0 Then
             App.FrmPlayer.PlayFromLibrary(App.FormatPlaylistTitle(LVLibrary.SelectedItems(0)), LVLibrary.SelectedItems(0).SubItems(LVLibrary.Columns("FilePath").Index).Text)
@@ -1272,18 +1343,18 @@ Public Class Library
         LibraryFilenameSort = SortOrder.None
     End Sub
     Private Sub SetLibraryTitles()
-        LVLibrary.Columns(0).Text = LVLibrary.Columns(0).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(1).Text = LVLibrary.Columns(1).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(2).Text = LVLibrary.Columns(2).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(3).Text = LVLibrary.Columns(3).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(4).Text = LVLibrary.Columns(4).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(5).Text = LVLibrary.Columns(5).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(6).Text = LVLibrary.Columns(6).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(7).Text = LVLibrary.Columns(7).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(8).Text = LVLibrary.Columns(8).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(9).Text = LVLibrary.Columns(9).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(10).Text = LVLibrary.Columns(10).Text.TrimEnd(" ↑↓".ToCharArray)
-        LVLibrary.Columns(11).Text = LVLibrary.Columns(11).Text.TrimEnd(" ↑↓".ToCharArray)
+        LVLibrary.Columns(0).Text = LVLibrary.Columns(0).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(1).Text = LVLibrary.Columns(1).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(2).Text = LVLibrary.Columns(2).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(3).Text = LVLibrary.Columns(3).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(4).Text = LVLibrary.Columns(4).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(5).Text = LVLibrary.Columns(5).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(6).Text = LVLibrary.Columns(6).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(7).Text = LVLibrary.Columns(7).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(8).Text = LVLibrary.Columns(8).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(9).Text = LVLibrary.Columns(9).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(10).Text = LVLibrary.Columns(10).Text.TrimEnd(" ▲▼".ToCharArray)
+        LVLibrary.Columns(11).Text = LVLibrary.Columns(11).Text.TrimEnd(" ▲▼".ToCharArray)
     End Sub
     Private Sub SetGroups()
 
@@ -1508,7 +1579,6 @@ Public Class Library
         TipLibraryEX.SetText(LblExtType, "No Text")
 
     End Sub
-
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow
