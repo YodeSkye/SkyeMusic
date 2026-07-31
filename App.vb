@@ -308,7 +308,7 @@ Namespace My
         Private ReadOnly HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
 
         ' Paths
-        Friend ReadOnly UserPath As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments + "\Skye\" 'UserPath is the base path for user-specific files.
+        Friend ReadOnly UserPath As String = Skye.Common.StorageManager.GetAppDirectory 'UserPath is the base path for user-specific files.
 #If DEBUG Then
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName + "DEV" 'RegPath is the path to the registry key where application settings are stored.
         Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
@@ -2965,6 +2965,21 @@ Namespace My
             Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName ' Use standard registry key for release builds
 #End If
             Skye.Common.Log.Write(My.Application.Info.ProductName + " Started")
+
+            ' Check for storage lockout
+            If String.IsNullOrEmpty(App.UserPath) Then
+                MessageBox.Show(
+                $"Critical Error: {My.Application.Info.ProductName} was unable to access its local storage directory." & vbCrLf & vbCrLf &
+                "This is usually caused by temporary file locks, security software, or folder permission issues." & vbCrLf & vbCrLf &
+                "The application will now exit.",
+                $"{My.Application.Info.ProductName} - Storage Access Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Stop
+            )
+                ' Cleanly terminate startup before any modules try to load broken paths
+                Environment.Exit(1)
+                Return
+            End If
 
             Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) ' Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense() ' Register Syncfusion License, required to use Syncfusion controls, which are used in the Player form for the SeekBar.
