@@ -119,12 +119,14 @@ Public Class Player
         Private _transitionGate As Integer = 0 'simple reentrancy guard
 
         Public Sub New(_invoker As Form)
+            Dim aoutArg As String = If(App.IsVolumeBoostEnabled, "--aout=directsound", "--aout=wasapi")
             Dim args As String() = {
-                "--aout=directsound",               ' wasapi or directsound"
-                "--no-audio-time-stretch",     'can reduce distortion on pitch correction
-                "--audio-resampler=soxr",      'higher quality resampler
-                "--file-caching=1000",         '1 second buffer for local files
-                "--network-caching=1500"}      'if streaming
+                aoutArg,                        ' wasapi or directsound"
+                "--no-audio-time-stretch",      'can reduce distortion on pitch correction
+                "--audio-resampler=soxr",       'higher quality resampler
+                "--file-caching=1000",          '1 second buffer for local files
+                "--network-caching=1500"}       'if streaming
+
             _libVLC = New LibVLC(args)
             _mediaPlayer = New MediaPlayer(_libVLC)
             AddHandler _mediaPlayer.Playing,
@@ -139,6 +141,7 @@ Public Class Player
                                               RaiseEvent PlaybackEnded()
                                           End Sub)
                  End Sub
+
         End Sub
         Public Sub Dispose() Implements IDisposable.Dispose
             _mediaPlayer.Stop()

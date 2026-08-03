@@ -17,6 +17,10 @@ Namespace My
     Public Module App
 
         ' Declarations
+        Public Enum AudioOutputModuleTypes
+            DirectSound
+            WASAPI
+        End Enum
         Friend Enum PlaylistTitleFormats 'When modifying, update Options form.
             UseFilename
             Song
@@ -263,6 +267,18 @@ Namespace My
         Friend ReadOnly Http As New HttpClient()
         Friend DirectoryLastSelectedSource As Integer = -1 'DirectoryLastSelectedSource stores the last selected source in the Directory form.
         Friend Property PlayerIsMiniMode As Boolean
+        Friend ReadOnly Property IsVolumeBoostEnabled As Boolean
+            Get
+                Select Case Settings.AudioOutputModule
+                    Case AudioOutputModuleTypes.DirectSound
+                        Return True
+                    Case AudioOutputModuleTypes.WASAPI
+                        Return False
+                    Case Else
+                        Return False
+                End Select
+            End Get
+        End Property
 
         ' Forms & Tray
         Friend FrmPlayer As Player 'FmrPlayer is the main player window that provides advanced playback controls and displays detailed information about the currently playing media.
@@ -1149,6 +1165,7 @@ Namespace My
             Friend Shared CompanionServerPort As Integer = 5050
 
             ' Player
+            Friend Shared AudioOutputModule As AudioOutputModuleTypes = AudioOutputModuleTypes.DirectSound
             Friend Shared PlayerLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
             Friend Shared PlayerSize As New Size(-1, -1)
             Friend Shared PlayerMiniLocation As New Point(-AdjustScreenBoundsNormalWindow - 1, -1)
@@ -4856,7 +4873,6 @@ Namespace My
         Protected Overrides Sub OnMouseWheel(e As MouseEventArgs)
             MyBase.OnMouseWheel(e)
             If DesignMode Then Exit Sub
-
             Dim newVol As Integer = VolumePercent
 
             If e.Delta > 0 Then
@@ -4866,20 +4882,21 @@ Namespace My
                     newVol = Math.Min(100, newVol + 2)
                     _maxStickCurrent = 0
                 ElseIf newVol = 100 Then
-                    ' We are at 100 → stick here for a few ticks
-                    _maxStickCurrent += 1
-                    If _maxStickCurrent < _maxStickCount Then
-                        ' Stay at 100
-                        newVol = 100
-                    Else
-                        ' Stick time over → allow boost
-                        newVol = 102
+                    If App.IsVolumeBoostEnabled Then
+                        ' We are at 100 → stick here for a few ticks
+                        _maxStickCurrent += 1
+                        If _maxStickCurrent < _maxStickCount Then
+                            ' Stay at 100
+                            newVol = 100
+                        Else
+                            ' Stick time over → allow boost
+                            newVol = 102
+                        End If
                     End If
                 Else
                     ' Already above 100 → normal boost increments
                     newVol = Math.Min(150, newVol + 2)
                 End If
-
             Else
                 ' Scrolling DOWN
                 newVol = Math.Max(0, newVol - 2)
