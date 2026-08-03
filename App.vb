@@ -1313,6 +1313,7 @@ Namespace My
                     Dim RegSubKey As Microsoft.Win32.RegistryKey
 
                     ' Player Settings
+                    Settings.AudioOutputModule = CType(Skye.Common.RegistryHelper.GetInt("AudioOutputModule", AudioOutputModuleTypes.DirectSound), AudioOutputModuleTypes)
                     Settings.PlayerLocation.X = CInt(Val(RegKey.GetValue("PlayerLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
                     Settings.PlayerLocation.Y = CInt(Val(RegKey.GetValue("PlayerLocationY", (-1).ToString)))
                     Settings.PlayerSize.Width = CInt(Val(RegKey.GetValue("PlayerSizeX", (-1).ToString)))
@@ -1590,6 +1591,7 @@ Namespace My
                     Dim RegSubKey As Microsoft.Win32.RegistryKey
 
                     ' Player Settings
+                    Skye.Common.RegistryHelper.SetInt("AudioOutputModule", Settings.AudioOutputModule)
                     RegKey.SetValue("PlayerLocationX", Settings.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("PlayerLocationY", Settings.PlayerLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("PlayerSizeX", Settings.PlayerSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
