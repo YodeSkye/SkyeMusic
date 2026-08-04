@@ -81,6 +81,7 @@ Partial Class Options
         LblHelperApp1Path = New Skye.UI.Label()
         LblCompanionServerPort = New Skye.UI.Label()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        ChkBoxVolumeBoost = New CheckBox()
         CkBoxPlayerShowMeterVert = New CheckBox()
         CkBoxPlayerShowMeterHoro = New CheckBox()
         GrBoxShowNowPlayingToast = New GroupBox()
@@ -962,6 +963,7 @@ Partial Class Options
         ' TPPlayer
         ' 
         TPPlayer.BorderStyle = BorderStyle.Fixed3D
+        TPPlayer.Controls.Add(ChkBoxVolumeBoost)
         TPPlayer.Controls.Add(CkBoxPlayerShowMeterVert)
         TPPlayer.Controls.Add(CkBoxPlayerShowMeterHoro)
         TPPlayer.Controls.Add(GrBoxShowNowPlayingToast)
@@ -988,6 +990,21 @@ Partial Class Options
         TipOptions.SetText(TPPlayer, Nothing)
         TPPlayer.Text = " Player "
         TPPlayer.ThemesEnabled = False
+        ' 
+        ' ChkBoxVolumeBoost
+        ' 
+        ChkBoxVolumeBoost.AutoSize = True
+        ChkBoxVolumeBoost.FlatStyle = FlatStyle.Flat
+        TipOptions.SetImage(ChkBoxVolumeBoost, My.Resources.Resources.ImagePlayerSound16)
+        TipError.SetImage(ChkBoxVolumeBoost, Nothing)
+        ChkBoxVolumeBoost.Location = New Point(269, 14)
+        ChkBoxVolumeBoost.Name = "ChkBoxVolumeBoost"
+        ChkBoxVolumeBoost.Size = New Size(282, 25)
+        ChkBoxVolumeBoost.TabIndex = 152
+        TipError.SetText(ChkBoxVolumeBoost, Nothing)
+        TipOptions.SetText(ChkBoxVolumeBoost, "Uses legacy DirectSound engine. Turn off if you experience audio crackling or pops.")
+        ChkBoxVolumeBoost.Text = "Enable Volume Boost (Beyond 100%)"
+        ChkBoxVolumeBoost.UseVisualStyleBackColor = True
         ' 
         ' CkBoxPlayerShowMeterVert
         ' 
@@ -1587,4 +1604,5 @@ Partial Class Options
     Friend WithEvents TxtBoxCompanionServerPort As Skye.UI.NumericTextBox
     Friend WithEvents CkBoxPlayerShowMeterHoro As CheckBox
     Friend WithEvents CkBoxPlayerShowMeterVert As CheckBox
+    Friend WithEvents ChkBoxVolumeBoost As CheckBox
 End Class

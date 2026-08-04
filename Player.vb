@@ -5327,11 +5327,14 @@ Public Class Player
         ' Dispose old player if it exists
         If _player IsNot Nothing Then
             Try
+                RemoveHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
+                RemoveHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
                 _player.Stop()
                 Dim vlccurrent = TryCast(_player, VLCPlayer)
                 vlccurrent?.Dispose()
             Catch
             End Try
+            _player = Nothing
         End If
 
         ' Create new VLCPlayer
@@ -5346,7 +5349,30 @@ Public Class Player
         AddHandler vlc.PlaybackEnded, AddressOf OnPlaybackEnded
 
         ' Restore volume (or from settings)
-        vlc.Volume = 100
+        App.SetSystemVolume(BtnVolume.VolumePercent)
+    End Sub
+    Friend Sub SwitchAudioOutputEngine()
+        ' 1. Capture playing state before tearing down
+        Dim currentPath As String = If(_player IsNot Nothing, _player.Path, Nothing)
+        Dim currentPos As Double = If(_player IsNot Nothing AndAlso _player.HasMedia, _player.Position, 0)
+        Dim wasPlaying As Boolean = False
+        Dim currentVlc = TryCast(_player, VLCPlayer)
+        If currentVlc IsNot Nothing AndAlso currentVlc.MediaPlayer IsNot Nothing Then
+            wasPlaying = currentVlc.MediaPlayer.IsPlaying
+        End If
+        ' 2. Re-initialize the player engine cleanly
+        InitVLCPlayer()
+        ' 3. Restore track state and timestamp if a track was loaded
+        If Not String.IsNullOrEmpty(currentPath) Then
+            _player.Play(currentPath)
+            If currentPos > 0 Then
+                _player.Position = currentPos
+            End If
+            ' Keep it paused if it wasn't actively playing when switched
+            If Not wasPlaying Then
+                _player.Pause()
+            End If
+        End If
     End Sub
     Friend Sub TogglePlay()
         If _player.HasMedia Then
@@ -5950,8 +5976,16 @@ Public Class Player
 
     End Sub
     Friend Sub SetPlayerVolume(volumepercent As Integer)
-        _player.Volume = volumepercent
-        'Debug.WriteLine("Internal VLC volume = " & DirectCast(_player, VLCPlayer).MediaPlayer.Volume)
+        If _player IsNot Nothing Then
+            Dim maxVol As Integer = If(App.Settings.AudioOutputModule = App.AudioOutputModuleTypes.DirectSound, 150, 100)
+            _player.Volume = Math.Max(0, Math.Min(maxVol, volumepercent))
+        End If
+    End Sub
+    Friend Sub EnforcePlayerVolume()
+        If BtnVolume.VolumePercent > 100 Then
+            BtnVolume.VolumePercent = 100
+            App.SetSystemVolume(100)
+        End If
     End Sub
     Friend Function GetDurationSeconds() As Integer
         If _player Is Nothing Then Return 0

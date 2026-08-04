@@ -31,6 +31,10 @@ Public Class Options
         ReThemeMenus()
 
         'Settings
+        Select Case App.Settings.AudioOutputModule
+            Case App.AudioOutputModuleTypes.DirectSound : ChkBoxVolumeBoost.Checked = True
+            Case App.AudioOutputModuleTypes.WASAPI : ChkBoxVolumeBoost.Checked = False
+        End Select
         Select Case App.Settings.PlayerPositionShowElapsed
             Case True : RadBtnElapsed.Checked = True
             Case False : RadBtnRemaining.Checked = True
@@ -509,6 +513,15 @@ Public Class Options
             TxtBoxCompanionServerPort.SelectAll()
         End If
     End Sub
+    Private Sub ChkBoxVolumeBoost_Click(sender As Object, e As EventArgs) Handles ChkBoxVolumeBoost.Click
+        If ChkBoxVolumeBoost.Checked Then
+            App.Settings.AudioOutputModule = App.AudioOutputModuleTypes.DirectSound
+        Else
+            App.Settings.AudioOutputModule = App.AudioOutputModuleTypes.WASAPI
+            App.FrmPlayer.EnforcePlayerVolume()
+            App.FrmPlayer.SwitchAudioOutputEngine()
+        End If
+    End Sub
     Private Sub CkBoxShowNowPlayingToast_Click(sender As Object, e As EventArgs) Handles CkBoxShowNowPlayingToast.Click
         App.Settings.ShowNowPlayingToast = Not App.Settings.ShowNowPlayingToast
         If App.Settings.ShowNowPlayingToast Then
@@ -714,6 +727,7 @@ Public Class Options
             GrBoxTime.BackColor = c
             GrBoxShowNowPlayingToast.BackColor = c
             RadBtnRemaining.BackColor = c
+            ChkBoxVolumeBoost.BackColor = c
             CkBoxShowNowPlayingToast.BackColor = c
             CkBoxPlayerShowMeterHoro.BackColor = c
             CkBoxPlayerShowMeterVert.BackColor = c
@@ -747,6 +761,7 @@ Public Class Options
             GrBoxTime.BackColor = App.CurrentTheme.BackColor
             GrBoxShowNowPlayingToast.BackColor = App.CurrentTheme.BackColor
             RadBtnRemaining.BackColor = App.CurrentTheme.BackColor
+            ChkBoxVolumeBoost.BackColor = App.CurrentTheme.BackColor
             CkBoxShowNowPlayingToast.BackColor = App.CurrentTheme.BackColor
             CkBoxPlayerShowMeterHoro.BackColor = App.CurrentTheme.BackColor
             CkBoxPlayerShowMeterVert.BackColor = App.CurrentTheme.BackColor
@@ -809,6 +824,7 @@ Public Class Options
         LblVideoIdentifier.ForeColor = forecolor
         lblStatusMessageDisplayTime1.ForeColor = forecolor
         lblStatusMessageDisplayTime2.ForeColor = forecolor
+        ChkBoxVolumeBoost.ForeColor = forecolor
         CkBoxShowNowPlayingToast.ForeColor = forecolor
         CkBoxPlayerShowMeterHoro.ForeColor = forecolor
         CkBoxPlayerShowMeterVert.ForeColor = forecolor
