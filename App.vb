@@ -2999,12 +2999,13 @@ Namespace My
                 Environment.Exit(1)
                 Return
             End If
-
+            Application.appsplash.UpdateStatus("Warming Up Audio Engine...")
             Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) ' Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
             LicenseKey.RegisterSyncfusionLicense() ' Register Syncfusion License, required to use Syncfusion controls, which are used in the Player form for the SeekBar.
             LibVLCSharp.Shared.Core.Initialize() ' Initialize LibVLCSharp, required to use the LibVLCSharp library for music playback.
             Http.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic/1.0") ' Set default User-Agent for HttpClient, used for fetching metadata from online sources, and for the Companion Server API.
 
+            Application.appsplash.UpdateStatus("Loading Settings...")
             Settings.Load()
             Settings.LoadDebug()
             CurrentTheme = GetCurrentThemeProperties()
@@ -3086,6 +3087,7 @@ Namespace My
             VideoExtensionDictionary.Add(".flv", "Flash Video")
 #End Region
 
+            Application.appsplash.UpdateStatus("Starting App...")
             ' Notify Icon
             NIApp.Icon = My.Resources.IconSkyeMusicRed
             NIApp.Text = My.Application.Info.Title
@@ -3139,9 +3141,6 @@ Namespace My
 
             RegisterHotKeys()
 
-            'FrmPlayer = New Player()
-            'FrmPlayer.Show()
-
             FrmLibrary = New Library With {
                     .Opacity = 0} 'This is done to initialize the form on startup, but keep it hidden from the user, to prevent null reference errors when the FileSystemWatcher fires and the user hasn't opened the form yet.
             FrmLibrary.Show()
@@ -3164,6 +3163,7 @@ Namespace My
             CompanionControlServer = New CompanionControlServerClass(FrmPlayer)
             SetCompanionServer()
 
+            Application.appsplash.CloseSplashWithFade()
         End Sub
         Friend Sub Finalize()
             SetCompanionServer(True) 'Ensure Companion Server is stopped
