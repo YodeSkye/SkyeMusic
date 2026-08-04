@@ -35,6 +35,21 @@ Skye Music also supports Volume Boost for quiet videos or recordings. When you s
 \par
 This makes volume control feel more natural and predictable, especially when switching between apps or using hardware keys. The button always reflects the real system state, and Boost Mode gives you extra headroom when you need it.\par
 \par
+\cf2\b Audio Settings & Volume Boost\cf0\b0\par
+Skye Music gives you control over how audio is delivered to your speakers through the "Enable Volume Boost" option in Settings.\par
+\par
+\i Enable Volume Boost (Checked)\i0\par
+When checked, Skye Music uses the DirectSound audio engine. This mode allows you to push player volume beyond 100%, making it ideal for quiet recordings or low-gain audio files that need extra volume. Note that on some PCs, high volume boost or heavy system loads can occasionally cause subtle audio pops or crackling.\par
+\par
+\i High Stability Mode (Unchecked)\i0\par
+When unchecked, Skye Music uses the modern WASAPI audio engine. This mode provides clean, crystal-clear, distortion-free sound and maximum playback stability across all system conditions. To prevent digital audio clipping, volume is capped at a maximum of 100% in this mode.\par
+\par
+\i Will toggling Volume Boost interrupt my playing song?\i0\par
+No. Skye Music automatically restarts the audio engine in the background and resumes your music at the exact second you left off.\par
+\par
+\i Why did my volume automatically drop to 100% when I unchecked Volume Boost?\i0\par
+WASAPI mode enforces a 100% volume limit to ensure clean sound without clipping. If your volume was set above 100%, Skye Music automatically adjusts it back down to 100%.\par
+\par
 \cf2\b Playlist Shortcuts\cf0\b0\fs28\par
 \b\fs24 <Up Arrow> \b0 Select Up\par
 \b <Down Arrow> \b0 Select Down\par
