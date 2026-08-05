@@ -5092,66 +5092,6 @@ Namespace My
             Me.SizeMode = PictureBoxSizeMode.Zoom
             FadeTimer.Interval = 16 ' ~60 FPS
         End Sub
-
-        ''' <summary>
-        ''' Crossfades to a new image safely without GDI+ memory conflicts.
-        ''' </summary>
-        Public Sub SetImageWithFade(newImg As Image)
-            FadeTimer.Stop()
-
-            ' Clean up previous snapshot
-            _oldImage?.Dispose()
-            _oldImage = Nothing
-
-            ' Snapshot current visible art as old image
-            If Me.Image IsNot Nothing Then
-                Try
-                    _oldImage = New Bitmap(Me.Image)
-                Catch
-                    _oldImage = Nothing
-                End Try
-            End If
-
-            ' Detach and clone new image safely
-            If newImg IsNot Nothing Then
-                Try
-                    _newImage = New Bitmap(newImg)
-                Catch
-                    _newImage = Nothing
-                End Try
-            Else
-                _newImage = Nothing
-            End If
-
-            ' Assign base image reference
-            Dim prevBase As Image = Me.Image
-            Me.Image = _newImage
-            prevBase?.Dispose()
-
-            ' If no old image exists, skip animation
-            If _oldImage Is Nothing OrElse _newImage Is Nothing Then
-                Me.Invalidate()
-                Exit Sub
-            End If
-
-            _alpha = 0.0F
-            FadeTimer.Start()
-        End Sub
-
-        Private Sub FadeTimer_Tick(sender As Object, e As EventArgs) Handles FadeTimer.Tick
-            _alpha += 0.02F ' Adjust this value for faster/slower fade speed
-
-            If _alpha >= 1.0F Then
-                _alpha = 1.0F
-                FadeTimer.Stop()
-
-                _oldImage?.Dispose()
-                _oldImage = Nothing
-            End If
-
-            Me.Invalidate()
-        End Sub
-
         Protected Overrides Sub OnPaint(pe As PaintEventArgs)
             Dim g As Graphics = pe.Graphics
             g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
@@ -5198,7 +5138,74 @@ Namespace My
             End If
 
         End Sub
+        Protected Overrides Sub Dispose(disposing As Boolean)
+            If disposing Then
+                FadeTimer?.Stop()
+                FadeTimer?.Dispose()
+                _oldImage?.Dispose()
+                _newImage?.Dispose()
+            End If
+            MyBase.Dispose(disposing)
+        End Sub
 
+        Private Sub FadeTimer_Tick(sender As Object, e As EventArgs) Handles FadeTimer.Tick
+            _alpha += 0.02F ' Adjust this value for faster/slower fade speed
+
+            If _alpha >= 1.0F Then
+                _alpha = 1.0F
+                FadeTimer.Stop()
+
+                _oldImage?.Dispose()
+                _oldImage = Nothing
+            End If
+
+            Me.Invalidate()
+        End Sub
+
+        ''' <summary>
+        ''' Crossfades to a new image safely without GDI+ memory conflicts.
+        ''' </summary>
+        Public Sub SetImageWithFade(newImg As Image)
+            FadeTimer.Stop()
+
+            ' Clean up previous snapshot
+            _oldImage?.Dispose()
+            _oldImage = Nothing
+
+            ' Snapshot current visible art as old image
+            If Me.Image IsNot Nothing Then
+                Try
+                    _oldImage = New Bitmap(Me.Image)
+                Catch
+                    _oldImage = Nothing
+                End Try
+            End If
+
+            ' Detach and clone new image safely
+            If newImg IsNot Nothing Then
+                Try
+                    _newImage = New Bitmap(newImg)
+                Catch
+                    _newImage = Nothing
+                End Try
+            Else
+                _newImage = Nothing
+            End If
+
+            ' Assign base image reference
+            Dim prevBase As Image = Me.Image
+            Me.Image = _newImage
+            prevBase?.Dispose()
+
+            ' If no old image exists, skip animation
+            If _oldImage Is Nothing OrElse _newImage Is Nothing Then
+                Me.Invalidate()
+                Exit Sub
+            End If
+
+            _alpha = 0.0F
+            FadeTimer.Start()
+        End Sub
         Private Sub DrawImageZoom(g As Graphics, img As Image, alpha As Single)
             If img Is Nothing OrElse alpha <= 0.0F Then Exit Sub
 
@@ -5224,15 +5231,6 @@ Namespace My
             End Using
         End Sub
 
-        Protected Overrides Sub Dispose(disposing As Boolean)
-            If disposing Then
-                FadeTimer?.Stop()
-                FadeTimer?.Dispose()
-                _oldImage?.Dispose()
-                _newImage?.Dispose()
-            End If
-            MyBase.Dispose(disposing)
-        End Sub
     End Class
 
 End Namespace
