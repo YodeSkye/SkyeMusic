@@ -29,6 +29,7 @@ Public Class Player
     Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
     Private TipCMPlaylist As Skye.UI.ToolTipEX 'Tooltip for Context Menu of Playlist
+    Private _lastDisplayMode As DisplayMode = DisplayMode.None
     Private _lastRealState As FormWindowState = FormWindowState.Normal 'Last real state of the form (not minimized)
     Private _lastStaleMeterLog As DateTime = DateTime.MinValue 'Last time the meter log was updated
     Private _handledClose As Boolean = False 'Indicates if the close event has been handled
@@ -3577,7 +3578,7 @@ Public Class Player
     End Sub
     Private Sub MIPlayMode_Click(sender As Object, e As EventArgs) Handles MIPlayMode.Click
         Dim newIndex As Byte = CType(App.Settings.PlayMode + 1, Byte)
-        App.ShowToast(Nothing, "Shuffle Play Yet?")
+        'App.ShowToast(Nothing, "Shuffle Play Yet?")
         If newIndex = [Enum].GetNames(GetType(App.PlayModes)).Length Then
             newIndex = 0
         End If
@@ -3864,29 +3865,29 @@ Public Class Player
     Private Sub CMICopyFilePathClick(sender As Object, e As EventArgs) Handles CMICopyFilePath.Click
         If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
-    Private Sub PicBoxAlbumArt_Paint(sender As Object, e As PaintEventArgs) Handles PicBoxAlbumArt.Paint
-        If AlbumArtCount > 1 Then
-            Dim g = e.Graphics
-            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+    'Private Sub PicBoxAlbumArt_Paint(sender As Object, e As PaintEventArgs) Handles PicBoxAlbumArt.Paint
+    '    If AlbumArtCount > 1 Then
+    '        Dim g = e.Graphics
+    '        g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
 
-            'Badge background (semi-transparent black circle)
-            Dim badgeSize As Integer = 28
-            Dim badgeRect As New Rectangle(PicBoxAlbumArt.Width - badgeSize - 6, 6, badgeSize, badgeSize)
-            Using bgBrush As New SolidBrush(App.CurrentTheme.BackColor)
-                g.FillEllipse(bgBrush, badgeRect)
-            End Using
+    '        'Badge background (semi-transparent black circle)
+    '        Dim badgeSize As Integer = 28
+    '        Dim badgeRect As New Rectangle(PicBoxAlbumArt.Width - badgeSize - 6, 6, badgeSize, badgeSize)
+    '        Using bgBrush As New SolidBrush(App.CurrentTheme.BackColor)
+    '            g.FillEllipse(bgBrush, badgeRect)
+    '        End Using
 
-            'Count text
-            Dim overlayText As String = AlbumArtCount.ToString()
-            Using f As New Font("Segoe UI", 12, FontStyle.Bold),
-                textBrush As New SolidBrush(App.CurrentTheme.TextColor),
-                sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
-                badgeRect.Offset(1, 1) ' Slight offset for better centering
-                g.DrawString(overlayText, f, textBrush, badgeRect, sf)
-            End Using
+    '        'Count text
+    '        Dim overlayText As String = AlbumArtCount.ToString()
+    '        Using f As New Font("Segoe UI", 12, FontStyle.Bold),
+    '            textBrush As New SolidBrush(App.CurrentTheme.TextColor),
+    '            sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
+    '            badgeRect.Offset(1, 1) ' Slight offset for better centering
+    '            g.DrawString(overlayText, f, textBrush, badgeRect, sf)
+    '        End Using
 
-        End If
-    End Sub
+    '    End If
+    'End Sub
     Private Sub PicBoxAlbumArt_MouseDown(sender As Object, e As MouseEventArgs) Handles PicBoxAlbumArt.MouseDown
         Select Case e.Button
             Case MouseButtons.Left
@@ -4447,6 +4448,15 @@ Public Class Player
     End Sub
     Friend Sub ShowNowPlayingToast(songtext As String)
         If App.Settings.ShowNowPlayingToast AndAlso Not String.IsNullOrWhiteSpace(songtext) Then
+            ' Create an isolated copy so SmoothPictureBox disposing/fading doesn't crash the Toast
+            Dim toastImg As Bitmap = Nothing
+            If PicBoxAlbumArt.Image IsNot Nothing Then
+                Try
+                    toastImg = New Bitmap(PicBoxAlbumArt.Image)
+                Catch ex As Exception
+                    toastImg = Nothing
+                End Try
+            End If
             Dim npo As New Skye.UI.ToastOptions With {
                 .Title = "Now Playing",
                 .Message = songtext,
@@ -4457,7 +4467,7 @@ Public Class Player
                 .TitleFont = New Font("Segoe UI", 12),
                 .MessageFont = New Font("Segoe UI", 12, FontStyle.Bold),
                 .Location = App.Settings.NowPlayingToastLocation,
-                .Image = PicBoxAlbumArt.Image
+                .Image = toastImg
             }
             Skye.UI.Toast.ShowToast(npo)
         End If
@@ -5353,7 +5363,7 @@ Public Class Player
     End Sub
     Friend Sub SwitchAudioOutputEngine()
         ' 1. Capture playing state before tearing down
-        Dim currentPath As String = If(_player IsNot Nothing, _player.Path, Nothing)
+        Dim currentPath As String = _player?.Path
         Dim currentPos As Double = If(_player IsNot Nothing AndAlso _player.HasMedia, _player.Position, 0)
         Dim wasPlaying As Boolean = False
         Dim currentVlc = TryCast(_player, VLCPlayer)
@@ -5902,9 +5912,20 @@ Public Class Player
     End Sub
     Private Sub ApplyDisplayMode(mode As DisplayMode, tlfile As TagLib.File)
 
-        ' Hide everything first
-        PicBoxAlbumArt.Visible = False
-        PicBoxAlbumArt.Image = Nothing
+        ' Check if we are transitioning from AlbumArt -> AlbumArt while an image is loaded
+        Dim shouldFade As Boolean = (_lastDisplayMode = DisplayMode.AlbumArt AndAlso
+                                 mode = DisplayMode.AlbumArt AndAlso
+                                 PicBoxAlbumArt.Image IsNot Nothing)
+
+        ' Reset non-album art controls (only reset image if NOT fading)
+        If Not shouldFade Then
+            PicBoxAlbumArt.Visible = False
+            If PicBoxAlbumArt.Image IsNot Nothing Then
+                PicBoxAlbumArt.Image.Dispose()
+                PicBoxAlbumArt.Image = Nothing
+            End If
+        End If
+
         DBEXVertLeft.Visible = False
         DBEXVertRight.Visible = False
         DBEXVertLeft.Value = 0
@@ -5931,27 +5952,37 @@ Public Class Player
 
                 RTBLyrics.SetAlignment(HorizontalAlignment.Center)
                 RTBLyrics.Visible = True
+
             Case DisplayMode.AlbumArt
                 Try
                     If AlbumArtIndex > tlfile.Tag.Pictures.Count - 1 Then AlbumArtIndex = 0
                     Dim picbytes = tlfile.Tag.Pictures(AlbumArtIndex).Data.Data
                     Using ms As New IO.MemoryStream(picbytes)
-                        Dim img As Image = Image.FromStream(ms)
-                        PicBoxAlbumArt.Image = img
-                        PicBoxAlbumArt.Visible = True
-                        App.FrmMiniPlayer?.SetAlbumArt(img)
-                        AlbumArtCount = CByte(tlfile.Tag.Pictures.Count)
-                        PicBoxAlbumArt.Invalidate()
-                        If App.Settings.PlayerMetersShowVertical Then
-                            DBEXVertLeft.Parent = PicBoxAlbumArt
-                            DBEXVertRight.Parent = PicBoxAlbumArt
-                            DBEXVertLeft.Location = New Point(0, 0)
-                            DBEXVertLeft.Height = PicBoxAlbumArt.ClientSize.Height
-                            DBEXVertRight.Location = New Point(PicBoxAlbumArt.ClientSize.Width - DBEXVertRight.Width, 0)
-                            DBEXVertRight.Height = PicBoxAlbumArt.ClientSize.Height
-                            DBEXVertLeft.Visible = True
-                            DBEXVertRight.Visible = True
-                        End If
+                        Using tmp As Image = Image.FromStream(ms)
+                            Using newImg As New Bitmap(tmp) ' Detached bitmap copy
+                                If shouldFade Then
+                                    PicBoxAlbumArt.SetImageWithFade(newImg)
+                                Else
+                                    PicBoxAlbumArt.Image = New Bitmap(newImg)
+                                End If
+                                PicBoxAlbumArt.Visible = True
+                                App.FrmMiniPlayer?.SetAlbumArt(newImg)
+                                AlbumArtCount = CByte(tlfile.Tag.Pictures.Count)
+                                PicBoxAlbumArt.BadgeCount = AlbumArtCount
+                                If App.Settings.PlayerMetersShowVertical Then
+                                    DBEXVertLeft.Parent = PicBoxAlbumArt
+                                    DBEXVertRight.Parent = PicBoxAlbumArt
+                                    DBEXVertLeft.Location = New Point(0, 0)
+                                    DBEXVertLeft.Height = PicBoxAlbumArt.ClientSize.Height
+                                    DBEXVertRight.Location = New Point(PicBoxAlbumArt.ClientSize.Width - DBEXVertRight.Width, 0)
+                                    DBEXVertRight.Height = PicBoxAlbumArt.ClientSize.Height
+                                    DBEXVertLeft.Visible = True
+                                    DBEXVertRight.Visible = True
+                                    DBEXVertLeft.BringToFront()
+                                    DBEXVertRight.BringToFront()
+                                End If
+                            End Using
+                        End Using
                     End Using
                 Catch ex As Exception
                     Skye.Common.Log.Write("Error loading album art: " & ex.Message)
@@ -5962,16 +5993,18 @@ Public Class Player
                 VideoSetSize()
                 VLCViewer.Visible = True
                 App.FrmMiniPlayer?.SetAlbumArt(Nothing)
+
             Case DisplayMode.Visualizer
                 VisualizerHost.Activate(App.Settings.Visualizer)
                 VisualizerEngine?.Start()
                 PanelVisualizer.Visible = True
                 PanelVisualizer.BringToFront()
+
             Case DisplayMode.None
                 ' Everything stays hidden
         End Select
 
-        ' Lyrics menu visibility
+        _lastDisplayMode = mode
         MILyrics.Visible = HasLyrics
 
     End Sub

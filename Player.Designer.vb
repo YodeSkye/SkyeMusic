@@ -86,7 +86,7 @@ Partial Class Player
         BtnForward = New Button()
         BtnStop = New Button()
         BtnNext = New Button()
-        PicBoxAlbumArt = New PictureBox()
+        PicBoxAlbumArt = New SmoothPictureBox()
         TxtBoxPlaylistSearch = New TextBox()
         ListBoxPlaylistSearch = New ListBox()
         PanelMedia = New Panel()
@@ -878,7 +878,7 @@ Partial Class Player
     Friend WithEvents BtnForward As Button
     Friend WithEvents BtnStop As Button
     Friend WithEvents BtnNext As Button
-    Friend WithEvents PicBoxAlbumArt As System.Windows.Forms.PictureBox
+    Friend WithEvents PicBoxAlbumArt As SmoothPictureBox
     Friend WithEvents TxtBoxPlaylistSearch As TextBox
     Friend WithEvents ListBoxPlaylistSearch As ListBox
     Friend WithEvents PanelMedia As Panel
