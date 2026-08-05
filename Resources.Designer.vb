@@ -61,11 +61,11 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil\fcharset1 Cambria Math;}}
+        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset0 SimSun;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil Segoe UI;}{\f7\fnil\fcharset1 Cambria Math;}}
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
-        '''{\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont6\mwrapIndent1440 }\viewkind4\uc1 
-        '''\pard\cf1\b\f0\fs28\lang9 Skye Music v1.5 What&apos;s New\par
-        '''\cf0\fs24 Released May 2026\cf1\pa [rest of string was truncated]&quot;;.
+        '''{\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont7\mwrapIndent1440 }\viewkind4\uc1 
+        '''\pard\cf1\b\f0\fs28\lang9 Skye Music v1.6 What&apos;s New\par
+        '''\cf0\f [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
             Get

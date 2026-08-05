@@ -226,11 +226,28 @@
 \b &lt;Double-Click&gt; \b0 on either Album Art, the Visualizer, or the Video will maximize the window or return it to a normal state.\par
 \par
 \cf2\b System Volume Button\cf0\b0\par
-The Volume button lets you adjust your computer\rquote s system volume directly from inside SkyeMusic. Instead of changing only player mute, this button now controls the actual Windows volume level, so everything you hear on your device stays consistent. The button shows the current system volume, and the wheel on your mouse changes the volume when you hover over it. Any changes you make here apply instantly to your whole system, not just the app.\par
+The Volume button lets you adjust your computer\rquote s system volume directly from inside Skye Music. Instead of changing only the player\rquote s mute state, this button now controls the actual Windows volume level, so everything you hear on your device stays consistent. The button shows the current system volume, and the wheel on your mouse changes the volume when you hover over it. Any changes you make here apply instantly to your whole system, not just the app.\par
 \par
-The button also includes a quick mute toggle. If you need to silence everything immediately, you can tap the button and Windows will mute all audio at once. Tapping it again restores your previous volume level. SkyeMusic stays in sync with your computer, so if you change the volume using your keyboard or the taskbar, the button updates automatically to match whatever the system is doing.\par
+The button also includes a quick mute toggle. If you need to silence everything immediately, you can tap the button and Windows will mute all audio at once. Tapping it again restores your previous volume level. Skye Music stays in sync with your computer, so if you change the volume using your keyboard or the taskbar, the button updates automatically to match whatever the system is doing.\par
 \par
-This makes volume control feel more natural and predictable, especially when switching between apps or using hardware keys. The button always reflects the real system state, so what you see is exactly what you hear.\par
+Skye Music also supports Volume Boost for quiet videos or recordings. When you scroll past 100%, the player can raise audio up to 150% using its internal amplifier. To make this feel natural, the volume control briefly \ldblquote pauses\rdblquote  at 100% before entering boost mode, so you don\rquote t jump into amplified audio by accident. Boost affects only Skye Music\rquote s playback and does not change your system\rquote s maximum volume.\par
+\par
+This makes volume control feel more natural and predictable, especially when switching between apps or using hardware keys. The button always reflects the real system state, and Boost Mode gives you extra headroom when you need it.\par
+\par
+\cf2\b Audio Settings &amp; Volume Boost\cf0\b0\par
+Skye Music gives you control over how audio is delivered to your speakers through the "Enable Volume Boost" option in Settings.\par
+\par
+\i Enable Volume Boost (Checked)\i0\par
+When checked, Skye Music uses the DirectSound audio engine. This mode allows you to push player volume beyond 100%, making it ideal for quiet recordings or low-gain audio files that need extra volume. Note that on some PCs, high volume boost or heavy system loads can occasionally cause subtle audio pops or crackling.\par
+\par
+\i High Stability Mode (Unchecked)\i0\par
+When unchecked, Skye Music uses the modern WASAPI audio engine. This mode provides clean, crystal-clear, distortion-free sound and maximum playback stability across all system conditions. To prevent digital audio clipping, volume is capped at a maximum of 100% in this mode.\par
+\par
+\i Will toggling Volume Boost interrupt my playing song?\i0\par
+No. Skye Music automatically restarts the audio engine in the background and resumes your music at the exact second you left off.\par
+\par
+\i Why did my volume automatically drop to 100% when I unchecked Volume Boost?\i0\par
+WASAPI mode enforces a 100% volume limit to ensure clean sound without clipping. If your volume was set above 100%, Skye Music automatically adjusts it back down to 100%.\par
 \par
 \cf2\b Playlist Shortcuts\cf0\b0\fs28\par
 \b\fs24 &lt;Up Arrow&gt; \b0 Select Up\par
@@ -340,7 +357,7 @@ Some stations, such as SomaFM, publish their track information separately from t
 If a station does not provide metadata, or provides only partial information, Skye\f5\lang1033  \f4\lang9 Music will simply display the station \f5\lang1033 title and URL from the playlist\f4\lang9  instead. This behavior is normal and depends entirely on what the station broadcasts.\f2\par
 \par
 \cf2\b\f1 Companion Server\cf0\b0\f4\par
-\f2 SkyeMusic includes a built\_in Companion Server that lets you control playback from other \f1\lang1033 Android or Windows \f2\lang9 device\f1\lang1033 s\f2\lang9  using the SkyeMusic Companion App. When enabled, your PC will accept connections from \f1\lang1033 other devices \f2\lang9 on your local network.\f1\lang1033\par
+\f2 Skye\f1\lang1033  \f2\lang9 Music includes a built\_in Companion Server that lets you control playback from other \f1\lang1033 Android or Windows \f2\lang9 device\f1\lang1033 s\f2\lang9  using the Skye\f1\lang1033  \f2\lang9 Music Companion App. When enabled, your PC will accept connections from \f1\lang1033 other devices \f2\lang9 on your local network.\f1\lang1033\par
 \par
 \f2\lang9 Connected devices appear in the Companion Clients window\f1\lang1033  accessed through the View menu. T\f2\lang9 here you can view basic information about each device, copy its name or IP address, or disconnect it if needed.\par
 \par
@@ -482,17 +499,44 @@ The Companion Server is optional and can be turned on or off at any time in Sett
     <value>My Project\ImageMoveUp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ChangeLogRT" xml:space="preserve">
-    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil\fcharset1 Cambria Math;}}
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset0 SimSun;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil Segoe UI;}{\f7\fnil\fcharset1 Cambria Math;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
-{\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont6\mwrapIndent1440 }\viewkind4\uc1 
-\pard\cf1\b\f0\fs28\lang9 Skye Music v1.5 What's New\par
+{\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont7\mwrapIndent1440 }\viewkind4\uc1 
+\pard\cf1\b\f0\fs28\lang9 Skye Music v1.6 What's New\par
+\cf0\fs24 Released August 2026\cf1\par
+\fs28\par
+\cf2\fs24 New Features\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Implemented crossfading between Album Art images.\f1\par
+\'a3\'ab\f0  Added a new option under Settings to toggle Volume Boost on or off. Turning Volume Boost off uses the modern WASAPI audio engine for crystal-clear, distortion-free playback, while enabling it uses DirectSound to allow software volume levels above 100% for quieter files.\f1\par
+\'a3\'ab\f0  Column Sizes and Positions are now saved for the Playlist and the Library.\f1\par
+\'a3\'ab\f0  Added a Position Bar to the Companion App.\par
+\f1\'a3\'ab\f2  \f0 Volume Boost. You can now raise volume above 100% (up to 150%). Includes a smooth "pause" at 100% so you don't jump into boost by accident.\f1\par
+\'a3\'ab\f2  \f0 Added Queuing support to the playlist in the Companion App.\par
+\f1\'a3\'ab\f2  \f0 Added optional vertical Meter Bars that display alongside Album Art. Made the standard horizontal Meter Bars optional as well, and updated the Meter Engine to run only when one or both Meter types are enabled, reducing unnecessary processing.\par
+\cf1\b\lang9\par
+\cf2 Improvements\par
+\cf0\b0\f3\u10003?\f4\lang1033  Improved the look and functionality of the Splash screen.\f5\lang9\par
+\f3\u10003?\f4\lang1033  \f5\lang9 Improved Data Storage &amp; Automated Migration\f4\lang1033 . \f5\lang9 Core application files have moved to AppData\\Local\\Skye\\ for better system compatibility and faster file access. Existing files from Documents\\Skye are moved automatically on first launch, featuring built-in startup protection against background file locks.\par
+\f3\u10003?\f4\lang1033  Added "?" key support throughout the app to make showing the Now Playing Toast more convenient and consistent.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Playlist and Library views now keep the current item vertically centered when possible.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Improved the Volume Button's visuals, especially at lower percentages.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Replaced the old meter bars with the new DataBarEX component, delivering a cleaner, more modern visual style and smoother rendering.\f1\par
+\par
+\cf2\b\f0\lang9 Fixes\par
+\cf0\b0\f3\u10005?\f4\lang1033  Fixed problems with Minimize To Tray that caused video to stop playing, as well as other minor issues.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed a bug where the player tooltip could throw an error after minimizing to the tray and restoring the app.\par
+\f3\lang9\u10005?\f4\lang1033  Meter Sticky State: Resolved an issue where vertical album art meters remained frozen on screen after playback stopped.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Fixed an issue where files with uppercase extensions failed to load, scan, or sync correctly by normalizing extension handling.\f5\lang9\par
+\f3\u10005?\f4\lang1033  Log Spam Suppression: Suppressed repetitive "Audio Meter Data Stale" log entries, recording only a single event per occurrence during brief audio dropouts or system sleep cycles.\par
+\f1\par
+\cf1\b\f0\lang9 Skye Music v1.5\fs28\par
 \cf0\fs24 Released May 2026\cf1\par
 \fs28\par
 \cf2\fs24 New Features\par
 \cf0\b0\f1\lang1033\'a3\'ab\f0  Added a link in About to download the Companion Client.\f1\par
 \'a3\'ab\f0  Show Now Playing toast on '?' key press from both Player and MiniPlayer.\f1\par
-\'a3\'ab\f0  SkyeMusic now includes full system\f2\_\f0 level volume control, making it easier to keep your listening experience consistent no matter where you adjust it. The app now stays perfectly in sync with your computer\rquote s volume, whether you change it using hardware keys, the Windows taskbar, or inside SkyeMusic itself. Mute and volume changes update instantly and feel smoother and more responsive, giving you a more natural and predictable audio experience. This update replaces the old player\f2\_\f0 only mute behavior with a true system\f2\_\f0 wide approach, so SkyeMusic always reflects the real volume of your device. Also added volume support to the Companion App Server\par
-\f1\'a3\'ab\f0  Added support for the SkyeMusic Companion App, allowing Android phones and tablets and other Windows devices on your network to control playback on your PC, view Now Playing information, view the Playlist and eventually stream audio.\f1\par
+\'a3\'ab\f0  Skye Music now includes full system\f6\_\f0 level volume control, making it easier to keep your listening experience consistent no matter where you adjust it. The app now stays perfectly in sync with your computer\rquote s volume, whether you change it using hardware keys, the Windows taskbar, or inside Skye Music itself. Mute and volume changes update instantly and feel smoother and more responsive, giving you a more natural and predictable audio experience. This update replaces the old player\f6\_\f0 only mute behavior with a true system\f6\_\f0 wide approach, so Skye Music always reflects the real volume of your device. Also added volume support to the Companion App Server\par
+\f1\'a3\'ab\f0  Added support for the Skye Music Companion App, allowing Android phones and tablets and other Windows devices on your network to control playback on your PC, view Now Playing information, view the Playlist and eventually stream audio.\f1\par
 \cf1\b\f0\lang9\par
 \cf2 Improvements\par
 \cf0\b0\f3\u10003?\f4\lang1033  Faster, more reliable album art: Artwork is now normalized and optimized before sending to Companion clients, fixing cases where artwork failed to appear and improving load speed.\par
@@ -537,14 +581,14 @@ The Companion Server is optional and can be turned on or off at any time in Sett
 \cf0\fs24 Released January 2026\cf1\par
 \b0\par
 \cf2\b New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  Directory: Skye Music now includes a full Stream Directory, a complete in\f2\_app browser for discovering and playing online radio stations\f0 , making it easier than ever to find and play online radio. Browse stations by name, tags, country, format, or bitrate; and pick from multiple stream options with a simple dropdown. Everything loads fast and stays out of your way. See the Help window in app for details.\f1\par
-\'a3\'ab\f0  MiniPlayer: A compact, always\f2\_\f0 on\f2\_\f0 top version of Skye Music designed for quick access and minimal screen space. Includes essential playback controls, album art, and a fully integrated visualizer panel. Visualizers now support a dedicated MiniMode, providing simplified, optimized visuals tailored for small windows. Each visualizer can enable or disable MiniMode individually through its settings.\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Directory: Skye Music now includes a full Stream Directory, a complete in\f6\_app browser for discovering and playing online radio stations\f0 , making it easier than ever to find and play online radio. Browse stations by name, tags, country, format, or bitrate; and pick from multiple stream options with a simple dropdown. Everything loads fast and stays out of your way. See the Help window in app for details.\f1\par
+\'a3\'ab\f0  MiniPlayer: A compact, always\f6\_\f0 on\f6\_\f0 top version of Skye Music designed for quick access and minimal screen space. Includes essential playback controls, album art, and a fully integrated visualizer panel. Visualizers now support a dedicated MiniMode, providing simplified, optimized visuals tailored for small windows. Each visualizer can enable or disable MiniMode individually through its settings.\par
 \f1\'a3\'ab\f0  Skye Music now lets you know when a new version is available. The About screen performs a quiet daily check and displays an upgrade notice right under the version number.\f1\par
 \'a3\'ab\f0  Added Theming to all context menus, the Tray menu, and the Player menu strip.\cf1\b\lang9\par
 \par
 \cf2 Improvements\par
 \cf0\b0\f3\u10003?\f4\lang1033  Multiples of the same song are now allowed in the Queue.\f5\lang9\par
-\f3\u10003?\f0  Library file\f2\_watcher alerts now appear in the Playlist status text instead of the Library menu.\f5\par
+\f3\u10003?\f0  Library file\f6\_watcher alerts now appear in the Playlist status text instead of the Library menu.\f5\par
 \f3\u10003?\f0  Changed the behavior of the Tray context menu options to open the Player, Library, and History. Removed the toggle so now clicking simply shows the window.\cf2\b\par
 \par
 Fixes\par
@@ -586,8 +630,8 @@ Skye Music v1.2\fs28\par
 \cf0\b0\fs24 Released November 2025\par
 \cf2\b\par
 New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Particle Nebula Visualizer. Swirling clouds, glowing bloom halos, and reactive trails create a cosmic, music\f2\_\f0 driven effect.\f1\par
-\'a3\'ab\f0  Added Circular Spectrum Visualizer, a spoke\f2\_\f0 style frequency display radiating bars around a central ring, with configurable gain, smoothing, and weighting modes.\f1\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Particle Nebula Visualizer. Swirling clouds, glowing bloom halos, and reactive trails create a cosmic, music\f6\_\f0 driven effect.\f1\par
+\'a3\'ab\f0  Added Circular Spectrum Visualizer, a spoke\f6\_\f0 style frequency display radiating bars around a central ring, with configurable gain, smoothing, and weighting modes.\f1\par
 \'a3\'ab\f0  Added Oscilloscope Visualizer, technical lines blazing across the screen, with stereo mode and glow trails.\f1\par
 \'a3\'ab\f0  Added Classic Spectrum Analyzer Visualizer, made to feel like the classic Winamp spectrum bars.\par
 \f1\'a3\'ab\f0  Added Star Field Visualizer, a gentle flow of stars set to music.\f1\par
@@ -617,33 +661,33 @@ New Features\par
 \f3\u10005? \f4\lang1033 Fixed lyrics display error when loading plain text or metadata lyrics and published hotfix.\cf1\b\f0\fs28\lang9\par
 \par
 \fs24 Skye Music v1.0\par
-This upgrade marks a major milestone in SkyeMusic\f2\rquote\f0 s playback architecture \f2\emdash  smoother, smarter, and built to last.\par
+This upgrade marks a major milestone in SkyeMusic\f6\rquote\f0 s playback architecture \f6\emdash  smoother, smarter, and built to last.\par
 \cf0\b0\f0 Released November 2025\cf1\b\fs28\par
 \par
 \cf2\fs24 New Features\par
 \cf0\b0\f1\lang1033\'a3\'ab\f0\lang9 Implemented a Plays Database using SQLite to track the actual plays per track and their duration.\par
-\f1\lang1033\'a3\'ab\f0\lang9 Full synced lyrics view with RichTextBox display. Current lyric line now bolded in real time with smooth switching between album\f2\_art view (single line) and full\_lyrics view\f0\lang1033 . Requires a matching '.LRC' file alongside the audio file for synced audio.\lang9\par
+\f1\lang1033\'a3\'ab\f0\lang9 Full synced lyrics view with RichTextBox display. Current lyric line now bolded in real time with smooth switching between album\f6\_art view (single line) and full\_lyrics view\f0\lang1033 . Requires a matching '.LRC' file alongside the audio file for synced audio.\lang9\par
 \f1\lang1033\'a3\'ab\f0\lang9 History &amp; Statistics page\par
-  \f6\u8594?\f0  \lang9 Added play stats: most played song, total songs, total duration\par
-  \f6\u8594?\f0  \lang9 Added 7\f2\_column list view (Title, Artist, Album, Genre, Plays, Last Played, Path)\par
-  \f6\u8594?\f0  \f2\lang9 Added multiple views: Most Played, Recently Played, Favorites\par
-  \f6\u8594?\f0  \f2\lang9 Added integrated charts: Genre Pie, Genre Polar, Genre Pareto, Artist Bar, Artist Word Cloud\par
-  \f6\u8594?\f0  \f2\lang9 Applied theme\_aware styling to charts and list view\par
-  \f6\u8594?\f0  \f2\lang9 Added context menu actions: Queue selected, Add selected to playlist\par
+  \f7\u8594?\f0  \lang9 Added play stats: most played song, total songs, total duration\par
+  \f7\u8594?\f0  \lang9 Added 7\f6\_column list view (Title, Artist, Album, Genre, Plays, Last Played, Path)\par
+  \f7\u8594?\f0  \f6\lang9 Added multiple views: Most Played, Recently Played, Favorites\par
+  \f7\u8594?\f0  \f6\lang9 Added integrated charts: Genre Pie, Genre Polar, Genre Pareto, Artist Bar, Artist Word Cloud\par
+  \f7\u8594?\f0  \f6\lang9 Applied theme\_aware styling to charts and list view\par
+  \f7\u8594?\f0  \f6\lang9 Added context menu actions: Queue selected, Add selected to playlist\par
 \f1\lang1033\'a3\'ab\f0\lang9 A Text Label has been added where the Album Art button was located. This may be used in the future for song information or a lyrics display.\par
 \f1\lang1033\'a3\'ab\f0\lang9 Full VLC Integration. Replaced legacy Windows Media Player(WMP) with modern LibVLC backend for improved format support and performance.\par
-\f1\lang1033\'a3\'ab\f0\lang9 Custom Fullscreen Mode. Implemented fullscreen support from scratch, tailored for VLC\f2\rquote\f0 s rendering model.\par
+\f1\lang1033\'a3\'ab\f0\lang9 Custom Fullscreen Mode. Implemented fullscreen support from scratch, tailored for VLC\f6\rquote\f0 s rendering model.\par
 \cf2\b\par
 Improvements\par
 \cf0\b0\f3\u10003?\f0  Refactored Plays Database PlayTrigger logic:\par
-    \f6\u8594?\f0  Defaulted to Manual unless AutoTrigger flag is set\par
-    \f6\u8594?\f0  Simplified intent tracking across playback paths\par
-    \f6\u8594?\f0  Logging now includes accurate trigger context\par
-    \f6\u8594?\f0  This change makes play history smarter without complicating playback flow.\lang9\par
+    \f7\u8594?\f0  Defaulted to Manual unless AutoTrigger flag is set\par
+    \f7\u8594?\f0  Simplified intent tracking across playback paths\par
+    \f7\u8594?\f0  Logging now includes accurate trigger context\par
+    \f7\u8594?\f0  This change makes play history smarter without complicating playback flow.\lang9\par
 \f3\u10003?\f0  \lang1033 Lyrics support includes '.LRC' files, plain text files, and metadata from the song file itself.\par
 \f3\lang9\u10003?\f0  \lang1033 Cycle through Album Art simply by left-clicking the Art. The Album Art button has been removed.\par
-\f3\lang9\u10003?\f0  Audio Playback Update. Improved stability by aligning with system audio settings. Tip: For best results, set your playback device to 16\f2\_bit, 44.1 kHz (CD Quality).\f0\lang1033  \f2\lang9 This matches most music files and avoids unnecessary resampling that can cause static.\f0\par
-\f3\u10003?\f0  Hook Reliability. Improved timing and resilience of mouse hook attachment to VLC\f2\rquote\f0 s native window.\par
+\f3\lang9\u10003?\f0  Audio Playback Update. Improved stability by aligning with system audio settings. Tip: For best results, set your playback device to 16\f6\_bit, 44.1 kHz (CD Quality).\f0\lang1033  \f6\lang9 This matches most music files and avoids unnecessary resampling that can cause static.\f0\par
+\f3\u10003?\f0  Hook Reliability. Improved timing and resilience of mouse hook attachment to VLC\f6\rquote\f0 s native window.\par
 \f3\u10003?\f0  Playback Lifecycle Management. Smoothed transitions between playback states to prevent UI hangs and race conditions.\par
 \f3\u10003?\f0  FullScreen Usage and Stability Overhaul. Added keyboard shortcuts and uniform click events to fullscreen functionality. Increased stability and reliability of fullscreen mode.\par
 \cf2\b\par
@@ -651,7 +695,7 @@ Fixes\par
 \cf0\b0\f3\u10005? \f4\lang1033 Fixed lyrics sync problem in Lyrics View.\f5\lang9\par
 \f3\u10005? Fixed repeat mode bug\f4\lang1033 , \f5\lang9 playback now restarts correctly at end of song\par
 \f3\u10005?\f0  Fixed RichTextBox cursor flicker by subclassing and overriding WM_SETCURSOR\par
-\f3\u10005?\f0  MPEG playback timing issue stabilized. A\f2 dded a startup timer to safely grab video dimensions and toggle mute, eliminating divide\_by\_zero and silent playback quirks.\f0\par
+\f3\u10005?\f0  MPEG playback timing issue stabilized. A\f6 dded a startup timer to safely grab video dimensions and toggle mute, eliminating divide\_by\_zero and silent playback quirks.\f0\par
 \f3\u10005?\f0  Fixed errors when loading history and statistics page and user interacts by clicking a button or closing prematurely.\par
 \f3\u10005?\f0  Ensured all UI updates are safely marshaled to the main thread\par
 \f3\u10005?\f0  Various FullScreen Lifecylce and Stability fixes.\par
