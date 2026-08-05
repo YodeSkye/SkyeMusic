@@ -11,6 +11,7 @@ A modern Windows media player built with **LibVLCSharp** and **WinForms**, featu
 - Metadata tag reading with **TagLib#**.
 - A compact mini-player mode.
 - Local database for play history & statistics.
+- A companion app for Android.
 - Lightweight installer powered by Inno Setup.
 - Upgrade notifications for new versions.
 - Open source and free to use!
@@ -30,7 +31,7 @@ Found a bug or have a feature request?
 
 ## 📥 Installing SkyeLibrary from a Local `.nupkg` File (included in the repo)
 
-SkyeClip depends on SkyeLibrary, which is included as a .nupkg file in this repository.
+SkyeClip depends on SkyeLibrary, a separate public repository where you can download the latest version.
 To install it (After cloning this repo):
 
 1. Open **Visual Studio**
