@@ -5966,7 +5966,7 @@ Public Class Player
                                     PicBoxAlbumArt.Image = New Bitmap(newImg)
                                 End If
                                 PicBoxAlbumArt.Visible = True
-                                App.FrmMiniPlayer?.SetAlbumArt(newImg)
+                                App.FrmMiniPlayer?.SetAlbumArt(New Bitmap(newImg))
                                 AlbumArtCount = CByte(tlfile.Tag.Pictures.Count)
                                 PicBoxAlbumArt.BadgeCount = AlbumArtCount
                                 If App.Settings.PlayerMetersShowVertical Then
