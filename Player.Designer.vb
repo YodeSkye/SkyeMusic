@@ -560,9 +560,9 @@ Partial Class Player
         ' PicBoxAlbumArt
         ' 
         PicBoxAlbumArt.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        PicBoxAlbumArt.Location = New Point(1, 27)
+        PicBoxAlbumArt.Location = New Point(1, 29)
         PicBoxAlbumArt.Name = "PicBoxAlbumArt"
-        PicBoxAlbumArt.Size = New Size(434, 294)
+        PicBoxAlbumArt.Size = New Size(434, 292)
         PicBoxAlbumArt.SizeMode = PictureBoxSizeMode.Zoom
         PicBoxAlbumArt.TabIndex = 20
         PicBoxAlbumArt.TabStop = False
@@ -597,9 +597,9 @@ Partial Class Player
         ' PanelMedia
         ' 
         PanelMedia.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        PanelMedia.Location = New Point(1, 27)
+        PanelMedia.Location = New Point(1, 29)
         PanelMedia.Name = "PanelMedia"
-        PanelMedia.Size = New Size(434, 294)
+        PanelMedia.Size = New Size(434, 292)
         PanelMedia.TabIndex = 30
         PanelMedia.Visible = False
         ' 
@@ -623,10 +623,10 @@ Partial Class Player
         LVPlaylist.EditableColumns = CType(resources.GetObject("LVPlaylist.EditableColumns"), List(Of Boolean))
         LVPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LVPlaylist.InsertionLineColor = Color.Teal
-        LVPlaylist.Location = New Point(437, 27)
+        LVPlaylist.Location = New Point(437, 29)
         LVPlaylist.Name = "LVPlaylist"
         LVPlaylist.OwnerDraw = True
-        LVPlaylist.Size = New Size(574, 409)
+        LVPlaylist.Size = New Size(574, 407)
         LVPlaylist.TabIndex = 0
         LVPlaylist.UseCompatibleStateImageBehavior = False
         LVPlaylist.View = View.Details
@@ -692,7 +692,7 @@ Partial Class Player
         ' VLCViewer
         ' 
         VLCViewer.BackColor = Color.Black
-        VLCViewer.Location = New Point(1, 27)
+        VLCViewer.Location = New Point(1, 29)
         VLCViewer.MediaPlayer = Nothing
         VLCViewer.Name = "VLCViewer"
         VLCViewer.Size = New Size(173, 214)
@@ -717,12 +717,12 @@ Partial Class Player
         RTBLyrics.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         RTBLyrics.BorderStyle = BorderStyle.None
         RTBLyrics.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        RTBLyrics.Location = New Point(1, 27)
+        RTBLyrics.Location = New Point(1, 29)
         RTBLyrics.Name = "RTBLyrics"
         RTBLyrics.ReadOnly = True
         RTBLyrics.ScrollBars = RichTextBoxScrollBars.Vertical
         RTBLyrics.ShortcutsEnabled = False
-        RTBLyrics.Size = New Size(434, 294)
+        RTBLyrics.Size = New Size(434, 292)
         RTBLyrics.TabIndex = 39
         RTBLyrics.TabStop = False
         RTBLyrics.Text = ""
@@ -738,9 +738,9 @@ Partial Class Player
         ' PanelVisualizer
         ' 
         PanelVisualizer.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        PanelVisualizer.Location = New Point(1, 27)
+        PanelVisualizer.Location = New Point(1, 29)
         PanelVisualizer.Name = "PanelVisualizer"
-        PanelVisualizer.Size = New Size(434, 294)
+        PanelVisualizer.Size = New Size(434, 292)
         PanelVisualizer.TabIndex = 40
         ' 
         ' DBEXVertRight
@@ -818,12 +818,8 @@ Partial Class Player
         Controls.Add(DBEXVertLeft)
         Controls.Add(DBEXVertRight)
         Controls.Add(BtnVolume)
-        Controls.Add(PanelVisualizer)
-        Controls.Add(RTBLyrics)
-        Controls.Add(VLCViewer)
         Controls.Add(LblPosition)
         Controls.Add(LblDuration)
-        Controls.Add(PicBoxAlbumArt)
         Controls.Add(ListBoxPlaylistSearch)
         Controls.Add(LVPlaylist)
         Controls.Add(BtnPrevious)
@@ -834,12 +830,16 @@ Partial Class Player
         Controls.Add(BtnReverse)
         Controls.Add(BtnPlay)
         Controls.Add(MenuPlayer)
-        Controls.Add(PanelMedia)
         Controls.Add(LblPlaylistCount)
         Controls.Add(DBEXRight)
         Controls.Add(DBEXLeft)
         Controls.Add(LblMedia)
         Controls.Add(TrackBarPosition)
+        Controls.Add(PanelVisualizer)
+        Controls.Add(RTBLyrics)
+        Controls.Add(VLCViewer)
+        Controls.Add(PicBoxAlbumArt)
+        Controls.Add(PanelMedia)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         ForeColor = SystemColors.HighlightText
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
