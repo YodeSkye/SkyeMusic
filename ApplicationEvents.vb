@@ -15,7 +15,7 @@ Namespace My
             If e.Cancel Then : Return False
             Else
                 Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High
-                My.App.InitializePreStartup()
+                My.App.InitializeAppPreStartup()
                 Return True
             End If
         End Function

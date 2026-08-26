@@ -2976,47 +2976,252 @@ Namespace My
         End Function
 
         ' Methods
-        Friend Sub InitializePreStartup()
-#If DEBUG Then
-            Skye.Common.Log.Initialize(My.Application.Info.ProductName + "DEV") ' Use separate log file for debug builds to prevent debug logs from being mixed with release logs
-            Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName + "DEV" ' Use separate registry key for debug builds
-#Else
-            Skye.Common.Log.Initialize(My.Application.Info.ProductName) ' Use standard log file for release builds
-            Skye.Common.RegistryHelper.BaseKey = "Software\" + My.Application.Info.ProductName ' Use standard registry key for release builds
-#End If
-            Skye.Common.Log.Write(My.Application.Info.ProductName + " Started")
+        Friend Sub InitializeAppPreStartup()
+            Dim baseName As String = If(Debugger.IsAttached, My.Application.Info.ProductName & "DEV", My.Application.Info.ProductName)
 
-            ' Check for storage lockout
+            ' Phase 1: Logging Subsystem
+            Try
+                Skye.Common.Log.Initialize(baseName)
+                Skye.Common.RegistryHelper.BaseKey = "Software\" & baseName
+                Skye.Common.Log.Write(My.Application.Info.ProductName & " Started")
+            Catch ex As Exception
+                System.Diagnostics.Trace.WriteLine($"Failed To Initialize Logging: {ex.Message}")
+                MessageBox.Show($"Application Failed To Initialize Logger:{Environment.NewLine}{ex.Message}", "Startup Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Environment.Exit(1)
+                Return
+            End Try
+
+            ' Phase 2: Storage Lockout Verification
             If String.IsNullOrEmpty(App.UserPath) Then
                 MessageBox.Show(
-                $"Critical Error: {My.Application.Info.ProductName} was unable to access its local storage directory." & vbCrLf & vbCrLf &
-                "This is usually caused by temporary file locks, security software, or folder permission issues." & vbCrLf & vbCrLf &
-                "The application will now exit.",
-                $"{My.Application.Info.ProductName} - Storage Access Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Stop
-            )
-                ' Cleanly terminate startup before any modules try to load broken paths
+            $"Critical Error: {My.Application.Info.ProductName} was unable to access its local storage directory." & vbCrLf & vbCrLf &
+            "This is usually caused by temporary file locks, security software, or folder permission issues." & vbCrLf & vbCrLf &
+            "The application will now exit.",
+            $"{My.Application.Info.ProductName} - Storage Access Error",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Stop
+        )
                 Environment.Exit(1)
                 Return
             End If
-            Application.appsplash.UpdateStatus("Warming Up Audio Engine...")
-            Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) ' Allows use of Windows-1252 character encoding, needed for Components context menu Proper Case function.
-            LicenseKey.RegisterSyncfusionLicense() ' Register Syncfusion License, required to use Syncfusion controls, which are used in the Player form for the SeekBar.
-            LibVLCSharp.Shared.Core.Initialize() ' Initialize LibVLCSharp, required to use the LibVLCSharp library for music playback.
-            Http.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic/1.0") ' Set default User-Agent for HttpClient, used for fetching metadata from online sources, and for the Companion Server API.
 
-            Application.appsplash.UpdateStatus("Loading Settings...")
-            Settings.Load()
-            Settings.LoadDebug()
-            CurrentTheme = GetCurrentThemeProperties()
-            LoadHistory()
-            LoadPlayHistoryDatabase()
-            GenerateHotKeyList()
-            SetHistoryAutoSaveTimer()
+            ' Phase 3: Core Libraries & Engines Initialization
+            Try
+                Application.appsplash.UpdateStatus("Warming Up Audio Engine...")
+                Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance)
+                LicenseKey.RegisterSyncfusionLicense()
+                LibVLCSharp.Shared.Core.Initialize()
+                Http.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic/1.0")
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Audio Engine Initialization Error: {ex}")
+                MessageBox.Show($"Failed to initialize core components (LibVLC/Syncfusion):{Environment.NewLine}{ex.Message}", "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Environment.Exit(1)
+                Return
+            End Try
 
-            ' Setup Dictionaries
-#Region "            Audio Types"
+            ' Phase 4: Settings & Data Loading
+            Try
+                Application.appsplash.UpdateStatus("Loading Settings...")
+                Settings.Load()
+                Settings.LoadDebug()
+                CurrentTheme = GetCurrentThemeProperties()
+                LoadHistory()
+                LoadPlayHistoryDatabase()
+                GenerateHotKeyList()
+                SetHistoryAutoSaveTimer()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Loading App Settings/Database: {ex}")
+                MessageBox.Show($"Warning: Failed to load user history or settings database.{Environment.NewLine}{ex.Message}", "Data Load Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                ' Non-fatal: Allow application to proceed with defaults if desired, or call Environment.Exit(1) if mandatory
+            End Try
+
+            ' Phase 5: UI & Dictionary Setup
+            Try
+                SetupExtensionDictionaries()
+                Application.appsplash.UpdateStatus("Starting App...")
+                InitializeNotifyIcon()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"UI Initialization Error: {ex}")
+                MessageBox.Show($"An Error Occurred While Starting The UI Components:{Environment.NewLine}{ex.Message}", "Startup Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+
+        End Sub
+        Friend Sub InitializeAppPostStartup()
+
+            ' 1. Global Hotkeys
+            Try
+                RegisterHotKeys()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"HotKey Registration Error: {ex}")
+            End Try
+
+            ' 2. Library Form Pre-Initialization (No Flash / No Show/Hide Hack)
+            Try
+                FrmLibrary = New Library()
+                ' Force handle creation so FileSystemWatcher & controls initialize cleanly without showing the form
+                Dim dummyHandle As IntPtr = FrmLibrary.Handle
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Pre-initializing Library Form: {ex}")
+            End Try
+
+            ' 3. System Events & Screen Saver Monitoring
+            Try
+                TimerScreenSaverWatcher.Interval = 1000
+                TimerScreenSaverWatcher.Start()
+                AddHandler Microsoft.Win32.SystemEvents.SessionSwitch, AddressOf SessionSwitchHandler
+                WatcherWorkTimer.AutoReset = False
+                SetWatchers()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Setting Up System/Watcher Handlers: {ex}")
+            End Try
+
+            ' 4. System Volume & Audio Endpoint Monitoring (MMDevice Guard)
+            Try
+                Dim dev As New MMDeviceEnumerator()
+                _audioEndpoint = dev.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)
+                StartSystemVolumeMonitor()
+                AddHandler SystemVolumeChanged, AddressOf OnSystemVolumeChanged
+                AddHandler SystemMuteChanged, AddressOf OnSystemMuteChanged
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Audio Endpoint Monitor Initialization Error (No active playback device?): {ex.Message}")
+            End Try
+
+            ' 5. Companion Server Listener
+            Try
+                CompanionControlServer = New CompanionControlServerClass(FrmPlayer)
+                SetCompanionServer()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Companion Control Server Failed to Start: {ex}")
+            End Try
+
+            ' 6. Close Splash Screen
+            Try
+                Application.appsplash.CloseSplashWithFade()
+            Catch ex As Exception
+                ' Fallback if splash is already disposed
+                Application.appsplash.CloseSplash()
+            End Try
+
+        End Sub
+        Friend Sub FinalizeApp()
+            Static isShuttingDown As Boolean = False
+            If isShuttingDown Then Return
+            isShuttingDown = True
+
+            ' Phase 1: CRITICAL DATA PERSISTENCE FIRST
+            ' Save history and settings immediately so user data is protected
+            Try
+                SaveHistory()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Saving History on Exit: {ex}")
+            End Try
+
+            Try
+                Settings.Save()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Saving Settings on Exit: {ex}")
+            End Try
+
+            ' Phase 2: PLAYER & COMPONENT CLEANUP
+            Try
+                FrmPlayer?.WhenClosing()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error During Player Form Cleanup: {ex}")
+            End Try
+
+            Try
+                SetCompanionServer(True) ' Stop HTTP Listener / Server
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Stopping Companion Server: {ex}")
+            End Try
+
+            Try
+                UnRegisterHotKeys()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Unregistering Hotkeys: {ex}")
+            End Try
+
+            Try
+                SetWatchers(True) ' Stop FileSystemWatchers
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Stopping File Watchers: {ex}")
+            End Try
+
+            ' Cleanup Audio Volume Monitoring
+            Try
+                RemoveHandler SystemVolumeChanged, AddressOf OnSystemVolumeChanged
+                RemoveHandler SystemMuteChanged, AddressOf OnSystemMuteChanged
+                If _audioEndpoint IsNot Nothing Then
+                    _audioEndpoint.Dispose()
+                    _audioEndpoint = Nothing
+                End If
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Cleaning Up Audio Endpoint: {ex}")
+            End Try
+
+            ' Phase 3: SAFELY CLOSE ALL OPEN FORMS
+            Try
+                Dim formsToClose As New List(Of Form)()
+                For Each frm As Form In Application.OpenForms
+                    If frm IsNot Application.appsplash Then
+                        formsToClose.Add(frm)
+                    End If
+                Next
+
+                For Each frm As Form In formsToClose
+                    Try
+                        frm.Hide()
+                        frm.Close()
+                        frm.Dispose()
+                    Catch ex As Exception
+                        Skye.Common.Log.Write($"Error Closing Form ({frm.Name}): {ex}")
+                    End Try
+                Next
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Iterating Open Forms: {ex}")
+            End Try
+
+            ' Phase 4: TRAY ICON REMOVAL
+            Try
+                If NIApp IsNot Nothing Then
+                    NIApp.Visible = False
+                    NIApp.Dispose()
+                End If
+            Catch ex As Exception
+                ' Ignore icon cleanup errors on exit
+            End Try
+
+            Skye.Common.Log.Write(My.Application.Info.ProductName + " Closed")
+        End Sub
+        Friend Sub ExitApp()
+            FinalizeApp()
+
+            ' Ensure main thread exits cleanly
+            Application.ApplicationContext.ExitThread()
+
+            ' Force clean process termination if background native threads (LibVLC/CoreAudio) linger
+            Environment.Exit(0)
+        End Sub
+        Friend Sub CheckForUpdatesIfNeeded()
+            Dim last = Settings.LastUpdateCheck.Date
+            Dim today = Date.Today
+
+            If last = today Then
+                ' Already checked today — use cached version
+                Exit Sub
+            End If
+
+            ' Not checked today — fetch fresh version
+            Dim latest = FetchLatestVersion()
+            If latest IsNot Nothing Then
+                Settings.LatestKnownVersion = latest
+                Settings.LastUpdateCheck = DateTime.Now
+                Settings.Save()
+            End If
+
+        End Sub
+        Private Sub SetupExtensionDictionaries()
+#Region "Audio Types"
             ExtensionDictionary.Add(".aa", "")
             AudioExtensionDictionary.Add(".aa", "")
             ExtensionDictionary.Add(".aax", "")
@@ -3056,7 +3261,7 @@ Namespace My
             ExtensionDictionary.Add(".webm", "")
             AudioExtensionDictionary.Add(".webm", "")
 #End Region
-#Region "            Video Types"
+#Region "Video Types"
             ExtensionDictionary.Add(".mkv", "Matroska")
             VideoExtensionDictionary.Add(".mkv", "Matroska")
             ExtensionDictionary.Add(".ogv", "OGG Video")
@@ -3069,7 +3274,6 @@ Namespace My
             VideoExtensionDictionary.Add(".asf", "ASF")
             ExtensionDictionary.Add(".mp4", "MP4")
             VideoExtensionDictionary.Add(".mp4", "MP4")
-            'ExtensionDictionary.Add(".m4p", "MP4")
             VideoExtensionDictionary.Add(".m4p", "MP4")
             ExtensionDictionary.Add(".m4v", "MP4")
             VideoExtensionDictionary.Add(".m4v", "MP4")
@@ -3083,124 +3287,70 @@ Namespace My
             VideoExtensionDictionary.Add(".mpv", "MPEG")
             ExtensionDictionary.Add(".m2v", "MPEG")
             VideoExtensionDictionary.Add(".m2v", "MPEG")
-            'Video Types Not Supported By TagLib-Sharp
             ExtensionDictionary.Add(".flv", "Flash Video")
             VideoExtensionDictionary.Add(".flv", "Flash Video")
 #End Region
-
-            Application.appsplash.UpdateStatus("Starting App...")
-            ' Notify Icon
+        End Sub
+        Private Sub InitializeNotifyIcon()
             NIApp.Icon = My.Resources.IconSkyeMusicRed
             NIApp.Text = My.Application.Info.Title
             AddHandler NIApp.MouseUp, AddressOf NIApp_MouseUp
+
             Dim cm As New ContextMenuStrip()
             ThemeMenu(cm)
             cm.Font = New Font("Segoe UI", 12.0!)
+
             Dim cmi As ToolStripMenuItem
             cmi = New ToolStripMenuItem("About " & My.Application.Info.Title, My.Resources.ImageAbout16) With {.Name = "NIApp_MIAbout"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIAbout_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
+
             cmi = New ToolStripMenuItem("Player", ResizeImage(My.Resources.ImagePlay, 16)) With {.Name = "NIApp_MIPlayer"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPlayer_MouseDown
             cm.Items.Add(cmi)
+
             cmi = New ToolStripMenuItem("Library", My.Resources.ImageLibrary16) With {.Name = "NIApp_MILibrary"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MILibrary_MouseDown
             cm.Items.Add(cmi)
+
             cmi = New ToolStripMenuItem("History", My.Resources.ImageHistory) With {.Name = "NIApp_MIHistory"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIHistory_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
+
             cmi = New ToolStripMenuItem With {.Name = "NIApp_MIPlay"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPlay_MouseDown
             cm.Items.Add(cmi)
+
             cmi = New ToolStripMenuItem("Stop") With {.Name = "NIApp_MIStop"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIStop_MouseDown
             cm.Items.Add(cmi)
+
             cmi = New ToolStripMenuItem("Previous") With {.Name = "NIApp_MIPrevious"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIPrevious_MouseDown
             cm.Items.Add(cmi)
+
             cmi = New ToolStripMenuItem("Next") With {.Name = "NIApp_MINext"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MINext_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
+
             cmi = New ToolStripMenuItem("Options", My.Resources.ImageSettings16)
             AddHandler cmi.MouseDown, AddressOf NIApp_MISettings_MouseDown
             cm.Items.Add(cmi)
+
             cmi = New ToolStripMenuItem("Help", My.Resources.ImageHelp16) With {.Name = "NIApp_MIHelp"}
             AddHandler cmi.MouseDown, AddressOf NIApp_MIHelp_MouseDown
             cm.Items.Add(cmi)
             cm.Items.Add(New ToolStripSeparator())
+
             cmi = New ToolStripMenuItem("Exit " & My.Application.Info.Title, My.Resources.ImageExit)
             AddHandler cmi.MouseDown, AddressOf NIApp_MIExit_MouseDown
             cm.Items.Add(cmi)
+
             AddHandler cm.Opening, AddressOf NIApp_Opening
             NIApp.ContextMenuStrip = cm
-
-        End Sub
-        Friend Sub InitializePostStartup()
-
-            RegisterHotKeys()
-
-            FrmLibrary = New Library With {
-                    .Opacity = 0} 'This is done to initialize the form on startup, but keep it hidden from the user, to prevent null reference errors when the FileSystemWatcher fires and the user hasn't opened the form yet.
-            FrmLibrary.Show()
-            FrmLibrary.Hide()
-            FrmLibrary.Opacity = 1
-
-            TimerScreenSaverWatcher.Interval = 1000
-            TimerScreenSaverWatcher.Start()
-            AddHandler Microsoft.Win32.SystemEvents.SessionSwitch, AddressOf SessionSwitchHandler 'SessionSwitchHandler is a handler for session switch events, sets the ScreenLocked flag, and acts accordingly.
-
-            WatcherWorkTimer.AutoReset = False
-            SetWatchers()
-
-            Dim dev As New MMDeviceEnumerator()
-            _audioEndpoint = dev.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)
-            StartSystemVolumeMonitor()
-            AddHandler SystemVolumeChanged, AddressOf OnSystemVolumeChanged
-            AddHandler SystemMuteChanged, AddressOf OnSystemMuteChanged
-
-            CompanionControlServer = New CompanionControlServerClass(FrmPlayer)
-            SetCompanionServer()
-
-            Application.appsplash.CloseSplashWithFade()
-        End Sub
-        Friend Sub Finalize()
-            SetCompanionServer(True) 'Ensure Companion Server is stopped
-            UnRegisterHotKeys() 'Unregister all hotkeys
-            If FrmHelp IsNot Nothing AndAlso FrmHelp.Visible Then FrmHelp.Close()
-            If FrmLog IsNot Nothing AndAlso FrmLog.Visible Then FrmLog.Close()
-            If FrmDirectory IsNot Nothing AndAlso FrmDirectory.Visible Then FrmDirectory.Close()
-            If FrmLibrary.Visible Then FrmLibrary.Close()
-            FrmLibrary.Dispose()
-            SaveHistory() 'Save history to disk
-            Settings.Save() 'Save settings to disk
-            SetWatchers(True) 'Dispose watchers
-            FrmPlayer.WhenClosing() 'Perform any necessary cleanup in the Player form before closing
-            Skye.Common.Log.Write(My.Application.Info.ProductName + " Closed")
-        End Sub
-        Friend Sub ExitApp()
-            Finalize()
-            Application.ApplicationContext.ExitThread()
-        End Sub
-        Friend Sub CheckForUpdatesIfNeeded()
-            Dim last = Settings.LastUpdateCheck.Date
-            Dim today = Date.Today
-
-            If last = today Then
-                ' Already checked today — use cached version
-                Exit Sub
-            End If
-
-            ' Not checked today — fetch fresh version
-            Dim latest = FetchLatestVersion()
-            If latest IsNot Nothing Then
-                Settings.LatestKnownVersion = latest
-                Settings.LastUpdateCheck = DateTime.Now
-                Settings.Save()
-            End If
-
         End Sub
         Friend Sub SaveHistory()
             If History Is Nothing OrElse History.Count = 0 Then

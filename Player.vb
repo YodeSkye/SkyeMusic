@@ -2902,7 +2902,7 @@ Public Class Player
         SetTimerMeter()
         TimerLyrics.Start()
 
-        App.InitializePostStartup()
+        App.InitializeAppPostStartup()
 
     End Sub
     Friend Sub WhenClosing()
