@@ -3865,29 +3865,6 @@ Public Class Player
     Private Sub CMICopyFilePathClick(sender As Object, e As EventArgs) Handles CMICopyFilePath.Click
         If LVPlaylist.SelectedItems.Count > 0 Then Clipboard.SetText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
     End Sub
-    'Private Sub PicBoxAlbumArt_Paint(sender As Object, e As PaintEventArgs) Handles PicBoxAlbumArt.Paint
-    '    If AlbumArtCount > 1 Then
-    '        Dim g = e.Graphics
-    '        g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-
-    '        'Badge background (semi-transparent black circle)
-    '        Dim badgeSize As Integer = 28
-    '        Dim badgeRect As New Rectangle(PicBoxAlbumArt.Width - badgeSize - 6, 6, badgeSize, badgeSize)
-    '        Using bgBrush As New SolidBrush(App.CurrentTheme.BackColor)
-    '            g.FillEllipse(bgBrush, badgeRect)
-    '        End Using
-
-    '        'Count text
-    '        Dim overlayText As String = AlbumArtCount.ToString()
-    '        Using f As New Font("Segoe UI", 12, FontStyle.Bold),
-    '            textBrush As New SolidBrush(App.CurrentTheme.TextColor),
-    '            sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
-    '            badgeRect.Offset(1, 1) ' Slight offset for better centering
-    '            g.DrawString(overlayText, f, textBrush, badgeRect, sf)
-    '        End Using
-
-    '    End If
-    'End Sub
     Private Sub PicBoxAlbumArt_MouseDown(sender As Object, e As MouseEventArgs) Handles PicBoxAlbumArt.MouseDown
         Select Case e.Button
             Case MouseButtons.Left
