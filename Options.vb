@@ -5,8 +5,6 @@ Imports SkyeMusic.My
 Public Class Options
 
     ' Declarations
-    Private mMove As Boolean = False
-    Private mOffset, mPosition As Point
     Private UIFolderBrowser As New FolderBrowserDialog
     Private uiFileBrowser As New OpenFileDialog
 
@@ -172,40 +170,16 @@ Public Class Options
         SetPrunePlaylistButtonText()
         SetPruneHistoryButtonText()
         UpdateCompanionServerTooltip()
+
+        App.EnableFormDragging(Me)
     End Sub
     Private Sub Options_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.Settings.Save()
         App.FrmPlayer.ShowPlayMode()
-    End Sub
-    Private Sub Options_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, GrBoxTime.MouseDown, LblTitleFormat.MouseDown, LblTitleSeparator.MouseDown, LblVideoIdentifier.MouseDown, LblSongPlayMode.MouseDown, LblDefaultPlaylistAction.MouseDown, LblPlaylistSearchAction.MouseDown, LblTheme.MouseDown, LblHelperApp2Path.MouseDown, LblHelperApp2Name.MouseDown, LblHelperApp1Path.MouseDown, LblHelperApp1Name.MouseDown, TCOptions.MouseDown, TPApp.MouseDown, TPPlayer.MouseDown, TPPlaylist.MouseDown, TPLibrary.MouseDown, LblHistoryAutoSaveInterval1.MouseDown, LblHistoryAutoSaveInterval2.MouseDown, LblLibrarySearchFolders.MouseDown, LblHistoryUpdateInterval1.MouseDown, LblHistoryUpdateInterval2.MouseDown, LblPlaylistFormatting.MouseDown, TPVisualizers.MouseDown
-        Dim cSender As Control
-        If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
-            mMove = True
-            cSender = CType(sender, Control)
-            If cSender Is Me Then
-                mOffset = New Point(-e.X - SystemInformation.FixedFrameBorderSize.Width - 7, -e.Y - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 7)
-            ElseIf cSender Is TCOptions Then
-                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 7, -e.Y - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 7)
-            ElseIf cSender Is TPApp OrElse cSender Is TPLibrary OrElse cSender Is TPPlayer OrElse cSender Is TPPlaylist Then
-                mOffset = New Point(-e.X - TCOptions.Left - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 9, -e.Y - TCOptions.Top - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 9)
-            Else
-                mOffset = New Point(-e.X - TCOptions.Left - TPApp.Left - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 9, -e.Y - TCOptions.Top - TPApp.Top - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 9)
-            End If
-        End If
-    End Sub
-    Private Sub Options_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, GrBoxTime.MouseMove, LblTitleFormat.MouseMove, LblTitleSeparator.MouseMove, LblVideoIdentifier.MouseMove, LblSongPlayMode.MouseMove, LblDefaultPlaylistAction.MouseMove, LblPlaylistSearchAction.MouseMove, LblTheme.MouseMove, LblHelperApp2Path.MouseMove, LblHelperApp2Name.MouseMove, LblHelperApp1Path.MouseMove, LblHelperApp1Name.MouseMove, TCOptions.MouseMove, TPApp.MouseMove, TPPlayer.MouseMove, TPPlaylist.MouseMove, TPLibrary.MouseMove, LblHistoryAutoSaveInterval1.MouseMove, LblHistoryAutoSaveInterval2.MouseMove, LblLibrarySearchFolders.MouseMove, LblHistoryUpdateInterval1.MouseMove, LblHistoryUpdateInterval2.MouseMove, LblPlaylistFormatting.MouseMove, TPVisualizers.MouseMove
-        If mMove Then
-            mPosition = MousePosition
-            mPosition.Offset(mOffset.X, mOffset.Y)
-            CheckMove(mPosition)
-            Location = mPosition
-        End If
-    End Sub
-    Private Sub Options_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, GrBoxTime.MouseUp, LblTitleFormat.MouseUp, LblTitleSeparator.MouseUp, LblVideoIdentifier.MouseUp, LblSongPlayMode.MouseUp, LblDefaultPlaylistAction.MouseUp, LblPlaylistSearchAction.MouseUp, LblTheme.MouseUp, LblHelperApp2Path.MouseUp, LblHelperApp2Name.MouseUp, LblHelperApp1Path.MouseUp, LblHelperApp1Name.MouseUp, TCOptions.MouseUp, TPApp.MouseUp, TPPlayer.MouseUp, TPPlaylist.MouseUp, TPLibrary.MouseUp, LblHistoryAutoSaveInterval1.MouseUp, LblHistoryAutoSaveInterval2.MouseUp, LblLibrarySearchFolders.MouseUp, LblHistoryUpdateInterval1.MouseUp, LblHistoryUpdateInterval2.MouseUp, LblPlaylistFormatting.MouseUp, TPVisualizers.MouseUp
-        mMove = False
+        App.DisableFormDragging(Me)
     End Sub
     Private Sub Options_Move(sender As Object, e As EventArgs) Handles MyBase.Move
-        If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
+        If Visible AndAlso WindowState = FormWindowState.Normal Then
             CheckMove(Location)
         End If
     End Sub

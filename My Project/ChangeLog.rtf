@@ -1,4 +1,4 @@
-{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset0 Segoe UI Symbol;}{\f4\fnil\fcharset0 SimSun;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil Segoe UI;}{\f7\fnil\fcharset1 Cambria Math;}}
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset0 Segoe UI Symbol;}{\f4\fnil Segoe UI Symbol;}{\f5\fnil\fcharset0 SimSun;}{\f6\fnil Segoe UI;}{\f7\fnil\fcharset1 Cambria Math;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont7\mwrapIndent1440 }\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 Skye Music v1.? What's New\par
@@ -8,7 +8,8 @@
 \cf0\b0\f1\lang1033\'a3\'ab\f0  \cf1\b\fs28\lang9\par
 \par
 \cf2\fs24 Improvements\par
-\cf0\b0\f2\u10003?\f3\lang1033  \f0 Added logging and error correction to the startup and shutdown processes. Single faults will no longer crash the app and any faults will be logged.\f3\par
+\cf0\b0\f2\u10003?\f3\lang1033  Window Management: Improved window dragging in the Options dialog. C\f4 licking empty background areas or embedded visualizer panels now drags the form seamlessly.\f2\lang9\par
+\u10003?\f3\lang1033  \f0 Added logging and error correction to the startup and shutdown processes. Single faults will no longer crash the app and any faults will be logged.\f3\par
 \f2\lang9\u10003?\f3\lang1033  \f0 Various UI Improvements.\cf1\b\fs28\lang9\par
 \par
 \cf2\fs24 Fixes\par
@@ -23,23 +24,23 @@
 \'a3\'ab\f0  Added a new option under Settings to toggle Volume Boost on or off. Turning Volume Boost off uses the modern WASAPI audio engine for crystal-clear, distortion-free playback, while enabling it uses DirectSound to allow software volume levels above 100% for quieter files.\f1\par
 \'a3\'ab\f0  Column Sizes and Positions are now saved for the Playlist and the Library.\f1\par
 \'a3\'ab\f0  Added a Position Bar to the Companion App.\par
-\f1\'a3\'ab\f4  \f0 Volume Boost. You can now raise volume above 100% (up to 150%). Includes a smooth "pause" at 100% so you don't jump into boost by accident.\f1\par
-\'a3\'ab\f4  \f0 Added Queuing support to the playlist in the Companion App.\par
-\f1\'a3\'ab\f4  \f0 Added optional vertical Meter Bars that display alongside Album Art. Made the standard horizontal Meter Bars optional as well, and updated the Meter Engine to run only when one or both Meter types are enabled, reducing unnecessary processing.\par
+\f1\'a3\'ab\f5  \f0 Volume Boost. You can now raise volume above 100% (up to 150%). Includes a smooth "pause" at 100% so you don't jump into boost by accident.\f1\par
+\'a3\'ab\f5  \f0 Added Queuing support to the playlist in the Companion App.\par
+\f1\'a3\'ab\f5  \f0 Added optional vertical Meter Bars that display alongside Album Art. Made the standard horizontal Meter Bars optional as well, and updated the Meter Engine to run only when one or both Meter types are enabled, reducing unnecessary processing.\par
 \cf1\b\lang9\par
 \cf2 Improvements\par
-\cf0\b0\f2\u10003?\f3\lang1033  Improved the look and functionality of the Splash screen.\f5\lang9\par
-\f2\u10003?\f3\lang1033  \f5\lang9 Improved Data Storage & Automated Migration\f3\lang1033 . \f5\lang9 Core application files have moved to AppData\\Local\\Skye\\ for better system compatibility and faster file access. Existing files from Documents\\Skye are moved automatically on first launch, featuring built-in startup protection against background file locks.\par
-\f2\u10003?\f3\lang1033  Added "?" key support throughout the app to make showing the Now Playing Toast more convenient and consistent.\f5\lang9\par
-\f2\u10003?\f3\lang1033  Playlist and Library views now keep the current item vertically centered when possible.\f5\lang9\par
-\f2\u10003?\f3\lang1033  Improved the Volume Button's visuals, especially at lower percentages.\f5\lang9\par
+\cf0\b0\f2\u10003?\f3\lang1033  Improved the look and functionality of the Splash screen.\f4\lang9\par
+\f2\u10003?\f3\lang1033  \f4\lang9 Improved Data Storage & Automated Migration\f3\lang1033 . \f4\lang9 Core application files have moved to AppData\\Local\\Skye\\ for better system compatibility and faster file access. Existing files from Documents\\Skye are moved automatically on first launch, featuring built-in startup protection against background file locks.\par
+\f2\u10003?\f3\lang1033  Added "?" key support throughout the app to make showing the Now Playing Toast more convenient and consistent.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Playlist and Library views now keep the current item vertically centered when possible.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Improved the Volume Button's visuals, especially at lower percentages.\f4\lang9\par
 \f2\u10003?\f3\lang1033  Replaced the old meter bars with the new DataBarEX component, delivering a cleaner, more modern visual style and smoother rendering.\f1\par
 \par
 \cf2\b\f0\lang9 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  Fixed problems with Minimize To Tray that caused video to stop playing, as well as other minor issues.\f5\lang9\par
+\cf0\b0\f2\u10005?\f3\lang1033  Fixed problems with Minimize To Tray that caused video to stop playing, as well as other minor issues.\f4\lang9\par
 \f2\u10005?\f3\lang1033  Fixed a bug where the player tooltip could throw an error after minimizing to the tray and restoring the app.\par
-\f2\lang9\u10005?\f3\lang1033  Meter Sticky State: Resolved an issue where vertical album art meters remained frozen on screen after playback stopped.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Fixed an issue where files with uppercase extensions failed to load, scan, or sync correctly by normalizing extension handling.\f5\lang9\par
+\f2\lang9\u10005?\f3\lang1033  Meter Sticky State: Resolved an issue where vertical album art meters remained frozen on screen after playback stopped.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed an issue where files with uppercase extensions failed to load, scan, or sync correctly by normalizing extension handling.\f4\lang9\par
 \f2\u10005?\f3\lang1033  Log Spam Suppression: Suppressed repetitive "Audio Meter Data Stale" log entries, recording only a single event per occurrence during brief audio dropouts or system sleep cycles.\par
 \f1\par
 \cf1\b\f0\lang9 Skye Music v1.5\fs28\par
@@ -54,21 +55,21 @@
 \cf2 Improvements\par
 \cf0\b0\f2\u10003?\f3\lang1033  Faster, more reliable album art: Artwork is now normalized and optimized before sending to Companion clients, fixing cases where artwork failed to appear and improving load speed.\par
 \f2\lang9\u10003?\f3\lang1033  Logging overhaul: Safer file operations, a redesigned Log Viewer, a rewritten search engine with reliable next/previous navigation, clearer \ldblquote not found\rdblquote  feedback, and automatic log rotation for large files.\par
-\f2\lang9\u10003?\f3\lang1033  \f5\lang9 Improved handling of multiple connected devices.\f3\lang1033\par
-\f2\lang9\u10003?\f3\lang1033  \f5\lang9 More reliable device connections and smoother communication between the\f3\lang1033  Companion\f5\lang9  \f3\lang1033 A\f5\lang9 pp and your PC\f3\lang1033 .\f5\lang9\par
-\f2\u10003?\f3\lang1033  Smoother transitions when switching between audio, video, visualizer, and lyrics modes.\f5\lang9\par
-\f2\u10003?\f3\lang1033  Improved how Helper Apps are handled and allowed for multiple selections to be passed to the app. Updated the UI.\f5\lang9\par
-\f2\u10003?\f3\lang1033  Improved high/mid frequency response in Particle Nebula Visualizer, making all color bands more vibrant. High Frequency Boost was added as a setting.\f5\lang9\par
+\f2\lang9\u10003?\f3\lang1033  \f4\lang9 Improved handling of multiple connected devices.\f3\lang1033\par
+\f2\lang9\u10003?\f3\lang1033  \f4\lang9 More reliable device connections and smoother communication between the\f3\lang1033  Companion\f4\lang9  \f3\lang1033 A\f4\lang9 pp and your PC\f3\lang1033 .\f4\lang9\par
+\f2\u10003?\f3\lang1033  Smoother transitions when switching between audio, video, visualizer, and lyrics modes.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Improved how Helper Apps are handled and allowed for multiple selections to be passed to the app. Updated the UI.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Improved high/mid frequency response in Particle Nebula Visualizer, making all color bands more vibrant. High Frequency Boost was added as a setting.\f4\lang9\par
 \f2\u10003? \f3\lang1033 Updated and Added several icons.\par
-\f2\lang9\u10003? \f3\lang1033 Player menu background now matches current theme if not in Accent mode.\f5\lang9\par
+\f2\lang9\u10003? \f3\lang1033 Player menu background now matches current theme if not in Accent mode.\f4\lang9\par
 \par
 \cf2\b\f0 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  Fixed a ghost title bar issue when minimizing the Player to tray by redesigning the window state system.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Stopped the toast from blinking when shown by resolving a player lifecycle issue.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Fixed a UI freeze when Companion Server was enabled on slow networks by properly threading the server.\f5\lang9\par
-\f2\u10005?\f3\lang1033  \f5\lang9 Resolved an issue where the audio meters could freeze mid\_update due to\f3\lang1033  \f5\lang9 NAudio\rquote s capture thread stalling. The app now monitors for stalled audio input and restarts the capture automatically, keeping the meters alive and accurate.\par
-\f2\u10005?\f3\lang1033  Fixed an issue where the visualizer wouldn't start in minimode if a video was playing.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Improved metadata handling for streams in History with clearer, more consistent labeling.\f5\lang9\par
+\cf0\b0\f2\u10005?\f3\lang1033  Fixed a ghost title bar issue when minimizing the Player to tray by redesigning the window state system.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Stopped the toast from blinking when shown by resolving a player lifecycle issue.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed a UI freeze when Companion Server was enabled on slow networks by properly threading the server.\f4\lang9\par
+\f2\u10005?\f3\lang1033  \f4\lang9 Resolved an issue where the audio meters could freeze mid\_update due to\f3\lang1033  \f4\lang9 NAudio\rquote s capture thread stalling. The app now monitors for stalled audio input and restarts the capture automatically, keeping the meters alive and accurate.\par
+\f2\u10005?\f3\lang1033  Fixed an issue where the visualizer wouldn't start in minimode if a video was playing.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Improved metadata handling for streams in History with clearer, more consistent labeling.\f4\lang9\par
 \f2\u10005?\f3\lang1033  Fixed several shuffle play bugs.\par
 \cf1\b\f0\fs28\lang9\par
 \fs24 Skye Music v1.4\fs28\par
@@ -80,15 +81,15 @@
 \'a3\'ab\f0  Added manual RSS feed import for any podcast URL\f1\par
 \'a3\'ab\f0  Podcast Support. Skye Music now includes full podcast browsing and playback. Explore podcasts from supported directories, view artwork and metadata, stream episodes instantly, or download them for offline listening. Manual RSS feed import is also supported, allowing you to add any podcast feed URL directly.\par
 \f1\'a3\'ab\f0  Added Favorites as a Stream Source.\par
-\f1\'a3\'ab\f0  \f3 Added Radio Paradise to list of Stream Sources.\f5\lang9\par
+\f1\'a3\'ab\f0  \f3 Added Radio Paradise to list of Stream Sources.\f4\lang9\par
 \f0\lang1033\par
 \cf2\b\lang9 Improvements\par
-\cf0\b0\f2\u10003? Enhanced \f3\lang1033 Stream M\f5\lang9 etadata \f3\lang1033 S\f5\lang9 upport: \f3\lang1033 The Player now reads metadata embedded in the stream or, when available, retrieves track information from external metadata feeds. Metadata availability varies by station and broadcast format; some stations provide detailed artist and title information, while others provide none at all. When no metadata is available, the playlist entry continues to serve as the stream\rquote s title.\f5\lang9\par
-\f2\u10003?\f3\lang1033  Unified Stream & Podcast Directory for a cleaner, more consistent experience.\f5\lang9\par
-\f2\u10003?\f3\lang1033  Reworked the UI of the Stream Directory.\f5\lang9\par
+\cf0\b0\f2\u10003? Enhanced \f3\lang1033 Stream M\f4\lang9 etadata \f3\lang1033 S\f4\lang9 upport: \f3\lang1033 The Player now reads metadata embedded in the stream or, when available, retrieves track information from external metadata feeds. Metadata availability varies by station and broadcast format; some stations provide detailed artist and title information, while others provide none at all. When no metadata is available, the playlist entry continues to serve as the stream\rquote s title.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Unified Stream & Podcast Directory for a cleaner, more consistent experience.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Reworked the UI of the Stream Directory.\f4\lang9\par
 \par
 \cf2\b\f0 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  Resolved an issue where the Mini Player could lose its TopMost status.\f5\lang9\par
+\cf0\b0\f2\u10005?\f3\lang1033  Resolved an issue where the Mini Player could lose its TopMost status.\f4\lang9\par
 \cf1\b\f0\fs28\par
 \fs24 Skye Music v1.3\fs28\par
 \cf0\fs24 Released January 2026\cf1\par
@@ -100,16 +101,16 @@
 \'a3\'ab\f0  Added Theming to all context menus, the Tray menu, and the Player menu strip.\cf1\b\lang9\par
 \par
 \cf2 Improvements\par
-\cf0\b0\f2\u10003?\f3\lang1033  Multiples of the same song are now allowed in the Queue.\f5\lang9\par
-\f2\u10003?\f0  Library file\f6\_watcher alerts now appear in the Playlist status text instead of the Library menu.\f5\par
+\cf0\b0\f2\u10003?\f3\lang1033  Multiples of the same song are now allowed in the Queue.\f4\lang9\par
+\f2\u10003?\f0  Library file\f6\_watcher alerts now appear in the Playlist status text instead of the Library menu.\f4\par
 \f2\u10003?\f0  Changed the behavior of the Tray context menu options to open the Player, Library, and History. Removed the toggle so now clicking simply shows the window.\cf2\b\par
 \par
 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  Fixed a bug where window locations weren't showing correctly after Saving Metrics.\f5\lang9\par
-\f2\u10005?\f3\lang1033  \f5\lang9 Fixed an issue where radio streams would not play after restarting the app. Older history entries were missing information needed to identify streams. Skye\f3\lang1033  \f5\lang9 Music now automatically repairs these entries so streams load and play correctly.\par
-\f2\u10005?\f3\lang1033  Fixed an overflow when assigning the song title to the Tray icon.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Fixed an issue preventing the MinimizeToTray option from saving.\f5\lang9\par
-\f2\u10005?\f3\lang1033  The Playlist selection no longer jumps away when using the arrow keys to navigate the list.\f5\lang9\par
+\cf0\b0\f2\u10005?\f3\lang1033  Fixed a bug where window locations weren't showing correctly after Saving Metrics.\f4\lang9\par
+\f2\u10005?\f3\lang1033  \f4\lang9 Fixed an issue where radio streams would not play after restarting the app. Older history entries were missing information needed to identify streams. Skye\f3\lang1033  \f4\lang9 Music now automatically repairs these entries so streams load and play correctly.\par
+\f2\u10005?\f3\lang1033  Fixed an overflow when assigning the song title to the Tray icon.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed an issue preventing the MinimizeToTray option from saving.\f4\lang9\par
+\f2\u10005?\f3\lang1033  The Playlist selection no longer jumps away when using the arrow keys to navigate the list.\f4\lang9\par
 \f2\u10005?\f3\lang1033  The Tray Icon now loads after the app is initialized, as intended.\cf2\b\f0\lang9\par
 \cf1\par
 Skye Music v1.2\fs28\par
@@ -123,20 +124,20 @@ Skye Music v1.2\fs28\par
 \'a3\'ab\f0  Julia Fractal Visualizer. Introduces a dynamic fractal effect based on Julia set mathematics. The visualizer continually evolves and morphs in real time, producing intricate, organic patterns that respond to audio input.\lang9\par
 \cf1\b\fs28\par
 \cf2\fs24 Improvements\par
-\cf0\b0\f2\u10003?\f3\lang1033  Updated the About window with the latest project attributions.\f5\lang9\par
+\cf0\b0\f2\u10003?\f3\lang1033  Updated the About window with the latest project attributions.\f4\lang9\par
 \f2\u10003?\f3\lang1033  Tag Editor can now be opened directly from the Playlist.\par
-\f2\lang9\u10003?\f3\lang1033  Added tooltips to Classic Spectrum Analyzer's settings page.\f5\lang9\par
-\f2\u10003?\f3\lang1033  Changed "Added Not Played" History List to "Forgotten Songs" and included songs not played for over a year.\f5\lang9\par
+\f2\lang9\u10003?\f3\lang1033  Added tooltips to Classic Spectrum Analyzer's settings page.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Changed "Added Not Played" History List to "Forgotten Songs" and included songs not played for over a year.\f4\lang9\par
 \f2\u10003?\f3\lang1033  Refactored History to include a Source Type field to track the type of media: File, Stream, or AudioCD\par
 \f2\lang9\u10003?\f3\lang1033  Refactored the Player to track the media being played by Source Type.\cf1\b\f0\fs28\lang9\par
 \par
 \cf2\fs24 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  Fixed issue with a blank window being shown when there was no album art.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Fixed cursor "blinking" issue on Help, Log, and What's New.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Fixed when changing system Accent Color, the Visualizers Settings Pages didn't update the background color.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Fixed errors when using the context menu in Log, Help, and What's New.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Fixed when the File Watcher adds new files to the Library or Playlist, they were not adding to History as well.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Fixed when Lyrics text was too big for the Media Label multiple lines were shown. Ellipsis now shows again.\f5\lang9\par
+\cf0\b0\f2\u10005?\f3\lang1033  Fixed issue with a blank window being shown when there was no album art.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed cursor "blinking" issue on Help, Log, and What's New.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed when changing system Accent Color, the Visualizers Settings Pages didn't update the background color.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed errors when using the context menu in Log, Help, and What's New.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed when the File Watcher adds new files to the Library or Playlist, they were not adding to History as well.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed when Lyrics text was too big for the Media Label multiple lines were shown. Ellipsis now shows again.\f4\lang9\par
 \f2\u10005?\f3\lang1033  Fixed crashing when minimizing while using Oscilloscope Visualizer.\par
 \cf1\b\f0\fs28\lang9\par
 \fs24 Skye Music v1.1\fs28\par
@@ -159,18 +160,18 @@ New Features\par
 \'a3\'ab\f0\lang9  Created a hidden DevTools form for viewing the raw History and Plays databases.\par
 \cf1\b\fs28\par
 \cf2\fs24 Improvements\par
-\cf0\b0\f2\u10003?\f3\lang1033  Refactored to Visual Studio 2026. This involved some minor tweaking and style improvements. Still running on .NET 9.0. Planning to upgrade to .NET 10.0 in the coming months.\f5\lang9\par
-\f2\u10003?\f3\lang1033  Refactored Visualizer system. Created a panel to dock the Visualizer Host. Removed old timer and picturebox system.\f5\lang9\par
+\cf0\b0\f2\u10003?\f3\lang1033  Refactored to Visual Studio 2026. This involved some minor tweaking and style improvements. Still running on .NET 9.0. Planning to upgrade to .NET 10.0 in the coming months.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Refactored Visualizer system. Created a panel to dock the Visualizer Host. Removed old timer and picturebox system.\f4\lang9\par
 \f2\u10003?\f3\lang1033  \f0 Refactored Meters to use NAudio instead of CoreAudio. Meters run at a 20fps rate with smooth drop offs.\cf2\b\lang9\par
-\cf0\b0\f2\u10003?\f3\lang1033  Refactored tooltips throughout the app to overcome ToolTipEX's deficiencies. In some cases this meant strictly controlling ToolTipEX's life-cycle, in other cases completely swapping to another component. This should solve the disappearing tooltips issue.\f5\lang9\par
+\cf0\b0\f2\u10003?\f3\lang1033  Refactored tooltips throughout the app to overcome ToolTipEX's deficiencies. In some cases this meant strictly controlling ToolTipEX's life-cycle, in other cases completely swapping to another component. This should solve the disappearing tooltips issue.\f4\lang9\par
 \f2\u10003?\f3\lang1033  Improved History & Statistics loading and data logic.\par
-\f2\lang9\u10003?\f3\lang1033  Improved History & Statistics UI\f5\lang9\par
+\f2\lang9\u10003?\f3\lang1033  Improved History & Statistics UI\f4\lang9\par
 \f2\u10003?\f0  Began implementing a new tooltip system to avoid ToolTipEX implementation problems.\par
 \cf1\b\fs28\par
 \cf2\fs24 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  Fixed potential crashing during History loading caused by concurrent background updates to history data.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Removed Core Audio because of conflicts with NAudio, which is needed for new Visualizer system.\f5\lang9\par
-\f2\u10005?\f3\lang1033  Fixed various bugs in History & Statistics.\f5\lang9\par
+\cf0\b0\f2\u10005?\f3\lang1033  Fixed potential crashing during History loading caused by concurrent background updates to history data.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Removed Core Audio because of conflicts with NAudio, which is needed for new Visualizer system.\f4\lang9\par
+\f2\u10005?\f3\lang1033  Fixed various bugs in History & Statistics.\f4\lang9\par
 \f2\u10005? \f3\lang1033 Fixed lyrics display error when loading plain text or metadata lyrics and published hotfix.\cf1\b\f0\fs28\lang9\par
 \par
 \fs24 Skye Music v1.0\par
@@ -205,8 +206,8 @@ Improvements\par
 \f2\u10003?\f0  FullScreen Usage and Stability Overhaul. Added keyboard shortcuts and uniform click events to fullscreen functionality. Increased stability and reliability of fullscreen mode.\par
 \cf2\b\par
 Fixes\par
-\cf0\b0\f2\u10005? \f3\lang1033 Fixed lyrics sync problem in Lyrics View.\f5\lang9\par
-\f2\u10005? Fixed repeat mode bug\f3\lang1033 , \f5\lang9 playback now restarts correctly at end of song\par
+\cf0\b0\f2\u10005? \f3\lang1033 Fixed lyrics sync problem in Lyrics View.\f4\lang9\par
+\f2\u10005? Fixed repeat mode bug\f3\lang1033 , \f4\lang9 playback now restarts correctly at end of song\par
 \f2\u10005?\f0  Fixed RichTextBox cursor flicker by subclassing and overriding WM_SETCURSOR\par
 \f2\u10005?\f0  MPEG playback timing issue stabilized. A\f6 dded a startup timer to safely grab video dimensions and toggle mute, eliminating divide\_by\_zero and silent playback quirks.\f0\par
 \f2\u10005?\f0  Fixed errors when loading history and statistics page and user interacts by clicking a button or closing prematurely.\par

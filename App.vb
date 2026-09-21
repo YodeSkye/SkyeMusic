@@ -300,6 +300,7 @@ Namespace My
         Friend FrmCompanionClients As CompanionClients 'FrmCompanionClients is the companion clients window that allows users to manage and monitor connected companion devices.
         Friend FrmDevTools As DevTools 'FrmDevTools is the developer tools window that provides debugging and database access features.
         Friend NIApp As New NotifyIcon 'NIApp is the system tray icon for the application.
+        Private ReadOnly _activeDragFilters As New Dictionary(Of Form, FormDragFilter)()
 
         ' HotKeys
         Private Structure HotKey
@@ -3243,6 +3244,30 @@ Namespace My
                 FrmChangeLog.ShowDialog()
             End If
         End Sub
+        ''' <summary>
+        ''' Enables native background window dragging for the target form.
+        ''' Call this in Form_Load.
+        ''' </summary>
+        Friend Sub EnableFormDragging(targetForm As Form)
+            If targetForm Is Nothing OrElse _activeDragFilters.ContainsKey(targetForm) Then Return
+
+            Dim filter As New FormDragFilter(targetForm)
+            System.Windows.Forms.Application.AddMessageFilter(filter)
+            _activeDragFilters(targetForm) = filter
+
+        End Sub
+        ''' <summary>
+        ''' Disables background window dragging and cleans up the message filter.
+        ''' Call this in Form_Closed or Form_FormClosing.
+        ''' </summary>
+        Friend Sub DisableFormDragging(targetForm As Form)
+            If targetForm Is Nothing OrElse Not _activeDragFilters.ContainsKey(targetForm) Then Return
+
+            Dim filter As FormDragFilter = _activeDragFilters(targetForm)
+            System.Windows.Forms.Application.RemoveMessageFilter(filter)
+            _activeDragFilters.Remove(targetForm)
+
+        End Sub
         Friend Sub ShowToast(title As String, message As String)
             If Settings.ShowNowPlayingToast Then
                 If String.IsNullOrWhiteSpace(title) Then title = My.Application.Info.Title
@@ -5384,6 +5409,33 @@ Namespace My
                 g.DrawImage(img, destRect, 0, 0, img.Width, img.Height, GraphicsUnit.Pixel, ia)
             End Using
         End Sub
+
+    End Class
+    Public Class FormDragFilter
+        Implements IMessageFilter
+
+        Private ReadOnly _targetForm As Form
+
+        Public Sub New(targetForm As Form)
+            _targetForm = targetForm
+        End Sub
+
+        Public Function PreFilterMessage(ByRef m As Message) As Boolean Implements IMessageFilter.PreFilterMessage
+            If m.Msg = Skye.WinAPI.WM_LBUTTONDOWN_CLIENT AndAlso _targetForm.WindowState = FormWindowState.Normal Then
+                Dim c As Control = Control.FromHandle(m.HWnd)
+                If c IsNot Nothing AndAlso (TypeOf c Is Form OrElse
+                                            TypeOf c Is TabPage OrElse
+                                            TypeOf c Is Panel OrElse
+                                            TypeOf c Is GroupBox OrElse
+                                            TypeOf c Is Label OrElse
+                                            TypeOf c Is UserControl) Then
+                    Skye.WinAPI.ReleaseCapture()
+                    Skye.WinAPI.SendMessage(_targetForm.Handle, Skye.WinAPI.WM_NCLBUTTONDOWN, Skye.WinAPI.HT_CAPTION, 0)
+                    Return True ' Intercept message so Windows takes over dragging natively
+                End If
+            End If
+            Return False
+        End Function
 
     End Class
 
