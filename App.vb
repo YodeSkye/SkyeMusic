@@ -17,7 +17,7 @@ Namespace My
 
     Public Module App
 
-        ' Declarations
+        ' DECLARATIONS
         Public Enum AudioOutputModuleTypes
             DirectSound
             WASAPI
@@ -2295,7 +2295,7 @@ Namespace My
 
         End Class
 
-        ' Control Events
+        ' CONTROL EVENTS
         Private Sub NIApp_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
             Dim miPlayer As ToolStripMenuItem = DirectCast(NIApp.ContextMenuStrip.Items("NIApp_MIPlayer"), ToolStripMenuItem)
             If FrmPlayer.Visible Then
@@ -2408,7 +2408,7 @@ Namespace My
             End Select
         End Sub
 
-        ' Handlers
+        ' HANDLERS
         Private Sub NIAppClickTimer_Tick(sender As Object, e As EventArgs) Handles NIAppClickTimer.Tick
             NIAppClickTimer.Stop()
 
@@ -2508,474 +2508,7 @@ Namespace My
             End If
         End Sub
 
-        ' History Methods
-        Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)
-            'Check if in the history already
-            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
-            If existingindex < 0 Then
-                'If not in the history, add it
-                Dim newsong As New Song With {
-                    .Path = songorstream,
-                    .InLibrary = False,
-                    .PlayCount = 0,
-                    .Added = DateTime.Now,
-                    .FirstPlayed = Nothing,
-                    .LastPlayed = Nothing,
-                    .Rating = 0}
-                If stream Then
-                    newsong.SourceType = MediaSourceTypes.Stream
-                Else
-                    newsong.SourceType = MediaSourceTypes.File
-                End If
-                History.Add(newsong)
-                HistoryChanged = True
-                Debug.Print("Added " + songorstream + " to history")
-            End If
-        End Sub
-        Friend Sub AddToHistoryFromLibrary(songorstream As String)
-            'Check if in the history already
-            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
-            If existingindex >= 0 Then
-                'If it is in the history, update the InLibrary flag if necessary
-                If Not History(existingindex).InLibrary Then
-                    Dim existingsong As Song = History(existingindex)
-                    existingsong.InLibrary = True
-                    History(existingindex) = existingsong
-                    'Debug.Print("Updated InLibrary flag for " + songorstream)
-                End If
-            Else
-                'If not in the history, add it with InLibrary flag set to True
-                Dim newsong As New Song With {
-                    .Path = songorstream,
-                    .InLibrary = True,
-                    .SourceType = MediaSourceTypes.File,
-                    .PlayCount = 0,
-                    .Added = DateTime.Now,
-                    .FirstPlayed = Nothing,
-                    .LastPlayed = Nothing,
-                    .Rating = 0}
-                History.Add(newsong)
-                Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
-            End If
-            HistoryChanged = True
-        End Sub
-        Friend Sub ClearHistoryInLibraryFlag()
-            If History.Count > 0 Then
-                'Clear the InLibrary flag for all songs in the history
-                For index As Integer = 0 To History.Count - 1
-                    If History(index).InLibrary Then
-                        Dim song As Song = History(index)
-                        song.InLibrary = False
-                        History(index) = song
-                    End If
-                Next
-                Debug.Print("Cleared History InLibrary Flag")
-            End If
-        End Sub
-        Friend Sub PruneHistory()
-            Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
-
-            'Find songs with invalid file types
-            Dim invalidfiletypelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not ExtensionDictionary.ContainsKey(IO.Path.GetExtension(p.Path).ToLower()) AndAlso Not p.SourceType = MediaSourceTypes.Stream)
-            Debug.Print("Pruning History InvalidsOnly..." + invalidfiletypelist.Count.ToString + " items found so far...")
-            For Each s As Song In invalidfiletypelist
-                History.Remove(s)
-            Next
-
-            'Find songs that are not in the library and don't exist
-            Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
-            Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
-
-            'Find streams that are not in the playlist
-            Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.SourceType = MediaSourceTypes.Stream)
-            Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
-            For Each s As Song In streamlist
-                If s.SourceType = MediaSourceTypes.Stream AndAlso FrmPlayer.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
-                    Debug.Print(s.Path + " found in playlist")
-                    prunelist.Remove(s)
-                End If
-            Next
-
-            'Prune History
-            For Each s As Song In prunelist
-                History.Remove(s)
-            Next
-            Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
-            Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
-            Skye.Common.Log.Write("History Pruned (" + prunelist.Count.ToString + ")")
-            streamlist = Nothing
-            prunelist = Nothing
-        End Sub
-        Friend Sub UpdateHistory(songorstream As String)
-            TimerHistoryUpdate.Stop()
-            If Settings.HistoryUpdateInterval = 0 Then
-                TimerHistoryUpdate.Tag = songorstream
-                UpdateHistory()
-                Return
-            Else
-                TimerHistoryUpdate.Interval = Settings.HistoryUpdateInterval * 1000
-                TimerHistoryUpdate.Tag = songorstream
-                TimerHistoryUpdate.Start()
-            End If
-        End Sub
-        Private Sub UpdateHistory()
-            Dim songorstream As String = CStr(TimerHistoryUpdate.Tag)
-            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
-            If existingindex >= 0 Then
-                Dim existingsong As Song = History(existingindex)
-                existingsong.PlayCount += CUShort(1)
-                If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
-                existingsong.LastPlayed = DateTime.Now
-                History(existingindex) = existingsong
-                'Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
-                Skye.Common.Log.Write("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
-                FrmPlayer.UpdateHistoryInPlaylist(songorstream)
-            Else
-                'Debug.Print("Song not found in history: " + songorstream)
-            End If
-            HistoryTotalPlayedSongs += CUInt(1)
-            'Debug.Print("Total Play Count = " & HistoryTotalPlayedSongs.ToString & ", " & HistoryTotalPlayedSongsThisSession & " this Session")
-            App.SongPlayData.IsValid = True
-            HistoryChanged = True
-        End Sub
-        Friend Sub UpdateRandomHistory(songorstream As String)
-            TimerRandomHistoryUpdate.Stop()
-            If Settings.RandomHistoryUpdateInterval = 0 Then
-                TimerRandomHistoryUpdate.Tag = songorstream
-                UpdateRandomHistory()
-                Return
-            Else
-                TimerRandomHistoryUpdate.Interval = Settings.RandomHistoryUpdateInterval * 1000
-                TimerRandomHistoryUpdate.Tag = songorstream
-                TimerRandomHistoryUpdate.Start()
-            End If
-        End Sub
-        Private Sub UpdateRandomHistory()
-            Dim songorstream As String = CStr(TimerRandomHistoryUpdate.Tag)
-            FrmPlayer.AddToRandomHistory(songorstream)
-        End Sub
-        Friend Sub StopHistoryUpdates()
-            TimerHistoryUpdate.Stop()
-            TimerRandomHistoryUpdate.Stop()
-            'Debug.Print("History Update Timers Stopped")
-        End Sub
-        Friend Sub SetHistoryAutoSaveTimer()
-            TimerHistoryAutoSave.Stop()
-            TimerHistoryAutoSave.Interval = Settings.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
-            TimerHistoryAutoSave.Start()
-            'Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
-        End Sub
-        Friend Function GetHistorySnapshot() As List(Of Song)
-            SyncLock History
-                Return History.ToList()
-            End SyncLock
-        End Function
-
-        ' Database Methods
-        Private Sub LoadPlayHistoryDatabase()
-            If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
-                My.Computer.FileSystem.CreateDirectory(App.UserPath)
-            End If
-
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-
-            'Create the database file if it doesn't exist
-            If Not File.Exists(DatabasePath) Then
-                SQLiteConnection.CreateFile(DatabasePath)
-            End If
-
-            'Create the Plays table if needed
-            Using connection As New SQLiteConnection(connectionString)
-                connection.Open()
-                Dim createTableSql As String = "
-                    CREATE TABLE IF NOT EXISTS Plays (
-                        ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Path TEXT NOT NULL,
-                        StartPlayTime DATETIME NOT NULL,
-                        StopPlayTime DATETIME NOT NULL,
-                        Duration INTEGER NOT NULL,
-                        PlayTrigger TEXT NOT NULL
-                    );"
-                Using command As New SQLiteCommand(createTableSql, connection)
-                    command.ExecuteNonQuery()
-                End Using
-            End Using
-
-        End Sub
-        Friend Sub LogPlayHistory(path As String, startTime As DateTime, stopTime As DateTime, durationSeconds As Integer, trigger As PlayTriggers)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            If durationSeconds < 0 Then Skye.Common.Log.Write("LogPlayHistory Duration was less than zero (" & durationSeconds.ToString & "), for " & path)
-            If durationSeconds <= 0 Then durationSeconds = CInt((stopTime - startTime).TotalSeconds)
-            Dim insertSql As String = "INSERT INTO Plays (Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger) VALUES (@Path, @Start, @Stop, @Duration, @Trigger);"
-
-            Using connection As New SQLiteConnection(connectionString)
-                connection.Open()
-                Using command As New SQLiteCommand(insertSql, connection)
-                    command.Parameters.AddWithValue("@Path", path)
-                    command.Parameters.AddWithValue("@Start", startTime)
-                    command.Parameters.AddWithValue("@Stop", stopTime)
-                    command.Parameters.AddWithValue("@Duration", durationSeconds)
-                    command.Parameters.AddWithValue("@Trigger", trigger.ToString)
-                    command.ExecuteNonQuery()
-                End Using
-            End Using
-
-        End Sub
-        Friend Function GetPlayHistoryTable() As DataTable
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Dim dt As New DataTable()
-
-            Try
-                Using conn As New SQLiteConnection(connectionString)
-                    conn.Open()
-
-                    Dim query As String = "SELECT * FROM Plays ORDER BY StartPlayTime DESC"
-                    Using cmd As New SQLiteCommand(query, conn)
-                        Using adapter As New SQLiteDataAdapter(cmd)
-                            adapter.Fill(dt)
-                        End Using
-                    End Using
-
-                End Using
-            Catch ex As Exception
-                Debug.Print("Error loading play history: " & ex.Message)
-            End Try
-
-            Return dt
-        End Function
-        Friend Function DeletePlayHistoryById(recordId As Integer) As Boolean
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Try
-                Using conn As New SQLiteConnection(connectionString)
-                    conn.Open()
-
-                    Dim query As String = "DELETE FROM Plays WHERE Id = @Id"
-                    Using cmd As New SQLiteCommand(query, conn)
-                        cmd.Parameters.AddWithValue("@Id", recordId)
-                        Dim rowsAffected As Integer = cmd.ExecuteNonQuery()
-                        Return rowsAffected > 0
-                    End Using
-
-                End Using
-
-            Catch ex As Exception
-                Debug.Print("Error deleting play record: " & ex.Message)
-                Return False
-            End Try
-        End Function
-        Friend Function GetSessionStats() As (Count As Integer, Duration As TimeSpan)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Dim count As Integer = 0
-            Dim duration As TimeSpan = TimeSpan.Zero
-
-            Using conn As New SQLiteConnection(connectionString)
-                conn.Open()
-
-                'Count plays this session
-                Dim countQuery As String = "SELECT COUNT(*) FROM Plays WHERE StartPlayTime >= @SessionStart"
-                Using cmd As New SQLiteCommand(countQuery, conn)
-                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
-                    count = Convert.ToInt32(cmd.ExecuteScalar())
-                End Using
-
-                'Sum duration this session
-                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays WHERE StartPlayTime >= @SessionStart"
-                Using cmd As New SQLiteCommand(durationQuery, conn)
-                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
-                    Dim totalSecondsObj = cmd.ExecuteScalar()
-                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
-                    duration = TimeSpan.FromSeconds(totalSeconds)
-                End Using
-            End Using
-
-            Return (count, duration)
-        End Function
-        Friend Function GetLifetimeStats() As (Count As Integer, Duration As TimeSpan)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Dim count As Integer = 0
-            Dim duration As TimeSpan = TimeSpan.Zero
-
-            Using conn As New SQLiteConnection(connectionString)
-                conn.Open()
-
-                ' Count all plays
-                Dim countQuery As String = "SELECT COUNT(*) FROM Plays"
-                Using cmd As New SQLiteCommand(countQuery, conn)
-                    count = Convert.ToInt32(cmd.ExecuteScalar())
-                End Using
-
-                ' Sum all durations
-                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays"
-                Using cmd As New SQLiteCommand(durationQuery, conn)
-                    Dim totalSecondsObj = cmd.ExecuteScalar()
-                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
-                    duration = TimeSpan.FromSeconds(totalSeconds)
-                End Using
-            End Using
-
-            Return (count, duration)
-        End Function
-        Friend Function GetPlays() As List(Of PlayRecord)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-            Dim plays As New List(Of PlayRecord)
-
-            Using conn As New SQLiteConnection(connectionString)
-                conn.Open()
-
-                Dim sql = "SELECT ID, Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger 
-                   FROM Plays 
-                   ORDER BY StartPlayTime ASC"
-
-                Using cmd As New SQLiteCommand(sql, conn)
-                    Using rdr As SQLiteDataReader = cmd.ExecuteReader()
-                        While rdr.Read()
-                            plays.Add(New PlayRecord With {
-                                .ID = rdr.GetInt32(0),
-                                .Path = rdr.GetString(1),
-                                .StartPlayTime = DateTime.Parse(rdr.GetString(2)),
-                                .StopPlayTime = DateTime.Parse(rdr.GetString(3)),
-                                .Duration = rdr.GetInt32(4),
-                                .PlayTrigger = rdr.GetString(5)
-                            })
-                        End While
-                    End Using
-                End Using
-            End Using
-
-            Return plays
-        End Function
-
-        ' Volume
-        Private Async Sub StartSystemVolumeMonitor()
-            ' Cancel any previous monitor if it exists
-            If _volCts IsNot Nothing Then
-                Try : _volCts.Cancel() : Catch : End Try
-            End If
-
-            _volCts = New CancellationTokenSource()
-            _volTimer = New PeriodicTimer(TimeSpan.FromMilliseconds(100))
-
-            ' Reset last-known values so first tick always fires events
-            _lastVol = -1
-            _lastMute = Not _audioEndpoint.AudioEndpointVolume.Mute
-
-            Dim ct = _volCts.Token
-
-            Try
-                While Await _volTimer.WaitForNextTickAsync(ct)
-
-                    ' Read system volume + mute
-                    Dim vol As Integer = CInt(_audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar * 100)
-                    Dim mute As Boolean = _audioEndpoint.AudioEndpointVolume.Mute
-
-                    ' Detect volume change
-                    If vol <> _lastVol Then
-                        _lastVol = vol
-                        RaiseEvent SystemVolumeChanged(vol)
-                    End If
-
-                    ' Detect mute change
-                    If mute <> _lastMute Then
-                        _lastMute = mute
-                        RaiseEvent SystemMuteChanged(mute)
-                    End If
-
-                End While
-
-            Catch ex As OperationCanceledException
-                ' Normal shutdown — ignore
-            Catch ex As Exception
-                ' Optional: log or handle unexpected errors
-            End Try
-        End Sub
-        Friend Sub SetSystemVolume(newVolume As Integer)
-            If _audioEndpoint Is Nothing Then Exit Sub
-
-            ' Clamp 0–100
-            Dim newVolumeBoost As Integer = Math.Max(100, Math.Min(150, newVolume))
-            If newVolume < 0 Then newVolume = 0
-            If newVolume > 100 Then newVolume = 100
-
-            ' Convert to scalar (0.0–1.0)
-            Dim scalar As Single = CSng(newVolume / 100.0F)
-
-            Try
-                FrmPlayer.SetPlayerVolume(newVolumeBoost) ' Update the player volume (boosted)
-                _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar = scalar ' Update the system volume (0.0–1.0)
-            Catch
-                ' Optional: log or ignore
-            End Try
-        End Sub
-        Friend Sub SetSystemMute(isMuted As Boolean)
-            If _audioEndpoint Is Nothing Then Exit Sub
-
-            Try
-                _audioEndpoint.AudioEndpointVolume.Mute = isMuted
-            Catch
-                ' Optional: log or ignore
-            End Try
-        End Sub
-
-        ' Companion Server
-        Friend Sub SetCompanionServer(Optional forcestop As Boolean = False)
-            If Settings.EnableCompanionServer AndAlso Not CompanionServerRunning Then
-                ' Start Companion Server
-                If CompanionControlServer.Start(Settings.CompanionServerPort) Then
-                    Debug.Print("<< COMPANION SERVER STARTED >>")
-                    Skye.Common.Log.Write("Companion Server Started on Port " & Settings.CompanionServerPort)
-                    CompanionServerRunning = True
-                Else
-                    Debug.Print("<< COMPANION SERVER FAILED TO START >>")
-                    CompanionServerRunning = False
-                End If
-            ElseIf Not Settings.EnableCompanionServer OrElse forcestop Then
-                ' Stop Companion Server
-                If CompanionServerRunning Then
-                    CompanionControlServer.Stop()
-                    Debug.Print("<< COMPANION SERVER STOPPED >>")
-                    Skye.Common.Log.Write("Companion Server Stopped")
-                    CompanionServerRunning = False
-                End If
-            End If
-            FrmOptions?.UpdateCompanionServerTooltip()
-        End Sub
-        Friend Sub BroadcastNowPlaying()
-            Try
-                If Not CompanionServerRunning Then Exit Sub
-
-                ' Build the message on the UI thread (fast)
-                Dim msg As String = Nothing
-                FrmPlayer.Invoke(Sub()
-                                     msg = FrmPlayer.BuildNowPlayingMessage()
-                                 End Sub)
-
-                ' Do the blocking network send on a background thread
-                Task.Run(Sub()
-                             Try
-                                 CompanionControlServer.Broadcast(msg)
-                             Catch ex As Exception
-                                 Skye.Common.Log.Write("BroadcastNowPlaying Task Error: " & ex.Message)
-                             End Try
-                         End Sub)
-
-            Catch ex As Exception
-                Skye.Common.Log.Write("BroadcastNowPlaying Error: " & ex.Message)
-            End Try
-        End Sub
-        Public Function GetServerIPv4() As String
-            Dim host = Dns.GetHostName()
-            Dim entry = Dns.GetHostEntry(host)
-
-            For Each ip In entry.AddressList
-                If ip.AddressFamily = AddressFamily.InterNetwork Then
-                    Return ip.ToString()
-                End If
-            Next
-
-            Return "0.0.0.0" ' fallback if no IPv4 found
-        End Function
-
-        ' Methods
+        ' METHODS
         Friend Sub InitializeAppPreStartup()
             Dim baseName As String = If(Debugger.IsAttached, My.Application.Info.ProductName & "DEV", My.Application.Info.ProductName)
 
@@ -4901,6 +4434,473 @@ Namespace My
             Catch
                 Return False
             End Try
+        End Function
+
+        ' History Methods
+        Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)
+            'Check if in the history already
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex < 0 Then
+                'If not in the history, add it
+                Dim newsong As New Song With {
+                    .Path = songorstream,
+                    .InLibrary = False,
+                    .PlayCount = 0,
+                    .Added = DateTime.Now,
+                    .FirstPlayed = Nothing,
+                    .LastPlayed = Nothing,
+                    .Rating = 0}
+                If stream Then
+                    newsong.SourceType = MediaSourceTypes.Stream
+                Else
+                    newsong.SourceType = MediaSourceTypes.File
+                End If
+                History.Add(newsong)
+                HistoryChanged = True
+                Debug.Print("Added " + songorstream + " to history")
+            End If
+        End Sub
+        Friend Sub AddToHistoryFromLibrary(songorstream As String)
+            'Check if in the history already
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex >= 0 Then
+                'If it is in the history, update the InLibrary flag if necessary
+                If Not History(existingindex).InLibrary Then
+                    Dim existingsong As Song = History(existingindex)
+                    existingsong.InLibrary = True
+                    History(existingindex) = existingsong
+                    'Debug.Print("Updated InLibrary flag for " + songorstream)
+                End If
+            Else
+                'If not in the history, add it with InLibrary flag set to True
+                Dim newsong As New Song With {
+                    .Path = songorstream,
+                    .InLibrary = True,
+                    .SourceType = MediaSourceTypes.File,
+                    .PlayCount = 0,
+                    .Added = DateTime.Now,
+                    .FirstPlayed = Nothing,
+                    .LastPlayed = Nothing,
+                    .Rating = 0}
+                History.Add(newsong)
+                Debug.Print("Added " + songorstream + " to history with InLibrary flag set")
+            End If
+            HistoryChanged = True
+        End Sub
+        Friend Sub ClearHistoryInLibraryFlag()
+            If History.Count > 0 Then
+                'Clear the InLibrary flag for all songs in the history
+                For index As Integer = 0 To History.Count - 1
+                    If History(index).InLibrary Then
+                        Dim song As Song = History(index)
+                        song.InLibrary = False
+                        History(index) = song
+                    End If
+                Next
+                Debug.Print("Cleared History InLibrary Flag")
+            End If
+        End Sub
+        Friend Sub PruneHistory()
+            Debug.Print("Pruning History..." + History.Count.ToString + " total history items...")
+
+            'Find songs with invalid file types
+            Dim invalidfiletypelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not ExtensionDictionary.ContainsKey(IO.Path.GetExtension(p.Path).ToLower()) AndAlso Not p.SourceType = MediaSourceTypes.Stream)
+            Debug.Print("Pruning History InvalidsOnly..." + invalidfiletypelist.Count.ToString + " items found so far...")
+            For Each s As Song In invalidfiletypelist
+                History.Remove(s)
+            Next
+
+            'Find songs that are not in the library and don't exist
+            Dim prunelist As Collections.Generic.List(Of Song) = History.FindAll(Function(p) Not p.InLibrary AndAlso Not My.Computer.FileSystem.FileExists(p.Path))
+            Debug.Print("Pruning History..." + prunelist.Count.ToString + " items found so far...")
+
+            'Find streams that are not in the playlist
+            Dim streamlist As Collections.Generic.List(Of Song) = prunelist.FindAll(Function(p) p.SourceType = MediaSourceTypes.Stream)
+            Debug.Print("Pruning Streams..." + streamlist.Count.ToString + " streams found so far...")
+            For Each s As Song In streamlist
+                If s.SourceType = MediaSourceTypes.Stream AndAlso FrmPlayer.LVPlaylist.FindItemWithText(s.Path, True, 0) IsNot Nothing Then
+                    Debug.Print(s.Path + " found in playlist")
+                    prunelist.Remove(s)
+                End If
+            Next
+
+            'Prune History
+            For Each s As Song In prunelist
+                History.Remove(s)
+            Next
+            Debug.Print("History Pruned (" + prunelist.Count.ToString + ")")
+            Debug.Print("Pruning History Complete..." + History.Count.ToString + " total history items.")
+            Skye.Common.Log.Write("History Pruned (" + prunelist.Count.ToString + ")")
+            streamlist = Nothing
+            prunelist = Nothing
+        End Sub
+        Friend Sub UpdateHistory(songorstream As String)
+            TimerHistoryUpdate.Stop()
+            If Settings.HistoryUpdateInterval = 0 Then
+                TimerHistoryUpdate.Tag = songorstream
+                UpdateHistory()
+                Return
+            Else
+                TimerHistoryUpdate.Interval = Settings.HistoryUpdateInterval * 1000
+                TimerHistoryUpdate.Tag = songorstream
+                TimerHistoryUpdate.Start()
+            End If
+        End Sub
+        Private Sub UpdateHistory()
+            Dim songorstream As String = CStr(TimerHistoryUpdate.Tag)
+            Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
+            If existingindex >= 0 Then
+                Dim existingsong As Song = History(existingindex)
+                existingsong.PlayCount += CUShort(1)
+                If existingsong.FirstPlayed = Nothing Then existingsong.FirstPlayed = DateTime.Now
+                existingsong.LastPlayed = DateTime.Now
+                History(existingindex) = existingsong
+                'Debug.Print("Updated PlayCount for " + songorstream + " to " + existingsong.PlayCount.ToString)
+                Skye.Common.Log.Write("History Updated " + songorstream + " (" + existingsong.PlayCount.ToString + If(existingsong.PlayCount = 1, " Play", " Plays") + ")")
+                FrmPlayer.UpdateHistoryInPlaylist(songorstream)
+            Else
+                'Debug.Print("Song not found in history: " + songorstream)
+            End If
+            HistoryTotalPlayedSongs += CUInt(1)
+            'Debug.Print("Total Play Count = " & HistoryTotalPlayedSongs.ToString & ", " & HistoryTotalPlayedSongsThisSession & " this Session")
+            App.SongPlayData.IsValid = True
+            HistoryChanged = True
+        End Sub
+        Friend Sub UpdateRandomHistory(songorstream As String)
+            TimerRandomHistoryUpdate.Stop()
+            If Settings.RandomHistoryUpdateInterval = 0 Then
+                TimerRandomHistoryUpdate.Tag = songorstream
+                UpdateRandomHistory()
+                Return
+            Else
+                TimerRandomHistoryUpdate.Interval = Settings.RandomHistoryUpdateInterval * 1000
+                TimerRandomHistoryUpdate.Tag = songorstream
+                TimerRandomHistoryUpdate.Start()
+            End If
+        End Sub
+        Private Sub UpdateRandomHistory()
+            Dim songorstream As String = CStr(TimerRandomHistoryUpdate.Tag)
+            FrmPlayer.AddToRandomHistory(songorstream)
+        End Sub
+        Friend Sub StopHistoryUpdates()
+            TimerHistoryUpdate.Stop()
+            TimerRandomHistoryUpdate.Stop()
+            'Debug.Print("History Update Timers Stopped")
+        End Sub
+        Friend Sub SetHistoryAutoSaveTimer()
+            TimerHistoryAutoSave.Stop()
+            TimerHistoryAutoSave.Interval = Settings.HistoryAutoSaveInterval * 60 * 1000 'Convert minutes to milliseconds
+            TimerHistoryAutoSave.Start()
+            'Debug.Print("History AutoSave Timer Set to " & App.HistoryAutoSaveInterval.ToString & " minutes")
+        End Sub
+        Friend Function GetHistorySnapshot() As List(Of Song)
+            SyncLock History
+                Return History.ToList()
+            End SyncLock
+        End Function
+
+        ' Database Methods
+        Private Sub LoadPlayHistoryDatabase()
+            If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
+                My.Computer.FileSystem.CreateDirectory(App.UserPath)
+            End If
+
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+
+            'Create the database file if it doesn't exist
+            If Not File.Exists(DatabasePath) Then
+                SQLiteConnection.CreateFile(DatabasePath)
+            End If
+
+            'Create the Plays table if needed
+            Using connection As New SQLiteConnection(connectionString)
+                connection.Open()
+                Dim createTableSql As String = "
+                    CREATE TABLE IF NOT EXISTS Plays (
+                        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Path TEXT NOT NULL,
+                        StartPlayTime DATETIME NOT NULL,
+                        StopPlayTime DATETIME NOT NULL,
+                        Duration INTEGER NOT NULL,
+                        PlayTrigger TEXT NOT NULL
+                    );"
+                Using command As New SQLiteCommand(createTableSql, connection)
+                    command.ExecuteNonQuery()
+                End Using
+            End Using
+
+        End Sub
+        Friend Sub LogPlayHistory(path As String, startTime As DateTime, stopTime As DateTime, durationSeconds As Integer, trigger As PlayTriggers)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            If durationSeconds < 0 Then Skye.Common.Log.Write("LogPlayHistory Duration was less than zero (" & durationSeconds.ToString & "), for " & path)
+            If durationSeconds <= 0 Then durationSeconds = CInt((stopTime - startTime).TotalSeconds)
+            Dim insertSql As String = "INSERT INTO Plays (Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger) VALUES (@Path, @Start, @Stop, @Duration, @Trigger);"
+
+            Using connection As New SQLiteConnection(connectionString)
+                connection.Open()
+                Using command As New SQLiteCommand(insertSql, connection)
+                    command.Parameters.AddWithValue("@Path", path)
+                    command.Parameters.AddWithValue("@Start", startTime)
+                    command.Parameters.AddWithValue("@Stop", stopTime)
+                    command.Parameters.AddWithValue("@Duration", durationSeconds)
+                    command.Parameters.AddWithValue("@Trigger", trigger.ToString)
+                    command.ExecuteNonQuery()
+                End Using
+            End Using
+
+        End Sub
+        Friend Function GetPlayHistoryTable() As DataTable
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim dt As New DataTable()
+
+            Try
+                Using conn As New SQLiteConnection(connectionString)
+                    conn.Open()
+
+                    Dim query As String = "SELECT * FROM Plays ORDER BY StartPlayTime DESC"
+                    Using cmd As New SQLiteCommand(query, conn)
+                        Using adapter As New SQLiteDataAdapter(cmd)
+                            adapter.Fill(dt)
+                        End Using
+                    End Using
+
+                End Using
+            Catch ex As Exception
+                Debug.Print("Error loading play history: " & ex.Message)
+            End Try
+
+            Return dt
+        End Function
+        Friend Function DeletePlayHistoryById(recordId As Integer) As Boolean
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Try
+                Using conn As New SQLiteConnection(connectionString)
+                    conn.Open()
+
+                    Dim query As String = "DELETE FROM Plays WHERE Id = @Id"
+                    Using cmd As New SQLiteCommand(query, conn)
+                        cmd.Parameters.AddWithValue("@Id", recordId)
+                        Dim rowsAffected As Integer = cmd.ExecuteNonQuery()
+                        Return rowsAffected > 0
+                    End Using
+
+                End Using
+
+            Catch ex As Exception
+                Debug.Print("Error deleting play record: " & ex.Message)
+                Return False
+            End Try
+        End Function
+        Friend Function GetSessionStats() As (Count As Integer, Duration As TimeSpan)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim count As Integer = 0
+            Dim duration As TimeSpan = TimeSpan.Zero
+
+            Using conn As New SQLiteConnection(connectionString)
+                conn.Open()
+
+                'Count plays this session
+                Dim countQuery As String = "SELECT COUNT(*) FROM Plays WHERE StartPlayTime >= @SessionStart"
+                Using cmd As New SQLiteCommand(countQuery, conn)
+                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
+                    count = Convert.ToInt32(cmd.ExecuteScalar())
+                End Using
+
+                'Sum duration this session
+                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays WHERE StartPlayTime >= @SessionStart"
+                Using cmd As New SQLiteCommand(durationQuery, conn)
+                    cmd.Parameters.AddWithValue("@SessionStart", HistoryThisSessionStartTime)
+                    Dim totalSecondsObj = cmd.ExecuteScalar()
+                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
+                    duration = TimeSpan.FromSeconds(totalSeconds)
+                End Using
+            End Using
+
+            Return (count, duration)
+        End Function
+        Friend Function GetLifetimeStats() As (Count As Integer, Duration As TimeSpan)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim count As Integer = 0
+            Dim duration As TimeSpan = TimeSpan.Zero
+
+            Using conn As New SQLiteConnection(connectionString)
+                conn.Open()
+
+                ' Count all plays
+                Dim countQuery As String = "SELECT COUNT(*) FROM Plays"
+                Using cmd As New SQLiteCommand(countQuery, conn)
+                    count = Convert.ToInt32(cmd.ExecuteScalar())
+                End Using
+
+                ' Sum all durations
+                Dim durationQuery As String = "SELECT SUM(Duration) FROM Plays"
+                Using cmd As New SQLiteCommand(durationQuery, conn)
+                    Dim totalSecondsObj = cmd.ExecuteScalar()
+                    Dim totalSeconds As Double = If(IsDBNull(totalSecondsObj), 0, Convert.ToDouble(totalSecondsObj))
+                    duration = TimeSpan.FromSeconds(totalSeconds)
+                End Using
+            End Using
+
+            Return (count, duration)
+        End Function
+        Friend Function GetPlays() As List(Of PlayRecord)
+            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
+            Dim plays As New List(Of PlayRecord)
+
+            Using conn As New SQLiteConnection(connectionString)
+                conn.Open()
+
+                Dim sql = "SELECT ID, Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger 
+                   FROM Plays 
+                   ORDER BY StartPlayTime ASC"
+
+                Using cmd As New SQLiteCommand(sql, conn)
+                    Using rdr As SQLiteDataReader = cmd.ExecuteReader()
+                        While rdr.Read()
+                            plays.Add(New PlayRecord With {
+                                .ID = rdr.GetInt32(0),
+                                .Path = rdr.GetString(1),
+                                .StartPlayTime = DateTime.Parse(rdr.GetString(2)),
+                                .StopPlayTime = DateTime.Parse(rdr.GetString(3)),
+                                .Duration = rdr.GetInt32(4),
+                                .PlayTrigger = rdr.GetString(5)
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            Return plays
+        End Function
+
+        ' Volume
+        Private Async Sub StartSystemVolumeMonitor()
+            ' Cancel any previous monitor if it exists
+            If _volCts IsNot Nothing Then
+                Try : _volCts.Cancel() : Catch : End Try
+            End If
+
+            _volCts = New CancellationTokenSource()
+            _volTimer = New PeriodicTimer(TimeSpan.FromMilliseconds(100))
+
+            ' Reset last-known values so first tick always fires events
+            _lastVol = -1
+            _lastMute = Not _audioEndpoint.AudioEndpointVolume.Mute
+
+            Dim ct = _volCts.Token
+
+            Try
+                While Await _volTimer.WaitForNextTickAsync(ct)
+
+                    ' Read system volume + mute
+                    Dim vol As Integer = CInt(_audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar * 100)
+                    Dim mute As Boolean = _audioEndpoint.AudioEndpointVolume.Mute
+
+                    ' Detect volume change
+                    If vol <> _lastVol Then
+                        _lastVol = vol
+                        RaiseEvent SystemVolumeChanged(vol)
+                    End If
+
+                    ' Detect mute change
+                    If mute <> _lastMute Then
+                        _lastMute = mute
+                        RaiseEvent SystemMuteChanged(mute)
+                    End If
+
+                End While
+
+            Catch ex As OperationCanceledException
+                ' Normal shutdown — ignore
+            Catch ex As Exception
+                ' Optional: log or handle unexpected errors
+            End Try
+        End Sub
+        Friend Sub SetSystemVolume(newVolume As Integer)
+            If _audioEndpoint Is Nothing Then Exit Sub
+
+            ' Clamp 0–100
+            Dim newVolumeBoost As Integer = Math.Max(100, Math.Min(150, newVolume))
+            If newVolume < 0 Then newVolume = 0
+            If newVolume > 100 Then newVolume = 100
+
+            ' Convert to scalar (0.0–1.0)
+            Dim scalar As Single = CSng(newVolume / 100.0F)
+
+            Try
+                FrmPlayer.SetPlayerVolume(newVolumeBoost) ' Update the player volume (boosted)
+                _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar = scalar ' Update the system volume (0.0–1.0)
+            Catch
+                ' Optional: log or ignore
+            End Try
+        End Sub
+        Friend Sub SetSystemMute(isMuted As Boolean)
+            If _audioEndpoint Is Nothing Then Exit Sub
+
+            Try
+                _audioEndpoint.AudioEndpointVolume.Mute = isMuted
+            Catch
+                ' Optional: log or ignore
+            End Try
+        End Sub
+
+        ' Companion Server
+        Friend Sub SetCompanionServer(Optional forcestop As Boolean = False)
+            If Settings.EnableCompanionServer AndAlso Not CompanionServerRunning Then
+                ' Start Companion Server
+                If CompanionControlServer.Start(Settings.CompanionServerPort) Then
+                    Debug.Print("<< COMPANION SERVER STARTED >>")
+                    Skye.Common.Log.Write("Companion Server Started on Port " & Settings.CompanionServerPort)
+                    CompanionServerRunning = True
+                Else
+                    Debug.Print("<< COMPANION SERVER FAILED TO START >>")
+                    CompanionServerRunning = False
+                End If
+            ElseIf Not Settings.EnableCompanionServer OrElse forcestop Then
+                ' Stop Companion Server
+                If CompanionServerRunning Then
+                    CompanionControlServer.Stop()
+                    Debug.Print("<< COMPANION SERVER STOPPED >>")
+                    Skye.Common.Log.Write("Companion Server Stopped")
+                    CompanionServerRunning = False
+                End If
+            End If
+            FrmOptions?.UpdateCompanionServerTooltip()
+        End Sub
+        Friend Sub BroadcastNowPlaying()
+            Try
+                If Not CompanionServerRunning Then Exit Sub
+
+                ' Build the message on the UI thread (fast)
+                Dim msg As String = Nothing
+                FrmPlayer.Invoke(Sub()
+                                     msg = FrmPlayer.BuildNowPlayingMessage()
+                                 End Sub)
+
+                ' Do the blocking network send on a background thread
+                Task.Run(Sub()
+                             Try
+                                 CompanionControlServer.Broadcast(msg)
+                             Catch ex As Exception
+                                 Skye.Common.Log.Write("BroadcastNowPlaying Task Error: " & ex.Message)
+                             End Try
+                         End Sub)
+
+            Catch ex As Exception
+                Skye.Common.Log.Write("BroadcastNowPlaying Error: " & ex.Message)
+            End Try
+        End Sub
+        Public Function GetServerIPv4() As String
+            Dim host = Dns.GetHostName()
+            Dim entry = Dns.GetHostEntry(host)
+
+            For Each ip In entry.AddressList
+                If ip.AddressFamily = AddressFamily.InterNetwork Then
+                    Return ip.ToString()
+                End If
+            Next
+
+            Return "0.0.0.0" ' fallback if no IPv4 found
         End Function
 
     End Module

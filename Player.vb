@@ -4209,11 +4209,15 @@ Public Class Player
 
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
-        If (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 500 Then
+        If MeterLastUpdate <> DateTime.MinValue AndAlso (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 500 Then
             If _lastStaleMeterLog = DateTime.MinValue Then
                 Skye.Common.Log.Write("Audio Meter Data Stale, Resetting Peaks")
                 _lastStaleMeterLog = DateTime.Now
             End If
+            DBEXLeft.Value = 0
+            DBEXRight.Value = 0
+            DBEXVertLeft.Value = 0
+            DBEXVertRight.Value = 0
             RestartMeterCapture()
             Return
         Else
@@ -4450,15 +4454,31 @@ Public Class Player
         End If
     End Sub
     Private Sub RestartMeterCapture()
+        ' 1. Tear down old capture safely
         Try
-            MeterAudioCapture?.StopRecording()
-            MeterAudioCapture?.Dispose()
-        Catch
+            If MeterAudioCapture IsNot Nothing Then
+                RemoveHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
+                MeterAudioCapture.StopRecording()
+                MeterAudioCapture.Dispose()
+            End If
+        Catch ex As Exception
+            Skye.Common.Log.Write($"Error Stopping Meter Capture{Environment.NewLine}{ex.Message}")
+        Finally
+            MeterAudioCapture = Nothing
         End Try
-
-        MeterAudioCapture = New WasapiLoopbackCapture()
-        AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
-        MeterAudioCapture.StartRecording()
+        ' 2. Re-initialize guard for device reconfigurations/invalidations
+        Try
+            MeterAudioCapture = New WasapiLoopbackCapture()
+            AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
+            MeterAudioCapture.StartRecording()
+        Catch ex As System.Runtime.InteropServices.COMException When ex.HResult = &H88890004
+            ' AUDCLNT_E_DEVICE_INVALIDATED: Driver/device is resetting, drop gracefully for this tick
+            MeterAudioCapture = Nothing
+            Skye.Common.Log.Write("WASAPI Meter Capture Delayed: Audio device invalidated or resetting.")
+        Catch ex As Exception
+            MeterAudioCapture = Nothing
+            Skye.Common.Log.Write($"Failed To Start WASAPI Meter Capture{Environment.NewLine}{ex.Message}")
+        End Try
     End Sub
     Friend Sub TogglePlayer()
         ' If MiniPlayer is active, single-click should hide MiniPlayer, not restore Player
