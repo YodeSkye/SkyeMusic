@@ -1,7 +1,4 @@
 ﻿
-Imports Skye.UI.Log
-Imports Syncfusion.Windows.Forms.Tools
-
 Public Class Log
 
     ' Declarations
@@ -136,7 +133,7 @@ Public Class Log
             DeleteLogConfirm = True
             Me.BTNDeleteLog.BackColor = Color.Red
             TipLogEX.HideDelay = 5000
-            TipLogEX.ShowTooltipAtCursor("Are You Sure?", My.Resources.ImageChangeLog32)
+            TipLogEX.ShowTooltipAtCursor("Are You Sure?", My.Resources.ImageDeleteLog32)
             TimerDeleteLog.Start()
         End If
     End Sub
