@@ -264,6 +264,10 @@ Namespace My
         Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
         Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
         Friend ReadOnly TipFont As New Font("Segoe UI", 12) 'Font for Tooltips
+        Friend ReadOnly NowPlayingToastTitleFont As New Font("Segoe UI", 16)
+        Friend ReadOnly NowPlayingToastMessageFont As New Font("Segoe UI", 16, FontStyle.Bold)
+        Friend ReadOnly ToastTitleFont As New Font("Segoe UI", 12, FontStyle.Bold)
+        Friend ReadOnly ToastMessageFont As New Font("Segoe UI", 12)
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
         Friend ReadOnly Http As New HttpClient()
         Friend DirectoryLastSelectedSource As Integer = -1 'DirectoryLastSelectedSource stores the last selected source in the Directory form.
@@ -3249,8 +3253,8 @@ Namespace My
                     .BackColor = App.CurrentTheme.BackColor,
                     .BorderColor = App.CurrentTheme.ButtonBackColor,
                     .ForeColor = App.CurrentTheme.TextColor,
-                    .TitleFont = New Font("Segoe UI", 12, FontStyle.Bold),
-                    .MessageFont = New Font("Segoe UI", 12),
+                    .TitleFont = App.ToastTitleFont,
+                    .MessageFont = App.ToastMessageFont,
                     .Location = Skye.UI.ToastLocation.BottomRight,
                     .Icon = My.Resources.IconSkyeMusicRed}
                 Skye.UI.Toast.ShowToast(toastoptions)

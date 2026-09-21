@@ -4445,8 +4445,8 @@ Public Class Player
                 .BackColor = App.CurrentTheme.BackColor,
                 .BorderColor = App.CurrentTheme.ButtonBackColor,
                 .ForeColor = App.CurrentTheme.TextColor,
-                .TitleFont = New Font("Segoe UI", 12),
-                .MessageFont = New Font("Segoe UI", 12, FontStyle.Bold),
+                .TitleFont = App.NowPlayingToastTitleFont,
+                .MessageFont = App.NowPlayingToastMessageFont,
                 .Location = App.Settings.NowPlayingToastLocation,
                 .Image = toastImg
             }
