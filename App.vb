@@ -2596,8 +2596,12 @@ Namespace My
             ' 2. Library Form Pre-Initialization (No Flash / No Show/Hide Hack)
             Try
                 FrmLibrary = New Library()
-                ' Force handle creation so FileSystemWatcher & controls initialize cleanly without showing the form
-                Dim dummyHandle As IntPtr = FrmLibrary.Handle
+                With App.FrmLibrary ' This is to ensure that the form is fully initialized without flashing on the screen, for FileSystemWatcher and controls to work properly
+                    .Opacity = 0
+                    .Show()
+                    .Hide()
+                    .Opacity = 1
+                End With
             Catch ex As Exception
                 Skye.Common.Log.Write($"Error Pre-initializing Library Form: {ex}")
             End Try

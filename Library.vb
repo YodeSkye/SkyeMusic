@@ -162,7 +162,6 @@ Public Class Library
         LblExtFileInfo.Text = String.Empty
         LblExtProperties.Text = String.Empty
         LblExtType.Text = String.Empty
-        'CustomDrawCMToolTip(CMLibrary)
         TipCMLibrary = New Skye.UI.ToolTipEX(components) With {
             .BackColor = App.CurrentTheme.BackColor,
             .ForeColor = App.CurrentTheme.TextColor,
@@ -955,7 +954,7 @@ Public Class Library
 
                 'If file exists, add to library & playlist
                 If Settings.WatcherUpdateLibrary Or Settings.WatcherUpdatePlaylist Then
-                    If File.Exists(path) Then
+                    If IO.File.Exists(path) Then
                         Dim lvi As ListViewItem = CreateLibraryItem(path)
                         If Settings.WatcherUpdateLibrary Then
                             App.AddToHistoryFromLibrary(path)
