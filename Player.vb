@@ -4398,6 +4398,14 @@ Public Class Player
             Return False
         End If
     End Function
+    Private Function IsExcluded(item As ListViewItem) As Boolean
+        If item Is Nothing Then Return False
+        Dim isEx As Boolean = False
+        If item.SubItems("Excluded") IsNot Nothing Then
+            Boolean.TryParse(item.SubItems("Excluded").Text, isEx)
+        End If
+        Return isEx
+    End Function
     Private Function FormatDuration(duration As Double) As String
         Dim dur As TimeSpan = TimeSpan.FromSeconds(duration)
         Dim durstr As String = ""
@@ -5615,7 +5623,6 @@ Public Class Player
         If PlayState = PlayStates.Paused Then TogglePlay()
     End Sub
     Friend Sub PlayPrevious()
-        'Stream = False
         StopPlay()
         LyricsOff()
         Select Case App.Settings.PlayMode
@@ -5692,6 +5699,16 @@ Public Class Player
                     PlayQueued()
                 Else
                     If LVPlaylist.Items.Count > 0 Then
+                        ' 1. Quick check: stop if ALL items are excluded
+                        Dim hasPlayableItem As Boolean = False
+                        For Each lvi As ListViewItem In LVPlaylist.Items
+                            If Not IsExcluded(lvi) Then
+                                hasPlayableItem = True
+                                Exit For
+                            End If
+                        Next
+                        If Not hasPlayableItem Then Exit Sub
+
                         Dim item As ListViewItem
                         If LVPlaylist.SelectedItems.Count > 0 Then
                             item = LVPlaylist.FindItemWithText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
@@ -5702,76 +5719,86 @@ Public Class Player
                                 item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
                             End If
                         End If
-                        Dim newindex As Integer = 0
-                        If item Is Nothing OrElse item.Index + 1 = LVPlaylist.Items.Count Then
-                            If IsStream(LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
-                                PlayStream(LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                            Else
-                                PlayFile(LVPlaylist.Items(0).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayNextLinear")
-                            End If
+
+                        ' 2. Calculate next index and scan forward past any excluded tracks
+                        Dim newindex As Integer = If(item Is Nothing, 0, item.Index + 1)
+                        If newindex >= LVPlaylist.Items.Count Then newindex = 0
+
+                        Dim scannedCount As Integer = 0
+                        While IsExcluded(LVPlaylist.Items(newindex)) AndAlso scannedCount < LVPlaylist.Items.Count
+                            newindex += 1
+                            If newindex >= LVPlaylist.Items.Count Then newindex = 0
+                            scannedCount += 1
+                        End While
+
+                        ' Play the resolved track
+                        Dim path As String = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                        If IsStream(path) Then
+                            PlayStream(path)
                         Else
-                            newindex = item.Index + 1
-                            If IsStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
-                                PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                            Else
-                                PlayFile(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayNextLinear")
-                            End If
+                            PlayFile(path, "PlayNextLinear")
                         End If
+
                         EnsurePlaylistItemIsVisible(newindex)
                         TimerShowMedia.Start()
                     End If
                 End If
+
             Case PlayModes.Random
                 If Queue.Count > 0 Then
                     PlayQueued()
                 Else
                     If LVPlaylist.Items.Count > 0 Then
-                        'Dim item As ListViewItem = Nothing
-                        'If _player.HasMedia Then
-                        '    item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
-                        'End If
-                        'Dim newindex As Integer
-                        'If RandomHistoryFull() Then RandomHistory.Clear()
-                        'If item Is Nothing Then
-                        '    newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
-                        'Else
-                        '    If LVPlaylist.Items.Count = 1 Then
-                        '        newindex = 0
-                        '    Else
-                        '        Do
-                        '            newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
-                        '        Loop Until newindex <> item.Index And Not RandomHistory.Contains(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                        '    End If
-                        'End If
+                        ' 1. Quick check: stop if ALL items are excluded
+                        Dim hasPlayableItem As Boolean = False
+                        For Each lvi As ListViewItem In LVPlaylist.Items
+                            If Not IsExcluded(lvi) Then
+                                hasPlayableItem = True
+                                Exit For
+                            End If
+                        Next
+                        If Not hasPlayableItem Then Exit Sub
+
                         If RandomHistoryFull() Then RandomHistory.Clear()
                         Dim newindex As Integer
+
                         If LVPlaylist.Items.Count = 1 Then
                             newindex = 0
                         Else
-                            'Do
-                            '    newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
-                            '    Dim path = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
-                            '    Dim isInHistory = RandomHistory.Contains(path)
-                            '    If Not isInHistory Then Exit Do
-                            'Loop
                             Dim attempts As Integer = 0
                             Dim maxAttempts As Integer = LVPlaylist.Items.Count * 2
                             Do
                                 newindex = Skye.Common.GetRandom(0, LVPlaylist.Items.Count - 1)
-                                Dim path = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
-                                If Not RandomHistory.Contains(path) Then Exit Do
+                                Dim targetItem As ListViewItem = LVPlaylist.Items(newindex)
+                                Dim path = targetItem.SubItems(LVPlaylist.Columns("Path").Index).Text
+
+                                ' Candidate is valid if it is NOT excluded AND NOT in recent random history
+                                If Not IsExcluded(targetItem) AndAlso Not RandomHistory.Contains(path) Then
+                                    Exit Do
+                                End If
+
                                 attempts += 1
                                 If attempts >= maxAttempts Then
                                     RandomHistory.Clear()
+                                    ' Fall back to linear scan for first valid non-excluded item
+                                    For i As Integer = 0 To LVPlaylist.Items.Count - 1
+                                        If Not IsExcluded(LVPlaylist.Items(i)) Then
+                                            newindex = i
+                                            Exit For
+                                        End If
+                                    Next
                                     Exit Do
                                 End If
                             Loop
                         End If
-                        If IsStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
-                            PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
+
+                        Dim finalPath As String = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                        If IsStream(finalPath) Then
+                            PlayStream(finalPath)
                         Else
-                            PlayFile(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayNextRandom")
+                            PlayFile(finalPath, "PlayNextRandom")
                         End If
+
                         EnsurePlaylistItemIsVisible(newindex)
                         TimerShowMedia.Start()
                     End If
