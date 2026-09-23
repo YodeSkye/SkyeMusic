@@ -3163,6 +3163,23 @@ Namespace My
                 End If
             End If
         End Sub
+        Friend Sub ShowCompanionClients()
+            If FrmCompanionClients Is Nothing OrElse FrmCompanionClients.IsDisposed Then
+                FrmCompanionClients = New CompanionClients
+                Dim newX As Integer = FrmPlayer.Left + (FrmPlayer.Width - FrmCompanionClients.Width) \ 2
+                Dim newY As Integer = FrmPlayer.Top + (FrmPlayer.Height - FrmCompanionClients.Height) \ 2
+                FrmCompanionClients.Location = New Point(newX, newY)
+                FrmCompanionClients.Show()
+            Else
+                If FrmCompanionClients.WindowState = FormWindowState.Minimized Then
+                    FrmCompanionClients.WindowState = FormWindowState.Normal
+                ElseIf FrmCompanionClients.Visible Then
+                    FrmCompanionClients.BringToFront()
+                Else
+                    FrmCompanionClients.Show()
+                End If
+            End If
+        End Sub
         Friend Sub ShowOptions(Optional showcenterscreen As Boolean = False)
             If FrmOptions Is Nothing OrElse FrmOptions.IsDisposed Then
                 FrmOptions = New Options

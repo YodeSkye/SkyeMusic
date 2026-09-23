@@ -132,7 +132,7 @@ Partial Class CompanionClients
         Margin = New Padding(4)
         MaximizeBox = False
         Name = "CompanionClients"
-        StartPosition = FormStartPosition.CenterParent
+        StartPosition = FormStartPosition.Manual
         Text = "Companion Clients"
         CMClients.ResumeLayout(False)
         ResumeLayout(False)
