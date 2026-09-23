@@ -109,6 +109,7 @@ Partial Class Player
         TimerStreamMeta = New Timer(components)
         DBEXLeft = New Skye.UI.DataBarEX()
         DBEXRight = New Skye.UI.DataBarEX()
+        CMIExclude = New ToolStripMenuItem()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -131,10 +132,10 @@ Partial Class Player
         ' CMPlaylist
         ' 
         CMPlaylist.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIViewInLibrary, CMIEditTag, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
+        CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIExclude, CMIViewInLibrary, CMIEditTag, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMPlaylist.Name = "CMPlaylist"
         CMPlaylist.ShowItemToolTips = False
-        CMPlaylist.Size = New Size(217, 470)
+        CMPlaylist.Size = New Size(217, 518)
         ' 
         ' CMIPlay
         ' 
@@ -215,7 +216,6 @@ Partial Class Player
         CMRatings.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMRatings.Items.AddRange(New ToolStripItem() {CMIRating5Stars, CMIRating4Stars, CMIRating3Stars, CMIRating2Stars, CMIRating1Star})
         CMRatings.Name = "CMRatings"
-        CMRatings.OwnerItem = CMIRating
         CMRatings.ShowImageMargin = False
         CMRatings.Size = New Size(121, 134)
         ' 
@@ -811,6 +811,12 @@ Partial Class Player
         DBEXRight.TabIndex = 43
         DBEXRight.TrailingGlow = True
         ' 
+        ' CMIExclude
+        ' 
+        CMIExclude.Name = "CMIExclude"
+        CMIExclude.Size = New Size(216, 26)
+        CMIExclude.Text = "Exclude"
+        ' 
         ' Player
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -947,4 +953,5 @@ Partial Class Player
     Friend WithEvents DBEXRight As Skye.UI.DataBarEX
     Friend WithEvents DBEXVertLeft As Skye.UI.DataBarEX
     Friend WithEvents DBEXVertRight As Skye.UI.DataBarEX
+    Friend WithEvents CMIExclude As ToolStripMenuItem
 End Class

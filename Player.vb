@@ -52,7 +52,8 @@ Public Class Player
     Private AutoNext As Boolean = False 'Used by Plays Database System to indicate if the player will automatically play the next item.
     Private PausedAt As DateTime? = Nothing 'Used by Plays Database System to track when the player was paused.
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero 'Used by Plays Database System to track total paused duration.
-    Private PlaylistBoldFont As Font 'Bold font for playlist titles
+    Private ReadOnly PlaylistRegularFont As New Font("Segoe UI", 12, FontStyle.Regular) 'Regular font for playlist titles
+    Private ReadOnly PlaylistBoldFont As New Font("Segoe UI", 12, FontStyle.Bold) 'Bold font for playlist titles
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
@@ -2773,7 +2774,6 @@ Public Class Player
         ' Initialize Form
         Text = Application.Info.Title 'Set the form title
         PlaylistSearchTitle = TxtBoxPlaylistSearch.Text 'Default search title
-        PlaylistBoldFont = New Font(LVPlaylist.Font, FontStyle.Bold) 'Bold font for playlist titles
         TrackBarPosition.Size = New Size(TrackBarPosition.Size.Width, 26)
 
         ' Initialize Listview
@@ -3085,31 +3085,104 @@ Public Class Player
             e.DrawDefault = True
         End If
     End Sub
+    'Private Sub LVPlaylist_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVPlaylist.DrawSubItem
+    '    Static b As Rectangle
+    '    Static s As SizeF
+    '    If e.Item.Selected = True Then
+    '        If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
+    '            b = e.Bounds
+    '            s = e.Graphics.MeasureString(e.SubItem.Text, e.Item.Font, e.Bounds.Size)
+    '            If s.Width <= e.Bounds.Width Then b.Width = CInt(s.Width) + 4
+    '            If b.Width > LVPlaylist.Columns(e.ColumnIndex).Width Then b.Width = LVPlaylist.Columns(e.ColumnIndex).Width
+    '            e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.TextColor), b)
+    '            TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, b.Width), e.Item.Font, New System.Drawing.Point(b.Left + 2, b.Top + 1), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix)
+    '        ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
+    '            TextRenderer.DrawText(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
+    '        Else
+    '            TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New System.Drawing.Point(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+    '        End If
+    '    Else
+    '        b = e.Bounds
+    '        e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.BackColor), b)
+    '        If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
+    '            TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistBoldFont, b.Width), PlaylistBoldFont, New System.Drawing.Point(b.Left + 2, b.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+    '        ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
+    '            TextRenderer.DrawText(e.Graphics, e.SubItem.Text, LVPlaylist.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
+    '        Else
+    '            TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, LVPlaylist.Font, b.Width), LVPlaylist.Font, New System.Drawing.Point(b.Left + 2, b.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+    '        End If
+    '    End If
+    'End Sub
+    Private Function BlendColors(foreColor As Color, backColor As Color, percentage As Double) As Color
+        ' Clamp percentage between 0.0 and 1.0
+        percentage = Math.Max(0.0, Math.Min(1.0, percentage))
+
+        Dim r As Integer = CInt(backColor.R + (CDbl(foreColor.R) - CDbl(backColor.R)) * percentage)
+        Dim g As Integer = CInt(backColor.G + (CDbl(foreColor.G) - CDbl(backColor.G)) * percentage)
+        Dim b As Integer = CInt(backColor.B + (CDbl(foreColor.B) - CDbl(backColor.B)) * percentage)
+
+        ' Clamp RGB values to valid byte ranges (0 - 255) to prevent OverflowExceptions
+        r = Math.Max(0, Math.Min(255, r))
+        g = Math.Max(0, Math.Min(255, g))
+        b = Math.Max(0, Math.Min(255, b))
+
+        Return Color.FromArgb(255, r, g, b)
+    End Function
+
     Private Sub LVPlaylist_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVPlaylist.DrawSubItem
         Static b As Rectangle
         Static s As SizeF
+
+        ' 1. Check Excluded state
+        Dim isExcluded As Boolean = False
+        If e.Item.SubItems("Excluded") IsNot Nothing Then
+            Boolean.TryParse(e.Item.SubItems("Excluded").Text, isExcluded)
+        End If
+
+        ' 2. Determine base colors (35% color blend if Excluded)
+        Dim baseTextColor As Color = App.CurrentTheme.TextColor
+        Dim baseInvertedTextColor As Color = App.CurrentTheme.BackColor
+
+        If isExcluded Then
+            baseTextColor = BlendColors(App.CurrentTheme.TextColor, App.CurrentTheme.BackColor, 0.4)
+            baseInvertedTextColor = BlendColors(App.CurrentTheme.BackColor, App.CurrentTheme.TextColor, 0.4)
+        End If
+
+        ' 3. Render Selected vs Unselected
         If e.Item.Selected = True Then
+            ' Selected: All columns bold (or regular if Excluded)
+            Dim selectedFont As Font = If(isExcluded, PlaylistRegularFont, PlaylistBoldFont)
+
             If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
                 b = e.Bounds
-                s = e.Graphics.MeasureString(e.SubItem.Text, e.Item.Font, e.Bounds.Size)
+                s = e.Graphics.MeasureString(e.SubItem.Text, selectedFont, e.Bounds.Size)
                 If s.Width <= e.Bounds.Width Then b.Width = CInt(s.Width) + 4
                 If b.Width > LVPlaylist.Columns(e.ColumnIndex).Width Then b.Width = LVPlaylist.Columns(e.ColumnIndex).Width
-                e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.TextColor), b)
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, b.Width), e.Item.Font, New System.Drawing.Point(b.Left + 2, b.Top + 1), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix)
+
+                Using fillBrush As New SolidBrush(App.CurrentTheme.TextColor)
+                    e.Graphics.FillRectangle(fillBrush, b)
+                End Using
+
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, selectedFont, b.Width), selectedFont, New System.Drawing.Point(b.Left + 2, b.Top + 1), baseInvertedTextColor, TextFormatFlags.NoPrefix)
             ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
-                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
+                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, selectedFont, e.Bounds, baseTextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
             Else
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New System.Drawing.Point(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, selectedFont, e.Bounds.Width), selectedFont, New System.Drawing.Point(e.Bounds.Left + 2, e.Bounds.Top + 1), baseTextColor, TextFormatFlags.NoPrefix)
             End If
         Else
+            ' Unselected: Title is bold (unless Excluded), other columns are regular
             b = e.Bounds
-            e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.BackColor), b)
+            Using fillBrush As New SolidBrush(App.CurrentTheme.BackColor)
+                e.Graphics.FillRectangle(fillBrush, b)
+            End Using
+
             If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistBoldFont, b.Width), PlaylistBoldFont, New System.Drawing.Point(b.Left + 2, b.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+                Dim unselectedTitleFont As Font = If(isExcluded, PlaylistRegularFont, PlaylistBoldFont)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, unselectedTitleFont, b.Width), unselectedTitleFont, New System.Drawing.Point(b.Left + 2, b.Top + 2), baseTextColor, TextFormatFlags.NoPrefix)
             ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
-                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, LVPlaylist.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
+                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, PlaylistRegularFont, b, baseTextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
             Else
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, LVPlaylist.Font, b.Width), LVPlaylist.Font, New System.Drawing.Point(b.Left + 2, b.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistRegularFont, b.Width), PlaylistRegularFont, New System.Drawing.Point(b.Left + 2, b.Top + 2), baseTextColor, TextFormatFlags.NoPrefix)
             End If
         End If
     End Sub
@@ -3820,6 +3893,24 @@ Public Class Player
             UpdateHistoryInPlaylist(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
             hsong = Nothing
         End If
+    End Sub
+    Private Sub CMIExclude_Click(sender As Object, e As EventArgs) Handles CMIExclude.Click
+        If LVPlaylist.SelectedItems.Count = 0 Then Exit Sub
+        LVPlaylist.BeginUpdate()
+
+        For Each lvi As ListViewItem In LVPlaylist.SelectedItems
+            ' Read current state (defaults to False if unparsed)
+            Dim currentStatus As Boolean = False
+            If lvi.SubItems("Excluded") IsNot Nothing Then
+                Boolean.TryParse(lvi.SubItems("Excluded").Text, currentStatus)
+            End If
+            ' Toggle state
+            Dim newStatus As Boolean = Not currentStatus
+            ' Update subitem text
+            lvi.SubItems("Excluded").Text = newStatus.ToString()
+        Next
+
+        LVPlaylist.EndUpdate()
     End Sub
     Private Sub CMIViewInLibraryClick(sender As Object, e As EventArgs) Handles CMIViewInLibrary.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.FrmLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
