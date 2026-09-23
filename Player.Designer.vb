@@ -43,6 +43,7 @@ Partial Class Player
         CMIRating3Stars = New ToolStripMenuItem()
         CMIRating2Stars = New ToolStripMenuItem()
         CMIRating1Star = New ToolStripMenuItem()
+        CMIExclude = New ToolStripMenuItem()
         CMIViewInLibrary = New ToolStripMenuItem()
         CMIEditTag = New ToolStripMenuItem()
         ToolStripSeparator6 = New ToolStripSeparator()
@@ -109,7 +110,6 @@ Partial Class Player
         TimerStreamMeta = New Timer(components)
         DBEXLeft = New Skye.UI.DataBarEX()
         DBEXRight = New Skye.UI.DataBarEX()
-        CMIExclude = New ToolStripMenuItem()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -216,6 +216,7 @@ Partial Class Player
         CMRatings.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMRatings.Items.AddRange(New ToolStripItem() {CMIRating5Stars, CMIRating4Stars, CMIRating3Stars, CMIRating2Stars, CMIRating1Star})
         CMRatings.Name = "CMRatings"
+        CMRatings.OwnerItem = CMIRating
         CMRatings.ShowImageMargin = False
         CMRatings.Size = New Size(121, 134)
         ' 
@@ -248,6 +249,13 @@ Partial Class Player
         CMIRating1Star.Name = "CMIRating1Star"
         CMIRating1Star.Size = New Size(120, 26)
         CMIRating1Star.Text = "★"
+        ' 
+        ' CMIExclude
+        ' 
+        CMIExclude.Image = My.Resources.Resources.ImageExclude16
+        CMIExclude.Name = "CMIExclude"
+        CMIExclude.Size = New Size(216, 26)
+        CMIExclude.Text = "Exclude"
         ' 
         ' CMIViewInLibrary
         ' 
@@ -810,12 +818,6 @@ Partial Class Player
         DBEXRight.Size = New Size(401, 8)
         DBEXRight.TabIndex = 43
         DBEXRight.TrailingGlow = True
-        ' 
-        ' CMIExclude
-        ' 
-        CMIExclude.Name = "CMIExclude"
-        CMIExclude.Size = New Size(216, 26)
-        CMIExclude.Text = "Exclude"
         ' 
         ' Player
         ' 

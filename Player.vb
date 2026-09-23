@@ -12,7 +12,7 @@ Imports SkyeMusic.My
 
 Public Class Player
 
-    ' Declarations
+    ' DECLARATIONS
     Private Enum DisplayMode
         None
         Lyrics
@@ -2669,7 +2669,7 @@ Public Class Player
 
     End Class
 
-    'Form Events                    
+    ' FORM EVENTS                    
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
         Try
             Select Case m.Msg
@@ -3037,7 +3037,7 @@ Public Class Player
         MyBase.OnResize(e)
     End Sub
 
-    'Control Events
+    ' CONTROL EVENTS
     Private Sub VLCViewer_SingleClick(clientPoint As Point)
         FullScreen = Not FullScreen
     End Sub
@@ -3085,50 +3085,6 @@ Public Class Player
             e.DrawDefault = True
         End If
     End Sub
-    'Private Sub LVPlaylist_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVPlaylist.DrawSubItem
-    '    Static b As Rectangle
-    '    Static s As SizeF
-    '    If e.Item.Selected = True Then
-    '        If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
-    '            b = e.Bounds
-    '            s = e.Graphics.MeasureString(e.SubItem.Text, e.Item.Font, e.Bounds.Size)
-    '            If s.Width <= e.Bounds.Width Then b.Width = CInt(s.Width) + 4
-    '            If b.Width > LVPlaylist.Columns(e.ColumnIndex).Width Then b.Width = LVPlaylist.Columns(e.ColumnIndex).Width
-    '            e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.TextColor), b)
-    '            TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, b.Width), e.Item.Font, New System.Drawing.Point(b.Left + 2, b.Top + 1), App.CurrentTheme.BackColor, TextFormatFlags.NoPrefix)
-    '        ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
-    '            TextRenderer.DrawText(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
-    '        Else
-    '            TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, e.Item.Font, e.Bounds.Width), e.Item.Font, New System.Drawing.Point(e.Bounds.Left + 2, e.Bounds.Top + 1), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
-    '        End If
-    '    Else
-    '        b = e.Bounds
-    '        e.Graphics.FillRectangle(New SolidBrush(App.CurrentTheme.BackColor), b)
-    '        If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
-    '            TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistBoldFont, b.Width), PlaylistBoldFont, New System.Drawing.Point(b.Left + 2, b.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
-    '        ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
-    '            TextRenderer.DrawText(e.Graphics, e.SubItem.Text, LVPlaylist.Font, b, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
-    '        Else
-    '            TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, LVPlaylist.Font, b.Width), LVPlaylist.Font, New System.Drawing.Point(b.Left + 2, b.Top + 2), App.CurrentTheme.TextColor, TextFormatFlags.NoPrefix)
-    '        End If
-    '    End If
-    'End Sub
-    Private Function BlendColors(foreColor As Color, backColor As Color, percentage As Double) As Color
-        ' Clamp percentage between 0.0 and 1.0
-        percentage = Math.Max(0.0, Math.Min(1.0, percentage))
-
-        Dim r As Integer = CInt(backColor.R + (CDbl(foreColor.R) - CDbl(backColor.R)) * percentage)
-        Dim g As Integer = CInt(backColor.G + (CDbl(foreColor.G) - CDbl(backColor.G)) * percentage)
-        Dim b As Integer = CInt(backColor.B + (CDbl(foreColor.B) - CDbl(backColor.B)) * percentage)
-
-        ' Clamp RGB values to valid byte ranges (0 - 255) to prevent OverflowExceptions
-        r = Math.Max(0, Math.Min(255, r))
-        g = Math.Max(0, Math.Min(255, g))
-        b = Math.Max(0, Math.Min(255, b))
-
-        Return Color.FromArgb(255, r, g, b)
-    End Function
-
     Private Sub LVPlaylist_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVPlaylist.DrawSubItem
         Static b As Rectangle
         Static s As SizeF
@@ -3705,6 +3661,7 @@ Public Class Player
             CMIPlaylistRemove.Enabled = False
             CMIEditTitle.Enabled = False
             CMIRating.Enabled = False
+            CMIExclude.Visible = False
             CMIViewInLibrary.Visible = False
             CMIEditTag.Visible = False
             CMIEditTag.Text = "Edit Tag"
@@ -3723,6 +3680,7 @@ Public Class Player
             CMIPlaylistRemove.Enabled = True
             CMIEditTitle.Enabled = True
             CMIRating.Enabled = True
+            CMIExclude.Visible = True
             CMIViewInLibrary.Visible = True
             CMIEditTag.Visible = True
             If LVPlaylist.SelectedItems.Count = 1 Then
@@ -3793,6 +3751,25 @@ Public Class Player
                     TSSeparatorExternalTools.Visible = False
                 End If
             End If
+
+            ' Excluded
+            Dim allExcluded As Boolean = True
+            For Each lvi As ListViewItem In LVPlaylist.SelectedItems
+                Dim isEx As Boolean = False
+                If lvi.SubItems("Excluded") IsNot Nothing Then
+                    Boolean.TryParse(lvi.SubItems("Excluded").Text, isEx)
+                End If
+                If Not isEx Then
+                    allExcluded = False
+                    Exit For
+                End If
+            Next
+            If allExcluded Then
+                CMIExclude.Text = If(LVPlaylist.SelectedItems.Count > 1, "Include Selected Tracks", "Include Track")
+            Else
+                CMIExclude.Text = If(LVPlaylist.SelectedItems.Count > 1, "Exclude Selected Tracks", "Exclude Track")
+            End If
+
         Else
             CMIPlay.Font = New Font(CMIPlay.Font, FontStyle.Regular)
             CMIQueue.Font = New Font(CMIQueue.Font, FontStyle.Regular)
@@ -3896,21 +3873,30 @@ Public Class Player
     End Sub
     Private Sub CMIExclude_Click(sender As Object, e As EventArgs) Handles CMIExclude.Click
         If LVPlaylist.SelectedItems.Count = 0 Then Exit Sub
-        LVPlaylist.BeginUpdate()
 
+        ' 1. Determine if ALL currently selected items are excluded
+        Dim allExcluded As Boolean = True
         For Each lvi As ListViewItem In LVPlaylist.SelectedItems
-            ' Read current state (defaults to False if unparsed)
-            Dim currentStatus As Boolean = False
+            Dim isEx As Boolean = False
             If lvi.SubItems("Excluded") IsNot Nothing Then
-                Boolean.TryParse(lvi.SubItems("Excluded").Text, currentStatus)
+                Boolean.TryParse(lvi.SubItems("Excluded").Text, isEx)
             End If
-            ' Toggle state
-            Dim newStatus As Boolean = Not currentStatus
-            ' Update subitem text
-            lvi.SubItems("Excluded").Text = newStatus.ToString()
+            If Not isEx Then
+                allExcluded = False
+                Exit For
+            End If
         Next
 
+        ' 2. Target state: If all are excluded, set them all to False (Include). Otherwise, set all to True (Exclude).
+        Dim targetStatus As Boolean = Not allExcluded
+        LVPlaylist.BeginUpdate()
+        For Each lvi As ListViewItem In LVPlaylist.SelectedItems
+            If lvi.SubItems("Excluded") IsNot Nothing Then
+                lvi.SubItems("Excluded").Text = targetStatus.ToString()
+            End If
+        Next
         LVPlaylist.EndUpdate()
+
     End Sub
     Private Sub CMIViewInLibraryClick(sender As Object, e As EventArgs) Handles CMIViewInLibrary.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.FrmLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
@@ -4123,7 +4109,7 @@ Public Class Player
         CType(e, HandledMouseEventArgs).Handled = True
     End Sub
 
-    'Handlers
+    ' HANDLERS
     Private Async Sub OnPlaybackStarted()
         OnPlay()
 
@@ -4390,7 +4376,7 @@ Public Class Player
 
     End Sub
 
-    'Methods
+    ' METHODS
     Private Function IsFile(path As String) As Boolean
         If App.History.FindIndex(Function(p) p.Path = path And p.SourceType = App.MediaSourceTypes.File) >= 0 Then
             Return True
@@ -4740,6 +4726,21 @@ Public Class Player
             Skye.Common.Log.Write("App Suspended @ " & Now)
         End If
     End Sub
+    Private Function BlendColors(foreColor As Color, backColor As Color, percentage As Double) As Color
+        ' Clamp percentage between 0.0 and 1.0
+        percentage = Math.Max(0.0, Math.Min(1.0, percentage))
+
+        Dim r As Integer = CInt(backColor.R + (CDbl(foreColor.R) - CDbl(backColor.R)) * percentage)
+        Dim g As Integer = CInt(backColor.G + (CDbl(foreColor.G) - CDbl(backColor.G)) * percentage)
+        Dim b As Integer = CInt(backColor.B + (CDbl(foreColor.B) - CDbl(backColor.B)) * percentage)
+
+        ' Clamp RGB values to valid byte ranges (0 - 255) to prevent OverflowExceptions
+        r = Math.Max(0, Math.Min(255, r))
+        g = Math.Max(0, Math.Min(255, g))
+        b = Math.Max(0, Math.Min(255, b))
+
+        Return Color.FromArgb(255, r, g, b)
+    End Function
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
@@ -4747,7 +4748,7 @@ Public Class Player
         If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = My.Computer.Screen.WorkingArea.Top
     End Sub
 
-    'Playlist
+    ' Playlist
     Private Sub SetPlaylistColumns()
         If App.Settings.PlaylistColumns Is Nothing Then Exit Sub
         If App.Settings.PlaylistColumns.Count = 0 Then Exit Sub
@@ -5380,7 +5381,7 @@ Public Class Player
         Return Nothing
     End Function
 
-    'Queue
+    ' Queue
     Friend Sub QueuePath(path As String)
         Queue.Add(path)
         SetPlaylistCountText()
@@ -5424,7 +5425,7 @@ Public Class Player
         End If
     End Sub
 
-    'Player
+    ' Player
     Private Sub InitVLCPlayer()
         ' Dispose old player if it exists
         If _player IsNot Nothing Then
@@ -6117,7 +6118,7 @@ Public Class Player
         Return CInt(_player.Duration)
     End Function
 
-    'Meters
+    ' Meters
     Friend Sub SetTimerMeter()
         TimerMeter.Stop()
         DBEXLeft.Visible = False
@@ -6136,7 +6137,7 @@ Public Class Player
         End If
     End Sub
 
-    'FullScreen
+    ' FullScreen
     Private Sub SetFullScreen()
         ' ⚠️ Handle with care: this method re-parents VLCViewer between forms.
         ' Must only be called from UI thread — use BeginInvoke if needed.
@@ -6201,7 +6202,7 @@ Public Class Player
         If e.KeyCode = Keys.Escape OrElse e.KeyCode = Keys.F OrElse e.KeyCode = Keys.F11 Then FullScreen = False
     End Sub
 
-    'Lryics
+    ' Lryics
     Private Sub LoadLyrics(songPath As String)
         LyricsText = String.Empty
         LyricsSynced = Nothing
@@ -6377,7 +6378,7 @@ Public Class Player
         End Using
     End Function
 
-    'Themes
+    ' Themes
     Private Sub SetAccentColor(Optional force As Boolean = False)
         Dim accent As Color = App.GetAccentColor()
         If CurrentAccentColor <> accent OrElse force Then
