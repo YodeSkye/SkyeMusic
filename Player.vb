@@ -2739,11 +2739,6 @@ Public Class Player
 
         ' Player Engine
         InitVLCPlayer()
-        '_player = New VLCPlayer(Me)
-        'VLCViewer.MediaPlayer = CType(_player, VLCPlayer).MediaPlayer
-        'AddHandler _player.PlaybackStarted, AddressOf OnPlaybackStarted
-        'AddHandler _player.PlaybackEnded, AddressOf OnPlaybackEnded
-        '_player.Volume = 100
 
         ' For Meters
         RestartMeterCapture()
@@ -4714,16 +4709,17 @@ Public Class Player
     Private Sub LoadPlaylist()
         If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-            Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of PlaylistItemType)))
+            Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of App.PlaylistTrackType)))
             Dim file As New IO.FileStream(App.PlaylistPath, IO.FileMode.Open)
-            Dim items As System.Collections.Generic.List(Of PlaylistItemType)
+            Dim items As System.Collections.Generic.List(Of App.PlaylistTrackType)
             Try
-                items = DirectCast(reader.Deserialize(file), System.Collections.Generic.List(Of PlaylistItemType))
-                For Each item As PlaylistItemType In items
+                items = DirectCast(reader.Deserialize(file), System.Collections.Generic.List(Of App.PlaylistTrackType))
+                For Each item As App.PlaylistTrackType In items
                     Dim lvi As ListViewItem
                     lvi = CreateListviewItem()
                     lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = item.Title
                     lvi.SubItems(LVPlaylist.Columns("Path").Index).Text = item.Path
+                    lvi.SubItems("Excluded").Text = item.Excluded.ToString()
                     GetHistory(lvi, item.Path)
                     LVPlaylist.Items.Add(lvi)
                     lvi = Nothing
@@ -4751,15 +4747,20 @@ Public Class Player
             If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then My.Computer.FileSystem.DeleteFile(App.PlaylistPath)
         Else
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-            Dim items As New System.Collections.Generic.List(Of PlaylistItemType)
+            Dim items As New System.Collections.Generic.List(Of App.PlaylistTrackType)
             For Each plitem As ListViewItem In LVPlaylist.Items
-                Dim newitem As New PlaylistItemType With {
+                Dim isExcluded As Boolean = False
+                If plitem.SubItems("Excluded") IsNot Nothing Then
+                    Boolean.TryParse(plitem.SubItems("Excluded").Text, isExcluded)
+                End If
+                Dim newitem As New App.PlaylistTrackType With {
                     .Title = plitem.SubItems(LVPlaylist.Columns("Title").Index).Text,
-                    .Path = plitem.SubItems(LVPlaylist.Columns("Path").Index).Text}
+                    .Path = plitem.SubItems(LVPlaylist.Columns("Path").Index).Text,
+                    .Excluded = isExcluded}
                 items.Add(newitem)
                 newitem = Nothing
             Next
-            Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of PlaylistItemType)))
+            Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of App.PlaylistTrackType)))
             If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                 My.Computer.FileSystem.CreateDirectory(App.UserPath)
             End If
@@ -5253,7 +5254,7 @@ Public Class Player
         LVPlaylist.SelectedIndices.Add(index)
         LVPlaylist.Items(index).Focused = True
     End Sub
-    Friend Function CreateListviewItem() As ListViewItem
+    Private Function CreateListviewItem() As ListViewItem
         Dim lvi As New ListViewItem    'Title
         lvi.SubItems.Add(String.Empty) 'Path
         lvi.SubItems.Add(String.Empty) 'Rating
@@ -5261,6 +5262,12 @@ Public Class Player
         lvi.SubItems.Add(String.Empty) 'LastPlayed
         lvi.SubItems.Add(String.Empty) 'FirstPlayed
         lvi.SubItems.Add(String.Empty) 'Added
+
+        Dim subEx As New ListViewItem.ListViewSubItem(lvi, "False") With {
+            .Name = "Excluded"
+        }
+        lvi.SubItems.Add(subEx)
+
         lvi.UseItemStyleForSubItems = False
         lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = PlaylistBoldFont
         Return lvi

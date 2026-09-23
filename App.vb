@@ -9,6 +9,7 @@ Imports System.Net.Http
 Imports System.Net.Sockets
 Imports System.Text.Json
 Imports System.Threading
+Imports System.Xml.Serialization
 Imports Microsoft.Win32
 Imports NAudio.CoreAudioApi
 Imports Skye.UI
@@ -89,7 +90,13 @@ Namespace My
             Stream
             AudioCD
         End Enum
-        Public Structure PlaylistItemType
+        <XmlRoot("ArrayOfPlaylistItemType"), XmlType("PlaylistItemType")> ' Keep this attribute to ensure backward compatibility with older versions of the application that used PlaylistItemType for playlist saving.
+        Public Structure PlaylistTrackType ' For Playlist Saving/Loading
+            Public Title As String
+            Public Path As String
+            Public Excluded As Boolean ' Excluded indicates whether the track is excluded from playback or Import/Export. Excluded tracks are not played or exported, but they remain in the playlist for reference.
+        End Structure
+        Public Structure PlaylistItemType ' For Import/Export of Playlist Items
             Public Title As String
             Public Path As String
         End Structure
