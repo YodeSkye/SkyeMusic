@@ -52,8 +52,6 @@ Public Class Player
     Private AutoNext As Boolean = False 'Used by Plays Database System to indicate if the player will automatically play the next item.
     Private PausedAt As DateTime? = Nothing 'Used by Plays Database System to track when the player was paused.
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero 'Used by Plays Database System to track total paused duration.
-    Private ReadOnly PlaylistRegularFont As New Font("Segoe UI", 12, FontStyle.Regular) 'Regular font for playlist titles
-    Private ReadOnly PlaylistBoldFont As New Font("Segoe UI", 12, FontStyle.Bold) 'Bold font for playlist titles
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
@@ -3107,7 +3105,7 @@ Public Class Player
         ' 3. Render Selected vs Unselected
         If e.Item.Selected = True Then
             ' Selected: All columns bold (or regular if Excluded)
-            Dim selectedFont As Font = If(isExcluded, PlaylistRegularFont, PlaylistBoldFont)
+            Dim selectedFont As Font = If(isExcluded, App.PlaylistRegularFont, App.PlaylistBoldFont)
 
             If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
                 b = e.Bounds
@@ -3133,12 +3131,12 @@ Public Class Player
             End Using
 
             If e.ColumnIndex = LVPlaylist.Columns("Title").Index Then
-                Dim unselectedTitleFont As Font = If(isExcluded, PlaylistRegularFont, PlaylistBoldFont)
+                Dim unselectedTitleFont As Font = If(isExcluded, App.PlaylistRegularFont, App.PlaylistBoldFont)
                 TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, unselectedTitleFont, b.Width), unselectedTitleFont, New System.Drawing.Point(b.Left + 2, b.Top + 2), baseTextColor, TextFormatFlags.NoPrefix)
             ElseIf e.ColumnIndex = LVPlaylist.Columns("PlayCount").Index Or e.ColumnIndex = LVPlaylist.Columns("Rating").Index Then
-                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, PlaylistRegularFont, b, baseTextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
+                TextRenderer.DrawText(e.Graphics, e.SubItem.Text, App.PlaylistRegularFont, b, baseTextColor, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
             Else
-                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, PlaylistRegularFont, b.Width), PlaylistRegularFont, New System.Drawing.Point(b.Left + 2, b.Top + 2), baseTextColor, TextFormatFlags.NoPrefix)
+                TextRenderer.DrawText(e.Graphics, App.GenerateEllipsis(e.Graphics, e.SubItem.Text, App.PlaylistRegularFont, b.Width), App.PlaylistRegularFont, New System.Drawing.Point(b.Left + 2, b.Top + 2), baseTextColor, TextFormatFlags.NoPrefix)
             End If
         End If
     End Sub
@@ -4987,8 +4985,23 @@ Public Class Player
         End If
 
         'Build playlist items
+        'Dim items = LVPlaylist.Items.Cast(Of ListViewItem)().
+        'Select(Function(lvi) New PlaylistItemType With {.Title = lvi.SubItems(0).Text, .Path = lvi.SubItems(1).Text})
+
+        'Build playlist items
+        Dim titleCol = LVPlaylist.Columns.Cast(Of ColumnHeader)().FirstOrDefault(Function(c) c.Text = "Title")
+        Dim pathCol = LVPlaylist.Columns.Cast(Of ColumnHeader)().FirstOrDefault(Function(c) c.Text = "Path")
+        Dim titleIdx As Integer = If(titleCol IsNot Nothing, titleCol.Index, 0)
+        Dim pathIdx As Integer = If(pathCol IsNot Nothing, pathCol.Index, 1)
         Dim items = LVPlaylist.Items.Cast(Of ListViewItem)().
-        Select(Function(lvi) New PlaylistItemType With {.Title = lvi.SubItems(0).Text, .Path = lvi.SubItems(1).Text})
+            Where(Function(lvi)
+                      Dim exSub = lvi.SubItems("Excluded")
+                      Return exSub Is Nothing OrElse exSub.Text <> "True"
+                  End Function).
+            Select(Function(lvi) New PlaylistItemType With {
+                .Title = If(lvi.SubItems.Count > titleIdx, lvi.SubItems(titleIdx).Text, lvi.Text),
+                .Path = If(lvi.SubItems.Count > pathIdx, lvi.SubItems(pathIdx).Text, String.Empty)
+            }).ToList()
 
         'Export
         If LVPlaylist.Items.Count = 0 Then
@@ -5369,7 +5382,7 @@ Public Class Player
         lvi.SubItems.Add(subEx)
 
         lvi.UseItemStyleForSubItems = False
-        lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = PlaylistBoldFont
+        lvi.SubItems(LVPlaylist.Columns("Title").Index).Font = App.PlaylistBoldFont
         Return lvi
     End Function
     Private Function ClearPlaylistSorts(currentsort As SortOrder) As SortOrder
@@ -5628,63 +5641,87 @@ Public Class Player
         Select Case App.Settings.PlayMode
             Case PlayModes.Repeat
                 TimerShowMedia.Start()
+
             Case PlayModes.Linear
                 If LVPlaylist.Items.Count > 0 Then
-                    Dim item As ListViewItem = LVPlaylist.FindItemWithText(_player.Path, True, 0)
-                    Dim newindex As Integer = LVPlaylist.Items.Count - 1
-                    If item Is Nothing Then
-                        If IsStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
-                            PlayStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                        Else
-                            PlayFile(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousLinear")
+
+                    ' Quick check: stop if ALL items are excluded
+                    Dim hasPlayableItem As Boolean = False
+                    For Each lvi As ListViewItem In LVPlaylist.Items
+                        If Not IsExcluded(lvi) Then
+                            hasPlayableItem = True
+                            Exit For
                         End If
-                    ElseIf item.Index = 0 Then
-                        If IsStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
-                            PlayStream(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                        Else
-                            PlayFile(LVPlaylist.Items(LVPlaylist.Items.Count - 1).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousLinear")
-                        End If
+                    Next
+                    If Not hasPlayableItem Then Exit Sub
+
+                    ' Locate currently playing or selected item
+                    Dim item As ListViewItem
+                    If LVPlaylist.SelectedItems.Count > 0 Then
+                        item = LVPlaylist.FindItemWithText(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
                     Else
-                        newindex = item.Index - 1
-                        If IsStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
-                            PlayStream(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text)
-                        Else
-                            PlayFile(LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousLinear")
-                        End If
-                    End If
-                    EnsurePlaylistItemIsVisible(newindex)
-                End If
-            Case PlayModes.Random
-                If RandomHistory.Count > 0 Then
-                    If LVPlaylist.Items.Count > 0 Then
-                        If RandomHistoryIndex > 0 Then
-                            RandomHistoryIndex -= 1
-                        Else
-                            RandomHistoryIndex = RandomHistory.Count - 1
-                        End If
-                        If RandomHistory.Item(RandomHistoryIndex) = _player.Path Then
-                            'Already Playing Previous Random
-                            RandomHistoryIndex -= 1
-                            If RandomHistoryIndex < 0 Then
-                                RandomHistoryIndex = RandomHistory.Count - 1
-                            End If
-                        End If
-                        Dim item As ListViewItem
-                        Try
-                            item = LVPlaylist.FindItemWithText(RandomHistory.Item(RandomHistoryIndex), True, 0)
-                        Catch
+                        If _player.Path Is Nothing OrElse _player.Path = String.Empty Then
                             item = Nothing
-                        End Try
-                        If item IsNot Nothing Then
-                            If IsStream(item.SubItems(LVPlaylist.Columns("Path").Index).Text) Then
-                                PlayStream(item.SubItems(LVPlaylist.Columns("Path").Index).Text)
-                            Else
-                                PlayFile(item.SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayPreviousRandom")
-                            End If
-                            EnsurePlaylistItemIsVisible(item.Index)
+                        Else
+                            item = LVPlaylist.FindItemWithText(_player.Path, True, 0)
                         End If
                     End If
+
+                    ' Calculate previous index and scan backward past any excluded tracks
+                    Dim newindex As Integer = If(item Is Nothing, LVPlaylist.Items.Count - 1, item.Index - 1)
+                    If newindex < 0 Then newindex = LVPlaylist.Items.Count - 1
+                    Dim scannedCount As Integer = 0
+                    While IsExcluded(LVPlaylist.Items(newindex)) AndAlso scannedCount < LVPlaylist.Items.Count
+                        newindex -= 1
+                        If newindex < 0 Then newindex = LVPlaylist.Items.Count - 1
+                        scannedCount += 1
+                    End While
+
+                    ' Play the resolved track
+                    Dim path As String = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
+                    If IsStream(path) Then
+                        PlayStream(path)
+                    Else
+                        PlayFile(path, "PlayPreviousLinear")
+                    End If
+
+                    EnsurePlaylistItemIsVisible(newindex)
+                    TimerShowMedia.Start()
                 End If
+
+            Case PlayModes.Random
+                If RandomHistory.Count = 0 OrElse LVPlaylist.Items.Count = 0 Then Exit Select
+
+                ' Move back in history
+                RandomHistoryIndex -= 1
+                If RandomHistoryIndex < 0 Then
+                    RandomHistoryIndex = RandomHistory.Count - 1
+                End If
+
+                ' If the selected history item matches the current playing file, step back one more
+                If RandomHistory.Item(RandomHistoryIndex) = _player.Path AndAlso RandomHistory.Count > 1 Then
+                    RandomHistoryIndex -= 1
+                    If RandomHistoryIndex < 0 Then
+                        RandomHistoryIndex = RandomHistory.Count - 1
+                    End If
+                End If
+
+                ' Find and play the item
+                Dim targetPath As String = RandomHistory.Item(RandomHistoryIndex)
+                Dim item As ListViewItem = LVPlaylist.FindItemWithText(targetPath, True, 0)
+                If item IsNot Nothing Then
+                    Dim pathColumnIndex As Integer = LVPlaylist.Columns("Path").Index
+                    Dim mediaPath As String = item.SubItems(pathColumnIndex).Text
+
+                    If IsStream(mediaPath) Then
+                        PlayStream(mediaPath)
+                    Else
+                        PlayFile(mediaPath, "PlayPreviousRandom")
+                    End If
+
+                    EnsurePlaylistItemIsVisible(item.Index)
+                End If
+
         End Select
     End Sub
     Friend Sub PlayNext()

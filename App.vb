@@ -275,6 +275,8 @@ Namespace My
         Friend ReadOnly NowPlayingToastMessageFont As New Font("Segoe UI", 16, FontStyle.Bold)
         Friend ReadOnly ToastTitleFont As New Font("Segoe UI", 12, FontStyle.Bold)
         Friend ReadOnly ToastMessageFont As New Font("Segoe UI", 12)
+        Friend ReadOnly PlaylistRegularFont As New Font("Segoe UI", 12, FontStyle.Regular) 'Regular font for playlist titles
+        Friend ReadOnly PlaylistBoldFont As New Font("Segoe UI", 12, FontStyle.Bold) 'Bold font for playlist titles
         Friend ReadOnly DummyMenu As New ContextMenuStrip()
         Friend ReadOnly Http As New HttpClient()
         Friend DirectoryLastSelectedSource As Integer = -1 'DirectoryLastSelectedSource stores the last selected source in the Directory form.
@@ -2738,6 +2740,19 @@ Namespace My
                 End If
             Catch ex As Exception
                 ' Ignore icon cleanup errors on exit
+            End Try
+
+            ' Phase 5: Fonts Cleanup
+            Try
+                If TipFont IsNot Nothing Then TipFont.Dispose()
+                If NowPlayingToastTitleFont IsNot Nothing Then NowPlayingToastTitleFont.Dispose()
+                If NowPlayingToastMessageFont IsNot Nothing Then NowPlayingToastMessageFont.Dispose()
+                If ToastTitleFont IsNot Nothing Then ToastTitleFont.Dispose()
+                If ToastMessageFont IsNot Nothing Then ToastMessageFont.Dispose()
+                If PlaylistRegularFont IsNot Nothing Then PlaylistRegularFont.Dispose()
+                If PlaylistBoldFont IsNot Nothing Then PlaylistBoldFont.Dispose()
+            Catch ex As Exception
+                ' Exception swallowed safely during shutdown
             End Try
 
             Skye.Common.Log.Write(My.Application.Info.ProductName + " Closed")
