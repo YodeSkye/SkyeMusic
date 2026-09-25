@@ -1,5 +1,6 @@
 ﻿
 Imports System.IO
+Imports System.Reflection.Metadata
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
@@ -2669,6 +2670,7 @@ Public Class Player
 
     ' FORM EVENTS                    
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
+        Dim handled As Boolean = False
         Try
             Select Case m.Msg
                 Case WinAPI.WM_CLOSE
@@ -2676,6 +2678,7 @@ Public Class Player
                         _handledClose = True
                         App.ExitApp()
                     End If
+                    handled = True
                     Return
                 Case Skye.WinAPI.WM_HOTKEY
                     'Debug.Print("HOTKEY " + m.WParam.ToString + " PRESSED")
@@ -2683,22 +2686,31 @@ Public Class Player
                 Case WinAPI.WM_SYSCOMMAND
                     Dim cmd As Integer = m.WParam.ToInt32() And &HFFF0
                     If cmd = WinAPI.SC_MINIMIZE Then
+                        ' CAPTURE REAL STATE BEFORE WINFORMS CHANGES IT
+                        If WindowState = FormWindowState.Maximized OrElse WindowState = FormWindowState.Normal Then
+                            _lastRealState = WindowState
+                            Debug.Print("Captured Real State: " + _lastRealState.ToString)
+                        End If
                         If App.Settings.ShowTrayIcon AndAlso App.Settings.MinimizeToTray Then
-                            ' CAPTURE REAL STATE BEFORE WINFORMS CHANGES IT
-                            If WindowState = FormWindowState.Maximized OrElse WindowState = FormWindowState.Normal Then
-                                _lastRealState = WindowState
-                            End If
                             ' Close playlist menu if open
                             If CMPlaylist IsNot Nothing AndAlso CMPlaylist.Visible Then
                                 WinAPI.PostMessage(CMPlaylist.Handle, WinAPI.WM_CLOSE, IntPtr.Zero, IntPtr.Zero)
                             End If
                             MinimizeToTray()
+                            handled = True ' Prevents MyBase.WndProc from running in Finally
                             Return ' <-- CRITICAL: prevents ghost titlebar
                         End If
+                    End If
+                    If cmd = WinAPI.SC_RESTORE Then
+                        ' Hand restore events (Alt+Tab, taskbar restore, wake up) directly to your tray restore handler
+                        RestoreFromTray()
+                        handled = True
+                        Return
                     End If
                     If cmd = WinAPI.SC_CLOSE Then
                         _handledClose = True
                         App.ExitApp()
+                        handled = True
                         Return
                     End If
                 Case Skye.WinAPI.WM_ACTIVATE
@@ -2727,11 +2739,12 @@ Public Class Player
                         Case Else
                             m.Result = New IntPtr(9999)
                     End Select
+                    handled = True
             End Select
         Catch ex As Exception
             Skye.Common.Log.Write("Player WndProc Handler Error" + Chr(13) + ex.ToString)
         Finally
-            If m.Msg <> Skye.WinAPI.WM_GET_CUSTOM_DATA Then MyBase.WndProc(m)
+            If Not handled Then MyBase.WndProc(m)
         End Try
     End Sub
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -3023,10 +3036,8 @@ Public Class Player
     Protected Overrides Sub OnResize(e As EventArgs)
         If Me.WindowState = FormWindowState.Minimized Then
             If App.Settings.ShowTrayIcon AndAlso App.Settings.MinimizeToTray Then
-
                 ' Undo WinForms minimize BEFORE the shell sees it
-                Me.WindowState = FormWindowState.Normal
-
+                'Me.WindowState = FormWindowState.Normal
                 MinimizeToTray()
                 Return
             End If
@@ -4569,54 +4580,23 @@ Public Class Player
             RestoreFromTray()
         End If
     End Sub
-    Friend Sub MinimizeToTray()
+    Friend Sub MinimizeToTray() ' DO NOT CHANGE THIS!! It will break tray minimize behaviour.
         ' Remember the real state (Normal or Maximized)
         If _lastRealState = Nothing AndAlso WindowState = FormWindowState.Normal OrElse WindowState = FormWindowState.Maximized Then
             _lastRealState = WindowState
         End If
-
         ' If maximized, normalize BEFORE hiding to avoid fullscreen glitch
         If WindowState = FormWindowState.Maximized Then
             WindowState = FormWindowState.Normal
         End If
-
-        'ShowInTaskbar = False
-        'WindowState = FormWindowState.Minimized
-        'Hide()
         Visible = False
-
-        'App.RegisterHotKeys() ' because MinimizeToTray will unregister hotkeys, so we need to re-register them here so they work while minimized to the tray
-
     End Sub
-    Friend Sub RestoreFromTray()
-
-        ' Get the path and position from the current player before we reinitialize it
-        'Dim _lastPath As String = Nothing
-        'Dim _lastPosition As Double = 0
-        'Dim old = TryCast(_player, VLCPlayer)
-        'If old IsNot Nothing Then
-        '    If old.HasMedia AndAlso PlayState <> PlayStates.Stopped Then
-        '        _lastPath = old.Path
-        '        _lastPosition = old.Position
-        '    End If
-        'End If
-
+    Friend Sub RestoreFromTray() ' DO NOT CHANGE THIS!! It will break tray minimize behaviour.
         Visible = True
-        'Show()
-        'ShowInTaskbar = True
+        Debug.Print("Restoring Player from Tray, Last State: " & _lastRealState.ToString)
         WindowState = _lastRealState
         _lastRealState = Nothing
         Activate()
-
-        'everything below is because the forms handle is destroyed when the form is hidden, so we need to reinitialize vlc and hotkeys
-        'App.RegisterHotKeys()
-        'InitVLCPlayer()
-        'Dim vlc = TryCast(_player, VLCPlayer)
-        'If vlc IsNot Nothing AndAlso _lastPath IsNot Nothing Then
-        '    vlc.Play(_lastPath)
-        '    vlc.Position = _lastPosition
-        'End If
-
     End Sub
     Private Sub EditTags()
         If LVPlaylist.SelectedItems.Count > 0 Then
