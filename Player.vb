@@ -2689,7 +2689,7 @@ Public Class Player
                         ' CAPTURE REAL STATE BEFORE WINFORMS CHANGES IT
                         If WindowState = FormWindowState.Maximized OrElse WindowState = FormWindowState.Normal Then
                             _lastRealState = WindowState
-                            Debug.Print("Captured Real State: " + _lastRealState.ToString)
+                            'Debug.Print("Captured Real State (WndProc): " + _lastRealState.ToString)
                         End If
                         If App.Settings.ShowTrayIcon AndAlso App.Settings.MinimizeToTray Then
                             ' Close playlist menu if open
@@ -4584,6 +4584,7 @@ Public Class Player
         ' Remember the real state (Normal or Maximized)
         If _lastRealState = Nothing AndAlso WindowState = FormWindowState.Normal OrElse WindowState = FormWindowState.Maximized Then
             _lastRealState = WindowState
+            'Debug.Print("Captured Real State (MinimizeToTray): " + _lastRealState.ToString)
         End If
         ' If maximized, normalize BEFORE hiding to avoid fullscreen glitch
         If WindowState = FormWindowState.Maximized Then
@@ -4708,7 +4709,15 @@ Public Class Player
         If App.Settings.SuspendOnSessionChange Then
             'Debug.Print("Suspending...")
             StopPlay()
-            Me.WindowState = FormWindowState.Minimized
+            If WindowState = FormWindowState.Normal OrElse WindowState = FormWindowState.Maximized Then
+                _lastRealState = WindowState
+                'Debug.Print("Captured Real State (Suspend): " + _lastRealState.ToString)
+            End If
+            If App.Settings.ShowTrayIcon AndAlso App.Settings.MinimizeToTray Then
+                MinimizeToTray()
+            Else
+                Me.WindowState = FormWindowState.Minimized
+            End If
             Skye.Common.Log.Write("App Suspended @ " & Now)
         End If
     End Sub
