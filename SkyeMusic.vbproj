@@ -106,7 +106,7 @@
     <PackageReference Include="LibVLCSharp.WinForms" Version="3.10.1" />
     <PackageReference Include="MetaBrainz.MusicBrainz" Version="8.0.1" />
     <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="7.1.0" />
-    <PackageReference Include="NAudio" Version="2.4.0" />
+    <PackageReference Include="NAudio" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SkyeLibrary" Version="1.5.45" />
     <PackageReference Include="Syncfusion.Tools.Windows" Version="34.2.9" />
