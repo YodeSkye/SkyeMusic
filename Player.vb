@@ -57,6 +57,8 @@ Public Class Player
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
     Friend Event TitleChanged(newTitle As String)
     Friend Event PlaylistChanged()
+    Private _playlistDirty As Boolean = False
+    Private WithEvents TimerPlaylistAutoSave As New System.Windows.Forms.Timer() With {.Interval = 3000}
 
     ' Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -4280,11 +4282,13 @@ Public Class Player
 
     End Sub
     Private Sub OnPlaylistChanged() Handles Me.PlaylistChanged
-        If Not App.Settings.EnableCompanionServer Then Exit Sub
-
-        BuildPlaylistJson()
-        App.CompanionControlServer.Broadcast("PLAYLIST_CHANGED")
-
+        ' 1. Always mark dirty so the local XML file auto-saves
+        MarkPlaylistDirty()
+        ' 2. Broadcast to Companion Server if enabled
+        If App.Settings.EnableCompanionServer Then
+            BuildPlaylistJson()
+            App.CompanionControlServer.Broadcast("PLAYLIST_CHANGED")
+        End If
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
         If MeterLastUpdate <> DateTime.MinValue AndAlso (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 500 Then
@@ -4383,6 +4387,14 @@ Public Class Player
 
         PollStreamMetadata()
 
+    End Sub
+    Private Sub TimerPlaylistAutoSave_Tick(sender As Object, e As EventArgs) Handles TimerPlaylistAutoSave.Tick
+        TimerPlaylistAutoSave.Stop()
+
+        If _playlistDirty Then
+            SavePlaylist()
+            _playlistDirty = False
+        End If
     End Sub
 
     ' METHODS
@@ -4860,6 +4872,13 @@ Public Class Player
             items = Nothing
             Skye.Common.Log.Write("Playlist Saved (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
         End If
+    End Sub
+    Private Sub MarkPlaylistDirty()
+        _playlistDirty = True
+
+        ' Reset the timer countdown on every edit
+        TimerPlaylistAutoSave.Stop()
+        TimerPlaylistAutoSave.Start()
     End Sub
     Friend Sub OpenPlaylist()
         Dim ext As String
