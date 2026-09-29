@@ -12,7 +12,7 @@ Imports Skye
 Imports Skye.Contracts
 Imports Skye.UI
 Imports SkyeMusic.My
-Imports SkyeMusicNAudioBridge
+Imports NAudioBridge
 
 Public Class Player
 

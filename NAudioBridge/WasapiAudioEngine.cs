@@ -4,7 +4,7 @@ using NAudio.Dsp;
 using NAudio.Wave;
 using System.Runtime.InteropServices;
 
-namespace SkyeMusicNAudioBridge
+namespace NAudioBridge
 {
     public class AudioDataEventArgs(float[] waveform, float[] magnitudes, float leftPeak, float rightPeak) : EventArgs
     {

@@ -118,7 +118,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="SkyeMusicNAudioBridge\SkyeMusicNAudioBridge.csproj" />
+    <ProjectReference Include="NAudioBridge\NAudioBridge.csproj" />
   </ItemGroup>
 
 </Project>
