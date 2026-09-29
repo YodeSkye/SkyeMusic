@@ -117,8 +117,4 @@
     <PackageReference Include="WordCloudSharp" Version="1.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SkyeMusicNAudioBridge\SkyeMusicNAudioBridge.csproj" />
-  </ItemGroup>
-
 </Project>
