@@ -1,8 +1,10 @@
 ﻿
 Imports System.IO
 Imports System.Reflection.Metadata
+Imports System.Runtime.InteropServices
 Imports System.Text
 Imports LibVLCSharp.Shared
+Imports NAudio.CoreAudioApi
 Imports NAudio.Dsp
 Imports NAudio.Wave
 Imports Newtonsoft.Json.Linq
@@ -10,6 +12,7 @@ Imports Skye
 Imports Skye.Contracts
 Imports Skye.UI
 Imports SkyeMusic.My
+Imports SkyeMusicNAudioBridge
 
 Public Class Player
 
@@ -21,9 +24,10 @@ Public Class Player
         Video
         Visualizer
     End Enum
-    Private MeterAudioCapture As WasapiLoopbackCapture 'Audio Capture for Meters
-    Private MeterPeakLeft, MeterPeakRight, MeterDecayLeft, MeterDecayRight As Single 'Meter Values
+    Private MeterAudioEngine As WasapiAudioEngine 'Audio Capture for Meters
+    Private MeterPeakLeft As Single, MeterPeakRight As Single
     Private MeterLastUpdate As DateTime = DateTime.MinValue
+    Private _lastStaleMeterLog As DateTime = DateTime.MinValue 'Last time the meter log was updated
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Private TipPlayerEX As Skye.UI.ToolTipEX 'Tooltip for Player Controls
@@ -32,7 +36,6 @@ Public Class Player
     Private TipCMPlaylist As Skye.UI.ToolTipEX 'Tooltip for Context Menu of Playlist
     Private _lastDisplayMode As DisplayMode = DisplayMode.None
     Private _lastRealState As FormWindowState = FormWindowState.Normal 'Last real state of the form (not minimized)
-    Private _lastStaleMeterLog As DateTime = DateTime.MinValue 'Last time the meter log was updated
     Private _handledClose As Boolean = False 'Indicates if the close event has been handled
     Private IsLoadingPlaylistColumns As Boolean = False 'Indicates if the playlist columns are being loaded
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
@@ -616,103 +619,64 @@ Public Class Player
 
     End Class
     Private Class VisualizerAudioEngine
+        Implements IDisposable
 
-        'Declarations
-        Private capture As WasapiLoopbackCapture
-        Private buffer() As Byte
+        ' Declarations
         Private ReadOnly visualizerHost As VisualizerHostClass
+        Private audioBridge As WasapiAudioEngine
+        Private isDisposed As Boolean
 
-        'Constructor
+        ' Events
         Public Sub New(host As VisualizerHostClass)
             visualizerHost = host
+            ' Instantiate the bridge internally so no external reference is needed
+            audioBridge = New WasapiAudioEngine()
         End Sub
-
-        'Methods
-        Public Sub Start()
-            capture = New WasapiLoopbackCapture()
-            AddHandler capture.DataAvailable, AddressOf OnDataAvailable
-            capture.StartRecording()
-        End Sub
-        Public Sub [Stop]()
-            If capture IsNot Nothing Then
-                capture.StopRecording()
-                RemoveHandler capture.DataAvailable, AddressOf OnDataAvailable
-                capture.Dispose()
+        Public Sub Dispose() Implements IDisposable.Dispose
+            If Not isDisposed Then
+                [Stop]()
+                If audioBridge IsNot Nothing Then
+                    audioBridge.Dispose()
+                    audioBridge = Nothing
+                End If
+                isDisposed = True
             End If
         End Sub
 
-        'Handlers
-        'Private Sub OnDataAvailable(sender As Object, e As WaveInEventArgs)
-        '    buffer = e.Buffer
-
-        '    'Convert to float samples
-        '    Dim sampleCount = e.BytesRecorded \ 4
-        '    Dim samples(sampleCount - 1) As Single
-        '    For i = 0 To sampleCount - 1
-        '        samples(i) = BitConverter.ToSingle(buffer, i * 4)
-        '    Next
-
-        '    'Apply FFT
-        '    Dim fftSize = 1024
-        '    Dim fftBuffer(fftSize - 1) As Complex
-        '    For i = 0 To fftSize - 1
-        '        If i < samples.Length Then
-        '            fftBuffer(i).X = samples(i)
-        '            fftBuffer(i).Y = 0
-        '        Else
-        '            fftBuffer(i).X = 0
-        '            fftBuffer(i).Y = 0
-        '        End If
-        '    Next
-        '    FastFourierTransform.FFT(True, CInt(Math.Log(fftSize, 2)), fftBuffer)
-
-        '    'Extract magnitudes
-        '    Dim magnitudes(fftSize \ 2 - 1) As Single
-        '    For i = 0 To magnitudes.Length - 1
-        '        magnitudes(i) = CSng(Math.Sqrt(fftBuffer(i).X ^ 2 + fftBuffer(i).Y ^ 2))
-        '    Next
-
-        '    'Feed to visualizer
-        '    visualizerHost.FeedAudio(magnitudes)
-        'End Sub
-        Private Sub OnDataAvailable(sender As Object, e As WaveInEventArgs)
-            buffer = e.Buffer
-
-            ' Convert to float samples
-            Dim sampleCount = e.BytesRecorded \ 4
-            Dim samples(sampleCount - 1) As Single
-            For i = 0 To sampleCount - 1
-                samples(i) = BitConverter.ToSingle(buffer, i * 4)
-            Next
+        ' Handlers
+        Private Sub OnAudioDataProcessed(sender As Object, e As AudioDataEventArgs)
+            If visualizerHost Is Nothing Then Return
 
             ' Feed raw waveform to oscilloscope
-            visualizerHost.FeedWaveform(samples)
-            App.FrmPlayer.MiniPlayerVisualizer?.UpdateWaveform(samples)
+            If e.Waveform IsNot Nothing AndAlso e.Waveform.Length > 0 Then
+                visualizerHost.FeedWaveform(e.Waveform)
+                App.FrmPlayer.MiniPlayerVisualizer?.UpdateWaveform(e.Waveform)
+            End If
 
-            ' Apply FFT
-            Dim fftSize = 1024
-            Dim fftBuffer(fftSize - 1) As Complex
-            For i = 0 To fftSize - 1
-                If i < samples.Length Then
-                    fftBuffer(i).X = samples(i)
-                    fftBuffer(i).Y = 0
-                Else
-                    fftBuffer(i).X = 0
-                    fftBuffer(i).Y = 0
-                End If
-            Next
-            FastFourierTransform.FFT(True, CInt(Math.Log(fftSize, 2)), fftBuffer)
-
-            ' Extract magnitudes
-            Dim magnitudes(fftSize \ 2 - 1) As Single
-            For i = 0 To magnitudes.Length - 1
-                magnitudes(i) = CSng(Math.Sqrt(fftBuffer(i).X ^ 2 + fftBuffer(i).Y ^ 2))
-            Next
-
-            ' Feed spectrum to analyzers
-            visualizerHost.FeedAudio(magnitudes)
-            App.FrmPlayer.MiniPlayerVisualizer?.Update(magnitudes)
+            ' Feed FFT magnitudes to spectrum analyzer
+            If e.Magnitudes IsNot Nothing AndAlso e.Magnitudes.Length > 0 Then
+                visualizerHost.FeedAudio(e.Magnitudes)
+                App.FrmPlayer.MiniPlayerVisualizer?.Update(e.Magnitudes)
+            End If
         End Sub
+
+        ' Methods
+        Public Sub Start()
+            If audioBridge IsNot Nothing Then
+                ' Ensure clean handler wiring
+                RemoveHandler audioBridge.AudioDataProcessed, AddressOf OnAudioDataProcessed
+                AddHandler audioBridge.AudioDataProcessed, AddressOf OnAudioDataProcessed
+
+                audioBridge.Start()
+            End If
+        End Sub
+        Public Sub [Stop]()
+            If audioBridge IsNot Nothing Then
+                RemoveHandler audioBridge.AudioDataProcessed, AddressOf OnAudioDataProcessed
+                audioBridge.Stop()
+            End If
+        End Sub
+
     End Class
     Private Class VisualizerRainbowBar
         Inherits UserControl
@@ -2922,11 +2886,11 @@ Public Class Player
             RemoveHandler VLCHook.RightClick, AddressOf VLCViewer_RightClick
             VLCHook = Nothing
         End If
-        If MeterAudioCapture IsNot Nothing Then
-            MeterAudioCapture.StopRecording()
-            RemoveHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
-            MeterAudioCapture.Dispose()
-            MeterAudioCapture = Nothing
+        If MeterAudioEngine IsNot Nothing Then
+            MeterAudioEngine.Stop()
+            RemoveHandler MeterAudioEngine.AudioDataProcessed, AddressOf OnMeterDataProcessed
+            MeterAudioEngine.Dispose()
+            MeterAudioEngine = Nothing
         End If
     End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnReverse.KeyDown, BtnPlay.KeyDown, BtnForward.KeyDown, TrackBarPosition.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
@@ -4196,69 +4160,15 @@ Public Class Player
         ' Reparenting VLCViewer during this moment causes WinForms to freeze.
         ' Let fullscreen collapse naturally — cleanup happens safely elsewhere, in OnPlaybackStarted.
     End Sub
-    Private Sub OnMeterDataAvailable(sender As Object, e As WaveInEventArgs)
-        MeterLastUpdate = DateTime.Now
-        Dim wf = MeterAudioCapture.WaveFormat
-        Dim channels As Integer = wf.Channels
-        If channels <> 2 Then
-            ' Fallback: mono -> duplicate into both channels
-            ' Convert appropriately below
+    Private Sub OnMeterDataProcessed(ByVal sender As Object, ByVal e As AudioDataEventArgs)
+        If TimerMeter.Enabled Then
+            MeterLastUpdate = DateTime.Now
+
+            ' Lock in the HIGHEST peak received between UI ticks
+            ' (Never let a smaller buffer sample decrease the value here!)
+            If e.LeftPeak > MeterPeakLeft Then MeterPeakLeft = e.LeftPeak
+            If e.RightPeak > MeterPeakRight Then MeterPeakRight = e.RightPeak
         End If
-
-        Dim leftMax As Single = 0.0F
-        Dim rightMax As Single = 0.0F
-
-        If wf.Encoding = WaveFormatEncoding.IeeeFloat Then
-            ' 32-bit float: 4 bytes per sample per channel, 8 bytes per stereo frame
-            Dim waveBuffer As New WaveBuffer(e.Buffer)
-            Dim totalSamples As Integer = e.BytesRecorded \ 4
-            ' Iterate by frame (two samples per frame)
-            For i As Integer = 0 To totalSamples - 2 Step 2
-                Dim l As Single = waveBuffer.FloatBuffer(i)
-                Dim r As Single = waveBuffer.FloatBuffer(i + 1)
-                leftMax = Math.Max(leftMax, Math.Abs(l))
-                rightMax = Math.Max(rightMax, Math.Abs(r))
-            Next
-
-        ElseIf wf.Encoding = WaveFormatEncoding.Pcm AndAlso wf.BitsPerSample = 16 Then
-            ' 16-bit PCM: 2 bytes per sample per channel, 4 bytes per stereo frame
-            Dim frames As Integer = e.BytesRecorded \ (channels * 2)
-            For f As Integer = 0 To frames - 1
-                Dim baseIndex As Integer = f * channels * 2
-
-                ' Little-endian Int16
-                Dim lInt As Short = CShort(e.Buffer(baseIndex) Or (e.Buffer(baseIndex + 1) << 8))
-                Dim rInt As Short
-                If channels >= 2 Then
-                    Dim rBase As Integer = baseIndex + 2
-                    rInt = CShort(e.Buffer(rBase) Or (e.Buffer(rBase + 1) << 8))
-                Else
-                    rInt = lInt ' mono fallback
-                End If
-
-                ' Normalize to -1..+1
-                Dim l As Single = Math.Abs(lInt / 32768.0F)
-                Dim r As Single = Math.Abs(rInt / 32768.0F)
-
-                leftMax = Math.Max(leftMax, l)
-                rightMax = Math.Max(rightMax, r)
-            Next
-
-        Else
-            ' Other encodings: add branches as needed (24-bit PCM, etc.)
-            ' For safety, bail out or treat as zero
-            leftMax = 0.0F
-            rightMax = 0.0F
-        End If
-
-        ' Optional smoothing: peak hold with gentle decay to avoid jitter
-        Dim decay As Single = 0.85F
-        MeterDecayLeft = Math.Max(leftMax, MeterDecayLeft * decay)
-        MeterDecayRight = Math.Max(rightMax, MeterDecayRight * decay)
-
-        ' Store normalized peaks (0..1). Use smoothed or raw max:
-        MeterPeakLeft = MeterDecayLeft
-        MeterPeakRight = MeterDecayRight
     End Sub
     Private Sub OnNowPlayingChanged(nptext As String)
         Dim title As String = nptext.Split("@"c)(0).Trim()
@@ -4296,10 +4206,12 @@ Public Class Player
                 Skye.Common.Log.Write("Audio Meter Data Stale, Resetting Peaks")
                 _lastStaleMeterLog = DateTime.Now
             End If
+
             DBEXLeft.Value = 0
             DBEXRight.Value = 0
             DBEXVertLeft.Value = 0
             DBEXVertRight.Value = 0
+
             RestartMeterCapture()
             Return
         Else
@@ -4310,10 +4222,17 @@ Public Class Player
             Dim rightScaled As Single = MeterPeakRight * 100.0F
             Dim leftVal As Integer = CInt(Math.Max(0, Math.Min(DBEXLeft.Maximum, leftScaled)))
             Dim rightVal As Integer = CInt(Math.Max(0, Math.Min(DBEXRight.Maximum, rightScaled)))
+
             DBEXLeft.Value = leftVal
             DBEXRight.Value = rightVal
             DBEXVertLeft.Value = leftVal
             DBEXVertRight.Value = rightVal
+
+            ' Apply decay after rendering so peaks drop smoothly over time
+            Dim decay As Single = 0.92F
+            MeterPeakLeft *= decay
+            MeterPeakRight *= decay
+
         End If
     End Sub
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
@@ -4552,29 +4471,32 @@ Public Class Player
         End If
     End Sub
     Private Sub RestartMeterCapture()
-        ' 1. Tear down old capture safely
+        ' Teardown existing capture
+        If MeterAudioEngine IsNot Nothing Then
+            Try
+                RemoveHandler MeterAudioEngine.AudioDataProcessed, AddressOf OnMeterDataProcessed
+                MeterAudioEngine.Stop()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Stopping Meter Capture{Environment.NewLine}{ex.Message}")
+            Finally
+                Try
+                    MeterAudioEngine.Dispose()
+                Catch
+                End Try
+                MeterAudioEngine = Nothing
+            End Try
+        End If
+
+        ' Re-initialize using C# Bridge
         Try
-            If MeterAudioCapture IsNot Nothing Then
-                RemoveHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
-                MeterAudioCapture.StopRecording()
-                MeterAudioCapture.Dispose()
-            End If
-        Catch ex As Exception
-            Skye.Common.Log.Write($"Error Stopping Meter Capture{Environment.NewLine}{ex.Message}")
-        Finally
-            MeterAudioCapture = Nothing
-        End Try
-        ' 2. Re-initialize guard for device reconfigurations/invalidations
-        Try
-            MeterAudioCapture = New WasapiLoopbackCapture()
-            AddHandler MeterAudioCapture.DataAvailable, AddressOf OnMeterDataAvailable
-            MeterAudioCapture.StartRecording()
+            MeterAudioEngine = New WasapiAudioEngine()
+            AddHandler MeterAudioEngine.AudioDataProcessed, AddressOf OnMeterDataProcessed
+            MeterAudioEngine.Start()
         Catch ex As System.Runtime.InteropServices.COMException When ex.HResult = &H88890004
-            ' AUDCLNT_E_DEVICE_INVALIDATED: Driver/device is resetting, drop gracefully for this tick
-            MeterAudioCapture = Nothing
+            MeterAudioEngine = Nothing
             Skye.Common.Log.Write("WASAPI Meter Capture Delayed: Audio device invalidated or resetting.")
         Catch ex As Exception
-            MeterAudioCapture = Nothing
+            MeterAudioEngine = Nothing
             Skye.Common.Log.Write($"Failed To Start WASAPI Meter Capture{Environment.NewLine}{ex.Message}")
         End Try
     End Sub

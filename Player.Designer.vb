@@ -695,7 +695,7 @@ Partial Class Player
         ' 
         ' TimerMeter
         ' 
-        TimerMeter.Interval = 20
+        TimerMeter.Interval = 33
         ' 
         ' VLCViewer
         ' 
