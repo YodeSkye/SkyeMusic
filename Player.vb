@@ -4163,9 +4163,6 @@ Public Class Player
     Private Sub OnMeterDataProcessed(ByVal sender As Object, ByVal e As AudioDataEventArgs)
         If TimerMeter.Enabled Then
             MeterLastUpdate = DateTime.Now
-
-            ' Lock in the HIGHEST peak received between UI ticks
-            ' (Never let a smaller buffer sample decrease the value here!)
             If e.LeftPeak > MeterPeakLeft Then MeterPeakLeft = e.LeftPeak
             If e.RightPeak > MeterPeakRight Then MeterPeakRight = e.RightPeak
         End If
@@ -4486,7 +4483,6 @@ Public Class Player
                 MeterAudioEngine = Nothing
             End Try
         End If
-
         ' Re-initialize using C# Bridge
         Try
             MeterAudioEngine = New WasapiAudioEngine()
@@ -6123,7 +6119,6 @@ Public Class Player
         DBEXVertRight.Visible = False
         DBEXVertLeft.Value = 0
         DBEXVertRight.Value = 0
-
         If App.Settings.PlayerMetersShowHorizontal Or App.Settings.PlayerMetersShowVertical Then TimerMeter.Start()
         If App.Settings.PlayerMetersShowHorizontal Then
             DBEXLeft.Visible = True
