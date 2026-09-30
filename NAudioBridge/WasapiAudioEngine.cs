@@ -28,51 +28,51 @@ namespace NAudioBridge
 
         public void Start()
         {
-            // Run initialization on a background thread so the VB.NET UI thread never blocks
-            System.Threading.Tasks.Task.Run(() =>
+            lock (_lock)
             {
-                lock (_lock)
+                try
                 {
-                    try
+                    StopInternal();
+
+                    using var enumerator = new MMDeviceEnumerator();
+                    using var renderDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+                    if (renderDevice == null || renderDevice.State != DeviceState.Active) return;
+
+                    _recorder = new WasapiRecorderBuilder()
+                        .WithDevice(renderDevice)
+                        .WithLoopbackCapture()
+                        .Build();
+
+                    _recorder.DataAvailable += (buffer, flags, devicePos, qpcPos) =>
                     {
-                        StopInternal();
-
-                        using var enumerator = new MMDeviceEnumerator();
-                        var renderDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-                        if (renderDevice == null || renderDevice.State != DeviceState.Active) return;
-
-                        _recorder = new WasapiRecorderBuilder()
-                            .WithDevice(renderDevice)
-                            .WithLoopbackCapture()
-                            .Build();
-
-                        _recorder.DataAvailable += (buffer, flags, devicePos, qpcPos) =>
+                        try
                         {
                             if (buffer.IsEmpty || _recorder == null) return;
-
                             byte[] bytes = buffer.ToArray();
                             ProcessBuffer(bytes, _recorder.WaveFormat);
-                        };
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"WASAPI ProcessBuffer Exception: {ex.Message}");
+                        }
+                    };
 
-                        _recorder.StartRecording();
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"WASAPI Loopback start error: {ex.Message}");
-                    }
+                    _recorder.StartRecording();
                 }
-            });
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"WASAPI Loopback start error: {ex.Message}");
+                    StopInternal();
+                }
+            }
         }
 
         public void Stop()
         {
-            System.Threading.Tasks.Task.Run(() =>
+            lock (_lock)
             {
-                lock (_lock)
-                {
-                    StopInternal();
-                }
-            });
+                StopInternal();
+            }
         }
 
         private void StopInternal()
@@ -81,6 +81,7 @@ namespace NAudioBridge
             {
                 try
                 {
+                    _recorder.DataAvailable -= null; // Remove handlers
                     _recorder.StopRecording();
                 }
                 catch { }

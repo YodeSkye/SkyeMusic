@@ -644,20 +644,38 @@ Public Class Player
         End Sub
 
         ' Handlers
+        Private ReadOnly _uiContext As System.Threading.SynchronizationContext = System.Threading.SynchronizationContext.Current
+
         Private Sub OnAudioDataProcessed(sender As Object, e As AudioDataEventArgs)
+            ' If called from background WASAPI thread, post cleanly to UI context
+            If _uiContext IsNot Nothing AndAlso System.Threading.Thread.CurrentThread.ManagedThreadId <> 1 Then
+                _uiContext.Post(Sub(state)
+                                    Dim args = CType(state, AudioDataEventArgs)
+                                    ProcessAudioOnUI(args)
+                                End Sub, e)
+                Return
+            End If
+
+            ProcessAudioOnUI(e)
+        End Sub
+        Private Sub ProcessAudioOnUI(e As AudioDataEventArgs)
             If visualizerHost Is Nothing Then Return
 
-            ' Feed raw waveform to oscilloscope
-            If e.Waveform IsNot Nothing AndAlso e.Waveform.Length > 0 Then
-                visualizerHost.FeedWaveform(e.Waveform)
-                App.FrmPlayer.MiniPlayerVisualizer?.UpdateWaveform(e.Waveform)
-            End If
+            Try
+                ' Feed raw waveform to oscilloscope
+                If e.Waveform IsNot Nothing AndAlso e.Waveform.Length > 0 Then
+                    visualizerHost.FeedWaveform(e.Waveform)
+                    App.FrmPlayer.MiniPlayerVisualizer?.UpdateWaveform(e.Waveform)
+                End If
 
-            ' Feed FFT magnitudes to spectrum analyzer
-            If e.Magnitudes IsNot Nothing AndAlso e.Magnitudes.Length > 0 Then
-                visualizerHost.FeedAudio(e.Magnitudes)
-                App.FrmPlayer.MiniPlayerVisualizer?.Update(e.Magnitudes)
-            End If
+                ' Feed FFT magnitudes to spectrum analyzer
+                If e.Magnitudes IsNot Nothing AndAlso e.Magnitudes.Length > 0 Then
+                    visualizerHost.FeedAudio(e.Magnitudes)
+                    App.FrmPlayer.MiniPlayerVisualizer?.Update(e.Magnitudes)
+                End If
+            Catch ex As Exception
+                ' Isolates visualizer rendering glitches from audio capture
+            End Try
         End Sub
 
         ' Methods
@@ -4467,22 +4485,28 @@ Public Class Player
             Skye.UI.Toast.ShowToast(npo)
         End If
     End Sub
+
+
+    Private _lastRestartAttempt As DateTime = DateTime.MinValue
+
     Private Sub RestartMeterCapture()
-        ' Teardown existing capture
+        ' Limit restart frequency to once every 3 seconds to avoid slamming MMDevice COM objects
+        If (DateTime.Now - _lastRestartAttempt).TotalSeconds < 3 Then Return
+        _lastRestartAttempt = DateTime.Now
+
+        ' Teardown existing capture synchronously
         If MeterAudioEngine IsNot Nothing Then
             Try
                 RemoveHandler MeterAudioEngine.AudioDataProcessed, AddressOf OnMeterDataProcessed
                 MeterAudioEngine.Stop()
+                MeterAudioEngine.Dispose()
             Catch ex As Exception
-                Skye.Common.Log.Write($"Error Stopping Meter Capture{Environment.NewLine}{ex.Message}")
+                Skye.Common.Log.Write($"Error Stopping Meter Capture: {ex.Message}")
             Finally
-                Try
-                    MeterAudioEngine.Dispose()
-                Catch
-                End Try
                 MeterAudioEngine = Nothing
             End Try
         End If
+
         ' Re-initialize using C# Bridge
         Try
             MeterAudioEngine = New WasapiAudioEngine()
@@ -4490,10 +4514,10 @@ Public Class Player
             MeterAudioEngine.Start()
         Catch ex As System.Runtime.InteropServices.COMException When ex.HResult = &H88890004
             MeterAudioEngine = Nothing
-            Skye.Common.Log.Write("WASAPI Meter Capture Delayed: Audio device invalidated or resetting.")
+            Skye.Common.Log.Write("WASAPI Meter Capture Delayed: Audio device resetting.")
         Catch ex As Exception
             MeterAudioEngine = Nothing
-            Skye.Common.Log.Write($"Failed To Start WASAPI Meter Capture{Environment.NewLine}{ex.Message}")
+            Skye.Common.Log.Write($"Failed To Start WASAPI Meter Capture: {ex.Message}")
         End Try
     End Sub
     Friend Sub TogglePlayer()
