@@ -1483,6 +1483,10 @@ Namespace My
                     ' Visualizer Settings
                     Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
                     RegSubKey = RegKey.CreateSubKey("Visualizers")
+                    Select Case RegSubKey.GetValue("RainbowBarAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.RainbowBarAllowMiniMode = False
+                        Case Else : Visualizers.RainbowBarAllowMiniMode = True
+                    End Select
                     Visualizers.RainbowBarCount = CInt(Val(RegSubKey.GetValue("RainbowBarCount", 32.ToString)))
                     Visualizers.RainbowBarGain = CSng(Val(RegSubKey.GetValue("RainbowBarGain", 100.0F.ToString)))
                     Select Case RegSubKey.GetValue("RainbowBarShowPeaks", "True").ToString
@@ -1493,6 +1497,10 @@ Namespace My
                     Visualizers.RainbowBarPeakThickness = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThickness", 6.ToString)))
                     Visualizers.RainbowBarPeakThreshold = CInt(Val(RegSubKey.GetValue("RainbowBarPeakThreshold", 50.ToString)))
                     Visualizers.RainbowBarHueCycleSpeed = CSng(Val(RegSubKey.GetValue("RainbowBarHueCycleSpeed", 2.0F.ToString)))
+                    Select Case RegSubKey.GetValue("ClassicSpectrumAnalyzerAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.ClassicSpectrumAnalyzerAllowMiniMode = False
+                        Case Else : Visualizers.ClassicSpectrumAnalyzerAllowMiniMode = True
+                    End Select
                     Visualizers.ClassicSpectrumAnalyzerBarCount = CInt(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerBarCount", 64.ToString)))
                     Visualizers.ClassicSpectrumAnalyzerGain = CSng(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerGain", 3.2F.ToString)))
                     Visualizers.ClassicSpectrumAnalyzerSmoothing = CSng(Val(RegSubKey.GetValue("ClassicSpectrumAnalyzerSmoothing", 0.7F.ToString)))
@@ -1505,6 +1513,10 @@ Namespace My
                     Try : Visualizers.ClassicSpectrumAnalyzerBandMappingMode = CType([Enum].Parse(GetType(ClassicSpectrumAnalyzerBandMappingModes), RegSubKey.GetValue("ClassicSpectrumAnalyzerBandMappingMode", ClassicSpectrumAnalyzerBandMappingModes.Linear.ToString).ToString), ClassicSpectrumAnalyzerBandMappingModes)
                     Catch : Settings.Visualizers.ClassicSpectrumAnalyzerBandMappingMode = ClassicSpectrumAnalyzerBandMappingModes.Linear
                     End Try
+                    Select Case RegSubKey.GetValue("CircularSpectrumAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.CircularSpectrumAllowMiniMode = False
+                        Case Else : Visualizers.CircularSpectrumAllowMiniMode = True
+                    End Select
                     Try : Visualizers.CircularSpectrumWeightingMode = CType([Enum].Parse(GetType(CircularSpectrumWeightingModes), RegSubKey.GetValue("CircularSpectrumWeightingMode", CircularSpectrumWeightingModes.Raw.ToString).ToString), CircularSpectrumWeightingModes)
                     Catch : Settings.Visualizers.CircularSpectrumWeightingMode = CircularSpectrumWeightingModes.Raw
                     End Try
@@ -1516,9 +1528,17 @@ Namespace My
                         Case "True", "1" : Visualizers.CircularSpectrumFill = True
                         Case Else : Visualizers.CircularSpectrumFill = False
                     End Select
+                    Select Case RegSubKey.GetValue("WaveformAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.WaveformAllowMiniMode = False
+                        Case Else : Visualizers.WaveformAllowMiniMode = True
+                    End Select
                     Select Case RegSubKey.GetValue("WaveformFill", "False").ToString
                         Case "True", "1" : Visualizers.WaveformFill = True
                         Case Else : Visualizers.WaveformFill = False
+                    End Select
+                    Select Case RegSubKey.GetValue("OscilloscopeAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.OscilloscopeAllowMiniMode = False
+                        Case Else : Visualizers.OscilloscopeAllowMiniMode = True
                     End Select
                     Try : Visualizers.OscilloscopeChannelMode = CType([Enum].Parse(GetType(OscilloscopeChannelModes), RegSubKey.GetValue("OscilloscopeChannelMode", OscilloscopeChannelModes.Mono.ToString).ToString), OscilloscopeChannelModes)
                     Catch : Settings.Visualizers.OscilloscopeChannelMode = OscilloscopeChannelModes.Mono
@@ -1531,26 +1551,46 @@ Namespace My
                         Case Else : Visualizers.OscilloscopeEnableGlow = False
                     End Select
                     Visualizers.OscilloscopeFadeAlpha = CInt(Val(RegSubKey.GetValue("OscilloscopeFadeAlpha", 48.ToString)))
+                    Select Case RegSubKey.GetValue("FractalCloudAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.FractalCloudAllowMiniMode = False
+                        Case Else : Visualizers.FractalCloudAllowMiniMode = True
+                    End Select
                     Try : Visualizers.FractalCloudPalette = CType([Enum].Parse(GetType(FractalCloudPalettes), RegSubKey.GetValue("FractalCloudPalette", FractalCloudPalettes.Normal.ToString).ToString), FractalCloudPalettes)
                     Catch : Settings.Visualizers.FractalCloudPalette = FractalCloudPalettes.Normal
                     End Try
                     Visualizers.FractalCloudSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedBase", 0.01F.ToString)))
                     Visualizers.FractalCloudSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("FractalCloudSwirlSpeedAudioFactor", 10.0F.ToString)))
                     Visualizers.FractalCloudTimeIncrement = CDbl(Val(RegSubKey.GetValue("FractalCloudTimeIncrement", 0.02F.ToString)))
+                    Select Case RegSubKey.GetValue("JuliaFractalAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.JuliaFractalAllowMiniMode = False
+                        Case Else : Visualizers.JuliaFractalAllowMiniMode = True
+                    End Select
                     Visualizers.JuliaFractalBaseCX = CSng(Val(RegSubKey.GetValue("JuliaFractalBaseCX", (-0.7F).ToString)))
                     Visualizers.JuliaFractalBassInfluence = CSng(Val(RegSubKey.GetValue("JuliaFractalBassInfluence", 0.5F.ToString)))
                     Visualizers.JuliaFractalBaseCY = CSng(Val(RegSubKey.GetValue("JuliaFractalBaseCY", 0.27015F.ToString)))
                     Visualizers.JuliaFractalMidInfluence = CSng(Val(RegSubKey.GetValue("JuliaFractalMidInfluence", 2.5F.ToString)))
                     Visualizers.JuliaFractalMaxIterations = CInt(Val(RegSubKey.GetValue("JuliaFractalMaxIterations", 100.ToString)))
+                    Select Case RegSubKey.GetValue("HyperspaceTunnelAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.HyperspaceTunnelAllowMiniMode = False
+                        Case Else : Visualizers.HyperspaceTunnelAllowMiniMode = True
+                    End Select
                     Visualizers.HyperspaceTunnelParticleCount = CInt(Val(RegSubKey.GetValue("HyperspaceTunnelParticleCount", 1000.ToString)))
                     Visualizers.HyperspaceTunnelSwirlSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedBase", 0.05F.ToString)))
                     Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelSwirlSpeedAudioFactor", 0.2F.ToString)))
                     Visualizers.HyperspaceTunnelParticleSpeedBase = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedBase", 2.0F.ToString)))
                     Visualizers.HyperspaceTunnelParticleSpeedAudioFactor = CDbl(Val(RegSubKey.GetValue("HyperspaceTunnelParticleSpeedAudioFactor", 20.0F.ToString)))
+                    Select Case RegSubKey.GetValue("StarFieldAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.StarFieldAllowMiniMode = False
+                        Case Else : Visualizers.StarFieldAllowMiniMode = True
+                    End Select
                     Visualizers.StarFieldStarCount = CInt(Val(RegSubKey.GetValue("StarFieldStarCount", 750.ToString)))
                     Visualizers.StarFieldBaseSpeed = CSng(Val(RegSubKey.GetValue("StarFieldBaseSpeed", 2.0F.ToString)))
                     Visualizers.StarFieldAudioSpeedFactor = CInt(Val(RegSubKey.GetValue("StarFieldAudioSpeedFactor", 10.ToString)))
                     Visualizers.StarFieldMaxStarSize = CInt(Val(RegSubKey.GetValue("StarFieldMaxStarSize", 6.ToString)))
+                    Select Case RegSubKey.GetValue("ParticleNebulaAllowMiniMode", "True").ToString
+                        Case "False", "0" : Visualizers.ParticleNebulaAllowMiniMode = False
+                        Case Else : Visualizers.ParticleNebulaAllowMiniMode = True
+                    End Select
                     Try : Visualizers.ParticleNebulaActivePalettePreset = CType([Enum].Parse(GetType(ParticleNebulaPalettePresets), RegSubKey.GetValue("ParticleNebulaActivePalettePreset", ParticleNebulaPalettePresets.Cosmic.ToString).ToString), ParticleNebulaPalettePresets)
                     Catch : Settings.Visualizers.ParticleNebulaActivePalettePreset = ParticleNebulaPalettePresets.Cosmic
                     End Try
@@ -1680,6 +1720,7 @@ Namespace My
                     ' Visualizer Settings
                     RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
                     RegSubKey = RegKey.OpenSubKey("Visualizers", True)
+                    RegSubKey.SetValue("RainbowBarAllowMiniMode", Visualizers.RainbowBarAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("RainbowBarCount", Visualizers.RainbowBarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("RainbowBarGain", Visualizers.RainbowBarGain.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("RainbowBarShowPeaks", Visualizers.RainbowBarShowPeaks.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1687,6 +1728,7 @@ Namespace My
                     RegSubKey.SetValue("RainbowBarPeakThickness", Visualizers.RainbowBarPeakThickness.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("RainbowBarPeakThreshold", Visualizers.RainbowBarPeakThreshold.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("RainbowBarHueCycleSpeed", Visualizers.RainbowBarHueCycleSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ClassicSpectrumAnalyzerAllowMiniMode", Visualizers.ClassicSpectrumAnalyzerAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ClassicSpectrumAnalyzerBarCount", Visualizers.ClassicSpectrumAnalyzerBarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ClassicSpectrumAnalyzerGain", Visualizers.ClassicSpectrumAnalyzerGain.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ClassicSpectrumAnalyzerSmoothing", Visualizers.ClassicSpectrumAnalyzerSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1694,37 +1736,45 @@ Namespace My
                     RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakDecay", Visualizers.ClassicSpectrumAnalyzerPeakDecay.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ClassicSpectrumAnalyzerPeakHoldFrames", Visualizers.ClassicSpectrumAnalyzerPeakHoldFrames.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ClassicSpectrumAnalyzerBandMappingMode", Settings.Visualizers.ClassicSpectrumAnalyzerBandMappingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("CircularSpectrumAllowMiniMode", Visualizers.CircularSpectrumAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("CircularSpectrumWeightingMode", Settings.Visualizers.CircularSpectrumWeightingMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("CircularSpectrumGain", Visualizers.CircularSpectrumGain.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("CircularSpectrumSmoothing", Visualizers.CircularSpectrumSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("CircularSpectrumLineWidth", Visualizers.CircularSpectrumLineWidth.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("CircularSpectrumRadiusFactor", Visualizers.CircularSpectrumRadiusFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("CircularSpectrumFill", Visualizers.CircularSpectrumFill.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("WaveformAllowMiniMode", Visualizers.WaveformAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("WaveformFill", Visualizers.WaveformFill.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("OscilloscopeAllowMiniMode", Visualizers.OscilloscopeAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("OscilloscopeChannelMode", Settings.Visualizers.OscilloscopeChannelMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("OscilloscopeGain", Visualizers.OscilloscopeGain.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("OscilloscopeSmoothing", Visualizers.OscilloscopeSmoothing.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("OscilloscopeLineWidth", Visualizers.OscilloscopeLineWidth.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("OscilloscopeEnableGlow", Visualizers.OscilloscopeEnableGlow.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("OscilloscopeFadeAlpha", Visualizers.OscilloscopeFadeAlpha.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("FractalCloudAllowMiniMode", Visualizers.FractalCloudAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("FractalCloudPalette", Visualizers.FractalCloudPalette.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("FractalCloudSwirlSpeedBase", Visualizers.FractalCloudSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("FractalCloudSwirlSpeedAudioFactor", Visualizers.FractalCloudSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("FractalCloudTimeIncrement", Visualizers.FractalCloudTimeIncrement.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("JuliaFractalAllowMiniMode", Visualizers.JuliaFractalAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("JuliaFractalBaseCX", Visualizers.JuliaFractalBaseCX.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("JuliaFractalBassInfluence", Visualizers.JuliaFractalBassInfluence.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("JuliaFractalBaseCY", Visualizers.JuliaFractalBaseCY.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("JuliaFractalMidInfluence", Visualizers.JuliaFractalMidInfluence.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("JuliaFractalMaxIterations", Visualizers.JuliaFractalMaxIterations.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("HyperspaceTunnelAllowMiniMode", Visualizers.HyperspaceTunnelAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("HyperspaceTunnelParticleCount", Visualizers.HyperspaceTunnelParticleCount.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedBase", Visualizers.HyperspaceTunnelSwirlSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("HyperspaceTunnelSwirlSpeedAudioFactor", Visualizers.HyperspaceTunnelSwirlSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("HyperspaceTunnelParticleSpeedBase", Visualizers.HyperspaceTunnelParticleSpeedBase.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("HyperspaceTunnelParticleSpeedAudioFactor", Visualizers.HyperspaceTunnelParticleSpeedAudioFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("StarFieldAllowMiniMode", Visualizers.StarFieldAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("StarFieldStarCount", Visualizers.StarFieldStarCount.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("StarFieldBaseSpeed", Visualizers.StarFieldBaseSpeed.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("StarFieldAudioSpeedFactor", Visualizers.StarFieldAudioSpeedFactor.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("StarFieldMaxStarSize", Visualizers.StarFieldMaxStarSize.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegSubKey.SetValue("ParticleNebulaAllowMiniMode", Visualizers.ParticleNebulaAllowMiniMode.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ParticleNebulaActivePalettePreset", Settings.Visualizers.ParticleNebulaActivePalettePreset.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ParticleNebulaBloomIntensity", Settings.Visualizers.ParticleNebulaBloomIntensity.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegSubKey.SetValue("ParticleNebulaBloomRadius", Settings.Visualizers.ParticleNebulaBloomRadius.ToString, Microsoft.Win32.RegistryValueKind.String)
