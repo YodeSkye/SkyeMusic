@@ -4216,7 +4216,14 @@ Public Class Player
         End If
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
-        If MeterLastUpdate <> DateTime.MinValue AndAlso (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 500 Then
+
+        ' 1. Only evaluate stale capture if actively playing media
+        Dim isPlaying As Boolean = (_player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing)
+
+        ' 2. Increase threshold to 1500ms to allow for smooth track transitions and thread scheduling
+        If isPlaying AndAlso MeterLastUpdate <> DateTime.MinValue AndAlso (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 1500 Then
+
+            ' Only log if we haven't already logged for this specific stale event
             If _lastStaleMeterLog = DateTime.MinValue Then
                 Skye.Common.Log.Write("Audio Meter Data Stale, Resetting Peaks")
                 _lastStaleMeterLog = DateTime.Now
@@ -4232,7 +4239,9 @@ Public Class Player
         Else
             _lastStaleMeterLog = DateTime.MinValue
         End If
-        If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing Then
+
+        ' 3. Normal rendering
+        If isPlaying Then
             Dim leftScaled As Single = MeterPeakLeft * 100.0F
             Dim rightScaled As Single = MeterPeakRight * 100.0F
             Dim leftVal As Integer = CInt(Math.Max(0, Math.Min(DBEXLeft.Maximum, leftScaled)))
@@ -4243,12 +4252,18 @@ Public Class Player
             DBEXVertLeft.Value = leftVal
             DBEXVertRight.Value = rightVal
 
-            ' Apply decay after rendering so peaks drop smoothly over time
+            ' Smooth decay
             Dim decay As Single = 0.92F
             MeterPeakLeft *= decay
             MeterPeakRight *= decay
-
+        Else
+            ' Zero meters when stopped or paused
+            DBEXLeft.Value = 0
+            DBEXRight.Value = 0
+            DBEXVertLeft.Value = 0
+            DBEXVertRight.Value = 0
         End If
+
     End Sub
     Private Sub TimerPosition_Tick(sender As Object, e As EventArgs) Handles TimerPosition.Tick
         If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing Then ShowPosition()
