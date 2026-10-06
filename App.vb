@@ -293,6 +293,7 @@ Namespace My
                 End Select
             End Get
         End Property
+        Friend VoiceEngine As VoiceController
 
         ' Forms & Tray
         Friend FrmPlayer As Player 'FmrPlayer is the main player window that provides advanced playback controls and displays detailed information about the currently playing media.
@@ -2695,7 +2696,14 @@ Namespace My
                 Skye.Common.Log.Write($"Companion Control Server Failed to Start: {ex}")
             End Try
 
-            ' 6. Close Splash Screen
+            ' 6. Speech Recognition Engine Initialization
+            Try
+                InitializeVoiceEngine()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Speech Recognition Engine Initialization Error: {ex}")
+            End Try
+
+            ' 7. Close Splash Screen
             Try
                 Application.appsplash.CloseSplashWithFade()
             Catch ex As Exception
@@ -2746,6 +2754,13 @@ Namespace My
                 SetWatchers(True) ' Stop FileSystemWatchers
             Catch ex As Exception
                 Skye.Common.Log.Write($"Error Stopping File Watchers: {ex}")
+            End Try
+
+            ' Speech Recognition Cleanup
+            Try
+                ShutdownVoiceEngine()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Speech Recognition Engine Closure Error: {ex}")
             End Try
 
             ' Cleanup Audio Volume Monitoring
@@ -5024,6 +5039,19 @@ Namespace My
 
             Return "0.0.0.0" ' fallback if no IPv4 found
         End Function
+
+        'Speech Recognition
+        Friend Sub InitializeVoiceEngine()
+            If VoiceEngine Is Nothing Then
+                VoiceEngine = New VoiceController()
+            End If
+        End Sub
+        Friend Sub ShutdownVoiceEngine()
+            If VoiceEngine IsNot Nothing Then
+                VoiceEngine.Dispose()
+                VoiceEngine = Nothing
+            End If
+        End Sub
 
     End Module
 

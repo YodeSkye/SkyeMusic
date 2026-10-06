@@ -1,16 +1,12 @@
 ﻿
 Imports System.IO
-Imports System.Reflection.Metadata
-Imports System.Runtime.InteropServices
 Imports System.Text
 Imports LibVLCSharp.Shared
-Imports NAudio.CoreAudioApi
 Imports NAudio.Dsp
 Imports NAudio.Wave
 Imports Newtonsoft.Json.Linq
 Imports Skye
 Imports Skye.Contracts
-Imports Skye.UI
 Imports SkyeMusic.My
 Imports NAudioBridge
 
@@ -28,6 +24,7 @@ Public Class Player
     Private MeterPeakLeft As Single, MeterPeakRight As Single
     Private MeterLastUpdate As DateTime = DateTime.MinValue
     Private _lastStaleMeterLog As DateTime = DateTime.MinValue 'Last time the meter log was updated
+    Private _lastRestartAttempt As DateTime = DateTime.MinValue
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Private TipPlayerEX As Skye.UI.ToolTipEX 'Tooltip for Player Controls
@@ -58,10 +55,25 @@ Public Class Player
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero 'Used by Plays Database System to track total paused duration.
     Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
+    Private _playlistDirty As Boolean = False
+
+    Private WithEvents TimerPlaylistAutoSave As New System.Windows.Forms.Timer() With {.Interval = 3000}
+
     Friend Event TitleChanged(newTitle As String)
     Friend Event PlaylistChanged()
-    Private _playlistDirty As Boolean = False
-    Private WithEvents TimerPlaylistAutoSave As New System.Windows.Forms.Timer() With {.Interval = 3000}
+
+    ''' <summary>
+    ''' Dynamically retrieves the current index of the Path column.
+    ''' Returns -1 if the column is missing.
+    ''' </summary>
+    Private ReadOnly Property PlaylistPathColumnIndex As Integer
+        Get
+            If LVPlaylist IsNot Nothing Then
+                Return LVPlaylist.Columns("Path").Index
+            End If
+            Return -1 ' Column not found
+        End Get
+    End Property
 
     ' Sort Orders
     Private PlaylistTitleSort As SortOrder = SortOrder.None
@@ -2875,7 +2887,7 @@ Public Class Player
         ' Disable Mouse Wheel support for TrackBar
         AddHandler TrackBarPosition.MouseWheel, AddressOf TrackBarPosition_MouseWheel
 
-        'Now Playing Handler
+        ' Now Playing Handler
         AddHandler NowPlaying.Changed, AddressOf OnNowPlayingChanged
 
     End Sub
@@ -2894,9 +2906,21 @@ Public Class Player
 
         App.InitializeAppPostStartup()
 
+        ' Attach VoiceEngine event listeners
+        If App.VoiceEngine IsNot Nothing Then
+            AddHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
+            AddHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
+        End If
+        ' Populate speech grammar with current playlist items
+        RefreshSpeechGrammar()
+
     End Sub
     Friend Sub WhenClosing()
         SavePlaylist()
+        If App.VoiceEngine IsNot Nothing Then
+            RemoveHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
+            RemoveHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
+        End If
         If VLCHook IsNot Nothing Then
             VLCHook.ReleaseHandle()
             RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
@@ -4500,10 +4524,6 @@ Public Class Player
             Skye.UI.Toast.ShowToast(npo)
         End If
     End Sub
-
-
-    Private _lastRestartAttempt As DateTime = DateTime.MinValue
-
     Private Sub RestartMeterCapture()
         ' Limit restart frequency to once every 3 seconds to avoid slamming MMDevice COM objects
         If (DateTime.Now - _lastRestartAttempt).TotalSeconds < 3 Then Return
@@ -6513,6 +6533,120 @@ Public Class Player
         App.ThemeMenu(CMPlaylist)
         App.ThemeMenu(CMRatings)
         VisualizerHost.SetVisualizersMenu()
+    End Sub
+
+    ' Speech Recognition
+    Private Sub OnVoiceCommandRecognized(ByVal command As String)
+        ' Ensure UI thread execution
+        If Me.InvokeRequired Then
+            Me.BeginInvoke(Sub() OnVoiceCommandRecognized(command))
+            Return
+        End If
+        Debug.Print("Voice Command Recognized: " & command)
+        Select Case command.ToLowerInvariant()
+            Case "play"
+                BtnPlay.PerformClick()
+            'Case "pause"
+            '    BtnPause.PerformClick()
+            Case "stop"
+                BtnStop.PerformClick()
+            Case "next"
+                BtnNext.PerformClick()
+            Case "previous"
+                BtnPrevious.PerformClick()
+        End Select
+    End Sub
+    Private Sub OnVoicePlayTargetRequested(ByVal targetKey As String)
+        ' Ensure UI thread execution
+        If Me.InvokeRequired Then
+            Me.BeginInvoke(Sub() OnVoicePlayTargetRequested(targetKey))
+            Return
+        End If
+        If LVPlaylist Is Nothing OrElse LVPlaylist.Items.Count = 0 Then Return
+
+        ' Find the exact ListViewItem by matching its unique key (Filename)
+        For Each item As ListViewItem In LVPlaylist.Items
+            If item.SubItems.Count > PlaylistPathColumnIndex Then
+                Dim itemKey As String = item.SubItems(PlaylistPathColumnIndex).Text
+
+                If String.Equals(itemKey, targetKey, StringComparison.OrdinalIgnoreCase) Then
+                    ' 1. Select the item in the UI
+                    LVPlaylist.SelectedItems.Clear()
+                    item.Selected = True
+                    item.Focused = True
+
+                    ' 2. Scroll the ListView directly to this item
+                    item.EnsureVisible()
+
+                    ' 3. Trigger your playback routine for the selected item
+                    'PlaySelectedItem(item)
+                    Exit For
+                End If
+            End If
+        Next
+    End Sub
+    ''' <summary>
+    ''' Extracts playlist phrases mapped to unique keys and loads them into the speech engine off the UI thread.
+    ''' </summary>
+    Public Async Sub RefreshSpeechGrammar()
+        If App.VoiceEngine Is Nothing OrElse LVPlaylist Is Nothing OrElse LVPlaylist.Items.Count = 0 Then
+            Return
+        End If
+
+        ' Retrieve your current settings variables
+        Dim videoTag As String = App.Settings.PlaylistVideoIdentifier
+        Dim separator As String = App.Settings.PlaylistTitleSeparator
+
+        ' 1. Snapshot raw display text AND unique keys from the UI thread
+        Dim itemSnapshots As New List(Of KeyValuePair(Of String, String))()
+
+        For Each item As ListViewItem In LVPlaylist.Items
+            Dim rawDisplay As String = item.Text
+
+            ' Read the unique identifier (e.g., Filename subitem)
+            Dim uniqueKey As String = ""
+            If item.SubItems.Count > PlaylistPathColumnIndex Then
+                uniqueKey = item.SubItems(PlaylistPathColumnIndex).Text
+            End If
+
+            If Not String.IsNullOrWhiteSpace(rawDisplay) AndAlso Not String.IsNullOrWhiteSpace(uniqueKey) Then
+                itemSnapshots.Add(New KeyValuePair(Of String, String)(rawDisplay, uniqueKey))
+            End If
+        Next
+
+        ' 2. Parse clean phrases and map them to keys off the UI thread
+        Await Task.Run(Async Function()
+                           Dim phraseToKeyMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+
+                           For Each entry In itemSnapshots
+                               Dim cleaned As String = entry.Key
+                               Dim key As String = entry.Value
+
+                               ' Strip video tag
+                               If Not String.IsNullOrWhiteSpace(videoTag) Then
+                                   cleaned = cleaned.Replace(videoTag, "")
+                               End If
+
+                               ' Replace separator string with spaces
+                               If Not String.IsNullOrWhiteSpace(separator) Then
+                                   cleaned = cleaned.Replace(separator, " ")
+                               End If
+
+                               ' Insert spaces between CamelCase / PascalCase words
+                               cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, "(?<=[a-z])(?=[A-Z])", " ")
+                               cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, "\s+", " ").Trim()
+
+                               ' Add to dictionary (skipping duplicate phrase keys to avoid crashes)
+                               If Not String.IsNullOrWhiteSpace(cleaned) AndAlso Not phraseToKeyMap.ContainsKey(cleaned) Then
+                                   phraseToKeyMap.Add(cleaned, key)
+                               End If
+                           Next
+
+                           ' 3. Load dynamic grammar into VoiceEngine
+                           Await App.VoiceEngine.LoadGrammarAsync(phraseToKeyMap)
+                           App.VoiceEngine.Start()
+                           Debug.Print("Voice Grammar Refreshed with " & phraseToKeyMap.Count & " phrases.")
+                       End Function)
     End Sub
 
 End Class
