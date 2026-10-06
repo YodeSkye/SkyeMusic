@@ -50,7 +50,7 @@ Friend Class VoiceController
     Private Sub OnSpeechRecognized(ByVal sender As Object, ByVal e As SpeechRecognizedEventArgs)
         Debug.WriteLine($"[VOICE DETECTED] Text: '{e.Result.Text}' | Confidence: {e.Result.Confidence}")
         ' Ignore low confidence hits
-        If e.Result.Confidence < 0.3F Then Return
+        If e.Result.Confidence < 0.65F Then Return
 
         Dim grammarName As String = e.Result.Grammar.Name
 

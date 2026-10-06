@@ -34,6 +34,7 @@ Public Class Player
     Private _lastDisplayMode As DisplayMode = DisplayMode.None
     Private _lastRealState As FormWindowState = FormWindowState.Normal 'Last real state of the form (not minimized)
     Private _handledClose As Boolean = False 'Indicates if the close event has been handled
+    Private _playlistDirty As Boolean = False 'Indicates if the playlist has been modified and needs to be saved
     Private IsLoadingPlaylistColumns As Boolean = False 'Indicates if the playlist columns are being loaded
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
@@ -53,12 +54,13 @@ Public Class Player
     Private AutoNext As Boolean = False 'Used by Plays Database System to indicate if the player will automatically play the next item.
     Private PausedAt As DateTime? = Nothing 'Used by Plays Database System to track when the player was paused.
     Private TotalPausedDuration As TimeSpan = TimeSpan.Zero 'Used by Plays Database System to track total paused duration.
-    Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
     Friend Queue As New Generic.List(Of String) 'Queue of items to play
-    Private _playlistDirty As Boolean = False
 
-    Private WithEvents TimerPlaylistAutoSave As New System.Windows.Forms.Timer() With {.Interval = 3000}
+    ' Timers
+    Private PicBoxAlbumArtClickTimer As Timer 'Timer for differentiating between clicks and double-clicks on Album Art
+    Private WithEvents TimerPlaylistAutoSave As New System.Windows.Forms.Timer() With {.Interval = 3000} 'Timer for auto-saving the playlist after changes
 
+    ' Events
     Friend Event TitleChanged(newTitle As String)
     Friend Event PlaylistChanged()
 
@@ -6542,18 +6544,23 @@ Public Class Player
             Me.BeginInvoke(Sub() OnVoiceCommandRecognized(command))
             Return
         End If
+
         Debug.Print("Voice Command Recognized: " & command)
+
         Select Case command.ToLowerInvariant()
             Case "play"
-                BtnPlay.PerformClick()
-            'Case "pause"
-            '    BtnPause.PerformClick()
+                If PlayState <> PlayStates.Playing Then TogglePlay()
+            Case "pause"
+                If PlayState = PlayStates.Playing Then TogglePlay()
             Case "stop"
-                BtnStop.PerformClick()
-            Case "next"
-                BtnNext.PerformClick()
+                StopPlay()
+                LVPlaylist.Focus()
             Case "previous"
-                BtnPrevious.PerformClick()
+                PlayPrevious()
+                LVPlaylist.Focus()
+            Case "next"
+                PlayNext()
+                LVPlaylist.Focus()
         End Select
     End Sub
     Private Sub OnVoicePlayTargetRequested(ByVal targetKey As String)
@@ -6563,6 +6570,8 @@ Public Class Player
             Return
         End If
         If LVPlaylist Is Nothing OrElse LVPlaylist.Items.Count = 0 Then Return
+
+        Debug.Print("Voice Play Target Requested: " & targetKey)
 
         ' Find the exact ListViewItem by matching its unique key (Filename)
         For Each item As ListViewItem In LVPlaylist.Items
@@ -6579,7 +6588,7 @@ Public Class Player
                     item.EnsureVisible()
 
                     ' 3. Trigger your playback routine for the selected item
-                    'PlaySelectedItem(item)
+                    PlayFromPlaylist()
                     Exit For
                 End If
             End If
@@ -6646,6 +6655,9 @@ Public Class Player
                            Await App.VoiceEngine.LoadGrammarAsync(phraseToKeyMap)
                            App.VoiceEngine.Start()
                            Debug.Print("Voice Grammar Refreshed with " & phraseToKeyMap.Count & " phrases.")
+                           For Each a In phraseToKeyMap
+                               Debug.Print("Phrase: " & a.Key & " => Key: " & a.Value)
+                           Next
                        End Function)
     End Sub
 
