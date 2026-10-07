@@ -2908,21 +2908,13 @@ Public Class Player
 
         App.InitializeAppPostStartup()
 
-        ' Attach VoiceEngine event listeners
-        If App.VoiceEngine IsNot Nothing Then
-            AddHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
-            AddHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
-        End If
-        ' Populate speech grammar with current playlist items
-        RefreshSpeechGrammar()
+        ' Attach VoiceEngine event listeners & Populate speech grammar with current playlist items
+        InitializeVoice()
 
     End Sub
     Friend Sub WhenClosing()
         SavePlaylist()
-        If App.VoiceEngine IsNot Nothing Then
-            RemoveHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
-            RemoveHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
-        End If
+        StopVoice()
         If VLCHook IsNot Nothing Then
             VLCHook.ReleaseHandle()
             RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
@@ -2935,6 +2927,19 @@ Public Class Player
             RemoveHandler MeterAudioEngine.AudioDataProcessed, AddressOf OnMeterDataProcessed
             MeterAudioEngine.Dispose()
             MeterAudioEngine = Nothing
+        End If
+    End Sub
+    Friend Sub InitializeVoice()
+        If App.VoiceEngine IsNot Nothing Then
+            AddHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
+            AddHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
+        End If
+        RefreshSpeechGrammar()
+    End Sub
+    Friend Sub StopVoice()
+        If App.VoiceEngine IsNot Nothing Then
+            RemoveHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
+            RemoveHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
         End If
     End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnReverse.KeyDown, BtnPlay.KeyDown, BtnForward.KeyDown, TrackBarPosition.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
@@ -6602,17 +6607,18 @@ Public Class Player
             Return
         End If
 
-        ' Retrieve your current settings variables
+        ' Retrieve current settings variables
+        Dim removeSpaces As Boolean = App.Settings.PlaylistTitleRemoveSpaces
         Dim videoTag As String = App.Settings.PlaylistVideoIdentifier
         Dim separator As String = App.Settings.PlaylistTitleSeparator
 
-        ' 1. Snapshot raw display text AND unique keys from the UI thread
+        ' 1. Snapshot raw display text AND unique keys on the UI thread
         Dim itemSnapshots As New List(Of KeyValuePair(Of String, String))()
 
         For Each item As ListViewItem In LVPlaylist.Items
             Dim rawDisplay As String = item.Text
 
-            ' Read the unique identifier (e.g., Filename subitem)
+            ' Read the unique identifier from the dynamic path column
             Dim uniqueKey As String = ""
             If item.SubItems.Count > PlaylistPathColumnIndex Then
                 uniqueKey = item.SubItems(PlaylistPathColumnIndex).Text
@@ -6627,33 +6633,53 @@ Public Class Player
         Await Task.Run(Async Function()
                            Dim phraseToKeyMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
 
+                           ' Helper lambda to expand PascalCase boundaries ("TaylorSwift" -> "Taylor Swift")
+                           ' and clean up extra whitespace
+                           Dim expandPascalCase As Func(Of String, String) = Function(input As String)
+                                                                                 If String.IsNullOrWhiteSpace(input) Then Return ""
+                                                                                 Dim text As String = System.Text.RegularExpressions.Regex.Replace(input, "(?<=[a-z])(?=[A-Z])", " ")
+                                                                                 Return System.Text.RegularExpressions.Regex.Replace(text, "\s+", " ").Trim()
+                                                                             End Function
+
                            For Each entry In itemSnapshots
-                               Dim cleaned As String = entry.Key
+                               Dim rawDisplay As String = entry.Key
                                Dim key As String = entry.Value
 
-                               ' Strip video tag
+                               ' 1. Strip the video tag
                                If Not String.IsNullOrWhiteSpace(videoTag) Then
-                                   cleaned = cleaned.Replace(videoTag, "")
+                                   rawDisplay = rawDisplay.Replace(videoTag, "")
                                End If
 
-                               ' Replace separator string with spaces
-                               If Not String.IsNullOrWhiteSpace(separator) Then
-                                   cleaned = cleaned.Replace(separator, " ")
+                               Dim rawChunks As New List(Of String)()
+
+                               ' 2. Determine how to split chunks based on the separator
+                               If Not String.IsNullOrWhiteSpace(separator) AndAlso separator <> " " AndAlso rawDisplay.Contains(separator) Then
+                                   ' Symbol separator (e.g., "-", ",", "|")
+                                   rawChunks.AddRange(rawDisplay.Split(New String() {separator}, StringSplitOptions.RemoveEmptyEntries))
+                               Else
+                                   ' Space separator (" ") or no symbol: split by spaces into main blocks (Artist vs Title)
+                                   rawChunks.AddRange(rawDisplay.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries))
                                End If
 
-                               ' Insert spaces between CamelCase / PascalCase words
-                               cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, "(?<=[a-z])(?=[A-Z])", " ")
-                               cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, "\s+", " ").Trim()
+                               ' 3. Register individual chunk phrases ("Taylor Swift", "The Fate Of Ophelia")
+                               For Each chunk In rawChunks
+                                   Dim spokenPhrase As String = expandPascalCase(chunk)
+                                   If spokenPhrase.Length > 2 AndAlso Not phraseToKeyMap.ContainsKey(spokenPhrase) Then
+                                       phraseToKeyMap.Add(spokenPhrase, key)
+                                   End If
+                               Next
 
-                               ' Add to dictionary (skipping duplicate phrase keys to avoid crashes)
-                               If Not String.IsNullOrWhiteSpace(cleaned) AndAlso Not phraseToKeyMap.ContainsKey(cleaned) Then
-                                   phraseToKeyMap.Add(cleaned, key)
+                               ' 4. Register full combined track phrase ("Taylor Swift The Fate Of Ophelia")
+                               Dim fullSpokenPhrase As String = expandPascalCase(rawDisplay)
+                               If fullSpokenPhrase.Length > 2 AndAlso Not phraseToKeyMap.ContainsKey(fullSpokenPhrase) Then
+                                   phraseToKeyMap.Add(fullSpokenPhrase, key)
                                End If
                            Next
 
                            ' 3. Load dynamic grammar into VoiceEngine
                            Await App.VoiceEngine.LoadGrammarAsync(phraseToKeyMap)
                            App.VoiceEngine.Start()
+
                            Debug.Print("Voice Grammar Refreshed with " & phraseToKeyMap.Count & " phrases.")
                            For Each a In phraseToKeyMap
                                Debug.Print("Phrase: " & a.Key & " => Key: " & a.Value)

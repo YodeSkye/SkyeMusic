@@ -1179,6 +1179,7 @@ Namespace My
             Friend Shared LatestKnownVersion As String = String.Empty
             Friend Shared EnableCompanionServer As Boolean = False
             Friend Shared CompanionServerPort As Integer = 5050
+            Friend Shared EnableVoiceCommands As Boolean = True
 
             ' Player
             Friend Shared AudioOutputModule As AudioOutputModuleTypes = AudioOutputModuleTypes.DirectSound
@@ -1480,6 +1481,7 @@ Namespace My
                     Settings.LatestKnownVersion = RegKey.GetValue("LatestKnownVersion", String.Empty).ToString
                     Settings.EnableCompanionServer = Skye.Common.RegistryHelper.GetBool("EnableCompanionServer", False)
                     Settings.CompanionServerPort = Skye.Common.RegistryHelper.GetInt("CompanionServerPort", 5050)
+                    Settings.EnableVoiceCommands = Skye.Common.RegistryHelper.GetBool("EnableVoiceCommands", True)
 
                     ' Visualizer Settings
                     Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
@@ -1717,6 +1719,7 @@ Namespace My
                     RegKey.SetValue("LatestKnownVersion", Settings.LatestKnownVersion, Microsoft.Win32.RegistryValueKind.String)
                     Skye.Common.RegistryHelper.SetBool("EnableCompanionServer", Settings.EnableCompanionServer)
                     Skye.Common.RegistryHelper.SetInt("CompanionServerPort", Settings.CompanionServerPort)
+                    Skye.Common.RegistryHelper.SetBool("EnableVoiceCommands", Settings.EnableVoiceCommands)
 
                     ' Visualizer Settings
                     RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
@@ -5045,12 +5048,14 @@ Namespace My
             If VoiceEngine Is Nothing Then
                 VoiceEngine = New VoiceController()
             End If
+            Skye.Common.Log.Write("Voice Engine Initialized")
         End Sub
         Friend Sub ShutdownVoiceEngine()
             If VoiceEngine IsNot Nothing Then
                 VoiceEngine.Dispose()
                 VoiceEngine = Nothing
             End If
+            Skye.Common.Log.Write("Voice Engine Shutdown")
         End Sub
 
     End Module

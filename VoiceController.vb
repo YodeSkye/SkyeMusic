@@ -22,6 +22,10 @@ Friend Class VoiceController
         If recognizer IsNot Nothing Then
             [Stop]()
             RemoveHandler recognizer.SpeechRecognized, AddressOf OnSpeechRecognized
+            Try
+                recognizer.UnloadAllGrammars()
+            Catch ex As Exception
+            End Try
             recognizer.Dispose()
             recognizer = Nothing
         End If

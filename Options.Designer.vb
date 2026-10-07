@@ -72,6 +72,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval2 = New Skye.UI.Label()
         TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        ChkBoxEnableVoiceCommands = New CheckBox()
         TxtBoxCompanionServerPort = New Skye.UI.NumericTextBox()
         CkBoxEnableCompanionServer = New CheckBox()
         CkBoxShowTrayIcon = New CheckBox()
@@ -804,6 +805,7 @@ Partial Class Options
         ' TPApp
         ' 
         TPApp.BorderStyle = BorderStyle.Fixed3D
+        TPApp.Controls.Add(ChkBoxEnableVoiceCommands)
         TPApp.Controls.Add(TxtBoxCompanionServerPort)
         TPApp.Controls.Add(CkBoxEnableCompanionServer)
         TPApp.Controls.Add(CkBoxShowTrayIcon)
@@ -841,6 +843,22 @@ Partial Class Options
         TipOptions.SetText(TPApp, Nothing)
         TPApp.Text = " App "
         TPApp.ThemesEnabled = False
+        ' 
+        ' ChkBoxEnableVoiceCommands
+        ' 
+        ChkBoxEnableVoiceCommands.AutoSize = True
+        ChkBoxEnableVoiceCommands.FlatStyle = FlatStyle.Flat
+        ChkBoxEnableVoiceCommands.Font = New Font("Segoe UI", 12F)
+        TipOptions.SetImage(ChkBoxEnableVoiceCommands, Nothing)
+        TipError.SetImage(ChkBoxEnableVoiceCommands, Nothing)
+        ChkBoxEnableVoiceCommands.Location = New Point(13, 376)
+        ChkBoxEnableVoiceCommands.Name = "ChkBoxEnableVoiceCommands"
+        ChkBoxEnableVoiceCommands.Size = New Size(197, 25)
+        ChkBoxEnableVoiceCommands.TabIndex = 149
+        TipError.SetText(ChkBoxEnableVoiceCommands, Nothing)
+        TipOptions.SetText(ChkBoxEnableVoiceCommands, "Enable Voice Commands for the App." & vbCrLf & "All commands begin with the trigger word ""Skye"", as in ""Skye Play [song name]"". See Help for more information.")
+        ChkBoxEnableVoiceCommands.Text = "Enable Voice Commands"
+        ChkBoxEnableVoiceCommands.UseVisualStyleBackColor = True
         ' 
         ' TxtBoxCompanionServerPort
         ' 
@@ -1605,4 +1623,5 @@ Partial Class Options
     Friend WithEvents CkBoxPlayerShowMeterHoro As CheckBox
     Friend WithEvents CkBoxPlayerShowMeterVert As CheckBox
     Friend WithEvents ChkBoxVolumeBoost As CheckBox
+    Friend WithEvents ChkBoxEnableVoiceCommands As CheckBox
 End Class

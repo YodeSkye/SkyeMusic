@@ -167,6 +167,7 @@ Public Class Options
             LblCompanionServerPort.Enabled = False
             TxtBoxCompanionServerPort.Enabled = False
         End If
+        ChkBoxEnableVoiceCommands.Checked = App.Settings.EnableVoiceCommands
         SetPrunePlaylistButtonText()
         SetPruneHistoryButtonText()
         UpdateCompanionServerTooltip()
@@ -555,6 +556,17 @@ Public Class Options
         End Select
         SetCompanionServer()
     End Sub
+    Private Sub ChkBoxEnableVoiceCommands_Click(sender As Object, e As EventArgs) Handles ChkBoxEnableVoiceCommands.Click
+        App.Settings.EnableVoiceCommands = Not App.Settings.EnableVoiceCommands
+        Select Case App.Settings.EnableVoiceCommands
+            Case True
+                App.InitializeVoiceEngine()
+                App.FrmPlayer.InitializeVoice()
+            Case False
+                App.FrmPlayer.StopVoice()
+                App.ShutdownVoiceEngine()
+        End Select
+    End Sub
     Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
         If e.Alt Then
         ElseIf e.Control Then
@@ -712,6 +724,7 @@ Public Class Options
             CkBoxShowTrayIcon.BackColor = c
             CkBoxMinimizeToTray.BackColor = c
             CkBoxEnableCompanionServer.BackColor = c
+            ChkBoxEnableVoiceCommands.BackColor = c
             TCOptions.TabPanelBackColor = c
         End If
         ResumeLayout()
@@ -746,6 +759,7 @@ Public Class Options
             CkBoxShowTrayIcon.BackColor = App.CurrentTheme.BackColor
             CkBoxMinimizeToTray.BackColor = App.CurrentTheme.BackColor
             CkBoxEnableCompanionServer.BackColor = App.CurrentTheme.BackColor
+            ChkBoxEnableVoiceCommands.BackColor = App.CurrentTheme.BackColor
             TCOptions.TabPanelBackColor = App.CurrentTheme.BackColor
             forecolor = App.CurrentTheme.TextColor
         End If
@@ -812,6 +826,7 @@ Public Class Options
         CkBoxWatchFoldersUpdatePlaylist.ForeColor = forecolor
         CkBoxPlaylistRemoveSpaces.ForeColor = forecolor
         CkBoxEnableCompanionServer.ForeColor = forecolor
+        ChkBoxEnableVoiceCommands.ForeColor = forecolor
         LblHelperApp1Name.ForeColor = forecolor
         LblHelperApp1Path.ForeColor = forecolor
         LblHelperApp2Name.ForeColor = forecolor
