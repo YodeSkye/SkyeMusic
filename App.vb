@@ -1362,6 +1362,7 @@ Namespace My
                         Case "True", "1" : Settings.PlaylistTitleRemoveSpaces = True
                         Case Else : Settings.PlaylistTitleRemoveSpaces = False
                     End Select
+                    Settings.PlaylistTitleSeparator = RegKey.GetValue("PlaylistTitleSeparator", " ").ToString
                     Settings.PlaylistVideoIdentifier = RegKey.GetValue("PlaylistVideoIdentifier", String.Empty).ToString
                     Try : Settings.PlaylistDefaultAction = CType([Enum].Parse(GetType(App.PlaylistActions), RegKey.GetValue("PlaylistDefaultAction", App.PlaylistActions.Play.ToString).ToString), App.PlaylistActions)
                     Catch : Settings.PlaylistDefaultAction = App.PlaylistActions.Play
@@ -5043,19 +5044,19 @@ Namespace My
             Return "0.0.0.0" ' fallback if no IPv4 found
         End Function
 
-        'Speech Recognition
+        ' Speech Recognition
         Friend Sub InitializeVoiceEngine()
-            If VoiceEngine Is Nothing Then
+            If Settings.EnableVoiceCommands AndAlso VoiceEngine Is Nothing Then
                 VoiceEngine = New VoiceController()
+                Skye.Common.Log.Write("Voice Engine Initialized")
             End If
-            Skye.Common.Log.Write("Voice Engine Initialized")
         End Sub
         Friend Sub ShutdownVoiceEngine()
             If VoiceEngine IsNot Nothing Then
                 VoiceEngine.Dispose()
                 VoiceEngine = Nothing
+                Skye.Common.Log.Write("Voice Engine Shutdown")
             End If
-            Skye.Common.Log.Write("Voice Engine Shutdown")
         End Sub
 
     End Module

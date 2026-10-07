@@ -336,7 +336,7 @@ Public Class Options
         CMTxtBox.ShortcutKeys(CType(sender, TextBox), e)
     End Sub
     Private Sub TxtBoxPlaylistTitleSeparatorValidated(sender As Object, e As EventArgs) Handles TxtBoxPlaylistTitleSeparator.Validated
-        Settings.PlaylistTitleSeparator = TxtBoxPlaylistTitleSeparator.Text
+        App.Settings.PlaylistTitleSeparator = TxtBoxPlaylistTitleSeparator.Text
         TxtBoxPlaylistTitleSeparator.SelectAll()
     End Sub
     Private Sub TxtBoxPlaylistVideoIdentifierValidated(sender As Object, e As EventArgs) Handles TxtBoxPlaylistVideoIdentifier.Validated

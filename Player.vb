@@ -2929,19 +2929,6 @@ Public Class Player
             MeterAudioEngine = Nothing
         End If
     End Sub
-    Friend Sub InitializeVoice()
-        If App.VoiceEngine IsNot Nothing Then
-            AddHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
-            AddHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
-        End If
-        RefreshSpeechGrammar()
-    End Sub
-    Friend Sub StopVoice()
-        If App.VoiceEngine IsNot Nothing Then
-            RemoveHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
-            RemoveHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
-        End If
-    End Sub
     Private Sub Player_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, BtnReverse.KeyDown, BtnPlay.KeyDown, BtnForward.KeyDown, TrackBarPosition.KeyDown, BtnStop.KeyDown, BtnNext.KeyDown, BtnPrevious.KeyDown
         If Not TxtBoxPlaylistSearch.Focused And Not LVPlaylist.EditableColumns(0) Then
             If e.Alt Then
@@ -4245,6 +4232,7 @@ Public Class Player
             BuildPlaylistJson()
             App.CompanionControlServer.Broadcast("PLAYLIST_CHANGED")
         End If
+        RefreshSpeechGrammar()
     End Sub
     Private Sub TimerMeter_Tick(sender As Object, e As EventArgs) Handles TimerMeter.Tick
 
@@ -4252,7 +4240,7 @@ Public Class Player
         Dim isPlaying As Boolean = (_player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing)
 
         ' 2. Increase threshold to 1500ms to allow for smooth track transitions and thread scheduling
-        If isPlaying AndAlso MeterLastUpdate <> DateTime.MinValue AndAlso (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 1500 Then
+        If isPlaying AndAlso MeterLastUpdate <> DateTime.MinValue AndAlso (DateTime.Now - MeterLastUpdate).TotalMilliseconds > 2000 Then
 
             ' Only log if we haven't already logged for this specific stale event
             If _lastStaleMeterLog = DateTime.MinValue Then
@@ -5558,7 +5546,8 @@ Public Class Player
     End Sub
     Friend Sub PlayFromLibrary(title As String, filename As String)
         LyricsOff()
-        Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(filename, True, 0)
+        Dim existingitem As ListViewItem = Nothing
+        If LVPlaylist.Items.Count > 0 Then LVPlaylist.FindItemWithText(filename, True, 0)
         If existingitem Is Nothing Then
             Dim lvi As ListViewItem
             lvi = CreateListviewItem()
@@ -5881,7 +5870,8 @@ Public Class Player
                 End If
                 TimerStreamMeta.Start()
             Case App.MediaSourceTypes.File
-                Dim lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+                Dim lvi As ListViewItem = Nothing
+                If LVPlaylist.Items.Count > 0 Then LVPlaylist.FindItemWithText(_player.Path, True, 0)
                 If lvi Is Nothing Then
                     PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
                     Text = My.Application.Info.Title + " - " + _player.Path
@@ -6543,6 +6533,19 @@ Public Class Player
     End Sub
 
     ' Speech Recognition
+    Friend Sub InitializeVoice()
+        If App.VoiceEngine IsNot Nothing Then
+            AddHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
+            AddHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
+        End If
+        RefreshSpeechGrammar()
+    End Sub
+    Friend Sub StopVoice()
+        If App.VoiceEngine IsNot Nothing Then
+            RemoveHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
+            RemoveHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
+        End If
+    End Sub
     Private Sub OnVoiceCommandRecognized(ByVal command As String)
         ' Ensure UI thread execution
         If Me.InvokeRequired Then
@@ -6554,18 +6557,22 @@ Public Class Player
 
         Select Case command.ToLowerInvariant()
             Case "play"
-                If PlayState <> PlayStates.Playing Then TogglePlay()
+                If PlayState <> PlayStates.Playing AndAlso LVPlaylist.Items.Count > 0 Then TogglePlay()
             Case "pause"
                 If PlayState = PlayStates.Playing Then TogglePlay()
             Case "stop"
                 StopPlay()
                 LVPlaylist.Focus()
             Case "previous"
-                PlayPrevious()
-                LVPlaylist.Focus()
+                If LVPlaylist.Items.Count > 0 Then
+                    PlayPrevious()
+                    LVPlaylist.Focus()
+                End If
             Case "next"
-                PlayNext()
-                LVPlaylist.Focus()
+                If LVPlaylist.Items.Count > 0 Then
+                    PlayNext()
+                    LVPlaylist.Focus()
+                End If
         End Select
     End Sub
     Private Sub OnVoicePlayTargetRequested(ByVal targetKey As String)
@@ -6602,10 +6609,16 @@ Public Class Player
     ''' <summary>
     ''' Extracts playlist phrases mapped to unique keys and loads them into the speech engine off the UI thread.
     ''' </summary>
-    Public Async Sub RefreshSpeechGrammar()
-        If App.VoiceEngine Is Nothing OrElse LVPlaylist Is Nothing OrElse LVPlaylist.Items.Count = 0 Then
+    Friend Async Sub RefreshSpeechGrammar()
+        If Not App.Settings.EnableVoiceCommands OrElse App.VoiceEngine Is Nothing Then
             Return
         End If
+        If LVPlaylist Is Nothing OrElse LVPlaylist.Items.Count = 0 Then
+            App.VoiceEngine.ClearGrammars()
+            Debug.Print("Voice Grammar cleared (playlist is empty).")
+            Return
+        End If
+        Debug.Print("Refreshing Voice Grammar...")
 
         ' Retrieve current settings variables
         Dim removeSpaces As Boolean = App.Settings.PlaylistTitleRemoveSpaces
@@ -6680,10 +6693,11 @@ Public Class Player
                            Await App.VoiceEngine.LoadGrammarAsync(phraseToKeyMap)
                            App.VoiceEngine.Start()
 
-                           Debug.Print("Voice Grammar Refreshed with " & phraseToKeyMap.Count & " phrases.")
                            For Each a In phraseToKeyMap
                                Debug.Print("Phrase: " & a.Key & " => Key: " & a.Value)
                            Next
+                           Debug.Print("Voice Grammar Refreshed with " & phraseToKeyMap.Count & " phrases.")
+
                        End Function)
     End Sub
 

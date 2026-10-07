@@ -77,7 +77,7 @@ Friend Class VoiceController
     ''' <summary>
     ''' Asynchronously builds speech grammars on a background thread.
     ''' </summary>
-    Public Async Function LoadGrammarAsync(ByVal phraseToKeyMap As Dictionary(Of String, String)) As Task
+    Friend Async Function LoadGrammarAsync(ByVal phraseToKeyMap As Dictionary(Of String, String)) As Task
         If recognizer Is Nothing Then Return
 
         Await Task.Run(Sub()
@@ -121,5 +121,15 @@ Friend Class VoiceController
                            End Try
                        End Sub)
     End Function
+    Friend Sub ClearGrammars()
+        If recognizer IsNot Nothing Then
+            Try
+                recognizer.RecognizeAsyncCancel()
+                recognizer.UnloadAllGrammars()
+            Catch ex As Exception
+                System.Diagnostics.Debug.WriteLine($"Error unloading grammars: {ex.Message}")
+            End Try
+        End If
+    End Sub
 
 End Class
