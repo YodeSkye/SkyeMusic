@@ -22,6 +22,7 @@ Friend Class VoiceController
         If recognizer IsNot Nothing Then
             [Stop]()
             RemoveHandler recognizer.SpeechRecognized, AddressOf OnSpeechRecognized
+            If App.VoicePhraseToKeyMap IsNot Nothing Then App.VoicePhraseToKeyMap.Clear()
             Try
                 recognizer.UnloadAllGrammars()
             Catch ex As Exception
@@ -53,23 +54,35 @@ Friend Class VoiceController
 
     Private Sub OnSpeechRecognized(ByVal sender As Object, ByVal e As SpeechRecognizedEventArgs)
         Debug.WriteLine($"[VOICE DETECTED] Text: '{e.Result.Text}' | Confidence: {e.Result.Confidence}")
-        ' Ignore low confidence hits
-        If e.Result.Confidence < 0.65F Then Return
 
-        Dim grammarName As String = e.Result.Grammar.Name
+        ' 1. Ignore low confidence hits
+        If e.Result.Confidence < 0.75F Then Return
+
+        Dim grammarName As String = e.Result.Grammar?.Name
+        Dim rawText As String = e.Result.Text.Trim()
 
         Select Case grammarName
             Case "Controls"
-                ' Handle "play", "pause", "stop", "next", "previous"
-                Dim commandText As String = e.Result.Text.Trim().ToLowerInvariant()
-                If commandText.StartsWith("skye ") Then commandText = commandText.Substring(5).Trim()
+                ' Matches "skye play", "skye pause", etc.
+                Dim commandText As String = rawText
+                If commandText.StartsWith("hey skye ", StringComparison.OrdinalIgnoreCase) Then
+                    commandText = commandText.Substring(9).Trim().ToLowerInvariant()
+                End If
+
                 RaiseEvent CommandRecognized(commandText)
 
             Case "DynamicPlaylist"
-                ' Retrieve the unique key (filename) linked to the phrase
-                If e.Result.Semantics.Value IsNot Nothing Then
-                    Dim targetKey As String = e.Result.Semantics.Value.ToString()
-                    RaiseEvent PlayTargetRequested(targetKey)
+                ' Matches "skye {Song Title}"
+                If rawText.StartsWith("hey skye ", StringComparison.OrdinalIgnoreCase) Then
+                    Dim recognizedPhrase As String = rawText.Substring(9).Trim()
+
+                    ' Look up the file path / key from the map
+                    Dim targetKey As String = ""
+                    If App.VoicePhraseToKeyMap IsNot Nothing AndAlso App.VoicePhraseToKeyMap.TryGetValue(recognizedPhrase, targetKey) Then
+                        RaiseEvent PlayTargetRequested(targetKey)
+                    Else
+                        Debug.WriteLine($"[VOICE DEBUG] Phrase '{recognizedPhrase}' matched grammar but was missing from dictionary.")
+                    End If
                 End If
         End Select
     End Sub
@@ -77,50 +90,76 @@ Friend Class VoiceController
     ''' <summary>
     ''' Asynchronously builds speech grammars on a background thread.
     ''' </summary>
-    Friend Async Function LoadGrammarAsync(ByVal phraseToKeyMap As Dictionary(Of String, String)) As Task
+    Friend Async Function LoadGrammarAsync() As Task
         If recognizer Is Nothing Then Return
 
         Await Task.Run(Sub()
+                           ' -------------------------------------------------------------
+                           ' 1. Isolated Unload Step (Prevents SAPI COM exceptions from stopping the build)
+                           ' -------------------------------------------------------------
                            Try
-                               Try
-                                   recognizer.UnloadAllGrammars()
-                               Catch
-                               End Try
+                               recognizer.UnloadAllGrammars()
+                           Catch ex As Exception
+                               System.Diagnostics.Debug.WriteLine($"[VOICE WARNING] UnloadAllGrammars non-fatal exception: {ex.Message}")
+                           End Try
 
-                               ' 1. Static Control Commands ("Skye, play", "Skye, stop", etc.)
+                           ' -------------------------------------------------------------
+                           ' 2. Build and Load Static Controls
+                           ' -------------------------------------------------------------
+                           Try
                                Dim controls As New Choices()
-                               controls.Add({"play", "pause", "stop", "next", "previous"})
+                               ' Use distinct, multi-syllable commands to prevent phonetic overlap
+                               controls.Add(New String() {"play music", "pause music", "stop music", "previous song", "next song"})
 
-                               Dim controlBuilder As New GrammarBuilder()
-                               controlBuilder.Append("skye") ' Wake word
+                               Dim controlBuilder As New GrammarBuilder() With {.Culture = recognizer.RecognizerInfo.Culture}
+                               controlBuilder.Append("hey skye") ' Wake word
                                controlBuilder.Append(controls)
 
-                               Dim controlGrammar As New Grammar(controlBuilder) With {.Name = "Controls"}
+                               Dim controlGrammar As New Grammar(controlBuilder) With {
+                               .Name = "Controls",
+                               .Weight = 0.8F
+                           }
                                recognizer.LoadGrammar(controlGrammar)
+                               System.Diagnostics.Debug.WriteLine("[VOICE SUCCESS] Controls grammar loaded.")
+                           Catch ex As Exception
+                               System.Diagnostics.Debug.WriteLine($"[VOICE ERROR] Controls grammar failed: {ex.Message}")
+                           End Try
 
-
-                               ' 2. Dynamic Playlist Commands ("Skye, play {Song/Artist}")
-                               If phraseToKeyMap IsNot Nothing AndAlso phraseToKeyMap.Count > 0 Then
-                                   Dim choicesList As New List(Of GrammarBuilder)()
-
-                                   For Each pair In phraseToKeyMap
-                                       Dim semVal As New SemanticResultValue(pair.Key, pair.Value)
-                                       choicesList.Add(New GrammarBuilder(semVal))
-                                   Next
-
-                                   Dim songChoices As New Choices(choicesList.ToArray())
-
-                                   Dim playBuilder As New GrammarBuilder()
-                                   playBuilder.Append("skye") ' Wake word
-                                   playBuilder.Append("play")
-                                   playBuilder.Append(songChoices)
-
-                                   Dim dynamicGrammar As New Grammar(playBuilder) With {.Name = "DynamicPlaylist"}
-                                   recognizer.LoadGrammar(dynamicGrammar)
+                           ' -------------------------------------------------------------
+                           ' 3. Build and Load Dynamic Playlist
+                           ' -------------------------------------------------------------
+                           Try
+                               If App.VoicePhraseToKeyMap Is Nothing OrElse App.VoicePhraseToKeyMap.Count = 0 Then
+                                   System.Diagnostics.Debug.WriteLine("[VOICE WARNING] App.phraseToKeyMap is NULL or EMPTY! Skipping DynamicPlaylist.")
+                                   Return
                                End If
 
+                               System.Diagnostics.Debug.WriteLine($"[VOICE DEBUG] Building grammar for {App.VoicePhraseToKeyMap.Count} songs...")
+
+                               Dim songChoices As New Choices()
+                               For Each phrase In App.VoicePhraseToKeyMap.Keys
+                                   If Not String.IsNullOrWhiteSpace(phrase) Then
+                                       ' Clean out quotes/brackets that break SAPI compilation
+                                       Dim cleanPhrase As String = phrase.Replace("""", "").Replace("&", "and").Trim()
+                                       If cleanPhrase.Length > 0 Then
+                                           songChoices.Add(cleanPhrase)
+                                       End If
+                                   End If
+                               Next
+
+                               Dim playBuilder As New GrammarBuilder() With {.Culture = recognizer.RecognizerInfo.Culture}
+                               playBuilder.Append("hey skye") ' Wake word
+                               playBuilder.Append(songChoices) ' Direct song title match
+
+                               Dim dynamicGrammar As New Grammar(playBuilder) With {
+                               .Name = "DynamicPlaylist",
+                               .Weight = 1.0F
+                           }
+                               recognizer.LoadGrammar(dynamicGrammar)
+                               System.Diagnostics.Debug.WriteLine("[VOICE SUCCESS] DynamicPlaylist grammar loaded successfully!")
+
                            Catch ex As Exception
-                               System.Diagnostics.Debug.WriteLine($"Error loading grammar: {ex.Message}")
+                               System.Diagnostics.Debug.WriteLine($"[VOICE ERROR] DynamicPlaylist grammar failed: {ex.Message}")
                            End Try
                        End Sub)
     End Function

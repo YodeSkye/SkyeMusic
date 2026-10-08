@@ -6556,19 +6556,19 @@ Public Class Player
         Debug.Print("Voice Command Recognized: " & command)
 
         Select Case command.ToLowerInvariant()
-            Case "play"
+            Case "play music"
                 If PlayState <> PlayStates.Playing AndAlso LVPlaylist.Items.Count > 0 Then TogglePlay()
-            Case "pause"
+            Case "pause music"
                 If PlayState = PlayStates.Playing Then TogglePlay()
-            Case "stop"
+            Case "stop music"
                 StopPlay()
                 LVPlaylist.Focus()
-            Case "previous"
+            Case "previous song"
                 If LVPlaylist.Items.Count > 0 Then
                     PlayPrevious()
                     LVPlaylist.Focus()
                 End If
-            Case "next"
+            Case "next song"
                 If LVPlaylist.Items.Count > 0 Then
                     PlayNext()
                     LVPlaylist.Focus()
@@ -6647,7 +6647,7 @@ Public Class Player
 
         ' 2. Parse clean phrases and map them to keys off the UI thread
         Await Task.Run(Async Function()
-                           Dim phraseToKeyMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+                           'Dim phraseToKeyMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
 
                            ' Helper lambda to expand PascalCase boundaries ("TaylorSwift" -> "Taylor Swift")
                            ' and clean up extra whitespace
@@ -6680,27 +6680,27 @@ Public Class Player
                                ' 3. Register individual chunk phrases ("Taylor Swift", "The Fate Of Ophelia")
                                For Each chunk In rawChunks
                                    Dim spokenPhrase As String = expandPascalCase(chunk)
-                                   If spokenPhrase.Length > 2 AndAlso Not phraseToKeyMap.ContainsKey(spokenPhrase) Then
-                                       phraseToKeyMap.Add(spokenPhrase, key)
+                                   If spokenPhrase.Length > 2 AndAlso Not App.VoicePhraseToKeyMap.ContainsKey(spokenPhrase) Then
+                                       App.VoicePhraseToKeyMap.Add(spokenPhrase, key)
                                    End If
                                Next
 
                                ' 4. Register full combined track phrase ("Taylor Swift The Fate Of Ophelia")
                                Dim fullSpokenPhrase As String = expandPascalCase(rawDisplay)
-                               If fullSpokenPhrase.Length > 2 AndAlso Not phraseToKeyMap.ContainsKey(fullSpokenPhrase) Then
-                                   phraseToKeyMap.Add(fullSpokenPhrase, key)
+                               If fullSpokenPhrase.Length > 2 AndAlso Not App.VoicePhraseToKeyMap.ContainsKey(fullSpokenPhrase) Then
+                                   App.VoicePhraseToKeyMap.Add(fullSpokenPhrase, key)
                                End If
                            Next
 
                            ' 3. Load dynamic grammar into VoiceEngine
-                           Await App.VoiceEngine.LoadGrammarAsync(phraseToKeyMap)
+                           Await App.VoiceEngine.LoadGrammarAsync()
                            App.VoiceEngine.Start()
 
-                           For Each a In phraseToKeyMap
+                           For Each a In App.VoicePhraseToKeyMap
                                Debug.Print("Phrase: " & a.Key & " => Key: " & a.Value)
                            Next
-                           Debug.Print("Voice Grammar Refreshed with " & phraseToKeyMap.Count & " phrases.")
-                           Skye.Common.Log.Write("Voice Grammar Refreshed with " & phraseToKeyMap.Count & " phrases (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                           Debug.Print("Voice Grammar Refreshed with " & App.VoicePhraseToKeyMap.Count & " phrases.")
+                           Skye.Common.Log.Write("Voice Grammar Refreshed with " & App.VoicePhraseToKeyMap.Count & " phrases (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
                        End Function)
     End Sub

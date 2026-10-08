@@ -293,7 +293,6 @@ Namespace My
                 End Select
             End Get
         End Property
-        Friend VoiceEngine As VoiceController
 
         ' Forms & Tray
         Friend FrmPlayer As Player 'FmrPlayer is the main player window that provides advanced playback controls and displays detailed information about the currently playing media.
@@ -1156,6 +1155,10 @@ Namespace My
             End Property
         End Class
         Friend CompanionControlServer As CompanionControlServerClass
+
+        ' Speech Recognition
+        Friend VoiceEngine As VoiceController
+        Friend VoicePhraseToKeyMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
 
         ' Settings
         Friend Class Settings
