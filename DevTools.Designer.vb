@@ -37,6 +37,10 @@ Partial Class DevTools
         BtnHistoryDeleteSelected = New Button()
         LblHistoryCounts = New Label()
         TPPlays = New TabPage()
+        TPVoiceGrammars = New TabPage()
+        PanelVoiceGrammars = New Panel()
+        lblVoiceGrammarsTotal = New Skye.UI.Label()
+        DGVVoiceGrammars = New DataGridView()
         CType(DGVPlays, ComponentModel.ISupportInitialize).BeginInit()
         PanelPlaysControls.SuspendLayout()
         PanelDGVPlays.SuspendLayout()
@@ -46,6 +50,9 @@ Partial Class DevTools
         CType(DGVHistory, ComponentModel.ISupportInitialize).BeginInit()
         PanelHistoryControls.SuspendLayout()
         TPPlays.SuspendLayout()
+        TPVoiceGrammars.SuspendLayout()
+        PanelVoiceGrammars.SuspendLayout()
+        CType(DGVVoiceGrammars, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' DGVPlays
@@ -123,6 +130,7 @@ Partial Class DevTools
         ' 
         TCDevTools.Controls.Add(TPHistory)
         TCDevTools.Controls.Add(TPPlays)
+        TCDevTools.Controls.Add(TPVoiceGrammars)
         TCDevTools.Dock = DockStyle.Fill
         TCDevTools.Location = New Point(0, 0)
         TCDevTools.Name = "TCDevTools"
@@ -224,6 +232,45 @@ Partial Class DevTools
         TPPlays.Text = "Plays"
         TPPlays.UseVisualStyleBackColor = True
         ' 
+        ' TPVoiceGrammars
+        ' 
+        TPVoiceGrammars.Controls.Add(PanelVoiceGrammars)
+        TPVoiceGrammars.Controls.Add(DGVVoiceGrammars)
+        TPVoiceGrammars.Location = New Point(4, 30)
+        TPVoiceGrammars.Name = "TPVoiceGrammars"
+        TPVoiceGrammars.Padding = New Padding(3)
+        TPVoiceGrammars.Size = New Size(1021, 596)
+        TPVoiceGrammars.TabIndex = 2
+        TPVoiceGrammars.Text = "Voice Grammars"
+        TPVoiceGrammars.UseVisualStyleBackColor = True
+        ' 
+        ' PanelVoiceGrammars
+        ' 
+        PanelVoiceGrammars.Controls.Add(lblVoiceGrammarsTotal)
+        PanelVoiceGrammars.Dock = DockStyle.Bottom
+        PanelVoiceGrammars.Location = New Point(3, 540)
+        PanelVoiceGrammars.Name = "PanelVoiceGrammars"
+        PanelVoiceGrammars.Size = New Size(1015, 53)
+        PanelVoiceGrammars.TabIndex = 1
+        ' 
+        ' lblVoiceGrammarsTotal
+        ' 
+        lblVoiceGrammarsTotal.Location = New Point(5, 16)
+        lblVoiceGrammarsTotal.Name = "lblVoiceGrammarsTotal"
+        lblVoiceGrammarsTotal.Size = New Size(1005, 23)
+        lblVoiceGrammarsTotal.TabIndex = 0
+        lblVoiceGrammarsTotal.Text = "Label1"
+        ' 
+        ' DGVVoiceGrammars
+        ' 
+        DGVVoiceGrammars.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        DGVVoiceGrammars.Dock = DockStyle.Fill
+        DGVVoiceGrammars.Location = New Point(3, 3)
+        DGVVoiceGrammars.Name = "DGVVoiceGrammars"
+        DGVVoiceGrammars.ReadOnly = True
+        DGVVoiceGrammars.Size = New Size(1015, 590)
+        DGVVoiceGrammars.TabIndex = 0
+        ' 
         ' DevTools
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
@@ -246,6 +293,9 @@ Partial Class DevTools
         PanelHistoryControls.ResumeLayout(False)
         PanelHistoryControls.PerformLayout()
         TPPlays.ResumeLayout(False)
+        TPVoiceGrammars.ResumeLayout(False)
+        PanelVoiceGrammars.ResumeLayout(False)
+        CType(DGVVoiceGrammars, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
     End Sub
 
@@ -264,4 +314,8 @@ Partial Class DevTools
     Friend WithEvents BtnHistoryDeleteSelected As Button
     Friend WithEvents LblHistoryCounts As Label
     Friend WithEvents DGVHistory As DataGridView
+    Friend WithEvents TPVoiceGrammars As TabPage
+    Friend WithEvents DGVVoiceGrammars As DataGridView
+    Friend WithEvents PanelVoiceGrammars As Panel
+    Friend WithEvents lblVoiceGrammarsTotal As Skye.UI.Label
 End Class

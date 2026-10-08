@@ -6623,6 +6623,7 @@ Public Class Player
 
         Dim starttime As TimeSpan = Computer.Clock.LocalTime.TimeOfDay
 
+        App.VoicePhraseToKeyMap.Clear()
         ' Retrieve current settings variables
         Dim removeSpaces As Boolean = App.Settings.PlaylistTitleRemoveSpaces
         Dim videoTag As String = App.Settings.PlaylistVideoIdentifier

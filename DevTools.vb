@@ -1,6 +1,4 @@
 ﻿
-Imports System.ComponentModel
-
 Public Class DevTools
 
     'Declarations
@@ -19,6 +17,7 @@ Public Class DevTools
         TimerDeletePlays.Interval = 5000
         GetHistoryData()
         GetPlaysData()
+        GetVoiceGrammars()
     End Sub
 
     'Control Events
@@ -132,6 +131,40 @@ Public Class DevTools
     Private Sub GetPlaysData()
         DGVPlays.DataSource = App.GetPlayHistoryTable()
         LblPlaysCounts.Text = DGVPlays.Rows.Count.ToString & " Rows"
+    End Sub
+    Private Sub GetVoiceGrammars()
+        DGVVoiceGrammars.DataSource = Nothing
+
+        If App.VoicePhraseToKeyMap IsNot Nothing AndAlso App.VoicePhraseToKeyMap.Count > 0 Then
+            DGVVoiceGrammars.SuspendLayout()
+
+            ' Project dictionary to a list of objects so WinForms DataBinding can auto-generate columns
+            Dim list = App.VoicePhraseToKeyMap.Select(Function(kvp) New With {
+            .Phrase = kvp.Key,
+            .FilePath = kvp.Value
+        }).ToList()
+
+            DGVVoiceGrammars.AutoGenerateColumns = True
+            DGVVoiceGrammars.DataSource = list
+
+            ' Clean header formatting and fill modes
+            If DGVVoiceGrammars.Columns("Phrase") IsNot Nothing Then
+                DGVVoiceGrammars.Columns("Phrase").HeaderText = "Spoken Phrase"
+                DGVVoiceGrammars.Columns("Phrase").Width = 250
+            End If
+
+            If DGVVoiceGrammars.Columns("FilePath") IsNot Nothing Then
+                DGVVoiceGrammars.Columns("FilePath").HeaderText = "Mapped Path / Key"
+                DGVVoiceGrammars.Columns("FilePath").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            End If
+
+            DGVVoiceGrammars.ResumeLayout()
+
+            ' Update your count label
+            lblVoiceGrammarsTotal.Text = $"Total Active Phrases: {App.VoicePhraseToKeyMap.Count:N0}"
+        Else
+            lblVoiceGrammarsTotal.Text = "Total Active Phrases: 0"
+        End If
     End Sub
     Private Sub SetDeleteHistoryConfirm(Optional forcereset As Boolean = False)
         If DeleteHistoryConfirm Or forcereset Then
