@@ -3908,6 +3908,7 @@ Public Class Player
         Next
         LVPlaylist.EndUpdate()
 
+        RaiseEvent PlaylistChanged()
     End Sub
     Private Sub CMIViewInLibraryClick(sender As Object, e As EventArgs) Handles CMIViewInLibrary.Click
         If LVPlaylist.SelectedItems.Count > 0 Then App.FrmLibrary.Show(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
@@ -6648,7 +6649,6 @@ Public Class Player
 
         ' 2. Parse clean phrases and map them to keys off the UI thread
         Await Task.Run(Async Function()
-                           'Dim phraseToKeyMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
 
                            ' Helper lambda to expand PascalCase boundaries ("TaylorSwift" -> "Taylor Swift")
                            ' and clean up extra whitespace
@@ -6692,9 +6692,10 @@ Public Class Player
                                    App.VoicePhraseToKeyMap.Add(fullSpokenPhrase, key)
                                End If
                            Next
-
+                           'Debug.Print("Voice Grammar Map built with " & App.VoicePhraseToKeyMap.Count & " phrases.")
                            ' 3. Load dynamic grammar into VoiceEngine
                            Await App.VoiceEngine.LoadGrammarAsync()
+                           'Debug.Print("Voice Grammar Loaded into Engine.")
                            App.VoiceEngine.Start()
 
                            For Each a In App.VoicePhraseToKeyMap

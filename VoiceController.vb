@@ -53,7 +53,7 @@ Friend Class VoiceController
     End Sub
 
     Private Sub OnSpeechRecognized(ByVal sender As Object, ByVal e As SpeechRecognizedEventArgs)
-        Debug.WriteLine($"[VOICE DETECTED] Text: '{e.Result.Text}' | Confidence: {e.Result.Confidence}")
+        Debug.WriteLine($"[VOICE DETECTED] Text: '{e.Result.Text}' | Confidence: {e.Result.Confidence:P2}")
 
         ' 1. Ignore low confidence hits
         If e.Result.Confidence < 0.75F Then Return
@@ -61,28 +61,47 @@ Friend Class VoiceController
         Dim grammarName As String = e.Result.Grammar?.Name
         Dim rawText As String = e.Result.Text.Trim()
 
+        ' 2. Guard Clause: Block standalone wake word triggers ("hey skye" or "skye" alone)
+        If rawText.Equals("hey skye", StringComparison.OrdinalIgnoreCase) OrElse rawText.Equals("skye", StringComparison.OrdinalIgnoreCase) Then
+            Debug.WriteLine("[VOICE IGNORED] Pure wake word detected without a command or song payload.")
+            Return
+        End If
+
+        ' 3. Mandatory Wake-Word Prefix Verification
+        If Not rawText.StartsWith("hey skye ", StringComparison.OrdinalIgnoreCase) Then
+            Debug.WriteLine($"[VOICE REJECTED] Phrase missing 'hey skye' prefix: '{rawText}'")
+            Return
+        End If
+
+        ' Extract payload phrase after "hey skye " (length 9)
+        Dim payload As String = rawText.Substring(9).Trim()
+
+        ' Ensure payload isn't empty space
+        If String.IsNullOrWhiteSpace(payload) Then Return
+
         Select Case grammarName
             Case "Controls"
-                ' Matches "skye play", "skye pause", etc.
-                Dim commandText As String = rawText
-                If commandText.StartsWith("hey skye ", StringComparison.OrdinalIgnoreCase) Then
-                    commandText = commandText.Substring(9).Trim().ToLowerInvariant()
-                End If
-
-                RaiseEvent CommandRecognized(commandText)
+                ' Raise command in lowercase for clean handling in your player (e.g., "play music", "next song")
+                RaiseEvent CommandRecognized(payload.ToLowerInvariant())
 
             Case "DynamicPlaylist"
-                ' Matches "skye {Song Title}"
-                If rawText.StartsWith("hey skye ", StringComparison.OrdinalIgnoreCase) Then
-                    Dim recognizedPhrase As String = rawText.Substring(9).Trim()
-
-                    ' Look up the file path / key from the map
-                    Dim targetKey As String = ""
-                    If App.VoicePhraseToKeyMap IsNot Nothing AndAlso App.VoicePhraseToKeyMap.TryGetValue(recognizedPhrase, targetKey) Then
-                        RaiseEvent PlayTargetRequested(targetKey)
-                    Else
-                        Debug.WriteLine($"[VOICE DEBUG] Phrase '{recognizedPhrase}' matched grammar but was missing from dictionary.")
+                ' Case-insensitive dictionary lookup against App.VoicePhraseToKeyMap
+                Dim targetKey As String = ""
+                If App.VoicePhraseToKeyMap IsNot Nothing Then
+                    ' Try direct lookup first
+                    If Not App.VoicePhraseToKeyMap.TryGetValue(payload, targetKey) Then
+                        ' Fallback: Case-insensitive search if exact dictionary casing differs
+                        Dim kvp = App.VoicePhraseToKeyMap.FirstOrDefault(Function(x) x.Key.Equals(payload, StringComparison.OrdinalIgnoreCase))
+                        If kvp.Key IsNot Nothing Then
+                            targetKey = kvp.Value
+                        End If
                     End If
+                End If
+
+                If Not String.IsNullOrEmpty(targetKey) Then
+                    RaiseEvent PlayTargetRequested(targetKey)
+                Else
+                    Debug.WriteLine($"[VOICE DEBUG] Phrase '{payload}' matched grammar but missing from dictionary map.")
                 End If
         End Select
     End Sub
@@ -94,6 +113,7 @@ Friend Class VoiceController
         If recognizer Is Nothing Then Return
 
         Await Task.Run(Sub()
+
                            ' -------------------------------------------------------------
                            ' 1. Isolated Unload Step (Prevents SAPI COM exceptions from stopping the build)
                            ' -------------------------------------------------------------
@@ -141,7 +161,7 @@ Friend Class VoiceController
                                    If Not String.IsNullOrWhiteSpace(phrase) Then
                                        ' Clean out quotes/brackets that break SAPI compilation
                                        Dim cleanPhrase As String = phrase.Replace("""", "").Replace("&", "and").Trim()
-                                       If cleanPhrase.Length > 0 Then
+                                       If cleanPhrase.Length > 1 Then
                                            songChoices.Add(cleanPhrase)
                                        End If
                                    End If
