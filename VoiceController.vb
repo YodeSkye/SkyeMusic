@@ -82,7 +82,10 @@ Friend Class VoiceController
 
         Await Task.Run(Sub()
                            Try
-                               recognizer.UnloadAllGrammars()
+                               Try
+                                   recognizer.UnloadAllGrammars()
+                               Catch
+                               End Try
 
                                ' 1. Static Control Commands ("Skye, play", "Skye, stop", etc.)
                                Dim controls As New Choices()

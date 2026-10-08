@@ -556,6 +556,7 @@ Public Class Library
             App.FrmPlayer.LVPlaylist.EndUpdate()
             LblStatus.Visible = False
             Skye.Common.Log.Write("Selected Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+            App.FrmPlayer.RaiseEventPlaylistChanged()
         End If
     End Sub
     Private Sub CMIAddAllToPlaylistClick(sender As Object, e As EventArgs) Handles CMIAddAllToPlaylist.Click
@@ -570,6 +571,7 @@ Public Class Library
         App.FrmPlayer.LVPlaylist.EndUpdate()
         LblStatus.Visible = False
         Skye.Common.Log.Write("Full Library Added to Playlist (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+        App.FrmPlayer.RaiseEventPlaylistChanged()
     End Sub
     Private Sub CMIAddGroupToPlaylist_Click(sender As Object, e As EventArgs) Handles CMIAddGroupToPlaylist.Click
         If LVLibrary.SelectedItems.Count > 0 Then
@@ -991,6 +993,7 @@ Public Class Library
             Skye.Common.Log.Write("Library Watcher " & If(paths.Count = 1, "Update Available", "Updates Available: " & paths.Count.ToString))
         End If
         Debug.Print("Library Watcher Work Complete: " & paths.Count.ToString)
+        If App.Settings.WatcherUpdatePlaylist Then App.FrmPlayer.RaiseEventPlaylistChanged()
     End Sub
     Private Function CreateLibraryItem(path As String) As ListViewItem
         Dim item As ListViewItem = Nothing

@@ -3351,11 +3351,11 @@ Public Class Player
                         LVPlaylist.Items.Insert(itemover.Index + 1, PlaylistItemMove)
                     End If
                 End If
+                RaiseEvent PlaylistChanged()
             End If
             PlaylistItemMove = Nothing
-            RaiseEvent PlaylistChanged()
         End If
-        PlaylistItemMove = Nothing
+        'PlaylistItemMove = Nothing
         Cursor = Cursors.Default
         LVPlaylist.LineBefore = -1
         LVPlaylist.LineAfter = -1
@@ -4366,6 +4366,9 @@ Public Class Player
     End Sub
 
     ' METHODS
+    Friend Sub RaiseEventPlaylistChanged()
+        RaiseEvent PlaylistChanged()
+    End Sub
     Private Function IsFile(path As String) As Boolean
         If App.History.FindIndex(Function(p) p.Path = path And p.SourceType = App.MediaSourceTypes.File) >= 0 Then
             Return True
@@ -4965,10 +4968,6 @@ Public Class Player
         End If
 
         'Build playlist items
-        'Dim items = LVPlaylist.Items.Cast(Of ListViewItem)().
-        'Select(Function(lvi) New PlaylistItemType With {.Title = lvi.SubItems(0).Text, .Path = lvi.SubItems(1).Text})
-
-        'Build playlist items
         Dim titleCol = LVPlaylist.Columns.Cast(Of ColumnHeader)().FirstOrDefault(Function(c) c.Text = "Title")
         Dim pathCol = LVPlaylist.Columns.Cast(Of ColumnHeader)().FirstOrDefault(Function(c) c.Text = "Path")
         Dim titleIdx As Integer = If(titleCol IsNot Nothing, titleCol.Index, 0)
@@ -5019,6 +5018,7 @@ Public Class Player
                 AddToPlaylistFromLibrary(frmAddStream.NewStream.Title, newstream)
                 LVPlaylist.SelectedIndices.Clear()
                 LVPlaylist.SelectedIndices.Add(LVPlaylist.FindItemWithText(frmAddStream.NewStream.Title).Index)
+                RaiseEvent PlaylistChanged()
                 'Play Stream
                 PlayStream(newstream)
                 'Debug.Print("New Stream Added (" + newstream + ")")
@@ -5114,7 +5114,7 @@ Public Class Player
         End If
         SetPlaylistCountText()
         lvi = Nothing
-        RaiseEvent PlaylistChanged()
+        'RaiseEvent PlaylistChanged()
     End Sub
     Friend Sub AddToPlaylistFromDirectory(title As String, stream As String)
         Dim realUrl As String = NormalizeUrl(stream)
@@ -5197,7 +5197,7 @@ Public Class Player
             lvi = LVPlaylist.FindItemWithText(filename, True, 0)
             If lvi IsNot Nothing Then
                 LVPlaylist.Items.Remove(lvi)
-                RaiseEvent PlaylistChanged()
+                'RaiseEvent PlaylistChanged()
             End If
             SetPlaylistCountText()
         End If
@@ -6597,7 +6597,7 @@ Public Class Player
                     item.Focused = True
 
                     ' 2. Scroll the ListView directly to this item
-                    item.EnsureVisible()
+                    EnsureVisibleCentered(LVPlaylist, item.Index)
 
                     ' 3. Trigger your playback routine for the selected item
                     PlayFromPlaylist()
@@ -6616,9 +6616,12 @@ Public Class Player
         If LVPlaylist Is Nothing OrElse LVPlaylist.Items.Count = 0 Then
             App.VoiceEngine.ClearGrammars()
             Debug.Print("Voice Grammar cleared (playlist is empty).")
+            Skye.Common.Log.Write("Voice Grammar Cleared, playlist is empty.")
             Return
         End If
         Debug.Print("Refreshing Voice Grammar...")
+
+        Dim starttime As TimeSpan = Computer.Clock.LocalTime.TimeOfDay
 
         ' Retrieve current settings variables
         Dim removeSpaces As Boolean = App.Settings.PlaylistTitleRemoveSpaces
@@ -6697,6 +6700,7 @@ Public Class Player
                                Debug.Print("Phrase: " & a.Key & " => Key: " & a.Value)
                            Next
                            Debug.Print("Voice Grammar Refreshed with " & phraseToKeyMap.Count & " phrases.")
+                           Skye.Common.Log.Write("Voice Grammar Refreshed with " & phraseToKeyMap.Count & " phrases (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
                        End Function)
     End Sub
