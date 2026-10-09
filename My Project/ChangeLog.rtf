@@ -8,8 +8,8 @@
 \cf0\b0\f1\lang1033\'a3\'ab\f0  Track Exclusion Feature: \f2 prevents excluded songs from playing during auto-play or manual track advancement.\cf1\b\f0\fs28\lang9\par
 \par
 \cf2\fs24 Improvements\par
-\cf0\b0\f3\u10003?\f4\lang1033  \f3\lang9 Retuned meter ballistics and refresh timing to 33ms (~30 FPS) to eliminate tip flickering and deliver smooth, responsive peak metering.\par
-\u10003?\f4\lang1033  Refactored audio visualization engine into a fully self-contained subsystem with robust WASAPI device reset and COM error recovery handling.\f5\lang9\par
+\cf0\b0\f3\u10003?\f4\lang1033  \f5\lang9 Retuned meter ballistics and refresh timing to 33ms (~30 FPS) to eliminate tip flickering and deliver smooth, responsive peak metering.\par
+\f3\u10003?\f4\lang1033  Refactored audio visualization engine into a fully self-contained subsystem with robust WASAPI device reset and COM error recovery handling.\f5\lang9\par
 \f3\u10003?\f4\lang1033  Redesigned audio spectrum analysis and peak metering engine into a dedicated high-performance C# bridge (WasapiAudioEngine).\par
 \f3\lang9\u10003?\f4\lang1033  \f5\lang9 Playlist updates (adds, deletes, reorders, and track exclusions\f4\lang1033 , etc\f5\lang9 ) now automatically save silently in the background.\par
 \f3\u10003?\f4\lang1033  Adjusted how the player window state is dealt with on minimize, restore, and suspend. Made sure Minimize To Tray works properly in all cases.\f5\lang9\par
@@ -18,8 +18,9 @@
 \f3\lang9\u10003?\f4\lang1033  \f0 Various UI Improvements.\cf1\b\fs28\lang9\par
 \par
 \cf2\fs24 Fixes\par
-\cf0\b0\f3\u10005?\f4\lang1033  \f3\lang9 Completely eliminated UI thread stuttering and visual lag by offloading WASAPI audio loopback capture and FFT mathematical calculations to a background thread.\par
-\u10005?\f4\lang1033  \f5\lang9 Resolved UI freeze/unresponsiveness after Windows sleep and screen lock cycles.\par
+\cf0\b0\f3\u10005?\f4\lang1033  Title Separator setting now saves as intended.\f3\lang9\par
+\u10005?\f4\lang1033  \f5\lang9 Completely eliminated UI thread stuttering and visual lag by offloading WASAPI audio loopback capture and FFT mathematical calculations to a background thread.\par
+\f3\u10005?\f4\lang1033  \f5\lang9 Resolved UI freeze/unresponsiveness after Windows sleep and screen lock cycles.\par
 \f3\u10005?\f4\lang1033  \f5\lang9 Resolved an issue where background library auto-updates failed to process file changes if the Library window hadn't been opened yet.\par
 \f3\u10005?\f4\lang1033  \f0 Fixed alignment issues on top edge of media panel and playlist to fit with the menu bar.\f4\par
 \f3\lang9\u10005?\f4\lang1033  \f0 Various Bug Fixes.\cf1\b\lang9\par
