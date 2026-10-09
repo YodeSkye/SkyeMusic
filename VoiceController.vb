@@ -53,6 +53,10 @@ Friend Class VoiceController
     End Sub
 
     Private Sub OnSpeechRecognized(ByVal sender As Object, ByVal e As SpeechRecognizedEventArgs)
+        If App.Settings.VoicePushToTalk AndAlso Not App.VoicePushToTalkActive Then
+            Debug.WriteLine("[VOICE IGNORED] Push-To-Talk is inactive.")
+            Return
+        End If
         Debug.WriteLine($"[VOICE DETECTED] Text: '{e.Result.Text}' | Confidence: {e.Result.Confidence:P2}")
 
         ' 1. Ignore low confidence hits
@@ -104,6 +108,9 @@ Friend Class VoiceController
                     Debug.WriteLine($"[VOICE DEBUG] Phrase '{payload}' matched grammar but missing from dictionary map.")
                 End If
         End Select
+        If App.Settings.VoicePushToTalk Then
+            App.VoicePushToTalkActive = False
+        End If
     End Sub
 
     ''' <summary>

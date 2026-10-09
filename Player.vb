@@ -2756,6 +2756,17 @@ Public Class Player
         ' Volume
         AddHandler App.SystemVolumeChanged,
             Sub(v)
+                ' 1. If active ducking is running, ALWAYS allow the ducked volume to show
+                If App.VoiceAudioIsDucked Then
+                    BtnVolume.VolumePercent = v
+                    Exit Sub
+                End If
+
+                ' 2. When NOT ducked: If Windows reports 100%, but the button is currently boosted (>100%),
+                '    ignore the 100% monitor tick so it doesn't strip the boost display (+10, +12, etc.)
+                If v = 100 AndAlso BtnVolume.VolumePercent > 100 Then Exit Sub
+
+                ' Otherwise update normally
                 BtnVolume.VolumePercent = v
             End Sub
         AddHandler App.SystemMuteChanged,
@@ -6606,6 +6617,9 @@ Public Class Player
                 End If
             End If
         Next
+    End Sub
+    Friend Sub RefreshVolumeButton()
+        Me.BtnVolume?.Invalidate()
     End Sub
     ''' <summary>
     ''' Extracts playlist phrases mapped to unique keys and loads them into the speech engine off the UI thread.

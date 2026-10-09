@@ -81,6 +81,7 @@ Partial Class Options
         LblHelperApp2Name = New Skye.UI.Label()
         LblHelperApp1Path = New Skye.UI.Label()
         LblCompanionServerPort = New Skye.UI.Label()
+        ChkBoxEnableVoicePushToTalk = New CheckBox()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         ChkBoxVolumeBoost = New CheckBox()
         CkBoxPlayerShowMeterVert = New CheckBox()
@@ -538,7 +539,7 @@ Partial Class Options
         CoBoxTheme.Location = New Point(13, 31)
         CoBoxTheme.Name = "CoBoxTheme"
         CoBoxTheme.Size = New Size(196, 33)
-        CoBoxTheme.TabIndex = 10
+        CoBoxTheme.TabIndex = 5
         TipOptions.SetText(CoBoxTheme, "Choose a color theme.")
         TipError.SetText(CoBoxTheme, Nothing)
         ' 
@@ -830,6 +831,7 @@ Partial Class Options
         TPApp.Controls.Add(LblHistoryAutoSaveInterval2)
         TPApp.Controls.Add(LblTheme)
         TPApp.Controls.Add(LblCompanionServerPort)
+        TPApp.Controls.Add(ChkBoxEnableVoicePushToTalk)
         TipError.SetImage(TPApp, Nothing)
         TipOptions.SetImage(TPApp, Nothing)
         TPApp.Image = Nothing
@@ -851,12 +853,12 @@ Partial Class Options
         ChkBoxEnableVoiceCommands.Font = New Font("Segoe UI", 12F)
         TipOptions.SetImage(ChkBoxEnableVoiceCommands, Nothing)
         TipError.SetImage(ChkBoxEnableVoiceCommands, Nothing)
-        ChkBoxEnableVoiceCommands.Location = New Point(13, 376)
+        ChkBoxEnableVoiceCommands.Location = New Point(13, 354)
         ChkBoxEnableVoiceCommands.Name = "ChkBoxEnableVoiceCommands"
         ChkBoxEnableVoiceCommands.Size = New Size(197, 25)
-        ChkBoxEnableVoiceCommands.TabIndex = 149
+        ChkBoxEnableVoiceCommands.TabIndex = 50
         TipError.SetText(ChkBoxEnableVoiceCommands, Nothing)
-        TipOptions.SetText(ChkBoxEnableVoiceCommands, "Enable Voice Commands for the App." & vbCrLf & "All commands begin with the trigger word ""Skye"", as in ""Skye Play [song name]"". See Help for more information.")
+        TipOptions.SetText(ChkBoxEnableVoiceCommands, "Enable Voice Commands for the App." & vbCrLf & "All commands begin with the trigger phrase ""Hey Skye"", as in ""Skye Play Music"". See Help for more information.")
         ChkBoxEnableVoiceCommands.Text = "Enable Voice Commands"
         ChkBoxEnableVoiceCommands.UseVisualStyleBackColor = True
         ' 
@@ -899,7 +901,7 @@ Partial Class Options
         CkBoxShowTrayIcon.Location = New Point(13, 105)
         CkBoxShowTrayIcon.Name = "CkBoxShowTrayIcon"
         CkBoxShowTrayIcon.Size = New Size(197, 25)
-        CkBoxShowTrayIcon.TabIndex = 145
+        CkBoxShowTrayIcon.TabIndex = 10
         TipError.SetText(CkBoxShowTrayIcon, Nothing)
         TipOptions.SetText(CkBoxShowTrayIcon, "Auto save window sizes and locations.")
         CkBoxShowTrayIcon.Text = "Show Skye Music In Tray"
@@ -915,7 +917,7 @@ Partial Class Options
         CkBoxMinimizeToTray.Location = New Point(13, 127)
         CkBoxMinimizeToTray.Name = "CkBoxMinimizeToTray"
         CkBoxMinimizeToTray.Size = New Size(189, 25)
-        CkBoxMinimizeToTray.TabIndex = 146
+        CkBoxMinimizeToTray.TabIndex = 12
         TipError.SetText(CkBoxMinimizeToTray, Nothing)
         TipOptions.SetText(CkBoxMinimizeToTray, "Stop play and Minimize the window if the screen is locked or screensaver is activated.")
         CkBoxMinimizeToTray.Text = "Minimize Player To Tray"
@@ -977,6 +979,22 @@ Partial Class Options
         LblCompanionServerPort.Text = "Port"
         TipError.SetText(LblCompanionServerPort, Nothing)
         LblCompanionServerPort.TextAlign = ContentAlignment.MiddleRight
+        ' 
+        ' ChkBoxEnableVoicePushToTalk
+        ' 
+        ChkBoxEnableVoicePushToTalk.AutoSize = True
+        ChkBoxEnableVoicePushToTalk.FlatStyle = FlatStyle.Flat
+        ChkBoxEnableVoicePushToTalk.Font = New Font("Segoe UI", 12F)
+        TipOptions.SetImage(ChkBoxEnableVoicePushToTalk, Nothing)
+        TipError.SetImage(ChkBoxEnableVoicePushToTalk, Nothing)
+        ChkBoxEnableVoicePushToTalk.Location = New Point(13, 376)
+        ChkBoxEnableVoicePushToTalk.Name = "ChkBoxEnableVoicePushToTalk"
+        ChkBoxEnableVoicePushToTalk.Size = New Size(163, 25)
+        ChkBoxEnableVoicePushToTalk.TabIndex = 52
+        TipError.SetText(ChkBoxEnableVoicePushToTalk, Nothing)
+        TipOptions.SetText(ChkBoxEnableVoicePushToTalk, "Prevents speaker playback from triggering voice commands." & vbCrLf & "Press your assigned hotkey to speak.")
+        ChkBoxEnableVoicePushToTalk.Text = "Enable Push-To-Talk"
+        ChkBoxEnableVoicePushToTalk.UseVisualStyleBackColor = True
         ' 
         ' TPPlayer
         ' 
@@ -1624,4 +1642,5 @@ Partial Class Options
     Friend WithEvents CkBoxPlayerShowMeterVert As CheckBox
     Friend WithEvents ChkBoxVolumeBoost As CheckBox
     Friend WithEvents ChkBoxEnableVoiceCommands As CheckBox
+    Friend WithEvents ChkBoxEnableVoicePushToTalk As CheckBox
 End Class

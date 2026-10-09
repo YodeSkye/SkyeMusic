@@ -337,6 +337,7 @@ Namespace My
         Private ReadOnly HotKeyStop As New HotKey(1, "Global Stop", Keys.MediaStop, Skye.WinAPI.VK_MEDIA_STOP, 0) 'HotKeyStop is a hotkey for global stop functionality.
         Private ReadOnly HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
         Private ReadOnly HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
+        Private ReadOnly HotKeyVoicePushToTalk As New HotKey(4, "Global Voice Command Push-To-Talk", Keys.V, 86, Skye.WinAPI.MOD_CONTROL Or Skye.WinAPI.MOD_SHIFT) 'HotKeyPushToTalk is a hotkey for global voice command push-to-talk functionality.
 
         ' Paths
         Friend ReadOnly UserPath As String = Skye.Common.StorageManager.GetAppDirectory 'UserPath is the base path for user-specific files.
@@ -1157,8 +1158,25 @@ Namespace My
         Friend CompanionControlServer As CompanionControlServerClass
 
         ' Speech Recognition
-        Friend VoiceEngine As VoiceController
-        Friend VoicePhraseToKeyMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+        Friend VoiceEngine As VoiceController ' VoiceEngine is the main controller for voice recognition and command processing.
+        Friend VoicePhraseToKeyMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase) ' VoicePhraseToKeyMap maps recognized voice phrases to corresponding key(path) commands for playback control.
+        Private _voicePushToTalkActive As Boolean = False
+        Friend Property VoicePushToTalkActive As Boolean ' VoicePushToTalkActive indicates whether the push-to-talk feature is currently active (i.e., the user has pressed the push-to-talk key).
+            Get
+                Return _voicePushToTalkActive
+            End Get
+            Set(ByVal value As Boolean)
+                ' Only run side-effects if the value is actually changing
+                If _voicePushToTalkActive <> value Then
+                    _voicePushToTalkActive = value
+                    OnVoicePushToTalkActiveChanged(_voicePushToTalkActive)
+                End If
+            End Set
+        End Property
+        Private Const VOICEPTT_DUCK_VOLUME_TARGET As Integer = 20 ' Target volume level (0-100) when push-to-talk is active
+        Private VoiceOriginalVolume As Integer = -1 ' Stores the original system volume as a percent before push-to-talk is activated
+        Friend VoiceAudioIsDucked As Boolean = False ' Flag indicating whether the audio has been ducked for push-to-talk
+        Private WithEvents VoicePushToTalkTimer As New System.Windows.Forms.Timer() With {.Interval = 7500}
 
         ' Settings
         Friend Class Settings
@@ -1182,7 +1200,8 @@ Namespace My
             Friend Shared LatestKnownVersion As String = String.Empty
             Friend Shared EnableCompanionServer As Boolean = False
             Friend Shared CompanionServerPort As Integer = 5050
-            Friend Shared EnableVoiceCommands As Boolean = True
+            Friend Shared EnableVoiceCommands As Boolean = False
+            Friend Shared VoicePushToTalk As Boolean = True
 
             ' Player
             Friend Shared AudioOutputModule As AudioOutputModuleTypes = AudioOutputModuleTypes.DirectSound
@@ -1332,6 +1351,51 @@ Namespace My
                     Dim RegKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegPath)
                     Dim RegSubKey As Microsoft.Win32.RegistryKey
 
+                    ' General App Settings
+                    Try : Settings.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.CrimsonEmber.ToString).ToString), App.Themes)
+                    Catch : Settings.Theme = App.Themes.CrimsonEmber
+                    End Try
+                    Select Case RegKey.GetValue("ShowTrayIcon", "False").ToString
+                        Case "True", "1" : Settings.ShowTrayIcon = True
+                        Case Else : Settings.ShowTrayIcon = False
+                    End Select
+                    Select Case RegKey.GetValue("MinimizeToTray", "False").ToString
+                        Case "True", "1" : Settings.MinimizeToTray = True
+                        Case Else : Settings.MinimizeToTray = False
+                    End Select
+                    Select Case RegKey.GetValue("SuspendOnSessionChange", "True").ToString
+                        Case "False", "0" : Settings.SuspendOnSessionChange = False
+                        Case Else : Settings.SuspendOnSessionChange = True
+                    End Select
+                    Select Case RegKey.GetValue("SaveWindowMetrics", "False").ToString
+                        Case "True", "1" : Settings.SaveWindowMetrics = True
+                        Case Else : Settings.SaveWindowMetrics = False
+                    End Select
+                    DirectoryLocation.X = Skye.Common.RegistryHelper.GetInt("DirectoryLocationX", -AdjustScreenBoundsNormalWindow - 1)
+                    DirectoryLocation.Y = Skye.Common.RegistryHelper.GetInt("DirectoryLocationY", -1)
+                    DirectorySize.Width = Skye.Common.RegistryHelper.GetInt("DirectorySizeX", -1)
+                    DirectorySize.Height = Skye.Common.RegistryHelper.GetInt("DirectorySizeY", -1)
+                    Settings.LogLocation.X = CInt(Val(RegKey.GetValue("LogLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
+                    Settings.LogLocation.Y = CInt(Val(RegKey.GetValue("LogLocationY", (-1).ToString)))
+                    Settings.LogSize.Width = CInt(Val(RegKey.GetValue("LogSizeX", (-1).ToString)))
+                    Settings.LogSize.Height = CInt(Val(RegKey.GetValue("LogSizeY", (-1).ToString)))
+                    Settings.HelperApp1Name = RegKey.GetValue("HelperApp1Name", String.Empty).ToString
+                    Settings.HelperApp1Path = RegKey.GetValue("HelperApp1Path", String.Empty).ToString
+                    Settings.HelperApp2Name = RegKey.GetValue("HelperApp2Name", String.Empty).ToString
+                    Settings.HelperApp2Path = RegKey.GetValue("HelperApp2Path", String.Empty).ToString
+                    Settings.ChangeLogLastVersionShown = RegKey.GetValue("ChangeLogLastVersionShown", String.Empty).ToString
+                    Dim dt As DateTime
+                    If DateTime.TryParse(CStr(RegKey.GetValue("LastUpdateCheck", String.Empty)), dt) Then
+                        Settings.LastUpdateCheck = dt
+                    Else
+                        Settings.LastUpdateCheck = DateTime.MinValue
+                    End If
+                    Settings.LatestKnownVersion = RegKey.GetValue("LatestKnownVersion", String.Empty).ToString
+                    Settings.EnableCompanionServer = Skye.Common.RegistryHelper.GetBool("EnableCompanionServer", False)
+                    Settings.CompanionServerPort = Skye.Common.RegistryHelper.GetInt("CompanionServerPort", 5050)
+                    Settings.EnableVoiceCommands = Skye.Common.RegistryHelper.GetBool("EnableVoiceCommands", False)
+                    Settings.VoicePushToTalk = Skye.Common.RegistryHelper.GetBool("VoicePushToTalk", True)
+
                     ' Player Settings
                     Settings.AudioOutputModule = CType(Skye.Common.RegistryHelper.GetInt("AudioOutputModule", AudioOutputModuleTypes.DirectSound), AudioOutputModuleTypes)
                     Settings.PlayerLocation.X = CInt(Val(RegKey.GetValue("PlayerLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
@@ -1442,50 +1506,6 @@ Namespace My
                         HistoryAutoSaveInterval = 1440 'Limit the interval to a maximum of 1440 minutes (24 hours)
                     End If
                     HistoryViewMaxRecords = CUShort(Val(RegKey.GetValue("HistoryViewMaxRecords", 25.ToString)))
-
-                    ' General App Settings
-                    Try : Settings.Theme = CType([Enum].Parse(GetType(App.Themes), RegKey.GetValue("Theme", App.Themes.CrimsonEmber.ToString).ToString), App.Themes)
-                    Catch : Settings.Theme = App.Themes.CrimsonEmber
-                    End Try
-                    Select Case RegKey.GetValue("ShowTrayIcon", "False").ToString
-                        Case "True", "1" : Settings.ShowTrayIcon = True
-                        Case Else : Settings.ShowTrayIcon = False
-                    End Select
-                    Select Case RegKey.GetValue("MinimizeToTray", "False").ToString
-                        Case "True", "1" : Settings.MinimizeToTray = True
-                        Case Else : Settings.MinimizeToTray = False
-                    End Select
-                    Select Case RegKey.GetValue("SuspendOnSessionChange", "True").ToString
-                        Case "False", "0" : Settings.SuspendOnSessionChange = False
-                        Case Else : Settings.SuspendOnSessionChange = True
-                    End Select
-                    Select Case RegKey.GetValue("SaveWindowMetrics", "False").ToString
-                        Case "True", "1" : Settings.SaveWindowMetrics = True
-                        Case Else : Settings.SaveWindowMetrics = False
-                    End Select
-                    DirectoryLocation.X = Skye.Common.RegistryHelper.GetInt("DirectoryLocationX", -AdjustScreenBoundsNormalWindow - 1)
-                    DirectoryLocation.Y = Skye.Common.RegistryHelper.GetInt("DirectoryLocationY", -1)
-                    DirectorySize.Width = Skye.Common.RegistryHelper.GetInt("DirectorySizeX", -1)
-                    DirectorySize.Height = Skye.Common.RegistryHelper.GetInt("DirectorySizeY", -1)
-                    Settings.LogLocation.X = CInt(Val(RegKey.GetValue("LogLocationX", (-AdjustScreenBoundsNormalWindow - 1).ToString)))
-                    Settings.LogLocation.Y = CInt(Val(RegKey.GetValue("LogLocationY", (-1).ToString)))
-                    Settings.LogSize.Width = CInt(Val(RegKey.GetValue("LogSizeX", (-1).ToString)))
-                    Settings.LogSize.Height = CInt(Val(RegKey.GetValue("LogSizeY", (-1).ToString)))
-                    Settings.HelperApp1Name = RegKey.GetValue("HelperApp1Name", String.Empty).ToString
-                    Settings.HelperApp1Path = RegKey.GetValue("HelperApp1Path", String.Empty).ToString
-                    Settings.HelperApp2Name = RegKey.GetValue("HelperApp2Name", String.Empty).ToString
-                    Settings.HelperApp2Path = RegKey.GetValue("HelperApp2Path", String.Empty).ToString
-                    Settings.ChangeLogLastVersionShown = RegKey.GetValue("ChangeLogLastVersionShown", String.Empty).ToString
-                    Dim dt As DateTime
-                    If DateTime.TryParse(CStr(RegKey.GetValue("LastUpdateCheck", String.Empty)), dt) Then
-                        Settings.LastUpdateCheck = dt
-                    Else
-                        Settings.LastUpdateCheck = DateTime.MinValue
-                    End If
-                    Settings.LatestKnownVersion = RegKey.GetValue("LatestKnownVersion", String.Empty).ToString
-                    Settings.EnableCompanionServer = Skye.Common.RegistryHelper.GetBool("EnableCompanionServer", False)
-                    Settings.CompanionServerPort = Skye.Common.RegistryHelper.GetInt("CompanionServerPort", 5050)
-                    Settings.EnableVoiceCommands = Skye.Common.RegistryHelper.GetBool("EnableVoiceCommands", True)
 
                     ' Visualizer Settings
                     Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
@@ -1652,6 +1672,32 @@ Namespace My
                     Dim RegKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegPath, True)
                     Dim RegSubKey As Microsoft.Win32.RegistryKey
 
+                    ' General App Settings
+                    RegKey.SetValue("Theme", Settings.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("ShowTrayIcon", Settings.ShowTrayIcon.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("MinimizeToTray", Settings.MinimizeToTray.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("SuspendOnSessionChange", Settings.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("SaveWindowMetrics", Settings.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    Skye.Common.RegistryHelper.SetInt("DirectoryLocationX", DirectoryLocation.X)
+                    Skye.Common.RegistryHelper.SetInt("DirectoryLocationY", DirectoryLocation.Y)
+                    Skye.Common.RegistryHelper.SetInt("DirectorySizeX", DirectorySize.Width)
+                    Skye.Common.RegistryHelper.SetInt("DirectorySizeY", DirectorySize.Height)
+                    RegKey.SetValue("LogLocationX", Settings.LogLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LogLocationY", Settings.LogLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LogSizeX", Settings.LogSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LogSizeY", Settings.LogSize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HelperApp1Name", Settings.HelperApp1Name, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HelperApp1Path", Settings.HelperApp1Path, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HelperApp2Name", Settings.HelperApp2Name, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("HelperApp2Path", Settings.HelperApp2Path, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("ChangeLogLastVersionShown", Settings.ChangeLogLastVersionShown, Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LastUpdateCheck", Settings.LastUpdateCheck.ToString("o"), Microsoft.Win32.RegistryValueKind.String)
+                    RegKey.SetValue("LatestKnownVersion", Settings.LatestKnownVersion, Microsoft.Win32.RegistryValueKind.String)
+                    Skye.Common.RegistryHelper.SetBool("EnableCompanionServer", Settings.EnableCompanionServer)
+                    Skye.Common.RegistryHelper.SetInt("CompanionServerPort", Settings.CompanionServerPort)
+                    Skye.Common.RegistryHelper.SetBool("EnableVoiceCommands", Settings.EnableVoiceCommands)
+                    Skye.Common.RegistryHelper.SetBool("VoicePushToTalk", Settings.VoicePushToTalk)
+
                     ' Player Settings
                     Skye.Common.RegistryHelper.SetInt("AudioOutputModule", Settings.AudioOutputModule)
                     RegKey.SetValue("PlayerLocationX", Settings.PlayerLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
@@ -1699,31 +1745,6 @@ Namespace My
                     RegKey.SetValue("HistoryLocationY", Settings.HistoryLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("HistorySizeX", Settings.HistorySize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("HistorySizeY", Settings.HistorySize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
-
-                    ' General App Settings
-                    RegKey.SetValue("Theme", Settings.Theme.ToString, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("ShowTrayIcon", Settings.ShowTrayIcon.ToString, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("MinimizeToTray", Settings.MinimizeToTray.ToString, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("SuspendOnSessionChange", Settings.SuspendOnSessionChange.ToString, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("SaveWindowMetrics", Settings.SaveWindowMetrics.ToString, Microsoft.Win32.RegistryValueKind.String)
-                    Skye.Common.RegistryHelper.SetInt("DirectoryLocationX", DirectoryLocation.X)
-                    Skye.Common.RegistryHelper.SetInt("DirectoryLocationY", DirectoryLocation.Y)
-                    Skye.Common.RegistryHelper.SetInt("DirectorySizeX", DirectorySize.Width)
-                    Skye.Common.RegistryHelper.SetInt("DirectorySizeY", DirectorySize.Height)
-                    RegKey.SetValue("LogLocationX", Settings.LogLocation.X.ToString, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("LogLocationY", Settings.LogLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("LogSizeX", Settings.LogSize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("LogSizeY", Settings.LogSize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("HelperApp1Name", Settings.HelperApp1Name, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("HelperApp1Path", Settings.HelperApp1Path, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("HelperApp2Name", Settings.HelperApp2Name, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("HelperApp2Path", Settings.HelperApp2Path, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("ChangeLogLastVersionShown", Settings.ChangeLogLastVersionShown, Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("LastUpdateCheck", Settings.LastUpdateCheck.ToString("o"), Microsoft.Win32.RegistryValueKind.String)
-                    RegKey.SetValue("LatestKnownVersion", Settings.LatestKnownVersion, Microsoft.Win32.RegistryValueKind.String)
-                    Skye.Common.RegistryHelper.SetBool("EnableCompanionServer", Settings.EnableCompanionServer)
-                    Skye.Common.RegistryHelper.SetInt("CompanionServerPort", Settings.CompanionServerPort)
-                    Skye.Common.RegistryHelper.SetBool("EnableVoiceCommands", Settings.EnableVoiceCommands)
 
                     ' Visualizer Settings
                     RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
@@ -2579,6 +2600,10 @@ Namespace My
                 CompanionControlServer.Broadcast($"MUTE|{isMuted.ToString().ToLower()}")
             End If
         End Sub
+        Private Sub VoicePushToTalkTimer_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles VoicePushToTalkTimer.Tick
+            Debug.WriteLine("[PTT TIMEOUT] No speech command detected within 5 seconds. Auto-closing listener.")
+            VoicePushToTalkActive = False
+        End Sub
 
         ' METHODS
         Friend Sub InitializeAppPreStartup()
@@ -3078,6 +3103,7 @@ Namespace My
             HotKeys.Add(HotKeyStop)
             HotKeys.Add(HotKeyNext)
             HotKeys.Add(HotKeyPrevious)
+            HotKeys.Add(HotKeyVoicePushToTalk)
         End Sub
         Friend Sub RegisterHotKeys()
             Dim status As Boolean
@@ -3109,6 +3135,10 @@ Namespace My
                     FrmPlayer.PlayNext()
                 Case HotKeyPrevious.WinID
                     FrmPlayer.PlayPrevious()
+                Case HotKeyVoicePushToTalk.WinID
+                    If Settings.EnableVoiceCommands AndAlso Settings.VoicePushToTalk Then
+                        App.VoicePushToTalkActive = True
+                    End If
             End Select
         End Sub
         Private Sub SessionSuspended() 'SessionSuspended is called when the screensaver is activated or the screen is locked.
@@ -4960,16 +4990,27 @@ Namespace My
                 ' Optional: log or handle unexpected errors
             End Try
         End Sub
-        Friend Sub SetSystemVolume(newVolume As Integer)
+        Friend Function GetSystemVolume() As Integer
+            If _audioEndpoint Is Nothing Then Return 0
+
+            Try
+                ' Read scalar (0.0 to 1.0) and convert to whole integer percentage (0 to 100)
+                Dim scalar As Single = _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar
+                Return CInt(Math.Round(scalar * 100.0F))
+            Catch
+                Return 0
+            End Try
+        End Function
+        Friend Sub SetSystemVolume(newVolumePercent As Integer)
             If _audioEndpoint Is Nothing Then Exit Sub
 
             ' Clamp 0–100
-            Dim newVolumeBoost As Integer = Math.Max(100, Math.Min(150, newVolume))
-            If newVolume < 0 Then newVolume = 0
-            If newVolume > 100 Then newVolume = 100
+            Dim newVolumeBoost As Integer = Math.Max(100, Math.Min(150, newVolumePercent))
+            If newVolumePercent < 0 Then newVolumePercent = 0
+            If newVolumePercent > 100 Then newVolumePercent = 100
 
             ' Convert to scalar (0.0–1.0)
-            Dim scalar As Single = CSng(newVolume / 100.0F)
+            Dim scalar As Single = CSng(newVolumePercent / 100.0F)
 
             Try
                 FrmPlayer.SetPlayerVolume(newVolumeBoost) ' Update the player volume (boosted)
@@ -5061,6 +5102,77 @@ Namespace My
                 Skye.Common.Log.Write("Voice Engine Shutdown")
             End If
         End Sub
+        Private Sub OnVoicePushToTalkActiveChanged(ByVal isActive As Boolean)
+            If isActive Then
+                ' --- PTT OPENED ---
+                ' 1. Start or restart the 5-second safety timer
+                VoicePushToTalkTimer.Stop()
+                VoicePushToTalkTimer.Start()
+
+                ' 2. Lower/duck playback audio
+                VoiceDuckAudioVolume()
+
+                ' 3. Optional: Play activation chime / show UI overlay
+                Debug.WriteLine("[PTT STATE] Activated — Audio ducked & timer started.")
+            Else
+                ' --- PTT CLOSED ---
+                ' 1. Stop safety timer
+                VoicePushToTalkTimer.Stop()
+
+                ' 2. Restore playback audio to normal
+                VoiceRestoreAudioVolume()
+
+                ' 3. Optional: Play deactivation chime / hide UI overlay
+                Debug.WriteLine("[PTT STATE] Deactivated — Audio restored & timer stopped.")
+            End If
+        End Sub
+        Private Sub VoiceDuckAudioVolume()
+            If _audioEndpoint Is Nothing Then Exit Sub
+
+            ' 1. Grab the FULL volume including boost (0-150) straight from the player UI!
+            Dim currentUIVol As Integer = If(FrmPlayer IsNot Nothing, FrmPlayer.BtnVolume.VolumePercent, GetSystemVolume())
+
+            ' Guard: Don't duck if volume is already at or below target
+            If currentUIVol <= VOICEPTT_DUCK_VOLUME_TARGET Then
+                VoiceAudioIsDucked = False
+                Return
+            End If
+
+            VoiceOriginalVolume = currentUIVol
+            VoiceAudioIsDucked = True
+
+            ' 3. Drop Windows Master Volume scalar to 20%
+            _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar = CSng(VOICEPTT_DUCK_VOLUME_TARGET / 100.0F)
+            Debug.WriteLine($"[PTT DUCK] Ducked master volume. Saved boosted state: {VoiceOriginalVolume}%")
+
+        End Sub
+        Private Sub VoiceRestoreAudioVolume()
+            If _audioEndpoint Is Nothing Then Exit Sub
+
+            If VoiceAudioIsDucked AndAlso VoiceOriginalVolume >= 0 Then
+                ' 1. If original volume had boost (> 100), restore Windows Master to 100% (1.0F)
+                '    Otherwise restore it to the exact percentage (e.g. 80% -> 0.8F)
+                SetSystemVolume(VoiceOriginalVolume)
+
+                ' 2. Update the UI button explicitly with the boosted integer (0-150)
+                If FrmPlayer IsNot Nothing AndAlso Not FrmPlayer.IsDisposed Then
+                    ' Assigning the boosted value (e.g., 150) updates _volumePercent
+                    Debug.Print("Restoring BtnVolume to original boosted value: " & VoiceOriginalVolume.ToString())
+                    FrmPlayer.BtnVolume.VolumePercent = VoiceOriginalVolume
+
+                    ' Explicitly force a fresh repaint of the control surface
+                    FrmPlayer.BtnVolume.Invalidate()
+
+                    Debug.WriteLine($"BtnVolume current _volumePercent is: {FrmPlayer.BtnVolume.VolumePercent}")
+                End If
+
+                Debug.WriteLine($"[PTT RESTORE] Restored Master System & VLC Player to {VoiceOriginalVolume}%")
+            End If
+
+            ' Reset state
+            VoiceOriginalVolume = -1
+            VoiceAudioIsDucked = False
+        End Sub
 
     End Module
 
@@ -5093,6 +5205,10 @@ Namespace My
                 Dim v = Math.Max(0, Math.Min(150, value))
                 If _volumePercent <> v Then
                     _volumePercent = v
+                    ' TEMPORARY DEBUG: Trace who is setting volume to 100
+                    If v = 100 Then
+                        Debug.WriteLine("[VOLUME SET TO 100 STACK TRACE]:" & Environment.NewLine & Environment.StackTrace)
+                    End If
                     Me.Invalidate()
                 End If
             End Set
@@ -5252,23 +5368,6 @@ Namespace My
                 g.FillPath(backBrush, path)
             End Using
 
-            '' Bar Fill
-            'If Not _isMuted AndAlso _volumePercent > 0 Then
-            '    Dim fillHeight As Integer = CInt((_volumePercent / 100.0F) * barRect.Height)
-            '    Dim fillRect As New Rectangle(barRect.Left + 1, barRect.Bottom - fillHeight + 1, BAR_WIDTH - 2, fillHeight - 2)
-
-            '    Using fillBrush As New SolidBrush(_barFillColor)
-            '        ' Clip drawing to the bar rectangle so arcs can't overflow
-            '        Dim oldClip = g.Clip
-            '        g.SetClip(barRect)
-
-            '        Dim path = RoundedRect(fillRect, 4)
-            '        g.FillPath(fillBrush, path)
-
-            '        g.Clip = oldClip
-            '    End Using
-            'End If
-
             ' Bar Fill
             If Not _isMuted AndAlso _volumePercent > 0 Then
                 Dim visualPercent As Integer = Math.Min(_volumePercent, 100)
@@ -5301,6 +5400,7 @@ Namespace My
             End If
 
             ' Percent Text
+            Debug.Print("VolumeButton OnPaint: _volumePercent = " & _volumePercent.ToString() & ", _isMuted = " & _isMuted.ToString())
             Dim percentText As String
             Dim percentFont As Font
             If _isMuted Then

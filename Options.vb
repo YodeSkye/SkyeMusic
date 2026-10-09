@@ -168,6 +168,7 @@ Public Class Options
             TxtBoxCompanionServerPort.Enabled = False
         End If
         ChkBoxEnableVoiceCommands.Checked = App.Settings.EnableVoiceCommands
+        ChkBoxEnableVoicePushToTalk.Checked = App.Settings.VoicePushToTalk
         SetPrunePlaylistButtonText()
         SetPruneHistoryButtonText()
         UpdateCompanionServerTooltip()
@@ -567,6 +568,9 @@ Public Class Options
                 App.ShutdownVoiceEngine()
         End Select
     End Sub
+    Private Sub ChkBoxEnableVoicePushToTalk_Click(sender As Object, e As EventArgs) Handles ChkBoxEnableVoicePushToTalk.Click
+        App.Settings.VoicePushToTalk = Not App.Settings.VoicePushToTalk
+    End Sub
     Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
         If e.Alt Then
         ElseIf e.Control Then
@@ -725,6 +729,7 @@ Public Class Options
             CkBoxMinimizeToTray.BackColor = c
             CkBoxEnableCompanionServer.BackColor = c
             ChkBoxEnableVoiceCommands.BackColor = c
+            ChkBoxEnableVoicePushToTalk.BackColor = c
             TCOptions.TabPanelBackColor = c
         End If
         ResumeLayout()
@@ -760,6 +765,7 @@ Public Class Options
             CkBoxMinimizeToTray.BackColor = App.CurrentTheme.BackColor
             CkBoxEnableCompanionServer.BackColor = App.CurrentTheme.BackColor
             ChkBoxEnableVoiceCommands.BackColor = App.CurrentTheme.BackColor
+            ChkBoxEnableVoicePushToTalk.BackColor = App.CurrentTheme.BackColor
             TCOptions.TabPanelBackColor = App.CurrentTheme.BackColor
             forecolor = App.CurrentTheme.TextColor
         End If
@@ -827,6 +833,7 @@ Public Class Options
         CkBoxPlaylistRemoveSpaces.ForeColor = forecolor
         CkBoxEnableCompanionServer.ForeColor = forecolor
         ChkBoxEnableVoiceCommands.ForeColor = forecolor
+        ChkBoxEnableVoicePushToTalk.ForeColor = forecolor
         LblHelperApp1Name.ForeColor = forecolor
         LblHelperApp1Path.ForeColor = forecolor
         LblHelperApp2Name.ForeColor = forecolor
