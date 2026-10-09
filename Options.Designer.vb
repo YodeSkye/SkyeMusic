@@ -858,7 +858,7 @@ Partial Class Options
         ChkBoxEnableVoiceCommands.Size = New Size(197, 25)
         ChkBoxEnableVoiceCommands.TabIndex = 50
         TipError.SetText(ChkBoxEnableVoiceCommands, Nothing)
-        TipOptions.SetText(ChkBoxEnableVoiceCommands, "Enable Voice Commands for the App." & vbCrLf & "All commands begin with the trigger phrase ""Hey Skye"", as in ""Skye Play Music"". See Help for more information.")
+        TipOptions.SetText(ChkBoxEnableVoiceCommands, "Enable Voice Commands for the App." & vbCrLf & "All commands begin with the trigger phrase ""Hey Skye"", as in ""Hey Skye Play Music"". See Help for more information.")
         ChkBoxEnableVoiceCommands.Text = "Enable Voice Commands"
         ChkBoxEnableVoiceCommands.UseVisualStyleBackColor = True
         ' 
