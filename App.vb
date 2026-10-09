@@ -1176,7 +1176,7 @@ Namespace My
         Private Const VOICEPTT_DUCK_VOLUME_TARGET As Integer = 20 ' Target volume level (0-100) when push-to-talk is active
         Private VoiceOriginalVolume As Integer = -1 ' Stores the original system volume as a percent before push-to-talk is activated
         Friend VoiceAudioIsDucked As Boolean = False ' Flag indicating whether the audio has been ducked for push-to-talk
-        Private WithEvents VoicePushToTalkTimer As New System.Windows.Forms.Timer() With {.Interval = 7500}
+        Private WithEvents VoicePushToTalkTimer As New System.Windows.Forms.Timer() With {.Interval = 6500}
 
         ' Settings
         Friend Class Settings
@@ -2601,7 +2601,7 @@ Namespace My
             End If
         End Sub
         Private Sub VoicePushToTalkTimer_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles VoicePushToTalkTimer.Tick
-            Debug.WriteLine("[PTT TIMEOUT] No speech command detected within 5 seconds. Auto-closing listener.")
+            'Debug.WriteLine("[PTT TIMEOUT] No speech command detected within 5 seconds. Auto-closing listener.")
             VoicePushToTalkActive = False
         End Sub
 
@@ -4772,8 +4772,29 @@ Namespace My
                 Return History.ToList()
             End SyncLock
         End Function
+        Friend Function IsFile(path As String) As Boolean
+            If History.FindIndex(Function(p) p.Path = path And p.SourceType = MediaSourceTypes.File) >= 0 Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
+        Friend Function IsStream(path As String) As Boolean
+            If History.FindIndex(Function(p) p.Path = path And p.SourceType = MediaSourceTypes.Stream) >= 0 Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
+        Friend Function IsAudioCD(path As String) As Boolean
+            If History.FindIndex(Function(p) p.Path = path And p.SourceType = MediaSourceTypes.AudioCD) >= 0 Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
 
-        ' Database Methods
+        ' Database (Play History) Methods
         Private Sub LoadPlayHistoryDatabase()
             If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                 My.Computer.FileSystem.CreateDirectory(App.UserPath)
@@ -4992,7 +5013,6 @@ Namespace My
         End Sub
         Friend Function GetSystemVolume() As Integer
             If _audioEndpoint Is Nothing Then Return 0
-
             Try
                 ' Read scalar (0.0 to 1.0) and convert to whole integer percentage (0 to 100)
                 Dim scalar As Single = _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar
@@ -5018,6 +5038,7 @@ Namespace My
             Catch
                 ' Optional: log or ignore
             End Try
+
         End Sub
         Friend Sub SetSystemMute(isMuted As Boolean)
             If _audioEndpoint Is Nothing Then Exit Sub
@@ -5103,6 +5124,7 @@ Namespace My
             End If
         End Sub
         Private Sub OnVoicePushToTalkActiveChanged(ByVal isActive As Boolean)
+            If CurrentMute Then Exit Sub
             If isActive Then
                 ' --- PTT OPENED ---
                 ' 1. Start or restart the 5-second safety timer
@@ -5143,30 +5165,21 @@ Namespace My
 
             ' 3. Drop Windows Master Volume scalar to 20%
             _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar = CSng(VOICEPTT_DUCK_VOLUME_TARGET / 100.0F)
-            Debug.WriteLine($"[PTT DUCK] Ducked master volume. Saved boosted state: {VoiceOriginalVolume}%")
+            'Debug.WriteLine($"[PTT DUCK] Ducked master volume. Saved boosted state: {VoiceOriginalVolume}%")
 
         End Sub
         Private Sub VoiceRestoreAudioVolume()
             If _audioEndpoint Is Nothing Then Exit Sub
 
             If VoiceAudioIsDucked AndAlso VoiceOriginalVolume >= 0 Then
-                ' 1. If original volume had boost (> 100), restore Windows Master to 100% (1.0F)
-                '    Otherwise restore it to the exact percentage (e.g. 80% -> 0.8F)
                 SetSystemVolume(VoiceOriginalVolume)
-
-                ' 2. Update the UI button explicitly with the boosted integer (0-150)
                 If FrmPlayer IsNot Nothing AndAlso Not FrmPlayer.IsDisposed Then
-                    ' Assigning the boosted value (e.g., 150) updates _volumePercent
-                    Debug.Print("Restoring BtnVolume to original boosted value: " & VoiceOriginalVolume.ToString())
+                    'Debug.Print("Restoring BtnVolume to original boosted value: " & VoiceOriginalVolume.ToString())
                     FrmPlayer.BtnVolume.VolumePercent = VoiceOriginalVolume
-
-                    ' Explicitly force a fresh repaint of the control surface
                     FrmPlayer.BtnVolume.Invalidate()
-
-                    Debug.WriteLine($"BtnVolume current _volumePercent is: {FrmPlayer.BtnVolume.VolumePercent}")
+                    ' Debug.WriteLine($"BtnVolume current _volumePercent is: {FrmPlayer.BtnVolume.VolumePercent}")
                 End If
-
-                Debug.WriteLine($"[PTT RESTORE] Restored Master System & VLC Player to {VoiceOriginalVolume}%")
+                'Debug.WriteLine($"[PTT RESTORE] Restored Master System & VLC Player to {VoiceOriginalVolume}%")
             End If
 
             ' Reset state
@@ -5206,9 +5219,9 @@ Namespace My
                 If _volumePercent <> v Then
                     _volumePercent = v
                     ' TEMPORARY DEBUG: Trace who is setting volume to 100
-                    If v = 100 Then
-                        Debug.WriteLine("[VOLUME SET TO 100 STACK TRACE]:" & Environment.NewLine & Environment.StackTrace)
-                    End If
+                    'If v = 100 Then
+                    '    Debug.WriteLine("[VOLUME SET TO 100 STACK TRACE]:" & Environment.NewLine & Environment.StackTrace)
+                    'End If
                     Me.Invalidate()
                 End If
             End Set
@@ -5390,7 +5403,6 @@ Namespace My
                         g.FillEllipse(fillBrush, cx, cy, d, d)
                     Else
                         ' --- CAPSULE MODE ---
-                        'Dim radius As Integer = w
                         Dim fillRect As New Rectangle(x, y, w, h)
                         Dim path As GraphicsPath = Capsule(fillRect)
                         g.FillPath(fillBrush, path)
@@ -5400,7 +5412,7 @@ Namespace My
             End If
 
             ' Percent Text
-            Debug.Print("VolumeButton OnPaint: _volumePercent = " & _volumePercent.ToString() & ", _isMuted = " & _isMuted.ToString())
+            'Debug.Print("VolumeButton OnPaint: _volumePercent = " & _volumePercent.ToString() & ", _isMuted = " & _isMuted.ToString())
             Dim percentText As String
             Dim percentFont As Font
             If _isMuted Then

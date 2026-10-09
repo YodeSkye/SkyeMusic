@@ -9,6 +9,7 @@ Friend Class VoiceController
     Friend Event CommandRecognized(ByVal command As String)
     Friend Event PlayTargetRequested(ByVal targetKey As String)
 
+    ' Base Methods
     Friend Sub New()
         Try
             recognizer = New SpeechRecognitionEngine()
@@ -52,6 +53,7 @@ Friend Class VoiceController
         End If
     End Sub
 
+    ' Handlers
     Private Sub OnSpeechRecognized(ByVal sender As Object, ByVal e As SpeechRecognizedEventArgs)
         If App.Settings.VoicePushToTalk AndAlso Not App.VoicePushToTalkActive Then
             Debug.WriteLine("[VOICE IGNORED] Push-To-Talk is inactive.")
@@ -67,13 +69,13 @@ Friend Class VoiceController
 
         ' 2. Guard Clause: Block standalone wake word triggers ("hey skye" or "skye" alone)
         If rawText.Equals("hey skye", StringComparison.OrdinalIgnoreCase) OrElse rawText.Equals("skye", StringComparison.OrdinalIgnoreCase) Then
-            Debug.WriteLine("[VOICE IGNORED] Pure wake word detected without a command or song payload.")
+            'Debug.WriteLine("[VOICE IGNORED] Pure wake word detected without a command or song payload.")
             Return
         End If
 
         ' 3. Mandatory Wake-Word Prefix Verification
         If Not rawText.StartsWith("hey skye ", StringComparison.OrdinalIgnoreCase) Then
-            Debug.WriteLine($"[VOICE REJECTED] Phrase missing 'hey skye' prefix: '{rawText}'")
+            'Debug.WriteLine($"[VOICE REJECTED] Phrase missing 'hey skye' prefix: '{rawText}'")
             Return
         End If
 
@@ -105,7 +107,7 @@ Friend Class VoiceController
                 If Not String.IsNullOrEmpty(targetKey) Then
                     RaiseEvent PlayTargetRequested(targetKey)
                 Else
-                    Debug.WriteLine($"[VOICE DEBUG] Phrase '{payload}' matched grammar but missing from dictionary map.")
+                    'Debug.WriteLine($"[VOICE DEBUG] Phrase '{payload}' matched grammar but missing from dictionary map.")
                 End If
         End Select
         If App.Settings.VoicePushToTalk Then
@@ -113,6 +115,7 @@ Friend Class VoiceController
         End If
     End Sub
 
+    ' Methods
     ''' <summary>
     ''' Asynchronously builds speech grammars on a background thread.
     ''' </summary>
@@ -127,7 +130,7 @@ Friend Class VoiceController
                            Try
                                recognizer.UnloadAllGrammars()
                            Catch ex As Exception
-                               System.Diagnostics.Debug.WriteLine($"[VOICE WARNING] UnloadAllGrammars non-fatal exception: {ex.Message}")
+                               'Debug.WriteLine($"[VOICE WARNING] UnloadAllGrammars non-fatal exception: {ex.Message}")
                            End Try
 
                            ' -------------------------------------------------------------
@@ -147,9 +150,9 @@ Friend Class VoiceController
                                .Weight = 0.8F
                            }
                                recognizer.LoadGrammar(controlGrammar)
-                               System.Diagnostics.Debug.WriteLine("[VOICE SUCCESS] Controls grammar loaded.")
+                               'Debug.WriteLine("[VOICE SUCCESS] Controls grammar loaded.")
                            Catch ex As Exception
-                               System.Diagnostics.Debug.WriteLine($"[VOICE ERROR] Controls grammar failed: {ex.Message}")
+                               'Debug.WriteLine($"[VOICE ERROR] Controls grammar failed: {ex.Message}")
                            End Try
 
                            ' -------------------------------------------------------------
@@ -157,11 +160,11 @@ Friend Class VoiceController
                            ' -------------------------------------------------------------
                            Try
                                If App.VoicePhraseToKeyMap Is Nothing OrElse App.VoicePhraseToKeyMap.Count = 0 Then
-                                   System.Diagnostics.Debug.WriteLine("[VOICE WARNING] App.phraseToKeyMap is NULL or EMPTY! Skipping DynamicPlaylist.")
+                                   'Debug.WriteLine("[VOICE WARNING] App.phraseToKeyMap is NULL or EMPTY! Skipping DynamicPlaylist.")
                                    Return
                                End If
 
-                               System.Diagnostics.Debug.WriteLine($"[VOICE DEBUG] Building grammar for {App.VoicePhraseToKeyMap.Count} songs...")
+                               'Debug.WriteLine($"[VOICE DEBUG] Building grammar for {App.VoicePhraseToKeyMap.Count} songs...")
 
                                Dim songChoices As New Choices()
                                For Each phrase In App.VoicePhraseToKeyMap.Keys
@@ -183,10 +186,10 @@ Friend Class VoiceController
                                .Weight = 1.0F
                            }
                                recognizer.LoadGrammar(dynamicGrammar)
-                               System.Diagnostics.Debug.WriteLine("[VOICE SUCCESS] DynamicPlaylist grammar loaded successfully!")
+                               'Debug.WriteLine("[VOICE SUCCESS] DynamicPlaylist grammar loaded successfully!")
 
                            Catch ex As Exception
-                               System.Diagnostics.Debug.WriteLine($"[VOICE ERROR] DynamicPlaylist grammar failed: {ex.Message}")
+                               'Debug.WriteLine($"[VOICE ERROR] DynamicPlaylist grammar failed: {ex.Message}")
                            End Try
                        End Sub)
     End Function

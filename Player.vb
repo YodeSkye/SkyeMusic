@@ -4381,27 +4381,6 @@ Public Class Player
     Friend Sub RaiseEventPlaylistChanged()
         RaiseEvent PlaylistChanged()
     End Sub
-    Private Function IsFile(path As String) As Boolean
-        If App.History.FindIndex(Function(p) p.Path = path And p.SourceType = App.MediaSourceTypes.File) >= 0 Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
-    Private Function IsStream(path As String) As Boolean
-        If App.History.FindIndex(Function(p) p.Path = path And p.SourceType = App.MediaSourceTypes.Stream) >= 0 Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
-    Private Function IsAudioCD(path As String) As Boolean
-        If App.History.FindIndex(Function(p) p.Path = path And p.SourceType = App.MediaSourceTypes.AudioCD) >= 0 Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
     Private Function IsExcluded(item As ListViewItem) As Boolean
         If item Is Nothing Then Return False
         Dim isEx As Boolean = False
@@ -4603,7 +4582,7 @@ Public Class Player
             Dim paths As New List(Of String)
             For Each lvi As ListViewItem In LVPlaylist.SelectedItems
                 Dim path As String = lvi.SubItems(LVPlaylist.Columns("Path").Index).Text
-                If IsFile(path) Then paths.Add(path)
+                If App.IsFile(path) Then paths.Add(path)
             Next
             If paths.Count > 0 Then
                 App.FrmTagEditor = New TagEditor(paths.ToList)
@@ -5285,7 +5264,7 @@ Public Class Player
         'Find files that don't exist
         Dim prunelist As New System.Collections.Generic.List(Of String)
         For index As Integer = 0 To LVPlaylist.Items.Count - 1
-            If Not IsStream(LVPlaylist.Items(index).SubItems(1).Text) AndAlso Not My.Computer.FileSystem.FileExists(LVPlaylist.Items(index).SubItems(1).Text) Then
+            If Not App.IsStream(LVPlaylist.Items(index).SubItems(1).Text) AndAlso Not My.Computer.FileSystem.FileExists(LVPlaylist.Items(index).SubItems(1).Text) Then
                 prunelist.Add(LVPlaylist.Items(index).SubItems(1).Text)
             End If
         Next
@@ -5425,7 +5404,7 @@ Public Class Player
     Private Sub PlayQueued()
         If Queue.Count > 0 Then
             StopPlay()
-            If IsStream(Queue(0)) Then
+            If App.IsStream(Queue(0)) Then
                 PlayStream(Queue(0))
             Else
                 PlayFile(Queue(0), "PlayQueued")
@@ -5549,7 +5528,7 @@ Public Class Player
         If LVPlaylist.SelectedItems.Count > 0 Then
             LyricsOff()
             StopPlay()
-            If IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
+            If App.IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                 PlayStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
             Else
                 PlayFile(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text, "PlayFromPlaylist")
@@ -5672,7 +5651,7 @@ Public Class Player
 
                     ' Play the resolved track
                     Dim path As String = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
-                    If IsStream(path) Then
+                    If App.IsStream(path) Then
                         PlayStream(path)
                     Else
                         PlayFile(path, "PlayPreviousLinear")
@@ -5706,7 +5685,7 @@ Public Class Player
                     Dim pathColumnIndex As Integer = LVPlaylist.Columns("Path").Index
                     Dim mediaPath As String = item.SubItems(pathColumnIndex).Text
 
-                    If IsStream(mediaPath) Then
+                    If App.IsStream(mediaPath) Then
                         PlayStream(mediaPath)
                     Else
                         PlayFile(mediaPath, "PlayPreviousRandom")
@@ -5763,7 +5742,7 @@ Public Class Player
 
                         ' Play the resolved track
                         Dim path As String = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
-                        If IsStream(path) Then
+                        If App.IsStream(path) Then
                             PlayStream(path)
                         Else
                             PlayFile(path, "PlayNextLinear")
@@ -5823,7 +5802,7 @@ Public Class Player
                         End If
 
                         Dim finalPath As String = LVPlaylist.Items(newindex).SubItems(LVPlaylist.Columns("Path").Index).Text
-                        If IsStream(finalPath) Then
+                        If App.IsStream(finalPath) Then
                             PlayStream(finalPath)
                         Else
                             PlayFile(finalPath, "PlayNextRandom")
@@ -6618,9 +6597,6 @@ Public Class Player
             End If
         Next
     End Sub
-    Friend Sub RefreshVolumeButton()
-        Me.BtnVolume?.Invalidate()
-    End Sub
     ''' <summary>
     ''' Extracts playlist phrases mapped to unique keys and loads them into the speech engine off the UI thread.
     ''' </summary>
@@ -6634,19 +6610,14 @@ Public Class Player
             Skye.Common.Log.Write("Voice Grammar Cleared, playlist is empty.")
             Return
         End If
-        Debug.Print("Refreshing Voice Grammar...")
+        'Debug.Print("Refreshing Voice Grammar...")
 
         Dim starttime As TimeSpan = Computer.Clock.LocalTime.TimeOfDay
-
         App.VoicePhraseToKeyMap.Clear()
-        ' Retrieve current settings variables
         Dim removeSpaces As Boolean = App.Settings.PlaylistTitleRemoveSpaces
         Dim videoTag As String = App.Settings.PlaylistVideoIdentifier
         Dim separator As String = App.Settings.PlaylistTitleSeparator
-
-        ' 1. Snapshot raw display text AND unique keys on the UI thread
         Dim itemSnapshots As New List(Of KeyValuePair(Of String, String))()
-
         For Each item As ListViewItem In LVPlaylist.Items
             Dim rawDisplay As String = item.Text
 
@@ -6664,8 +6635,7 @@ Public Class Player
         ' 2. Parse clean phrases and map them to keys off the UI thread
         Await Task.Run(Async Function()
 
-                           ' Helper lambda to expand PascalCase boundaries ("TaylorSwift" -> "Taylor Swift")
-                           ' and clean up extra whitespace
+                           ' Helper lambda to expand PascalCase boundaries ("TaylorSwift" -> "Taylor Swift") and clean up extra whitespace
                            Dim expandPascalCase As Func(Of String, String) = Function(input As String)
                                                                                  If String.IsNullOrWhiteSpace(input) Then Return ""
                                                                                  Dim text As String = System.Text.RegularExpressions.Regex.Replace(input, "(?<=[a-z])(?=[A-Z])", " ")
@@ -6706,19 +6676,15 @@ Public Class Player
                                    App.VoicePhraseToKeyMap.Add(fullSpokenPhrase, key)
                                End If
                            Next
-                           'Debug.Print("Voice Grammar Map built with " & App.VoicePhraseToKeyMap.Count & " phrases.")
-                           ' 3. Load dynamic grammar into VoiceEngine
+
                            Await App.VoiceEngine.LoadGrammarAsync()
-                           'Debug.Print("Voice Grammar Loaded into Engine.")
                            App.VoiceEngine.Start()
 
-                           For Each a In App.VoicePhraseToKeyMap
-                               Debug.Print("Phrase: " & a.Key & " => Key: " & a.Value)
-                           Next
                            Debug.Print("Voice Grammar Refreshed with " & App.VoicePhraseToKeyMap.Count & " phrases.")
                            Skye.Common.Log.Write("Voice Grammar Refreshed with " & App.VoicePhraseToKeyMap.Count & " phrases (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
 
                        End Function)
+
     End Sub
 
 End Class
