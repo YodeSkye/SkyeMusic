@@ -311,19 +311,19 @@ Namespace My
         Friend NIApp As New NotifyIcon 'NIApp is the system tray icon for the application.
         Private ReadOnly _activeDragFilters As New Dictionary(Of Form, FormDragFilter)()
 
-        ' HotKeys
-        Private Structure HotKey
+        ' HotKeys, customizable hotkeys are in settings, but these are the default hotkeys for global media control.
+        Friend Structure HotKey
             Public WinID As Integer
             Public Description As String
             Public Key As Keys
             Public KeyCode As Byte
             Public KeyMod As Byte
-            ReadOnly Property KeyText As String
-                Get
-                    Dim kc As New System.Windows.Forms.KeysConverter
-                    KeyText = kc.ConvertToString(Key)
-                End Get
-            End Property
+            'ReadOnly Property KeyText As String
+            '    Get
+            '        Dim kc As New System.Windows.Forms.KeysConverter
+            '        KeyText = kc.ConvertToString(Key)
+            '    End Get
+            'End Property
             Sub New(id As Integer, description As String, key As Keys, keycode As Byte, keymod As Byte)
                 Me.WinID = id
                 Me.Description = description
@@ -337,7 +337,6 @@ Namespace My
         Private ReadOnly HotKeyStop As New HotKey(1, "Global Stop", Keys.MediaStop, Skye.WinAPI.VK_MEDIA_STOP, 0) 'HotKeyStop is a hotkey for global stop functionality.
         Private ReadOnly HotKeyNext As New HotKey(2, "Global Next Track", Keys.MediaNextTrack, Skye.WinAPI.VK_MEDIA_NEXT_TRACK, 0) 'HotKeyNext is a hotkey for global next track functionality.
         Private ReadOnly HotKeyPrevious As New HotKey(3, "Global Previous Track", Keys.MediaPreviousTrack, Skye.WinAPI.VK_MEDIA_PREV_TRACK, 0) 'HotKeyPrevious is a hotkey for global previous track functionality.
-        Private ReadOnly HotKeyVoicePushToTalk As New HotKey(4, "Global Voice Command Push-To-Talk", Keys.V, 86, Skye.WinAPI.MOD_CONTROL Or Skye.WinAPI.MOD_SHIFT) 'HotKeyPushToTalk is a hotkey for global voice command push-to-talk functionality.
 
         ' Paths
         Friend ReadOnly UserPath As String = Skye.Common.StorageManager.GetAppDirectory 'UserPath is the base path for user-specific files.
@@ -1344,6 +1343,9 @@ Namespace My
                 Public Property ParticleNebulaBloomRadius As Integer = 2 ' 1 – 5 *1 ' How Many Extra Bloom Rings to Draw.
                 Public Property ParticleNebulaHighFrequencyBoost As Single = 1.0F ' 0.5 - 3.0 *10 ' Boost for High Frequency Bands, which can be overpowered by bass. Higher values increase the influence of highs on particle behavior and color.
             End Class
+
+            ' Customizable HotKeys
+            Friend Shared HotKeyVoicePushToTalk As New HotKey(4, "Global Voice Command Push-To-Talk", Keys.V, 86, Skye.WinAPI.MOD_CONTROL Or Skye.WinAPI.MOD_SHIFT) 'HotKeyPushToTalk is a hotkey for global voice command push-to-talk functionality.
 
             Friend Shared Sub Load()
                 Try
@@ -2790,6 +2792,9 @@ Namespace My
 
             ' Speech Recognition Cleanup
             Try
+                If VoiceAudioIsDucked Then
+                    OnVoicePushToTalkActiveChanged(False)
+                End If
                 ShutdownVoiceEngine()
             Catch ex As Exception
                 Skye.Common.Log.Write($"Speech Recognition Engine Closure Error: {ex}")
@@ -3097,13 +3102,13 @@ Namespace My
                 HistoryTotalPlayedSongs = 0
             End If
         End Sub
-        Private Sub GenerateHotKeyList()
+        Friend Sub GenerateHotKeyList()
             HotKeys.Clear()
             HotKeys.Add(HotKeyPlay)
             HotKeys.Add(HotKeyStop)
             HotKeys.Add(HotKeyNext)
             HotKeys.Add(HotKeyPrevious)
-            HotKeys.Add(HotKeyVoicePushToTalk)
+            HotKeys.Add(Settings.HotKeyVoicePushToTalk)
         End Sub
         Friend Sub RegisterHotKeys()
             Dim status As Boolean
@@ -3115,7 +3120,7 @@ Namespace My
                 End If
             Next
         End Sub
-        Private Sub UnRegisterHotKeys()
+        Friend Sub UnRegisterHotKeys()
             Dim status As Boolean
             For Each key As HotKey In HotKeys
                 If Not key.Key = Keys.None Then
@@ -3135,9 +3140,9 @@ Namespace My
                     FrmPlayer.PlayNext()
                 Case HotKeyPrevious.WinID
                     FrmPlayer.PlayPrevious()
-                Case HotKeyVoicePushToTalk.WinID
+                Case Settings.HotKeyVoicePushToTalk.WinID
                     If Settings.EnableVoiceCommands AndAlso Settings.VoicePushToTalk Then
-                        App.VoicePushToTalkActive = True
+                        VoicePushToTalkActive = True
                     End If
             End Select
         End Sub

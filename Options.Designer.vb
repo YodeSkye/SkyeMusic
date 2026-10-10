@@ -72,6 +72,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval2 = New Skye.UI.Label()
         TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        TxtBoxVoicePushToTalk = New TextBox()
         ChkBoxEnableVoiceCommands = New CheckBox()
         TxtBoxCompanionServerPort = New Skye.UI.NumericTextBox()
         CkBoxEnableCompanionServer = New CheckBox()
@@ -592,7 +593,7 @@ Partial Class Options
         TxtBoxHistoryAutoSaveInterval.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipError.SetImage(TxtBoxHistoryAutoSaveInterval, Nothing)
         TipOptions.SetImage(TxtBoxHistoryAutoSaveInterval, Nothing)
-        TxtBoxHistoryAutoSaveInterval.Location = New Point(148, 285)
+        TxtBoxHistoryAutoSaveInterval.Location = New Point(148, 271)
         TxtBoxHistoryAutoSaveInterval.Name = "TxtBoxHistoryAutoSaveInterval"
         TxtBoxHistoryAutoSaveInterval.ShortcutsEnabled = False
         TxtBoxHistoryAutoSaveInterval.Size = New Size(61, 29)
@@ -607,7 +608,7 @@ Partial Class Options
         BtnHistorySaveNow.Image = My.Resources.Resources.ImageSave32
         TipOptions.SetImage(BtnHistorySaveNow, My.Resources.Resources.ImageSave32)
         BtnHistorySaveNow.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistorySaveNow.Location = New Point(267, 277)
+        BtnHistorySaveNow.Location = New Point(267, 263)
         BtnHistorySaveNow.Name = "BtnHistorySaveNow"
         BtnHistorySaveNow.Size = New Size(120, 40)
         BtnHistorySaveNow.TabIndex = 44
@@ -623,7 +624,7 @@ Partial Class Options
         BtnHistoryPrune.Image = My.Resources.Resources.ImagePrune32
         TipOptions.SetImage(BtnHistoryPrune, My.Resources.Resources.ImagePrune32)
         BtnHistoryPrune.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistoryPrune.Location = New Point(587, 277)
+        BtnHistoryPrune.Location = New Point(587, 263)
         BtnHistoryPrune.Name = "BtnHistoryPrune"
         BtnHistoryPrune.Size = New Size(218, 40)
         BtnHistoryPrune.TabIndex = 80
@@ -757,7 +758,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval1.Font = New Font("Segoe UI", 12F)
         TipError.SetImage(LblHistoryAutoSaveInterval1, Nothing)
         TipOptions.SetImage(LblHistoryAutoSaveInterval1, Nothing)
-        LblHistoryAutoSaveInterval1.Location = New Point(13, 288)
+        LblHistoryAutoSaveInterval1.Location = New Point(13, 274)
         LblHistoryAutoSaveInterval1.Name = "LblHistoryAutoSaveInterval1"
         LblHistoryAutoSaveInterval1.Size = New Size(139, 21)
         LblHistoryAutoSaveInterval1.TabIndex = 143
@@ -772,7 +773,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval2.Font = New Font("Segoe UI", 12F)
         TipError.SetImage(LblHistoryAutoSaveInterval2, Nothing)
         TipOptions.SetImage(LblHistoryAutoSaveInterval2, Nothing)
-        LblHistoryAutoSaveInterval2.Location = New Point(206, 288)
+        LblHistoryAutoSaveInterval2.Location = New Point(206, 274)
         LblHistoryAutoSaveInterval2.Name = "LblHistoryAutoSaveInterval2"
         LblHistoryAutoSaveInterval2.Size = New Size(66, 21)
         LblHistoryAutoSaveInterval2.TabIndex = 144
@@ -806,6 +807,7 @@ Partial Class Options
         ' TPApp
         ' 
         TPApp.BorderStyle = BorderStyle.Fixed3D
+        TPApp.Controls.Add(TxtBoxVoicePushToTalk)
         TPApp.Controls.Add(ChkBoxEnableVoiceCommands)
         TPApp.Controls.Add(TxtBoxCompanionServerPort)
         TPApp.Controls.Add(CkBoxEnableCompanionServer)
@@ -846,6 +848,18 @@ Partial Class Options
         TPApp.Text = " App "
         TPApp.ThemesEnabled = False
         ' 
+        ' TxtBoxVoicePushToTalk
+        ' 
+        TipError.SetImage(TxtBoxVoicePushToTalk, Nothing)
+        TipOptions.SetImage(TxtBoxVoicePushToTalk, Nothing)
+        TxtBoxVoicePushToTalk.Location = New Point(11, 375)
+        TxtBoxVoicePushToTalk.Name = "TxtBoxVoicePushToTalk"
+        TxtBoxVoicePushToTalk.Size = New Size(191, 29)
+        TxtBoxVoicePushToTalk.TabIndex = 54
+        TipOptions.SetText(TxtBoxVoicePushToTalk, Nothing)
+        TipError.SetText(TxtBoxVoicePushToTalk, Nothing)
+        TxtBoxVoicePushToTalk.TextAlign = HorizontalAlignment.Center
+        ' 
         ' ChkBoxEnableVoiceCommands
         ' 
         ChkBoxEnableVoiceCommands.AutoSize = True
@@ -853,7 +867,7 @@ Partial Class Options
         ChkBoxEnableVoiceCommands.Font = New Font("Segoe UI", 12F)
         TipOptions.SetImage(ChkBoxEnableVoiceCommands, Nothing)
         TipError.SetImage(ChkBoxEnableVoiceCommands, Nothing)
-        ChkBoxEnableVoiceCommands.Location = New Point(13, 354)
+        ChkBoxEnableVoiceCommands.Location = New Point(13, 326)
         ChkBoxEnableVoiceCommands.Name = "ChkBoxEnableVoiceCommands"
         ChkBoxEnableVoiceCommands.Size = New Size(197, 25)
         ChkBoxEnableVoiceCommands.TabIndex = 50
@@ -987,7 +1001,7 @@ Partial Class Options
         ChkBoxEnableVoicePushToTalk.Font = New Font("Segoe UI", 12F)
         TipOptions.SetImage(ChkBoxEnableVoicePushToTalk, Nothing)
         TipError.SetImage(ChkBoxEnableVoicePushToTalk, Nothing)
-        ChkBoxEnableVoicePushToTalk.Location = New Point(13, 376)
+        ChkBoxEnableVoicePushToTalk.Location = New Point(13, 348)
         ChkBoxEnableVoicePushToTalk.Name = "ChkBoxEnableVoicePushToTalk"
         ChkBoxEnableVoicePushToTalk.Size = New Size(163, 25)
         ChkBoxEnableVoicePushToTalk.TabIndex = 52
@@ -1643,4 +1657,5 @@ Partial Class Options
     Friend WithEvents ChkBoxVolumeBoost As CheckBox
     Friend WithEvents ChkBoxEnableVoiceCommands As CheckBox
     Friend WithEvents ChkBoxEnableVoicePushToTalk As CheckBox
+    Friend WithEvents TxtBoxVoicePushToTalk As TextBox
 End Class
