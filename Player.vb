@@ -6643,37 +6643,41 @@ Public Class Player
                                                                              End Function
 
                            For Each entry In itemSnapshots
-                               Dim rawDisplay As String = entry.Key
-                               Dim key As String = entry.Value
-
-                               ' 1. Strip the video tag
-                               If Not String.IsNullOrWhiteSpace(videoTag) Then
-                                   rawDisplay = rawDisplay.Replace(videoTag, "")
-                               End If
-
-                               Dim rawChunks As New List(Of String)()
-
-                               ' 2. Determine how to split chunks based on the separator
-                               If Not String.IsNullOrWhiteSpace(separator) AndAlso separator <> " " AndAlso rawDisplay.Contains(separator) Then
-                                   ' Symbol separator (e.g., "-", ",", "|")
-                                   rawChunks.AddRange(rawDisplay.Split(New String() {separator}, StringSplitOptions.RemoveEmptyEntries))
+                               If IsStream(entry.Value) OrElse IsAudioCD(entry.Value) Then
+                                   App.VoicePhraseToKeyMap.Add(entry.Key, entry.Value)
                                Else
-                                   ' Space separator (" ") or no symbol: split by spaces into main blocks (Artist vs Title)
-                                   rawChunks.AddRange(rawDisplay.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries))
-                               End If
+                                   Dim rawDisplay As String = entry.Key
+                                   Dim key As String = entry.Value
 
-                               ' 3. Register individual chunk phrases ("Taylor Swift", "The Fate Of Ophelia")
-                               For Each chunk In rawChunks
-                                   Dim spokenPhrase As String = expandPascalCase(chunk)
-                                   If spokenPhrase.Length > 2 AndAlso Not App.VoicePhraseToKeyMap.ContainsKey(spokenPhrase) Then
-                                       App.VoicePhraseToKeyMap.Add(spokenPhrase, key)
+                                   ' 1. Strip the video tag
+                                   If Not String.IsNullOrWhiteSpace(videoTag) Then
+                                       rawDisplay = rawDisplay.Replace(videoTag, "")
                                    End If
-                               Next
 
-                               ' 4. Register full combined track phrase ("Taylor Swift The Fate Of Ophelia")
-                               Dim fullSpokenPhrase As String = expandPascalCase(rawDisplay)
-                               If fullSpokenPhrase.Length > 2 AndAlso Not App.VoicePhraseToKeyMap.ContainsKey(fullSpokenPhrase) Then
-                                   App.VoicePhraseToKeyMap.Add(fullSpokenPhrase, key)
+                                   ' 2. Determine how to split chunks based on the separator
+                                   Dim rawChunks As New List(Of String)()
+                                   If Not String.IsNullOrWhiteSpace(separator) AndAlso separator <> " " AndAlso rawDisplay.Contains(separator) Then
+                                       ' Symbol separator (e.g., "-", ",", "|")
+                                       rawChunks.AddRange(rawDisplay.Split(New String() {separator}, StringSplitOptions.RemoveEmptyEntries))
+                                   Else
+                                       ' Space separator (" ") or no symbol: split by spaces into main blocks (Artist vs Title)
+                                       rawChunks.AddRange(rawDisplay.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries))
+                                   End If
+
+                                   ' 3. Register individual chunk phrases ("Taylor Swift", "The Fate Of Ophelia")
+                                   For Each chunk In rawChunks
+                                       Dim spokenPhrase As String = expandPascalCase(chunk)
+                                       If spokenPhrase.Length > 2 AndAlso Not App.VoicePhraseToKeyMap.ContainsKey(spokenPhrase) Then
+                                           App.VoicePhraseToKeyMap.Add(spokenPhrase, key)
+                                       End If
+                                   Next
+
+                                   ' 4. Register full combined track phrase ("Taylor Swift The Fate Of Ophelia")
+                                   Dim fullSpokenPhrase As String = expandPascalCase(rawDisplay)
+                                   If fullSpokenPhrase.Length > 2 AndAlso Not App.VoicePhraseToKeyMap.ContainsKey(fullSpokenPhrase) Then
+                                       App.VoicePhraseToKeyMap.Add(fullSpokenPhrase, key)
+                                   End If
+
                                End If
                            Next
 
