@@ -170,12 +170,7 @@ Public Class Options
         End If
         ChkBoxEnableVoiceCommands.Checked = App.Settings.EnableVoiceCommands
         ChkBoxEnableVoicePushToTalk.Checked = App.Settings.VoicePushToTalk
-        Dim hotkey = Settings.HotKeyVoicePushToTalk
-        Dim combinedKey As Keys = hotkey.Key
-        If (hotkey.KeyMod And 2) = 2 Then combinedKey = combinedKey Or Keys.Control
-        If (hotkey.KeyMod And 4) = 4 Then combinedKey = combinedKey Or Keys.Shift
-        If (hotkey.KeyMod And 1) = 1 Then combinedKey = combinedKey Or Keys.Alt
-        TxtBoxVoicePushToTalk.Text = BuildHotKeyDisplayString(combinedKey)
+        TxtBoxVoicePushToTalk.Text = Settings.HotKeyVoicePushToTalk.KeyText
         SetPrunePlaylistButtonText()
         SetPruneHistoryButtonText()
         UpdateCompanionServerTooltip()
@@ -361,15 +356,20 @@ Public Class Options
         If e.Shift Then modByte = CByte(modByte Or &H4)   ' MOD_SHIFT
         If e.Alt Then modByte = CByte(modByte Or &H1)     ' MOD_ALT
 
+        Dim combinedKey As Keys = baseKey
+        If (modByte And 2) = 2 Then combinedKey = combinedKey Or Keys.Control
+        If (modByte And 4) = 4 Then combinedKey = combinedKey Or Keys.Shift
+        If (modByte And 1) = 1 Then combinedKey = combinedKey Or Keys.Alt
+
         ' 3. Update your HotKey structure fields
         With Settings.HotKeyVoicePushToTalk
-            .Key = baseKey
+            .Key = combinedKey
             .KeyCode = CByte(baseKey)
             .KeyMod = modByte
         End With
 
         ' Update the textbox display using your structure's KeyText property or custom builder
-        TxtBoxVoicePushToTalk.Text = BuildHotKeyDisplayString(e.KeyData)
+        TxtBoxVoicePushToTalk.Text = Settings.HotKeyVoicePushToTalk.KeyText
 
         ' Unregister and re-register the hotkey with Windows here using the new values!
         App.UnRegisterHotKeys()
@@ -744,26 +744,6 @@ Public Class Options
             $"Enable or Disable the Companion App Server{vbCr}" &
             $"The Companion Server is currently {If(App.CompanionServerRunning, "ENABLED", "DISABLED")} on {ip}")
     End Sub
-    Private Function BuildHotKeyDisplayString(keyData As Keys) As String
-        Dim parts As New List(Of String)()
-
-        If (keyData And Keys.Control) = Keys.Control Then parts.Add("Ctrl")
-        If (keyData And Keys.Shift) = Keys.Shift Then parts.Add("Shift")
-        If (keyData And Keys.Alt) = Keys.Alt Then parts.Add("Alt")
-
-        ' Extract the base key code without the modifier flags
-        Dim baseKey As Keys = keyData And Not Keys.Modifiers
-
-        ' Only add the base key if it's not one of the modifier keys themselves
-        If baseKey <> Keys.None AndAlso
-           baseKey <> Keys.ControlKey AndAlso
-           baseKey <> Keys.ShiftKey AndAlso
-           baseKey <> Keys.Menu Then
-            parts.Add(baseKey.ToString())
-        End If
-
-        Return String.Join(" + ", parts)
-    End Function
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > My.Computer.Screen.WorkingArea.Right Then location.X = My.Computer.Screen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
         If location.Y + Me.Height > My.Computer.Screen.WorkingArea.Bottom Then location.Y = My.Computer.Screen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsDialogWindow

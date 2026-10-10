@@ -12,6 +12,7 @@ Imports System.Threading
 Imports System.Xml.Serialization
 Imports Microsoft.Win32
 Imports NAudio.CoreAudioApi
+Imports Skye.Common
 Imports Skye.UI
 
 Namespace My
@@ -318,12 +319,23 @@ Namespace My
             Public Key As Keys
             Public KeyCode As Byte
             Public KeyMod As Byte
-            'ReadOnly Property KeyText As String
-            '    Get
-            '        Dim kc As New System.Windows.Forms.KeysConverter
-            '        KeyText = kc.ConvertToString(Key)
-            '    End Get
-            'End Property
+            ReadOnly Property KeyText As String
+                Get
+                    Dim parts As New List(Of String)()
+
+                    If (Key And Keys.Control) = Keys.Control Then parts.Add("Ctrl")
+                    If (Key And Keys.Shift) = Keys.Shift Then parts.Add("Shift")
+                    If (Key And Keys.Alt) = Keys.Alt Then parts.Add("Alt")
+
+                    ' Extract the base key code without the modifier flags
+                    Dim baseKey As Keys = Key And Not Keys.Modifiers
+
+                    ' Only add the base key if it's not one of the modifier keys themselves
+                    If baseKey <> Keys.None AndAlso baseKey <> Keys.ControlKey AndAlso baseKey <> Keys.ShiftKey AndAlso baseKey <> Keys.Menu Then parts.Add(baseKey.ToString())
+
+                    Return String.Join(" + ", parts)
+                End Get
+            End Property
             Sub New(id As Integer, description As String, key As Keys, keycode As Byte, keymod As Byte)
                 Me.WinID = id
                 Me.Description = description
@@ -1246,6 +1258,9 @@ Namespace My
             Friend Shared HistoryAutoSaveInterval As UShort = 5 '1-1440 'Interval in minutes to automatically save the history.
             Friend Shared HistoryViewMaxRecords As UShort = 25 'Maximum number of records to display in the history view.
 
+            ' Customizable HotKeys
+            Friend Shared HotKeyVoicePushToTalk As HotKey 'HotKeyPushToTalk is a hotkey for global voice command push-to-talk functionality.
+
             ' Visualizers
             Friend Shared Visualizer As String = "Rainbow Bar" 'The current visualizer used in the application.
             Friend Shared VisualizerMiniMode As Boolean = False 'Whether the mini mode is enabled for the visualizer. (Used in MiniPlayer)
@@ -1343,9 +1358,6 @@ Namespace My
                 Public Property ParticleNebulaBloomRadius As Integer = 2 ' 1 – 5 *1 ' How Many Extra Bloom Rings to Draw.
                 Public Property ParticleNebulaHighFrequencyBoost As Single = 1.0F ' 0.5 - 3.0 *10 ' Boost for High Frequency Bands, which can be overpowered by bass. Higher values increase the influence of highs on particle behavior and color.
             End Class
-
-            ' Customizable HotKeys
-            Friend Shared HotKeyVoicePushToTalk As New HotKey(4, "Global Voice Command Push-To-Talk", Keys.V, 86, Skye.WinAPI.MOD_CONTROL Or Skye.WinAPI.MOD_SHIFT) 'HotKeyPushToTalk is a hotkey for global voice command push-to-talk functionality.
 
             Friend Shared Sub Load()
                 Try
@@ -1508,6 +1520,15 @@ Namespace My
                         HistoryAutoSaveInterval = 1440 'Limit the interval to a maximum of 1440 minutes (24 hours)
                     End If
                     HistoryViewMaxRecords = CUShort(Val(RegKey.GetValue("HistoryViewMaxRecords", 25.ToString)))
+
+                    'HotKeys
+                    Dim rawKey As Integer = RegistryHelper.GetInt("HotKeyVoicePushToTalkKey", CInt(Keys.V Or Keys.Control Or Keys.Shift))
+                    Dim hotKey As Keys = If(rawKey >= 0, CType(rawKey, Keys), Keys.V Or Keys.Control Or Keys.Shift)
+                    Dim rawcode As Integer = RegistryHelper.GetInt("HotKeyVoicePushToTalkKeyCode", CInt(Keys.V))
+                    Dim hotKeyCode As Byte = CByte(Math.Clamp(rawcode, Byte.MinValue, Byte.MaxValue))
+                    Dim rawMod As Integer = RegistryHelper.GetInt("HotKeyVoicePushToTalkKeyMod", Skye.WinAPI.MOD_CONTROL Or Skye.WinAPI.MOD_SHIFT)
+                    Dim hotKeyMod As Byte = CByte(Math.Clamp(rawMod, Byte.MinValue, Byte.MaxValue))
+                    HotKeyVoicePushToTalk = New HotKey(4, "Global Voice Command Push-To-Talk", hotKey, hotKeyCode, hotKeyMod)
 
                     ' Visualizer Settings
                     Visualizer = RegKey.GetValue("Visualizer", "Rainbow Bar").ToString
@@ -1747,6 +1768,11 @@ Namespace My
                     RegKey.SetValue("HistoryLocationY", Settings.HistoryLocation.Y.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("HistorySizeX", Settings.HistorySize.Width.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("HistorySizeY", Settings.HistorySize.Height.ToString, Microsoft.Win32.RegistryValueKind.String)
+
+                    ' HotKeys
+                    RegistryHelper.SetInt("HotKeyVoicePushToTalkKey", CInt(HotKeyVoicePushToTalk.Key))
+                    RegistryHelper.SetInt("HotKeyVoicePushToTalkKeyCode", CInt(HotKeyVoicePushToTalk.KeyCode))
+                    RegistryHelper.SetInt("HotKeyVoicePushToTalkKeyMod", CInt(HotKeyVoicePushToTalk.KeyMod))
 
                     ' Visualizer Settings
                     RegKey.SetValue("Visualizer", Visualizer, RegistryValueKind.String)
