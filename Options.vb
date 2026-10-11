@@ -171,6 +171,7 @@ Public Class Options
         ChkBoxEnableVoiceCommands.Checked = App.Settings.EnableVoiceCommands
         ChkBoxEnableVoicePushToTalk.Checked = App.Settings.VoicePushToTalk
         TxtBoxVoicePushToTalk.Text = Settings.HotKeyVoicePushToTalk.KeyText
+        SetVoiceSettingsState()
         SetPrunePlaylistButtonText()
         SetPruneHistoryButtonText()
         UpdateCompanionServerTooltip()
@@ -609,9 +610,11 @@ Public Class Options
                 App.FrmPlayer.StopVoice()
                 App.ShutdownVoiceEngine()
         End Select
+        SetVoiceSettingsState()
     End Sub
     Private Sub ChkBoxEnableVoicePushToTalk_Click(sender As Object, e As EventArgs) Handles ChkBoxEnableVoicePushToTalk.Click
         App.Settings.VoicePushToTalk = Not App.Settings.VoicePushToTalk
+        SetVoiceSettingsState()
     End Sub
     Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
         If e.Alt Then
@@ -736,6 +739,19 @@ Public Class Options
                     .Dock = DockStyle.Fill}
                 PanelVisualizers.Controls.Add(c)
         End Select
+    End Sub
+    Private Sub SetVoiceSettingsState()
+        If App.Settings.EnableVoiceCommands Then
+            ChkBoxEnableVoicePushToTalk.Enabled = True
+            If App.Settings.VoicePushToTalk Then
+                TxtBoxVoicePushToTalk.Enabled = True
+            Else
+                TxtBoxVoicePushToTalk.Enabled = False
+            End If
+        Else
+            ChkBoxEnableVoicePushToTalk.Enabled = False
+            TxtBoxVoicePushToTalk.Enabled = False
+        End If
     End Sub
     Friend Sub UpdateCompanionServerTooltip()
         TipOptions.HideTooltip()

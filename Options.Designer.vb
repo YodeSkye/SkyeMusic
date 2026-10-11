@@ -856,7 +856,7 @@ Partial Class Options
         TxtBoxVoicePushToTalk.Name = "TxtBoxVoicePushToTalk"
         TxtBoxVoicePushToTalk.Size = New Size(191, 29)
         TxtBoxVoicePushToTalk.TabIndex = 54
-        TipOptions.SetText(TxtBoxVoicePushToTalk, Nothing)
+        TipOptions.SetText(TxtBoxVoicePushToTalk, "HotKey for Push-To-Talk." & vbCrLf & "Select and type a key or key combination.")
         TipError.SetText(TxtBoxVoicePushToTalk, Nothing)
         TxtBoxVoicePushToTalk.TextAlign = HorizontalAlignment.Center
         ' 
