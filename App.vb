@@ -5058,6 +5058,12 @@ Namespace My
 
             ' Clamp 0–100
             Dim newVolumeBoost As Integer = Math.Max(100, Math.Min(150, newVolumePercent))
+            'Dim newVolumeBoost As Integer
+            'If Settings.AudioOutputModule = AudioOutputModuleTypes.DirectSound Then
+            '    newVolumeBoost = Math.Max(100, Math.Min(150, newVolumePercent))
+            'Else
+            '    newVolumeBoost = Math.Min(100, newVolumePercent) ' WRONG
+            'End If
             If newVolumePercent < 0 Then newVolumePercent = 0
             If newVolumePercent > 100 Then newVolumePercent = 100
 
@@ -5068,9 +5074,33 @@ Namespace My
                 FrmPlayer.SetPlayerVolume(newVolumeBoost) ' Update the player volume (boosted)
                 _audioEndpoint.AudioEndpointVolume.MasterVolumeLevelScalar = scalar ' Update the system volume (0.0–1.0)
             Catch
-                ' Optional: log or ignore
             End Try
 
+        End Sub
+        Friend Sub AdjustSystemVolume(delta As Integer)
+            If VoiceAudioIsDucked Then
+                ' If currently ducked, update the baseline volume so it restores to the new level
+                If Settings.AudioOutputModule = AudioOutputModuleTypes.DirectSound Then
+                    VoiceOriginalVolume = Math.Clamp(VoiceOriginalVolume + delta, 0, 150)
+                Else
+                    VoiceOriginalVolume = Math.Clamp(VoiceOriginalVolume + delta, 0, 100)
+                End If
+            Else
+                ' If idle, change the live volume and UI state directly
+                Dim currentVol As Integer = FrmPlayer.BtnVolume.VolumePercent
+                Dim newVol As Integer
+                If Settings.AudioOutputModule = AudioOutputModuleTypes.DirectSound Then
+                    newVol = Math.Clamp(currentVol + delta, 0, 150)
+                Else
+                    newVol = Math.Clamp(currentVol + delta, 0, 100)
+                End If
+                ' Apply to your audio endpoint / UI controller
+                SetSystemVolume(newVol)
+                If FrmPlayer IsNot Nothing AndAlso Not FrmPlayer.IsDisposed Then
+                    FrmPlayer.BtnVolume.VolumePercent = newVol
+                    FrmPlayer.BtnVolume.Invalidate()
+                End If
+            End If
         End Sub
         Friend Sub SetSystemMute(isMuted As Boolean)
             If _audioEndpoint Is Nothing Then Exit Sub
@@ -5167,7 +5197,7 @@ Namespace My
                 VoiceDuckAudioVolume()
 
                 ' 3. Optional: Play activation chime / show UI overlay
-                Debug.WriteLine("[PTT STATE] Activated — Audio ducked & timer started.")
+                'Debug.WriteLine("[PTT STATE] Activated — Audio ducked & timer started.")
             Else
                 ' --- PTT CLOSED ---
                 ' 1. Stop safety timer
@@ -5177,7 +5207,7 @@ Namespace My
                 VoiceRestoreAudioVolume()
 
                 ' 3. Optional: Play deactivation chime / hide UI overlay
-                Debug.WriteLine("[PTT STATE] Deactivated — Audio restored & timer stopped.")
+                'Debug.WriteLine("[PTT STATE] Deactivated — Audio restored & timer stopped.")
             End If
         End Sub
         Private Sub VoiceDuckAudioVolume()
@@ -5651,7 +5681,7 @@ Namespace My
                                Try
                                    Dim controls As New Choices()
                                    ' Use distinct, multi-syllable commands to prevent phonetic overlap
-                                   controls.Add(New String() {"play music", "pause music", "stop music", "previous song", "next song", "playmode once", "playmode repeat", "playmode linear", "playmode shuffle"})
+                                   controls.Add(New String() {"play music", "pause music", "stop music", "previous song", "next song", "playmode once", "playmode repeat", "playmode linear", "playmode shuffle", "volume up", "volume down"})
 
                                    Dim controlBuilder As New GrammarBuilder() With {.Culture = recognizer.RecognizerInfo.Culture}
                                    controlBuilder.Append("hey skye") ' Wake word

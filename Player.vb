@@ -6580,6 +6580,10 @@ Public Class Player
                 App.Settings.PlayMode = App.PlayModes.Random
                 ShowPlayMode()
                 SetTipPlayer()
+            Case "volume up"
+                App.AdjustSystemVolume(10)
+            Case "volume down"
+                App.AdjustSystemVolume(-10)
         End Select
     End Sub
     Private Sub OnVoicePlayTargetRequested(ByVal targetKey As String)
