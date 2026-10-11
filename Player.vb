@@ -1,14 +1,15 @@
 ﻿
+Imports System.Buffers
 Imports System.IO
 Imports System.Text
 Imports LibVLCSharp.Shared
 Imports NAudio.Dsp
 Imports NAudio.Wave
+Imports NAudioBridge
 Imports Newtonsoft.Json.Linq
 Imports Skye
 Imports Skye.Contracts
 Imports SkyeMusic.My
-Imports NAudioBridge
 
 Public Class Player
 
@@ -3621,7 +3622,6 @@ Public Class Player
     End Sub
     Private Sub MIPlayMode_Click(sender As Object, e As EventArgs) Handles MIPlayMode.Click
         Dim newIndex As Byte = CType(App.Settings.PlayMode + 1, Byte)
-        'App.ShowToast(Nothing, "Shuffle Play Yet?")
         If newIndex = [Enum].GetNames(GetType(App.PlayModes)).Length Then
             newIndex = 0
         End If
@@ -6564,6 +6564,22 @@ Public Class Player
                     PlayNext()
                     LVPlaylist.Focus()
                 End If
+            Case "playmode once"
+                App.Settings.PlayMode = App.PlayModes.None
+                ShowPlayMode()
+                SetTipPlayer()
+            Case "playmode repeat"
+                App.Settings.PlayMode = App.PlayModes.Repeat
+                ShowPlayMode()
+                SetTipPlayer()
+            Case "playmode linear"
+                App.Settings.PlayMode = App.PlayModes.Linear
+                ShowPlayMode()
+                SetTipPlayer()
+            Case "playmode shuffle"
+                App.Settings.PlayMode = App.PlayModes.Random
+                ShowPlayMode()
+                SetTipPlayer()
         End Select
     End Sub
     Private Sub OnVoicePlayTargetRequested(ByVal targetKey As String)
