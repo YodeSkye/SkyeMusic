@@ -4233,10 +4233,10 @@ Public Class Player
         RaiseEvent TitleChanged(title)
 
         ' Show Toast
-        ShowNowPlayingToast(title)
+        'ShowNowPlayingToast(title)
 
         'Broadcast
-        App.BroadcastNowPlaying()
+        'App.BroadcastNowPlaying()
 
     End Sub
     Private Sub OnPlaylistChanged() Handles Me.PlaylistChanged
@@ -4306,7 +4306,7 @@ Public Class Player
         TimerShowMedia.Stop()
         ShowMedia()
         ShowNowPlayingToast(PlaylistCurrentText)
-        NowPlaying.Text = PlaylistCurrentText
+        'NowPlaying.Text = PlaylistCurrentText
         App.BroadcastNowPlaying()
     End Sub
     Private Sub TimerStatus_Tick(sender As Object, e As EventArgs) Handles TimerStatus.Tick
@@ -5416,7 +5416,7 @@ Public Class Player
             If item IsNot Nothing Then EnsurePlaylistItemIsVisible(item.Index)
             Queue.RemoveAt(0)
             SetPlaylistCountText()
-            TimerShowMedia.Start()
+            'TimerShowMedia.Start()
         End If
     End Sub
 
@@ -5616,7 +5616,7 @@ Public Class Player
         LyricsOff()
         Select Case App.Settings.PlayMode
             Case PlayModes.Repeat
-                TimerShowMedia.Start()
+                'TimerShowMedia.Start()
 
             Case PlayModes.Linear
                 If LVPlaylist.Items.Count > 0 Then
@@ -5662,7 +5662,7 @@ Public Class Player
                     End If
 
                     EnsurePlaylistItemIsVisible(newindex)
-                    TimerShowMedia.Start()
+                    'TimerShowMedia.Start()
                 End If
 
             Case PlayModes.Random
@@ -5706,7 +5706,7 @@ Public Class Player
         Select Case App.Settings.PlayMode
             Case PlayModes.Repeat
                 TogglePlay()
-                TimerShowMedia.Start()
+                'TimerShowMedia.Start()
             Case PlayModes.Linear
                 If Queue.Count > 0 Then
                     PlayQueued()
@@ -5753,7 +5753,7 @@ Public Class Player
                         End If
 
                         EnsurePlaylistItemIsVisible(newindex)
-                        TimerShowMedia.Start()
+                        'TimerShowMedia.Start()
                     End If
                 End If
 
@@ -5813,7 +5813,7 @@ Public Class Player
                         End If
 
                         EnsurePlaylistItemIsVisible(newindex)
-                        TimerShowMedia.Start()
+                        'TimerShowMedia.Start()
                     End If
                 End If
         End Select
@@ -5869,16 +5869,16 @@ Public Class Player
                 If LVPlaylist.Items.Count > 0 Then LVPlaylist.FindItemWithText(_player.Path, True, 0)
                 If lvi Is Nothing Then
                     PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
-                    Text = My.Application.Info.Title + " - " + _player.Path
-                    App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
+                    'Text = My.Application.Info.Title + " - " + _player.Path
+                    'App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
                 Else
                     PlaylistCurrentText = lvi.Text
-                    Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
-                    App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
+                    'Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
+                    'App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
                 End If
                 LoadLyrics(_player.Path)
         End Select
-        'NowPlaying.Text = PlaylistCurrentText
+        NowPlaying.Text = PlaylistCurrentText
 
         TimerShowMedia.Start()
 
