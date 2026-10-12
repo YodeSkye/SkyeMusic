@@ -150,6 +150,7 @@ Public Class Player
 
             _libVLC = New LibVLC(args)
             _mediaPlayer = New MediaPlayer(_libVLC)
+
             AddHandler _mediaPlayer.Playing,
                 Sub(sender, e)
                     _invoker.BeginInvoke(Sub()
@@ -2749,7 +2750,9 @@ Public Class Player
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         ' Player Engine
+        'Debug.Print("VLC INIT start...")
         InitVLCPlayer()
+        'Debug.Print("VLC INIT complete")
 
         ' For Meters
         RestartMeterCapture()
@@ -5431,11 +5434,11 @@ Public Class Player
             End Try
             _player = Nothing
         End If
-
+        'Debug.Print("old disposed")
         ' Create new VLCPlayer
         Dim vlc = New VLCPlayer(Me)
         _player = vlc
-
+        'Debug.Print("new created")
         ' Attach to viewer
         VLCViewer.MediaPlayer = vlc.MediaPlayer
 
@@ -5445,6 +5448,7 @@ Public Class Player
 
         ' Restore volume (or from settings)
         App.SetSystemVolume(BtnVolume.VolumePercent)
+
     End Sub
     Friend Sub SwitchAudioOutputEngine()
         ' 1. Capture playing state before tearing down
