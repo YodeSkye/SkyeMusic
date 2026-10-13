@@ -3370,7 +3370,6 @@ Public Class Player
             End If
             PlaylistItemMove = Nothing
         End If
-        'PlaylistItemMove = Nothing
         Cursor = Cursors.Default
         LVPlaylist.LineBefore = -1
         LVPlaylist.LineAfter = -1
@@ -3673,7 +3672,7 @@ Public Class Player
         If LVPlaylist.SelectedItems.Count > 0 Then
             SetPlaylistToolTip()
             Dim tiptext As String = App.History.Find(Function(p) p.Path = LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)?.ToString
-            If TipPlaylist IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(tiptext) Then TipPlaylist.ShowTooltipAt(New Point(CMPlaylist.Location.X, CMPlaylist.Location.Y - 37), tiptext)
+            If TipPlaylist IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(tiptext) Then TipPlaylist.ShowTooltipAt(New Point(CMPlaylist.Location.X, CMPlaylist.Location.Y - 36), tiptext)
         End If
         If LVPlaylist.Items.Count = 0 Then
             CMIClearPlaylist.Enabled = False
@@ -5299,8 +5298,9 @@ Public Class Player
             .ForeColor = App.CurrentTheme.TextColor,
             .BorderColor = App.CurrentTheme.ButtonBackColor,
             .Font = App.TipFont,
-            .ShadowAlpha = 150,
-            .ShadowThickness = 2,
+            .ShadowAlpha = 0,
+            .ShadowThickness = 0,
+            .BorderThickness = 1,
             .FadeInRate = 0,
             .FadeOutRate = 0,
             .HideDelay = 1000000,
