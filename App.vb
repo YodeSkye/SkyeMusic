@@ -5554,6 +5554,7 @@ Namespace My
         Private recognizer As SpeechRecognitionEngine
         Private isListening As Boolean = False
         Friend Event CommandRecognized(ByVal command As String)
+        Friend Event SearchRequested(ByVal searchQuery As String)
         Friend Event PlayTargetRequested(ByVal targetKey As String)
 
         ' Base Methods
@@ -5637,6 +5638,18 @@ Namespace My
                     ' Raise command in lowercase for clean handling in your player (e.g., "play music", "next song")
                     RaiseEvent CommandRecognized(payload.ToLowerInvariant())
 
+                Case "Search", "LibrarySearch"
+                    ' payload here has already had "hey skye " stripped (e.g., "search taylor swift new album")
+                    If payload.StartsWith("search ", StringComparison.OrdinalIgnoreCase) Then
+                        ' Strip off "search " (length 7) to leave the exact search payload
+                        Dim searchQuery As String = payload.Substring(7).Trim()
+
+                        If Not String.IsNullOrWhiteSpace(searchQuery) Then
+                            Debug.WriteLine($"[VOICE SEARCH] Extracted query: '{searchQuery}'")
+                            RaiseEvent SearchRequested(searchQuery)
+                        End If
+                    End If
+
                 Case "DynamicPlaylist"
                     ' Case-insensitive dictionary lookup against App.VoicePhraseToKeyMap
                     Dim targetKey As String = ""
@@ -5654,8 +5667,12 @@ Namespace My
                     If Not String.IsNullOrEmpty(targetKey) Then
                         RaiseEvent PlayTargetRequested(targetKey)
                     Else
-                        'Debug.WriteLine($"[VOICE DEBUG] Phrase '{payload}' matched grammar but missing from dictionary map.")
+                        ' Fallback: SAPI matched a known title/artist phrase from your grammar, 
+                        ' but it didn't resolve to a specific key. Route it to search!
+                        Debug.WriteLine($"[VOICE FALLBACK] Payload '{payload}' missing from map. Routing to search.")
+                        RaiseEvent SearchRequested(payload)
                     End If
+
             End Select
             If App.Settings.VoicePushToTalk Then
                 App.VoicePushToTalkActive = False
@@ -5697,10 +5714,10 @@ Namespace My
                                End Try
 
                                ' Build and Load Dynamic Playlist
+                               Dim songChoices As New Choices()
                                Try
                                    If App.VoicePhraseToKeyMap Is Nothing OrElse App.VoicePhraseToKeyMap.Count = 0 Then Return
 
-                                   Dim songChoices As New Choices()
                                    For Each phrase In App.VoicePhraseToKeyMap.Keys
                                        If Not String.IsNullOrWhiteSpace(phrase) Then
                                            ' Clean out quotes/brackets that break SAPI compilation
@@ -5723,6 +5740,39 @@ Namespace My
                                    recognizer.LoadGrammar(dynamicGrammar)
                                Catch ex As Exception
                                End Try
+
+                               ' Build and Load Open-Ended Search Grammar using Dictation
+                               Try
+                                   Dim searchBuilder As New GrammarBuilder() With {.Culture = recognizer.RecognizerInfo.Culture}
+                                   searchBuilder.Append("hey skye")
+                                   searchBuilder.Append("search")
+                                   searchBuilder.AppendDictation() ' Captures entire freeform spoken phrases
+
+                                   Dim searchGrammar As New Grammar(searchBuilder) With {
+                                        .Name = "Search",
+                                        .Weight = 0.8F
+                                    }
+                                   recognizer.LoadGrammar(searchGrammar)
+                               Catch ex As Exception
+                               End Try
+
+                               ' 2. Build and Load Library Search Grammar (Reuses songChoices for high accuracy on band/song names!)
+                               Try
+                                   If songChoices IsNot Nothing Then
+                                       Dim librarySearchBuilder As New GrammarBuilder() With {.Culture = recognizer.RecognizerInfo.Culture}
+                                       librarySearchBuilder.Append("hey skye")
+                                       librarySearchBuilder.Append("search")
+                                       librarySearchBuilder.Append(songChoices) ' Reuses the exact same Choices instance!
+
+                                       Dim librarySearchGrammar As New Grammar(librarySearchBuilder) With {
+                                           .Name = "LibrarySearch",
+                                           .Weight = 1.0F ' Higher weight so exact band/song matches win over generic dictation
+                                       }
+                                       recognizer.LoadGrammar(librarySearchGrammar)
+                                   End If
+                               Catch ex As Exception
+                               End Try
+
                            End Sub)
         End Function
         Friend Sub ClearGrammars()

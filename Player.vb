@@ -3,6 +3,7 @@ Imports System.Buffers
 Imports System.IO
 Imports System.Text
 Imports LibVLCSharp.Shared
+Imports MetaBrainz.MusicBrainz
 Imports NAudio.Dsp
 Imports NAudio.Wave
 Imports NAudioBridge
@@ -65,6 +66,7 @@ Public Class Player
     Friend Event TitleChanged(newTitle As String)
     Friend Event PlaylistChanged()
 
+    ' Properties
     ''' <summary>
     ''' Dynamically retrieves the current index of the Path column.
     ''' Returns -1 if the column is missing.
@@ -6531,6 +6533,7 @@ Public Class Player
     Friend Sub InitializeVoice()
         If App.VoiceEngine IsNot Nothing Then
             AddHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
+            AddHandler App.VoiceEngine.SearchRequested, AddressOf OnVoiceSearchRequested
             AddHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
         End If
         RefreshSpeechGrammar()
@@ -6538,6 +6541,7 @@ Public Class Player
     Friend Sub StopVoice()
         If App.VoiceEngine IsNot Nothing Then
             RemoveHandler App.VoiceEngine.CommandRecognized, AddressOf OnVoiceCommandRecognized
+            RemoveHandler App.VoiceEngine.SearchRequested, AddressOf OnVoiceSearchRequested
             RemoveHandler App.VoiceEngine.PlayTargetRequested, AddressOf OnVoicePlayTargetRequested
         End If
     End Sub
@@ -6589,6 +6593,21 @@ Public Class Player
             Case "volume down"
                 App.AdjustSystemVolume(-10)
         End Select
+    End Sub
+    Private Sub OnVoiceSearchRequested(ByVal searchQuery As String)
+        ' Ensure thread safety if speech event fires off-thread
+        If Me.InvokeRequired Then
+            Me.Invoke(Sub() OnVoiceSearchRequested(searchQuery))
+            Return
+        End If
+
+        Debug.Print("Voice Search Requested: " & searchQuery)
+
+        TxtBoxPlaylistSearch.Text = searchQuery
+        TxtBoxPlaylistSearchTextChanged(Nothing, New EventArgs)
+        TxtBoxPlaylistSearch.Focus()
+        ' select none and put cusor at end
+        TxtBoxPlaylistSearch.SelectionStart = TxtBoxPlaylistSearch.Text.Length
     End Sub
     Private Sub OnVoicePlayTargetRequested(ByVal targetKey As String)
         ' Ensure UI thread execution
