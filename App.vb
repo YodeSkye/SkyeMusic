@@ -355,7 +355,7 @@ Namespace My
         Friend ReadOnly UserPath As String = Skye.Common.StorageManager.GetAppDirectory 'UserPath is the base path for user-specific files.
 #If DEBUG Then
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName + "DEV" 'RegPath is the path to the registry key where application settings are stored.
-        Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
+        'Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
         Private ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.xml" 'HistoryPath is the path to the media history XML file.
         Private ReadOnly DatabasePath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.db" 'DatabasePath is the path to the SQLite database file.
@@ -363,7 +363,7 @@ Namespace My
         Friend ReadOnly DownloadPath As String = UserPath + "DownloadsDEV\" 'DownloadPath is the path to the Downloads folder.
 #Else
         Private ReadOnly RegPath As String = "Software\\" + My.Application.Info.ProductName 'RegPath is the path to the registry key where application settings are stored.
-        Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
+        'Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
         Private ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "History.xml" 'HistoryPath is the path to the media history XML file.
         Private ReadOnly DatabasePath As String = UserPath + My.Application.Info.ProductName + "History.db" 'DatabasePath is the path to the SQLite database file.
@@ -1228,6 +1228,7 @@ Namespace My
             Friend Shared NowPlayingToastLocation As Skye.UI.ToastLocation = Skye.UI.ToastLocation.TopRight
 
             ' Playlist
+            Friend Shared Playlists As Collections.Generic.List(Of String)
             Friend Shared PlaylistTitleFormat As PlaylistTitleFormats = PlaylistTitleFormats.ArtistSong
             Friend Shared PlaylistTitleRemoveSpaces As Boolean = False
             Friend Shared PlaylistTitleSeparator As String = " "
@@ -1437,6 +1438,7 @@ Namespace My
                     End Try
 
                     ' Playlist Settings
+                    LoadPlaylists()
                     Try : Settings.PlaylistTitleFormat = CType([Enum].Parse(GetType(App.PlaylistTitleFormats), RegKey.GetValue("PlaylistTitleFormat", App.PlaylistTitleFormats.ArtistSong.ToString).ToString), PlaylistTitleFormats)
                     Catch : Settings.PlaylistTitleFormat = App.PlaylistTitleFormats.ArtistSong
                     End Try
@@ -1681,6 +1683,17 @@ Namespace My
                     Skye.Common.Log.Write("Error Loading Options" + vbCr + ex.Message)
                 End Try
             End Sub
+            Private Shared Sub LoadPlaylists() ' Load playlists from the registry
+                Dim playlistArray As String() = Skye.Common.RegistryHelper.GetStringArray("Playlists", New String() {"Default"})
+                If playlistArray IsNot Nothing AndAlso playlistArray.Length > 0 Then
+                    Playlists = playlistArray.ToList()
+                Else
+                    Playlists = New List(Of String) From {"Default"}
+                End If
+                If Playlists.Count = 0 Then ' Ensure safety check
+                    Playlists.Add("Default")
+                End If
+            End Sub
             Friend Shared Sub LoadDebug()
 #If DEBUG Then
                 'WatcherEnabled = True
@@ -1738,6 +1751,7 @@ Namespace My
                     RegKey.SetValue("NowPlayingToastLocation", Settings.NowPlayingToastLocation.ToString, Microsoft.Win32.RegistryValueKind.String)
 
                     ' Playlist Settings
+                    SavePlaylists()
                     RegKey.SetValue("PlaylistTitleFormat", Settings.PlaylistTitleFormat.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("PlaylistTitleRemoveSpaces", Settings.PlaylistTitleRemoveSpaces.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("PlaylistTitleSeparator", Settings.PlaylistTitleSeparator, Microsoft.Win32.RegistryValueKind.String)
@@ -1859,7 +1873,10 @@ Namespace My
                     Skye.Common.Log.Write("Error Saving Options" + vbCr + ex.Message)
                 End Try
             End Sub
-
+            Private Shared Sub SavePlaylists() ' Save playlists to the registry
+                Dim playlistArray As String() = Playlists.ToArray()
+                RegistryHelper.SetStringArray("Playlists", playlistArray)
+            End Sub
         End Class
 
         ' Interfaces

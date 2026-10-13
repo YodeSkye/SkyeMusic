@@ -1,5 +1,6 @@
 ﻿
 Imports System.Buffers
+Imports System.ComponentModel
 Imports System.IO
 Imports System.Text
 Imports LibVLCSharp.Shared
@@ -46,6 +47,36 @@ Public Class Player
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
     Private AlbumArt As Image = Nothing 'Current Album Art
     Private TrackBarScale As Int16 = 100 'TrackBar Scale for Position
+    Private _currentPlaylist As String = "Default" ' Private backing field for the active playlist
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
+    Public Property CurrentPlaylist As String ' The active playlist property that automates the save/load cycle
+        Get
+            Return _currentPlaylist
+        End Get
+        Set(value As String)
+            If Not String.IsNullOrEmpty(value) AndAlso _currentPlaylist <> value Then
+                ' 1. Save current ListView workspace to the old playlist file before switching
+                'SavePlaylistToXml(_currentPlaylist)
+
+                ' 2. Update active pointer
+                _currentPlaylist = value
+
+                ' 3. Clear the ListView workspace buffer
+                'ListViewTracks.Items.Clear()
+
+                ' 4. Load the new playlist XML file into the ListView workspace
+                'LoadPlaylistFromXml(_currentPlaylist)
+
+                ' 5. Keep your UI ComboBox in sync if needed
+                'UpdatePlaylistUISelection(_currentPlaylist)
+
+                ' 6. Reload voice grammars
+                'ReloadVoiceGrammarsForPlaylist(_currentPlaylist)
+
+                Debug.WriteLine($"[PLAYLIST] Switched from old playlist to: {_currentPlaylist}")
+            End If
+        End Set
+    End Property
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
     Private PlaylistSearchTitle As String 'Title for Playlist Search
     Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
@@ -2752,9 +2783,7 @@ Public Class Player
     Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         ' Player Engine
-        'Debug.Print("VLC INIT start...")
         InitVLCPlayer()
-        'Debug.Print("VLC INIT complete")
 
         ' For Meters
         RestartMeterCapture()
@@ -2887,6 +2916,8 @@ Public Class Player
         App.ThemeMenu(MenuPlayer)
         App.ThemeMenu(CMPlaylist)
         App.ThemeMenu(CMRatings)
+        CurrentPlaylist = App.Settings.Playlists(0)
+        'GetPlaylistPath("Default")
         LoadPlaylist()
         ClearPlaylistTitles()
         SetPlaylistColumns()
@@ -4776,11 +4807,14 @@ Public Class Player
         Skye.Common.RegistryHelper.SetString("PlaylistSortOrder", order.ToString)
     End Sub
     Private Sub LoadPlaylist()
-        If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then
+        Dim targetPath As String = GetPlaylistPath(CurrentPlaylist)
+
+        If My.Computer.FileSystem.FileExists(targetPath) Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of App.PlaylistTrackType)))
-            Dim file As New IO.FileStream(App.PlaylistPath, IO.FileMode.Open)
+            Dim file As New IO.FileStream(targetPath, IO.FileMode.Open)
             Dim items As System.Collections.Generic.List(Of App.PlaylistTrackType)
+            LVPlaylist.Items.Clear()
             Try
                 items = DirectCast(reader.Deserialize(file), System.Collections.Generic.List(Of App.PlaylistTrackType))
                 For Each item As App.PlaylistTrackType In items
@@ -4800,20 +4834,22 @@ Public Class Player
             file.Dispose()
             reader = Nothing
             If items Is Nothing Then
-                Skye.Common.Log.Write("Playlist Not Loaded: File not valid (" + App.PlaylistPath + ")")
+                Skye.Common.Log.Write("Playlist Not Loaded: File not valid (" + targetPath + ")")
             Else
                 items.Clear()
                 items = Nothing
                 Skye.Common.Log.Write("Playlist Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             End If
         Else
-            Skye.Common.Log.Write("Playlist Not Loaded: File does not exist")
+            Skye.Common.Log.Write("Playlist Not Loaded: File does not exist (" + targetPath + ")")
         End If
         SetPlaylistCountText()
     End Sub
     Private Sub SavePlaylist()
+        Dim targetPath As String = GetPlaylistPath(CurrentPlaylist)
+
         If LVPlaylist.Items.Count = 0 Then
-            If My.Computer.FileSystem.FileExists(App.PlaylistPath) Then My.Computer.FileSystem.DeleteFile(App.PlaylistPath)
+            If My.Computer.FileSystem.FileExists(targetPath) Then My.Computer.FileSystem.DeleteFile(targetPath)
         Else
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim items As New System.Collections.Generic.List(Of App.PlaylistTrackType)
@@ -4833,7 +4869,7 @@ Public Class Player
             If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                 My.Computer.FileSystem.CreateDirectory(App.UserPath)
             End If
-            Dim file As New System.IO.StreamWriter(App.PlaylistPath)
+            Dim file As New System.IO.StreamWriter(targetPath)
             writer.Serialize(file, items)
             file.Close()
             file.Dispose()
@@ -5376,6 +5412,21 @@ Public Class Player
         Next
 
         Return Nothing
+    End Function
+    Private Function GetPlaylistPath(playlistName As String) As String
+        Dim devSuffix As String = ""
+#If DEBUG Then
+        devSuffix = "DEV"
+#End If
+        ' Special rule for your legacy default file name
+        If playlistName.Equals("Default", StringComparison.OrdinalIgnoreCase) Then
+            'Debug.Print(Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}.xml"))
+            Return Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}.xml")
+        End If
+        ' Standard rule for any custom user playlist names
+        Dim safeName As String = String.Join("_", playlistName.Split(Path.GetInvalidFileNameChars()))
+        'Debug.Print(Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}_{safeName}.xml"))
+        Return Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}_{safeName}.xml")
     End Function
 
     ' Queue
