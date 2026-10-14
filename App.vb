@@ -1696,6 +1696,7 @@ Namespace My
             End Sub
             Friend Shared Sub LoadDebug()
 #If DEBUG Then
+                'Playlists.Add("Test")
                 'WatcherEnabled = True
                 'WatcherUpdateLibrary = True
                 'WatcherUpdatePlaylist = True
@@ -2843,6 +2844,7 @@ Namespace My
             Catch ex As Exception
                 Skye.Common.Log.Write($"Speech Recognition Engine Closure Error: {ex}")
             End Try
+            Debug.Print("Speech Recognition Engine Shutdown Complete")
 
             ' Cleanup Audio Volume Monitoring
             Try
@@ -5610,7 +5612,7 @@ Namespace My
         Friend Sub [Stop]()
             If recognizer IsNot Nothing AndAlso isListening Then
                 Try
-                    recognizer.RecognizeAsyncStop()
+                    recognizer.RecognizeAsyncCancel()
                     isListening = False
                 Catch ex As Exception
                     System.Diagnostics.Debug.WriteLine($"Error stopping voice listening: {ex.Message}")

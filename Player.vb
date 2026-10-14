@@ -55,24 +55,12 @@ Public Class Player
         End Get
         Set(value As String)
             If Not String.IsNullOrEmpty(value) AndAlso _currentPlaylist <> value Then
-                ' 1. Save current ListView workspace to the old playlist file before switching
-                'SavePlaylistToXml(_currentPlaylist)
-
-                ' 2. Update active pointer
+                SavePlaylist()
                 _currentPlaylist = value
-
-                ' 3. Clear the ListView workspace buffer
-                'ListViewTracks.Items.Clear()
-
-                ' 4. Load the new playlist XML file into the ListView workspace
-                'LoadPlaylistFromXml(_currentPlaylist)
-
-                ' 5. Keep your UI ComboBox in sync if needed
-                'UpdatePlaylistUISelection(_currentPlaylist)
-
-                ' 6. Reload voice grammars
-                'ReloadVoiceGrammarsForPlaylist(_currentPlaylist)
-
+                StopVoice()
+                LoadPlaylist()
+                RefreshSpeechGrammar()
+                InitializeVoice()
                 Debug.WriteLine($"[PLAYLIST] Switched from old playlist to: {_currentPlaylist}")
             End If
         End Set
@@ -2925,6 +2913,13 @@ Public Class Player
         IsLoadingPlaylistColumns = False
         ShowPlayMode()
 
+        ' Playlists ComboBox
+        RemoveHandler CoBoxPlaylists.SelectedIndexChanged, AddressOf CoBoxPlaylists_SelectedIndexChanged
+        CoBoxPlaylists.DataSource = Nothing
+        CoBoxPlaylists.DataSource = App.Settings.Playlists
+        CoBoxPlaylists.SelectedItem = CurrentPlaylist
+        AddHandler CoBoxPlaylists.SelectedIndexChanged, AddressOf CoBoxPlaylists_SelectedIndexChanged
+
         ' Place the window where it was last time
 #If DEBUG Then
         'If App.SaveWindowMetrics AndAlso App.PlayerSize.Height >= 0 Then Me.Size = App.PlayerSize
@@ -2961,8 +2956,8 @@ Public Class Player
 
     End Sub
     Friend Sub WhenClosing()
-        SavePlaylist()
         StopVoice()
+        SavePlaylist()
         If VLCHook IsNot Nothing Then
             VLCHook.ReleaseHandle()
             RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
@@ -4112,6 +4107,11 @@ Public Class Player
                     QueueFromPlaylist()
             End Select
         End If
+    End Sub
+    Private Sub CoBoxPlaylists_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxPlaylists.SelectedIndexChanged
+        If CoBoxPlaylists.SelectedItem Is Nothing Then Return
+        Dim selectedPlaylist As String = CoBoxPlaylists.SelectedItem.ToString()
+        CurrentPlaylist = selectedPlaylist
     End Sub
     Private Sub BtnPlayMouseDown(sender As Object, e As MouseEventArgs) Handles BtnPlay.MouseDown
         TogglePlay()
@@ -6563,6 +6563,8 @@ Public Class Player
         BtnPrevious.Image = App.CurrentTheme.PlayerPrevious
         BtnForward.Image = App.CurrentTheme.PlayerFastForward
         BtnReverse.Image = App.CurrentTheme.PlayerFastReverse
+        CoBoxPlaylists.BackColor = App.CurrentTheme.BackColor
+        CoBoxPlaylists.ForeColor = App.CurrentTheme.TextColor
         TipPlayerEX.BackColor = App.CurrentTheme.BackColor
         TipPlayerEX.ForeColor = App.CurrentTheme.TextColor
         TipPlayerEX.BorderColor = App.CurrentTheme.ButtonBackColor
@@ -6695,9 +6697,7 @@ Public Class Player
     ''' Extracts playlist phrases mapped to unique keys and loads them into the speech engine off the UI thread.
     ''' </summary>
     Friend Async Sub RefreshSpeechGrammar()
-        If Not App.Settings.EnableVoiceCommands OrElse App.VoiceEngine Is Nothing Then
-            Return
-        End If
+        If Not App.Settings.EnableVoiceCommands OrElse App.VoiceEngine Is Nothing Then Return
         If LVPlaylist Is Nothing OrElse LVPlaylist.Items.Count = 0 Then
             App.VoiceEngine.ClearGrammars()
             Debug.Print("Voice Grammar cleared (playlist is empty).")

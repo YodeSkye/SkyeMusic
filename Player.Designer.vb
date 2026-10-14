@@ -110,6 +110,7 @@ Partial Class Player
         TimerStreamMeta = New Timer(components)
         DBEXLeft = New Skye.UI.DataBarEX()
         DBEXRight = New Skye.UI.DataBarEX()
+        CoBoxPlaylists = New Skye.UI.ComboBox()
         CMPlaylist.SuspendLayout()
         CMRatings.SuspendLayout()
         MenuPlayer.SuspendLayout()
@@ -135,7 +136,7 @@ Partial Class Player
         CMPlaylist.Items.AddRange(New ToolStripItem() {CMIPlay, CMIQueue, CMIPlayWithWindows, ToolStripSeparator3, CMIPlaylistAdd, CMIPlaylistRemove, CMIClearPlaylist, CMIEditTitle, ToolStripSeparator1, CMIShowCurrent, CMIRating, CMIExclude, CMIViewInLibrary, CMIEditTag, ToolStripSeparator6, CMIHelperApp1, CMIHelperApp2, CMIOpenLocation, TSSeparatorExternalTools, CMICopyTitle, CMICopyFileName, CMICopyFilePath})
         CMPlaylist.Name = "CMPlaylist"
         CMPlaylist.ShowItemToolTips = False
-        CMPlaylist.Size = New Size(217, 518)
+        CMPlaylist.Size = New Size(217, 496)
         ' 
         ' CMIPlay
         ' 
@@ -586,7 +587,7 @@ Partial Class Player
         TxtBoxPlaylistSearch.Location = New Point(441, 5)
         TxtBoxPlaylistSearch.Name = "TxtBoxPlaylistSearch"
         TxtBoxPlaylistSearch.ShortcutsEnabled = False
-        TxtBoxPlaylistSearch.Size = New Size(150, 18)
+        TxtBoxPlaylistSearch.Size = New Size(405, 18)
         TxtBoxPlaylistSearch.TabIndex = 22
         TxtBoxPlaylistSearch.TabStop = False
         TxtBoxPlaylistSearch.Text = "Search Playlist"
@@ -819,6 +820,18 @@ Partial Class Player
         DBEXRight.TabIndex = 43
         DBEXRight.TrailingGlow = True
         ' 
+        ' CoBoxPlaylists
+        ' 
+        CoBoxPlaylists.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        CoBoxPlaylists.DropDownStyle = ComboBoxStyle.DropDownList
+        CoBoxPlaylists.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        CoBoxPlaylists.FormattingEnabled = True
+        CoBoxPlaylists.ItemHeight = 19
+        CoBoxPlaylists.Location = New Point(850, 2)
+        CoBoxPlaylists.Name = "CoBoxPlaylists"
+        CoBoxPlaylists.Size = New Size(159, 25)
+        CoBoxPlaylists.TabIndex = 44
+        ' 
         ' Player
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -837,7 +850,6 @@ Partial Class Player
         Controls.Add(BtnForward)
         Controls.Add(BtnReverse)
         Controls.Add(BtnPlay)
-        Controls.Add(MenuPlayer)
         Controls.Add(LblPlaylistCount)
         Controls.Add(DBEXRight)
         Controls.Add(DBEXLeft)
@@ -848,6 +860,8 @@ Partial Class Player
         Controls.Add(VLCViewer)
         Controls.Add(PicBoxAlbumArt)
         Controls.Add(PanelMedia)
+        Controls.Add(CoBoxPlaylists)
+        Controls.Add(MenuPlayer)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         ForeColor = SystemColors.HighlightText
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -956,4 +970,5 @@ Partial Class Player
     Friend WithEvents DBEXVertLeft As Skye.UI.DataBarEX
     Friend WithEvents DBEXVertRight As Skye.UI.DataBarEX
     Friend WithEvents CMIExclude As ToolStripMenuItem
+    Friend WithEvents CoBoxPlaylists As Skye.UI.ComboBox
 End Class
