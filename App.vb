@@ -1237,8 +1237,9 @@ Namespace My
             Friend Shared PlaylistSearchAction As PlaylistActions = PlaylistActions.Play
             Friend Shared PlaylistStatusMessageDisplayTime As Byte = 8 '0 - 60, 0 = Don't display status messages.
             Friend Shared PlaylistColumns As New List(Of ListViewColumnInfo)
-            Friend Shared PlaylistSortColumn As Integer = -1 '-1 = No sort
-            Friend Shared PlaylistSortOrder As SortOrder = SortOrder.None
+            'Friend Shared PlaylistSortColumn As Integer = -1 '-1 = No sort ' Deprecated
+            'Friend Shared PlaylistSortOrder As SortOrder = SortOrder.None ' Deprecated
+            Friend Shared PlaylistSorts As New Dictionary(Of String, (Integer, SortOrder))(StringComparer.OrdinalIgnoreCase)
             Friend Shared LibraryColumns As New List(Of ListViewColumnInfo)
             Friend Shared LibrarySortColumn As Integer = -1 '-1 = No sort
             Friend Shared LibrarySortOrder As SortOrder = SortOrder.None
@@ -1439,6 +1440,7 @@ Namespace My
 
                     ' Playlist Settings
                     LoadPlaylists()
+                    LoadSortStates()
                     Try : Settings.PlaylistTitleFormat = CType([Enum].Parse(GetType(App.PlaylistTitleFormats), RegKey.GetValue("PlaylistTitleFormat", App.PlaylistTitleFormats.ArtistSong.ToString).ToString), PlaylistTitleFormats)
                     Catch : Settings.PlaylistTitleFormat = App.PlaylistTitleFormats.ArtistSong
                     End Try
@@ -1460,17 +1462,17 @@ Namespace My
                     End If
                     Dim json As String = Skye.Common.RegistryHelper.GetString("PlaylistColumns", "")
                     App.Settings.PlaylistColumns = ListViewColumnInfo.FromJson(json)
-                    Settings.PlaylistSortColumn = Skye.Common.RegistryHelper.GetInt("PlaylistSortColumn", -1)
-                    Dim sortOrderString As String = Skye.Common.RegistryHelper.GetString("PlaylistSortOrder", "None")
-                    Try
-                        Settings.PlaylistSortOrder = CType([Enum].Parse(GetType(SortOrder), sortOrderString), SortOrder)
-                    Catch
-                        Settings.PlaylistSortOrder = SortOrder.None
-                    End Try
+                    'Settings.PlaylistSortColumn = Skye.Common.RegistryHelper.GetInt("PlaylistSortColumn", -1)
+                    'Dim sortOrderString As String = Skye.Common.RegistryHelper.GetString("PlaylistSortOrder", "None")
+                    'Try
+                    '    Settings.PlaylistSortOrder = CType([Enum].Parse(GetType(SortOrder), sortOrderString), SortOrder)
+                    'Catch
+                    '    Settings.PlaylistSortOrder = SortOrder.None
+                    'End Try
                     json = Skye.Common.RegistryHelper.GetString("LibraryColumns", "")
                     App.Settings.LibraryColumns = ListViewColumnInfo.FromJson(json)
                     Settings.LibrarySortColumn = Skye.Common.RegistryHelper.GetInt("LibrarySortColumn", -1)
-                    sortOrderString = Skye.Common.RegistryHelper.GetString("LibrarySortOrder", "None")
+                    Dim sortOrderString = Skye.Common.RegistryHelper.GetString("LibrarySortOrder", "None")
                     Try
                         Settings.LibrarySortOrder = CType([Enum].Parse(GetType(SortOrder), sortOrderString), SortOrder)
                     Catch
@@ -1694,6 +1696,22 @@ Namespace My
                     Playlists.Add("Default")
                 End If
             End Sub
+            Private Shared Sub LoadSortStates()
+                PlaylistSorts.Clear()
+                Dim json As String = Skye.Common.RegistryHelper.GetString("PlaylistSortStates", "")
+                If String.IsNullOrWhiteSpace(json) Then
+                    PlaylistSorts = New Dictionary(Of String, (Integer, SortOrder))(StringComparer.OrdinalIgnoreCase)
+                Else
+                    Try
+                        Dim options As New System.Text.Json.JsonSerializerOptions With {
+                            .IncludeFields = True
+                        }
+                        PlaylistSorts = System.Text.Json.JsonSerializer.Deserialize(Of Dictionary(Of String, (Column As Integer, Order As SortOrder)))(json, options)
+                    Catch
+                        PlaylistSorts = New Dictionary(Of String, (Column As Integer, Order As SortOrder))(StringComparer.OrdinalIgnoreCase)
+                    End Try
+                End If
+            End Sub
             Friend Shared Sub LoadDebug()
 #If DEBUG Then
                 'Playlists.Add("Test")
@@ -1753,6 +1771,7 @@ Namespace My
 
                     ' Playlist Settings
                     SavePlaylists()
+                    SaveSortStates()
                     RegKey.SetValue("PlaylistTitleFormat", Settings.PlaylistTitleFormat.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("PlaylistTitleRemoveSpaces", Settings.PlaylistTitleRemoveSpaces.ToString, Microsoft.Win32.RegistryValueKind.String)
                     RegKey.SetValue("PlaylistTitleSeparator", Settings.PlaylistTitleSeparator, Microsoft.Win32.RegistryValueKind.String)
@@ -1877,6 +1896,16 @@ Namespace My
             Private Shared Sub SavePlaylists() ' Save playlists to the registry
                 Dim playlistArray As String() = Playlists.ToArray()
                 RegistryHelper.SetStringArray("Playlists", playlistArray)
+            End Sub
+            Friend Shared Sub SaveSortStates()
+                Try
+                    Dim options As New System.Text.Json.JsonSerializerOptions With {
+                        .IncludeFields = True
+                    }
+                    Dim json As String = System.Text.Json.JsonSerializer.Serialize(PlaylistSorts, options)
+                    Skye.Common.RegistryHelper.SetString("PlaylistSortStates", json)
+                Catch
+                End Try
             End Sub
         End Class
 

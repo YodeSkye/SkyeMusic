@@ -31,14 +31,10 @@ Public Class Player
     Private mMove As Boolean = False 'For Moving the Form
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Private TipPlayerEX As Skye.UI.ToolTipEX 'Tooltip for Player Controls
-    Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
     Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
-    Private TipCMPlaylist As Skye.UI.ToolTipEX 'Tooltip for Context Menu of Playlist
     Private _lastDisplayMode As DisplayMode = DisplayMode.None
     Private _lastRealState As FormWindowState = FormWindowState.Normal 'Last real state of the form (not minimized)
     Private _handledClose As Boolean = False 'Indicates if the close event has been handled
-    Private _playlistDirty As Boolean = False 'Indicates if the playlist has been modified and needs to be saved
-    Private IsLoadingPlaylistColumns As Boolean = False 'Indicates if the playlist columns are being loaded
     Friend PlayState As PlayStates = PlayStates.Stopped 'Status of the currently playing song
     Private CurrentMediaType As App.MediaSourceTypes 'Type of the current playing media
     Private Mute As Boolean = False 'True if the player is muted
@@ -47,28 +43,6 @@ Public Class Player
     Private AlbumArtIndex As Byte = 0 'Index of the current album art
     Private AlbumArt As Image = Nothing 'Current Album Art
     Private TrackBarScale As Int16 = 100 'TrackBar Scale for Position
-    Private _currentPlaylist As String = "Default" ' Private backing field for the active playlist
-    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
-    Public Property CurrentPlaylist As String ' The active playlist property that automates the save/load cycle
-        Get
-            Return _currentPlaylist
-        End Get
-        Set(value As String)
-            If Not String.IsNullOrEmpty(value) AndAlso _currentPlaylist <> value Then
-                SavePlaylist()
-                _currentPlaylist = value
-                StopVoice()
-                LoadPlaylist()
-                RefreshSpeechGrammar()
-                InitializeVoice()
-                Debug.WriteLine($"[PLAYLIST] Switched from old playlist to: {_currentPlaylist}")
-            End If
-        End Set
-    End Property
-    Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
-    Private PlaylistSearchTitle As String 'Title for Playlist Search
-    Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
-    Friend PlaylistCurrentText As String 'Text of the current playlist item
     Private RandomHistory As New Generic.List(Of String) 'History of played items for shuffle play mode
     Private RandomHistoryIndex As Integer = 0 'Index for the shuffle history
     Private CurrentAccentColor As Color 'Current Windows Accent Color
@@ -147,6 +121,36 @@ Public Class Player
             If Not String.IsNullOrWhiteSpace(_watchernotification) Then ShowStatusMessage(_watchernotification)
         End Set
     End Property
+
+    ' Playlist
+    Private _currentPlaylist As String = "Default" ' Private backing field for the active playlist
+    Private _playlistDirty As Boolean = False 'Indicates if the playlist has been modified and needs to be saved
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
+    Public Property CurrentPlaylist As String ' The active playlist property that automates the save/load cycle
+        Get
+            Return _currentPlaylist
+        End Get
+        Set(value As String)
+            If Not String.IsNullOrEmpty(value) AndAlso _currentPlaylist <> value Then
+                SavePlaylist()
+                _currentPlaylist = value
+                StopVoice()
+                LoadPlaylist()
+                ClearPlaylistTitles()
+                SetPlaylistSortState()
+                RefreshSpeechGrammar()
+                InitializeVoice()
+                Debug.WriteLine($"[PLAYLIST] Switched from old playlist to: {_currentPlaylist}")
+            End If
+        End Set
+    End Property
+    Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
+    Private PlaylistSearchTitle As String 'Title for Playlist Search
+    Private PlaylistSearchItems As New List(Of ListViewItem) 'Items found in the playlist search
+    Friend PlaylistCurrentText As String 'Text of the current playlist item
+    Private IsLoadingPlaylistColumns As Boolean = False 'Indicates if the playlist columns are being loaded
+    Private TipPlaylist As Skye.UI.ToolTipEX 'Tooltip for Playlist
+    Private TipCMPlaylist As Skye.UI.ToolTipEX 'Tooltip for Context Menu of Playlist
 
     ' Player Interface
     Private _player As Skye.Contracts.IMediaPlayer 'Media Player Interface
@@ -449,6 +453,9 @@ Public Class Player
         End Function
 
     End Class
+
+    ' Voice
+    Private ReadOnly refreshLockVoiceGrammar As New System.Threading.SemaphoreSlim(1, 1)
 
     ' Visualizer Interface
     Friend Visualizer As Boolean = False 'Indicates if the visualizer is active
@@ -2905,7 +2912,6 @@ Public Class Player
         App.ThemeMenu(CMPlaylist)
         App.ThemeMenu(CMRatings)
         CurrentPlaylist = App.Settings.Playlists(0)
-        'GetPlaylistPath("Default")
         LoadPlaylist()
         ClearPlaylistTitles()
         SetPlaylistColumns()
@@ -2915,7 +2921,6 @@ Public Class Player
 
         ' Playlists ComboBox
         RemoveHandler CoBoxPlaylists.SelectedIndexChanged, AddressOf CoBoxPlaylists_SelectedIndexChanged
-        CoBoxPlaylists.DataSource = Nothing
         CoBoxPlaylists.DataSource = App.Settings.Playlists
         CoBoxPlaylists.SelectedItem = CurrentPlaylist
         AddHandler CoBoxPlaylists.SelectedIndexChanged, AddressOf CoBoxPlaylists_SelectedIndexChanged
@@ -4755,6 +4760,20 @@ Public Class Player
     End Sub
 
     ' Playlist
+    Friend Sub SetPlaylistSelectorFromSettings()
+        _currentPlaylist = App.Settings.Playlists(0)
+        RemoveHandler CoBoxPlaylists.SelectedIndexChanged, AddressOf CoBoxPlaylists_SelectedIndexChanged
+        CoBoxPlaylists.DataSource = Nothing
+        CoBoxPlaylists.DataSource = App.Settings.Playlists
+        CoBoxPlaylists.SelectedItem = CurrentPlaylist
+        AddHandler CoBoxPlaylists.SelectedIndexChanged, AddressOf CoBoxPlaylists_SelectedIndexChanged
+        StopVoice()
+        LoadPlaylist()
+        ClearPlaylistTitles()
+        SetPlaylistSortState()
+        RefreshSpeechGrammar()
+        InitializeVoice()
+    End Sub
     Private Sub SetPlaylistColumns()
         If App.Settings.PlaylistColumns Is Nothing Then Exit Sub
         If App.Settings.PlaylistColumns.Count = 0 Then Exit Sub
@@ -4782,8 +4801,15 @@ Public Class Player
         Skye.Common.RegistryHelper.SetString("PlaylistColumns", json)
     End Sub
     Private Sub SetPlaylistSortState()
-        Dim col = App.Settings.PlaylistSortColumn
-        Dim order = App.Settings.PlaylistSortOrder
+
+        Dim activePlaylist As String = If(String.IsNullOrWhiteSpace(CurrentPlaylist), "Default", CurrentPlaylist)
+        Dim col As Integer = 0
+        Dim order As SortOrder = SortOrder.None
+        Dim sortState As (Column As Integer, Order As SortOrder)
+        If App.Settings.PlaylistSorts.TryGetValue(activePlaylist, sortState) Then
+            col = sortState.Column
+            order = sortState.Order
+        End If
         If col < 0 OrElse col >= LVPlaylist.Columns.Count Then Exit Sub
 
         Dim header = LVPlaylist.Columns(col)
@@ -4798,11 +4824,9 @@ Public Class Player
 
     End Sub
     Private Sub SavePlaylistSortState(columnIndex As Integer, order As SortOrder)
-        App.Settings.PlaylistSortColumn = columnIndex
-        App.Settings.PlaylistSortOrder = order
-
-        Skye.Common.RegistryHelper.SetInt("PlaylistSortColumn", columnIndex)
-        Skye.Common.RegistryHelper.SetString("PlaylistSortOrder", order.ToString)
+        Dim activePlaylist As String = If(String.IsNullOrWhiteSpace(CurrentPlaylist), "Default", CurrentPlaylist)
+        App.Settings.PlaylistSorts(activePlaylist) = (columnIndex, order)
+        App.Settings.SaveSortStates()
     End Sub
     Private Sub LoadPlaylist()
         Dim targetPath As String = GetPlaylistPath(CurrentPlaylist)
@@ -6697,91 +6721,105 @@ Public Class Player
     ''' </summary>
     Friend Async Sub RefreshSpeechGrammar()
         If Not App.Settings.EnableVoiceCommands OrElse App.VoiceEngine Is Nothing Then Return
-        If LVPlaylist Is Nothing OrElse LVPlaylist.Items.Count = 0 Then
-            App.VoiceEngine.ClearGrammars()
-            Debug.Print("Voice Grammar cleared (playlist is empty).")
-            Skye.Common.Log.Write("Voice Grammar Cleared, playlist is empty.")
-            Return
-        End If
-        'Debug.Print("Refreshing Voice Grammar...")
 
-        Dim starttime As TimeSpan = Computer.Clock.LocalTime.TimeOfDay
-        App.VoicePhraseToKeyMap.Clear()
-        Dim removeSpaces As Boolean = App.Settings.PlaylistTitleRemoveSpaces
-        Dim videoTag As String = App.Settings.PlaylistVideoIdentifier
-        Dim separator As String = App.Settings.PlaylistTitleSeparator
-        Dim itemSnapshots As New List(Of KeyValuePair(Of String, String))()
-        For Each item As ListViewItem In LVPlaylist.Items
-            Dim rawDisplay As String = item.Text
+        ' Ensure only one refresh runs at a time; drop or wait for concurrent calls
+        If Not Await refreshLockVoiceGrammar.WaitAsync(0) Then Return ' Skip if already refreshing
 
-            ' Read the unique identifier from the dynamic path column
-            Dim uniqueKey As String = ""
-            If item.SubItems.Count > PlaylistPathColumnIndex Then
-                uniqueKey = item.SubItems(PlaylistPathColumnIndex).Text
+        Try
+            If LVPlaylist Is Nothing OrElse LVPlaylist.Items.Count = 0 Then
+                App.VoiceEngine.ClearGrammars()
+                App.VoicePhraseToKeyMap.Clear()
+                Debug.Print("Voice Grammar cleared (playlist is empty).")
+                Skye.Common.Log.Write("Voice Grammar Cleared, playlist is empty.")
+                Return
             End If
 
-            If Not String.IsNullOrWhiteSpace(rawDisplay) AndAlso Not String.IsNullOrWhiteSpace(uniqueKey) Then
-                itemSnapshots.Add(New KeyValuePair(Of String, String)(rawDisplay, uniqueKey))
-            End If
-        Next
+            Dim starttime As TimeSpan = Computer.Clock.LocalTime.TimeOfDay
+            Dim removeSpaces As Boolean = App.Settings.PlaylistTitleRemoveSpaces
+            Dim videoTag As String = App.Settings.PlaylistVideoIdentifier
+            Dim separator As String = App.Settings.PlaylistTitleSeparator
 
-        ' 2. Parse clean phrases and map them to keys off the UI thread
-        Await Task.Run(Async Function()
-                           App.VoiceEngine.Stop()
+            ' 1. Snapshot UI items safely on the UI thread
+            Dim itemSnapshots As New List(Of KeyValuePair(Of String, String))()
+            For Each item As ListViewItem In LVPlaylist.Items
+                Dim rawDisplay As String = item.Text
+                Dim uniqueKey As String = ""
+                If item.SubItems.Count > PlaylistPathColumnIndex Then
+                    uniqueKey = item.SubItems(PlaylistPathColumnIndex).Text
+                End If
 
-                           ' Helper lambda to expand PascalCase boundaries ("TaylorSwift" -> "Taylor Swift") and clean up extra whitespace
-                           Dim expandPascalCase As Func(Of String, String) = Function(input As String)
-                                                                                 If String.IsNullOrWhiteSpace(input) Then Return ""
-                                                                                 Dim text As String = System.Text.RegularExpressions.Regex.Replace(input, "(?<=[a-z])(?=[A-Z])", " ")
-                                                                                 Return System.Text.RegularExpressions.Regex.Replace(text, "\s+", " ").Trim()
-                                                                             End Function
+                If Not String.IsNullOrWhiteSpace(rawDisplay) AndAlso Not String.IsNullOrWhiteSpace(uniqueKey) Then
+                    itemSnapshots.Add(New KeyValuePair(Of String, String)(rawDisplay, uniqueKey))
+                End If
+            Next
 
-                           For Each entry In itemSnapshots
-                               If IsStream(entry.Value) OrElse IsAudioCD(entry.Value) Then
-                                   App.VoicePhraseToKeyMap.Add(entry.Key, entry.Value)
-                               Else
-                                   Dim rawDisplay As String = entry.Key
-                                   Dim key As String = entry.Value
+            ' 2. Process phrases and build a LOCAL dictionary off the UI thread first
+            Await Task.Run(Async Function()
+                               App.VoiceEngine.Stop()
 
-                                   ' 1. Strip the video tag
-                                   If Not String.IsNullOrWhiteSpace(videoTag) Then
-                                       rawDisplay = rawDisplay.Replace(videoTag, "")
-                                   End If
+                               Dim localPhraseMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
 
-                                   ' 2. Determine how to split chunks based on the separator
-                                   Dim rawChunks As New List(Of String)()
-                                   If Not String.IsNullOrWhiteSpace(separator) AndAlso separator <> " " AndAlso rawDisplay.Contains(separator) Then
-                                       ' Symbol separator (e.g., "-", ",", "|")
-                                       rawChunks.AddRange(rawDisplay.Split(New String() {separator}, StringSplitOptions.RemoveEmptyEntries))
+                               Dim expandPascalCase As Func(Of String, String) = Function(input As String)
+                                                                                     If String.IsNullOrWhiteSpace(input) Then Return ""
+                                                                                     Dim text As String = System.Text.RegularExpressions.Regex.Replace(input, "(?<=[a-z])(?=[A-Z])", " ")
+                                                                                     Return System.Text.RegularExpressions.Regex.Replace(text, "\s+", " ").Trim()
+                                                                                 End Function
+
+                               For Each entry In itemSnapshots
+                                   If IsStream(entry.Value) OrElse IsAudioCD(entry.Value) Then
+                                       If Not localPhraseMap.ContainsKey(entry.Key) Then
+                                           localPhraseMap.Add(entry.Key, entry.Value)
+                                       End If
                                    Else
-                                       ' Space separator (" ") or no symbol: split by spaces into main blocks (Artist vs Title)
-                                       rawChunks.AddRange(rawDisplay.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries))
-                                   End If
+                                       Dim rawDisplay As String = entry.Key
+                                       Dim key As String = entry.Value
 
-                                   ' 3. Register individual chunk phrases ("Taylor Swift", "The Fate Of Ophelia")
-                                   For Each chunk In rawChunks
-                                       Dim spokenPhrase As String = expandPascalCase(chunk)
-                                       If spokenPhrase.Length > 2 AndAlso Not App.VoicePhraseToKeyMap.ContainsKey(spokenPhrase) Then
-                                           App.VoicePhraseToKeyMap.Add(spokenPhrase, key)
+                                       If Not String.IsNullOrWhiteSpace(videoTag) Then
+                                           rawDisplay = rawDisplay.Replace(videoTag, "")
+                                       End If
+
+                                       Dim rawChunks As New List(Of String)()
+                                       If Not String.IsNullOrWhiteSpace(separator) AndAlso separator <> " " AndAlso rawDisplay.Contains(separator) Then
+                                           rawChunks.AddRange(rawDisplay.Split(New String() {separator}, StringSplitOptions.RemoveEmptyEntries))
+                                       Else
+                                           rawChunks.AddRange(rawDisplay.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries))
+                                       End If
+
+                                       For Each chunk In rawChunks
+                                           Dim spokenPhrase As String = expandPascalCase(chunk)
+                                           If spokenPhrase.Length > 2 AndAlso Not localPhraseMap.ContainsKey(spokenPhrase) Then
+                                               localPhraseMap.Add(spokenPhrase, key)
+                                           End If
+                                       Next
+
+                                       Dim fullSpokenPhrase As String = expandPascalCase(rawDisplay)
+                                       If fullSpokenPhrase.Length > 2 AndAlso Not localPhraseMap.ContainsKey(fullSpokenPhrase) Then
+                                           localPhraseMap.Add(fullSpokenPhrase, key)
+                                       End If
+                                   End If
+                               Next
+
+                               ' 3. Atomically commit local map to the global App dictionary
+                               SyncLock App.VoicePhraseToKeyMap
+                                   App.VoicePhraseToKeyMap.Clear()
+                                   For Each kvp In localPhraseMap
+                                       If Not App.VoicePhraseToKeyMap.ContainsKey(kvp.Key) Then
+                                           App.VoicePhraseToKeyMap.Add(kvp.Key, kvp.Value)
                                        End If
                                    Next
+                               End SyncLock
 
-                                   ' 4. Register full combined track phrase ("Taylor Swift The Fate Of Ophelia")
-                                   Dim fullSpokenPhrase As String = expandPascalCase(rawDisplay)
-                                   If fullSpokenPhrase.Length > 2 AndAlso Not App.VoicePhraseToKeyMap.ContainsKey(fullSpokenPhrase) Then
-                                       App.VoicePhraseToKeyMap.Add(fullSpokenPhrase, key)
-                                   End If
+                               ' 4. Load grammars and restart engine safely
+                               Await App.VoiceEngine.LoadGrammarAsync()
+                               App.VoiceEngine.Start()
 
-                               End If
-                           Next
+                               Debug.Print("Voice Grammar Refreshed with " & App.VoicePhraseToKeyMap.Count & " phrases.")
+                               Skye.Common.Log.Write("Voice Grammar Refreshed with " & App.VoicePhraseToKeyMap.Count & " phrases (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
+                           End Function)
 
-                           Await App.VoiceEngine.LoadGrammarAsync()
-                           App.VoiceEngine.Start()
-
-                           Debug.Print("Voice Grammar Refreshed with " & App.VoicePhraseToKeyMap.Count & " phrases.")
-                           Skye.Common.Log.Write("Voice Grammar Refreshed with " & App.VoicePhraseToKeyMap.Count & " phrases (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
-
-                       End Function)
+        Finally
+            refreshLockVoiceGrammar.Release()
+        End Try
 
     End Sub
 
