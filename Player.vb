@@ -4272,9 +4272,7 @@ Public Class Player
 
     End Sub
     Private Sub OnPlaylistChanged() Handles Me.PlaylistChanged
-        ' 1. Always mark dirty so the local XML file auto-saves
         MarkPlaylistDirty()
-        ' 2. Broadcast to Companion Server if enabled
         If App.Settings.EnableCompanionServer Then
             BuildPlaylistJson()
             App.CompanionControlServer.Broadcast("PLAYLIST_CHANGED")
@@ -4808,13 +4806,13 @@ Public Class Player
     End Sub
     Private Sub LoadPlaylist()
         Dim targetPath As String = GetPlaylistPath(CurrentPlaylist)
+        LVPlaylist.Items.Clear()
 
         If My.Computer.FileSystem.FileExists(targetPath) Then
             Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
             Dim reader As New System.Xml.Serialization.XmlSerializer(GetType(System.Collections.Generic.List(Of App.PlaylistTrackType)))
             Dim file As New IO.FileStream(targetPath, IO.FileMode.Open)
             Dim items As System.Collections.Generic.List(Of App.PlaylistTrackType)
-            LVPlaylist.Items.Clear()
             Try
                 items = DirectCast(reader.Deserialize(file), System.Collections.Generic.List(Of App.PlaylistTrackType))
                 For Each item As App.PlaylistTrackType In items
@@ -4841,8 +4839,9 @@ Public Class Player
                 Skye.Common.Log.Write("Playlist Loaded (" + Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) + ")")
             End If
         Else
-            Skye.Common.Log.Write("Playlist Not Loaded: File does not exist (" + targetPath + ")")
+            'Skye.Common.Log.Write("Playlist Not Loaded: File does not exist (" + targetPath + ")")
         End If
+
         SetPlaylistCountText()
     End Sub
     Private Sub SavePlaylist()
@@ -6728,6 +6727,7 @@ Public Class Player
 
         ' 2. Parse clean phrases and map them to keys off the UI thread
         Await Task.Run(Async Function()
+                           App.VoiceEngine.Stop()
 
                            ' Helper lambda to expand PascalCase boundaries ("TaylorSwift" -> "Taylor Swift") and clean up extra whitespace
                            Dim expandPascalCase As Func(Of String, String) = Function(input As String)
