@@ -106,6 +106,13 @@ Partial Class Options
         LblVisualizers = New Skye.UI.Label()
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         LBPlaylists = New ListBox()
+        CMPlaylists = New ContextMenuStrip(components)
+        CMIPlaylistsAdd = New ToolStripMenuItem()
+        CMIPlaylistsEdit = New ToolStripMenuItem()
+        CMIPlaylistsRemove = New ToolStripMenuItem()
+        ToolStripSeparator1 = New ToolStripSeparator()
+        CMIPlaylistsMoveUp = New ToolStripMenuItem()
+        CMIPlaylistsMoveDown = New ToolStripMenuItem()
         LblPlaylists = New Label()
         TxtBoxStatusMessageDisplayTime = New TextBox()
         lblStatusMessageDisplayTime1 = New Skye.UI.Label()
@@ -116,7 +123,6 @@ Partial Class Options
         CkBoxWatchFolders = New CheckBox()
         LblLibrarySearchFolders = New Label()
         TipOptions = New Skye.UI.ToolTipEX(components)
-        CMPlaylists = New ContextMenuStrip(components)
         TipError = New Skye.UI.ToolTipEX(components)
         GrBoxTime.SuspendLayout()
         CMLibrarySearchFolders.SuspendLayout()
@@ -127,6 +133,7 @@ Partial Class Options
         GrBoxShowNowPlayingToast.SuspendLayout()
         TPVisualizers.SuspendLayout()
         TPPlaylist.SuspendLayout()
+        CMPlaylists.SuspendLayout()
         TPLibrary.SuspendLayout()
         SuspendLayout()
         ' 
@@ -365,12 +372,12 @@ Partial Class Options
         ' 
         ' CMLibrarySearchFolders
         ' 
-        CMLibrarySearchFolders.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        CMLibrarySearchFolders.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipOptions.SetImage(CMLibrarySearchFolders, Nothing)
         TipError.SetImage(CMLibrarySearchFolders, Nothing)
         CMLibrarySearchFolders.Items.AddRange(New ToolStripItem() {CMILibrarySearchFoldersAdd, CMILibrarySearchFoldersRemove})
         CMLibrarySearchFolders.Name = "CMLibrarySearchFolders"
-        CMLibrarySearchFolders.Size = New Size(165, 48)
+        CMLibrarySearchFolders.Size = New Size(186, 56)
         TipOptions.SetText(CMLibrarySearchFolders, Nothing)
         TipError.SetText(CMLibrarySearchFolders, Nothing)
         ' 
@@ -378,14 +385,14 @@ Partial Class Options
         ' 
         CMILibrarySearchFoldersAdd.Image = My.Resources.Resources.ImageAdd16
         CMILibrarySearchFoldersAdd.Name = "CMILibrarySearchFoldersAdd"
-        CMILibrarySearchFoldersAdd.Size = New Size(164, 22)
+        CMILibrarySearchFoldersAdd.Size = New Size(185, 26)
         CMILibrarySearchFoldersAdd.Text = "Add Folder"
         ' 
         ' CMILibrarySearchFoldersRemove
         ' 
         CMILibrarySearchFoldersRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMILibrarySearchFoldersRemove.Name = "CMILibrarySearchFoldersRemove"
-        CMILibrarySearchFoldersRemove.Size = New Size(164, 22)
+        CMILibrarySearchFoldersRemove.Size = New Size(185, 26)
         CMILibrarySearchFoldersRemove.Text = "Remove Folder"
         ' 
         ' CkBoxSaveWindowMetrics
@@ -1396,6 +1403,57 @@ Partial Class Options
         TipOptions.SetText(LBPlaylists, "Add your music folders here, the Library uses this list to find your music." & vbCrLf & "Right-Click for options.")
         TipError.SetText(LBPlaylists, Nothing)
         ' 
+        ' CMPlaylists
+        ' 
+        CMPlaylists.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipOptions.SetImage(CMPlaylists, Nothing)
+        TipError.SetImage(CMPlaylists, Nothing)
+        CMPlaylists.Items.AddRange(New ToolStripItem() {CMIPlaylistsAdd, CMIPlaylistsEdit, CMIPlaylistsRemove, ToolStripSeparator1, CMIPlaylistsMoveUp, CMIPlaylistsMoveDown})
+        CMPlaylists.Name = "CMPlaylists"
+        CMPlaylists.Size = New Size(181, 162)
+        TipOptions.SetText(CMPlaylists, Nothing)
+        TipError.SetText(CMPlaylists, Nothing)
+        ' 
+        ' CMIPlaylistsAdd
+        ' 
+        CMIPlaylistsAdd.Image = My.Resources.Resources.ImageAdd16
+        CMIPlaylistsAdd.Name = "CMIPlaylistsAdd"
+        CMIPlaylistsAdd.Size = New Size(180, 26)
+        CMIPlaylistsAdd.Text = "Add"
+        ' 
+        ' CMIPlaylistsEdit
+        ' 
+        CMIPlaylistsEdit.Image = My.Resources.Resources.ImageEdit16
+        CMIPlaylistsEdit.Name = "CMIPlaylistsEdit"
+        CMIPlaylistsEdit.Size = New Size(180, 26)
+        CMIPlaylistsEdit.Text = "Edit"
+        ' 
+        ' CMIPlaylistsRemove
+        ' 
+        CMIPlaylistsRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
+        CMIPlaylistsRemove.Name = "CMIPlaylistsRemove"
+        CMIPlaylistsRemove.Size = New Size(180, 26)
+        CMIPlaylistsRemove.Text = "Remove"
+        ' 
+        ' ToolStripSeparator1
+        ' 
+        ToolStripSeparator1.Name = "ToolStripSeparator1"
+        ToolStripSeparator1.Size = New Size(177, 6)
+        ' 
+        ' CMIPlaylistsMoveUp
+        ' 
+        CMIPlaylistsMoveUp.Image = My.Resources.Resources.ImageMoveUp
+        CMIPlaylistsMoveUp.Name = "CMIPlaylistsMoveUp"
+        CMIPlaylistsMoveUp.Size = New Size(180, 26)
+        CMIPlaylistsMoveUp.Text = "Move Up"
+        ' 
+        ' CMIPlaylistsMoveDown
+        ' 
+        CMIPlaylistsMoveDown.Image = My.Resources.Resources.ImageMoveDown
+        CMIPlaylistsMoveDown.Name = "CMIPlaylistsMoveDown"
+        CMIPlaylistsMoveDown.Size = New Size(180, 26)
+        CMIPlaylistsMoveDown.Text = "Move Down"
+        ' 
         ' LblPlaylists
         ' 
         LblPlaylists.AutoSize = True
@@ -1552,15 +1610,6 @@ Partial Class Options
         TipOptions.ShadowThickness = 0
         TipOptions.ShowDelay = 1000
         ' 
-        ' CMPlaylists
-        ' 
-        TipOptions.SetImage(CMPlaylists, Nothing)
-        TipError.SetImage(CMPlaylists, Nothing)
-        CMPlaylists.Name = "CMPlaylists"
-        CMPlaylists.Size = New Size(61, 4)
-        TipOptions.SetText(CMPlaylists, Nothing)
-        TipError.SetText(CMPlaylists, Nothing)
-        ' 
         ' TipError
         ' 
         TipError.FadeInRate = 25
@@ -1605,6 +1654,7 @@ Partial Class Options
         TPVisualizers.ResumeLayout(False)
         TPPlaylist.ResumeLayout(False)
         TPPlaylist.PerformLayout()
+        CMPlaylists.ResumeLayout(False)
         TPLibrary.ResumeLayout(False)
         TPLibrary.PerformLayout()
         ResumeLayout(False)
@@ -1704,4 +1754,10 @@ Partial Class Options
     Friend WithEvents LBPlaylists As ListBox
     Friend WithEvents LblPlaylists As Label
     Friend WithEvents CMPlaylists As ContextMenuStrip
+    Friend WithEvents CMIPlaylistsAdd As ToolStripMenuItem
+    Friend WithEvents CMIPlaylistsEdit As ToolStripMenuItem
+    Friend WithEvents CMIPlaylistsRemove As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
+    Friend WithEvents CMIPlaylistsMoveUp As ToolStripMenuItem
+    Friend WithEvents CMIPlaylistsMoveDown As ToolStripMenuItem
 End Class
