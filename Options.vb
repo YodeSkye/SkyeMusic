@@ -114,6 +114,7 @@ Public Class Options
         TxtBoxPlaylistTitleSeparator.Text = Settings.PlaylistTitleSeparator
         TxtBoxPlaylistVideoIdentifier.Text = Settings.PlaylistVideoIdentifier
         TxtBoxStatusMessageDisplayTime.Text = Settings.PlaylistStatusMessageDisplayTime.ToString
+        ShowPlaylists()
         LBLibrarySearchFolders.Items.Clear()
         For Each item In Settings.LibrarySearchFolders
             LBLibrarySearchFolders.Items.Add(item)
@@ -616,6 +617,12 @@ Public Class Options
         App.Settings.VoicePushToTalk = Not App.Settings.VoicePushToTalk
         SetVoiceSettingsState()
     End Sub
+    Private Sub LBPlaylists_KeyDown(sender As Object, e As KeyEventArgs) Handles LBPlaylists.KeyDown
+
+    End Sub
+    Private Sub LBPlaylists_MouseDown(sender As Object, e As MouseEventArgs) Handles LBPlaylists.MouseDown
+
+    End Sub
     Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
         If e.Alt Then
         ElseIf e.Control Then
@@ -633,8 +640,6 @@ Public Class Options
                 Case Keys.Left
                 Case Keys.Right
                 Case Keys.Space
-                    'TogglePlay()
-                    'e.SuppressKeyPress = True
                 Case Keys.OemQuestion
                 Case Keys.PageUp
                 Case Keys.PageDown
@@ -650,17 +655,17 @@ Public Class Options
             LBLibrarySearchFolders.SelectedIndex = LBLibrarySearchFolders.IndexFromPoint(e.X, e.Y)
         End If
     End Sub
-    Private Sub CMLibrarySearchFolders_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMLibrarySearchFolders.Opening
+    Private Sub CMLibrarySearchFolders_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
         If LBLibrarySearchFolders.SelectedItems.Count = 0 Then
             CMILibrarySearchFoldersRemove.Enabled = False
         Else
             CMILibrarySearchFoldersRemove.Enabled = True
         End If
     End Sub
-    Private Sub CMILibrarySearchFoldersAddClick(sender As Object, e As EventArgs) Handles CMILibrarySearchFoldersAdd.Click
+    Private Sub CMILibrarySearchFoldersAddClick(sender As Object, e As EventArgs)
         LibrarySearchFoldersAdd()
     End Sub
-    Private Sub CMILibrarySearchFoldersRemoveClick(sender As Object, e As EventArgs) Handles CMILibrarySearchFoldersRemove.Click
+    Private Sub CMILibrarySearchFoldersRemoveClick(sender As Object, e As EventArgs)
         LibrarySearchFoldersRemove()
     End Sub
 
@@ -685,6 +690,17 @@ Public Class Options
             App.Settings.LibrarySearchFolders.Add(item.ToString)
         Next
         App.SetWatchers()
+    End Sub
+    Private Sub ShowPlaylists()
+        LBPlaylists.DataSource = Nothing
+        LBPlaylists.DataSource = App.Settings.Playlists
+    End Sub
+    Private Sub SetPlaylists()
+        App.Settings.Playlists.Clear()
+        For Each item In LBPlaylists.Items
+            App.Settings.Playlists.Add(item.ToString)
+        Next
+        'update FrmPlayer
     End Sub
     Private Sub SetPrunePlaylistButtonText()
         BtnPrunePlaylist.Text = BtnPrunePlaylist.Text.TrimEnd(App.TrimEndSearch) + " (" + App.FrmPlayer.LVPlaylist.Items.Count.ToString + ")"
@@ -849,6 +865,8 @@ Public Class Options
         TxtBoxPlaylistVideoIdentifier.ForeColor = App.CurrentTheme.TextColor
         TxtBoxStatusMessageDisplayTime.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxStatusMessageDisplayTime.ForeColor = App.CurrentTheme.TextColor
+        LBPlaylists.BackColor = App.CurrentTheme.ControlBackColor
+        LBPlaylists.ForeColor = App.CurrentTheme.TextColor
         LBLibrarySearchFolders.BackColor = App.CurrentTheme.ControlBackColor
         LBLibrarySearchFolders.ForeColor = App.CurrentTheme.TextColor
         TxtBoxHelperApp1Name.BackColor = App.CurrentTheme.ControlBackColor
@@ -869,6 +887,7 @@ Public Class Options
         LblPlaylistSearchAction.ForeColor = forecolor
         LblTheme.ForeColor = forecolor
         LblLibrarySearchFolders.ForeColor = forecolor
+        LblPlaylists.ForeColor = forecolor
         LblPlaylistFormatting.ForeColor = forecolor
         LblTitleFormat.ForeColor = forecolor
         LblTitleSeparator.ForeColor = forecolor
@@ -929,6 +948,7 @@ Public Class Options
         'Debug.Print("Options Theme Set")
     End Sub
     Private Sub ReThemeMenus()
+        App.ThemeMenu(CMPlaylists)
         App.ThemeMenu(CMLibrarySearchFolders)
         App.ThemeMenu(CMTxtBox)
     End Sub

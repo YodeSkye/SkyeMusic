@@ -105,6 +105,8 @@ Partial Class Options
         CoBoxVisualizers = New ComboBox()
         LblVisualizers = New Skye.UI.Label()
         TPPlaylist = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        LBPlaylists = New ListBox()
+        LblPlaylists = New Label()
         TxtBoxStatusMessageDisplayTime = New TextBox()
         lblStatusMessageDisplayTime1 = New Skye.UI.Label()
         lblStatusMessageDisplayTime2 = New Skye.UI.Label()
@@ -114,6 +116,7 @@ Partial Class Options
         CkBoxWatchFolders = New CheckBox()
         LblLibrarySearchFolders = New Label()
         TipOptions = New Skye.UI.ToolTipEX(components)
+        CMPlaylists = New ContextMenuStrip(components)
         TipError = New Skye.UI.ToolTipEX(components)
         GrBoxTime.SuspendLayout()
         CMLibrarySearchFolders.SuspendLayout()
@@ -1345,6 +1348,8 @@ Partial Class Options
         ' TPPlaylist
         ' 
         TPPlaylist.BorderStyle = BorderStyle.Fixed3D
+        TPPlaylist.Controls.Add(LBPlaylists)
+        TPPlaylist.Controls.Add(LblPlaylists)
         TPPlaylist.Controls.Add(TxtBoxStatusMessageDisplayTime)
         TPPlaylist.Controls.Add(lblStatusMessageDisplayTime1)
         TPPlaylist.Controls.Add(BtnPrunePlaylist)
@@ -1374,6 +1379,35 @@ Partial Class Options
         TipOptions.SetText(TPPlaylist, Nothing)
         TPPlaylist.Text = " Playlist "
         TPPlaylist.ThemesEnabled = False
+        ' 
+        ' LBPlaylists
+        ' 
+        LBPlaylists.BackColor = SystemColors.Window
+        LBPlaylists.ContextMenuStrip = CMPlaylists
+        LBPlaylists.Font = New Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LBPlaylists.FormattingEnabled = True
+        TipError.SetImage(LBPlaylists, Nothing)
+        TipOptions.SetImage(LBPlaylists, Nothing)
+        LBPlaylists.Location = New Point(567, 171)
+        LBPlaylists.Name = "LBPlaylists"
+        LBPlaylists.Size = New Size(234, 88)
+        LBPlaylists.Sorted = True
+        LBPlaylists.TabIndex = 1001
+        TipOptions.SetText(LBPlaylists, "Add your music folders here, the Library uses this list to find your music." & vbCrLf & "Right-Click for options.")
+        TipError.SetText(LBPlaylists, Nothing)
+        ' 
+        ' LblPlaylists
+        ' 
+        LblPlaylists.AutoSize = True
+        TipError.SetImage(LblPlaylists, Nothing)
+        TipOptions.SetImage(LblPlaylists, Nothing)
+        LblPlaylists.Location = New Point(566, 150)
+        LblPlaylists.Name = "LblPlaylists"
+        LblPlaylists.Size = New Size(66, 21)
+        LblPlaylists.TabIndex = 1002
+        TipError.SetText(LblPlaylists, Nothing)
+        LblPlaylists.Text = "Playlists"
+        TipOptions.SetText(LblPlaylists, Nothing)
         ' 
         ' TxtBoxStatusMessageDisplayTime
         ' 
@@ -1518,6 +1552,15 @@ Partial Class Options
         TipOptions.ShadowThickness = 0
         TipOptions.ShowDelay = 1000
         ' 
+        ' CMPlaylists
+        ' 
+        TipOptions.SetImage(CMPlaylists, Nothing)
+        TipError.SetImage(CMPlaylists, Nothing)
+        CMPlaylists.Name = "CMPlaylists"
+        CMPlaylists.Size = New Size(61, 4)
+        TipOptions.SetText(CMPlaylists, Nothing)
+        TipError.SetText(CMPlaylists, Nothing)
+        ' 
         ' TipError
         ' 
         TipError.FadeInRate = 25
@@ -1658,4 +1701,7 @@ Partial Class Options
     Friend WithEvents ChkBoxEnableVoiceCommands As CheckBox
     Friend WithEvents ChkBoxEnableVoicePushToTalk As CheckBox
     Friend WithEvents TxtBoxVoicePushToTalk As TextBox
+    Friend WithEvents LBPlaylists As ListBox
+    Friend WithEvents LblPlaylists As Label
+    Friend WithEvents CMPlaylists As ContextMenuStrip
 End Class
