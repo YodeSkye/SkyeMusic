@@ -4689,6 +4689,21 @@ Namespace My
                 Return False
             End Try
         End Function
+        Friend Function GetPlaylistPath(playlistName As String) As String
+            Dim devSuffix As String = ""
+#If DEBUG Then
+            devSuffix = "DEV"
+#End If
+            ' Special rule for your legacy default file name
+            If playlistName.Equals("Default", StringComparison.OrdinalIgnoreCase) Then
+                'Debug.Print(Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}.xml"))
+                Return Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}.xml")
+            End If
+            ' Standard rule for any custom user playlist names
+            Dim safeName As String = String.Join("_", playlistName.Split(Path.GetInvalidFileNameChars()))
+            'Debug.Print(Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}_{safeName}.xml"))
+            Return Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}_{safeName}.xml")
+        End Function
 
         ' History Methods
         Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)

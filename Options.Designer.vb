@@ -1398,7 +1398,6 @@ Partial Class Options
         LBPlaylists.Location = New Point(567, 171)
         LBPlaylists.Name = "LBPlaylists"
         LBPlaylists.Size = New Size(234, 88)
-        LBPlaylists.Sorted = True
         LBPlaylists.TabIndex = 1001
         TipOptions.SetText(LBPlaylists, "Add your music folders here, the Library uses this list to find your music." & vbCrLf & "Right-Click for options.")
         TipError.SetText(LBPlaylists, Nothing)
@@ -1410,7 +1409,7 @@ Partial Class Options
         TipError.SetImage(CMPlaylists, Nothing)
         CMPlaylists.Items.AddRange(New ToolStripItem() {CMIPlaylistsAdd, CMIPlaylistsEdit, CMIPlaylistsRemove, ToolStripSeparator1, CMIPlaylistsMoveUp, CMIPlaylistsMoveDown})
         CMPlaylists.Name = "CMPlaylists"
-        CMPlaylists.Size = New Size(181, 162)
+        CMPlaylists.Size = New Size(165, 140)
         TipOptions.SetText(CMPlaylists, Nothing)
         TipError.SetText(CMPlaylists, Nothing)
         ' 
@@ -1418,40 +1417,40 @@ Partial Class Options
         ' 
         CMIPlaylistsAdd.Image = My.Resources.Resources.ImageAdd16
         CMIPlaylistsAdd.Name = "CMIPlaylistsAdd"
-        CMIPlaylistsAdd.Size = New Size(180, 26)
+        CMIPlaylistsAdd.Size = New Size(164, 26)
         CMIPlaylistsAdd.Text = "Add"
         ' 
         ' CMIPlaylistsEdit
         ' 
         CMIPlaylistsEdit.Image = My.Resources.Resources.ImageEdit16
         CMIPlaylistsEdit.Name = "CMIPlaylistsEdit"
-        CMIPlaylistsEdit.Size = New Size(180, 26)
+        CMIPlaylistsEdit.Size = New Size(164, 26)
         CMIPlaylistsEdit.Text = "Edit"
         ' 
         ' CMIPlaylistsRemove
         ' 
         CMIPlaylistsRemove.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMIPlaylistsRemove.Name = "CMIPlaylistsRemove"
-        CMIPlaylistsRemove.Size = New Size(180, 26)
+        CMIPlaylistsRemove.Size = New Size(164, 26)
         CMIPlaylistsRemove.Text = "Remove"
         ' 
         ' ToolStripSeparator1
         ' 
         ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New Size(177, 6)
+        ToolStripSeparator1.Size = New Size(161, 6)
         ' 
         ' CMIPlaylistsMoveUp
         ' 
         CMIPlaylistsMoveUp.Image = My.Resources.Resources.ImageMoveUp
         CMIPlaylistsMoveUp.Name = "CMIPlaylistsMoveUp"
-        CMIPlaylistsMoveUp.Size = New Size(180, 26)
+        CMIPlaylistsMoveUp.Size = New Size(164, 26)
         CMIPlaylistsMoveUp.Text = "Move Up"
         ' 
         ' CMIPlaylistsMoveDown
         ' 
         CMIPlaylistsMoveDown.Image = My.Resources.Resources.ImageMoveDown
         CMIPlaylistsMoveDown.Name = "CMIPlaylistsMoveDown"
-        CMIPlaylistsMoveDown.Size = New Size(180, 26)
+        CMIPlaylistsMoveDown.Size = New Size(164, 26)
         CMIPlaylistsMoveDown.Text = "Move Down"
         ' 
         ' LblPlaylists

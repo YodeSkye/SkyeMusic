@@ -123,7 +123,7 @@ Public Class Player
     End Property
 
     ' Playlist
-    Private _currentPlaylist As String = "Default" ' Private backing field for the active playlist
+    Private _currentPlaylist As String = Nothing ' Private backing field for the active playlist
     Private _playlistDirty As Boolean = False 'Indicates if the playlist has been modified and needs to be saved
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
     Public Property CurrentPlaylist As String ' The active playlist property that automates the save/load cycle
@@ -131,17 +131,25 @@ Public Class Player
             Return _currentPlaylist
         End Get
         Set(value As String)
-            If Not String.IsNullOrEmpty(value) AndAlso _currentPlaylist <> value Then
+            If String.IsNullOrEmpty(value) Then Return
+            If _currentPlaylist = value Then Return ' No change needed
+
+            ' CRITICAL STARTUP GUARD:
+            ' If _currentPlaylist is empty/null, this is the initial startup assignment. 
+            ' Do NOT run SavePlaylist() here, because there is no previous playlist to save!
+            If Not String.IsNullOrEmpty(_currentPlaylist) Then
                 SavePlaylist()
-                _currentPlaylist = value
-                StopVoice()
-                LoadPlaylist()
-                ClearPlaylistTitles()
-                SetPlaylistSortState()
-                RefreshSpeechGrammar()
-                InitializeVoice()
-                Debug.WriteLine($"[PLAYLIST] Switched from old playlist to: {_currentPlaylist}")
             End If
+
+            _currentPlaylist = value
+
+            StopVoice()
+            LoadPlaylist()
+            ClearPlaylistTitles()
+            SetPlaylistSortState()
+            RefreshSpeechGrammar()
+            InitializeVoice()
+            Debug.WriteLine($"[PLAYLIST] Switched to: {_currentPlaylist}")
         End Set
     End Property
     Private PlaylistItemMove As ListViewItem 'Item being moved in the playlist
@@ -4829,7 +4837,7 @@ Public Class Player
         App.Settings.SaveSortStates()
     End Sub
     Private Sub LoadPlaylist()
-        Dim targetPath As String = GetPlaylistPath(CurrentPlaylist)
+        Dim targetPath As String = App.GetPlaylistPath(CurrentPlaylist)
         LVPlaylist.Items.Clear()
 
         If My.Computer.FileSystem.FileExists(targetPath) Then
@@ -4869,7 +4877,7 @@ Public Class Player
         SetPlaylistCountText()
     End Sub
     Private Sub SavePlaylist()
-        Dim targetPath As String = GetPlaylistPath(CurrentPlaylist)
+        Dim targetPath As String = App.GetPlaylistPath(CurrentPlaylist)
 
         If LVPlaylist.Items.Count = 0 Then
             If My.Computer.FileSystem.FileExists(targetPath) Then My.Computer.FileSystem.DeleteFile(targetPath)
@@ -5435,21 +5443,6 @@ Public Class Player
         Next
 
         Return Nothing
-    End Function
-    Private Function GetPlaylistPath(playlistName As String) As String
-        Dim devSuffix As String = ""
-#If DEBUG Then
-        devSuffix = "DEV"
-#End If
-        ' Special rule for your legacy default file name
-        If playlistName.Equals("Default", StringComparison.OrdinalIgnoreCase) Then
-            'Debug.Print(Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}.xml"))
-            Return Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}.xml")
-        End If
-        ' Standard rule for any custom user playlist names
-        Dim safeName As String = String.Join("_", playlistName.Split(Path.GetInvalidFileNameChars()))
-        'Debug.Print(Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}_{safeName}.xml"))
-        Return Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}_{safeName}.xml")
     End Function
 
     ' Queue

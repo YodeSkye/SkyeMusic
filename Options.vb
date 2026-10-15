@@ -8,6 +8,7 @@ Public Class Options
     ' Declarations
     Private UIFolderBrowser As New FolderBrowserDialog
     Private uiFileBrowser As New OpenFileDialog
+    Private _playlistsDirty As Boolean
 
     ' Form Events
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
@@ -180,6 +181,9 @@ Public Class Options
         App.EnableFormDragging(Me)
     End Sub
     Private Sub Options_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        If _playlistsDirty Then
+            FrmPlayer?.SetPlaylistSelectorFromSettings()
+        End If
         App.Settings.Save()
         App.FrmPlayer.ShowPlayMode()
         App.DisableFormDragging(Me)
@@ -618,10 +622,36 @@ Public Class Options
         SetVoiceSettingsState()
     End Sub
     Private Sub LBPlaylists_KeyDown(sender As Object, e As KeyEventArgs) Handles LBPlaylists.KeyDown
-
+        If e.Alt Then
+        ElseIf e.Control Then
+            Select Case e.KeyCode
+            End Select
+        ElseIf e.Shift Then
+            Select Case e.KeyCode
+            End Select
+        Else
+            Select Case e.KeyCode
+                Case Keys.Enter
+                Case Keys.Escape
+                Case Keys.End
+                Case Keys.Up
+                Case Keys.Left
+                Case Keys.Right
+                Case Keys.Space
+                Case Keys.OemQuestion
+                Case Keys.PageUp
+                Case Keys.PageDown
+                Case Keys.Home
+                Case Keys.Delete
+                    PlaylistsRemove()
+                Case Keys.Insert
+            End Select
+        End If
     End Sub
     Private Sub LBPlaylists_MouseDown(sender As Object, e As MouseEventArgs) Handles LBPlaylists.MouseDown
-
+        If e.Button = MouseButtons.Right Then
+            LBPlaylists.SelectedIndex = LBPlaylists.IndexFromPoint(e.X, e.Y)
+        End If
     End Sub
     Private Sub LBLibrarySearchFoldersKeyDown(sender As Object, e As KeyEventArgs) Handles LBLibrarySearchFolders.KeyDown
         If e.Alt Then
@@ -655,6 +685,39 @@ Public Class Options
             LBLibrarySearchFolders.SelectedIndex = LBLibrarySearchFolders.IndexFromPoint(e.X, e.Y)
         End If
     End Sub
+    Private Sub CMPlaylists_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylists.Opening
+        If LBPlaylists.SelectedItems.Count = 0 Then
+            CMIPlaylistsEdit.Enabled = False
+            CMIPlaylistsRemove.Enabled = False
+            CMIPlaylistsMoveUp.Enabled = False
+            CMIPlaylistsMoveDown.Enabled = False
+        Else
+            CMIPlaylistsEdit.Enabled = True
+            If LBPlaylists.Items.Count = 1 Then
+                CMIPlaylistsRemove.Enabled = False
+            Else
+                CMIPlaylistsRemove.Enabled = True
+            End If
+            CMIPlaylistsMoveUp.Enabled = True
+            CMIPlaylistsMoveDown.Enabled = True
+        End If
+
+    End Sub
+    Private Sub CMIPlaylistsAdd_Click(sender As Object, e As EventArgs) Handles CMIPlaylistsAdd.Click
+        PlaylistsAdd()
+    End Sub
+    Private Sub CMIPlaylistsEdit_Click(sender As Object, e As EventArgs) Handles CMIPlaylistsEdit.Click
+        PlaylistsEdit()
+    End Sub
+    Private Sub CMIPlaylistsRemove_Click(sender As Object, e As EventArgs) Handles CMIPlaylistsRemove.Click
+        PlaylistsRemove()
+    End Sub
+    Private Sub CMIPlaylistsMoveUp_Click(sender As Object, e As EventArgs) Handles CMIPlaylistsMoveUp.Click
+
+    End Sub
+    Private Sub CMIPlaylistsMoveDown_Click(sender As Object, e As EventArgs) Handles CMIPlaylistsMoveDown.Click
+
+    End Sub
     Private Sub CMLibrarySearchFolders_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
         If LBLibrarySearchFolders.SelectedItems.Count = 0 Then
             CMILibrarySearchFoldersRemove.Enabled = False
@@ -670,6 +733,114 @@ Public Class Options
     End Sub
 
     ' Methods
+    Private Sub ShowPlaylists()
+        LBPlaylists.DataSource = Nothing
+        LBPlaylists.DataSource = App.Settings.Playlists
+    End Sub
+    Private Sub PlaylistsAdd()
+        Dim newName As String = InputDialog.ShowDialog("Add Playlist", "Enter a name for the new playlist:")
+        If Not String.IsNullOrEmpty(newName) Then
+            newName = newName.Trim()
+            ' Check for duplicates
+            If App.Settings.Playlists.Contains(newName, StringComparer.OrdinalIgnoreCase) Then
+                App.ShowToast("Duplicate Name", "A playlist with that name already exists.")
+                LBPlaylists.Focus()
+                Return
+            End If
+            App.Settings.Playlists.Add(newName)
+            _playlistsDirty = True
+            ShowPlaylists()
+            LBPlaylists.SelectedItem = newName
+            LBPlaylists.Focus()
+        End If
+    End Sub
+    Private Sub PlaylistsEdit()
+        If LBPlaylists.SelectedIndex = -1 Then Return
+
+        Dim oldName As String = LBPlaylists.SelectedItem.ToString()
+        Dim newName As String = InputDialog.ShowDialog("Rename Playlist", "Enter a new name:", oldName)
+        If Not String.IsNullOrEmpty(newName) Then
+            newName = newName.Trim()
+            If String.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase) Then
+                Return ' No change made
+            End If
+            ' Check for duplicates
+            If App.Settings.Playlists.Contains(newName, StringComparer.OrdinalIgnoreCase) Then
+                App.ShowToast("Duplicate Name", "A playlist with that name already exists.")
+                LBPlaylists.Focus()
+                Return
+            End If
+            Dim index As Integer = LBPlaylists.SelectedIndex
+            App.Settings.Playlists(index) = newName
+            _playlistsDirty = True
+            ShowPlaylists()
+            LBPlaylists.SelectedItem = newName
+            LBPlaylists.Focus()
+
+            Dim oldPath As String = App.GetPlaylistPath(oldName) ' Gets "playlist.xml" if oldName is "Default"
+            Dim newPath As String = App.GetPlaylistPath(newName) ' Gets "[NewName].xml"
+            ' 1. Move/Rename the file on disk if it exists
+            If My.Computer.FileSystem.FileExists(oldPath) Then
+                ' If the new target file already exists, handle it or overwrite
+                If My.Computer.FileSystem.FileExists(newPath) Then
+                    My.Computer.FileSystem.DeleteFile(newPath)
+                End If
+                My.Computer.FileSystem.MoveFile(oldPath, newPath)
+            End If
+            ' 2. Transfer sort states in dictionary
+            If App.Settings.PlaylistSorts.ContainsKey(oldName) Then
+                App.Settings.PlaylistSorts(newName) = App.Settings.PlaylistSorts(oldName)
+                App.Settings.PlaylistSorts.Remove(oldName)
+                App.Settings.SaveSortStates()
+            End If
+
+        End If
+    End Sub
+    Private Sub PlaylistsRemove()
+        If LBPlaylists.SelectedIndex = -1 Then Return
+        ' 1. Guardrail: Enforce minimum of one playlist
+        If App.Settings.Playlists.Count <= 1 Then
+            App.ShowToast("Cannot Delete", "You must keep at least one playlist.")
+            LBPlaylists.Focus()
+            Return
+        End If
+
+        Dim playlistName As String = LBPlaylists.SelectedItem.ToString()
+
+        ' Confirm deletion so they don't accidentally wipe a playlist
+        Dim result As DialogResult = MessageBox.Show(
+        $"Are you sure you want to delete '{playlistName}' and its saved tracks?",
+        "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        If result <> DialogResult.Yes Then Return
+
+        ' Remove from the List
+        App.Settings.Playlists.Remove(playlistName)
+        _playlistsDirty = True
+        ShowPlaylists()
+
+        ' Select the first item so the selection doesn't drop to -1 awkwardly
+        If LBPlaylists.Items.Count > 0 Then
+            LBPlaylists.SelectedIndex = 0
+        End If
+        LBPlaylists.Focus()
+
+        ' Delete the XML file from disk (handles "Default" legacy path too via GetPlaylistPath)
+        Dim filePath As String = App.GetPlaylistPath(playlistName)
+        If My.Computer.FileSystem.FileExists(filePath) Then
+            Try
+                My.Computer.FileSystem.DeleteFile(filePath)
+            Catch ex As Exception
+                Skye.Common.Log.Write("Error Deleting Playlist File: " & ex.ToString)
+            End Try
+        End If
+
+        ' Clean up sort states from the dictionary
+        If App.Settings.PlaylistSorts.ContainsKey(playlistName) Then
+            App.Settings.PlaylistSorts.Remove(playlistName)
+            App.Settings.SaveSortStates()
+        End If
+
+    End Sub
     Private Sub LibrarySearchFoldersAdd()
         Dim r As DialogResult = UIFolderBrowser.ShowDialog(Me)
         If r = DialogResult.OK And Not UIFolderBrowser.SelectedPath = String.Empty And Not LBLibrarySearchFolders.Items.Contains(UIFolderBrowser.SelectedPath) Then
@@ -691,17 +862,7 @@ Public Class Options
         Next
         App.SetWatchers()
     End Sub
-    Private Sub ShowPlaylists()
-        LBPlaylists.DataSource = Nothing
-        LBPlaylists.DataSource = App.Settings.Playlists
-    End Sub
-    Private Sub SetPlaylists()
-        App.Settings.Playlists.Clear()
-        For Each item In LBPlaylists.Items
-            App.Settings.Playlists.Add(item.ToString)
-        Next
-        'update FrmPlayer
-    End Sub
+
     Private Sub SetPrunePlaylistButtonText()
         BtnPrunePlaylist.Text = BtnPrunePlaylist.Text.TrimEnd(App.TrimEndSearch) + " (" + App.FrmPlayer.LVPlaylist.Items.Count.ToString + ")"
         BtnPrunePlaylist.Enabled = (App.FrmPlayer.LVPlaylist.Items.Count > 0)
