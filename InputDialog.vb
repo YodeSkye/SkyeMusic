@@ -5,8 +5,6 @@ Imports System.ComponentModel
 Public Class InputDialog
 
     'Declarations
-    Private mMove As Boolean = False
-    Private mOffset, mPosition As Point
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
     Private Property InputText As String
 
@@ -37,38 +35,17 @@ Public Class InputDialog
             End If
         End Using
     End Function
-    Private Sub InputDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetAccentColor()
         SetTheme()
         App.ThemeMenu(CMEditTitle)
+        App.EnableFormDragging(Me)
     End Sub
-    Private Sub InputDialog_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblPrompt.MouseDown
-        Dim cSender As Control
-        If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
-            mMove = True
-            cSender = CType(sender, Control)
-            If cSender Is Me Then
-                mOffset = New Point(-e.X - SystemInformation.FixedFrameBorderSize.Width - 5, -e.Y - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 5)
-            Else
-                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FixedFrameBorderSize.Width - 5, -e.Y - cSender.Top - SystemInformation.FixedFrameBorderSize.Height - SystemInformation.CaptionHeight - 5)
-            End If
-        End If
+    Private Sub Form_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        App.DisableFormDragging(Me)
     End Sub
-    Private Sub InputDialog_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, LblPrompt.MouseMove
-        If mMove Then
-            mPosition = MousePosition
-            mPosition.Offset(mOffset.X, mOffset.Y)
-            CheckMove(mPosition)
-            Location = mPosition
-        End If
-    End Sub
-    Private Sub InputDialog_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, LblPrompt.MouseUp
-        mMove = False
-    End Sub
-    Private Sub InputDialog_Move(sender As Object, e As EventArgs) Handles MyBase.Move
-        If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
-            CheckMove(Location)
-        End If
+    Private Sub Form_Move(sender As Object, e As EventArgs) Handles MyBase.Move
+        CheckMove(Location)
     End Sub
 
     'Control Events

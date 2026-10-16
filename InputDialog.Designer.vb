@@ -42,8 +42,9 @@ Partial Class InputDialog
         ' 
         ' CMEditTitle
         ' 
+        CMEditTitle.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CMEditTitle.Name = "CMEditTitle"
-        CMEditTitle.Size = New Size(138, 176)
+        CMEditTitle.Size = New Size(181, 226)
         ' 
         ' BtnOK
         ' 
