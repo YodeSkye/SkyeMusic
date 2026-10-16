@@ -1399,7 +1399,7 @@ Partial Class Options
         LBPlaylists.Name = "LBPlaylists"
         LBPlaylists.Size = New Size(234, 88)
         LBPlaylists.TabIndex = 1001
-        TipOptions.SetText(LBPlaylists, "Add your music folders here, the Library uses this list to find your music." & vbCrLf & "Right-Click for options.")
+        TipOptions.SetText(LBPlaylists, "Add and edit your playlists here." & vbCrLf & "Right-Click for options.")
         TipError.SetText(LBPlaylists, Nothing)
         ' 
         ' CMPlaylists

@@ -807,7 +807,7 @@ Public Class Options
         Dim playlistName As String = LBPlaylists.SelectedItem.ToString()
 
         ' Confirm deletion so they don't accidentally wipe a playlist
-        Dim result As DialogResult = ConfirmationDialog.ShowDialog("Confirm Removal", $"Are you sure you want to remove '{playlistName}' and its saved tracks?")
+        Dim result As DialogResult = ConfirmationDialog.ShowDialog("Confirm Playlist Removal", $"Are you sure you want to remove '{playlistName}' and its saved tracks?")
         If result <> DialogResult.OK Then Return
 
         ' Remove from the List
@@ -859,7 +859,6 @@ Public Class Options
         Next
         App.SetWatchers()
     End Sub
-
     Private Sub SetPrunePlaylistButtonText()
         BtnPrunePlaylist.Text = BtnPrunePlaylist.Text.TrimEnd(App.TrimEndSearch) + " (" + App.FrmPlayer.LVPlaylist.Items.Count.ToString + ")"
         BtnPrunePlaylist.Enabled = (App.FrmPlayer.LVPlaylist.Items.Count > 0)

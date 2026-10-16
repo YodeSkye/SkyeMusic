@@ -2898,6 +2898,7 @@ Public Class Player
         TipPlayerEX.SetText(BtnReverse, "Skip Backward")
         TipPlayerEX.SetText(BtnForward, "Skip Forward")
         TipPlayerEX.SetText(LblDuration, "Song Duration")
+        TipPlayerEX.SetText(CoBoxPlaylists, "Select Playlist")
         SetTipPlayer()
         TipCMPlaylist = New Skye.UI.ToolTipEX(components) With {
             .BackColor = App.CurrentTheme.BackColor,
@@ -4120,6 +4121,9 @@ Public Class Player
                     QueueFromPlaylist()
             End Select
         End If
+    End Sub
+    Private Sub CoBoxPlaylists_DropDown(sender As Object, e As EventArgs) Handles CoBoxPlaylists.DropDown
+        TipPlayerEX.HideTooltip()
     End Sub
     Private Sub CoBoxPlaylists_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxPlaylists.SelectedIndexChanged
         If CoBoxPlaylists.SelectedItem Is Nothing Then Return
