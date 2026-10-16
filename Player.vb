@@ -6521,12 +6521,14 @@ Public Class Player
                 MenuPlayer.BackColor = App.CurrentTheme.BackColor
                 TxtBoxPlaylistSearch.BackColor = App.CurrentTheme.BackColor
             End If
+            CoBoxPlaylists.BackColor = App.CurrentTheme.BackColor
         End If
     End Sub
     Private Sub SetInactiveTitleBarColor()
         If Not IsFocused Then
             MenuPlayer.BackColor = App.CurrentTheme.InactiveTitleBarColor
             TxtBoxPlaylistSearch.BackColor = App.CurrentTheme.InactiveTitleBarColor
+            CoBoxPlaylists.BackColor = App.CurrentTheme.InactiveTitleBarColor
         End If
     End Sub
     Private Sub SetTheme()
