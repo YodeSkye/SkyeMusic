@@ -823,6 +823,7 @@ Partial Class Player
         ' CoBoxPlaylists
         ' 
         CoBoxPlaylists.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        CoBoxPlaylists.BorderStyle = Skye.UI.ComboBox.ComboBorderStyle.None
         CoBoxPlaylists.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxPlaylists.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         CoBoxPlaylists.FormattingEnabled = True

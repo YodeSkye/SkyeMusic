@@ -686,11 +686,20 @@ Public Class Options
         End If
     End Sub
     Private Sub CMPlaylists_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMPlaylists.Opening
+        CMIPlaylistsMoveUp.Enabled = False
+        CMIPlaylistsMoveDown.Enabled = False
         If LBPlaylists.SelectedItems.Count = 0 Then
             CMIPlaylistsEdit.Enabled = False
             CMIPlaylistsRemove.Enabled = False
             CMIPlaylistsMoveUp.Enabled = False
             CMIPlaylistsMoveDown.Enabled = False
+        ElseIf LBPlaylists.SelectedItems.Count = 1 Then
+            If LBPlaylists.SelectedIndices(0) >= 1 Then
+                CMIPlaylistsMoveUp.Enabled = True
+            End If
+            If LBPlaylists.SelectedIndices(0) <= LBPlaylists.Items.Count - 2 Then
+                CMIPlaylistsMoveDown.Enabled = True
+            End If
         Else
             CMIPlaylistsEdit.Enabled = True
             If LBPlaylists.Items.Count = 1 Then
@@ -701,6 +710,7 @@ Public Class Options
             CMIPlaylistsMoveUp.Enabled = True
             CMIPlaylistsMoveDown.Enabled = True
         End If
+
     End Sub
     Private Sub CMIPlaylistsAdd_Click(sender As Object, e As EventArgs) Handles CMIPlaylistsAdd.Click
         PlaylistsAdd()
@@ -712,10 +722,10 @@ Public Class Options
         PlaylistsRemove()
     End Sub
     Private Sub CMIPlaylistsMoveUp_Click(sender As Object, e As EventArgs) Handles CMIPlaylistsMoveUp.Click
-
+        PlaylistsMove(-1)
     End Sub
     Private Sub CMIPlaylistsMoveDown_Click(sender As Object, e As EventArgs) Handles CMIPlaylistsMoveDown.Click
-
+        PlaylistsMove(1)
     End Sub
     Private Sub CMLibrarySearchFolders_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs)
         If LBLibrarySearchFolders.SelectedItems.Count = 0 Then
@@ -837,6 +847,21 @@ Public Class Options
             App.Settings.SaveSortStates()
         End If
 
+    End Sub
+    Private Sub PlaylistsMove(direction As Integer)
+        If LBPlaylists.SelectedIndices.Count <> 1 Then Return
+        Dim currentIndex As Integer = LBPlaylists.SelectedIndices(0)
+        Dim newIndex As Integer = currentIndex + direction
+        If newIndex < 0 OrElse newIndex >= LBPlaylists.Items.Count Then Return
+        Dim playlistName As String = LBPlaylists.Items(currentIndex).ToString()
+
+        App.Settings.Playlists.RemoveAt(currentIndex)
+        App.Settings.Playlists.Insert(newIndex, playlistName)
+        _playlistsDirty = True
+
+        ShowPlaylists()
+        LBPlaylists.SelectedIndex = newIndex
+        App.Settings.Save()
     End Sub
     Private Sub LibrarySearchFoldersAdd()
         Dim r As DialogResult = UIFolderBrowser.ShowDialog(Me)
