@@ -701,7 +701,6 @@ Public Class Options
             CMIPlaylistsMoveUp.Enabled = True
             CMIPlaylistsMoveDown.Enabled = True
         End If
-
     End Sub
     Private Sub CMIPlaylistsAdd_Click(sender As Object, e As EventArgs) Handles CMIPlaylistsAdd.Click
         PlaylistsAdd()
@@ -808,10 +807,8 @@ Public Class Options
         Dim playlistName As String = LBPlaylists.SelectedItem.ToString()
 
         ' Confirm deletion so they don't accidentally wipe a playlist
-        Dim result As DialogResult = MessageBox.Show(
-        $"Are you sure you want to delete '{playlistName}' and its saved tracks?",
-        "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-        If result <> DialogResult.Yes Then Return
+        Dim result As DialogResult = ConfirmationDialog.ShowDialog("Confirm Removal", $"Are you sure you want to remove '{playlistName}' and its saved tracks?")
+        If result <> DialogResult.OK Then Return
 
         ' Remove from the List
         App.Settings.Playlists.Remove(playlistName)
