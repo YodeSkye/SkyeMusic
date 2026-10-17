@@ -126,7 +126,7 @@ Public Class Player
     Private _currentPlaylist As String = Nothing ' Private backing field for the active playlist
     Private _playlistDirty As Boolean = False 'Indicates if the playlist has been modified and needs to be saved
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
-    Public Property CurrentPlaylist As String ' The active playlist property that automates the save/load cycle
+    Private Property CurrentPlaylist As String ' The active playlist property that automates the save/load cycle
         Get
             Return _currentPlaylist
         End Get

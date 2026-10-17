@@ -3093,134 +3093,6 @@ Namespace My
             AddHandler cm.Opening, AddressOf NIApp_Opening
             NIApp.ContextMenuStrip = cm
         End Sub
-        Friend Sub SaveHistory()
-            If History Is Nothing OrElse History.Count = 0 Then
-                If My.Computer.FileSystem.FileExists(HistoryPath) Then
-                    My.Computer.FileSystem.DeleteFile(HistoryPath)
-                End If
-            Else
-                Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-                Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(HistoryData))
-
-                If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
-                    My.Computer.FileSystem.CreateDirectory(App.UserPath)
-                End If
-
-                Dim data As New HistoryData With {.SchemaVersion = 2, .History = History, .TotalPlayedSongs = HistoryTotalPlayedSongs}
-
-                Using file As New System.IO.StreamWriter(HistoryPath)
-                    writer.Serialize(file, data)
-                End Using
-
-                Debug.Print("History Saved")
-                Skye.Common.Log.Write("History Saved (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
-            End If
-        End Sub
-        Private Sub LoadHistory()
-            If My.Computer.FileSystem.FileExists(HistoryPath) Then
-                Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
-
-                'Try new wrapper format first
-                Dim wrapperReader As New System.Xml.Serialization.XmlSerializer(GetType(HistoryData))
-                Using file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
-                    Try
-                        Dim data As HistoryData = DirectCast(wrapperReader.Deserialize(file), HistoryData)
-                        Select Case data.SchemaVersion
-                            Case 1
-                                History = If(data.History, New List(Of Song))
-                                HistoryTotalPlayedSongs = data.TotalPlayedSongs
-
-                                ' 🔑 Conversion step: map old flags into SourceType
-                                For Each s In History
-                                    If s.IsStream OrElse (s.Path IsNot Nothing AndAlso s.Path.StartsWith("http", StringComparison.OrdinalIgnoreCase)) Then
-                                        s.SourceType = MediaSourceTypes.Stream
-                                    Else
-                                        s.SourceType = MediaSourceTypes.File
-                                    End If
-                                Next
-
-                                '' bump schema version so it won’t run again
-                                'data.SchemaVersion = 2
-                            Case 2
-                                History = If(data.History, New List(Of Song))
-                                HistoryTotalPlayedSongs = data.TotalPlayedSongs
-                            Case Else
-                                History = If(data.History, New List(Of Song))
-                                HistoryTotalPlayedSongs = data.TotalPlayedSongs
-                                Skye.Common.Log.Write("Loaded Schema version " & data.SchemaVersion & " (Unknown, Using defaults For New fields)")
-                        End Select
-                        Skye.Common.Log.Write("History Loaded (Schema v" & data.SchemaVersion & ") (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
-                        Exit Sub
-                    Catch
-                        'Fall back to old format (just a List(Of Song))
-                    End Try
-                End Using
-
-                'Old format fallback
-                Dim listReader As New System.Xml.Serialization.XmlSerializer(GetType(List(Of Song)))
-                Using file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
-                    Try
-                        History = DirectCast(listReader.Deserialize(file), List(Of Song))
-                        HistoryTotalPlayedSongs = 0
-                        Skye.Common.Log.Write("History Loaded (Legacy Format) (" &
-                               Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
-                    Catch
-                        History = New List(Of Song)
-                        HistoryTotalPlayedSongs = 0
-                        Skye.Common.Log.Write("History Not Loaded: File not valid (" & HistoryPath & ")")
-                    End Try
-                End Using
-
-            Else
-                Skye.Common.Log.Write("History Not Loaded: File does not exist")
-                History = New List(Of Song)
-                HistoryTotalPlayedSongs = 0
-            End If
-        End Sub
-        Friend Sub GenerateHotKeyList()
-            HotKeys.Clear()
-            HotKeys.Add(HotKeyPlay)
-            HotKeys.Add(HotKeyStop)
-            HotKeys.Add(HotKeyNext)
-            HotKeys.Add(HotKeyPrevious)
-            HotKeys.Add(Settings.HotKeyVoicePushToTalk)
-        End Sub
-        Friend Sub RegisterHotKeys()
-            Dim status As Boolean
-            For Each key As HotKey In HotKeys
-                If Not key.Key = Keys.None Then
-                    status = Skye.WinAPI.RegisterHotKey(FrmPlayer.Handle, key.WinID, key.KeyMod, key.KeyCode)
-                    'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
-                    Skye.Common.Log.Write("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
-                End If
-            Next
-        End Sub
-        Friend Sub UnRegisterHotKeys()
-            Dim status As Boolean
-            For Each key As HotKey In HotKeys
-                If Not key.Key = Keys.None Then
-                    status = Skye.WinAPI.UnregisterHotKey(FrmPlayer.Handle, key.WinID)
-                    'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
-                    Skye.Common.Log.Write("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
-                End If
-            Next
-        End Sub
-        Friend Sub PerformHotKeyAction(hotkey As Integer)
-            Select Case hotkey
-                Case HotKeyPlay.WinID
-                    FrmPlayer.TogglePlay()
-                Case HotKeyStop.WinID
-                    FrmPlayer.StopPlay()
-                Case HotKeyNext.WinID
-                    FrmPlayer.PlayNext()
-                Case HotKeyPrevious.WinID
-                    FrmPlayer.PlayPrevious()
-                Case Settings.HotKeyVoicePushToTalk.WinID
-                    If Settings.EnableVoiceCommands AndAlso Settings.VoicePushToTalk Then
-                        VoicePushToTalkActive = True
-                    End If
-            End Select
-        End Sub
         Private Sub SessionSuspended() 'SessionSuspended is called when the screensaver is activated or the screen is locked.
             If ScreenLocked OrElse ScreenSaverActive Then FrmPlayer.Suspend()
         End Sub
@@ -3314,159 +3186,6 @@ Namespace My
 
                 FrmPlayer.ShowMedia()
 
-            End If
-        End Sub
-        Friend Sub ShowDevTools()
-            If FrmDevTools Is Nothing OrElse FrmDevTools.IsDisposed Then
-                FrmDevTools = New DevTools
-                FrmDevTools.Show()
-            Else
-                If FrmDevTools.WindowState = FormWindowState.Minimized Then
-                    FrmDevTools.WindowState = FormWindowState.Normal
-                ElseIf FrmDevTools.Visible Then
-                    FrmDevTools.BringToFront()
-                Else
-                    FrmDevTools.Show()
-                End If
-            End If
-        End Sub
-        Friend Sub ShowLibrary()
-            If FrmLibrary.WindowState = FormWindowState.Minimized Then
-                FrmLibrary.WindowState = FormWindowState.Normal
-            ElseIf FrmLibrary.Visible Then
-                FrmLibrary.BringToFront()
-            Else
-                FrmLibrary.Show()
-            End If
-        End Sub
-        Friend Sub ShowDirectory()
-            If FrmDirectory Is Nothing OrElse FrmDirectory.IsDisposed Then
-                FrmDirectory = New Directory
-                FrmDirectory.Show()
-            Else
-                If FrmDirectory.WindowState = FormWindowState.Minimized Then
-                    FrmDirectory.WindowState = FormWindowState.Normal
-                ElseIf FrmDirectory.Visible Then
-                    FrmDirectory.BringToFront()
-                Else
-                    FrmDirectory.Show()
-                End If
-            End If
-        End Sub
-        Friend Sub ShowHistory()
-            If FrmHistory Is Nothing OrElse FrmHistory.IsDisposed Then
-                FrmHistory = New History
-                FrmHistory.Show()
-            Else
-                If FrmHistory.WindowState = FormWindowState.Minimized Then
-                    FrmHistory.WindowState = FormWindowState.Normal
-                ElseIf FrmHistory.Visible Then
-                    FrmHistory.BringToFront()
-                Else
-                    FrmHistory.Show()
-                End If
-            End If
-        End Sub
-        Friend Sub ShowCompanionClients()
-            If FrmCompanionClients Is Nothing OrElse FrmCompanionClients.IsDisposed Then
-                FrmCompanionClients = New CompanionClients
-                Dim newX As Integer = FrmPlayer.Left + (FrmPlayer.Width - FrmCompanionClients.Width) \ 2
-                Dim newY As Integer = FrmPlayer.Top + (FrmPlayer.Height - FrmCompanionClients.Height) \ 2
-                FrmCompanionClients.Location = New Point(newX, newY)
-                FrmCompanionClients.Show()
-            Else
-                If FrmCompanionClients.WindowState = FormWindowState.Minimized Then
-                    FrmCompanionClients.WindowState = FormWindowState.Normal
-                ElseIf FrmCompanionClients.Visible Then
-                    FrmCompanionClients.BringToFront()
-                Else
-                    FrmCompanionClients.Show()
-                End If
-            End If
-        End Sub
-        Friend Sub ShowOptions(Optional showcenterscreen As Boolean = False)
-            If FrmOptions Is Nothing OrElse FrmOptions.IsDisposed Then
-                FrmOptions = New Options
-                If showcenterscreen Then
-                    FrmOptions.StartPosition = FormStartPosition.CenterScreen
-                Else
-                    FrmOptions.StartPosition = FormStartPosition.CenterParent
-                End If
-                FrmOptions.ShowDialog()
-            Else
-                If FrmOptions.Visible Then
-                    FrmOptions.BringToFront()
-                Else
-                    If showcenterscreen Then
-                        FrmOptions.StartPosition = FormStartPosition.CenterScreen
-                    Else
-                        FrmOptions.StartPosition = FormStartPosition.CenterParent
-                    End If
-                    FrmOptions.ShowDialog()
-                End If
-            End If
-        End Sub
-        Friend Sub ShowHelp()
-            If FrmHelp Is Nothing OrElse FrmHelp.IsDisposed Then
-                FrmHelp = New Help
-            End If
-            If FrmHelp.Visible Then
-                FrmHelp.BringToFront()
-            Else
-                FrmHelp.Show()
-            End If
-        End Sub
-        Friend Sub ShowLog(Optional refresh As Boolean = False)
-            If refresh AndAlso FrmLog IsNot Nothing Then
-                FrmLog.BringToFront()
-                FrmLog.Focus()
-                FrmLog.LogViewer.RefreshContent()
-            Else
-                FrmLog = New Log
-                FrmLog.Show()
-            End If
-            FrmLog.LBLLogInfo.Text = Skye.Common.Log.LogFilePath
-            FrmLog.LBLLogInfo.Text += " (" + Skye.Common.Log.LineCount.ToString + IIf(Skye.Common.Log.LineCount = 1, " Line", " Lines").ToString + ")"
-            If Skye.Common.Log.LineCount > 0 Then
-                FrmLog.BTNDeleteLog.Visible = True
-            Else
-                FrmLog.BTNDeleteLog.Visible = False
-            End If
-            FrmLog.BTNOK.Select()
-        End Sub
-        Friend Sub DeleteLog()
-            'If IO.File.Exists(Skye.Common.Log.LogFilePath) Then IO.File.Delete(Skye.Common.Log.LogFilePath)
-            Skye.Common.Log.Clear()
-            ShowLog(True)
-        End Sub
-        Friend Sub ShowAbout(Optional showcentered As Boolean = False)
-            If FrmAbout Is Nothing OrElse FrmAbout.IsDisposed Then
-                FrmAbout = New About
-            End If
-            If FrmAbout.Visible Then
-                FrmAbout.BringToFront()
-            Else
-                If showcentered Then
-                    FrmAbout.StartPosition = FormStartPosition.CenterScreen
-                Else
-                    FrmAbout.StartPosition = FormStartPosition.CenterParent
-                End If
-                FrmAbout.ShowDialog()
-            End If
-        End Sub
-        Friend Sub ShowChangeLog(Optional showcentered As Boolean = False)
-            If FrmChangeLog Is Nothing OrElse FrmChangeLog.IsDisposed Then
-                FrmChangeLog = New ChangeLog
-            End If
-            If FrmChangeLog.Visible Then
-                FrmChangeLog.BringToFront()
-            Else
-                If showcentered Then
-                    FrmChangeLog.StartPosition = FormStartPosition.CenterScreen
-                Else
-                    FrmChangeLog.StartPosition = FormStartPosition.CenterParent
-                End If
-                FrmChangeLog.ShowDialog()
             End If
         End Sub
         ''' <summary>
@@ -3587,6 +3306,420 @@ Namespace My
                 End If
             End If
         End Sub
+        Friend Function IsUrl(input As String) As Boolean
+            If String.IsNullOrWhiteSpace(input) Then Return False
+
+            Dim uriResult As Uri = Nothing
+            If Uri.TryCreate(input, UriKind.Absolute, uriResult) Then
+                Return uriResult.Scheme = Uri.UriSchemeHttp OrElse uriResult.Scheme = Uri.UriSchemeHttps
+            End If
+
+            Return False
+        End Function
+        Friend Function GenerateEllipsis(ByRef g As Graphics, s As String, f As System.Drawing.Font, width As Integer) As String
+            Dim ellipsistext As String = s
+            If width >= 0 Then
+                Do While g.MeasureString(ellipsistext, f).Width > width
+                    ellipsistext = ellipsistext.Substring(0, ellipsistext.Length - 1)
+                Loop
+            End If
+            If ellipsistext = s Then
+                Return s
+            Else
+                If ellipsistext.Length <= 2 Then
+                    Return "..."
+                Else
+                    Return ellipsistext.Substring(0, ellipsistext.Length - 2) + "..."
+                End If
+            End If
+        End Function
+        Friend Function GetSimpleVersion() As String
+            GetSimpleVersion = My.Application.Info.Version.Major.ToString & "." & My.Application.Info.Version.Minor.ToString
+        End Function
+        Friend Function GetFullVersion() As String
+            GetFullVersion = My.Application.Info.Version.Major.ToString & "." & My.Application.Info.Version.Minor.ToString & "." & My.Application.Info.Version.Build.ToString
+        End Function
+        Private Function FetchLatestVersion() As String
+            Try
+                Using client As New Net.Http.HttpClient()
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic")
+                    Dim versionText As String = client.GetStringAsync("https://raw.githubusercontent.com/yodeskye/SkyeMusic/master/publishedversion.txt").Result
+                    Debug.Print("Fetched Latest Version: " & versionText.Trim())
+                    Return versionText.Trim()
+                End Using
+            Catch
+                Return Nothing
+            End Try
+        End Function
+        Friend Function IsNewerVersion(latest As String) As Boolean
+            Try
+                Dim vCurrent As New Version(GetFullVersion())
+                Dim vLatest As New Version(latest)
+                Debug.Print("Comparing Versions: Current=" & vCurrent.ToString() & " Latest=" & vLatest.ToString())
+                Return vLatest > vCurrent
+            Catch
+                Return False
+            End Try
+        End Function
+        Friend Sub HookTSItemsForCMTooltip(ts As ToolStrip, tip As ToolTipEX)
+            For Each item As ToolStripItem In ts.Items
+                AddHandler item.MouseEnter,
+                    Sub(sender, e)
+                        Dim it = CType(sender, ToolStripItem)
+                        If String.IsNullOrWhiteSpace(it.ToolTipText) Then Exit Sub
+
+                        ' Delay one UI tick so ToolStrip finishes layout
+                        ts.BeginInvoke(Sub()
+                                           ShowTSItemTooltip(ts, it, tip)
+                                       End Sub)
+                    End Sub
+                AddHandler item.MouseLeave,
+                    Sub(sender, e)
+                        tip.HideTooltip()
+                    End Sub
+            Next
+        End Sub
+        Private Sub ShowTSItemTooltip(ts As ToolStrip, it As ToolStripItem, tip As ToolTipEX)
+
+            ' Get item bounds in screen coordinates
+            Dim itemScreenRect As New Rectangle(ts.PointToScreen(it.Bounds.Location), it.Bounds.Size)
+
+            ' Measure tooltip size
+            Dim textSize As Size = TextRenderer.MeasureText(it.ToolTipText, tip.Font)
+            Dim tipWidth As Integer = textSize.Width + tip.TextPadding * 2
+            Dim tipHeight As Integer = textSize.Height + tip.TextPadding * 2
+
+            ' Default: show to the right of the item
+            Dim pos As New Point(itemScreenRect.Right + 1, itemScreenRect.Top + (itemScreenRect.Height - tipHeight) \ 2 - 1)
+
+            ' Clamp horizontally using working area
+            Dim wa As Rectangle = Screen.FromPoint(pos).WorkingArea
+            If pos.X + tipWidth > wa.Right Then
+                pos.X = itemScreenRect.Left - tipWidth
+            End If
+
+            tip.ShowTooltipAt(pos, it.ToolTipText)
+        End Sub
+        Public Function TintIcon(baseIcon As Image, color As Color) As Image
+            Dim bmp As New Bitmap(baseIcon.Width, baseIcon.Height)
+
+            Using g = Graphics.FromImage(bmp)
+                g.Clear(Color.Transparent)
+
+                Dim cm As New Imaging.ColorMatrix(New Single()() {
+                    New Single() {0, 0, 0, 0, 0},
+                    New Single() {0, 0, 0, 0, 0},
+                    New Single() {0, 0, 0, 0, 0},
+                    New Single() {0, 0, 0, 1, 0},
+                    New Single() {color.R / 255.0F, color.G / 255.0F, color.B / 255.0F, 0, 1}
+                })
+
+                Dim ia As New Imaging.ImageAttributes()
+                ia.SetColorMatrix(cm)
+
+                g.DrawImage(baseIcon,
+                    New Rectangle(0, 0, baseIcon.Width, baseIcon.Height),
+                    0, 0, baseIcon.Width, baseIcon.Height,
+                    GraphicsUnit.Pixel,
+                    ia)
+            End Using
+
+            Return bmp
+        End Function
+        Friend Function ResizeImage(src As Image, size As Integer) As Image
+            Dim bmp As New Bitmap(size, size)
+            bmp.SetResolution(src.HorizontalResolution, src.VerticalResolution)
+            Using g = Graphics.FromImage(bmp)
+                g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+                g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+                g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+                g.DrawImage(src, New Rectangle(0, 0, size, size))
+            End Using
+            Return bmp
+        End Function
+
+        ' Forms
+        Friend Sub ShowDevTools()
+            If FrmDevTools Is Nothing OrElse FrmDevTools.IsDisposed Then
+                FrmDevTools = New DevTools
+                FrmDevTools.Show()
+            Else
+                If FrmDevTools.WindowState = FormWindowState.Minimized Then
+                    FrmDevTools.WindowState = FormWindowState.Normal
+                ElseIf FrmDevTools.Visible Then
+                    FrmDevTools.BringToFront()
+                Else
+                    FrmDevTools.Show()
+                End If
+            End If
+        End Sub
+        Friend Sub ShowLibrary()
+            If FrmLibrary.WindowState = FormWindowState.Minimized Then
+                FrmLibrary.WindowState = FormWindowState.Normal
+            ElseIf FrmLibrary.Visible Then
+                FrmLibrary.BringToFront()
+            Else
+                FrmLibrary.Show()
+            End If
+        End Sub
+        Friend Sub ShowDirectory()
+            If FrmDirectory Is Nothing OrElse FrmDirectory.IsDisposed Then
+                FrmDirectory = New Directory
+                FrmDirectory.Show()
+            Else
+                If FrmDirectory.WindowState = FormWindowState.Minimized Then
+                    FrmDirectory.WindowState = FormWindowState.Normal
+                ElseIf FrmDirectory.Visible Then
+                    FrmDirectory.BringToFront()
+                Else
+                    FrmDirectory.Show()
+                End If
+            End If
+        End Sub
+        Friend Sub ShowHistory()
+            If FrmHistory Is Nothing OrElse FrmHistory.IsDisposed Then
+                FrmHistory = New History
+                FrmHistory.Show()
+            Else
+                If FrmHistory.WindowState = FormWindowState.Minimized Then
+                    FrmHistory.WindowState = FormWindowState.Normal
+                ElseIf FrmHistory.Visible Then
+                    FrmHistory.BringToFront()
+                Else
+                    FrmHistory.Show()
+                End If
+            End If
+        End Sub
+        Friend Sub ShowCompanionClients()
+            If FrmCompanionClients Is Nothing OrElse FrmCompanionClients.IsDisposed Then
+                FrmCompanionClients = New CompanionClients
+                Dim newX As Integer = FrmPlayer.Left + (FrmPlayer.Width - FrmCompanionClients.Width) \ 2
+                Dim newY As Integer = FrmPlayer.Top + (FrmPlayer.Height - FrmCompanionClients.Height) \ 2
+                FrmCompanionClients.Location = New Point(newX, newY)
+                FrmCompanionClients.Show()
+            Else
+                If FrmCompanionClients.WindowState = FormWindowState.Minimized Then
+                    FrmCompanionClients.WindowState = FormWindowState.Normal
+                ElseIf FrmCompanionClients.Visible Then
+                    FrmCompanionClients.BringToFront()
+                Else
+                    FrmCompanionClients.Show()
+                End If
+            End If
+        End Sub
+        Friend Sub ShowOptions(Optional showcenterscreen As Boolean = False)
+            If FrmOptions Is Nothing OrElse FrmOptions.IsDisposed Then
+                FrmOptions = New Options
+                If showcenterscreen Then
+                    FrmOptions.StartPosition = FormStartPosition.CenterScreen
+                Else
+                    FrmOptions.StartPosition = FormStartPosition.CenterParent
+                End If
+                FrmOptions.ShowDialog()
+            Else
+                If FrmOptions.Visible Then
+                    FrmOptions.BringToFront()
+                Else
+                    If showcenterscreen Then
+                        FrmOptions.StartPosition = FormStartPosition.CenterScreen
+                    Else
+                        FrmOptions.StartPosition = FormStartPosition.CenterParent
+                    End If
+                    FrmOptions.ShowDialog()
+                End If
+            End If
+        End Sub
+        Friend Sub ShowHelp()
+            If FrmHelp Is Nothing OrElse FrmHelp.IsDisposed Then
+                FrmHelp = New Help
+            End If
+            If FrmHelp.Visible Then
+                FrmHelp.BringToFront()
+            Else
+                FrmHelp.Show()
+            End If
+        End Sub
+        Friend Sub ShowLog(Optional refresh As Boolean = False)
+            If refresh AndAlso FrmLog IsNot Nothing Then
+                FrmLog.BringToFront()
+                FrmLog.Focus()
+                FrmLog.LogViewer.RefreshContent()
+            Else
+                FrmLog = New Log
+                FrmLog.Show()
+            End If
+            FrmLog.LBLLogInfo.Text = Skye.Common.Log.LogFilePath
+            FrmLog.LBLLogInfo.Text += " (" + Skye.Common.Log.LineCount.ToString + IIf(Skye.Common.Log.LineCount = 1, " Line", " Lines").ToString + ")"
+            If Skye.Common.Log.LineCount > 0 Then
+                FrmLog.BTNDeleteLog.Visible = True
+            Else
+                FrmLog.BTNDeleteLog.Visible = False
+            End If
+            FrmLog.BTNOK.Select()
+        End Sub
+        Friend Sub DeleteLog()
+            Skye.Common.Log.Clear()
+            ShowLog(True)
+        End Sub
+        Friend Sub ShowAbout(Optional showcentered As Boolean = False)
+            If FrmAbout Is Nothing OrElse FrmAbout.IsDisposed Then
+                FrmAbout = New About
+            End If
+            If FrmAbout.Visible Then
+                FrmAbout.BringToFront()
+            Else
+                If showcentered Then
+                    FrmAbout.StartPosition = FormStartPosition.CenterScreen
+                Else
+                    FrmAbout.StartPosition = FormStartPosition.CenterParent
+                End If
+                FrmAbout.ShowDialog()
+            End If
+        End Sub
+        Friend Sub ShowChangeLog(Optional showcentered As Boolean = False)
+            If FrmChangeLog Is Nothing OrElse FrmChangeLog.IsDisposed Then
+                FrmChangeLog = New ChangeLog
+            End If
+            If FrmChangeLog.Visible Then
+                FrmChangeLog.BringToFront()
+            Else
+                If showcentered Then
+                    FrmChangeLog.StartPosition = FormStartPosition.CenterScreen
+                Else
+                    FrmChangeLog.StartPosition = FormStartPosition.CenterParent
+                End If
+                FrmChangeLog.ShowDialog()
+            End If
+        End Sub
+
+        ' Theming
+        Friend Function GetAccentColor() As Color
+            Dim c As Color
+            Dim regkey As RegistryKey
+            Dim regvalue As Integer
+            regkey = Registry.CurrentUser.OpenSubKey("Software\Microsoft\Windows\DWM")
+            regvalue = CInt(regkey.GetValue("AccentColor"))
+            If regvalue = Nothing Then
+                c = App.CurrentTheme.BackColor
+            Else
+                c = Color.FromArgb(255, Skye.WinAPI.GetRValue(regvalue), Skye.WinAPI.GetGValue(regvalue), Skye.WinAPI.GetBValue(regvalue))
+            End If
+            regkey.Close()
+            regkey.Dispose()
+            GetAccentColor = c
+
+            '
+            'API Method
+            'Dim params As WinAPI.DWMCOLORIZATIONPARAMS
+            'WinAPI.DwmGetColorizationParameters(params)
+            'c = Color.FromArgb(255, App.GetRValue(params.ColorizationColor), App.GetGValue(params.ColorizationColor), App.GetBValue(params.ColorizationColor))
+            '
+
+        End Function
+        Friend Function GetCurrentThemeProperties() As ThemeProperties
+            Select Case Settings.Theme
+                Case Themes.BlueAccent
+                    Return BlueAccentTheme
+                Case Themes.PinkAccent
+                    Return PinkAccentTheme
+                Case Themes.EmeraldAccent
+                    Return EmeraldAccentTheme
+                Case Themes.VioletAccent
+                    Return VioletAccentTheme
+                Case Themes.AmberAccent
+                    Return AmberAccentTheme
+                Case Themes.TealAccent
+                    Return TealAccentTheme
+                Case Themes.HighContrast
+                    Return HighContrastTheme
+                Case Themes.Light
+                    Return LightTheme
+                Case Themes.Dark
+                    Return DarkTheme
+                Case Themes.DarkPink
+                    Return DarkPinkTheme
+                Case Themes.Blossom
+                    Return BlossomTheme
+                Case Themes.CrimsonEmber
+                    Return CrimsonEmberTheme
+                Case Themes.MidnightBlue
+                    Return MidnightBlueTheme
+                Case Themes.ForestGreen
+                    Return ForestGreenTheme
+                Case Themes.SolarGold
+                    Return SolarGoldTheme
+                Case Themes.Amethyst
+                    Return AmethystTheme
+                Case Themes.Glacier
+                    Return GlacierTheme
+                Case Else
+                    Return CrimsonEmberTheme
+            End Select
+        End Function
+        Friend Sub ThemeMenu(cm As ToolStrip)
+            cm.Renderer = New SkyeMenuRenderer(
+                back:=CurrentTheme.BackColor,
+                hover:=CurrentTheme.HoverColor,
+                border:=CurrentTheme.ButtonBackColor,
+                text:=CurrentTheme.TextColor,
+                separator:=Color.FromArgb(80, 80, 80)
+                )
+            cm.SuspendLayout()
+            cm.PerformLayout()
+            cm.ResumeLayout(True)
+            cm.Invalidate()
+        End Sub
+        Friend Sub ReThemeTrayMenu()
+            If Settings.ShowTrayIcon Then ThemeMenu(NIApp.ContextMenuStrip)
+        End Sub
+
+        ' HotKeys
+        Friend Sub GenerateHotKeyList()
+            HotKeys.Clear()
+            HotKeys.Add(HotKeyPlay)
+            HotKeys.Add(HotKeyStop)
+            HotKeys.Add(HotKeyNext)
+            HotKeys.Add(HotKeyPrevious)
+            HotKeys.Add(Settings.HotKeyVoicePushToTalk)
+        End Sub
+        Friend Sub RegisterHotKeys()
+            Dim status As Boolean
+            For Each key As HotKey In HotKeys
+                If Not key.Key = Keys.None Then
+                    status = Skye.WinAPI.RegisterHotKey(FrmPlayer.Handle, key.WinID, key.KeyMod, key.KeyCode)
+                    'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
+                    Skye.Common.Log.Write("HotKey '" + key.Description + " (" + key.WinID.ToString + ") (" + key.Key.ToString + ") (" + key.KeyCode.ToString + " mod " + key.KeyMod.ToString + ")' " + IIf(status, "Successfully Registered", "Failed To Register").ToString)
+                End If
+            Next
+        End Sub
+        Friend Sub UnRegisterHotKeys()
+            Dim status As Boolean
+            For Each key As HotKey In HotKeys
+                If Not key.Key = Keys.None Then
+                    status = Skye.WinAPI.UnregisterHotKey(FrmPlayer.Handle, key.WinID)
+                    'Debug.Print("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
+                    Skye.Common.Log.Write("HotKey '" + key.Description + " (" + key.WinID.ToString + ")' " + IIf(status, "Successfully UNRegistered", "Failed To UNRegister").ToString)
+                End If
+            Next
+        End Sub
+        Friend Sub PerformHotKeyAction(hotkey As Integer)
+            Select Case hotkey
+                Case HotKeyPlay.WinID
+                    FrmPlayer.TogglePlay()
+                Case HotKeyStop.WinID
+                    FrmPlayer.StopPlay()
+                Case HotKeyNext.WinID
+                    FrmPlayer.PlayNext()
+                Case HotKeyPrevious.WinID
+                    FrmPlayer.PlayPrevious()
+                Case Settings.HotKeyVoicePushToTalk.WinID
+                    If Settings.EnableVoiceCommands AndAlso Settings.VoicePushToTalk Then
+                        VoicePushToTalkActive = True
+                    End If
+            End Select
+        End Sub
+
+        ' Playlist
         Private Function FormatPlaylistTitleCore(filePath As String) As String 'Core routine: all formatting logic lives here
             FormatPlaylistTitleCore = String.Empty
             Dim tlfile As TagLib.File = Nothing
@@ -4460,34 +4593,7 @@ Namespace My
         Friend Function FormatPlaylistTitle(filename As String) As String
             Return FormatPlaylistTitleCore(filename)
         End Function
-        Friend Function IsUrl(input As String) As Boolean
-            If String.IsNullOrWhiteSpace(input) Then Return False
-
-            Dim uriResult As Uri = Nothing
-            If Uri.TryCreate(input, UriKind.Absolute, uriResult) Then
-                Return uriResult.Scheme = Uri.UriSchemeHttp OrElse uriResult.Scheme = Uri.UriSchemeHttps
-            End If
-
-            Return False
-        End Function
-        Friend Function GenerateEllipsis(ByRef g As Graphics, s As String, f As System.Drawing.Font, width As Integer) As String
-            Dim ellipsistext As String = s
-            If width >= 0 Then
-                Do While g.MeasureString(ellipsistext, f).Width > width
-                    ellipsistext = ellipsistext.Substring(0, ellipsistext.Length - 1)
-                Loop
-            End If
-            If ellipsistext = s Then
-                Return s
-            Else
-                If ellipsistext.Length <= 2 Then
-                    Return "..."
-                Else
-                    Return ellipsistext.Substring(0, ellipsistext.Length - 2) + "..."
-                End If
-            End If
-        End Function
-        Public Sub EnsureVisibleCentered(lv As ListView, index As Integer)
+        Friend Sub EnsureVisibleCentered(lv As ListView, index As Integer)
             If index < 0 OrElse index >= lv.Items.Count Then Exit Sub
             If lv.View <> View.Details AndAlso lv.View <> View.List Then Exit Sub
 
@@ -4506,189 +4612,6 @@ Namespace My
             End Try
             lv.EndUpdate()
         End Sub
-        Friend Function GetSimpleVersion() As String
-            GetSimpleVersion = My.Application.Info.Version.Major.ToString & "." & My.Application.Info.Version.Minor.ToString
-        End Function
-        Friend Function GetFullVersion() As String
-            GetFullVersion = My.Application.Info.Version.Major.ToString & "." & My.Application.Info.Version.Minor.ToString & "." & My.Application.Info.Version.Build.ToString
-        End Function
-        Friend Function GetAccentColor() As Color
-            Dim c As Color
-            Dim regkey As RegistryKey
-            Dim regvalue As Integer
-            regkey = Registry.CurrentUser.OpenSubKey("Software\Microsoft\Windows\DWM")
-            regvalue = CInt(regkey.GetValue("AccentColor"))
-            If regvalue = Nothing Then
-                c = App.CurrentTheme.BackColor
-            Else
-                c = Color.FromArgb(255, Skye.WinAPI.GetRValue(regvalue), Skye.WinAPI.GetGValue(regvalue), Skye.WinAPI.GetBValue(regvalue))
-            End If
-            regkey.Close()
-            regkey.Dispose()
-            GetAccentColor = c
-
-            '
-            'API Method
-            'Dim params As WinAPI.DWMCOLORIZATIONPARAMS
-            'WinAPI.DwmGetColorizationParameters(params)
-            'c = Color.FromArgb(255, App.GetRValue(params.ColorizationColor), App.GetGValue(params.ColorizationColor), App.GetBValue(params.ColorizationColor))
-            '
-
-        End Function
-        Friend Function GetCurrentThemeProperties() As ThemeProperties
-            Select Case Settings.Theme
-                Case Themes.BlueAccent
-                    Return BlueAccentTheme
-                Case Themes.PinkAccent
-                    Return PinkAccentTheme
-                Case Themes.EmeraldAccent
-                    Return EmeraldAccentTheme
-                Case Themes.VioletAccent
-                    Return VioletAccentTheme
-                Case Themes.AmberAccent
-                    Return AmberAccentTheme
-                Case Themes.TealAccent
-                    Return TealAccentTheme
-                Case Themes.HighContrast
-                    Return HighContrastTheme
-                Case Themes.Light
-                    Return LightTheme
-                Case Themes.Dark
-                    Return DarkTheme
-                Case Themes.DarkPink
-                    Return DarkPinkTheme
-                Case Themes.Blossom
-                    Return BlossomTheme
-                Case Themes.CrimsonEmber
-                    Return CrimsonEmberTheme
-                Case Themes.MidnightBlue
-                    Return MidnightBlueTheme
-                Case Themes.ForestGreen
-                    Return ForestGreenTheme
-                Case Themes.SolarGold
-                    Return SolarGoldTheme
-                Case Themes.Amethyst
-                    Return AmethystTheme
-                Case Themes.Glacier
-                    Return GlacierTheme
-                Case Else
-                    Return CrimsonEmberTheme
-            End Select
-        End Function
-        Friend Sub ThemeMenu(cm As ToolStrip)
-            cm.Renderer = New SkyeMenuRenderer(
-                back:=CurrentTheme.BackColor,
-                hover:=CurrentTheme.HoverColor,
-                border:=CurrentTheme.ButtonBackColor,
-                text:=CurrentTheme.TextColor,
-                separator:=Color.FromArgb(80, 80, 80)
-                )
-            cm.SuspendLayout()
-            cm.PerformLayout()
-            cm.ResumeLayout(True)
-            cm.Invalidate()
-        End Sub
-        Friend Sub ReThemeTrayMenu()
-            If Settings.ShowTrayIcon Then ThemeMenu(NIApp.ContextMenuStrip)
-        End Sub
-        Friend Sub HookTSItemsForCMTooltip(ts As ToolStrip, tip As ToolTipEX)
-            For Each item As ToolStripItem In ts.Items
-                AddHandler item.MouseEnter,
-                    Sub(sender, e)
-                        Dim it = CType(sender, ToolStripItem)
-                        If String.IsNullOrWhiteSpace(it.ToolTipText) Then Exit Sub
-
-                        ' Delay one UI tick so ToolStrip finishes layout
-                        ts.BeginInvoke(Sub()
-                                           ShowTSItemTooltip(ts, it, tip)
-                                       End Sub)
-                    End Sub
-                AddHandler item.MouseLeave,
-                    Sub(sender, e)
-                        tip.HideTooltip()
-                    End Sub
-            Next
-        End Sub
-        Private Sub ShowTSItemTooltip(ts As ToolStrip, it As ToolStripItem, tip As ToolTipEX)
-
-            ' Get item bounds in screen coordinates
-            Dim itemScreenRect As New Rectangle(ts.PointToScreen(it.Bounds.Location), it.Bounds.Size)
-
-            ' Measure tooltip size
-            Dim textSize As Size = TextRenderer.MeasureText(it.ToolTipText, tip.Font)
-            Dim tipWidth As Integer = textSize.Width + tip.TextPadding * 2
-            Dim tipHeight As Integer = textSize.Height + tip.TextPadding * 2
-
-            ' Default: show to the right of the item
-            Dim pos As New Point(itemScreenRect.Right + 1, itemScreenRect.Top + (itemScreenRect.Height - tipHeight) \ 2 - 1)
-
-            ' Clamp horizontally using working area
-            Dim wa As Rectangle = Screen.FromPoint(pos).WorkingArea
-            If pos.X + tipWidth > wa.Right Then
-                pos.X = itemScreenRect.Left - tipWidth
-            End If
-
-            tip.ShowTooltipAt(pos, it.ToolTipText)
-        End Sub
-        Public Function TintIcon(baseIcon As Image, color As Color) As Image
-            Dim bmp As New Bitmap(baseIcon.Width, baseIcon.Height)
-
-            Using g = Graphics.FromImage(bmp)
-                g.Clear(Color.Transparent)
-
-                Dim cm As New Imaging.ColorMatrix(New Single()() {
-                    New Single() {0, 0, 0, 0, 0},
-                    New Single() {0, 0, 0, 0, 0},
-                    New Single() {0, 0, 0, 0, 0},
-                    New Single() {0, 0, 0, 1, 0},
-                    New Single() {color.R / 255.0F, color.G / 255.0F, color.B / 255.0F, 0, 1}
-                })
-
-                Dim ia As New Imaging.ImageAttributes()
-                ia.SetColorMatrix(cm)
-
-                g.DrawImage(baseIcon,
-                    New Rectangle(0, 0, baseIcon.Width, baseIcon.Height),
-                    0, 0, baseIcon.Width, baseIcon.Height,
-                    GraphicsUnit.Pixel,
-                    ia)
-            End Using
-
-            Return bmp
-        End Function
-        Friend Function ResizeImage(src As Image, size As Integer) As Image
-            Dim bmp As New Bitmap(size, size)
-            bmp.SetResolution(src.HorizontalResolution, src.VerticalResolution)
-            Using g = Graphics.FromImage(bmp)
-                g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-                g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-                g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-                g.DrawImage(src, New Rectangle(0, 0, size, size))
-            End Using
-            Return bmp
-        End Function
-        Private Function FetchLatestVersion() As String
-            Try
-                Using client As New Net.Http.HttpClient()
-                    client.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeMusic")
-                    Dim versionText As String = client.GetStringAsync("https://raw.githubusercontent.com/yodeskye/SkyeMusic/master/publishedversion.txt").Result
-                    Debug.Print("Fetched Latest Version: " & versionText.Trim())
-                    Return versionText.Trim()
-                End Using
-            Catch
-                Return Nothing
-            End Try
-        End Function
-        Friend Function IsNewerVersion(latest As String) As Boolean
-            Try
-                Dim vCurrent As New Version(GetFullVersion())
-                Dim vLatest As New Version(latest)
-                Debug.Print("Comparing Versions: Current=" & vCurrent.ToString() & " Latest=" & vLatest.ToString())
-                Return vLatest > vCurrent
-            Catch
-                Return False
-            End Try
-        End Function
         Friend Function GetPlaylistPath(playlistName As String) As String
             Dim devSuffix As String = ""
 #If DEBUG Then
@@ -4696,16 +4619,98 @@ Namespace My
 #End If
             ' Special rule for your legacy default file name
             If playlistName.Equals("Default", StringComparison.OrdinalIgnoreCase) Then
-                'Debug.Print(Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}.xml"))
                 Return Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}.xml")
             End If
             ' Standard rule for any custom user playlist names
             Dim safeName As String = String.Join("_", playlistName.Split(Path.GetInvalidFileNameChars()))
-            'Debug.Print(Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}_{safeName}.xml"))
             Return Path.Combine(App.UserPath, $"{My.Application.Info.ProductName}Playlist{devSuffix}_{safeName}.xml")
         End Function
 
         ' History Methods
+        Private Sub LoadHistory()
+            If My.Computer.FileSystem.FileExists(HistoryPath) Then
+                Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+
+                'Try new wrapper format first
+                Dim wrapperReader As New System.Xml.Serialization.XmlSerializer(GetType(HistoryData))
+                Using file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
+                    Try
+                        Dim data As HistoryData = DirectCast(wrapperReader.Deserialize(file), HistoryData)
+                        Select Case data.SchemaVersion
+                            Case 1
+                                History = If(data.History, New List(Of Song))
+                                HistoryTotalPlayedSongs = data.TotalPlayedSongs
+
+                                ' 🔑 Conversion step: map old flags into SourceType
+                                For Each s In History
+                                    If s.IsStream OrElse (s.Path IsNot Nothing AndAlso s.Path.StartsWith("http", StringComparison.OrdinalIgnoreCase)) Then
+                                        s.SourceType = MediaSourceTypes.Stream
+                                    Else
+                                        s.SourceType = MediaSourceTypes.File
+                                    End If
+                                Next
+
+                                '' bump schema version so it won’t run again
+                                'data.SchemaVersion = 2
+                            Case 2
+                                History = If(data.History, New List(Of Song))
+                                HistoryTotalPlayedSongs = data.TotalPlayedSongs
+                            Case Else
+                                History = If(data.History, New List(Of Song))
+                                HistoryTotalPlayedSongs = data.TotalPlayedSongs
+                                Skye.Common.Log.Write("Loaded Schema version " & data.SchemaVersion & " (Unknown, Using defaults For New fields)")
+                        End Select
+                        Skye.Common.Log.Write("History Loaded (Schema v" & data.SchemaVersion & ") (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
+                        Exit Sub
+                    Catch
+                        'Fall back to old format (just a List(Of Song))
+                    End Try
+                End Using
+
+                'Old format fallback
+                Dim listReader As New System.Xml.Serialization.XmlSerializer(GetType(List(Of Song)))
+                Using file As New IO.FileStream(App.HistoryPath, IO.FileMode.Open)
+                    Try
+                        History = DirectCast(listReader.Deserialize(file), List(Of Song))
+                        HistoryTotalPlayedSongs = 0
+                        Skye.Common.Log.Write("History Loaded (Legacy Format) (" &
+                               Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
+                    Catch
+                        History = New List(Of Song)
+                        HistoryTotalPlayedSongs = 0
+                        Skye.Common.Log.Write("History Not Loaded: File not valid (" & HistoryPath & ")")
+                    End Try
+                End Using
+
+            Else
+                Skye.Common.Log.Write("History Not Loaded: File does not exist")
+                History = New List(Of Song)
+                HistoryTotalPlayedSongs = 0
+            End If
+        End Sub
+        Friend Sub SaveHistory()
+            If History Is Nothing OrElse History.Count = 0 Then
+                If My.Computer.FileSystem.FileExists(HistoryPath) Then
+                    My.Computer.FileSystem.DeleteFile(HistoryPath)
+                End If
+            Else
+                Dim starttime As TimeSpan = My.Computer.Clock.LocalTime.TimeOfDay
+                Dim writer As New System.Xml.Serialization.XmlSerializer(GetType(HistoryData))
+
+                If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
+                    My.Computer.FileSystem.CreateDirectory(App.UserPath)
+                End If
+
+                Dim data As New HistoryData With {.SchemaVersion = 2, .History = History, .TotalPlayedSongs = HistoryTotalPlayedSongs}
+
+                Using file As New System.IO.StreamWriter(HistoryPath)
+                    writer.Serialize(file, data)
+                End Using
+
+                Debug.Print("History Saved")
+                Skye.Common.Log.Write("History Saved (" & Skye.Common.GenerateLogTime(starttime, My.Computer.Clock.LocalTime.TimeOfDay, True) & ")")
+            End If
+        End Sub
         Friend Sub AddToHistoryFromPlaylist(songorstream As String, Optional stream As Boolean = False)
             'Check if in the history already
             Dim existingindex As Integer = History.FindIndex(Function(p) p.Path.Equals(songorstream, StringComparison.OrdinalIgnoreCase))
