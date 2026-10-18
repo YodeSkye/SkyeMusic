@@ -66,7 +66,6 @@ namespace NAudioBridge
                 }
             }
         }
-
         public void Stop()
         {
             lock (_lock)
@@ -74,7 +73,6 @@ namespace NAudioBridge
                 StopInternal();
             }
         }
-
         private void StopInternal()
         {
             if (_recorder != null)
@@ -92,7 +90,19 @@ namespace NAudioBridge
                 }
             }
         }
-
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Stop();
+            }
+        }
+     
         private void ProcessBuffer(byte[] buffer, WaveFormat wf)
         {
             if (buffer == null || buffer.Length == 0) return;
@@ -159,18 +169,5 @@ namespace NAudioBridge
             AudioDataProcessed?.Invoke(this, new AudioDataEventArgs(samples, _magnitudes, leftMax, rightMax));
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Stop();
-            }
-        }
     }
 }
