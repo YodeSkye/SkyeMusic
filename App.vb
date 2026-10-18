@@ -358,7 +358,7 @@ Namespace My
         'Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
         Private ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.xml" 'HistoryPath is the path to the media history XML file.
-        Private ReadOnly HistoryDatabasePath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.db" 'DatabasePath is the path to the SQLite database file.
+        Private ReadOnly HistoryDatabasePath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.db" 'HistoryDatabasePath is the path to the SQLite database file.
         Friend ReadOnly DirectoryFavoritesPath As String = UserPath + My.Application.Info.ProductName + "DirectoryFavoritesDEV.json" 'DirectoryFavoritesPath is the path to the Directory Favorites JSON file.
         Friend ReadOnly DownloadPath As String = UserPath + "DownloadsDEV\" 'DownloadPath is the path to the Downloads folder.
 #Else
@@ -366,7 +366,7 @@ Namespace My
         'Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "Playlist.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "Library.xml" 'LibraryPath is the path to the media library XML file.
         Private ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "History.xml" 'HistoryPath is the path to the media history XML file.
-        Private ReadOnly DatabasePath As String = UserPath + My.Application.Info.ProductName + "History.db" 'DatabasePath is the path to the SQLite database file.
+        Private ReadOnly HistoryDatabasePath As String = UserPath + My.Application.Info.ProductName + "History.db" 'HistoryDatabasePath is the path to the SQLite database file.
         Friend ReadOnly DirectoryFavoritesPath As String = UserPath + My.Application.Info.ProductName + "DirectoryFavorites.json" 'DirectoryFavoritesPath is the path to the Directory Favorites JSON file.
         Friend ReadOnly DownloadPath As String = UserPath + "Downloads\" 'DownloadPath is the path to the Downloads folder.
 #End If
