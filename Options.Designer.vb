@@ -72,6 +72,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval2 = New Skye.UI.Label()
         TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        BtnHistoryDBMaintenance = New Button()
         TxtBoxVoicePushToTalk = New TextBox()
         ChkBoxEnableVoiceCommands = New CheckBox()
         TxtBoxCompanionServerPort = New Skye.UI.NumericTextBox()
@@ -817,6 +818,7 @@ Partial Class Options
         ' TPApp
         ' 
         TPApp.BorderStyle = BorderStyle.Fixed3D
+        TPApp.Controls.Add(BtnHistoryDBMaintenance)
         TPApp.Controls.Add(TxtBoxVoicePushToTalk)
         TPApp.Controls.Add(ChkBoxEnableVoiceCommands)
         TPApp.Controls.Add(TxtBoxCompanionServerPort)
@@ -857,6 +859,22 @@ Partial Class Options
         TipOptions.SetText(TPApp, Nothing)
         TPApp.Text = " App "
         TPApp.ThemesEnabled = False
+        ' 
+        ' BtnHistoryDBMaintenance
+        ' 
+        TipError.SetImage(BtnHistoryDBMaintenance, Nothing)
+        BtnHistoryDBMaintenance.Image = My.Resources.Resources.ImageDatabase32
+        TipOptions.SetImage(BtnHistoryDBMaintenance, My.Resources.Resources.ImageDatabase16)
+        BtnHistoryDBMaintenance.ImageAlign = ContentAlignment.MiddleLeft
+        BtnHistoryDBMaintenance.Location = New Point(516, 309)
+        BtnHistoryDBMaintenance.Name = "BtnHistoryDBMaintenance"
+        BtnHistoryDBMaintenance.Size = New Size(289, 40)
+        BtnHistoryDBMaintenance.TabIndex = 149
+        TipOptions.SetText(BtnHistoryDBMaintenance, "Run Routine Maintenance on Play History Database.")
+        TipError.SetText(BtnHistoryDBMaintenance, Nothing)
+        BtnHistoryDBMaintenance.Text = "Run Plays Database Maintenance"
+        BtnHistoryDBMaintenance.TextAlign = ContentAlignment.MiddleRight
+        BtnHistoryDBMaintenance.UseVisualStyleBackColor = True
         ' 
         ' TxtBoxVoicePushToTalk
         ' 
@@ -1759,4 +1777,5 @@ Partial Class Options
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents CMIPlaylistsMoveUp As ToolStripMenuItem
     Friend WithEvents CMIPlaylistsMoveDown As ToolStripMenuItem
+    Friend WithEvents BtnHistoryDBMaintenance As Button
 End Class

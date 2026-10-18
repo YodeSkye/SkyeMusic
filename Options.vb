@@ -1,4 +1,5 @@
 ﻿
+Imports System.Data.SQLite
 Imports System.IO
 Imports SkyeMusic.My
 Imports TagLib.Riff
@@ -232,6 +233,45 @@ Public Class Options
     End Sub
     Private Sub BtnHistorySaveNow_Click(sender As Object, e As EventArgs) Handles BtnHistorySaveNow.Click
         App.SaveHistory()
+    End Sub
+    Private Sub BtnHistoryDBMaintenance_Click(sender As Object, e As EventArgs) Handles BtnHistoryDBMaintenance.Click
+        Cursor = Cursors.WaitCursor
+        Try
+            Using conn As New SQLiteConnection(App.HistoryDBConnectionString)
+                conn.Open()
+                Using cmd = conn.CreateCommand()
+
+                    ' Checkpoint WAL
+                    cmd.CommandText = "PRAGMA wal_checkpoint(TRUNCATE);"
+                    cmd.ExecuteNonQuery()
+
+                    ' Integrity Check
+                    cmd.CommandText = "PRAGMA integrity_check;"
+                    Dim integrityResult As String = Convert.ToString(cmd.ExecuteScalar())
+                    If integrityResult <> "ok" Then
+                        Throw New Exception($"Integrity check failed: {integrityResult}")
+                    End If
+
+                    ' Rebuild and defragment database
+                    cmd.CommandText = "VACUUM;"
+                    cmd.ExecuteNonQuery()
+
+                    ' Update query optimizer stats
+                    cmd.CommandText = "ANALYZE;"
+                    cmd.ExecuteNonQuery()
+
+                    ' Optimize database for performance
+                    cmd.CommandText = "PRAGMA optimize;"
+                    cmd.ExecuteNonQuery()
+
+                End Using
+            End Using
+            Skye.Common.Log.Write($"Play History Database Maintenance Completed Successfully")
+        Catch ex As Exception
+            Skye.Common.Log.Write($"PLAY HISTORY DATABASE MAINTENANCE ERROR: {ex.Message}")
+        Finally
+            Cursor = Cursors.Default
+        End Try
     End Sub
     Private Sub BtnLibrarySearchFoldersAdd_Click(sender As Object, e As EventArgs) Handles BtnLibrarySearchFoldersAdd.Click
         LibrarySearchFoldersAdd()
@@ -1114,6 +1154,8 @@ Public Class Options
         TxtBoxHistoryAutoSaveInterval.ForeColor = App.CurrentTheme.TextColor
         TxtBoxCompanionServerPort.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxCompanionServerPort.ForeColor = App.CurrentTheme.TextColor
+        BtnHistoryDBMaintenance.BackColor = App.CurrentTheme.ButtonBackColor
+        BtnHistoryDBMaintenance.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnPrunePlaylist.BackColor = App.CurrentTheme.ButtonBackColor
         BtnPrunePlaylist.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnHistorySaveNow.BackColor = App.CurrentTheme.ButtonBackColor

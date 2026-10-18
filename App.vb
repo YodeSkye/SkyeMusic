@@ -358,7 +358,7 @@ Namespace My
         'Friend ReadOnly PlaylistPath As String = UserPath + My.Application.Info.ProductName + "PlaylistDEV.xml" 'PlayerPath is the path to the playlist XML file.
         Friend ReadOnly LibraryPath As String = UserPath + My.Application.Info.ProductName + "LibraryDEV.xml" 'LibraryPath is the path to the media library XML file.
         Private ReadOnly HistoryPath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.xml" 'HistoryPath is the path to the media history XML file.
-        Private ReadOnly DatabasePath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.db" 'DatabasePath is the path to the SQLite database file.
+        Private ReadOnly HistoryDatabasePath As String = UserPath + My.Application.Info.ProductName + "HistoryDEV.db" 'DatabasePath is the path to the SQLite database file.
         Friend ReadOnly DirectoryFavoritesPath As String = UserPath + My.Application.Info.ProductName + "DirectoryFavoritesDEV.json" 'DirectoryFavoritesPath is the path to the Directory Favorites JSON file.
         Friend ReadOnly DownloadPath As String = UserPath + "DownloadsDEV\" 'DownloadPath is the path to the Downloads folder.
 #Else
@@ -370,6 +370,11 @@ Namespace My
         Friend ReadOnly DirectoryFavoritesPath As String = UserPath + My.Application.Info.ProductName + "DirectoryFavorites.json" 'DirectoryFavoritesPath is the path to the Directory Favorites JSON file.
         Friend ReadOnly DownloadPath As String = UserPath + "Downloads\" 'DownloadPath is the path to the Downloads folder.
 #End If
+        Public ReadOnly Property HistoryDBConnectionString As String
+            Get
+                Return $"Data Source={HistoryDatabasePath};Version=3;Synchronous=Normal;Busy Timeout=5000;"
+            End Get
+        End Property
 
         ' Themes
         Friend Enum Themes
@@ -2733,6 +2738,7 @@ Namespace My
                 CurrentTheme = GetCurrentThemeProperties()
                 LoadHistory()
                 LoadPlayHistoryDatabase()
+                InitializeHistoryDatabaseOnStartup()
                 GenerateHotKeyList()
                 SetHistoryAutoSaveTimer()
             Catch ex As Exception
@@ -4894,21 +4900,35 @@ Namespace My
             End If
         End Function
 
-        ' Database (Play History) Methods
+        ' Play History Database (Play History) Methods
+        Friend Sub InitializeHistoryDatabaseOnStartup()
+            Using conn As New SQLiteConnection(HistoryDBConnectionString)
+                conn.Open()
+                Using cmd = conn.CreateCommand()
+                    ' Writes WAL mode to the DB header once
+                    cmd.CommandText = "PRAGMA journal_mode=WAL;"
+                    cmd.ExecuteNonQuery()
+                    ' Quick sanity check
+                    cmd.CommandText = "PRAGMA quick_check;"
+                    Dim result As String = Convert.ToString(cmd.ExecuteScalar())
+                    If result <> "ok" Then
+                        Skye.Common.Log.Write($"PLAY HISTORY DATABASE WARNING on Startup Quick Check: {result}")
+                    End If
+                End Using
+            End Using
+        End Sub
         Private Sub LoadPlayHistoryDatabase()
             If Not My.Computer.FileSystem.DirectoryExists(App.UserPath) Then
                 My.Computer.FileSystem.CreateDirectory(App.UserPath)
             End If
 
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
-
             'Create the database file if it doesn't exist
-            If Not File.Exists(DatabasePath) Then
-                SQLiteConnection.CreateFile(DatabasePath)
+            If Not File.Exists(HistoryDatabasePath) Then
+                SQLiteConnection.CreateFile(HistoryDatabasePath)
             End If
 
             'Create the Plays table if needed
-            Using connection As New SQLiteConnection(connectionString)
+            Using connection As New SQLiteConnection(HistoryDBConnectionString)
                 connection.Open()
                 Dim createTableSql As String = "
                     CREATE TABLE IF NOT EXISTS Plays (
@@ -4926,12 +4946,11 @@ Namespace My
 
         End Sub
         Friend Sub LogPlayHistory(path As String, startTime As DateTime, stopTime As DateTime, durationSeconds As Integer, trigger As PlayTriggers)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             If durationSeconds < 0 Then Skye.Common.Log.Write("LogPlayHistory Duration was less than zero (" & durationSeconds.ToString & "), for " & path)
             If durationSeconds <= 0 Then durationSeconds = CInt((stopTime - startTime).TotalSeconds)
             Dim insertSql As String = "INSERT INTO Plays (Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger) VALUES (@Path, @Start, @Stop, @Duration, @Trigger);"
 
-            Using connection As New SQLiteConnection(connectionString)
+            Using connection As New SQLiteConnection(HistoryDBConnectionString)
                 connection.Open()
                 Using command As New SQLiteCommand(insertSql, connection)
                     command.Parameters.AddWithValue("@Path", path)
@@ -4945,11 +4964,10 @@ Namespace My
 
         End Sub
         Friend Function GetPlayHistoryTable() As DataTable
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Dim dt As New DataTable()
 
             Try
-                Using conn As New SQLiteConnection(connectionString)
+                Using conn As New SQLiteConnection(HistoryDBConnectionString)
                     conn.Open()
 
                     Dim query As String = "SELECT * FROM Plays ORDER BY StartPlayTime DESC"
@@ -4967,9 +4985,8 @@ Namespace My
             Return dt
         End Function
         Friend Function DeletePlayHistoryById(recordId As Integer) As Boolean
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Try
-                Using conn As New SQLiteConnection(connectionString)
+                Using conn As New SQLiteConnection(HistoryDBConnectionString)
                     conn.Open()
 
                     Dim query As String = "DELETE FROM Plays WHERE Id = @Id"
@@ -4987,11 +5004,10 @@ Namespace My
             End Try
         End Function
         Friend Function GetSessionStats() As (Count As Integer, Duration As TimeSpan)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Dim count As Integer = 0
             Dim duration As TimeSpan = TimeSpan.Zero
 
-            Using conn As New SQLiteConnection(connectionString)
+            Using conn As New SQLiteConnection(HistoryDBConnectionString)
                 conn.Open()
 
                 'Count plays this session
@@ -5014,11 +5030,10 @@ Namespace My
             Return (count, duration)
         End Function
         Friend Function GetLifetimeStats() As (Count As Integer, Duration As TimeSpan)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Dim count As Integer = 0
             Dim duration As TimeSpan = TimeSpan.Zero
 
-            Using conn As New SQLiteConnection(connectionString)
+            Using conn As New SQLiteConnection(HistoryDBConnectionString)
                 conn.Open()
 
                 ' Count all plays
@@ -5039,10 +5054,9 @@ Namespace My
             Return (count, duration)
         End Function
         Friend Function GetPlays() As List(Of PlayRecord)
-            Dim connectionString = $"Data Source={DatabasePath};Version=3;"
             Dim plays As New List(Of PlayRecord)
 
-            Using conn As New SQLiteConnection(connectionString)
+            Using conn As New SQLiteConnection(HistoryDBConnectionString)
                 conn.Open()
 
                 Dim sql = "SELECT ID, Path, StartPlayTime, StopPlayTime, Duration, PlayTrigger 
