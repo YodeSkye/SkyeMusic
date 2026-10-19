@@ -92,6 +92,12 @@ Namespace My
             Stream
             AudioCD
         End Enum
+        Public Enum AudioStreamBitrate
+            Low = 128       ' Low bitrate for live streams, typically used for lower quality audio streaming or weak wi-fi.
+            Medium = 192    ' Medium bitrate for live streams, typically used for standard quality audio streaming, good default.
+            High = 256      ' High bitrate for live streams, typically used for higher quality audio streaming, very crisp.
+            Max = 320       ' Max bitrate for live streams, typically used for the highest quality audio streaming.
+        End Enum
         <XmlRoot("ArrayOfPlaylistItemType"), XmlType("PlaylistItemType")> ' Keep this attribute to ensure backward compatibility with older versions of the application that used PlaylistItemType for playlist saving.
         Public Structure PlaylistTrackType ' For Playlist Saving/Loading
             Public Title As String
@@ -1217,6 +1223,9 @@ Namespace My
             Friend Shared LatestKnownVersion As String = String.Empty
             Friend Shared EnableCompanionServer As Boolean = False
             Friend Shared CompanionServerPort As Integer = 5050
+            Friend Shared EnableAudioStreaming As Boolean = False
+            Friend Shared AudioStreamingPort As Integer = 5051
+            Friend Shared AudioStreamingBitrate As AudioStreamBitrate = AudioStreamBitrate.Medium
             Friend Shared EnableVoiceCommands As Boolean = False
             Friend Shared VoicePushToTalk As Boolean = True
 

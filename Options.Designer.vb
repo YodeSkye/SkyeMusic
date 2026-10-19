@@ -72,6 +72,9 @@ Partial Class Options
         LblHistoryAutoSaveInterval2 = New Skye.UI.Label()
         TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        TxtBoxAudioServerPort = New Skye.UI.NumericTextBox()
+        ChkBoxEnableAudioServer = New CheckBox()
+        LblAudioServerPort = New Skye.UI.Label()
         BtnHistoryDBMaintenance = New Button()
         TxtBoxVoicePushToTalk = New TextBox()
         ChkBoxEnableVoiceCommands = New CheckBox()
@@ -446,7 +449,7 @@ Partial Class Options
         TipError.SetImage(BtnHelperApp2, Nothing)
         BtnHelperApp2.Image = My.Resources.Resources.ImageGetPath16
         TipOptions.SetImage(BtnHelperApp2, Nothing)
-        BtnHelperApp2.Location = New Point(773, 199)
+        BtnHelperApp2.Location = New Point(773, 180)
         BtnHelperApp2.Name = "BtnHelperApp2"
         BtnHelperApp2.Size = New Size(32, 31)
         BtnHelperApp2.TabIndex = 70
@@ -635,7 +638,7 @@ Partial Class Options
         BtnHistoryPrune.Image = My.Resources.Resources.ImagePrune32
         TipOptions.SetImage(BtnHistoryPrune, My.Resources.Resources.ImagePrune32)
         BtnHistoryPrune.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistoryPrune.Location = New Point(587, 263)
+        BtnHistoryPrune.Location = New Point(590, 234)
         BtnHistoryPrune.Name = "BtnHistoryPrune"
         BtnHistoryPrune.Size = New Size(218, 40)
         BtnHistoryPrune.TabIndex = 80
@@ -651,7 +654,7 @@ Partial Class Options
         TxtBoxHelperApp2Path.Font = New Font("Segoe UI", 12F)
         TipError.SetImage(TxtBoxHelperApp2Path, Nothing)
         TipOptions.SetImage(TxtBoxHelperApp2Path, Nothing)
-        TxtBoxHelperApp2Path.Location = New Point(353, 200)
+        TxtBoxHelperApp2Path.Location = New Point(353, 182)
         TxtBoxHelperApp2Path.Name = "TxtBoxHelperApp2Path"
         TxtBoxHelperApp2Path.ShortcutsEnabled = False
         TxtBoxHelperApp2Path.Size = New Size(420, 29)
@@ -665,7 +668,7 @@ Partial Class Options
         TxtBoxHelperApp2Name.Font = New Font("Segoe UI", 12F)
         TipError.SetImage(TxtBoxHelperApp2Name, Nothing)
         TipOptions.SetImage(TxtBoxHelperApp2Name, Nothing)
-        TxtBoxHelperApp2Name.Location = New Point(353, 150)
+        TxtBoxHelperApp2Name.Location = New Point(353, 132)
         TxtBoxHelperApp2Name.Name = "TxtBoxHelperApp2Name"
         TxtBoxHelperApp2Name.ShortcutsEnabled = False
         TxtBoxHelperApp2Name.Size = New Size(202, 29)
@@ -818,6 +821,9 @@ Partial Class Options
         ' TPApp
         ' 
         TPApp.BorderStyle = BorderStyle.Fixed3D
+        TPApp.Controls.Add(TxtBoxAudioServerPort)
+        TPApp.Controls.Add(ChkBoxEnableAudioServer)
+        TPApp.Controls.Add(LblAudioServerPort)
         TPApp.Controls.Add(BtnHistoryDBMaintenance)
         TPApp.Controls.Add(TxtBoxVoicePushToTalk)
         TPApp.Controls.Add(ChkBoxEnableVoiceCommands)
@@ -860,13 +866,57 @@ Partial Class Options
         TPApp.Text = " App "
         TPApp.ThemesEnabled = False
         ' 
+        ' TxtBoxAudioServerPort
+        ' 
+        TipError.SetImage(TxtBoxAudioServerPort, Nothing)
+        TipOptions.SetImage(TxtBoxAudioServerPort, Nothing)
+        TxtBoxAudioServerPort.Location = New Point(744, 375)
+        TxtBoxAudioServerPort.Name = "TxtBoxAudioServerPort"
+        TxtBoxAudioServerPort.ShortcutsEnabled = False
+        TxtBoxAudioServerPort.Size = New Size(61, 29)
+        TxtBoxAudioServerPort.TabIndex = 151
+        TipError.SetText(TxtBoxAudioServerPort, Nothing)
+        TipOptions.SetText(TxtBoxAudioServerPort, "Companion App Server Port Number")
+        TxtBoxAudioServerPort.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' ChkBoxEnableAudioServer
+        ' 
+        ChkBoxEnableAudioServer.AutoSize = True
+        ChkBoxEnableAudioServer.FlatStyle = FlatStyle.Flat
+        ChkBoxEnableAudioServer.Font = New Font("Segoe UI", 12F)
+        TipOptions.SetImage(ChkBoxEnableAudioServer, Nothing)
+        TipError.SetImage(ChkBoxEnableAudioServer, Nothing)
+        ChkBoxEnableAudioServer.Location = New Point(511, 376)
+        ChkBoxEnableAudioServer.Name = "ChkBoxEnableAudioServer"
+        ChkBoxEnableAudioServer.Size = New Size(192, 25)
+        ChkBoxEnableAudioServer.TabIndex = 150
+        TipError.SetText(ChkBoxEnableAudioServer, Nothing)
+        TipOptions.SetText(ChkBoxEnableAudioServer, "Set In Code")
+        ChkBoxEnableAudioServer.Text = "Enable Audio Streaming"
+        ChkBoxEnableAudioServer.UseVisualStyleBackColor = True
+        ' 
+        ' LblAudioServerPort
+        ' 
+        LblAudioServerPort.AutoSize = True
+        LblAudioServerPort.Font = New Font("Segoe UI", 12F)
+        TipError.SetImage(LblAudioServerPort, Nothing)
+        TipOptions.SetImage(LblAudioServerPort, Nothing)
+        LblAudioServerPort.Location = New Point(709, 379)
+        LblAudioServerPort.Name = "LblAudioServerPort"
+        LblAudioServerPort.Size = New Size(38, 21)
+        LblAudioServerPort.TabIndex = 152
+        TipOptions.SetText(LblAudioServerPort, Nothing)
+        LblAudioServerPort.Text = "Port"
+        TipError.SetText(LblAudioServerPort, Nothing)
+        LblAudioServerPort.TextAlign = ContentAlignment.MiddleRight
+        ' 
         ' BtnHistoryDBMaintenance
         ' 
         TipError.SetImage(BtnHistoryDBMaintenance, Nothing)
         BtnHistoryDBMaintenance.Image = My.Resources.Resources.ImageDatabase32
         TipOptions.SetImage(BtnHistoryDBMaintenance, My.Resources.Resources.ImageDatabase16)
         BtnHistoryDBMaintenance.ImageAlign = ContentAlignment.MiddleLeft
-        BtnHistoryDBMaintenance.Location = New Point(516, 309)
+        BtnHistoryDBMaintenance.Location = New Point(519, 280)
         BtnHistoryDBMaintenance.Name = "BtnHistoryDBMaintenance"
         BtnHistoryDBMaintenance.Size = New Size(289, 40)
         BtnHistoryDBMaintenance.TabIndex = 149
@@ -908,7 +958,7 @@ Partial Class Options
         ' 
         TipError.SetImage(TxtBoxCompanionServerPort, Nothing)
         TipOptions.SetImage(TxtBoxCompanionServerPort, Nothing)
-        TxtBoxCompanionServerPort.Location = New Point(744, 374)
+        TxtBoxCompanionServerPort.Location = New Point(744, 344)
         TxtBoxCompanionServerPort.Name = "TxtBoxCompanionServerPort"
         TxtBoxCompanionServerPort.ShortcutsEnabled = False
         TxtBoxCompanionServerPort.Size = New Size(61, 29)
@@ -924,7 +974,7 @@ Partial Class Options
         CkBoxEnableCompanionServer.Font = New Font("Segoe UI", 12F)
         TipOptions.SetImage(CkBoxEnableCompanionServer, Nothing)
         TipError.SetImage(CkBoxEnableCompanionServer, Nothing)
-        CkBoxEnableCompanionServer.Location = New Point(496, 376)
+        CkBoxEnableCompanionServer.Location = New Point(496, 346)
         CkBoxEnableCompanionServer.Name = "CkBoxEnableCompanionServer"
         CkBoxEnableCompanionServer.Size = New Size(206, 25)
         CkBoxEnableCompanionServer.TabIndex = 98
@@ -971,7 +1021,7 @@ Partial Class Options
         LblHelperApp2Path.Font = New Font("Segoe UI", 12F)
         TipError.SetImage(LblHelperApp2Path, Nothing)
         TipOptions.SetImage(LblHelperApp2Path, Nothing)
-        LblHelperApp2Path.Location = New Point(353, 179)
+        LblHelperApp2Path.Location = New Point(353, 161)
         LblHelperApp2Path.Name = "LblHelperApp2Path"
         LblHelperApp2Path.Size = New Size(153, 21)
         LblHelperApp2Path.TabIndex = 135
@@ -985,7 +1035,7 @@ Partial Class Options
         LblHelperApp2Name.Font = New Font("Segoe UI", 12F)
         TipError.SetImage(LblHelperApp2Name, Nothing)
         TipOptions.SetImage(LblHelperApp2Name, Nothing)
-        LblHelperApp2Name.Location = New Point(353, 129)
+        LblHelperApp2Name.Location = New Point(353, 111)
         LblHelperApp2Name.Name = "LblHelperApp2Name"
         LblHelperApp2Name.Size = New Size(165, 21)
         LblHelperApp2Name.TabIndex = 134
@@ -1013,7 +1063,7 @@ Partial Class Options
         LblCompanionServerPort.Font = New Font("Segoe UI", 12F)
         TipError.SetImage(LblCompanionServerPort, Nothing)
         TipOptions.SetImage(LblCompanionServerPort, Nothing)
-        LblCompanionServerPort.Location = New Point(709, 378)
+        LblCompanionServerPort.Location = New Point(709, 348)
         LblCompanionServerPort.Name = "LblCompanionServerPort"
         LblCompanionServerPort.Size = New Size(38, 21)
         LblCompanionServerPort.TabIndex = 148
@@ -1778,4 +1828,7 @@ Partial Class Options
     Friend WithEvents CMIPlaylistsMoveUp As ToolStripMenuItem
     Friend WithEvents CMIPlaylistsMoveDown As ToolStripMenuItem
     Friend WithEvents BtnHistoryDBMaintenance As Button
+    Friend WithEvents TxtBoxAudioServerPort As Skye.UI.NumericTextBox
+    Friend WithEvents ChkBoxEnableAudioServer As CheckBox
+    Friend WithEvents LblAudioServerPort As Skye.UI.Label
 End Class

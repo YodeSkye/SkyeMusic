@@ -171,6 +171,12 @@ Public Class Options
             LblCompanionServerPort.Enabled = False
             TxtBoxCompanionServerPort.Enabled = False
         End If
+        ChkBoxEnableAudioServer.Checked = Settings.EnableAudioStreaming
+        TxtBoxAudioServerPort.Text = Settings.AudioStreamingPort.ToString
+        If Not Settings.EnableAudioStreaming Then
+            LblAudioServerPort.Enabled = False
+            TxtBoxAudioServerPort.Enabled = False
+        End If
         ChkBoxEnableVoiceCommands.Checked = App.Settings.EnableVoiceCommands
         ChkBoxEnableVoicePushToTalk.Checked = App.Settings.VoicePushToTalk
         TxtBoxVoicePushToTalk.Text = Settings.HotKeyVoicePushToTalk.KeyText
@@ -579,6 +585,32 @@ Public Class Options
             TxtBoxCompanionServerPort.SelectAll()
         End If
     End Sub
+    Private Sub TxtBoxAudioServerPort_Validated(sender As Object, e As EventArgs) Handles TxtBoxAudioServerPort.Validated
+        Dim value As Integer
+        ' TryParse avoids exceptions and keeps things calm
+        If Integer.TryParse(TxtBoxAudioServerPort.Text, value) Then
+            ' Validate range (choose the range you want)
+            If value >= 1024 AndAlso value <= 49151 Then
+                ' Only update if changed
+                If Settings.AudioStreamingPort <> value Then
+                    Settings.AudioStreamingPort = value
+                    TxtBoxAudioServerPort.SelectAll()
+                    If Settings.EnableAudioStreaming Then
+                        'SetAudioStreaming(True)
+                        'SetAudioStreaming()
+                    End If
+                End If
+            Else
+                ' Out of range → restore previous value
+                TxtBoxAudioServerPort.Text = Settings.AudioStreamingPort.ToString()
+                TxtBoxAudioServerPort.SelectAll()
+            End If
+        Else
+            ' Not a number → restore previous value
+            TxtBoxAudioServerPort.Text = Settings.AudioStreamingPort.ToString()
+            TxtBoxAudioServerPort.SelectAll()
+        End If
+    End Sub
     Private Sub ChkBoxVolumeBoost_Click(sender As Object, e As EventArgs) Handles ChkBoxVolumeBoost.Click
         If ChkBoxVolumeBoost.Checked Then
             App.Settings.AudioOutputModule = App.AudioOutputModuleTypes.DirectSound
@@ -646,6 +678,18 @@ Public Class Options
                 TxtBoxCompanionServerPort.Enabled = False
         End Select
         SetCompanionServer()
+    End Sub
+    Private Sub ChkBoxEnableAudioServer_Click(sender As Object, e As EventArgs) Handles ChkBoxEnableAudioServer.Click
+        Settings.EnableAudioStreaming = Not Settings.EnableAudioStreaming
+        Select Case Settings.EnableAudioStreaming
+            Case True
+                LblAudioServerPort.Enabled = True
+                TxtBoxAudioServerPort.Enabled = True
+            Case False
+                LblAudioServerPort.Enabled = False
+                TxtBoxAudioServerPort.Enabled = False
+        End Select
+        'SetAudioStreaming()
     End Sub
     Private Sub ChkBoxEnableVoiceCommands_Click(sender As Object, e As EventArgs) Handles ChkBoxEnableVoiceCommands.Click
         App.Settings.EnableVoiceCommands = Not App.Settings.EnableVoiceCommands
@@ -1026,6 +1070,7 @@ Public Class Options
             CkBoxShowTrayIcon.BackColor = c
             CkBoxMinimizeToTray.BackColor = c
             CkBoxEnableCompanionServer.BackColor = c
+            ChkBoxEnableAudioServer.BackColor = c
             ChkBoxEnableVoiceCommands.BackColor = c
             ChkBoxEnableVoicePushToTalk.BackColor = c
             TCOptions.TabPanelBackColor = c
@@ -1062,6 +1107,7 @@ Public Class Options
             CkBoxShowTrayIcon.BackColor = App.CurrentTheme.BackColor
             CkBoxMinimizeToTray.BackColor = App.CurrentTheme.BackColor
             CkBoxEnableCompanionServer.BackColor = App.CurrentTheme.BackColor
+            ChkBoxEnableAudioServer.BackColor = App.CurrentTheme.BackColor
             ChkBoxEnableVoiceCommands.BackColor = App.CurrentTheme.BackColor
             ChkBoxEnableVoicePushToTalk.BackColor = App.CurrentTheme.BackColor
             TCOptions.TabPanelBackColor = App.CurrentTheme.BackColor
@@ -1133,6 +1179,7 @@ Public Class Options
         CkBoxWatchFoldersUpdatePlaylist.ForeColor = forecolor
         CkBoxPlaylistRemoveSpaces.ForeColor = forecolor
         CkBoxEnableCompanionServer.ForeColor = forecolor
+        ChkBoxEnableAudioServer.ForeColor = forecolor
         ChkBoxEnableVoiceCommands.ForeColor = forecolor
         ChkBoxEnableVoicePushToTalk.ForeColor = forecolor
         LblHelperApp1Name.ForeColor = forecolor
@@ -1146,6 +1193,7 @@ Public Class Options
         LblHistoryAutoSaveInterval1.ForeColor = forecolor
         LblHistoryAutoSaveInterval2.ForeColor = forecolor
         LblCompanionServerPort.ForeColor = forecolor
+        LblAudioServerPort.ForeColor = forecolor
         TxtBoxVoicePushToTalk.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxVoicePushToTalk.ForeColor = forecolor
         TxtBoxRandomHistoryUpdateInterval.BackColor = App.CurrentTheme.ControlBackColor
@@ -1156,6 +1204,8 @@ Public Class Options
         TxtBoxHistoryAutoSaveInterval.ForeColor = App.CurrentTheme.TextColor
         TxtBoxCompanionServerPort.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxCompanionServerPort.ForeColor = App.CurrentTheme.TextColor
+        TxtBoxAudioServerPort.BackColor = App.CurrentTheme.ControlBackColor
+        TxtBoxAudioServerPort.ForeColor = App.CurrentTheme.TextColor
         BtnHistoryDBMaintenance.BackColor = App.CurrentTheme.ButtonBackColor
         BtnHistoryDBMaintenance.ForeColor = App.CurrentTheme.ButtonTextColor
         BtnPrunePlaylist.BackColor = App.CurrentTheme.ButtonBackColor
