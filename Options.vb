@@ -266,8 +266,10 @@ Public Class Options
 
                 End Using
             End Using
+            App.ShowToast("", "Play History Database Maintenance Completed Successfully")
             Skye.Common.Log.Write($"Play History Database Maintenance Completed Successfully")
         Catch ex As Exception
+            App.ShowToast("Error", $"Play History Database Maintenance Failed. See Log For Details.")
             Skye.Common.Log.Write($"PLAY HISTORY DATABASE MAINTENANCE ERROR: {ex.Message}")
         Finally
             Cursor = Cursors.Default
