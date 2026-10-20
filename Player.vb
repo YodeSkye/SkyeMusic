@@ -5898,6 +5898,7 @@ Public Class Player
         ' - Avoid cross-thread reparenting or teardown collisions
 
         PlayState = PlayStates.Playing
+        If App.Settings.EnableAudioStreaming Then LiveAudioServer.Start(App.Settings.AudioStreamingPort)
 
         'Update The Histories
         UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed for uniformity.
@@ -5955,6 +5956,7 @@ Public Class Player
 
         TimerShowMedia.Start()
 
+
     End Sub
     Private Sub OnPause()
         PlayState = PlayStates.Paused
@@ -6010,6 +6012,7 @@ Public Class Player
         If FullScreen Then FullScreen = False
         VLCViewer.Visible = False
         App.BroadcastNowPlaying()
+
     End Sub
     Private Sub ShowPosition()
         Try
