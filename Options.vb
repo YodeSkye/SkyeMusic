@@ -172,8 +172,12 @@ Public Class Options
             TxtBoxCompanionServerPort.Enabled = False
         End If
         ChkBoxEnableAudioServer.Checked = Settings.EnableAudioStreaming
+        CoBoxAudioServerBitrate.DataSource = [Enum].GetValues(GetType(App.AudioStreamBitrate))
+        CoBoxAudioServerBitrate.SelectedItem = Settings.AudioStreamingBitrate
         TxtBoxAudioServerPort.Text = Settings.AudioStreamingPort.ToString
         If Not Settings.EnableAudioStreaming Then
+            LblAudioServerBitrate.Enabled = False
+            CoBoxAudioServerBitrate.Enabled = False
             LblAudioServerPort.Enabled = False
             TxtBoxAudioServerPort.Enabled = False
         End If
@@ -379,6 +383,10 @@ Public Class Options
     End Sub
     Private Sub CoBoxPlaylistTitleFormat_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxPlaylistTitleFormat.SelectionChangeCommitted
         App.Settings.PlaylistTitleFormat = CType(CoBoxPlaylistTitleFormat.SelectedIndex, App.PlaylistTitleFormats)
+    End Sub
+    Private Sub CoBoxAudioServerBitrate_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAudioServerBitrate.SelectionChangeCommitted
+        App.Settings.AudioStreamingBitrate = CType(CoBoxAudioServerBitrate.SelectedItem, App.AudioStreamBitrate)
+        'SetAudioStreaming()
     End Sub
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown, TxtBoxHistoryUpdateInterval.KeyDown, TxtBoxRandomHistoryUpdateInterval.KeyDown, TxtBoxStatusMessageDisplayTime.KeyDown, TxtBoxCompanionServerPort.KeyDown
         If e.KeyCode = Keys.Enter Then
@@ -683,9 +691,13 @@ Public Class Options
         Settings.EnableAudioStreaming = Not Settings.EnableAudioStreaming
         Select Case Settings.EnableAudioStreaming
             Case True
+                LblAudioServerBitrate.Enabled = True
+                CoBoxAudioServerBitrate.Enabled = True
                 LblAudioServerPort.Enabled = True
                 TxtBoxAudioServerPort.Enabled = True
             Case False
+                LblAudioServerBitrate.Enabled = False
+                CoBoxAudioServerBitrate.Enabled = False
                 LblAudioServerPort.Enabled = False
                 TxtBoxAudioServerPort.Enabled = False
         End Select
@@ -1129,6 +1141,8 @@ Public Class Options
         CoBoxPlaylistTitleFormat.ForeColor = App.CurrentTheme.TextColor
         CoBoxVisualizers.BackColor = App.CurrentTheme.ControlBackColor
         CoBoxVisualizers.ForeColor = App.CurrentTheme.TextColor
+        CoBoxAudioServerBitrate.BackColor = App.CurrentTheme.ControlBackColor
+        CoBoxAudioServerBitrate.ForeColor = App.CurrentTheme.TextColor
         TxtBoxPlaylistTitleSeparator.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxPlaylistTitleSeparator.ForeColor = App.CurrentTheme.TextColor
         TxtBoxPlaylistVideoIdentifier.BackColor = App.CurrentTheme.ControlBackColor
@@ -1193,6 +1207,7 @@ Public Class Options
         LblHistoryAutoSaveInterval1.ForeColor = forecolor
         LblHistoryAutoSaveInterval2.ForeColor = forecolor
         LblCompanionServerPort.ForeColor = forecolor
+        LblAudioServerBitrate.ForeColor = forecolor
         LblAudioServerPort.ForeColor = forecolor
         TxtBoxVoicePushToTalk.BackColor = App.CurrentTheme.ControlBackColor
         TxtBoxVoicePushToTalk.ForeColor = forecolor

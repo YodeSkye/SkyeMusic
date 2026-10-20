@@ -72,6 +72,7 @@ Partial Class Options
         LblHistoryAutoSaveInterval2 = New Skye.UI.Label()
         TCOptions = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPApp = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        CoBoxAudioServerBitrate = New Skye.UI.ComboBox()
         TxtBoxAudioServerPort = New Skye.UI.NumericTextBox()
         ChkBoxEnableAudioServer = New CheckBox()
         LblAudioServerPort = New Skye.UI.Label()
@@ -87,6 +88,7 @@ Partial Class Options
         LblHelperApp1Path = New Skye.UI.Label()
         LblCompanionServerPort = New Skye.UI.Label()
         ChkBoxEnableVoicePushToTalk = New CheckBox()
+        LblAudioServerBitrate = New Skye.UI.Label()
         TPPlayer = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         ChkBoxVolumeBoost = New CheckBox()
         CkBoxPlayerShowMeterVert = New CheckBox()
@@ -821,6 +823,7 @@ Partial Class Options
         ' TPApp
         ' 
         TPApp.BorderStyle = BorderStyle.Fixed3D
+        TPApp.Controls.Add(CoBoxAudioServerBitrate)
         TPApp.Controls.Add(TxtBoxAudioServerPort)
         TPApp.Controls.Add(ChkBoxEnableAudioServer)
         TPApp.Controls.Add(LblAudioServerPort)
@@ -852,6 +855,7 @@ Partial Class Options
         TPApp.Controls.Add(LblTheme)
         TPApp.Controls.Add(LblCompanionServerPort)
         TPApp.Controls.Add(ChkBoxEnableVoicePushToTalk)
+        TPApp.Controls.Add(LblAudioServerBitrate)
         TipError.SetImage(TPApp, Nothing)
         TipOptions.SetImage(TPApp, Nothing)
         TPApp.Image = Nothing
@@ -866,6 +870,20 @@ Partial Class Options
         TPApp.Text = " App "
         TPApp.ThemesEnabled = False
         ' 
+        ' CoBoxAudioServerBitrate
+        ' 
+        CoBoxAudioServerBitrate.BorderStyle = Skye.UI.ComboBox.ComboBorderStyle.Fixed3D
+        CoBoxAudioServerBitrate.DropDownStyle = ComboBoxStyle.DropDownList
+        CoBoxAudioServerBitrate.FormattingEnabled = True
+        TipOptions.SetImage(CoBoxAudioServerBitrate, Nothing)
+        TipError.SetImage(CoBoxAudioServerBitrate, Nothing)
+        CoBoxAudioServerBitrate.Location = New Point(611, 374)
+        CoBoxAudioServerBitrate.Name = "CoBoxAudioServerBitrate"
+        CoBoxAudioServerBitrate.Size = New Size(95, 30)
+        CoBoxAudioServerBitrate.TabIndex = 97
+        TipOptions.SetText(CoBoxAudioServerBitrate, resources.GetString("CoBoxAudioServerBitrate.Text"))
+        TipError.SetText(CoBoxAudioServerBitrate, Nothing)
+        ' 
         ' TxtBoxAudioServerPort
         ' 
         TipError.SetImage(TxtBoxAudioServerPort, Nothing)
@@ -874,9 +892,9 @@ Partial Class Options
         TxtBoxAudioServerPort.Name = "TxtBoxAudioServerPort"
         TxtBoxAudioServerPort.ShortcutsEnabled = False
         TxtBoxAudioServerPort.Size = New Size(61, 29)
-        TxtBoxAudioServerPort.TabIndex = 151
+        TxtBoxAudioServerPort.TabIndex = 98
         TipError.SetText(TxtBoxAudioServerPort, Nothing)
-        TipOptions.SetText(TxtBoxAudioServerPort, "Companion App Server Port Number")
+        TipOptions.SetText(TxtBoxAudioServerPort, "Audio Streaming Port Number")
         TxtBoxAudioServerPort.TextAlign = HorizontalAlignment.Center
         ' 
         ' ChkBoxEnableAudioServer
@@ -886,12 +904,12 @@ Partial Class Options
         ChkBoxEnableAudioServer.Font = New Font("Segoe UI", 12F)
         TipOptions.SetImage(ChkBoxEnableAudioServer, Nothing)
         TipError.SetImage(ChkBoxEnableAudioServer, Nothing)
-        ChkBoxEnableAudioServer.Location = New Point(511, 376)
+        ChkBoxEnableAudioServer.Location = New Point(357, 377)
         ChkBoxEnableAudioServer.Name = "ChkBoxEnableAudioServer"
         ChkBoxEnableAudioServer.Size = New Size(192, 25)
-        ChkBoxEnableAudioServer.TabIndex = 150
+        ChkBoxEnableAudioServer.TabIndex = 95
         TipError.SetText(ChkBoxEnableAudioServer, Nothing)
-        TipOptions.SetText(ChkBoxEnableAudioServer, "Set In Code")
+        TipOptions.SetText(ChkBoxEnableAudioServer, "Enable or Disable the Audio Streaming at the selected Bitrate over the selected Port #.")
         ChkBoxEnableAudioServer.Text = "Enable Audio Streaming"
         ChkBoxEnableAudioServer.UseVisualStyleBackColor = True
         ' 
@@ -919,7 +937,7 @@ Partial Class Options
         BtnHistoryDBMaintenance.Location = New Point(519, 280)
         BtnHistoryDBMaintenance.Name = "BtnHistoryDBMaintenance"
         BtnHistoryDBMaintenance.Size = New Size(289, 40)
-        BtnHistoryDBMaintenance.TabIndex = 149
+        BtnHistoryDBMaintenance.TabIndex = 82
         TipOptions.SetText(BtnHistoryDBMaintenance, "Run Routine Maintenance on Play History Database.")
         TipError.SetText(BtnHistoryDBMaintenance, Nothing)
         BtnHistoryDBMaintenance.Text = "Run Plays Database Maintenance"
@@ -962,7 +980,7 @@ Partial Class Options
         TxtBoxCompanionServerPort.Name = "TxtBoxCompanionServerPort"
         TxtBoxCompanionServerPort.ShortcutsEnabled = False
         TxtBoxCompanionServerPort.Size = New Size(61, 29)
-        TxtBoxCompanionServerPort.TabIndex = 99
+        TxtBoxCompanionServerPort.TabIndex = 91
         TipError.SetText(TxtBoxCompanionServerPort, Nothing)
         TipOptions.SetText(TxtBoxCompanionServerPort, "Companion App Server Port Number")
         TxtBoxCompanionServerPort.TextAlign = HorizontalAlignment.Center
@@ -977,7 +995,7 @@ Partial Class Options
         CkBoxEnableCompanionServer.Location = New Point(496, 346)
         CkBoxEnableCompanionServer.Name = "CkBoxEnableCompanionServer"
         CkBoxEnableCompanionServer.Size = New Size(206, 25)
-        CkBoxEnableCompanionServer.TabIndex = 98
+        CkBoxEnableCompanionServer.TabIndex = 90
         TipError.SetText(CkBoxEnableCompanionServer, Nothing)
         TipOptions.SetText(CkBoxEnableCompanionServer, "Set In Code")
         CkBoxEnableCompanionServer.Text = "Enable Companion Server"
@@ -1087,6 +1105,21 @@ Partial Class Options
         TipOptions.SetText(ChkBoxEnableVoicePushToTalk, "Prevents speaker playback from triggering voice commands." & vbCrLf & "Press your assigned hotkey to speak.")
         ChkBoxEnableVoicePushToTalk.Text = "Enable Push-To-Talk"
         ChkBoxEnableVoicePushToTalk.UseVisualStyleBackColor = True
+        ' 
+        ' LblAudioServerBitrate
+        ' 
+        LblAudioServerBitrate.AutoSize = True
+        LblAudioServerBitrate.Font = New Font("Segoe UI", 12F)
+        TipError.SetImage(LblAudioServerBitrate, Nothing)
+        TipOptions.SetImage(LblAudioServerBitrate, Nothing)
+        LblAudioServerBitrate.Location = New Point(558, 379)
+        LblAudioServerBitrate.Name = "LblAudioServerBitrate"
+        LblAudioServerBitrate.Size = New Size(55, 21)
+        LblAudioServerBitrate.TabIndex = 154
+        TipOptions.SetText(LblAudioServerBitrate, Nothing)
+        LblAudioServerBitrate.Text = "Bitrate"
+        TipError.SetText(LblAudioServerBitrate, Nothing)
+        LblAudioServerBitrate.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' TPPlayer
         ' 
@@ -1831,4 +1864,6 @@ Partial Class Options
     Friend WithEvents TxtBoxAudioServerPort As Skye.UI.NumericTextBox
     Friend WithEvents ChkBoxEnableAudioServer As CheckBox
     Friend WithEvents LblAudioServerPort As Skye.UI.Label
+    Friend WithEvents CoBoxAudioServerBitrate As Skye.UI.ComboBox
+    Friend WithEvents LblAudioServerBitrate As Skye.UI.Label
 End Class
