@@ -77,7 +77,7 @@ Public Class PlayerMini
                     If e.Shift Then App.ShowDevTools()
                 Case Keys.Space
                     e.SuppressKeyPress = True
-                    App.FrmPlayer.StopPlay()
+                    App.FrmPlayer.UserStopPlay()
             End Select
         ElseIf e.Shift Then
         Else
@@ -206,7 +206,7 @@ Public Class PlayerMini
         SetPlayState()
     End Sub
     Private Sub BtnStop_Click(sender As Object, e As EventArgs) Handles BtnStop.Click
-        App.FrmPlayer.StopPlay()
+        App.FrmPlayer.UserStopPlay()
         SetPlayState()
     End Sub
     Private Sub BtnPrevious_Click(sender As Object, e As EventArgs) Handles BtnPrevious.Click

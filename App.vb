@@ -1090,7 +1090,7 @@ Namespace My
                                                     Case "PLAY", "PAUSE", "TOGGLE"
                                                         _player.TogglePlay()
                                                     Case "STOP"
-                                                        _player.StopPlay()
+                                                        _player.UserStopPlay()
                                                     Case "SEEK"
                                                         HandleSeek(payload)
                                                     Case "NEXT"
@@ -2519,7 +2519,7 @@ Namespace My
         Private Sub NIApp_MIStop_MouseDown(sender As Object, e As MouseEventArgs)
             Select Case e.Button
                 Case MouseButtons.Left
-                    FrmPlayer.StopPlay()
+                    FrmPlayer.UserStopPlay()
                 Case MouseButtons.Right
             End Select
         End Sub
@@ -3722,7 +3722,7 @@ Namespace My
                 Case HotKeyPlay.WinID
                     FrmPlayer.TogglePlay()
                 Case HotKeyStop.WinID
-                    FrmPlayer.StopPlay()
+                    FrmPlayer.UserStopPlay()
                 Case HotKeyNext.WinID
                     FrmPlayer.PlayNext()
                 Case HotKeyPrevious.WinID

@@ -2998,7 +2998,7 @@ Public Class Player
                         End If
                     Case Keys.Space
                         e.SuppressKeyPress = True
-                        StopPlay()
+                        UserStopPlay()
                 End Select
             ElseIf e.Shift Then
             Else
@@ -4134,7 +4134,7 @@ Public Class Player
         TogglePlay()
     End Sub
     Private Sub BtnStopMouseDown(sender As Object, e As MouseEventArgs) Handles BtnStop.MouseDown
-        StopPlay()
+        UserStopPlay()
         LVPlaylist.Focus()
     End Sub
     Private Sub BtnReverseMouseDown(sender As Object, e As MouseEventArgs) Handles BtnReverse.MouseDown
@@ -4736,7 +4736,7 @@ Public Class Player
     Friend Sub Suspend() 'Called when the user locks the screen or activates the screen saver
         If App.Settings.SuspendOnSessionChange Then
             'Debug.Print("Suspending...")
-            StopPlay()
+            UserStopPlay()
             If WindowState = FormWindowState.Normal OrElse WindowState = FormWindowState.Maximized Then
                 _lastRealState = WindowState
                 'Debug.Print("Captured Real State (Suspend): " + _lastRealState.ToString)
@@ -5479,7 +5479,7 @@ Public Class Player
     End Sub
     Private Sub PlayQueued()
         If Queue.Count > 0 Then
-            StopPlay()
+            SystemStopPlay()
             If App.IsStream(Queue(0)) Then
                 PlayStream(Queue(0))
             Else
@@ -5563,7 +5563,11 @@ Public Class Player
         End If
         LVPlaylist.Focus()
     End Sub
-    Friend Sub StopPlay()
+    Friend Sub UserStopPlay()
+        App.StopAudioStreaming()
+        SystemStopPlay()
+    End Sub
+    Private Sub SystemStopPlay()
         If _player.HasMedia Then
             _player.Stop()
             OnStop()
@@ -5604,7 +5608,7 @@ Public Class Player
     Private Sub PlayFromPlaylist()
         If LVPlaylist.SelectedItems.Count > 0 Then
             LyricsOff()
-            StopPlay()
+            SystemStopPlay()
             If App.IsStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text) Then
                 PlayStream(LVPlaylist.SelectedItems(0).SubItems(LVPlaylist.Columns("Path").Index).Text)
             Else
@@ -5641,7 +5645,7 @@ Public Class Player
             End If
             EnsurePlaylistItemIsVisible(existingitem.Index)
         End If
-        StopPlay()
+        SystemStopPlay()
         PlayFile(filename, "PlayFromLibrary")
     End Sub
     Friend Sub PlayFromDirectory(title As String, stream As String)
@@ -5653,13 +5657,13 @@ Public Class Player
         Else
             EnsurePlaylistItemIsVisible(existingitem.Index)
         End If
-        StopPlay()
+        SystemStopPlay()
         PlayStream(realUrl)
     End Sub
     Friend Sub PlayFromCompanion(path As String)
         If Not String.IsNullOrWhiteSpace(path) Then
             LyricsOff()
-            StopPlay()
+            SystemStopPlay()
             If App.IsUrl(path) Then
                 path = NormalizeUrl(path)
                 PlayStream(path)
@@ -5685,7 +5689,7 @@ Public Class Player
         If PlayState = PlayStates.Paused Then TogglePlay()
     End Sub
     Friend Sub PlayPrevious()
-        StopPlay()
+        SystemStopPlay()
         LyricsOff()
         Select Case App.Settings.PlayMode
             Case PlayModes.Repeat
@@ -5774,7 +5778,7 @@ Public Class Player
         End Select
     End Sub
     Friend Sub PlayNext()
-        StopPlay()
+        SystemStopPlay()
         LyricsOff()
         Select Case App.Settings.PlayMode
             Case PlayModes.Repeat
@@ -6637,7 +6641,7 @@ Public Class Player
             Case "pause music"
                 If PlayState = PlayStates.Playing Then TogglePlay()
             Case "stop music"
-                StopPlay()
+                UserStopPlay()
                 LVPlaylist.Focus()
             Case "previous song"
                 If LVPlaylist.Items.Count > 0 Then

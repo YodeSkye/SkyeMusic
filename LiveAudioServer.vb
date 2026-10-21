@@ -55,10 +55,12 @@ Public Class LiveAudioServer
     ''' Stops the server and closes all client connections.
     ''' </summary>
     Public Shared Sub [Stop]()
-        ' 1. Stop the modern C# audio recorder first
-        AudioStreamCapturer.StopCapture()
+        ' 1. Guard clause: If we aren't listening and the server is null, bail out immediately!
+        If Not _isListening AndAlso _tcpServer Is Nothing Then Return
 
-        ' 2. Safely remove the event handler so it doesn't duplicate on restart
+        ' 2. Stop the modern C# audio recorder first
+        AudioStreamCapturer.StopCapture()
+        ' 3. Safely remove the event handler so it doesn't duplicate on restart
         RemoveHandler AudioStreamCapturer.AudioDataCaptured, AddressOf HandleAudioCaptured
 
         _isListening = False
