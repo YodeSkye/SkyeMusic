@@ -5,7 +5,7 @@ Imports System.Text
 Imports System.Threading
 Imports NAudioStreamEngine
 
-Public Class LiveAudioServer
+Friend Class LiveAudioServer
 
     ' Declarations
     Private Shared _tcpServer As TcpListener
@@ -13,7 +13,7 @@ Public Class LiveAudioServer
     Private Shared _isListening As Boolean = False
     Private Shared ReadOnly _clientLock As New Object()
     Private Shared ReadOnly _connectedStreams As New List(Of NetworkStream)()
-    Public Shared ReadOnly Property IsListening As Boolean
+    Friend Shared ReadOnly Property IsListening As Boolean
         Get
             Return _isListening
         End Get
@@ -23,7 +23,7 @@ Public Class LiveAudioServer
     ''' <summary>
     ''' Starts the raw TCP audio streaming server on any user-configured port for the LAN without admin rights.
     ''' </summary>
-    Public Shared Sub Start(port As Integer)
+    Friend Shared Sub Start(port As Integer)
         If _isListening Then Return
 
         Try
@@ -54,7 +54,7 @@ Public Class LiveAudioServer
     ''' <summary>
     ''' Stops the server and closes all client connections.
     ''' </summary>
-    Public Shared Sub [Stop]()
+    Friend Shared Sub [Stop]()
         ' 1. Guard clause: If we aren't listening and the server is null, bail out immediately!
         If Not _isListening AndAlso _tcpServer Is Nothing Then Return
 
@@ -168,7 +168,7 @@ Public Class LiveAudioServer
     ''' <summary>
     ''' Broadcasts encoded MP3 audio buffer bytes to all active connected clients.
     ''' </summary>
-    Public Shared Sub BroadcastAudioBuffer(buffer As Byte(), count As Integer)
+    Friend Shared Sub BroadcastAudioBuffer(buffer As Byte(), count As Integer)
         SyncLock _clientLock
             If _connectedStreams.Count = 0 Then Return
 
