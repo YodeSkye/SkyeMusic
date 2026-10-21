@@ -5898,7 +5898,7 @@ Public Class Player
         ' - Avoid cross-thread reparenting or teardown collisions
 
         PlayState = PlayStates.Playing
-        If App.Settings.EnableAudioStreaming Then LiveAudioServer.Start(App.Settings.AudioStreamingPort)
+        App.StartAudioStreaming()
 
         'Update The Histories
         UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed for uniformity.
@@ -5955,7 +5955,6 @@ Public Class Player
         NowPlaying.Text = PlaylistCurrentText
 
         TimerShowMedia.Start()
-
 
     End Sub
     Private Sub OnPause()

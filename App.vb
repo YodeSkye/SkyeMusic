@@ -1223,7 +1223,7 @@ Namespace My
             Friend Shared LatestKnownVersion As String = String.Empty
             Friend Shared EnableCompanionServer As Boolean = False
             Friend Shared CompanionServerPort As Integer = 5050
-            Friend Shared EnableAudioStreaming As Boolean = False
+            Friend Shared EnableAudioStreaming As Boolean = True
             Friend Shared AudioStreamingPort As Integer = 5051
             Friend Shared AudioStreamingBitrate As AudioStreamBitrate = AudioStreamBitrate.Medium
             Friend Shared EnableVoiceCommands As Boolean = False
@@ -5261,6 +5261,14 @@ Namespace My
 
             Return "0.0.0.0" ' fallback if no IPv4 found
         End Function
+
+        ' Audio Streaming
+        Friend Sub StartAudioStreaming()
+            If Settings.EnableAudioStreaming Then LiveAudioServer.Start(Settings.AudioStreamingPort)
+        End Sub
+        Friend Sub StopAudioStreaming()
+            LiveAudioServer.Stop()
+        End Sub
 
         ' Speech Recognition
         Friend Sub InitializeVoiceEngine()
