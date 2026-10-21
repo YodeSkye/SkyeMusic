@@ -6,19 +6,20 @@ Imports System.Threading
 Imports NAudioStreamEngine
 
 Public Class LiveAudioServer
+
+    ' Declarations
     Private Shared _tcpServer As TcpListener
     Private Shared _listenerThread As Thread
     Private Shared _isListening As Boolean = False
-
     Private Shared ReadOnly _clientLock As New Object()
     Private Shared ReadOnly _connectedStreams As New List(Of NetworkStream)()
-
     Public Shared ReadOnly Property IsListening As Boolean
         Get
             Return _isListening
         End Get
     End Property
 
+    ' Base Methods
     ''' <summary>
     ''' Starts the raw TCP audio streaming server on any user-configured port for the LAN without admin rights.
     ''' </summary>
@@ -50,7 +51,6 @@ Public Class LiveAudioServer
             [Stop]()
         End Try
     End Sub
-
     ''' <summary>
     ''' Stops the server and closes all client connections.
     ''' </summary>
@@ -84,6 +84,12 @@ Public Class LiveAudioServer
         Debug.WriteLine("[LiveAudioServer] Streaming server and capture stopped.")
     End Sub
 
+    ' Handlers
+    Private Shared Sub HandleAudioCaptured(buffer() As Byte, count As Integer)
+        BroadcastAudioBuffer(buffer, count)
+    End Sub
+
+    ' Methods
     Private Shared Sub AcceptClientsLoop()
         While _isListening
             Try
@@ -103,7 +109,6 @@ Public Class LiveAudioServer
             End Try
         End While
     End Sub
-
     Private Shared Sub HandleClientConnection(client As TcpClient)
         Dim netStream As NetworkStream = Nothing
         Try
@@ -158,11 +163,6 @@ Public Class LiveAudioServer
             Debug.WriteLine("[LiveAudioServer] Client disconnected.")
         End Try
     End Sub
-
-    Private Shared Sub HandleAudioCaptured(buffer() As Byte, count As Integer)
-        BroadcastAudioBuffer(buffer, count)
-    End Sub
-
     ''' <summary>
     ''' Broadcasts encoded MP3 audio buffer bytes to all active connected clients.
     ''' </summary>
@@ -190,4 +190,5 @@ Public Class LiveAudioServer
             Next
         End SyncLock
     End Sub
+
 End Class
