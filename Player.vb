@@ -5390,6 +5390,39 @@ Public Class Player
         End If
         LblPlaylistCount.Text += LVPlaylist.SelectedItems.Count.ToString + " Selected"
         LblPlaylistCount.Text += ", " + Queue.Count.ToString + " Queued"
+
+        'Select Case AppAudioStreamingManager.CurrentState
+        '    Case StreamingState.Listening
+        '        ' Green dot or solid bullet when actively running
+        '        streamIndicator = "● Stream Live"
+        '    Case StreamingState.Stopped
+        '        ' Hollow dot when ready/idle
+        '        streamIndicator = "○ Stream Idle"
+        '    Case StreamingState.Error
+        '        ' Warning symbol when there's an issue
+        '        streamIndicator = "✕ Stream Error"
+        'End Select
+        'If App.Settings.IsStreamingEnabled Then
+        '    Dim streamIndicator As String = ""
+        '    Dim clientCount As Integer = LiveAudioServer.ConnectedClientsCount
+
+        '    Select Case AppAudioStreamingManager.CurrentState
+        '        Case StreamingState.Listening
+        '            If clientCount > 0 Then
+        '                ' Show listener count when people are tuned in!
+        '                streamIndicator = $"● Stream Live ({clientCount} listener" & If(clientCount = 1, "", "s") & ")"
+        '            Else
+        '                streamIndicator = "● Stream Ready"
+        '            End If
+        '        Case StreamingState.Stopped
+        '            streamIndicator = "○ Stream Idle"
+        '        Case StreamingState.Error
+        '            streamIndicator = "✕ Stream Error"
+        '    End Select
+
+        '    statusText = $"{streamIndicator}  |  {statusText}"
+        'End If
+
     End Sub
     Private Sub ClearPlaylistTitles()
         PlaylistTitleSort = SortOrder.None
