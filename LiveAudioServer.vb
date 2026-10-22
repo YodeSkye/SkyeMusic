@@ -8,6 +8,21 @@ Imports NAudioStreamEngine
 Friend Class LiveAudioServer
 
     ' Declarations
+    Friend Class AudioClientInfo
+
+        Public Property Client As TcpClient
+        Public Property NetStream As NetworkStream
+        Public Property ConnectedAt As DateTime
+        Public Property EndPoint As String
+
+        Public Sub New(client As TcpClient, netStream As NetworkStream)
+            Me.Client = client
+            Me.NetStream = netStream
+            Me.ConnectedAt = DateTime.Now
+            Me.EndPoint = If(client.Client?.RemoteEndPoint IsNot Nothing, client.Client.RemoteEndPoint.ToString(), "Unknown")
+        End Sub
+
+    End Class
     Friend Enum StreamingState
         Stopped
         Listening
@@ -17,7 +32,8 @@ Friend Class LiveAudioServer
     Private Shared _listenerThread As Thread
     Private Shared _isListening As Boolean = False
     Private Shared ReadOnly _clientLock As New Object()
-    Private Shared ReadOnly _connectedStreams As New List(Of NetworkStream)()
+    Private Shared ReadOnly _connectedClients As New List(Of AudioClientInfo)()
+
     Friend Shared ReadOnly Property IsListening As Boolean
         Get
             Return _isListening
@@ -26,10 +42,18 @@ Friend Class LiveAudioServer
     Friend Shared ReadOnly Property ConnectedClientCount As Integer
         Get
             SyncLock _clientLock
-                Return _connectedStreams.Count
+                Return _connectedClients.Count
             End SyncLock
         End Get
     End Property
+    Friend Shared ReadOnly Property ActiveClients As List(Of AudioClientInfo)
+        Get
+            SyncLock _clientLock
+                Return New List(Of AudioClientInfo)(_connectedClients)
+            End SyncLock
+        End Get
+    End Property
+
     Friend Shared Event StreamingStatusChanged As Action(Of StreamingState, String)
 
     ' Base Methods
@@ -57,9 +81,9 @@ Friend Class LiveAudioServer
 
                 ' 3. Start background thread to accept incoming client connections
                 _listenerThread = New Thread(AddressOf AcceptClientsLoop) With {
-                .IsBackground = True,
-                .Name = "LiveAudioTcp_Listener"
-            }
+                    .IsBackground = True,
+                    .Name = "LiveAudioTcp_Listener"
+                }
                 _listenerThread.Start()
 
                 NotifyStatusChanged(StreamingState.Listening, "Server Active")
@@ -118,18 +142,34 @@ Friend Class LiveAudioServer
         End Try
 
         SyncLock _clientLock
-            For Each stream In _connectedStreams
+            For Each clientInfo In _connectedClients
                 Try
-                    stream.Close()
+                    clientInfo.NetStream?.Close()
+                    clientInfo.Client?.Close()
                 Catch
                 End Try
             Next
-            _connectedStreams.Clear()
+            _connectedClients.Clear()
         End SyncLock
 
         If Not isDueToError Then NotifyStatusChanged(StreamingState.Stopped, "Server Idle")
         Debug.WriteLine("[STREAMING SERVER] Streaming server and capture stopped.")
         Skye.Common.Log.Write($"Streaming Server Stopped")
+    End Sub
+    Friend Shared Sub DisconnectClient(targetEndPoint As String)
+        SyncLock _clientLock
+            Dim target = _connectedClients.FirstOrDefault(Function(c) c.EndPoint = targetEndPoint)
+            If target IsNot Nothing Then
+                Try
+                    target.NetStream?.Close()
+                    target.Client?.Close()
+                Catch
+                End Try
+                _connectedClients.Remove(target)
+                Debug.WriteLine($"[STREAMING SERVER] Forcefully disconnected client: {targetEndPoint}")
+                Skye.Common.Log.Write($"Streaming Server Forcefully Disconnected Client: {targetEndPoint}")
+            End If
+        End SyncLock
     End Sub
 
     ' Handlers
@@ -162,6 +202,7 @@ Friend Class LiveAudioServer
     End Sub
     Private Shared Sub HandleClientConnection(client As TcpClient)
         Dim netStream As NetworkStream = Nothing
+        Dim clientInfo As AudioClientInfo = Nothing
         Try
             client.NoDelay = True ' Disable Nagle's algorithm for real-time audio latency
             netStream = client.GetStream()
@@ -183,13 +224,14 @@ Friend Class LiveAudioServer
             netStream.Write(headerBytes, 0, headerBytes.Length)
             netStream.Flush()
 
-            ' Register the stream for broadcasting
+            ' Create wrapper and register the client info for broadcasting and UI tracking
+            clientInfo = New AudioClientInfo(client, netStream)
             SyncLock _clientLock
-                _connectedStreams.Add(netStream)
+                _connectedClients.Add(clientInfo)
             End SyncLock
 
             NotifyStatusChanged(StreamingState.Listening, "Client Connected")
-            Debug.WriteLine($"[STREAMING SERVER] Client connected from {client.Client.RemoteEndPoint}")
+            Debug.WriteLine($"[STREAMING SERVER] Client connected from {clientInfo.EndPoint}")
 
             ' Keep thread alive while client is connected and server is running
             While _isListening AndAlso client.Connected
@@ -200,47 +242,48 @@ Friend Class LiveAudioServer
             Debug.WriteLine($"[STREAMING SERVER] Client connection error: {ex.Message}")
             Skye.Common.Log.Write($"Streaming Server Client Connection Error: {ex.Message}")
         Finally
-            If netStream IsNot Nothing Then
+            If clientInfo IsNot Nothing Then
                 SyncLock _clientLock
-                    _connectedStreams.Remove(netStream)
+                    _connectedClients.Remove(clientInfo)
                 End SyncLock
-                Try
-                    netStream.Close()
-                Catch
-                End Try
             End If
+
             Try
-                client.Close()
+                netStream?.Close()
             Catch
             End Try
+            Try
+                client?.Close()
+            Catch
+            End Try
+
             NotifyStatusChanged(StreamingState.Listening, "Client Disconnected")
             Debug.WriteLine("[STREAMING SERVER] Client disconnected.")
         End Try
     End Sub
-    Private Shared Sub BroadcastAudioBuffer(buffer As Byte(), count As Integer) ' Broadcasts encoded MP3 audio buffer bytes to all active connected clients.
-        ' Track whether we actually removed anyone so we only notify when needed
+    Private Shared Sub BroadcastAudioBuffer(buffer As Byte(), count As Integer)
         Dim streamsChanged As Integer = 0
 
         SyncLock _clientLock
-            If _connectedStreams.Count = 0 Then Return
+            If _connectedClients.Count = 0 Then Return
 
-            Dim deadStreams As New List(Of NetworkStream)()
+            Dim deadClients As New List(Of AudioClientInfo)()
 
-            For Each netStream In _connectedStreams
+            For Each clientInfo In _connectedClients
                 Try
-                    netStream.Write(buffer, 0, count)
-                    netStream.Flush()
+                    clientInfo.NetStream.Write(buffer, 0, count)
+                    clientInfo.NetStream.Flush()
                 Catch ex As Exception
-                    deadStreams.Add(netStream)
+                    deadClients.Add(clientInfo)
                 End Try
             Next
 
-            ' If we found any dead streams, clean them up!
-            If deadStreams.Count > 0 Then
-                For Each deadStream In deadStreams
-                    _connectedStreams.Remove(deadStream)
+            If deadClients.Count > 0 Then
+                For Each deadClient In deadClients
+                    _connectedClients.Remove(deadClient)
                     Try
-                        deadStream.Close()
+                        deadClient.NetStream?.Close()
+                        deadClient.Client?.Close()
                     Catch
                     End Try
                     streamsChanged += 1
