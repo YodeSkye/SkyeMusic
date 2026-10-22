@@ -80,11 +80,11 @@ namespace NAudioStreamEngine
                     _recorder.StartRecording();
                     _isCapturing = true;
 
-                    Debug.WriteLine($"[AudioStreamCapturer] WASAPI + MP3 encoder started at {targetBitrateKbps} kbps.");
+                    Debug.WriteLine($"[AUDIOSTREAMCAPTURER] WASAPI + MP3 encoder started at {targetBitrateKbps} kbps.");
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"[AudioStreamCapturer] Failed to start recorder/encoder: {ex.Message}");
+                    Debug.WriteLine($"[AUDIOSTREAMCAPTURER] Failed to start recorder/encoder: {ex.Message}");
                     StopCapture();
                 }
             }
@@ -114,12 +114,12 @@ namespace NAudioStreamEngine
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"[AudioStreamCapturer] Error stopping capture: {ex.Message}");
+                    Debug.WriteLine($"[AUDIOSTREAMCAPTURER] Error stopping capture: {ex.Message}");
                 }
                 finally
                 {
                     _isCapturing = false;
-                    Debug.WriteLine("[AudioStreamCapturer] Engine stopped.");
+                    Debug.WriteLine("[AUDIOSTREAMCAPTURER] Engine stopped.");
                 }
             }
         }

@@ -59,9 +59,11 @@ Friend Class LiveAudioServer
             _listenerThread.Start()
 
             NotifyStatusChanged(StreamingState.Listening, "Server Active")
-            Debug.WriteLine($"[LiveAudioServer] LAN TCP streaming listener started on port {port}.")
+            Debug.WriteLine($"[STREAMING SERVER] LAN TCP streaming listener started on port {port}.")
+            Skye.Common.Log.Write($"Streaming Server Started On Port {port}")
         Catch ex As Exception
-            Debug.WriteLine($"[LiveAudioServer] Failed to start TCP listener: {ex.Message}")
+            Debug.WriteLine($"[STREAMING SERVER] Failed to start TCP listener: {ex.Message}")
+            Skye.Common.Log.Write($"Streaming Server Failed To Start: {ex.Message}")
             NotifyStatusChanged(StreamingState.Error, ex.Message)
             [Stop](True)
         End Try
@@ -99,7 +101,8 @@ Friend Class LiveAudioServer
         End SyncLock
 
         If Not isDueToError Then NotifyStatusChanged(StreamingState.Stopped, "Server Idle")
-        Debug.WriteLine("[LiveAudioServer] Streaming server and capture stopped.")
+        Debug.WriteLine("[STREAMING SERVER] Streaming server and capture stopped.")
+        Skye.Common.Log.Write($"Streaming Server Stopped")
     End Sub
 
     ' Handlers
@@ -159,7 +162,7 @@ Friend Class LiveAudioServer
             End SyncLock
 
             NotifyStatusChanged(StreamingState.Listening, "Client Connected")
-            Debug.WriteLine($"[LiveAudioServer] Client connected from {client.Client.RemoteEndPoint}")
+            Debug.WriteLine($"[STREAMING SERVER] Client connected from {client.Client.RemoteEndPoint}")
 
             ' Keep thread alive while client is connected and server is running
             While _isListening AndAlso client.Connected
@@ -167,7 +170,8 @@ Friend Class LiveAudioServer
             End While
 
         Catch ex As Exception
-            Debug.WriteLine($"[LiveAudioServer] Client connection error: {ex.Message}")
+            Debug.WriteLine($"[STREAMING SERVER] Client connection error: {ex.Message}")
+            Skye.Common.Log.Write($"Streaming Server Client Connection Error: {ex.Message}")
         Finally
             If netStream IsNot Nothing Then
                 SyncLock _clientLock
@@ -183,7 +187,7 @@ Friend Class LiveAudioServer
             Catch
             End Try
             NotifyStatusChanged(StreamingState.Listening, "Client Disconnected")
-            Debug.WriteLine("[LiveAudioServer] Client disconnected.")
+            Debug.WriteLine("[STREAMING SERVER] Client disconnected.")
         End Try
     End Sub
     Private Shared Sub BroadcastAudioBuffer(buffer As Byte(), count As Integer) ' Broadcasts encoded MP3 audio buffer bytes to all active connected clients.
