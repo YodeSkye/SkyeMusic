@@ -30,7 +30,7 @@ Friend Class LiveAudioServer
             End SyncLock
         End Get
     End Property
-    Public Shared Event StreamingStatusChanged As Action(Of StreamingState, String)
+    Friend Shared Event StreamingStatusChanged As Action(Of StreamingState, String)
 
     ' Base Methods
     ''' <summary>
