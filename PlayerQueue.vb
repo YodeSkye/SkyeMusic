@@ -204,7 +204,7 @@ Public Class PlayerQueue
                     End If
                 Next
                 SaveLVToQueue()
-                App.FrmPlayer.SetPlaylistCountText()
+                App.FrmPlayer.SetPlaylistStatus()
             End If
             files.Clear()
         End If

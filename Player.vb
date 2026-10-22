@@ -11,6 +11,7 @@ Imports NAudioBridge
 Imports Newtonsoft.Json.Linq
 Imports Skye
 Imports Skye.Contracts
+Imports SkyeMusic.LiveAudioServer
 Imports SkyeMusic.My
 
 Public Class Player
@@ -464,6 +465,10 @@ Public Class Player
 
     ' Voice
     Private ReadOnly refreshLockVoiceGrammar As New System.Threading.SemaphoreSlim(1, 1)
+
+    ' Audio Streaming
+    Dim _currentStreamState As LiveAudioServer.StreamingState = LiveAudioServer.StreamingState.Stopped ' Current state of the audio streaming server
+    Dim _currentStreamMessage As String = "" ' Current message associated with the streaming state
 
     ' Visualizer Interface
     Friend Visualizer As Boolean = False 'Indicates if the visualizer is active
@@ -2949,6 +2954,9 @@ Public Class Player
         ' Now Playing Handler
         AddHandler NowPlaying.Changed, AddressOf OnNowPlayingChanged
 
+        '  Live Audio Server Handler
+        AddHandler LiveAudioServer.StreamingStatusChanged, AddressOf OnStreamingStatusEventReceived
+
     End Sub
     Private Sub Player_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         TopMost = False
@@ -2972,6 +2980,7 @@ Public Class Player
     Friend Sub WhenClosing()
         StopVoice()
         SavePlaylist()
+        RemoveHandler LiveAudioServer.StreamingStatusChanged, AddressOf OnStreamingStatusEventReceived
         If VLCHook IsNot Nothing Then
             VLCHook.ReleaseHandle()
             RemoveHandler VLCHook.SingleClick, AddressOf VLCViewer_SingleClick
@@ -3484,7 +3493,7 @@ Public Class Player
                             ClearPlaylistTitles()
                             LVPlaylist.Items.Insert(itemover.Index, lvi)
                         End If
-                        SetPlaylistCountText()
+                        SetPlaylistStatus()
                     Else
                         'Update playlist entry
                         lvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(mediafiles(x))
@@ -3515,7 +3524,7 @@ Public Class Player
         End If
     End Sub
     Private Sub LVPlaylist_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVPlaylist.SelectedIndexChanged
-        SetPlaylistCountText()
+        SetPlaylistStatus()
         AlbumArtIndex = 0
     End Sub
     Private Sub LVPlaylist_BeforeEdit(item As ListViewItem, subItemIndex As Integer, ByRef cancel As Boolean) Handles LVPlaylist.BeforeEdit
@@ -4267,6 +4276,18 @@ Public Class Player
             If e.RightPeak > MeterPeakRight Then MeterPeakRight = e.RightPeak
         End If
     End Sub
+    Private Sub OnStreamingStatusEventReceived(state As StreamingState, message As String)
+        ' Ensure thread safety if background network threads fire this
+        If Me.InvokeRequired Then
+            Me.Invoke(Sub() OnStreamingStatusEventReceived(state, message))
+            Return
+        End If
+
+        _currentStreamState = state
+        _currentStreamMessage = message
+
+        SetPlaylistStatus()
+    End Sub
     Private Sub OnNowPlayingChanged(nptext As String)
         Dim title As String = nptext.Split("@"c)(0).Trim()
         Dim fullTitle As String = title & " @ " & _player.Path.TrimEnd("/"c)
@@ -4358,7 +4379,7 @@ Public Class Player
     End Sub
     Private Sub TimerStatus_Tick(sender As Object, e As EventArgs) Handles TimerStatus.Tick
         TimerStatus.Stop()
-        SetPlaylistCountText()
+        SetPlaylistStatus()
     End Sub
     Private Sub TimerLyrics_Tick(sender As Object, e As EventArgs) Handles TimerLyrics.Tick
         If _player IsNot Nothing AndAlso _player.HasMedia AndAlso PlayState = PlayStates.Playing AndAlso HasLyricsSynced Then
@@ -4878,7 +4899,7 @@ Public Class Player
             'Skye.Common.Log.Write("Playlist Not Loaded: File does not exist (" + targetPath + ")")
         End If
 
-        SetPlaylistCountText()
+        SetPlaylistStatus()
     End Sub
     Private Sub SavePlaylist()
         Dim targetPath As String = App.GetPlaylistPath(CurrentPlaylist)
@@ -5138,7 +5159,7 @@ Public Class Player
             RaiseEvent PlaylistChanged()
             lvi = Nothing
         End If
-        SetPlaylistCountText()
+        SetPlaylistStatus()
         ofd.Dispose()
     End Sub
     Private Sub AddToPlaylistFromPath(path As String)
@@ -5158,7 +5179,7 @@ Public Class Player
         Else
             LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
         End If
-        SetPlaylistCountText()
+        SetPlaylistStatus()
         lvi = Nothing
     End Sub
     Friend Sub AddToPlaylistFromLibrary(title As String, filename As String)
@@ -5178,7 +5199,7 @@ Public Class Player
         Else
             LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
         End If
-        SetPlaylistCountText()
+        SetPlaylistStatus()
         lvi = Nothing
         'RaiseEvent PlaylistChanged()
     End Sub
@@ -5205,7 +5226,7 @@ Public Class Player
         Else
             LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, lvi)
         End If
-        SetPlaylistCountText()
+        SetPlaylistStatus()
 
     End Sub
     Friend Sub AddToPlaylistFromHistory(items As List(Of String))
@@ -5226,7 +5247,7 @@ Public Class Player
                     LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index, newlvi)
                 End If
                 addedcount += 1
-                SetPlaylistCountText()
+                SetPlaylistStatus()
             End If
         Next
         LVPlaylist.EndUpdate()
@@ -5250,7 +5271,7 @@ Public Class Player
                     item.Remove()
                 Next
                 LVPlaylist.Enabled = True
-                SetPlaylistCountText()
+                SetPlaylistStatus()
                 If LVPlaylist.Items.Count = 0 Then ClearPlaylistTitles()
                 If RandomHistoryIndex > RandomHistory.Count - 1 Then RandomHistoryIndex = RandomHistory.Count - 1
             End If
@@ -5265,7 +5286,7 @@ Public Class Player
                 LVPlaylist.Items.Remove(lvi)
                 'RaiseEvent PlaylistChanged()
             End If
-            SetPlaylistCountText()
+            SetPlaylistStatus()
         End If
     End Sub
     Private Sub GetHistory(ByRef lvi As ListViewItem, path As String)
@@ -5356,7 +5377,7 @@ Public Class Player
         Skye.Common.Log.Write("Playlist Pruned (" + prunelist.Count.ToString + ")")
 
         prunelist = Nothing
-        SetPlaylistCountText()
+        SetPlaylistStatus()
 
     End Sub
     Private Sub SetPlaylistToolTip()
@@ -5380,49 +5401,32 @@ Public Class Player
             .ShowDelay = 1000
         }
     End Sub
-    Friend Sub SetPlaylistCountText()
+    Friend Sub SetPlaylistStatus()
         LblPlaylistCount.ResetText()
-        LblPlaylistCount.Text = LVPlaylist.Items.Count.ToString
-        If LVPlaylist.Items.Count = 1 Then
-            LblPlaylistCount.Text += " Song, "
-        Else
-            LblPlaylistCount.Text += " Songs, "
+
+        Dim streamIndicator As String = ""
+        If App.Settings.EnableAudioStreaming Then
+            Dim clientCount As Integer = LiveAudioServer.ConnectedClientCount
+            Select Case _currentStreamState
+                Case StreamingState.Listening
+                    If clientCount > 0 Then
+                        streamIndicator = $"● Stream Live ({clientCount} listener" & If(clientCount = 1, "", "s") & ")"
+                    Else
+                        streamIndicator = "● Stream Ready"
+                    End If
+                Case StreamingState.Stopped
+                    streamIndicator = "○ Stream Idle"
+                Case StreamingState.Error
+                    streamIndicator = "✕ Stream Error"
+            End Select
         End If
-        LblPlaylistCount.Text += LVPlaylist.SelectedItems.Count.ToString + " Selected"
-        LblPlaylistCount.Text += ", " + Queue.Count.ToString + " Queued"
 
-        'Select Case AppAudioStreamingManager.CurrentState
-        '    Case StreamingState.Listening
-        '        ' Green dot or solid bullet when actively running
-        '        streamIndicator = "● Stream Live"
-        '    Case StreamingState.Stopped
-        '        ' Hollow dot when ready/idle
-        '        streamIndicator = "○ Stream Idle"
-        '    Case StreamingState.Error
-        '        ' Warning symbol when there's an issue
-        '        streamIndicator = "✕ Stream Error"
-        'End Select
-        'If App.Settings.IsStreamingEnabled Then
-        '    Dim streamIndicator As String = ""
-        '    Dim clientCount As Integer = LiveAudioServer.ConnectedClientsCount
+        Dim counts As String = LVPlaylist.Items.Count.ToString
+        counts += If(LVPlaylist.Items.Count = 1, " Song, ", " Songs, ")
+        counts += LVPlaylist.SelectedItems.Count.ToString + " Selected"
+        counts += ", " + Queue.Count.ToString + " Queued"
 
-        '    Select Case AppAudioStreamingManager.CurrentState
-        '        Case StreamingState.Listening
-        '            If clientCount > 0 Then
-        '                ' Show listener count when people are tuned in!
-        '                streamIndicator = $"● Stream Live ({clientCount} listener" & If(clientCount = 1, "", "s") & ")"
-        '            Else
-        '                streamIndicator = "● Stream Ready"
-        '            End If
-        '        Case StreamingState.Stopped
-        '            streamIndicator = "○ Stream Idle"
-        '        Case StreamingState.Error
-        '            streamIndicator = "✕ Stream Error"
-        '    End Select
-
-        '    statusText = $"{streamIndicator}  |  {statusText}"
-        'End If
-
+        LblPlaylistCount.Text = If(App.Settings.EnableAudioStreaming, streamIndicator & "  |  ", "") & counts
     End Sub
     Private Sub ClearPlaylistTitles()
         PlaylistTitleSort = SortOrder.None
@@ -5485,15 +5489,15 @@ Public Class Player
     ' Queue
     Friend Sub QueuePath(path As String)
         Queue.Add(path)
-        SetPlaylistCountText()
+        SetPlaylistStatus()
     End Sub
     Friend Sub RemoveFromQueue(path As String)
         Queue.Remove(path)
-        SetPlaylistCountText()
+        SetPlaylistStatus()
     End Sub
     Friend Sub RemoveFromQueue(index As Integer)
         Queue.RemoveAt(index)
-        SetPlaylistCountText()
+        SetPlaylistStatus()
     End Sub
     Friend Sub PruneQueue()
         Dim count As Integer = 0
@@ -5507,7 +5511,7 @@ Public Class Player
         For Each item As String In removelist
             Queue.Remove(item)
         Next
-        SetPlaylistCountText()
+        SetPlaylistStatus()
         Skye.Common.Log.Write("Queue Pruned (" + count.ToString + ")")
     End Sub
     Private Sub PlayQueued()
@@ -5521,7 +5525,7 @@ Public Class Player
             Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
             If item IsNot Nothing Then EnsurePlaylistItemIsVisible(item.Index)
             Queue.RemoveAt(0)
-            SetPlaylistCountText()
+            SetPlaylistStatus()
             'TimerShowMedia.Start()
         End If
     End Sub
@@ -5666,7 +5670,7 @@ Public Class Player
             Else
                 LVPlaylist.Items.Insert(LVPlaylist.SelectedItems(0).Index + 1, lvi)
             End If
-            SetPlaylistCountText()
+            SetPlaylistStatus()
             lvi = Nothing
             RaiseEvent PlaylistChanged()
         Else

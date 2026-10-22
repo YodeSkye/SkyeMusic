@@ -8,6 +8,11 @@ Imports NAudioStreamEngine
 Friend Class LiveAudioServer
 
     ' Declarations
+    Friend Enum StreamingState
+        Stopped
+        Listening
+        [Error]
+    End Enum
     Private Shared _tcpServer As TcpListener
     Private Shared _listenerThread As Thread
     Private Shared _isListening As Boolean = False
@@ -18,6 +23,14 @@ Friend Class LiveAudioServer
             Return _isListening
         End Get
     End Property
+    Friend Shared ReadOnly Property ConnectedClientCount As Integer
+        Get
+            SyncLock _clientLock
+                Return _connectedStreams.Count
+            End SyncLock
+        End Get
+    End Property
+    Public Shared Event StreamingStatusChanged As Action(Of StreamingState, String)
 
     ' Base Methods
     ''' <summary>
@@ -45,6 +58,7 @@ Friend Class LiveAudioServer
             }
             _listenerThread.Start()
 
+            NotifyStatusChanged(StreamingState.Listening, "Server Active")
             Debug.WriteLine($"[LiveAudioServer] LAN TCP streaming listener started on port {port}.")
         Catch ex As Exception
             Debug.WriteLine($"[LiveAudioServer] Failed to start TCP listener: {ex.Message}")
@@ -83,6 +97,7 @@ Friend Class LiveAudioServer
             _connectedStreams.Clear()
         End SyncLock
 
+        NotifyStatusChanged(StreamingState.Stopped, "Server Idle")
         Debug.WriteLine("[LiveAudioServer] Streaming server and capture stopped.")
     End Sub
 
@@ -92,6 +107,9 @@ Friend Class LiveAudioServer
     End Sub
 
     ' Methods
+    Private Shared Sub NotifyStatusChanged(state As StreamingState, message As String)
+        RaiseEvent StreamingStatusChanged(state, message)
+    End Sub
     Private Shared Sub AcceptClientsLoop()
         While _isListening
             Try
@@ -139,6 +157,7 @@ Friend Class LiveAudioServer
                 _connectedStreams.Add(netStream)
             End SyncLock
 
+            NotifyStatusChanged(StreamingState.Listening, "Client Connected")
             Debug.WriteLine($"[LiveAudioServer] Client connected from {client.Client.RemoteEndPoint}")
 
             ' Keep thread alive while client is connected and server is running
@@ -162,13 +181,11 @@ Friend Class LiveAudioServer
                 client.Close()
             Catch
             End Try
+            NotifyStatusChanged(StreamingState.Listening, "Client Disconnected")
             Debug.WriteLine("[LiveAudioServer] Client disconnected.")
         End Try
     End Sub
-    ''' <summary>
-    ''' Broadcasts encoded MP3 audio buffer bytes to all active connected clients.
-    ''' </summary>
-    Friend Shared Sub BroadcastAudioBuffer(buffer As Byte(), count As Integer)
+    Private Shared Sub BroadcastAudioBuffer(buffer As Byte(), count As Integer) ' Broadcasts encoded MP3 audio buffer bytes to all active connected clients.
         SyncLock _clientLock
             If _connectedStreams.Count = 0 Then Return
 

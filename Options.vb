@@ -386,9 +386,10 @@ Public Class Options
     End Sub
     Private Sub CoBoxAudioServerBitrate_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAudioServerBitrate.SelectionChangeCommitted
         App.Settings.AudioStreamingBitrate = CType(CoBoxAudioServerBitrate.SelectedItem, App.AudioStreamBitrate)
-        'SetAudioStreaming()
+        App.StopAudioStreaming()
+        App.StartAudioStreaming()
     End Sub
-    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown, TxtBoxHistoryUpdateInterval.KeyDown, TxtBoxRandomHistoryUpdateInterval.KeyDown, TxtBoxStatusMessageDisplayTime.KeyDown, TxtBoxCompanionServerPort.KeyDown
+    Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHelperApp1Path.KeyDown, TxtBoxHelperApp1Name.KeyDown, TxtBoxHelperApp2Name.KeyDown, TxtBoxHelperApp2Path.KeyDown, TxtBoxPlaylistTitleSeparator.KeyDown, TxtBoxPlaylistVideoIdentifier.KeyDown, TxtBoxHistoryAutoSaveInterval.KeyDown, TxtBoxHistoryUpdateInterval.KeyDown, TxtBoxRandomHistoryUpdateInterval.KeyDown, TxtBoxStatusMessageDisplayTime.KeyDown, TxtBoxCompanionServerPort.KeyDown, TxtBoxAudioServerPort.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
             Validate()
@@ -603,10 +604,8 @@ Public Class Options
                 If Settings.AudioStreamingPort <> value Then
                     Settings.AudioStreamingPort = value
                     TxtBoxAudioServerPort.SelectAll()
-                    If Settings.EnableAudioStreaming Then
-                        'SetAudioStreaming(True)
-                        'SetAudioStreaming()
-                    End If
+                    App.StopAudioStreaming()
+                    App.StartAudioStreaming()
                 End If
             Else
                 ' Out of range → restore previous value
@@ -701,7 +700,9 @@ Public Class Options
                 LblAudioServerPort.Enabled = False
                 TxtBoxAudioServerPort.Enabled = False
         End Select
-        'SetAudioStreaming()
+        App.FrmPlayer.SetPlaylistStatus()
+        App.StopAudioStreaming()
+        App.StartAudioStreaming()
     End Sub
     Private Sub ChkBoxEnableVoiceCommands_Click(sender As Object, e As EventArgs) Handles ChkBoxEnableVoiceCommands.Click
         App.Settings.EnableVoiceCommands = Not App.Settings.EnableVoiceCommands
