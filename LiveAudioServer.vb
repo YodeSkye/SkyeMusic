@@ -62,9 +62,9 @@ Friend Class LiveAudioServer
             Debug.WriteLine($"[STREAMING SERVER] LAN TCP streaming listener started on port {port}.")
             Skye.Common.Log.Write($"Streaming Server Started On Port {port}")
         Catch ex As Exception
-            Debug.WriteLine($"[STREAMING SERVER] Failed to start TCP listener: {ex.Message}")
-            Skye.Common.Log.Write($"Streaming Server Failed To Start: {ex.Message}")
-            NotifyStatusChanged(StreamingState.Error, ex.Message)
+            Debug.WriteLine($"[STREAMING SERVER] Failed to start TCP listener: {ex}")
+            Skye.Common.Log.Write($"Streaming Server Failed To Start: {ex}")
+            NotifyStatusChanged(StreamingState.Error, ex.ToString)
             [Stop](True)
         End Try
     End Sub

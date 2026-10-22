@@ -86,6 +86,7 @@ namespace NAudioStreamEngine
                 {
                     Debug.WriteLine($"[AUDIOSTREAMCAPTURER] Failed to start recorder/encoder: {ex.Message}");
                     StopCapture();
+                    throw;
                 }
             }
         }
