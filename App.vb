@@ -1223,7 +1223,7 @@ Namespace My
             Friend Shared LatestKnownVersion As String = String.Empty
             Friend Shared EnableCompanionServer As Boolean = False
             Friend Shared CompanionServerPort As Integer = 5050
-            Friend Shared EnableAudioStreaming As Boolean = True
+            Friend Shared EnableAudioStreaming As Boolean = False
             Friend Shared AudioStreamingPort As Integer = 5051
             Friend Shared AudioStreamingBitrate As AudioStreamBitrate = AudioStreamBitrate.Medium
             Friend Shared EnableVoiceCommands As Boolean = False
@@ -1424,6 +1424,10 @@ Namespace My
                     Settings.LatestKnownVersion = RegKey.GetValue("LatestKnownVersion", String.Empty).ToString
                     Settings.EnableCompanionServer = Skye.Common.RegistryHelper.GetBool("EnableCompanionServer", False)
                     Settings.CompanionServerPort = Skye.Common.RegistryHelper.GetInt("CompanionServerPort", 5050)
+                    Settings.EnableAudioStreaming = Skye.Common.RegistryHelper.GetBool("EnableAudioStreaming", False)
+                    Settings.AudioStreamingPort = Skye.Common.RegistryHelper.GetInt("AudioStreamingPort", 5051)
+                    Dim savedBitrateValue As Integer = Skye.Common.RegistryHelper.GetInt("AudioStreamingBitrate", CInt(AudioStreamBitrate.Medium))
+                    Settings.AudioStreamingBitrate = CType(savedBitrateValue, AudioStreamBitrate)
                     Settings.EnableVoiceCommands = Skye.Common.RegistryHelper.GetBool("EnableVoiceCommands", False)
                     Settings.VoicePushToTalk = Skye.Common.RegistryHelper.GetBool("VoicePushToTalk", True)
 
@@ -1765,6 +1769,9 @@ Namespace My
                     RegKey.SetValue("LatestKnownVersion", Settings.LatestKnownVersion, Microsoft.Win32.RegistryValueKind.String)
                     Skye.Common.RegistryHelper.SetBool("EnableCompanionServer", Settings.EnableCompanionServer)
                     Skye.Common.RegistryHelper.SetInt("CompanionServerPort", Settings.CompanionServerPort)
+                    Skye.Common.RegistryHelper.SetBool("EnableAudioStreaming", Settings.EnableAudioStreaming)
+                    Skye.Common.RegistryHelper.SetInt("AudioStreamingPort", Settings.AudioStreamingPort)
+                    Skye.Common.RegistryHelper.SetInt("AudioStreamingBitrate", CInt(Settings.AudioStreamingBitrate))
                     Skye.Common.RegistryHelper.SetBool("EnableVoiceCommands", Settings.EnableVoiceCommands)
                     Skye.Common.RegistryHelper.SetBool("VoicePushToTalk", Settings.VoicePushToTalk)
 
@@ -2900,6 +2907,13 @@ Namespace My
                 End If
             Catch ex As Exception
                 Skye.Common.Log.Write($"Error Cleaning Up Audio Endpoint: {ex}")
+            End Try
+
+            ' Shutdown Streaming Server
+            Try
+                If Settings.EnableAudioStreaming Then LiveAudioServer.Stop()
+            Catch ex As Exception
+                Skye.Common.Log.Write($"Error Stopping Live Audio Streaming Server: {ex}")
             End Try
 
             ' Phase 3: SAFELY CLOSE ALL OPEN FORMS

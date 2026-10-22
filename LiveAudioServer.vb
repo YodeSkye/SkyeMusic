@@ -62,13 +62,14 @@ Friend Class LiveAudioServer
             Debug.WriteLine($"[LiveAudioServer] LAN TCP streaming listener started on port {port}.")
         Catch ex As Exception
             Debug.WriteLine($"[LiveAudioServer] Failed to start TCP listener: {ex.Message}")
-            [Stop]()
+            NotifyStatusChanged(StreamingState.Error, ex.Message)
+            [Stop](True)
         End Try
     End Sub
     ''' <summary>
     ''' Stops the server and closes all client connections.
     ''' </summary>
-    Friend Shared Sub [Stop]()
+    Friend Shared Sub [Stop](Optional isDueToError As Boolean = False)
         ' 1. Guard clause: If we aren't listening and the server is null, bail out immediately!
         If Not _isListening AndAlso _tcpServer Is Nothing Then Return
 
@@ -97,7 +98,7 @@ Friend Class LiveAudioServer
             _connectedStreams.Clear()
         End SyncLock
 
-        NotifyStatusChanged(StreamingState.Stopped, "Server Idle")
+        If Not isDueToError Then NotifyStatusChanged(StreamingState.Stopped, "Server Idle")
         Debug.WriteLine("[LiveAudioServer] Streaming server and capture stopped.")
     End Sub
 
@@ -186,6 +187,9 @@ Friend Class LiveAudioServer
         End Try
     End Sub
     Private Shared Sub BroadcastAudioBuffer(buffer As Byte(), count As Integer) ' Broadcasts encoded MP3 audio buffer bytes to all active connected clients.
+        ' Track whether we actually removed anyone so we only notify when needed
+        Dim streamsChanged As Integer = 0
+
         SyncLock _clientLock
             If _connectedStreams.Count = 0 Then Return
 
@@ -200,14 +204,20 @@ Friend Class LiveAudioServer
                 End Try
             Next
 
-            For Each deadStream In deadStreams
-                _connectedStreams.Remove(deadStream)
-                Try
-                    deadStream.Close()
-                Catch
-                End Try
-            Next
+            ' If we found any dead streams, clean them up!
+            If deadStreams.Count > 0 Then
+                For Each deadStream In deadStreams
+                    _connectedStreams.Remove(deadStream)
+                    Try
+                        deadStream.Close()
+                    Catch
+                    End Try
+                    streamsChanged += 1
+                Next
+            End If
         End SyncLock
+
+        If streamsChanged > 0 Then NotifyStatusChanged(StreamingState.Listening, $"Dead Streams Removed: {streamsChanged}")
     End Sub
 
 End Class
