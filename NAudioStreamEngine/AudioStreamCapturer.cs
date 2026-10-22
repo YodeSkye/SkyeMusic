@@ -13,7 +13,6 @@ namespace NAudioStreamEngine
         private static LameMP3FileWriter? _mp3Writer;
         private static bool _isCapturing;
         private static readonly Lock _captureLock = new();
-
         public static event Action<byte[], int>? AudioDataCaptured;
 
         public static void StartCapture(int targetBitrateKbps)
@@ -90,7 +89,6 @@ namespace NAudioStreamEngine
                 }
             }
         }
-
         public static void StopCapture()
         {
             lock (_captureLock)
@@ -125,7 +123,6 @@ namespace NAudioStreamEngine
             }
         }
     }
-
     internal class Mp3CallbackStream(Action<byte[], int, int> onWrite) : Stream
     {
         private readonly Action<byte[], int, int> _onWrite = onWrite;

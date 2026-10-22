@@ -39,34 +39,61 @@ Friend Class LiveAudioServer
     Friend Shared Sub Start(port As Integer)
         If _isListening Then Return
 
-        Try
-            ' Bind to IPAddress.Any to accept LAN connections on a custom port without admin rights or HTTP.SYS restrictions
-            _tcpServer = New TcpListener(IPAddress.Any, port)
-            _tcpServer.Start()
-            _isListening = True
+        Dim maxRetries As Integer = 3
+        Dim retryDelayMs As Integer = 150
 
-            ' 1. Wire up the C# audio capture event to feed this LiveAudioServer broadcaster
-            AddHandler AudioStreamCapturer.AudioDataCaptured, AddressOf HandleAudioCaptured
+        For attempt As Integer = 1 To maxRetries
+            Try
+                ' Bind to IPAddress.Any to accept LAN connections on a custom port without admin rights or HTTP.SYS restrictions
+                _tcpServer = New TcpListener(IPAddress.Any, port)
+                _tcpServer.Start()
+                _isListening = True
 
-            ' 2. Start the modern C# MP3 audio recorder using your settings enum cast to Integer
-            AudioStreamCapturer.StartCapture(CInt(App.Settings.AudioStreamingBitrate))
+                ' 1. Wire up the C# audio capture event to feed this LiveAudioServer broadcaster
+                AddHandler AudioStreamCapturer.AudioDataCaptured, AddressOf HandleAudioCaptured
 
-            ' 3. Start background thread to accept incoming client connections
-            _listenerThread = New Thread(AddressOf AcceptClientsLoop) With {
+                ' 2. Start the modern C# MP3 audio recorder using your settings enum cast to Integer
+                AudioStreamCapturer.StartCapture(CInt(App.Settings.AudioStreamingBitrate))
+
+                ' 3. Start background thread to accept incoming client connections
+                _listenerThread = New Thread(AddressOf AcceptClientsLoop) With {
                 .IsBackground = True,
                 .Name = "LiveAudioTcp_Listener"
             }
-            _listenerThread.Start()
+                _listenerThread.Start()
 
-            NotifyStatusChanged(StreamingState.Listening, "Server Active")
-            Debug.WriteLine($"[STREAMING SERVER] LAN TCP streaming listener started on port {port}.")
-            Skye.Common.Log.Write($"Streaming Server Started On Port {port}")
-        Catch ex As Exception
-            Debug.WriteLine($"[STREAMING SERVER] Failed to start TCP listener: {ex}")
-            Skye.Common.Log.Write($"Streaming Server Failed To Start: {ex}")
-            NotifyStatusChanged(StreamingState.Error, ex.ToString)
-            [Stop](True)
-        End Try
+                NotifyStatusChanged(StreamingState.Listening, "Server Active")
+                Debug.WriteLine($"[STREAMING SERVER] LAN TCP streaming listener started on port {port}.")
+                Skye.Common.Log.Write($"Streaming Server Started On Port {port}")
+
+                ' Successfully started! Break out of the retry loop.
+                Exit For
+
+            Catch ex As SocketException When ex.SocketErrorCode = SocketError.AddressAlreadyInUse AndAlso attempt < maxRetries
+                ' The port is still releasing from a recent Stop() call. Clean up and wait briefly before retrying.
+                Try
+                    _tcpServer?.Stop()
+                Catch
+                End Try
+                _tcpServer = Nothing
+
+                System.Threading.Thread.Sleep(retryDelayMs)
+
+            Catch ex As Exception
+                ' Any other error, or if retries are exhausted, clean up and handle the failure
+                Try
+                    _tcpServer?.Stop()
+                Catch
+                End Try
+                _tcpServer = Nothing
+
+                Debug.WriteLine($"[STREAMING SERVER] Failed to start TCP listener: {ex}")
+                Skye.Common.Log.Write($"Streaming Server Failed To Start: {ex}")
+                NotifyStatusChanged(StreamingState.Error, ex.ToString)
+                [Stop](True)
+                Exit For
+            End Try
+        Next
     End Sub
     ''' <summary>
     ''' Stops the server and closes all client connections.
