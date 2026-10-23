@@ -35,7 +35,20 @@ Partial Class CompanionClients
         CMICopyIP = New ToolStripMenuItem()
         CMIRefresh = New ToolStripMenuItem()
         TimerRefresh = New Timer(components)
+        TCClients = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
+        TPClients = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        TPListeners = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
+        ListViewex1 = New Skye.UI.ListViewEX()
+        ColumnHeader2 = New ColumnHeader()
+        ColumnHeader3 = New ColumnHeader()
+        ColumnHeader5 = New ColumnHeader()
+        ColumnHeader6 = New ColumnHeader()
+        ColumnHeader7 = New ColumnHeader()
         CMClients.SuspendLayout()
+        CType(TCClients, ComponentModel.ISupportInitialize).BeginInit()
+        TCClients.SuspendLayout()
+        TPClients.SuspendLayout()
+        TPListeners.SuspendLayout()
         SuspendLayout()
         ' 
         ' LVClients
@@ -52,7 +65,7 @@ Partial Class CompanionClients
         LVClients.MultiSelect = False
         LVClients.Name = "LVClients"
         LVClients.OwnerDraw = True
-        LVClients.Size = New Size(659, 168)
+        LVClients.Size = New Size(659, 204)
         LVClients.TabIndex = 0
         LVClients.UseCompatibleStateImageBehavior = False
         LVClients.View = View.Details
@@ -120,12 +133,101 @@ Partial Class CompanionClients
         TimerRefresh.Enabled = True
         TimerRefresh.Interval = 3000
         ' 
+        ' TCClients
+        ' 
+        TCClients.ActiveTabFont = New Font("Segoe UI", 14.25F, FontStyle.Bold)
+        TCClients.BeforeTouchSize = New Size(727, 248)
+        TCClients.Controls.Add(TPClients)
+        TCClients.Controls.Add(TPListeners)
+        TCClients.Dock = DockStyle.Fill
+        TCClients.Location = New Point(0, 0)
+        TCClients.Name = "TCClients"
+        TCClients.Size = New Size(727, 248)
+        TCClients.TabIndex = 1
+        TCClients.TabStop = False
+        TCClients.TabStyle = GetType(Syncfusion.Windows.Forms.Tools.TabRendererWhidbey)
+        TCClients.ThemeName = "TabRendererWhidbey"
+        ' 
+        ' TPClients
+        ' 
+        TPClients.Controls.Add(LVClients)
+        TPClients.Image = Nothing
+        TPClients.ImageSize = New Size(16, 16)
+        TPClients.Location = New Point(1, 42)
+        TPClients.Name = "TPClients"
+        TPClients.ShowCloseButton = True
+        TPClients.Size = New Size(659, 204)
+        TPClients.TabIndex = 1
+        TPClients.Text = " Clients "
+        TPClients.ThemesEnabled = False
+        ' 
+        ' TPListeners
+        ' 
+        TPListeners.Controls.Add(ListViewex1)
+        TPListeners.Image = Nothing
+        TPListeners.ImageSize = New Size(16, 16)
+        TPListeners.Location = New Point(1, 42)
+        TPListeners.Name = "TPListeners"
+        TPListeners.ShowCloseButton = True
+        TPListeners.Size = New Size(724, 204)
+        TPListeners.TabIndex = 2
+        TPListeners.Text = " Listeners "
+        TPListeners.ThemesEnabled = False
+        ' 
+        ' ListViewex1
+        ' 
+        ListViewex1.AllowColumnReorder = True
+        ListViewex1.Columns.AddRange(New ColumnHeader() {ColumnHeader2, ColumnHeader3, ColumnHeader5, ColumnHeader6, ColumnHeader7})
+        ListViewex1.ContextMenuStrip = CMClients
+        ListViewex1.Dock = DockStyle.Fill
+        ListViewex1.EditableColumns = CType(resources.GetObject("ListViewex1.EditableColumns"), List(Of Boolean))
+        ListViewex1.FullRowSelect = True
+        ListViewex1.HeaderStyle = ColumnHeaderStyle.Nonclickable
+        ListViewex1.InsertionLineColor = Color.Teal
+        ListViewex1.Location = New Point(0, 0)
+        ListViewex1.MultiSelect = False
+        ListViewex1.Name = "ListViewex1"
+        ListViewex1.OwnerDraw = True
+        ListViewex1.Size = New Size(724, 204)
+        ListViewex1.TabIndex = 1
+        ListViewex1.UseCompatibleStateImageBehavior = False
+        ListViewex1.View = View.Details
+        ' 
+        ' ColumnHeader2
+        ' 
+        ColumnHeader2.Text = "IP"
+        ColumnHeader2.TextAlign = HorizontalAlignment.Center
+        ColumnHeader2.Width = 120
+        ' 
+        ' ColumnHeader3
+        ' 
+        ColumnHeader3.Text = "Connected At"
+        ColumnHeader3.TextAlign = HorizontalAlignment.Center
+        ColumnHeader3.Width = 180
+        ' 
+        ' ColumnHeader5
+        ' 
+        ColumnHeader5.Text = "Duration"
+        ColumnHeader5.TextAlign = HorizontalAlignment.Center
+        ColumnHeader5.Width = 100
+        ' 
+        ' ColumnHeader6
+        ' 
+        ColumnHeader6.Text = "Data Streamed"
+        ColumnHeader6.TextAlign = HorizontalAlignment.Center
+        ColumnHeader6.Width = 120
+        ' 
+        ' ColumnHeader7
+        ' 
+        ColumnHeader7.Text = "User-Agent"
+        ColumnHeader7.Width = 200
+        ' 
         ' CompanionClients
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(659, 168)
-        Controls.Add(LVClients)
+        ClientSize = New Size(727, 248)
+        Controls.Add(TCClients)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
@@ -135,6 +237,10 @@ Partial Class CompanionClients
         StartPosition = FormStartPosition.Manual
         Text = "Companion Clients"
         CMClients.ResumeLayout(False)
+        CType(TCClients, ComponentModel.ISupportInitialize).EndInit()
+        TCClients.ResumeLayout(False)
+        TPClients.ResumeLayout(False)
+        TPListeners.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
 
@@ -149,4 +255,13 @@ Partial Class CompanionClients
     Friend WithEvents CMICopyDeviceName As ToolStripMenuItem
     Friend WithEvents CMICopyIP As ToolStripMenuItem
     Friend WithEvents CMIRefresh As ToolStripMenuItem
+    Friend WithEvents TCClients As Syncfusion.Windows.Forms.Tools.TabControlAdv
+    Friend WithEvents TPClients As Syncfusion.Windows.Forms.Tools.TabPageAdv
+    Friend WithEvents TPListeners As Syncfusion.Windows.Forms.Tools.TabPageAdv
+    Friend WithEvents ListViewex1 As Skye.UI.ListViewEX
+    Friend WithEvents ColumnHeader2 As ColumnHeader
+    Friend WithEvents ColumnHeader3 As ColumnHeader
+    Friend WithEvents ColumnHeader5 As ColumnHeader
+    Friend WithEvents ColumnHeader6 As ColumnHeader
+    Friend WithEvents ColumnHeader7 As ColumnHeader
 End Class

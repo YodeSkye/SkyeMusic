@@ -39,7 +39,7 @@ Public Class CompanionClients
         Static b As Rectangle
         'Draw Background
         b = e.Bounds
-        Using br As Brush = New SolidBrush(App.CurrentTheme.BackColor)
+        Using br As Brush = New SolidBrush(CurrentTheme.BackColor)
             e.Graphics.FillRectangle(br, b)
         End Using
         'Draw Borders
@@ -50,16 +50,16 @@ Public Class CompanionClients
         b.Height -= 1
         e.Graphics.DrawLine(SystemPens.ControlLightLight, b.X, b.Y, b.Right, b.Y)
         e.Graphics.DrawLine(SystemPens.ControlLightLight, b.X, b.Y, b.X, b.Bottom)
-        e.Graphics.DrawLine(SystemPens.ControlDark, (b.X + 1), b.Bottom, b.Right, b.Bottom)
-        e.Graphics.DrawLine(SystemPens.ControlDark, b.Right, (b.Y + 1), b.Right, b.Bottom)
+        e.Graphics.DrawLine(SystemPens.ControlDark, b.X + 1, b.Bottom, b.Right, b.Bottom)
+        e.Graphics.DrawLine(SystemPens.ControlDark, b.Right, b.Y + 1, b.Right, b.Bottom)
         'Draw Text
         b = e.Bounds
-        Dim width As Integer = TextRenderer.MeasureText(" ", App.CurrentTheme.SubBaseFont).Width
+        Dim width = TextRenderer.MeasureText(" ", CurrentTheme.SubBaseFont).Width
         b = Rectangle.Inflate(e.Bounds, -2, 0)
         If e.ColumnIndex = 0 Then
-            TextRenderer.DrawText(e.Graphics, e.Header.Text, App.CurrentTheme.SubBaseFont, b, App.CurrentTheme.TextColor, TextFormatFlags.Left)
+            TextRenderer.DrawText(e.Graphics, e.Header.Text, CurrentTheme.SubBaseFont, b, CurrentTheme.TextColor, TextFormatFlags.Left)
         Else
-            TextRenderer.DrawText(e.Graphics, e.Header.Text, App.CurrentTheme.SubBaseFont, b, App.CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter)
+            TextRenderer.DrawText(e.Graphics, e.Header.Text, CurrentTheme.SubBaseFont, b, CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter)
         End If
     End Sub
     Private Sub LVClients_DrawItem(sender As Object, e As DrawListViewItemEventArgs) Handles LVClients.DrawItem

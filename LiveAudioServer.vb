@@ -14,6 +14,8 @@ Friend Class LiveAudioServer
         Public Property NetStream As NetworkStream
         Public Property ConnectedAt As DateTime
         Public Property EndPoint As String
+        Public Property BytesStreamed As Long = 0
+        Public Property UserAgent As String = "Unknown / Custom Player"
 
         Public Sub New(client As TcpClient, netStream As NetworkStream)
             Me.Client = client
@@ -208,10 +210,16 @@ Friend Class LiveAudioServer
             netStream = client.GetStream()
 
             ' Read incoming HTTP request headers from the client (VLC / Browser) so it doesn't block or stall
+            Dim detectedAgent As String = "Generic / VLC"
             Dim reader As New StreamReader(netStream, Encoding.ASCII, False, 1024, leaveOpen:=True)
             While reader.Peek() >= 0
                 Dim line As String = reader.ReadLine()
                 If String.IsNullOrEmpty(line) Then Exit While ' End of HTTP headers
+
+                ' Check if this line contains the User-Agent header
+                If line.StartsWith("User-Agent:", StringComparison.OrdinalIgnoreCase) Then
+                    detectedAgent = line.Substring("User-Agent:".Length).Trim()
+                End If
             End While
 
             ' Send standard HTTP response headers for MP3 streaming
@@ -224,8 +232,11 @@ Friend Class LiveAudioServer
             netStream.Write(headerBytes, 0, headerBytes.Length)
             netStream.Flush()
 
-            ' Create wrapper and register the client info for broadcasting and UI tracking
-            clientInfo = New AudioClientInfo(client, netStream)
+            ' Create wrapper and assign the detected user agent
+            clientInfo = New AudioClientInfo(client, netStream) With {
+                .UserAgent = detectedAgent
+            }
+
             SyncLock _clientLock
                 _connectedClients.Add(clientInfo)
             End SyncLock
@@ -273,6 +284,7 @@ Friend Class LiveAudioServer
                 Try
                     clientInfo.NetStream.Write(buffer, 0, count)
                     clientInfo.NetStream.Flush()
+                    clientInfo.BytesStreamed += count
                 Catch ex As Exception
                     deadClients.Add(clientInfo)
                 End Try
