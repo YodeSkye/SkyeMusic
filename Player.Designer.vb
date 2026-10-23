@@ -460,7 +460,6 @@ Partial Class Player
         MIViewClients.Image = My.Resources.Resources.ImageNetwork16
         MIViewClients.Name = "MIViewClients"
         MIViewClients.Size = New Size(211, 26)
-        MIViewClients.Text = "Clients"
         ' 
         ' MIOptions
         ' 

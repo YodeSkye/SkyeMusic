@@ -38,7 +38,7 @@ Partial Class CompanionClients
         TCClients = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPClients = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
         TPListeners = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
-        ListViewex1 = New Skye.UI.ListViewEX()
+        LVListeners = New Skye.UI.ListViewEX()
         ColumnHeader2 = New ColumnHeader()
         ColumnHeader3 = New ColumnHeader()
         ColumnHeader5 = New ColumnHeader()
@@ -65,7 +65,7 @@ Partial Class CompanionClients
         LVClients.MultiSelect = False
         LVClients.Name = "LVClients"
         LVClients.OwnerDraw = True
-        LVClients.Size = New Size(659, 204)
+        LVClients.Size = New Size(914, 394)
         LVClients.TabIndex = 0
         LVClients.UseCompatibleStateImageBehavior = False
         LVClients.View = View.Details
@@ -73,25 +73,25 @@ Partial Class CompanionClients
         ' DeviceName
         ' 
         DeviceName.Text = "Device Name"
-        DeviceName.Width = 175
+        DeviceName.Width = 310
         ' 
         ' IPAddress
         ' 
         IPAddress.Text = "IP"
         IPAddress.TextAlign = HorizontalAlignment.Center
-        IPAddress.Width = 120
+        IPAddress.Width = 200
         ' 
         ' ConnectedAt
         ' 
         ConnectedAt.Text = "Connected At"
         ConnectedAt.TextAlign = HorizontalAlignment.Center
-        ConnectedAt.Width = 180
+        ConnectedAt.Width = 200
         ' 
         ' LastMessage
         ' 
         LastMessage.Text = "Last Message"
         LastMessage.TextAlign = HorizontalAlignment.Center
-        LastMessage.Width = 180
+        LastMessage.Width = 200
         ' 
         ' CMClients
         ' 
@@ -136,13 +136,13 @@ Partial Class CompanionClients
         ' TCClients
         ' 
         TCClients.ActiveTabFont = New Font("Segoe UI", 14.25F, FontStyle.Bold)
-        TCClients.BeforeTouchSize = New Size(727, 248)
+        TCClients.BeforeTouchSize = New Size(917, 438)
         TCClients.Controls.Add(TPClients)
         TCClients.Controls.Add(TPListeners)
         TCClients.Dock = DockStyle.Fill
         TCClients.Location = New Point(0, 0)
         TCClients.Name = "TCClients"
-        TCClients.Size = New Size(727, 248)
+        TCClients.Size = New Size(917, 438)
         TCClients.TabIndex = 1
         TCClients.TabStop = False
         TCClients.TabStyle = GetType(Syncfusion.Windows.Forms.Tools.TabRendererWhidbey)
@@ -156,48 +156,47 @@ Partial Class CompanionClients
         TPClients.Location = New Point(1, 42)
         TPClients.Name = "TPClients"
         TPClients.ShowCloseButton = True
-        TPClients.Size = New Size(659, 204)
+        TPClients.Size = New Size(914, 394)
         TPClients.TabIndex = 1
         TPClients.Text = " Clients "
         TPClients.ThemesEnabled = False
         ' 
         ' TPListeners
         ' 
-        TPListeners.Controls.Add(ListViewex1)
+        TPListeners.Controls.Add(LVListeners)
         TPListeners.Image = Nothing
         TPListeners.ImageSize = New Size(16, 16)
         TPListeners.Location = New Point(1, 42)
         TPListeners.Name = "TPListeners"
         TPListeners.ShowCloseButton = True
-        TPListeners.Size = New Size(724, 204)
+        TPListeners.Size = New Size(914, 394)
         TPListeners.TabIndex = 2
         TPListeners.Text = " Listeners "
         TPListeners.ThemesEnabled = False
         ' 
-        ' ListViewex1
+        ' LVListeners
         ' 
-        ListViewex1.AllowColumnReorder = True
-        ListViewex1.Columns.AddRange(New ColumnHeader() {ColumnHeader2, ColumnHeader3, ColumnHeader5, ColumnHeader6, ColumnHeader7})
-        ListViewex1.ContextMenuStrip = CMClients
-        ListViewex1.Dock = DockStyle.Fill
-        ListViewex1.EditableColumns = CType(resources.GetObject("ListViewex1.EditableColumns"), List(Of Boolean))
-        ListViewex1.FullRowSelect = True
-        ListViewex1.HeaderStyle = ColumnHeaderStyle.Nonclickable
-        ListViewex1.InsertionLineColor = Color.Teal
-        ListViewex1.Location = New Point(0, 0)
-        ListViewex1.MultiSelect = False
-        ListViewex1.Name = "ListViewex1"
-        ListViewex1.OwnerDraw = True
-        ListViewex1.Size = New Size(724, 204)
-        ListViewex1.TabIndex = 1
-        ListViewex1.UseCompatibleStateImageBehavior = False
-        ListViewex1.View = View.Details
+        LVListeners.AllowColumnReorder = True
+        LVListeners.Columns.AddRange(New ColumnHeader() {ColumnHeader2, ColumnHeader3, ColumnHeader5, ColumnHeader6, ColumnHeader7})
+        LVListeners.Dock = DockStyle.Fill
+        LVListeners.EditableColumns = CType(resources.GetObject("LVListeners.EditableColumns"), List(Of Boolean))
+        LVListeners.FullRowSelect = True
+        LVListeners.HeaderStyle = ColumnHeaderStyle.Nonclickable
+        LVListeners.InsertionLineColor = Color.Teal
+        LVListeners.Location = New Point(0, 0)
+        LVListeners.MultiSelect = False
+        LVListeners.Name = "LVListeners"
+        LVListeners.OwnerDraw = True
+        LVListeners.Size = New Size(914, 394)
+        LVListeners.TabIndex = 1
+        LVListeners.UseCompatibleStateImageBehavior = False
+        LVListeners.View = View.Details
         ' 
         ' ColumnHeader2
         ' 
         ColumnHeader2.Text = "IP"
         ColumnHeader2.TextAlign = HorizontalAlignment.Center
-        ColumnHeader2.Width = 120
+        ColumnHeader2.Width = 190
         ' 
         ' ColumnHeader3
         ' 
@@ -215,18 +214,18 @@ Partial Class CompanionClients
         ' 
         ColumnHeader6.Text = "Data Streamed"
         ColumnHeader6.TextAlign = HorizontalAlignment.Center
-        ColumnHeader6.Width = 120
+        ColumnHeader6.Width = 140
         ' 
         ' ColumnHeader7
         ' 
         ColumnHeader7.Text = "User-Agent"
-        ColumnHeader7.Width = 200
+        ColumnHeader7.Width = 300
         ' 
         ' CompanionClients
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(727, 248)
+        ClientSize = New Size(917, 438)
         Controls.Add(TCClients)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -235,7 +234,7 @@ Partial Class CompanionClients
         MaximizeBox = False
         Name = "CompanionClients"
         StartPosition = FormStartPosition.Manual
-        Text = "Companion Clients"
+        Text = "Companion Clients & Stream Listeners"
         CMClients.ResumeLayout(False)
         CType(TCClients, ComponentModel.ISupportInitialize).EndInit()
         TCClients.ResumeLayout(False)
@@ -258,7 +257,7 @@ Partial Class CompanionClients
     Friend WithEvents TCClients As Syncfusion.Windows.Forms.Tools.TabControlAdv
     Friend WithEvents TPClients As Syncfusion.Windows.Forms.Tools.TabPageAdv
     Friend WithEvents TPListeners As Syncfusion.Windows.Forms.Tools.TabPageAdv
-    Friend WithEvents ListViewex1 As Skye.UI.ListViewEX
+    Friend WithEvents LVListeners As Skye.UI.ListViewEX
     Friend WithEvents ColumnHeader2 As ColumnHeader
     Friend WithEvents ColumnHeader3 As ColumnHeader
     Friend WithEvents ColumnHeader5 As ColumnHeader

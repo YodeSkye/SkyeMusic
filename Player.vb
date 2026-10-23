@@ -3617,15 +3617,18 @@ Public Class Player
         Else
             MIViewQueue.Enabled = True
         End If
-        If App.CompanionServerRunning Then
+        If App.CompanionServerRunning Or LiveAudioServer.IsListening Then
             MIViewClients.Visible = True
+
             Dim clients = App.CompanionControlServer.ClientCount
-            MIViewClients.Text = MIViewClients.Text.TrimEnd(App.TrimEndSearch) + " (" + clients.ToString + ")"
-            If clients = 0 Then
+            Dim listeners = LiveAudioServer.ConnectedClientCount
+            MIViewClients.Text = $"Clients ({clients}) && Listeners ({listeners})"
+            If clients = 0 And listeners = 0 Then
                 MIViewClients.Enabled = False
             Else
                 MIViewClients.Enabled = True
             End If
+
         Else
             MIViewClients.Visible = False
         End If

@@ -15,11 +15,11 @@ Public Class CompanionClients
         End Try
     End Sub
     Private Sub Frm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Text = My.Application.Info.Title + " Companion Clients"
+        Text = My.Application.Info.Title & " " & Text
         SetAccentColor()
         SetTheme()
         ReThemeMenus()
-        RefreshClientList()
+        RefreshLists()
     End Sub
     Private Sub Frm_Move(sender As Object, e As EventArgs) Handles MyBase.Move
         If Visible AndAlso WindowState = FormWindowState.Normal Then
@@ -35,6 +35,15 @@ Public Class CompanionClients
     End Sub
 
     ' Control Events
+    Private Sub TCClients_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TCClients.SelectedIndexChanged
+        'Debug.Print(TCClients.SelectedTab.Name)
+        Select Case TCClients.SelectedTab.Name
+            Case "TPClients"
+                LVClients.Focus()
+            Case "TPListeners"
+                LVListeners.Focus()
+        End Select
+    End Sub
     Private Sub LVClients_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles LVClients.DrawColumnHeader
         Static b As Rectangle
         'Draw Background
@@ -88,7 +97,7 @@ Public Class CompanionClients
         If info Is Nothing Then Exit Sub
 
         App.CompanionControlServer.DisconnectClient(info)
-        RefreshClientList()
+        RefreshLists()
 
     End Sub
     Private Sub CMICopyDeviceName_Click(sender As Object, e As EventArgs) Handles CMICopyDeviceName.Click
@@ -106,16 +115,54 @@ Public Class CompanionClients
 
     End Sub
     Private Sub CMIRefresh_Click(sender As Object, e As EventArgs) Handles CMIRefresh.Click
-        RefreshClientList()
+        RefreshLists()
+    End Sub
+    Private Sub LVListeners_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles LVListeners.DrawColumnHeader
+        Static b As Rectangle
+        'Draw Background
+        b = e.Bounds
+        Using br As Brush = New SolidBrush(CurrentTheme.BackColor)
+            e.Graphics.FillRectangle(br, b)
+        End Using
+        'Draw Borders
+        b.Width -= 1
+        b.Height -= 1
+        e.Graphics.DrawRectangle(SystemPens.ControlDarkDark, b)
+        b.Width -= 1
+        b.Height -= 1
+        e.Graphics.DrawLine(SystemPens.ControlLightLight, b.X, b.Y, b.Right, b.Y)
+        e.Graphics.DrawLine(SystemPens.ControlLightLight, b.X, b.Y, b.X, b.Bottom)
+        e.Graphics.DrawLine(SystemPens.ControlDark, b.X + 1, b.Bottom, b.Right, b.Bottom)
+        e.Graphics.DrawLine(SystemPens.ControlDark, b.Right, b.Y + 1, b.Right, b.Bottom)
+        'Draw Text
+        b = e.Bounds
+        Dim width = TextRenderer.MeasureText(" ", CurrentTheme.SubBaseFont).Width
+        b = Rectangle.Inflate(e.Bounds, -2, 0)
+        If e.ColumnIndex = 0 Then
+            TextRenderer.DrawText(e.Graphics, e.Header.Text, CurrentTheme.SubBaseFont, b, CurrentTheme.TextColor, TextFormatFlags.Left)
+        Else
+            TextRenderer.DrawText(e.Graphics, e.Header.Text, CurrentTheme.SubBaseFont, b, CurrentTheme.TextColor, TextFormatFlags.HorizontalCenter)
+        End If
+    End Sub
+    Private Sub LVListeners_DrawItem(sender As Object, e As DrawListViewItemEventArgs) Handles LVListeners.DrawItem
+        e.DrawDefault = True
+    End Sub
+    Private Sub LVListeners_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles LVListeners.DrawSubItem
+        e.DrawDefault = True
+    End Sub
+    Private Sub LVListeners_ColumnWidthChanging(sender As Object, e As ColumnWidthChangingEventArgs) Handles LVListeners.ColumnWidthChanging
+        ' Block all resizing:
+        e.Cancel = True
+        e.NewWidth = LVListeners.Columns(e.ColumnIndex).Width
     End Sub
 
     ' Handlers
     Private Sub TimerRefresh_Tick(sender As Object, e As EventArgs) Handles TimerRefresh.Tick
-        If CMClients.Visible = False Then RefreshClientList()
+        If CMClients.Visible = False Then RefreshLists()
     End Sub
 
     ' Methods
-    Private Sub RefreshClientList()
+    Private Sub RefreshLists()
         LVClients.Items.Clear()
         Dim clients = App.CompanionControlServer.GetClients()
         For Each info In clients
@@ -126,7 +173,20 @@ Public Class CompanionClients
             item.Tag = info
             LVClients.Items.Add(item)
         Next
-        Debug.WriteLine($"Refreshed client list: {clients.Count} clients found.")
+        LVListeners.Items.Clear()
+        Dim Listeners = LiveAudioServer.ActiveClients
+        For Each listener In Listeners
+            Dim item As New ListViewItem(listener.EndPoint)
+            item.SubItems.Add(listener.ConnectedAt.ToString("g"))
+            Dim duration As TimeSpan = DateTime.Now - listener.ConnectedAt
+            Dim durationText As String = duration.ToString("hh\:mm\:ss")
+            item.SubItems.Add(durationText)
+            item.SubItems.Add(Skye.Common.FormatFileSize(listener.BytesStreamed, Skye.Common.FormatFileSizeUnits.KiloBytes))
+            item.SubItems.Add(listener.UserAgent)
+            item.Tag = listener.EndPoint
+            LVListeners.Items.Add(item)
+        Next
+        Debug.WriteLine($"Refreshed client list: {clients.Count} clients found, {Listeners.Count} listeners found.")
     End Sub
     Private Function GetSelectedClient() As CompanionClientInfo
         If LVClients.SelectedItems.Count = 0 Then Return Nothing
@@ -143,19 +203,28 @@ Public Class CompanionClients
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
             BackColor = accent
+            TCClients.TabPanelBackColor = accent
         End If
         ResumeLayout()
     End Sub
     Private Sub SetTheme()
+        Static forecolor As Color
         SuspendLayout()
         If App.CurrentTheme.IsAccent Then
-            'LBLLogInfo.ForeColor = App.CurrentTheme.AccentTextColor
+            forecolor = App.CurrentTheme.AccentTextColor
         Else
+            forecolor = App.CurrentTheme.TextColor
             BackColor = App.CurrentTheme.BackColor
-            'LBLLogInfo.ForeColor = App.CurrentTheme.TextColor
+            TCClients.TabPanelBackColor = App.CurrentTheme.BackColor
         End If
+        TCClients.ActiveTabColor = App.CurrentTheme.ButtonBackColor
+        TCClients.ActiveTabForeColor = App.CurrentTheme.ButtonTextColor
+        TCClients.InactiveTabColor = App.CurrentTheme.ControlBackColor
+        TCClients.InActiveTabForeColor = forecolor
         LVClients.BackColor = App.CurrentTheme.BackColor
         LVClients.ForeColor = App.CurrentTheme.TextColor
+        LVListeners.BackColor = App.CurrentTheme.BackColor
+        LVListeners.ForeColor = App.CurrentTheme.TextColor
         ResumeLayout()
     End Sub
     Friend Sub SetColors()
