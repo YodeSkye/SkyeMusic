@@ -30,10 +30,10 @@ Partial Class CompanionClients
         ConnectedAt = New ColumnHeader()
         LastMessage = New ColumnHeader()
         CMClients = New ContextMenuStrip(components)
-        CMIDisconnect = New ToolStripMenuItem()
-        CMICopyDeviceName = New ToolStripMenuItem()
-        CMICopyIP = New ToolStripMenuItem()
-        CMIRefresh = New ToolStripMenuItem()
+        CMIClientsDisconnect = New ToolStripMenuItem()
+        CMIClientsCopyDeviceName = New ToolStripMenuItem()
+        CMIClientsCopyIP = New ToolStripMenuItem()
+        CMIClientsRefresh = New ToolStripMenuItem()
         TimerRefresh = New Timer(components)
         TCClients = New Syncfusion.Windows.Forms.Tools.TabControlAdv()
         TPClients = New Syncfusion.Windows.Forms.Tools.TabPageAdv()
@@ -44,11 +44,16 @@ Partial Class CompanionClients
         ColumnHeader5 = New ColumnHeader()
         ColumnHeader6 = New ColumnHeader()
         ColumnHeader7 = New ColumnHeader()
+        CMListeners = New ContextMenuStrip(components)
+        CMIListenersDisconnect = New ToolStripMenuItem()
+        CMIListenersCopyIP = New ToolStripMenuItem()
+        CMIListenersRefresh = New ToolStripMenuItem()
         CMClients.SuspendLayout()
         CType(TCClients, ComponentModel.ISupportInitialize).BeginInit()
         TCClients.SuspendLayout()
         TPClients.SuspendLayout()
         TPListeners.SuspendLayout()
+        CMListeners.SuspendLayout()
         SuspendLayout()
         ' 
         ' LVClients
@@ -96,37 +101,37 @@ Partial Class CompanionClients
         ' CMClients
         ' 
         CMClients.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        CMClients.Items.AddRange(New ToolStripItem() {CMIDisconnect, CMICopyDeviceName, CMICopyIP, CMIRefresh})
+        CMClients.Items.AddRange(New ToolStripItem() {CMIClientsDisconnect, CMIClientsCopyDeviceName, CMIClientsCopyIP, CMIClientsRefresh})
         CMClients.Name = "CMClients"
         CMClients.Size = New Size(188, 92)
         ' 
-        ' CMIDisconnect
+        ' CMIClientsDisconnect
         ' 
-        CMIDisconnect.Image = My.Resources.Resources.ImageNetwork16
-        CMIDisconnect.Name = "CMIDisconnect"
-        CMIDisconnect.Size = New Size(187, 22)
-        CMIDisconnect.Text = "Disconnect"
+        CMIClientsDisconnect.Image = My.Resources.Resources.ImageNetwork16
+        CMIClientsDisconnect.Name = "CMIClientsDisconnect"
+        CMIClientsDisconnect.Size = New Size(187, 22)
+        CMIClientsDisconnect.Text = "Disconnect"
         ' 
-        ' CMICopyDeviceName
+        ' CMIClientsCopyDeviceName
         ' 
-        CMICopyDeviceName.Image = My.Resources.Resources.ImageCopy16
-        CMICopyDeviceName.Name = "CMICopyDeviceName"
-        CMICopyDeviceName.Size = New Size(187, 22)
-        CMICopyDeviceName.Text = "Copy Device Name"
+        CMIClientsCopyDeviceName.Image = My.Resources.Resources.ImageCopy16
+        CMIClientsCopyDeviceName.Name = "CMIClientsCopyDeviceName"
+        CMIClientsCopyDeviceName.Size = New Size(187, 22)
+        CMIClientsCopyDeviceName.Text = "Copy Device Name"
         ' 
-        ' CMICopyIP
+        ' CMIClientsCopyIP
         ' 
-        CMICopyIP.Image = My.Resources.Resources.ImageCopy16
-        CMICopyIP.Name = "CMICopyIP"
-        CMICopyIP.Size = New Size(187, 22)
-        CMICopyIP.Text = "Copy IP Address"
+        CMIClientsCopyIP.Image = My.Resources.Resources.ImageCopy16
+        CMIClientsCopyIP.Name = "CMIClientsCopyIP"
+        CMIClientsCopyIP.Size = New Size(187, 22)
+        CMIClientsCopyIP.Text = "Copy IP Address"
         ' 
-        ' CMIRefresh
+        ' CMIClientsRefresh
         ' 
-        CMIRefresh.Image = My.Resources.Resources.ImageRefresh16
-        CMIRefresh.Name = "CMIRefresh"
-        CMIRefresh.Size = New Size(187, 22)
-        CMIRefresh.Text = "Refresh"
+        CMIClientsRefresh.Image = My.Resources.Resources.ImageRefresh16
+        CMIClientsRefresh.Name = "CMIClientsRefresh"
+        CMIClientsRefresh.Size = New Size(187, 22)
+        CMIClientsRefresh.Text = "Refresh"
         ' 
         ' TimerRefresh
         ' 
@@ -178,6 +183,7 @@ Partial Class CompanionClients
         ' 
         LVListeners.AllowColumnReorder = True
         LVListeners.Columns.AddRange(New ColumnHeader() {ColumnHeader2, ColumnHeader3, ColumnHeader5, ColumnHeader6, ColumnHeader7})
+        LVListeners.ContextMenuStrip = CMListeners
         LVListeners.Dock = DockStyle.Fill
         LVListeners.EditableColumns = CType(resources.GetObject("LVListeners.EditableColumns"), List(Of Boolean))
         LVListeners.FullRowSelect = True
@@ -221,6 +227,34 @@ Partial Class CompanionClients
         ColumnHeader7.Text = "User-Agent"
         ColumnHeader7.Width = 300
         ' 
+        ' CMListeners
+        ' 
+        CMListeners.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        CMListeners.Items.AddRange(New ToolStripItem() {CMIListenersDisconnect, CMIListenersCopyIP, CMIListenersRefresh})
+        CMListeners.Name = "CMClients"
+        CMListeners.Size = New Size(173, 70)
+        ' 
+        ' CMIListenersDisconnect
+        ' 
+        CMIListenersDisconnect.Image = My.Resources.Resources.ImageNetwork16
+        CMIListenersDisconnect.Name = "CMIListenersDisconnect"
+        CMIListenersDisconnect.Size = New Size(172, 22)
+        CMIListenersDisconnect.Text = "Disconnect"
+        ' 
+        ' CMIListenersCopyIP
+        ' 
+        CMIListenersCopyIP.Image = My.Resources.Resources.ImageCopy16
+        CMIListenersCopyIP.Name = "CMIListenersCopyIP"
+        CMIListenersCopyIP.Size = New Size(172, 22)
+        CMIListenersCopyIP.Text = "Copy IP Address"
+        ' 
+        ' CMIListenersRefresh
+        ' 
+        CMIListenersRefresh.Image = My.Resources.Resources.ImageRefresh16
+        CMIListenersRefresh.Name = "CMIListenersRefresh"
+        CMIListenersRefresh.Size = New Size(172, 22)
+        CMIListenersRefresh.Text = "Refresh"
+        ' 
         ' CompanionClients
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
@@ -240,6 +274,7 @@ Partial Class CompanionClients
         TCClients.ResumeLayout(False)
         TPClients.ResumeLayout(False)
         TPListeners.ResumeLayout(False)
+        CMListeners.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
 
@@ -250,10 +285,10 @@ Partial Class CompanionClients
     Friend WithEvents LastMessage As ColumnHeader
     Friend WithEvents CMClients As ContextMenuStrip
     Friend WithEvents TimerRefresh As Timer
-    Friend WithEvents CMIDisconnect As ToolStripMenuItem
-    Friend WithEvents CMICopyDeviceName As ToolStripMenuItem
-    Friend WithEvents CMICopyIP As ToolStripMenuItem
-    Friend WithEvents CMIRefresh As ToolStripMenuItem
+    Friend WithEvents CMIClientsDisconnect As ToolStripMenuItem
+    Friend WithEvents CMIClientsCopyDeviceName As ToolStripMenuItem
+    Friend WithEvents CMIClientsCopyIP As ToolStripMenuItem
+    Friend WithEvents CMIClientsRefresh As ToolStripMenuItem
     Friend WithEvents TCClients As Syncfusion.Windows.Forms.Tools.TabControlAdv
     Friend WithEvents TPClients As Syncfusion.Windows.Forms.Tools.TabPageAdv
     Friend WithEvents TPListeners As Syncfusion.Windows.Forms.Tools.TabPageAdv
@@ -263,4 +298,8 @@ Partial Class CompanionClients
     Friend WithEvents ColumnHeader5 As ColumnHeader
     Friend WithEvents ColumnHeader6 As ColumnHeader
     Friend WithEvents ColumnHeader7 As ColumnHeader
+    Friend WithEvents CMListeners As ContextMenuStrip
+    Friend WithEvents CMIListenersDisconnect As ToolStripMenuItem
+    Friend WithEvents CMIListenersCopyIP As ToolStripMenuItem
+    Friend WithEvents CMIListenersRefresh As ToolStripMenuItem
 End Class

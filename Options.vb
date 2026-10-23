@@ -700,9 +700,9 @@ Public Class Options
                 LblAudioServerPort.Enabled = False
                 TxtBoxAudioServerPort.Enabled = False
         End Select
-        App.FrmPlayer.SetPlaylistStatus()
         App.StopAudioStreaming()
         App.StartAudioStreaming()
+        App.FrmPlayer.SetPlaylistStatus()
     End Sub
     Private Sub ChkBoxEnableVoiceCommands_Click(sender As Object, e As EventArgs) Handles ChkBoxEnableVoiceCommands.Click
         App.Settings.EnableVoiceCommands = Not App.Settings.EnableVoiceCommands

@@ -88,7 +88,12 @@ Friend Class LiveAudioServer
                 }
                 _listenerThread.Start()
 
-                NotifyStatusChanged(StreamingState.Listening, "Server Active")
+                If FrmPlayer?.PlayState = App.PlayStates.Stopped Then
+                    NotifyStatusChanged(StreamingState.Stopped, "Server Active & Idle")
+                Else
+                    NotifyStatusChanged(StreamingState.Listening, "Server Active & Playing")
+                End If
+                'NotifyStatusChanged(StreamingState.Listening, "Server Active")
                 Debug.WriteLine($"[STREAMING SERVER] LAN TCP streaming listener started on port {port}.")
                 Skye.Common.Log.Write($"Streaming Server Started On Port {port}")
 
@@ -125,15 +130,17 @@ Friend Class LiveAudioServer
     ''' Stops the server and closes all client connections.
     ''' </summary>
     Friend Shared Sub [Stop](Optional isDueToError As Boolean = False)
-        ' 1. Guard clause: If we aren't listening and the server is null, bail out immediately!
         If Not _isListening AndAlso _tcpServer Is Nothing Then Return
 
-        ' 2. Stop the modern C# audio recorder first
-        AudioStreamCapturer.StopCapture()
-        ' 3. Safely remove the event handler so it doesn't duplicate on restart
+        _isListening = False
+
         RemoveHandler AudioStreamCapturer.AudioDataCaptured, AddressOf HandleAudioCaptured
 
-        _isListening = False
+        Try
+            AudioStreamCapturer.StopCapture()
+        Catch ex As Exception
+            Debug.WriteLine($"[STREAMING SERVER] AudioStreamCapturer error on stop: {ex.Message}")
+        End Try
 
         Try
             If _tcpServer IsNot Nothing Then
@@ -154,7 +161,13 @@ Friend Class LiveAudioServer
             _connectedClients.Clear()
         End SyncLock
 
-        If Not isDueToError Then NotifyStatusChanged(StreamingState.Stopped, "Server Idle")
+        If Not isDueToError Then
+            If FrmPlayer?.PlayState = App.PlayStates.Stopped Then
+                NotifyStatusChanged(StreamingState.Stopped, "Server Active & Idle")
+            Else
+                NotifyStatusChanged(StreamingState.Stopped, "Server Idle")
+            End If
+        End If
         Debug.WriteLine("[STREAMING SERVER] Streaming server and capture stopped.")
         Skye.Common.Log.Write($"Streaming Server Stopped")
     End Sub

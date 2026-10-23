@@ -92,29 +92,29 @@ Public Class CompanionClients
     Private Sub CMClients_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMClients.Opening
         If LVClients.SelectedItems.Count = 0 Then e.Cancel = True
     End Sub
-    Private Sub CMIDisconnect_Click(sender As Object, e As EventArgs) Handles CMIDisconnect.Click
+    Private Sub CMIClientsDisconnect_Click(sender As Object, e As EventArgs) Handles CMIClientsDisconnect.Click
         Dim info = GetSelectedClient()
         If info Is Nothing Then Exit Sub
 
-        App.CompanionControlServer.DisconnectClient(info)
+        CompanionControlServer.DisconnectClient(info)
         RefreshLists()
 
     End Sub
-    Private Sub CMICopyDeviceName_Click(sender As Object, e As EventArgs) Handles CMICopyDeviceName.Click
+    Private Sub CMIClientsCopyDeviceName_Click(sender As Object, e As EventArgs) Handles CMIClientsCopyDeviceName.Click
         Dim info = GetSelectedClient()
         If info Is Nothing Then Exit Sub
 
         Clipboard.SetText(info.Name)
 
     End Sub
-    Private Sub CMICopyIP_Click(sender As Object, e As EventArgs) Handles CMICopyIP.Click
+    Private Sub CMIClientsCopyIP_Click(sender As Object, e As EventArgs) Handles CMIClientsCopyIP.Click
         Dim info = GetSelectedClient()
         If info Is Nothing Then Exit Sub
 
         Clipboard.SetText(info.IP)
 
     End Sub
-    Private Sub CMIRefresh_Click(sender As Object, e As EventArgs) Handles CMIRefresh.Click
+    Private Sub CMIClientsRefresh_Click(sender As Object, e As EventArgs) Handles CMIClientsRefresh.Click
         RefreshLists()
     End Sub
     Private Sub LVListeners_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles LVListeners.DrawColumnHeader
@@ -155,10 +155,31 @@ Public Class CompanionClients
         e.Cancel = True
         e.NewWidth = LVListeners.Columns(e.ColumnIndex).Width
     End Sub
+    Private Sub CMListeners_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMListeners.Opening
+        If LVListeners.SelectedItems.Count = 0 Then e.Cancel = True
+    End Sub
+    Private Sub CMIListenersDisconnect_Click(sender As Object, e As EventArgs) Handles CMIListenersDisconnect.Click
+        Dim info = TryCast(LVListeners.SelectedItems(0).Tag, String)
+        If String.IsNullOrWhiteSpace(info) Then Exit Sub
+
+        LiveAudioServer.DisconnectClient(info)
+        RefreshLists()
+
+    End Sub
+    Private Sub CMIListenersCopyIP_Click(sender As Object, e As EventArgs) Handles CMIListenersCopyIP.Click
+        Dim info = TryCast(LVListeners.SelectedItems(0).Tag, String)
+        If String.IsNullOrWhiteSpace(info) Then Exit Sub
+
+        Clipboard.SetText(info)
+
+    End Sub
+    Private Sub CMIListenersRefresh_Click(sender As Object, e As EventArgs) Handles CMIListenersRefresh.Click
+        RefreshLists()
+    End Sub
 
     ' Handlers
     Private Sub TimerRefresh_Tick(sender As Object, e As EventArgs) Handles TimerRefresh.Tick
-        If CMClients.Visible = False Then RefreshLists()
+        If CMClients.Visible = False And CMListeners.Visible = False Then RefreshLists()
     End Sub
 
     ' Methods
