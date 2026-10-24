@@ -1,5 +1,5 @@
 {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil Segoe UI Symbol;}{\f5\fnil\fcharset0 Segoe UI Symbol;}}
-{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
+{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;\red0\green0\blue255;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 Skye Music Help\par
 \par
@@ -201,7 +201,7 @@ This ensures:\par
 - No hidden or unstable URLs\par
 If a station provides multiple streams, Skye\f1\lang1033  \f2\lang9 Music will choose a suitable option automatically, but you can always override it using the dropdown menu.\par
 \par
-Notes\par
+\i Notes\i0\par
 - The Directory updates automatically when switching sources\par
 - Some stations may appear offline if their streams are temporarily unavailable\par
 - Stream URLs can change over time; selecting a fresh one usually resolves playback issues\par
@@ -224,5 +224,37 @@ If a station does not provide metadata, or provides only partial information, Sk
 \par
 The Companion Server is optional and can be turned on or off at any time in \f1\lang1033 Options.\par
 \f2\lang9\par
+\cf2\b\f1 Streaming Server\par
+\cf0\b0\f2 Skye Music includes a built-in local network audio server that allows you to stream your live music playback directly to other computers, mobile devices, web browsers, media players (such as VLC)\f1\lang1033 , or the Companion App\f2\lang9  connected to the same local area network (LAN).\par
+\par
+\i Overview & How It Works\i0\par
+When enabled, Skye Music captures its raw audio output and broadcasts it over a high-efficiency TCP/HTTP socket stream. Any device on your home or studio network can connect to your PC's IP address and listen to your playback in real time with minimal latency.\par
+\par
+\i Quick Start: Connecting a Client\i0\par
+\f1\lang1033 - \f2\lang9 Find your Host IP Address\f1\lang1033  & e\f2\lang9 nsure the host computer running Skye Music is connected to your local Wi-Fi or Ethernet network.\par
+\f1\lang1033 - \f2\lang9 Open a web browser or network media player (e.g., VLC, Chrome, Safari, or a mobile stream app) on your remote device.\par
+\f1\lang1033 - \f2\lang9 Navigate to your streaming address using your host PC's local IP address and configured port:\f1\lang1033  {{\field{\*\fldinst{HYPERLINK http://<YOUR-PC-IP-ADDRESS>:<PORT>/live }}{\fldrslt{http://<YOUR-PC-IP-ADDRESS>:<PORT>/live\ul0\cf0}}}}\f1\fs24 . Examples: {{\field{\*\fldinst{HYPERLINK http://10.0.0.100:5051/live }}{\fldrslt{http://10.0.0.100:5051/live\ul0\cf0}}}}\f1\fs24 , or {{\field{\*\fldinst{HYPERLINK http://192.168.1.150:8080/live }}{\fldrslt{http://192.168.1.150:8080/live\ul0\cf0}}}}\f1\fs24 .\f2\lang9\par
+\par
+\i Managing Active Listeners\par
+\i0\f1\lang1033 A tab has been added to the Clients window to montior listener connections. Information on the connection is provided, like connected IP Address, and data sent.\par
+\f2\lang9\par
+If an unwanted or stale connection remains active on your network:\par
+\f1\lang1033 - \f2\lang9 Right-click any client entry in the Listener\f1\lang1033 s\f2\lang9  list.\par
+\f1\lang1033 - \f2\lang9 Select Disconnect Client from the context menu.\par
+\f1\lang1033 - \f2\lang9 Skye Music will instantly terminate the TCP socket for that client and free up server resources.\par
+\par
+\i Understanding Server Status Messages\i0\par
+The \f1\lang1033 Playlist Status B\f2\lang9 ar \f1\lang1033 will \f2\lang9 display real-time feedback on the server engine state\f1\lang1033 .\par
+- Stream Idle. This means the server is running.\par
+- Stream Ready. This means a song is playing and the server is listening for new connections.\par
+- Stream Live (x listeners). This tells you one or more streams are active.\par
+\par
+Options\par
+The audio streaming server can be enabled or disabled in the App tab of the Options window. You can also configure the Port # and the target bitrate for the streams.\par
+\par
+Troubleshooting & Network Tips\par
+- Windows Firewall Prompt. The first time you launch the streaming server, Windows Defender Firewall may ask for permission. Be sure to check Private networks to allow local devices to reach Skye Music.\par
+- No Audio on Client. Ensure Skye Music is actively playing a track. If the player is paused, the stream will play silence until playback resumes.\par
+- Router / Subnet Limits. Ensure your remote device (phone, tablet, laptop, secondary PC) is connected to the exact same Wi-Fi network/subnet as the host computer.\f2\lang9\par
 }
  
