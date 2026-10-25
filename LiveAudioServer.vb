@@ -59,9 +59,6 @@ Friend Class LiveAudioServer
     Friend Shared Event StreamingStatusChanged As Action(Of StreamingState, String)
 
     ' Base Methods
-    ''' <summary>
-    ''' Starts the raw TCP audio streaming server on any user-configured port for the LAN without admin rights.
-    ''' </summary>
     Friend Shared Sub Start(port As Integer)
         If _isListening Then Return
 
@@ -70,18 +67,13 @@ Friend Class LiveAudioServer
 
         For attempt As Integer = 1 To maxRetries
             Try
-                ' Bind to IPAddress.Any to accept LAN connections on a custom port without admin rights or HTTP.SYS restrictions
                 _tcpServer = New TcpListener(IPAddress.Any, port)
                 _tcpServer.Start()
                 _isListening = True
 
-                ' 1. Wire up the C# audio capture event to feed this LiveAudioServer broadcaster
                 AddHandler AudioStreamCapturer.AudioDataCaptured, AddressOf HandleAudioCaptured
-
-                ' 2. Start the modern C# MP3 audio recorder using your settings enum cast to Integer
                 AudioStreamCapturer.StartCapture(CInt(App.Settings.AudioStreamingBitrate))
 
-                ' 3. Start background thread to accept incoming client connections
                 _listenerThread = New Thread(AddressOf AcceptClientsLoop) With {
                     .IsBackground = True,
                     .Name = "LiveAudioTcp_Listener"
@@ -93,25 +85,20 @@ Friend Class LiveAudioServer
                 Else
                     NotifyStatusChanged(StreamingState.Listening, "Server Active & Playing")
                 End If
-                'NotifyStatusChanged(StreamingState.Listening, "Server Active")
+
                 Debug.WriteLine($"[STREAMING SERVER] LAN TCP streaming listener started on port {port}.")
                 Skye.Common.Log.Write($"Streaming Server Started On Port {port}")
-
-                ' Successfully started! Break out of the retry loop.
                 Exit For
 
             Catch ex As SocketException When ex.SocketErrorCode = SocketError.AddressAlreadyInUse AndAlso attempt < maxRetries
-                ' The port is still releasing from a recent Stop() call. Clean up and wait briefly before retrying.
                 Try
                     _tcpServer?.Stop()
                 Catch
                 End Try
                 _tcpServer = Nothing
-
                 System.Threading.Thread.Sleep(retryDelayMs)
 
             Catch ex As Exception
-                ' Any other error, or if retries are exhausted, clean up and handle the failure
                 Try
                     _tcpServer?.Stop()
                 Catch
@@ -126,14 +113,10 @@ Friend Class LiveAudioServer
             End Try
         Next
     End Sub
-    ''' <summary>
-    ''' Stops the server and closes all client connections.
-    ''' </summary>
     Friend Shared Sub [Stop](Optional isDueToError As Boolean = False)
         If Not _isListening AndAlso _tcpServer Is Nothing Then Return
 
         _isListening = False
-
         RemoveHandler AudioStreamCapturer.AudioDataCaptured, AddressOf HandleAudioCaptured
 
         Try
@@ -187,12 +170,9 @@ Friend Class LiveAudioServer
         End SyncLock
     End Sub
 
-    ' Handlers
     Private Shared Sub HandleAudioCaptured(buffer() As Byte, count As Integer)
         BroadcastAudioBuffer(buffer, count)
     End Sub
-
-    ' Methods
     Private Shared Sub NotifyStatusChanged(state As StreamingState, message As String)
         RaiseEvent StreamingStatusChanged(state, message)
     End Sub
@@ -202,7 +182,6 @@ Friend Class LiveAudioServer
                 If _tcpServer IsNot Nothing AndAlso _tcpServer.Pending() Then
                     Dim client As TcpClient = _tcpServer.AcceptTcpClient()
 
-                    ' Handle client handshake and streaming on a background thread
                     Dim clientThread As New Thread(Sub() HandleClientConnection(client)) With {
                         .IsBackground = True
                     }
@@ -219,17 +198,53 @@ Friend Class LiveAudioServer
         Dim netStream As NetworkStream = Nothing
         Dim clientInfo As AudioClientInfo = Nothing
         Try
-            client.NoDelay = True ' Disable Nagle's algorithm for real-time audio latency
+            client.NoDelay = True
             netStream = client.GetStream()
 
-            ' Read incoming HTTP request headers from the client (VLC / Browser) so it doesn't block or stall
-            Dim detectedAgent As String = "Generic / VLC"
             Dim reader As New StreamReader(netStream, Encoding.ASCII, False, 1024, leaveOpen:=True)
+            Dim requestLine As String = reader.ReadLine()
+
+            If String.IsNullOrEmpty(requestLine) Then
+                client.Close()
+                Exit Sub
+            End If
+
+            ' 1. INTERCEPT HEAD REQUESTS: Windows Media Foundation sends HEAD to probe headers. 
+            ' Send headers back immediately and close connection without streaming audio or crashing.
+            If requestLine.StartsWith("HEAD", StringComparison.OrdinalIgnoreCase) Then
+                Dim headResponse = Encoding.ASCII.GetBytes(
+                    "HTTP/1.1 200 OK" & vbCrLf &
+                    "Content-Type: audio/mpeg" & vbCrLf &
+                    "Accept-Ranges: none" & vbCrLf &
+                    "icy-metaint: 0" & vbCrLf &
+                    "Connection: close" & vbCrLf & vbCrLf
+                )
+                netStream.Write(headResponse, 0, headResponse.Length)
+                netStream.Flush()
+                client.Close()
+                Exit Sub
+            End If
+
+            ' 2. Intercept duplicate GET probes from an IP that is already connected
+            Dim remoteEndPoint = TryCast(client.Client?.RemoteEndPoint, IPEndPoint)
+            Dim clientIp = If(remoteEndPoint IsNot Nothing, remoteEndPoint.Address.ToString(), "")
+
+            If Not String.IsNullOrEmpty(clientIp) Then
+                SyncLock _clientLock
+                    Dim alreadyConnected = _connectedClients.Any(Function(c) c.EndPoint.StartsWith(clientIp))
+                    If alreadyConnected Then
+                        client.Close()
+                        Exit Sub
+                    End If
+                End SyncLock
+            End If
+
+            ' 3. Read remaining HTTP headers (like User-Agent) for standard GET requests
+            Dim detectedAgent As String = "Generic / VLC"
             While reader.Peek() >= 0
                 Dim line As String = reader.ReadLine()
-                If String.IsNullOrEmpty(line) Then Exit While ' End of HTTP headers
+                If String.IsNullOrEmpty(line) Then Exit While ' End of headers
 
-                ' Check if this line contains the User-Agent header
                 If line.StartsWith("User-Agent:", StringComparison.OrdinalIgnoreCase) Then
                     detectedAgent = line.Substring("User-Agent:".Length).Trim()
                 End If
@@ -239,13 +254,14 @@ Friend Class LiveAudioServer
             Dim headerBytes = Encoding.ASCII.GetBytes(
                 "HTTP/1.1 200 OK" & vbCrLf &
                 "Content-Type: audio/mpeg" & vbCrLf &
+                "Accept-Ranges: none" & vbCrLf &
+                "icy-metaint: 0" & vbCrLf &
                 "Cache-Control: no-cache, no-store, must-revalidate" & vbCrLf &
                 "Connection: keep-alive" & vbCrLf & vbCrLf
             )
             netStream.Write(headerBytes, 0, headerBytes.Length)
             netStream.Flush()
 
-            ' Create wrapper and assign the detected user agent
             clientInfo = New AudioClientInfo(client, netStream) With {
                 .UserAgent = detectedAgent
             }
@@ -255,7 +271,7 @@ Friend Class LiveAudioServer
             End SyncLock
 
             NotifyStatusChanged(StreamingState.Listening, "Client Connected")
-            Debug.WriteLine($"[STREAMING SERVER] Client connected from {clientInfo.EndPoint}")
+            Debug.WriteLine($"[STREAMING SERVER] Client connected from {clientInfo.EndPoint} ({detectedAgent})")
 
             ' Keep thread alive while client is connected and server is running
             While _isListening AndAlso client.Connected
@@ -264,7 +280,6 @@ Friend Class LiveAudioServer
 
         Catch ex As Exception
             Debug.WriteLine($"[STREAMING SERVER] Client connection error: {ex.Message}")
-            Skye.Common.Log.Write($"Streaming Server Client Connection Error: {ex.Message}")
         Finally
             If clientInfo IsNot Nothing Then
                 SyncLock _clientLock
@@ -299,6 +314,7 @@ Friend Class LiveAudioServer
                     clientInfo.NetStream.Flush()
                     clientInfo.BytesStreamed += count
                 Catch ex As Exception
+                    ' Safely catch dropped probe connections or abrupt Windows disconnections
                     deadClients.Add(clientInfo)
                 End Try
             Next
