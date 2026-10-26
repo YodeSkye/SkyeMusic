@@ -182,6 +182,17 @@ Friend Class LiveAudioServer
                 If _tcpServer IsNot Nothing AndAlso _tcpServer.Pending() Then
                     Dim client As TcpClient = _tcpServer.AcceptTcpClient()
 
+                    ' --- AGGRESSIVE KEEP-ALIVE CONFIGURATION ---
+                    Dim sock = client.Client
+                    sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, True)
+
+                    ' Send first keep-alive probe after 5 seconds of silence
+                    sock.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 5)
+
+                    ' Send subsequent probes every 2 seconds if no acknowledgment
+                    sock.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 2)
+                    ' -------------------------------------------
+
                     Dim clientThread As New Thread(Sub() HandleClientConnection(client)) With {
                         .IsBackground = True
                     }
@@ -255,9 +266,14 @@ Friend Class LiveAudioServer
                 "HTTP/1.1 200 OK" & vbCrLf &
                 "Content-Type: audio/mpeg" & vbCrLf &
                 "Accept-Ranges: none" & vbCrLf &
+                "X-Accept-Ranges: none" & vbCrLf &
                 "icy-metaint: 0" & vbCrLf &
                 "Cache-Control: no-cache, no-store, must-revalidate" & vbCrLf &
-                "Connection: keep-alive" & vbCrLf & vbCrLf
+                "Pragma: no-cache" & vbCrLf &
+                "Connection: keep-alive" & vbCrLf &
+                "icy-name: Skye Music Live" & vbCrLf &
+                "X-Content-Type-Options: nosniff" & vbCrLf &
+                "Expires: 0" & vbCrLf & vbCrLf
             )
             netStream.Write(headerBytes, 0, headerBytes.Length)
             netStream.Flush()
@@ -274,8 +290,20 @@ Friend Class LiveAudioServer
             Debug.WriteLine($"[STREAMING SERVER] Client connected from {clientInfo.EndPoint} ({detectedAgent})")
 
             ' Keep thread alive while client is connected and server is running
-            While _isListening AndAlso client.Connected
-                Thread.Sleep(500)
+            While _isListening
+                ' Check if socket is still genuinely connected using Poll
+                If client.Client IsNot Nothing AndAlso client.Client.Poll(1000000, SelectMode.SelectRead) Then
+                    ' If Poll returns true with 0 available bytes, the connection has closed/dropped
+                    If client.Client.Available = 0 Then
+                        Exit While
+                    End If
+                End If
+
+                If Not client.Connected Then
+                    Exit While
+                End If
+
+                Thread.Sleep(1000)
             End While
 
         Catch ex As Exception
