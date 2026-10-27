@@ -2704,7 +2704,11 @@ Namespace My
 
         ' METHODS
         Friend Sub InitializeAppPreStartup()
-            Dim baseName As String = If(Debugger.IsAttached, My.Application.Info.ProductName & "DEV", My.Application.Info.ProductName)
+#If DEBUG Then
+            Dim baseName As String = My.Application.Info.ProductName & "DEV"
+#Else
+            Dim baseName As String = My.Application.Info.ProductName
+#End If
 
             ' Phase 1: Logging Subsystem
             Try
