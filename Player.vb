@@ -5410,18 +5410,22 @@ Public Class Player
         Dim streamIndicator As String = ""
         If App.Settings.EnableAudioStreaming Then
             Dim clientCount As Integer = LiveAudioServer.ConnectedClientCount
-            Select Case _currentStreamState
-                Case StreamingState.Listening
-                    If clientCount > 0 Then
-                        streamIndicator = $"● Stream Live ({clientCount} listener" & If(clientCount = 1, "", "s") & ")"
-                    Else
-                        streamIndicator = "● Stream Ready"
-                    End If
-                Case StreamingState.Stopped
-                    streamIndicator = "○ Stream Idle"
-                Case StreamingState.Error
-                    streamIndicator = "✕ Stream Error"
-            End Select
+            If PlayState = PlayStates.Stopped Then
+                streamIndicator = "○ Stream Idle"
+            Else
+                Select Case _currentStreamState
+                    Case StreamingState.Listening
+                        If clientCount > 0 Then
+                            streamIndicator = $"● Stream Live ({clientCount} listener" & If(clientCount = 1, "", "s") & ")"
+                        Else
+                            streamIndicator = "● Stream Ready"
+                        End If
+                    Case StreamingState.Stopped
+                        streamIndicator = "○ Stream Idle"
+                    Case StreamingState.Error
+                        streamIndicator = "✕ Stream Error"
+                End Select
+            End If
         End If
 
         Dim counts As String = LVPlaylist.Items.Count.ToString
