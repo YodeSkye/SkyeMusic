@@ -5877,7 +5877,6 @@ Public Class Player
                         'TimerShowMedia.Start()
                     End If
                 End If
-
             Case PlayModes.Random
                 If Queue.Count > 0 Then
                     PlayQueued()
@@ -5947,6 +5946,7 @@ Public Class Player
 
         PlayState = PlayStates.Playing
         App.StartAudioStreaming()
+        SetPlaylistStatus()
 
         'Update The Histories
         UpdateHistory(_player.Path.TrimEnd("/"c)) 'Trimming is needed for uniformity.
