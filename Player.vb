@@ -11,6 +11,7 @@ Imports NAudioBridge
 Imports Newtonsoft.Json.Linq
 Imports Skye
 Imports Skye.Contracts
+Imports Skye.UI
 Imports SkyeMusic.LiveAudioServer
 Imports SkyeMusic.My
 
@@ -33,6 +34,7 @@ Public Class Player
     Private mOffset, mPosition As System.Drawing.Point 'For Moving the Form
     Private TipPlayerEX As Skye.UI.ToolTipEX 'Tooltip for Player Controls
     Private TipVolume As Skye.UI.ToolTipEX 'Tooltip for Volume Button
+    Private TipLV As Skye.UI.ToolTipEX 'Tooltip for Playlist ListView
     Private _lastDisplayMode As DisplayMode = DisplayMode.None
     Private _lastRealState As FormWindowState = FormWindowState.Normal 'Last real state of the form (not minimized)
     Private _handledClose As Boolean = False 'Indicates if the close event has been handled
@@ -2918,6 +2920,19 @@ Public Class Player
             .ShowDelay = 250
         }
         App.HookTSItemsForCMTooltip(CMPlaylist, TipCMPlaylist)
+        TipLV = New Skye.UI.ToolTipEX(components) With {
+            .BackColor = App.CurrentTheme.BackColor,
+            .ForeColor = App.CurrentTheme.TextColor,
+            .BorderColor = App.CurrentTheme.ButtonBackColor,
+            .Font = App.TipFont,
+            .ShadowAlpha = 0,
+            .ShadowThickness = 0,
+            .FadeInRate = 25,
+            .FadeOutRate = 25,
+            .HideDelay = 5000,
+            .ShowDelay = 250
+        }
+        HookPlaylistListViewColumnTooltip(LVPlaylist, TipLV)
 
         ' More Form Initialization
         SetAccentColor()
@@ -6640,6 +6655,12 @@ Public Class Player
         TipPlayerEX.BackColor = App.CurrentTheme.BackColor
         TipPlayerEX.ForeColor = App.CurrentTheme.TextColor
         TipPlayerEX.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipCMPlaylist.BackColor = App.CurrentTheme.BackColor
+        TipCMPlaylist.ForeColor = App.CurrentTheme.TextColor
+        TipCMPlaylist.BorderColor = App.CurrentTheme.ButtonBackColor
+        TipLV.BackColor = App.CurrentTheme.BackColor
+        TipLV.ForeColor = App.CurrentTheme.TextColor
+        TipLV.BorderColor = App.CurrentTheme.ButtonBackColor
         ResumeLayout()
         'Debug.Print("Player Theme Set")
     End Sub
@@ -6870,6 +6891,89 @@ Public Class Player
             refreshLockVoiceGrammar.Release()
         End Try
 
+    End Sub
+
+    ' Custom Playlist ListView Truncation ToolTips (Strictly for Column 0 / Title)
+    Friend Sub HookPlaylistListViewColumnTooltip(lv As ListView, tip As ToolTipEX)
+        Dim lastItem As ListViewItem = Nothing
+
+        AddHandler lv.MouseMove,
+                Sub(sender, e)
+                    If lv.View <> View.Details OrElse lv.Columns.Count = 0 Then
+                        tip.HideTooltip()
+                        Exit Sub
+                    End If
+
+                    Dim hitInfo As ListViewHitTestInfo = lv.HitTest(e.Location)
+
+                    If hitInfo.Item IsNot Nothing Then
+                        Dim colWidth As Integer = lv.Columns(0).Width
+                        Dim itemRect As Rectangle = hitInfo.Item.Bounds
+
+                        ' itemRect.Left automatically accounts for horizontal scrolling (becomes negative when scrolled right)
+                        Dim colLeft As Integer = itemRect.Left
+                        Dim colRight As Integer = colLeft + colWidth
+
+                        ' Verify the mouse is strictly over Column 0
+                        If e.Location.X >= colLeft AndAlso e.Location.X <= colRight Then
+                            Dim subItemText As String = hitInfo.Item.SubItems(0).Text
+
+                            If String.IsNullOrEmpty(subItemText) Then
+                                tip.HideTooltip()
+                                lastItem = Nothing
+                                Exit Sub
+                            End If
+
+                            ' Measure text using standard ListView flags
+                            Dim flags As TextFormatFlags = TextFormatFlags.SingleLine Or
+                                                           TextFormatFlags.NoPrefix Or
+                                                           TextFormatFlags.LeftAndRightPadding
+                            Dim textSize As Size = TextRenderer.MeasureText(subItemText, lv.Font, New Size(Integer.MaxValue, Integer.MaxValue), flags)
+
+                            Dim cellPadding As Integer = 16
+                            If lv.SmallImageList IsNot Nothing OrElse lv.CheckBoxes Then
+                                cellPadding += 20
+                            End If
+
+                            If textSize.Width > (colWidth - cellPadding) Then
+                                ' Prevent spamming if hovering the same item
+                                If hitInfo.Item IsNot lastItem Then
+                                    lastItem = hitInfo.Item
+
+                                    ' Compute screen rectangle using the scrolled position
+                                    Dim subItemRect As New Rectangle(colLeft, itemRect.Top, colWidth, itemRect.Height)
+                                    Dim screenRect As New Rectangle(lv.PointToScreen(subItemRect.Location), subItemRect.Size)
+
+                                    Dim pos As New Point(screenRect.Left + 2, screenRect.Bottom + 2)
+
+                                    ' Clamp horizontally using working area
+                                    Dim wa As Rectangle = Screen.FromPoint(pos).WorkingArea
+                                    Dim tipWidth As Integer = textSize.Width + tip.TextPadding * 2
+                                    If pos.X + tipWidth > wa.Right Then
+                                        pos.X = wa.Right - tipWidth - 5
+                                    End If
+
+                                    tip.ShowTooltipAt(pos, subItemText)
+                                End If
+                            Else
+                                tip.HideTooltip()
+                                lastItem = Nothing
+                            End If
+                        Else
+                            tip.HideTooltip()
+                            lastItem = Nothing
+                        End If
+                    Else
+                        tip.HideTooltip()
+                        lastItem = Nothing
+                    End If
+                End Sub
+
+        AddHandler lv.MouseLeave,
+                Sub(sender, e)
+                    tip.HideTooltip()
+                    lastItem = Nothing
+                End Sub
     End Sub
 
 End Class
