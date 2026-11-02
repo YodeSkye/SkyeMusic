@@ -5545,7 +5545,8 @@ Public Class Player
             Else
                 PlayFile(Queue(0), "PlayQueued")
             End If
-            Dim item As ListViewItem = LVPlaylist.FindItemWithText(Queue(0), True, 0)
+            Dim item As ListViewItem = Nothing
+            If LVPlaylist.Items.Count > 0 Then item = LVPlaylist.FindItemWithText(Queue(0), True, 0)
             If item IsNot Nothing Then EnsurePlaylistItemIsVisible(item.Index)
             Queue.RemoveAt(0)
             SetPlaylistStatus()
