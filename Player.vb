@@ -5710,7 +5710,8 @@ Public Class Player
     Friend Sub PlayFromDirectory(title As String, stream As String)
         LyricsOff()
         Dim realUrl As String = NormalizeUrl(stream)
-        Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(realUrl, True, 0)
+        Dim existingitem As ListViewItem = Nothing
+        If LVPlaylist.Items.Count > 0 Then existingitem = LVPlaylist.FindItemWithText(realUrl, True, 0)
         If existingitem Is Nothing Then
             AddToPlaylistFromDirectory(title, realUrl)
         Else
