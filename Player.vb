@@ -5251,7 +5251,8 @@ Public Class Player
         Dim addedcount As Integer = 0
         LVPlaylist.BeginUpdate()
         For Each item As String In items
-            Dim existingitem As ListViewItem = LVPlaylist.FindItemWithText(item, True, 0)
+            Dim existingitem As ListViewItem = Nothing
+            If LVPlaylist.Items.Count > 0 Then existingitem = LVPlaylist.FindItemWithText(item, True, 0)
             If existingitem Is Nothing Then
                 Dim newlvi As ListViewItem = CreateListviewItem()
                 newlvi.SubItems(LVPlaylist.Columns("Title").Index).Text = App.FormatPlaylistTitle(item)
