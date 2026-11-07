@@ -4320,12 +4320,6 @@ Public Class Player
         PlaylistCurrentText = title
         RaiseEvent TitleChanged(title)
 
-        ' Show Toast
-        'ShowNowPlayingToast(title)
-
-        'Broadcast
-        'App.BroadcastNowPlaying()
-
     End Sub
     Private Sub OnPlaylistChanged() Handles Me.PlaylistChanged
         MarkPlaylistDirty()
@@ -4392,7 +4386,6 @@ Public Class Player
         TimerShowMedia.Stop()
         ShowMedia()
         ShowNowPlayingToast(PlaylistCurrentText)
-        'NowPlaying.Text = PlaylistCurrentText
         App.BroadcastNowPlaying()
     End Sub
     Private Sub TimerStatus_Tick(sender As Object, e As EventArgs) Handles TimerStatus.Tick
@@ -5993,28 +5986,25 @@ Public Class Player
                 ' not implemented
             Case App.MediaSourceTypes.Stream
                 Dim path As String = _player.Path.TrimEnd("/"c)
-                Dim lvi = LVPlaylist.FindItemWithText(path, True, 0)
+                Dim lvi As ListViewItem = Nothing
+                If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(path, True, 0)
                 If lvi Is Nothing Then
                     PlaylistCurrentText = IO.Path.GetFileNameWithoutExtension(_player.Path)
-                    Text = My.Application.Info.Title + " - " + _player.Path
-                    App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
-                Else
-                    PlaylistCurrentText = lvi.Text
-                    Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
-                    App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
-                End If
-                TimerStreamMeta.Start()
-            Case App.MediaSourceTypes.File
-                Dim lvi As ListViewItem = Nothing
-                If LVPlaylist.Items.Count > 0 Then LVPlaylist.FindItemWithText(_player.Path, True, 0)
-                If lvi Is Nothing Then
-                    PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
                     'Text = My.Application.Info.Title + " - " + _player.Path
                     'App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
                 Else
                     PlaylistCurrentText = lvi.Text
-                    'Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + _player.Path
+                    'Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
                     'App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
+                End If
+                TimerStreamMeta.Start()
+            Case App.MediaSourceTypes.File
+                Dim lvi As ListViewItem = Nothing
+                If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(_player.Path, True, 0)
+                If lvi Is Nothing Then
+                    PlaylistCurrentText = Path.GetFileNameWithoutExtension(_player.Path)
+                Else
+                    PlaylistCurrentText = lvi.Text
                 End If
                 LoadLyrics(_player.Path)
         End Select
