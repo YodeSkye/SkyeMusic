@@ -29,7 +29,7 @@ Found a bug or have a feature request?
 - Visual Studio 2022 or 2026
 - .NET 10 SDK
 
-## 📥 Installing SkyeLibrary from a Local `.nupkg` File (included in the repo)
+## 📥 Installing SkyeLibrary from a Local `.nupkg` File
 
 SkyeClip depends on SkyeLibrary, a separate public repository where you can download the latest version.
 To install it (After cloning this repo):
