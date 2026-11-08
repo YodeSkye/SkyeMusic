@@ -1384,11 +1384,12 @@ Public Class Library
                 Case LibraryGroupMode.Year
                     pGroup = item.SubItems(LVLibrary.Columns("Year").Index).Text
                 Case LibraryGroupMode.Type
-                    Dim ext As String = Computer.FileSystem.GetFileInfo(item.SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
-                    If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
-                        pGroup = ext.TrimStart(CChar("."))
+                    Dim ext As String = Computer.FileSystem.GetFileInfo(item.SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension.ToLower
+                    Dim groupName As String = String.Empty
+                    If Not String.IsNullOrEmpty(ext) AndAlso App.ExtensionDictionary.TryGetValue(ext, groupName) AndAlso Not String.IsNullOrEmpty(groupName) Then
+                        pGroup = groupName
                     Else
-                        pGroup = App.ExtensionDictionary.Item(ext)
+                        pGroup = ext.TrimStart(CChar("."))
                     End If
                 Case Else
                     pGroup = String.Empty
@@ -1449,11 +1450,12 @@ Public Class Library
                 Case LibraryGroupMode.Year
                     aGroup = item.SubItems(LVLibrary.Columns("Year").Index).Text
                 Case LibraryGroupMode.Type
-                    Dim ext As String = Computer.FileSystem.GetFileInfo(item.SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension
-                    If String.IsNullOrEmpty(App.ExtensionDictionary.Item(ext)) Then
-                        aGroup = ext.TrimStart(CChar("."))
+                    Dim ext As String = Computer.FileSystem.GetFileInfo(item.SubItems(LVLibrary.Columns("FilePath").Index).Text).Extension.ToLower
+                    Dim groupName As String = String.Empty
+                    If Not String.IsNullOrEmpty(ext) AndAlso App.ExtensionDictionary.TryGetValue(ext, groupName) AndAlso Not String.IsNullOrEmpty(groupName) Then
+                        aGroup = groupName
                     Else
-                        aGroup = App.ExtensionDictionary.Item(ext)
+                        aGroup = ext.TrimStart(CChar("."))
                     End If
                 Case Else
                     aGroup = String.Empty
