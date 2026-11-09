@@ -1,7 +1,7 @@
 [Setup]
 AppName=Skye Music
-AppVersion=1.5
-AppVerName=Skye Music v1.5
+AppVersion=2.0
+AppVerName=Skye Music v2.0
 DefaultDirName={commonpf64}\Skye\Skye Music
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
