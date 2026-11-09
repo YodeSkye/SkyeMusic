@@ -1,15 +1,16 @@
 ﻿# Skye Music 🎶
 
-[⬇️ Download Skye Music](https://github.com/YodeSkye/SkyeMusic/releases/tag/v1.6)
-![Skye Music screenshot](https://raw.githubusercontent.com/YodeSkye/SkyeMusic/refs/heads/master/share/ScreenshotDirectory3.png)
+[⬇️ Download Skye Music](https://github.com/YodeSkye/SkyeMusic/releases/tag/v2.0)
+![Skye Music screenshot](https://raw.githubusercontent.com/YodeSkye/SkyeMusic/refs/heads/master/share/Screenshot5.png)
 
 A modern Windows media player built with **LibVLCSharp** and **WinForms**, featuring:
 - Smooth audio & video playback.
-- Playlist and queue management.
+- Multiple playlist and queue management.
 - Integrated library for browsing and managing media files.
 - Integrated directory for browsing online streams and podcasts.
 - Metadata tag reading with **TagLib#**.
 - A compact mini-player mode.
+- Voice Commands for controlling playback.
 - Local database for play history & statistics.
 - A companion app for Android.
 - Lightweight installer powered by Inno Setup.
