@@ -61,10 +61,10 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset0 SimSun;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil Segoe UI;}{\f7\fnil\fcharset1 Cambria Math;}}
+        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil\fcharset0 SimSun;}{\f7\fnil\fcharset1 Cambria Math;}}
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont7\mwrapIndent1440 }\viewkind4\uc1 
-        '''\pard\cf1\b\f0\fs28\lang9 Skye Music v1.6 What&apos;s New\par
+        '''\pard\cf1\b\f0\fs28\lang9 Skye Music v2.0 What&apos;s New\par
         '''\cf0\f [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
@@ -75,13 +75,12 @@ Namespace My.Resources
         
         '''<summary>
         '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil Segoe UI Symbol;}{\f5\fnil\fcharset0 Segoe UI Symbol;}}
-        '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
+        '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;\red0\green0\blue255;}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
         '''\pard\cf1\b\f0\fs28\lang9 Skye Music Help\par
         '''\par
         '''\cf2\f1\fs24 Player Shortcuts &amp; Functions\par
-        '''\cf0 &lt;Spacebar&gt; \b0 Toggle Play/Pause\par
-        '''\b &lt;Ctrl&gt;+&lt;Spacebar [rest of string was truncated]&quot;;.
+        '''\cf0 &lt;Spacebar&gt; \b0 Toggle Play/Pause\par [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property HelpRT() As String
             Get
