@@ -101,14 +101,20 @@ Public Class Player
     Private frmFullScreen As Form 'Fullscreen Form
     Private fullscreenOriginalParent As Control 'Original Parent Control of VLC Viewer
     Private fullscreenOriginalBounds As Rectangle 'Original Bounds of VLC Viewer
-    Private _FullScreen As Boolean = False 'ONLY Used by FullScreen Property Getter/Setter
+    Private _FullScreen As Boolean = False
     Private Property FullScreen As Boolean 'Indicates if the player is in fullscreen mode
         Get
             Return _FullScreen
         End Get
         Set(value As Boolean)
-            _FullScreen = value
-            SetFullScreen()
+            If _FullScreen <> value Then
+                If value AndAlso App.VideoExtensionDictionary.ContainsKey(Path.GetExtension(_player.Path)) Then
+                    _FullScreen = True
+                Else
+                    _FullScreen = False
+                End If
+                SetFullScreen()
+            End If
         End Set
     End Property
 
