@@ -4312,6 +4312,7 @@ Public Class Player
 
         SetPlaylistStatus()
     End Sub
+
     Private Sub OnNowPlayingChanged(nptext As String)
         Dim title As String = nptext.Split("@"c)(0).Trim()
         Dim fullTitle As String = title & " @ " & _player.Path.TrimEnd("/"c)
@@ -4325,6 +4326,8 @@ Public Class Player
         ' Fire your existing MiniPlayer event
         PlaylistCurrentText = title
         RaiseEvent TitleChanged(title)
+
+        If CurrentMediaType = App.MediaSourceTypes.Stream AndAlso Not String.IsNullOrWhiteSpace(title) Then ShowNowPlayingToast(PlaylistCurrentText)
 
     End Sub
     Private Sub OnPlaylistChanged() Handles Me.PlaylistChanged
@@ -4391,7 +4394,7 @@ Public Class Player
     Private Sub TimerShowMedia_Tick(sender As Object, e As EventArgs) Handles TimerShowMedia.Tick
         TimerShowMedia.Stop()
         ShowMedia()
-        ShowNowPlayingToast(PlaylistCurrentText)
+        If Not CurrentMediaType = MediaSourceTypes.Stream Then ShowNowPlayingToast(PlaylistCurrentText)
         App.BroadcastNowPlaying()
     End Sub
     Private Sub TimerStatus_Tick(sender As Object, e As EventArgs) Handles TimerStatus.Tick
@@ -4579,7 +4582,7 @@ Public Class Player
         If App.Settings.ShowNowPlayingToast AndAlso Not String.IsNullOrWhiteSpace(songtext) Then
             ' Create an isolated copy so SmoothPictureBox disposing/fading doesn't crash the Toast
             Dim toastImg As Bitmap = Nothing
-            If PicBoxAlbumArt.Image IsNot Nothing Then
+            If PicBoxAlbumArt.Image IsNot Nothing AndAlso Not CurrentMediaType = MediaSourceTypes.Stream Then
                 Try
                     toastImg = New Bitmap(PicBoxAlbumArt.Image)
                 Catch ex As Exception
@@ -5996,12 +5999,8 @@ Public Class Player
                 If LVPlaylist.Items.Count > 0 Then lvi = LVPlaylist.FindItemWithText(path, True, 0)
                 If lvi Is Nothing Then
                     PlaylistCurrentText = IO.Path.GetFileNameWithoutExtension(_player.Path)
-                    'Text = My.Application.Info.Title + " - " + _player.Path
-                    'App.NIApp.Text = Skye.Common.Trunc(Application.Info.Title + " - " + _player.Path, 127)
                 Else
                     PlaylistCurrentText = lvi.Text
-                    'Text = My.Application.Info.Title + " - " + lvi.Text + " @ " + path
-                    'App.NIApp.Text = Skye.Common.Trunc(My.Application.Info.Title + " - " + lvi.Text, 127)
                 End If
                 TimerStreamMeta.Start()
             Case App.MediaSourceTypes.File
