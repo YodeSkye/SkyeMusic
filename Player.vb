@@ -4312,7 +4312,6 @@ Public Class Player
 
         SetPlaylistStatus()
     End Sub
-
     Private Sub OnNowPlayingChanged(nptext As String)
         Dim title As String = nptext.Split("@"c)(0).Trim()
         Dim fullTitle As String = title & " @ " & _player.Path.TrimEnd("/"c)
@@ -6079,7 +6078,7 @@ Public Class Player
             If App.Settings.PlayerPositionShowElapsed Then
                 LblPosition.Text = FormatPosition(_player.Position)
             Else
-                If CurrentMediaType = App.MediaSourceTypes.Stream Then
+                If CurrentMediaType = App.MediaSourceTypes.Stream AndAlso _player.Duration = 0 Then
                     LblPosition.Text = "00:00"
                 Else
                     LblPosition.Text = FormatPosition(_player.Duration - _player.Position)
