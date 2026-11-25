@@ -19,6 +19,7 @@ Public Class CompanionClients
         SetAccentColor()
         SetTheme()
         ReThemeMenus()
+        RefreshTotals()
         RefreshLists()
     End Sub
     Private Sub Frm_Move(sender As Object, e As EventArgs) Handles MyBase.Move
@@ -179,10 +180,17 @@ Public Class CompanionClients
 
     ' Handlers
     Private Sub TimerRefresh_Tick(sender As Object, e As EventArgs) Handles TimerRefresh.Tick
+        RefreshTotals()
         If CMClients.Visible = False And CMListeners.Visible = False Then RefreshLists()
     End Sub
 
     ' Methods
+    Private Sub RefreshTotals()
+        Dim clienttotal = App.CompanionControlServer.GetClients().Count
+        Dim listenertotal = LiveAudioServer.ActiveClients.Count
+        TPClients.Text = $" Clients ({clienttotal}) "
+        TPListeners.Text = $" Listeners ({listenertotal}) "
+    End Sub
     Private Sub RefreshLists()
         LVClients.Items.Clear()
         Dim clients = App.CompanionControlServer.GetClients()
