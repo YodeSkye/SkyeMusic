@@ -4579,15 +4579,17 @@ Public Class Player
     End Sub
     Friend Sub ShowNowPlayingToast(songtext As String)
         If App.Settings.ShowNowPlayingToast AndAlso Not String.IsNullOrWhiteSpace(songtext) Then
-            ' Create an isolated copy so SmoothPictureBox disposing/fading doesn't crash the Toast
+
+            ' Create an isolated copy of the current album art so disposing doesn't crash the Toast or app
             Dim toastImg As Bitmap = Nothing
-            If PicBoxAlbumArt.Image IsNot Nothing AndAlso Not CurrentMediaType = MediaSourceTypes.Stream Then
+            If AlbumArt IsNot Nothing AndAlso Not CurrentMediaType = MediaSourceTypes.Stream Then
                 Try
-                    toastImg = New Bitmap(PicBoxAlbumArt.Image)
+                    toastImg = New Bitmap(AlbumArt)
                 Catch ex As Exception
                     toastImg = Nothing
                 End Try
             End If
+
             Dim npo As New Skye.UI.ToastOptions With {
                 .Title = "Now Playing",
                 .Message = songtext,
@@ -4601,6 +4603,7 @@ Public Class Player
                 .Image = toastImg
             }
             Skye.UI.Toast.ShowToast(npo)
+
         End If
     End Sub
     Private Sub RestartMeterCapture()
